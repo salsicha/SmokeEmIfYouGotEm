@@ -3,7 +3,25 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact parallel CFL scan and engine integration](../reconstruction-review-2026-09-07/solver-cfl-rows.md).
+Latest: [SM5 cook failure and verified shader corrections](../reconstruction-review-2026-09-07/sm5-cook-recovery.md).
+Package session80881 is TERMINAL FAILED (UAT25, cook3):36 SM5 shader errors;
+no archive exists. Do not keep polling old cook16144 or restart unchanged.
+Fixed prescribed-normal variable-index stores and group-uniform acceleration
+barrier guards:12 focused SM5 compiler cases PASS;2 actual D3D12/SM6 native
+tests PASS, including unchanged numerical and bit-exact controls. Full cook,
+SM5 GPU execution, pressure/transport compiler failures remain OPEN.
+Isolated prepare-unroll probe session13666/PID15160 is LIVE, not production;
+poll that same job, do not assume its annotation is a fix or restart on timeout.
+New packaged-source runner checks all444 retained identities plus runtime
+closure and fresh non-editor evidence;96 related Python tests PASS. Not yet
+executed against a package. Latest Game18d9e4b2... remains the required binary.
+SAME hydraulic18716/session69416:1500/1550s cell AND all86,720 exact-dry bank
+checks PASS; NOT settled (latest86.619794out vs45.306955in). NEXT local8000 /
+absolute1600s audits. Last ordinary17.819710FPS / p9581.6343ms still FAILS30FPS.
+Visual/physical/default integration and all later rivers/crew/release stay OPEN.
+Troublemaker remains a rapid within South Fork, never a separate menu scenario.
+
+Previous: [exact parallel CFL scan and engine integration](../reconstruction-review-2026-09-07/solver-cfl-rows.md).
 All4 native tests PASS; independent original-scan/rounding/storage controls PASS.
 Two fixed four-pair source replays preserve all44 paired frames each exactly;
 all8 candidates faster, median solve/capture reductions8.08% and13.20%. These

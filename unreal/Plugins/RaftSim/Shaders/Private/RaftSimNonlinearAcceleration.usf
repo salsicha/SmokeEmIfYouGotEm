@@ -102,6 +102,7 @@ groupshared float4 Shared[256];
 groupshared float2 Scale,Rz,Norm,Alpha,Beta;
 groupshared int2 ScaleExponent,RatioExponent;
 groupshared uint2 Active;
+groupshared uint GroupInvalid,GroupInactive;
 float4 Reduce(float4 v,uint lane,bool maximum)
 {
     Shared[lane]=v;GroupMemoryBarrierWithGroupSync();
@@ -157,7 +158,12 @@ void MainCS(uint lane:SV_GroupIndex)
     uint count=GridSize.x*GridSize.y;
     // Every lane executes every barrier, including lanes with no owned cells.
     // The entire grid belongs to this one group; never dispatch extra groups.
-    if(Diagnostics[0]!=0)
+    // An SRV/UAV read is not a compiler-proven group-uniform value on SM5,
+    // even at constant index zero. Broadcast once before any early return so
+    // every lane demonstrably reaches the same subsequent barriers.
+    if(lane==0)GroupInvalid=Diagnostics[0];
+    GroupMemoryBarrierWithGroupSync();
+    if(GroupInvalid!=0)
     { for(uint i=lane;i<count;i+=256){Solution[i]=0;TrueResidual[i]=-RightHandSide[i];}return; }
     float4 peak=0;
     for(uint i=lane;i<count;i+=256)peak=max(peak,abs(RightHandSide[i]));
@@ -236,7 +242,15 @@ void MainCS(uint lane:SV_GroupIndex)
 void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_GroupIndex)
 {
     uint i=id.x,count=GridSize.x*GridSize.y;
-    if(Diagnostics[0]!=0)
+    if(lane==0)
+    {
+        GroupInvalid=Diagnostics[0];
+#if RAFTSIM_ACCELERATION_PHASE >= 6 && RAFTSIM_ACCELERATION_PHASE <= 10
+        GroupInactive=all(Control[3].xy==0)?1:0;
+#endif
+    }
+    GroupMemoryBarrierWithGroupSync();
+    if(GroupInvalid!=0)
     {
 #if RAFTSIM_ACCELERATION_PHASE == 11
         if(i<count){Solution[i]=0;Direction[i]=0;}
@@ -271,13 +285,13 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
     // Also used for the final true residual, even when both poles converged.
     if(i<count)WValue[i]=Fraction(i)*ApplyW(i);
 #elif RAFTSIM_ACCELERATION_PHASE == 6
-    if(all(Control[3].xy==0))return;
+    if(GroupInactive!=0)return;
     float2 sums=0;
     if(i<count){float4 a=ApplyA(i);Scratch[i]=a;sums=PairDot(Direction[i],a);}
     float4 reduced=Reduce(float4(sums,0,0),lane,false);
     if(lane==0)Partial[group.x]=reduced;
 #elif RAFTSIM_ACCELERATION_PHASE == 7
-    if(all(Control[3].xy==0))return;
+    if(GroupInactive!=0)return;
     float4 sums=0;for(uint j=lane;j<PartialCount;j+=256)sums+=Partial[j];
     sums=Reduce(sums,lane,false);
     if(lane==0)
@@ -291,7 +305,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
         Control[2]=float4(alpha,0,0);Control[3]=float4(active,0,0);
     }
 #elif RAFTSIM_ACCELERATION_PHASE == 8
-    if(all(Control[3].xy==0))return;
+    if(GroupInactive!=0)return;
     float4 sums=0,r=0;
     if(i<count)
     {
@@ -305,7 +319,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
     sums=Reduce(sums,lane,false);
     if(lane==0){Partial[group.x]=sums;PartialExponents[group.x]=float2(exponent);}
 #elif RAFTSIM_ACCELERATION_PHASE == 9
-    if(all(Control[3].xy==0))return;
+    if(GroupInactive!=0)return;
     float2 exponent=-512;for(uint j=lane;j<PartialCount;j+=256)exponent=max(exponent,PartialExponents[j]);
     float4 peaks=Reduce(float4(exponent,exponent),lane,true);int2 ratio=int2(peaks.xy);
     GroupMemoryBarrierWithGroupSync();
@@ -325,7 +339,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
         Control[0]=float4(Control[0].xy+ratio,0,0);Control[4]=float4(ratio,0,0);
     }
 #elif RAFTSIM_ACCELERATION_PHASE == 10
-    if(all(Control[3].xy==0))return;
+    if(GroupInactive!=0)return;
     if(i<count)
     {float4 r=ScalePower(Residual[i],-int2(Control[4].xy));Residual[i]=r;
         Direction[i]=r/Diagonal[i]+PairScale(Control[2].zw)*Direction[i];}

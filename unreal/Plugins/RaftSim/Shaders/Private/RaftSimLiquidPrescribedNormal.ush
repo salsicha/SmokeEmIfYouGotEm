@@ -12,13 +12,17 @@ float3 RaftSimLiquidPrescribedNormalPosition(float3 start,float3 candidate,float
     int axis=abs(inwardNormal.x)>=abs(inwardNormal.y)?0:1;
     FDFScalar actual=RaftSimLiquidPhysicalDot(DFTwoSum(candidate,-start),inwardNormal);
     FDFScalar residual=DFSubtract(actual,travel);
-    candidate[axis]=DFDemote(DFSubtract(DFPromote(candidate[axis]),DFDivide(residual,inwardNormal[axis])));
+    float corrected=DFDemote(DFSubtract(DFPromote(candidate[axis]),DFDivide(residual,inwardNormal[axis])));
+    // FXC cannot address a vector component through a variable l-value. Keep
+    // the same dominant-axis arithmetic and store only that named component.
+    if(axis==0) candidate.x=corrected; else candidate.y=corrected;
     actual=RaftSimLiquidPhysicalDot(DFTwoSum(candidate,-start),inwardNormal);
     if(DFLess(actual,travel))
     {
         float value=candidate[axis];
-        if(value==0) candidate[axis]=inwardNormal[axis]>0 ? asfloat(0x00800000u):-asfloat(0x00800000u);
-        else candidate[axis]=asfloat(asuint(value)+((value>0)==(inwardNormal[axis]>0)?1u:0xffffffffu));
+        if(value==0) corrected=inwardNormal[axis]>0 ? asfloat(0x00800000u):-asfloat(0x00800000u);
+        else corrected=asfloat(asuint(value)+((value>0)==(inwardNormal[axis]>0)?1u:0xffffffffu));
+        if(axis==0) candidate.x=corrected; else candidate.y=corrected;
     }
     return candidate;
 }
