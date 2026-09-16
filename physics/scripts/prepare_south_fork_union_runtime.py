@@ -21,7 +21,31 @@ def wet_flags(depth):
     return dict(solver_wet=bool(depth>1.e-6),native_sample_wet=bool(depth>1.e-4))
 
 
-def prepare(export,probes_path,output):
+def choose_window(stream,points,requested_center=None):
+    points=np.asarray(points,dtype=float)
+    if points.ndim!=2 or points.shape[1]!=2 or not len(points) or not np.isfinite(points).all():
+        raise ValueError('Finite nonempty horizontal query points required')
+    desired=(points.min(axis=0)+points.max(axis=0))*.5
+    if requested_center is not None:
+        desired=np.asarray(requested_center,dtype=float)
+        if desired.shape!=(2,) or not np.isfinite(desired).all():
+            raise ValueError('Finite two-coordinate requested center required')
+    # Leave four real cells around EVERY query inside the unchanged224m crop.
+    admissible_low=points.max(axis=0)-108;admissible_high=points.min(axis=0)+108
+    candidates=[]
+    for window in stream['windows']:
+        for rect in window['valid_live_center_bounds_m']:
+            low=np.maximum(rect[:2],admissible_low);high=np.minimum(rect[2:],admissible_high)
+            if np.any(low>high):continue
+            if requested_center is not None and (np.any(desired<low) or np.any(desired>high)):continue
+            center=np.clip(desired,low,high)
+            candidates.append((float(np.sum((center-desired)**2)),window['cooked_fields_manifest'],center))
+    if not candidates:raise ValueError('No validated full runtime window contains all collision cells at the requested center')
+    _,manifest,center=min(candidates,key=lambda p:(p[0],p[1]))
+    return manifest,center
+
+
+def prepare(export,probes_path,output,requested_center=None):
     export=Path(export).resolve();probes_path=Path(probes_path).resolve();output=Path(output).resolve()
     if output.exists() or not output.is_relative_to(ROOT/'tmp'):raise ValueError('Fresh project tmp expectations required')
     probes=json.loads(probes_path.read_text());atlas_path=export/'atlas/manifest.json'
@@ -41,17 +65,7 @@ def prepare(export,probes_path,output):
         values=np.load(path,allow_pickle=False,mmap_mode='r')
         fields[name]=values[cells[:,0]*80+cells[:,1],cells[:,2]]
         dependencies[path.relative_to(ROOT).as_posix()]=meta['sha256']
-    candidates=[];desired=(points.min(axis=0)+points.max(axis=0))*.5
-    # Leave four real cells around every query, inside the unchanged 224 m crop.
-    admissible_low=points.max(axis=0)-108;admissible_high=points.min(axis=0)+108
-    for window in stream['windows']:
-        for rect in window['valid_live_center_bounds_m']:
-            low=np.maximum(rect[:2],admissible_low);high=np.minimum(rect[2:],admissible_high)
-            if np.any(low>high):continue
-            center=np.clip(desired,low,high)
-            candidates.append((float(np.sum((center-desired)**2)),window['cooked_fields_manifest'],center))
-    if not candidates:raise ValueError('No validated full runtime window contains all collision cells')
-    _,manifest,center=min(candidates,key=lambda p:(p[0],p[1]))
+    manifest,center=choose_window(stream,points,requested_center)
     for i,row in enumerate(rows):
         if abs(fields['bed'][i]*100-row['world_position_cm'][2])>1.e-8:
             raise ValueError('Actual exported runtime bed differs from collision source')
@@ -73,4 +87,5 @@ def prepare(export,probes_path,output):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('export',type=Path)
     p.add_argument('--probes',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
-    a=p.parse_args();print(json.dumps(prepare(a.export,a.probes,a.output),indent=2),flush=True)
+    p.add_argument('--center',type=float,nargs=2,help='Exact comparison center; never clamped or allowed to drop query margins')
+    a=p.parse_args();print(json.dumps(prepare(a.export,a.probes,a.output,a.center),indent=2),flush=True)
