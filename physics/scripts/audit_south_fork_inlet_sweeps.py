@@ -24,6 +24,7 @@ from subcell_inlet_face_transport import source_transport_balance
 from subcell_inlet_hydrostatic_force import source_hydrostatic_force
 from subcell_inlet_lateral_flux import lateral_flux
 from subcell_inlet_lateral_energy import lateral_energy_flux
+from subcell_inlet_front_ownership import owned_front_transfers
 from subcell_source_activation import assembly
 
 
@@ -84,6 +85,7 @@ def route(part, fronts, on_face=None):
             original_donor_transport=donor_transport,
             original_receiver_lateral_flux=lateral_flux(sweep, fragments[receiver]),
             original_receiver_lateral_energy=lateral_energy_flux(sweep, fragments[receiver]),
+            single_stream_owned_lateral_front=owned_front_transfers(sweep, fragments),
             above_receiver_minimum=not front['receiving_face_contact']['contact_starts_at_birth'],
             physical_update_accepted=False)
         if float(incoming[1]) == 0 or float(sweep.time_root**3) == 0:
@@ -201,9 +203,13 @@ def main():
     if any(sha(Path(path)) != digest for path, digest in hashes.items()):
         raise ValueError('Source or implementation changed during inlet audit')
     routed = [r for r in records if r['status'] == 'source-clipped-conditional-geometry']
+    # Dry-side sources need not appear among positive-water pieces.
+    front_sources = {key for r in records
+        for t in r.get('single_stream_owned_lateral_front', {}).get('transfers', [])
+        for key in (t['wet_source'], t['dry_source']) if key is not None}
     provenance = [dict(parent=p, source_id=s, original_cell=indices[p],
         authority_codes=sorted(set(map(int, authority[sampler.faces[s]].ravel()))))
-        for p, s in sorted({(p['parent'], p['source_id']) for r in routed for p in r['pieces']} | witness_sources)]
+        for p, s in sorted({(p['parent'], p['source_id']) for r in routed for p in r['pieces']} | witness_sources | front_sources)]
     report = dict(schema='raftsim.south_fork.inlet_sweep_geometry.v1', accepted=False,
         rational_encoding='decimal-string-or-tagged-fraction_hex.v1',
         source_sha256=hashes, source_time_seconds=source['source_time_seconds'],
@@ -220,6 +226,7 @@ def main():
         face_transport_scope='Time-integrated conditional advective flux on every original edge of every routed source; incoming minus outgoing balances the non-horizontal stored profile. Original inlet inflow requires coupled donor debit. No pressure, bed-force, receding/fan or physical time-step acceptance.',
         hydrostatic_force_scope='Instantaneous interior-trace hydrostatic/bed momentum residual of the non-horizontal profile, including finite-depth lateral-front pressure jumps. Boundary-aligned wet/dry traces are NOT a common numerical flux. Lateral spreading/front law and nonhydrostatic/curvature/time coupling remain unaccepted.',
         lateral_energy_scope='Instantaneous energy transfer of the same local homogeneous dry-front fan as lateral mass/momentum; includes pressure work and original affine bed potential with datum zero. Correlated wet debit/dry credit must be owned once. Not a finite-time 2D or dispersive energy update.',
+        lateral_ownership_scope='Each conditional stream partitions its entire side ray once in exact entry-time coordinates, including positive sub-float intervals. Each common transfer has distinct signed wet/dry domain references. Missing original sources remain explicit; source overlap and bed-trace mismatch reject. This does not establish initial dry-state, evolving pool or multi-stream ownership, nor a finite-time update. Legacy per-piece closed-boundary queries remain diagnostic and must not be summed.',
         initially_owned_source_streams=sum(r['enters_initially_owned_source'] for r in routed),
         proven_initial_wet_overlap_streams=sum(r['initial_wet_overlap_proven'] for r in routed),
         possible_initial_wet_overlap_streams=sum(r['initial_wet_overlap_possible'] for r in routed),

@@ -3,7 +3,18 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [same-front hydrostatic energy transfer](../reconstruction-review-2026-09-07/normal-river-inlet-lateral-energy.md).
+Latest: [single front ownership](../reconstruction-review-2026-09-07/normal-river-front-ownership.md).
+Exact whole-ray source partitions assign one common transfer with signed wet/dry
+domain references; overlap and mismatched beds reject, missing owners stay explicit.
+69 focused PASS; actual11 streams:10 paired,1 positive ray outside the audited
+block remains unresolved. All old record fields and613 source hashes verified.
+Final672 PASS/13 unchanged FAIL, no errors/skips or relaxed gates. NOT a coupled
+step, installed physics/visual improvement or pressure fix. Same LIVE cook17516:
+4050/4100/4150 state AND86,720 dry banks PASS, NOT settled(4150:95.805445out/
+45.306955in). Next4200/local12000 needs marker AND both audits. No new FPS;
+last25.907729/p9544.7123ms FAIL30. Full ordered scene/crew/release scope stays OPEN.
+
+Previous: [same-front hydrostatic energy transfer](../reconstruction-review-2026-09-07/normal-river-inlet-lateral-energy.md).
 Added bounded instantaneous energy flux of the SAME local dry-front fan,
 including pressure work and original bed potential.66 focused PASS. Actual
 28 energy queries preserve all original mass/momentum/piece fields and612
