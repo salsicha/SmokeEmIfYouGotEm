@@ -1,0 +1,50 @@
+#ifndef RAFTSIM_FROTH_DEPARTURE
+#define RAFTSIM_FROTH_DEPARTURE
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimRegisteredDetailSample.ush"
+
+// Optical characteristics in ONE frozen, paired mean-current frame. This is
+// not historical fluid advection, new foam production or surface displacement.
+bool RaftSimFrothVelocity(Texture2D<float4> flow,float2 local,float cell,
+    int2 size,out float2 velocity)
+{
+    float2 q=local/cell;
+    velocity=0;
+    if(!all(isfinite(q)) || any(q<0) || any(q>float2(size-1)))return false;
+    int2 i=min(int2(floor(q)),size-2);float2 f=q-i;
+    float4 value=lerp(lerp(flow.Load(int3(i,0)),flow.Load(int3(i+int2(1,0),0)),f.x),
+        lerp(flow.Load(int3(i+int2(0,1),0)),flow.Load(int3(i+1,0)),f.x),f.y);
+    if(!all(isfinite(value)) || value.x<=.01)return false;
+    velocity=value.yz;return true;
+}
+
+// xy is displacement, z is the existing ownership blend. A failed path returns
+// the original local-velocity departure with weight zero; no edge clamping or
+// invented dry-cell velocity. Integrate displacement to avoid repeated rounding
+// of kilometre-scale world coordinates at each substep.
+float3 RaftSimFrothDeparture(Texture2D<float4> detail,Texture2D<float4> flow,
+    float2 fieldM,float2 fallback,float seconds,float enable,uint steps)
+{
+    float3 legacy=float3(fallback*seconds,0);
+    uint width,height,fw,fh;detail.GetDimensions(width,height);flow.GetDimensions(fw,fh);
+    if(width<2 || height<3 || fw!=width || fh!=height || steps==0 || steps>64 ||
+        !isfinite(seconds) || seconds<0 || seconds>1)return legacy;
+    float4 origin=detail.Load(int3(0,height-1,0)),clock=detail.Load(int3(1,height-1,0));
+    if(!all(isfinite(origin)) || origin.w!=1 || origin.z<=0 || !all(isfinite(clock)) ||
+        (clock.w!=2 && clock.w!=3) || clock.z!=0 ||
+        any(origin!=flow.Load(int3(0,height-1,0))) ||
+        any(clock!=flow.Load(int3(1,height-1,0))))return legacy;
+    float weight=RaftSimRegisteredDetailWindowWeight(detail,fieldM)*saturate(enable);
+    if(weight<=0)return legacy;
+    float2 local=fieldM-origin.xy,displacement=0,velocity;
+    float dt=seconds/steps;int2 size=int2(width,height-1);
+    [loop]for(uint i=0;i<steps;++i)
+    {
+        if(!RaftSimFrothVelocity(flow,local-displacement,origin.z,size,velocity))return legacy;
+        float2 middle=local-displacement-.5*dt*velocity;
+        if(!RaftSimFrothVelocity(flow,middle,origin.z,size,velocity))return legacy;
+        displacement+=dt*velocity;
+    }
+    if(!RaftSimFrothVelocity(flow,local-displacement,origin.z,size,velocity))return legacy;
+    return float3(displacement,weight);
+}
+#endif

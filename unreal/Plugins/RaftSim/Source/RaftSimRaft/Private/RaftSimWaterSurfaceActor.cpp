@@ -1511,6 +1511,18 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
 #if !UE_BUILD_SHIPPING
     if(GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
         FParse::Param(FCommandLine::Get(),TEXT("RaftSimEphemeralProfile")) &&
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimFrothDepartureReview")))
+    {
+        auto* Review=LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/FrothDeparture/M_SouthForkFrothDepartureV2"));
+        if(Review)
+        {
+            LiveVolumeCoreMaterial=Review;
+            UE_LOG(LogTemp,Display,TEXT("Froth departure review: frozen paired current, existing single carrier; not physical or visual acceptance"));
+        }
+        else UE_LOG(LogTemp,Error,TEXT("Froth departure material unavailable; no review acceptance"));
+    }
+    if(GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimEphemeralProfile")) &&
         FParse::Param(FCommandLine::Get(),TEXT("RaftSimOpticalNormalFilterReview")))
     {
         FString Variant;

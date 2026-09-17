@@ -3,7 +3,15 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [finer crest lookup rejected](../reconstruction-review-2026-09-07/fine-crest-index-rejected.md).
+Latest: [frozen-current froth experiment](../reconstruction-review-2026-09-07/froth-frozen-characteristics.md).
+Opt-in single-carrier review only; installed gameplay/material unchanged.
+28 focused tests PASS including hardware/WARP shader execution. Frozen-field
+departures improve numerically, but inspected captures do not establish
+convincing breaking/froth. Reference/candidate both FAIL 30 FPS: 29.044752 /
+28.674556 FPS, p95 39.4775 / 39.2346 ms. Do not promote. Full physical, visual,
+motion, scenario, crew and release gates remain OPEN.
+
+Previous: [finer crest lookup rejected](../reconstruction-review-2026-09-07/fine-crest-index-rejected.md).
 29 native PASS,398,145 exact fixture queries; actual1,200-frame audit preserves
 125,947,647 queries exactly. Four audit-free coarse/fine/fine/coarse runs fail
 repeatable speed qualification and30FPS: fine27.312398/27.768909FPS,
