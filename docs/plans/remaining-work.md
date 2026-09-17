@@ -3,7 +3,21 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [adjacent crest range cache rejected](../reconstruction-review-2026-09-07/adjacent-crest-range-rejected.md).
+Latest: [same-front hydrostatic energy transfer](../reconstruction-review-2026-09-07/normal-river-inlet-lateral-energy.md).
+Added bounded instantaneous energy flux of the SAME local dry-front fan,
+including pressure work and original bed potential.66 focused PASS. Actual
+28 energy queries preserve all original mass/momentum/piece fields and612
+source hashes. Large exact width scale now survives lossless tagged-hex JSON;
+the failed partial v1 report is retained. Full suite654 PASS/13 unchanged FAIL,
+no errors/skips or relaxed gates. NOT a coupled step or pressure fix.
+Full nonlinear/dry/energy/runtime and physical breaking/froth gates stay OPEN.
+Same LIVE cook17516/start2026-09-17T12:52:03.0749210Z:4000 state AND86,720 dry banks
+PASS, NOT settled(92.421242out/45.306955in). Next4050/local9000 requires marker AND
+both audits. No installed changes or new visual/FPS claim; last25.907729FPS/
+p9544.7123ms FAIL30. Full ordered scene/crew/normalization/regression/release
+scope remains; Troublemaker is a rapid within South Fork, not a scenario.
+
+Previous: [adjacent crest range cache rejected](../reconstruction-review-2026-09-07/adjacent-crest-range-rejected.md).
 Two actual64-pair histories preserve8,636,720 expanded vertices exactly, but
 the second fails the both-order speed gate. Cache remains diagnostic-only;
 no installed runtime/material/terrain changed. Final native29 and Python74 PASS.

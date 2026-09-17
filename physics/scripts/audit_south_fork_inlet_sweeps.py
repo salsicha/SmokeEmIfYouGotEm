@@ -11,6 +11,7 @@ from pathlib import Path
 import math
 
 import numpy as np
+from exact_rational_json import json_default
 
 from audit_south_fork_nonlinear_source_block import load_original_block
 from audit_south_fork_secondary_fronts import analyze
@@ -22,6 +23,7 @@ from subcell_inlet_stream_overlap import simultaneous_pairs, signed_area
 from subcell_inlet_face_transport import source_transport_balance
 from subcell_inlet_hydrostatic_force import source_hydrostatic_force
 from subcell_inlet_lateral_flux import lateral_flux
+from subcell_inlet_lateral_energy import lateral_energy_flux
 from subcell_source_activation import assembly
 
 
@@ -81,6 +83,7 @@ def route(part, fronts, on_face=None):
             primary_height=height, full_incoming_moments=incoming,
             original_donor_transport=donor_transport,
             original_receiver_lateral_flux=lateral_flux(sweep, fragments[receiver]),
+            original_receiver_lateral_energy=lateral_energy_flux(sweep, fragments[receiver]),
             above_receiver_minimum=not front['receiving_face_contact']['contact_starts_at_birth'],
             physical_update_accepted=False)
         if float(incoming[1]) == 0 or float(sweep.time_root**3) == 0:
@@ -107,6 +110,7 @@ def route(part, fronts, on_face=None):
                 if key != donor:
                     piece['conditional_hydrostatic_force'] = source_hydrostatic_force(sweep, fragment)
                     piece['conditional_lateral_flux'] = lateral_flux(sweep, fragment)
+                    piece['conditional_lateral_energy'] = lateral_energy_flux(sweep, fragment)
                 if key in occupied:
                     pool_index, form = occupied[key]
                     piece['initial_wet_support'] = dict(pool_index=pool_index,
@@ -201,6 +205,7 @@ def main():
         authority_codes=sorted(set(map(int, authority[sampler.faces[s]].ravel()))))
         for p, s in sorted({(p['parent'], p['source_id']) for r in routed for p in r['pieces']} | witness_sources)]
     report = dict(schema='raftsim.south_fork.inlet_sweep_geometry.v1', accepted=False,
+        rational_encoding='decimal-string-or-tagged-fraction_hex.v1',
         source_sha256=hashes, source_time_seconds=source['source_time_seconds'],
         original_block_col_row=[args.block_col, args.block_row], origin_registered_m=origin,
         records=records, provenance=provenance, original_water_unchanged=True,
@@ -214,6 +219,7 @@ def main():
             p['conditional_face_transport']['maximum_relative_balance_width'] for r in routed for p in r['pieces']),
         face_transport_scope='Time-integrated conditional advective flux on every original edge of every routed source; incoming minus outgoing balances the non-horizontal stored profile. Original inlet inflow requires coupled donor debit. No pressure, bed-force, receding/fan or physical time-step acceptance.',
         hydrostatic_force_scope='Instantaneous interior-trace hydrostatic/bed momentum residual of the non-horizontal profile, including finite-depth lateral-front pressure jumps. Boundary-aligned wet/dry traces are NOT a common numerical flux. Lateral spreading/front law and nonhydrostatic/curvature/time coupling remain unaccepted.',
+        lateral_energy_scope='Instantaneous energy transfer of the same local homogeneous dry-front fan as lateral mass/momentum; includes pressure work and original affine bed potential with datum zero. Correlated wet debit/dry credit must be owned once. Not a finite-time 2D or dispersive energy update.',
         initially_owned_source_streams=sum(r['enters_initially_owned_source'] for r in routed),
         proven_initial_wet_overlap_streams=sum(r['initial_wet_overlap_proven'] for r in routed),
         possible_initial_wet_overlap_streams=sum(r['initial_wet_overlap_possible'] for r in routed),
@@ -221,9 +227,12 @@ def main():
         contact_time_scope='First positive-overlap infimum for the conditional constant-velocity sweep against STATIC original wet support. All wet sources tested, including outside the current footprint. Does not evolve the existing pool, couple pressure or merge streams.',
         scope='Constant-velocity leading outward inlet geometry only. Exact initial wet-support intersections do not merge or step independent streams. Fan, source crossings, pressure/force, time and native/gameplay integration remain open.',
         authority_note='1 captured DEM; 3 exposed rock; 2 submerged prior, 4 interpolation, 5 inferred flank. Rational coordinates add no measured precision.')
+    # Validate complete serialization before creating a fresh evidence file.
+    # Large positive sub-float rationals stay exact without changing the
+    # process-wide decimal conversion safeguard or deleting their fields.
+    payload = json.dumps(report, indent=2, allow_nan=False, default=json_default)
     with args.report.open('x') as stream:
-        json.dump(report, stream, indent=2, allow_nan=False,
-                  default=lambda value: str(value) if isinstance(value, F) else value.tolist())
+        stream.write(payload)
     print(json.dumps(dict(routed=len(routed), total=len(records),
         maximum_moment_uncertainty=report['maximum_relative_moment_uncertainty'])), flush=True)
     return 0 if report['conditional_geometry_controls_passed'] else 1
