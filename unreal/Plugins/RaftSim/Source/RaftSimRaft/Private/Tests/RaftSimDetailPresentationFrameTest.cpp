@@ -21,6 +21,8 @@ bool FRaftSimDetailPresentationFrameTest::RunTest(const FString&)
     for (int32 Y=0;Y<Ny;++Y) for (int32 X=0;X<Nx;++X)
         Expected->Pixels[Y*Nx+X]=FVector4f(.04f*FMath::Sin(X*.31f)*FMath::Cos(Y*.43f),X*.003f,Y*-.005f,(X+Y)*.02f);
     Expected->Pixels[Nx*Ny]=FVector4f(-5439,3606,.5f,1);
+    TArray<FVector4f> InputFlow;InputFlow.Init(FVector4f(2,3,-4,.2f),Nx*Ny);
+    const auto OriginalFlow=InputFlow;
     auto Mailbox=MakeShared<FRaftSimDetailFrameMailbox,ESPMode::ThreadSafe>();
     auto Slot=MakeShared<FRaftSimDetailFrameReadback,ESPMode::ThreadSafe>();
     FTextureRHIRef Candidate;
@@ -30,7 +32,8 @@ bool FRaftSimDetailPresentationFrameTest::RunTest(const FString&)
             .SetFlags(ETextureCreateFlags::ShaderResource).SetInitialState(ERHIAccess::CopyDest));
         Cmd.UpdateTexture2D(Candidate,0,FUpdateTextureRegion2D(0,0,0,0,Nx,Ny+1),Nx*sizeof(FVector4f),reinterpret_cast<const uint8*>(Expected->Pixels.GetData()));
         Cmd.Transition(FRHITransitionInfo(Candidate,ERHIAccess::CopyDest,ERHIAccess::SRVMask));
-        Slot->Enqueue(Cmd,Candidate,Expected->Size,Expected->Sequence,Expected->ElapsedSeconds,Expected->SimulationSeconds);
+        Slot->Enqueue(Cmd,Candidate,Expected->Size,Expected->Sequence,Expected->ElapsedSeconds,Expected->SimulationSeconds,false,&InputFlow);
+        InputFlow.Init(FVector4f(8,-9,12,.8f),Nx*Ny);
         // Simulation may overwrite its candidate while the queued copy and
         // the currently presented frame retain independent ownership.
         auto NewPixels=Expected->Pixels;NewPixels[Nx*Ny].X+=8;NewPixels[20].X+=.07f;
@@ -50,6 +53,14 @@ bool FRaftSimDetailPresentationFrameTest::RunTest(const FString&)
     }
     if (!TestTrue(TEXT("production nonblocking slot returns completed registered data"),PollOK && Frame.IsValid()))return false;
     TestEqual(TEXT("readback inserts captured host clock marker, not wall time"),Frame->Pixels[Nx*Ny+1].W,3.f);
+    bool ExactFlow=Frame->FoamFlowPixels.Num()==Nx*(Ny+1);
+    if(ExactFlow)
+    {
+        for(int32 I=0;I<Nx*Ny;++I)ExactFlow &= Frame->FoamFlowPixels[I]==OriginalFlow[I];
+        for(int32 I=Nx*Ny;I<Nx*(Ny+1);++I)ExactFlow &= Frame->FoamFlowPixels[I]==Frame->Pixels[I];
+    }
+    TestTrue(TEXT("flow and exact registration/clock survive later source overwrite"),ExactFlow);
+    TestTrue(TEXT("paired flow samples the original captured current"),Frame->SampleFoamFlow(FVector2f(-5438,3607))==FVector4f(2,3,-4,.2f));
     TestTrue(TEXT("expected payload gains only captured clock metadata"),Expected->WriteHostClockMetadata());
     TestTrue(TEXT("padded texture rows, metadata, clock and pixels survive candidate overwrite exactly"),
         Frame->Pixels==Expected->Pixels && Frame->Sequence==2 && Frame->ElapsedSeconds==2 && Frame->SimulationSeconds==1.99);
@@ -100,6 +111,29 @@ bool FRaftSimDetailPresentationFrameTest::RunTest(const FString&)
     FlushRenderingCommands();
     TestTrue(TEXT("CPU support samples the same reuploaded registered frame as the actual GPU material helper"),ReadOK && Finite && MaxError<1.e-6f);
     AddInfo(FString::Printf(TEXT("Completed GPU frame copy/reupload/registered sampler: %d queries, max RGBA error %.9g; includes far data edge, outside and overwritten simulation candidate"),Queries.Num(),MaxError));
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimPairedFoamFlowFrameTest,"RaftSim.WaterDetail.PairedFoamFlowFrame",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimPairedFoamFlowFrameTest::RunTest(const FString&)
+{
+    FRaftSimDetailPresentationFrame F;F.Size=FIntPoint(2,2);F.Sequence=1;F.SimulationSeconds=1.99;
+    F.Pixels.Init(FVector4f(0,0,0,0),6);F.Pixels[4]=FVector4f(-5439,3606,.5f,1);
+    TestTrue(TEXT("fixture clock installed"),F.WriteHostClockMetadata());
+    TArray<FVector4f> Flow;Flow.Init(FVector4f(1,2,3,.5f),4);
+    auto Bad=Flow;Bad[0].Y=std::numeric_limits<float>::quiet_NaN();
+    TestFalse(TEXT("nonfinite current is rejected"),F.AttachFoamFlow(Bad));
+    Bad=Flow;Bad.Pop();TestFalse(TEXT("incomplete current is rejected"),F.AttachFoamFlow(Bad));
+    TestTrue(TEXT("failed attachments leave the frame untouched"),F.FoamFlowPixels.IsEmpty() && F.Validate());
+    TestTrue(TEXT("exact input attachment succeeds"),F.AttachFoamFlow(Flow));
+    TestFalse(TEXT("an attached immutable current cannot be replaced"),F.AttachFoamFlow(Flow));
+    auto Moved=F;Moved.FoamFlowPixels[4].X+=.5f;
+    TestFalse(TEXT("mismatched current origin rejected"),Moved.Validate());
+    auto Retimed=F;Retimed.FoamFlowPixels[5].X+=1;
+    TestFalse(TEXT("mismatched current clock rejected"),Retimed.Validate());
+    TestTrue(TEXT("outside does not clamp or wrap foam current"),F.SampleFoamFlow(FVector2f(-6000,3606))==FVector4f(0,0,0,0));
+    TestTrue(TEXT("far data edge never samples metadata"),F.SampleFoamFlow(FVector2f(-5438.5,3606.5))==Flow[3]);
     return !HasAnyErrors();
 }
 #endif

@@ -21,6 +21,7 @@
 #include "RaftSimWaterTextureHistory.h"
 #include "RaftSimFoamTransportFrame.h"
 #include "RaftSimFoamEvolution.h"
+#include "RaftSimFoamFlowPairAudit.h"
 #include "RaftSimPlayableCrestMesh.h"
 #include "RaftSimCarrierShapeAudit.h"
 #include "Async/ParallelFor.h"
@@ -8638,6 +8639,8 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             LiveVolumeCoreTriangleCount=CartesianShorelineMesh->GetWaterIndices().Num()/3;
         }
         Perf.Mark(TEXT("clip_bounds_enqueue"));
+        if(MovingDetail && GetWorld())RaftSimFoamFlowPairAudit::Run(CartesianShorelineMesh->GetWaterVertices(),
+            MovingDetail->GetPresentedFrame(),WaterAdapter->GetRiverWorldYSign(),GetWorld()->GetTimeSeconds());
 #if !UE_BUILD_SHIPPING
         FString ShapeAuditPath;
         if (bFineCrests && GetWorld() && GetWorld()->GetTimeSeconds()>=13.f &&

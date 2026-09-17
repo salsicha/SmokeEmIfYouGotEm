@@ -591,8 +591,9 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
             ++Shared->FrameSequence;bool bCopied=false;
             for (auto& Slot:Shared->FrameReadbacks) if (!Slot->Sequence)
             {
+                static const bool CaptureFoamFlow=[]{FString P;return FParse::Value(FCommandLine::Get(),TEXT("RaftSimFoamFlowPairAudit="),P);}();
                 Slot->Enqueue(Cmd,Target->GetRenderTargetTexture(),Grid.Size,Shared->FrameSequence,
-                    CaptureElapsed,Shared->Simulation.GetSimulationSeconds());bCopied=true;break;
+                    CaptureElapsed,Shared->Simulation.GetSimulationSeconds(),false,CaptureFoamFlow?&Flow:nullptr);bCopied=true;break;
             }
             if (!bCopied) ++Shared->SkippedFrameCopies; // Hold the paired presented frame, never stall the PDE.
         }

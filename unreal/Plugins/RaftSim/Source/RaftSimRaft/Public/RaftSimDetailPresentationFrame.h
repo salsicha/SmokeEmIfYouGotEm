@@ -12,6 +12,18 @@ struct FRaftSimDetailPresentationFrame
     uint64 Sequence=0;
     double ElapsedSeconds=0,SimulationSeconds=0;
     bool bGPUClockMetadata=false;
+    // Optional exact mean-flow input captured with the completed legacy step.
+    // H,U,V,source data plus the SAME registration/clock row as Pixels.
+    // This is transport evidence, not a second water surface or new momentum.
+    TArray<FVector4f> FoamFlowPixels;
+    bool AttachFoamFlow(TConstArrayView<FVector4f> Flow)
+    {
+        if(!FoamFlowPixels.IsEmpty() || !Validate() || Flow.Num()!=int64(Size.X)*Size.Y)return false;
+        for(const auto& F:Flow)if(F.ContainsNaN())return false;
+        FoamFlowPixels.Append(Flow.GetData(),Flow.Num());
+        FoamFlowPixels.Append(Pixels.GetData()+Size.X*Size.Y,Size.X);
+        return true;
+    }
     // Attach the host timestamp captured WITH this legacy GPU readback.
     bool WriteHostClockMetadata()
     {
@@ -50,20 +62,28 @@ struct FRaftSimDetailPresentationFrame
             const float High=float(SimulationSeconds),Low=float(SimulationSeconds-double(High));
             if(Clock.Z!=0.f || Clock.X!=High || Clock.Y!=Low)return false;
         }
+        if(!FoamFlowPixels.IsEmpty())
+        {
+            if(FoamFlowPixels.Num()!=Pixels.Num())return false;
+            for(const auto& F:FoamFlowPixels)if(F.ContainsNaN())return false;
+            for(int32 I=Size.X*Size.Y;I<Pixels.Num();++I)if(FoamFlowPixels[I]!=Pixels[I])return false;
+        }
         return true;
     }
-    FVector4f SampleField(FVector2f FieldM) const
+    FVector4f SamplePayload(const TArray<FVector4f>& Payload,FVector2f FieldM) const
     {
-        if (Size.X<2 || Size.Y<2 || Pixels.Num()!=int64(Size.X)*(Size.Y+1) || FieldM.ContainsNaN()) return FVector4f(0,0,0,0);
-        const auto M=Pixels[Size.X*Size.Y];
+        if (Size.X<2 || Size.Y<2 || Payload.Num()!=int64(Size.X)*(Size.Y+1) || FieldM.ContainsNaN()) return FVector4f(0,0,0,0);
+        const auto M=Payload[Size.X*Size.Y];
         if (M.W!=1.f || M.Z<=0.f) return FVector4f(0,0,0,0);
         const FVector2f P=(FieldM-FVector2f(M.X,M.Y))/M.Z;
         if (P.X<0 || P.Y<0 || P.X>Size.X-1 || P.Y>Size.Y-1) return FVector4f(0,0,0,0);
         const int32 X=FMath::Clamp(FMath::FloorToInt(P.X),0,Size.X-2);
         const int32 Y=FMath::Clamp(FMath::FloorToInt(P.Y),0,Size.Y-2);
-        return FMath::Lerp(FMath::Lerp(Pixels[Y*Size.X+X],Pixels[Y*Size.X+X+1],P.X-X),
-            FMath::Lerp(Pixels[(Y+1)*Size.X+X],Pixels[(Y+1)*Size.X+X+1],P.X-X),P.Y-Y);
+        return FMath::Lerp(FMath::Lerp(Payload[Y*Size.X+X],Payload[Y*Size.X+X+1],P.X-X),
+            FMath::Lerp(Payload[(Y+1)*Size.X+X],Payload[(Y+1)*Size.X+X+1],P.X-X),P.Y-Y);
     }
+    FVector4f SampleField(FVector2f FieldM) const { return SamplePayload(Pixels,FieldM); }
+    FVector4f SampleFoamFlow(FVector2f FieldM) const { return SamplePayload(FoamFlowPixels,FieldM); }
     float DisplacementCm(const FVector& WorldCm,float NorthSign) const
     {
         // Match the material custom node's float world-coordinate conversion.

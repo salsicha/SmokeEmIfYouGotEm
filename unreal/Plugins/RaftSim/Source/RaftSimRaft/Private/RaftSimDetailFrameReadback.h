@@ -12,6 +12,7 @@ struct FRaftSimDetailFrameReadback
     uint64 Sequence=0;
     double Elapsed=0,Simulation=0;
     bool bGPUClockMetadata=false;
+    TArray<FVector4f> FoamFlow;
     bool Poll(FRaftSimDetailFrameMailbox& Mailbox)
     {
         if (!Sequence || !Readback.IsReady()) return true;
@@ -27,13 +28,17 @@ struct FRaftSimDetailFrameReadback
         if(bGPUClockMetadata && !Frame->AdoptGPUClock())return false;
         if (!Frame->Validate()) return false;
         if (!bGPUClockMetadata && !Frame->WriteHostClockMetadata()) return false;
+        if(!FoamFlow.IsEmpty() && !Frame->AttachFoamFlow(FoamFlow))return false;
+        FoamFlow.Reset();
         Mailbox.Publish(Frame); // A newer completed slot may already supersede it.
         return true;
     }
     void Enqueue(FRHICommandListImmediate& Cmd,FRHITexture* Texture,FIntPoint InSize,
-        uint64 InSequence,double InElapsed,double InSimulation,bool bInGPUClockMetadata=false)
+        uint64 InSequence,double InElapsed,double InSimulation,bool bInGPUClockMetadata=false,
+        const TArray<FVector4f>* InFoamFlow=nullptr)
     {
         check(!Sequence); Size=InSize;Sequence=InSequence;Elapsed=InElapsed;Simulation=InSimulation;bGPUClockMetadata=bInGPUClockMetadata;
+        if(InFoamFlow)FoamFlow=*InFoamFlow;else FoamFlow.Reset();
         Cmd.Transition(FRHITransitionInfo(Texture,ERHIAccess::SRVMask,ERHIAccess::CopySrc));
         Readback.EnqueueCopy(Cmd,Texture);
         Cmd.Transition(FRHITransitionInfo(Texture,ERHIAccess::CopySrc,ERHIAccess::SRVMask));
