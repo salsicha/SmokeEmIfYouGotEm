@@ -3,7 +3,19 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [same-coordinate source comparison and bank-view launch](../reconstruction-review-2026-09-07/source-matched-angular-face.md).
+Latest: [adjacent crest range cache rejected](../reconstruction-review-2026-09-07/adjacent-crest-range-rejected.md).
+Two actual64-pair histories preserve8,636,720 expanded vertices exactly, but
+the second fails the both-order speed gate. Cache remains diagnostic-only;
+no installed runtime/material/terrain changed. Final native29 and Python74 PASS.
+Fresh ordinary installed25.907729FPS/p9544.7123ms still FAIL30. Sampling/profile
+evaluation remains the larger CPU target; do not promote the tiny average win.
+Same LIVE cook17516/start2026-09-17T12:52:03.0749210Z:3950 state AND86,720 dry banks
+PASS, NOT settled(91.263301out/45.306955in). Next4000/local8000 needs marker AND
+both audits. Physical breaking/froth, terrain/flow consistency and full ordered
+scene/crew/normalization/regression/release scope remain OPEN. No new visual or
+reference-video acceptance. Troublemaker remains a rapid, never a menu scenario.
+
+Previous: [same-coordinate source comparison and bank-view launch](../reconstruction-review-2026-09-07/source-matched-angular-face.md).
 Installed exact crest-boundary optimization is committed and ordinary startup
 verified without overrides.61 focused plus112 terrain/preview Python checks
 and both PowerShell suites PASS.

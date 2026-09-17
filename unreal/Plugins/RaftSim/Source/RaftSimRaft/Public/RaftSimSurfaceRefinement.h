@@ -8,6 +8,7 @@
 #include "RaftSimEdgeMap.h"
 #include "RaftSimIndexedEdgeMap.h"
 #include "RaftSimBoundCoordinateMemo.h"
+#include "RaftSimCrestRangeMemo.h"
 
 // Conforming red/green triangle refinement. Midpoints retain parent indices so
 // every render attribute uses the same piecewise-linear hydraulic authority;
@@ -91,9 +92,14 @@ struct FRaftSimSurfaceRefinement
         TConstArrayView<FBox2D> NonzeroRegions={},TMap<FVector2D,float>* ProfileValues=nullptr,
         bool bParallel=false,bool bMemoizeParallel=false,
         const FBox2D* DetailWindow=nullptr,float DetailSpanCm=0,bool bRetainParallelMemo=false,
-        bool bFastCoordinateHash=true,bool bKeepParallelContexts=true,bool bShareCornerSamples=false)
+        bool bFastCoordinateHash=true,bool bKeepParallelContexts=true,bool bShareCornerSamples=false,
+        bool bMemoizeAdjacentRanges=false)
     {
         if (!FMath::IsFinite(ToleranceCm) || ToleranceCm<=0) return false;
+        // Batch-owned, not thread-local: a task may run on any worker. The
+        // array is resized only between joined levels and discarded on return.
+        TArray<FRaftSimCrestRangeMemo> RangeMemos;
+        if(bMemoizeAdjacentRanges && !bParallel)RangeMemos.SetNum(1);
         TUniquePtr<FRaftSimCrestRegionIndex> RegionIndex;
         if(bIndexedRegions)RegionIndex=MakeUnique<FRaftSimCrestRegionIndex>(NonzeroRegions);
         ParallelContextsCreated=ParallelContextsDestroyed=0;
@@ -172,7 +178,9 @@ struct FRaftSimSurfaceRefinement
                 }
                 if(HeightRangeWidthCm)
                 {
-                    const float Width=HeightRangeWidthCm(Bounds);
+                    const float Width=bMemoizeAdjacentRanges
+                        ? RangeMemos[Context].Width(Bounds,HeightRangeWidthCm)
+                        : HeightRangeWidthCm(Bounds);
                     // All quarter-triangle weights are nonnegative and sum
                     // to one. Profile values and their interpolation stay in
                     // the same range, hence their difference is <= its width.
@@ -197,6 +205,7 @@ struct FRaftSimSurfaceRefinement
             };
         const TFunction<void(int32)> PrepareParallel=[&](int32 Contexts)
             {
+                if(bMemoizeAdjacentRanges)RangeMemos.SetNum(Contexts);
                 // Resize only after the previous level has joined. Values
                 // remain valid across levels within this exact profile build.
                 // No sampled height survives into another build's epoch.
