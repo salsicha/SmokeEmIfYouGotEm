@@ -3,15 +3,14 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from raftsim.editor_source_layout import LandscapeFoliageSourceSet, read_landscape_foliage_source
 
 from _capture_evidence import assert_capture_recorded
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FOLIAGE_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/"
-    "RaftSimEditorLandscapeFoliage.cpp"
+    LandscapeFoliageSourceSet(REPO_ROOT)
 )
 AUTOMATION_SOURCE = (
     REPO_ROOT

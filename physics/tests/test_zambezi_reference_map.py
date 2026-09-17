@@ -1,6 +1,7 @@
 import hashlib
 import json
 from pathlib import Path
+from raftsim.editor_source_layout import LandscapeFoliageSourceSet, read_landscape_foliage_source
 
 import numpy as np
 from PIL import Image
@@ -1117,10 +1118,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Rivers/"
         "RaftSimEditorZambeziDirector.cpp"
     ).read_text(encoding="utf-8")
-    foliage_cpp = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/"
-        "RaftSimEditorLandscapeFoliage.cpp"
-    ).read_text(encoding="utf-8")
+    foliage_cpp = read_landscape_foliage_source(REPO_ROOT)
     lighting_cpp = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorNearFieldAndLighting.cpp"

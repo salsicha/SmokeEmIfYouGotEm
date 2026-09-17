@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from raftsim.editor_source_layout import LandscapeFoliageSourceSet, read_landscape_foliage_source
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -14,7 +15,7 @@ TEXTURE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorPhotorealTextureAssets.cp
 BASE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorMaterialsBase.cpp"
 CATALOG_SOURCE = EDITOR_ROOT / "Environment/RaftSimEditorEnvironmentCatalog.cpp"
 GEOMETRY_SOURCE = EDITOR_ROOT / "Landscape/RaftSimEditorLandscapeGeometry.cpp"
-FOLIAGE_SOURCE = EDITOR_ROOT / "Landscape/RaftSimEditorLandscapeFoliage.cpp"
+FOLIAGE_SOURCE = LandscapeFoliageSourceSet(REPO_ROOT)
 WATER_CONFIG_HEADER = (
     RUNTIME_ROOT / "RaftSimWater/Public/RaftSimRiverWaterConfig.h"
 )

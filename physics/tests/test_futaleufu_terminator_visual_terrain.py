@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from raftsim.editor_source_layout import LandscapeFoliageSourceSet, read_landscape_foliage_source
 
 import numpy as np
 from PIL import Image
@@ -82,11 +83,7 @@ def test_unreal_binds_terminator_reach_local_landscape_and_runtime_water() -> No
 
 
 def test_shared_temperate_canopy_breaks_repeated_geometry_and_placement() -> None:
-    foliage_source = (
-        REPO_ROOT
-        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/"
-        "RaftSimEditorLandscapeFoliage.cpp"
-    ).read_text(encoding="utf-8")
+    foliage_source = read_landscape_foliage_source(REPO_ROOT)
     map_test_source = (
         REPO_ROOT
         / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"

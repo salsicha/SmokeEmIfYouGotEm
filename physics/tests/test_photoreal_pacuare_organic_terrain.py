@@ -1,4 +1,5 @@
 from pathlib import Path
+from raftsim.editor_source_layout import LandscapeFoliageSourceSet, read_landscape_foliage_source
 import hashlib
 import json
 
@@ -15,9 +16,7 @@ BASE_SOURCE = (
     "RaftSimEditorMaterialsBase.cpp"
 )
 FOLIAGE_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/"
-    "RaftSimEditorLandscapeFoliage.cpp"
+    LandscapeFoliageSourceSet(REPO_ROOT)
 )
 MANIFEST = (
     REPO_ROOT

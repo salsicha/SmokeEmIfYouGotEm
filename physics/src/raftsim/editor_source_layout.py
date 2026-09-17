@@ -64,6 +64,35 @@ def read_south_fork_full_reach_source(repo_root: Path) -> str:
     )
 
 
+LANDSCAPE_FOLIAGE_MEMBERS = (
+    "RaftSimEditorLandscapeFoliageInternal.h",
+    "RaftSimEditorLandscapeFoliageAssets.cpp",
+    "RaftSimEditorLandscapeFoliage.cpp",
+    "RaftSimEditorLandscapeFoliagePlacement.cpp",
+    "RaftSimEditorLandscapeFoliagePacuare.cpp",
+    "RaftSimEditorLandscapeFoliageZambezi.cpp",
+)
+
+
+def read_landscape_foliage_source(repo_root: Path) -> str:
+    """Read the exact biome source set; absent members fail, no unrelated code."""
+    landscape = repo_root / EDITOR_PRIVATE_RELATIVE_PATH / "Landscape"
+    return "\n".join(
+        (landscape / name).read_text(encoding="utf-8")
+        for name in LANDSCAPE_FOLIAGE_MEMBERS
+    )
+
+
+@dataclass(frozen=True)
+class LandscapeFoliageSourceSet:
+    repo_root: Path
+
+    def read_text(self, encoding: str = "utf-8") -> str:
+        if encoding.lower().replace("_", "-") != "utf-8":
+            raise ValueError("Landscape foliage source aggregation supports UTF-8 only")
+        return read_landscape_foliage_source(self.repo_root)
+
+
 def _registered_console_commands(source: str) -> list[dict[str, str | None]]:
     assignment_pattern = re.compile(
         r"(?P<member>[A-Za-z0-9_]+)\s*=\s*MakeUnique<FAutoConsoleCommand>\s*\(\s*"

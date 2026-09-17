@@ -3,7 +3,19 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [standalone SM5 transport qualification, pending](../reconstruction-review-2026-09-07/standalone-transport-sm5.md).
+Latest: [landscape foliage split and completed transport checks](../reconstruction-review-2026-09-07/landscape-foliage-split.md).
+Five isolated editor CPP units compile and the module links; all six source
+members meet the original 3,000-line bound. Ten focused tests pass; the broader
+suite remains 91 passed / 25 failed. Existing 1,234 biome assertions are unchanged.
+Standalone transport now passes all 18 fixtures on hardware/WARP and all 13
+harness tests; pressure/full RK2 qualification remains open. Original engine
+SM5 replay is still live with unchanged inputs. The original cook completed
+at 1,800s: state and 86,720 dry-bank checks PASS, NOT settled (92.233295 out
+versus 45.306955 in m3/s); no continuation started or snapshot promoted.
+Installed modules unchanged; 27.068531 FPS / p95 43.391ms still FAILS 30 FPS.
+All remaining scene, physics, crew, and release work below remains open.
+
+Previous: [standalone SM5 transport qualification, pending](../reconstruction-review-2026-09-07/standalone-transport-sm5.md).
 Original six-phase transport runner compiled/linked; two CLI rejection checks
 PASS and13 GPU tests collected, NOT run. Candidate compile40945/PID8220 is LIVE:
 phases0–2 compiled, phase3 pending, no full transport/pressure/RK2 acceptance.
