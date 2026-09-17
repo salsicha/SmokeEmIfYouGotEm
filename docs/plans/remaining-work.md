@@ -3,7 +3,25 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [integer optical normal correction installed](../reconstruction-review-2026-09-07/integer-optical-normal-installed.md).
+Latest: [same-coordinate source comparison and bank-view launch](../reconstruction-review-2026-09-07/source-matched-angular-face.md).
+Installed exact crest-boundary optimization is committed and ordinary startup
+verified without overrides.61 focused plus112 terrain/preview Python checks
+and both PowerShell suites PASS.
+Latest ordinary30.936070FPS/p9539.5813ms still FAIL30's p95 budget. Two recordings
+fully decoded; broad sheet-like froth remains unaccepted. Both reference videos
+accessed again: sparse actual bank0:55/1:00 and raft0:40 frames, not calibration.
+Same-world-XY source audit retains all7 probes: installed~43deg mean-stage faces
+become7.35/2.80deg in source-matched3350s candidate; different bed/state ages
+prevent isolated causal acceptance. Candidate remains inferred and unpromoted.
+Fixed preview launcher rejecting native-supportedv2; actual fixed bank view
+passes runtime preflight with one visible surface, not visual/FPS acceptance.
+Same LIVE cook17516/start2026-09-17T12:52:03.0749210Z:3750/3800/3850/3900 state AND
+86,720 dry banks PASS, NOT settled(3900:89.927435out/45.306955in). Next3950/local7000
+needs marker AND both audits. Continue source-consistent physical/local breaking
+and froth, then full ordered scene/crew/normalization/regression/release scope.
+Troublemaker remains a rapid in South Fork, not a scenario/menu entry.
+
+Previous: [integer optical normal correction installed](../reconstruction-review-2026-09-07/integer-optical-normal-installed.md).
 Integer lattice hash removes the obvious rectangular patches in inspected lit
 and WorldNormal candidate captures; now installed in the ordinary South Fork
 material with exact rollback and fresh persisted-graph verification. Ordinary

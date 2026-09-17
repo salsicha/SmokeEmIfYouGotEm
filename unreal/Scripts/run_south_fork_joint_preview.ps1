@@ -5,6 +5,14 @@ param(
     [string]$Editor = 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe'
 )
 $ErrorActionPreference = 'Stop'
+function Test-RaftSimJointPreviewDescriptor($Descriptor) {
+    # Both formats are supported by the native loader. V2 adds the registered
+    # terrain revision; its native geometry/dependency checks remain mandatory.
+    return ($null -ne $Descriptor -and $Descriptor.schema -is [string] -and
+        $Descriptor.schema -cin @('raftsim.south_fork_joint_preview.v1', 'raftsim.south_fork_joint_preview.v2') -and
+        $Descriptor.candidate -is [bool] -and $Descriptor.candidate -eq $true -and
+        $Descriptor.production_promoted -is [bool] -and $Descriptor.production_promoted -eq $false)
+}
 $repoPath = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $manifestFile = [IO.Path]::GetFullPath((Join-Path $repoPath $Manifest))
 $tmpRoot = Join-Path $repoPath 'tmp'
@@ -12,7 +20,7 @@ if (-not $manifestFile.StartsWith($tmpRoot + [IO.Path]::DirectorySeparatorChar, 
     throw 'Preview descriptor must be inside this repository tmp directory'
 }
 $descriptor = Get-Content -LiteralPath $manifestFile -Raw | ConvertFrom-Json
-if ($descriptor.schema -ne 'raftsim.south_fork_joint_preview.v1' -or $descriptor.candidate -ne $true -or $descriptor.production_promoted -ne $false) {
+if (-not (Test-RaftSimJointPreviewDescriptor $descriptor)) {
     throw 'An explicit unaccepted joint-preview descriptor is required'
 }
 $relativeManifest = [IO.Path]::GetRelativePath($repoPath, $manifestFile).Replace('\', '/')
@@ -52,6 +60,7 @@ $passed = $engineExitCode -eq 0 -and -not $refused -and $installed.Count -eq 1 -
     $singleSurface -and $recorded -and $screens.Count -eq 3
 [ordered]@{
     schema = 'raftsim.joint_preview_run.v1'
+    descriptor_schema = $descriptor.schema
     runtime_capture_completed = $passed
     descriptor_sha256 = (Get-FileHash -LiteralPath $manifestFile -Algorithm SHA256).Hash.ToLowerInvariant()
     engine_exit_code = $engineExitCode

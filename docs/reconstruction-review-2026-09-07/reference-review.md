@@ -1,5 +1,19 @@
 # Troublemaker reference cross-check
 
+## September 17: installed boundary build and same-coordinate source comparison
+
+Computer-use skill and browser retry succeeded for BOTH supplied players.
+Inspected Qweniden paused0:55/1:00 after the ordinary Skip-ad control, and John
+Elkins paused0:40. Exposed angular shelves, localized overfalls, broken white
+tongues and dark gaps remain the qualitative target. Cameras move and occupants
+occlude the raft view; these are sparse actual frames, not measured bathymetry,
+discharge, calibrated dimensions or continuous-motion acceptance. No media was
+downloaded/imported. Compared with newly decoded installed gameplay and the
+source-matched fixed bank view: broad white sheeting and insufficient localized
+breaking remain. [Same-coordinate evidence and launcher repair](source-matched-angular-face.md)
+records source-stage differences without treating a flatter candidate as proof
+of correct physical geometry. No production terrain/flow promotion follows.
+
 ## September 17: paired terrain rendering and decoded motion
 
 The 3350-second source-matched preview and native checks are now complete.
