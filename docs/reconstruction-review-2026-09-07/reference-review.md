@@ -1,5 +1,17 @@
 # Troublemaker reference cross-check
 
+## September 17: paired terrain rendering and decoded motion
+
+The 3350-second source-matched preview and native checks are now complete.
+Decoded engine frames exposed the revised terrain bypassing the original mesh's
+exact-render policy. A guarded correction removes the starting green bank patch
+in isolated and normal-installed-module captures. Broad smooth foam/rounded
+spilling remain, and the installed 11-second frame has a rectangular water
+transition to investigate. No new reference viewing or calibrated motion match
+is claimed in this pass. Full video decoding and sparse frame inspection do not
+establish physical/photographic acceptance. See
+[the paired-source review](joint-preview-exact-ground.md) for evidence and limits.
+
 ## September 17 continuation: reference playback and installed shape recheck
 
 Used the computer-use skill and browser UI; no login, download, upload or security

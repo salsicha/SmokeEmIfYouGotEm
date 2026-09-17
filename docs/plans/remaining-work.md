@@ -3,7 +3,20 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [crest capacity and empty-tile candidates rejected](../reconstruction-review-2026-09-07/crest-capacity-and-empty-tile-rejection.md).
+Latest: [joint-preview exact terrain rendering](../reconstruction-review-2026-09-07/joint-preview-exact-ground.md).
+3350s native terrain/field check complete:64,935 collision and25,600 field queries
+PASS, zero wet mismatches;803,842 exact directed triangles compared. Paired motion
+exposed the replacement mesh bypassing the original's exact-render policy.
+Scoped preview correction now installed with verified rollback; normal-module
+capture removes the starting green bank patch. Native14 and Python101 PASS.
+Broad foam/rounded breaking remain; installed11s frame exposes a rectangular
+water transition to trace next. Three videos fully decoded, NOT FPS acceptance.
+Candidate geometry/hydraulics remain unpromoted and inferred, not measured bed.
+Same cook36872:3400/3450 state AND86,720 dry banks PASS, NOT settled
+(3450:86.489332out/45.306955in). Next3500/local34000 requires BOTH audits.
+No new ordinary FPS; full ordered physics/scene/crew/regression/release scope OPEN.
+
+Previous: [crest capacity and empty-tile candidates rejected](../reconstruction-review-2026-09-07/crest-capacity-and-empty-tile-rejection.md).
 Both preserve exact output but fail robust both-order speed qualification;
 neither enabled or installed. Empty-tile native34 PASS,183,768 exact height/foam
 samples; Python60 PASS. Two actual64-pair captures retained, including v2 failure.

@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Dom/JsonObject.h"
 #include "Engine/StaticMesh.h"
+#include "StaticMeshResources.h"
 #include "Engine/StaticMeshActor.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
@@ -24,6 +25,15 @@ bool IsAllowed(const FString& MapName, bool bEphemeralProfile, bool bEditorBuild
 {
     return bEditorBuild && bEphemeralProfile &&
         MapName.EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
+}
+
+bool HasFullTerrainFallback(const UStaticMesh* Mesh,int64 VerifiedTriangles)
+{
+    // The separately hash-verified collision source must also be the only
+    // rendered fallback LOD. Never substitute a reduced proxy for that source.
+    const FStaticMeshRenderData* Data=Mesh ? Mesh->GetRenderData() : nullptr;
+    return VerifiedTriangles>0 && Data && Mesh->LODForCollision==0 &&
+        Data->LODResources.Num()==1 && Data->LODResources[0].GetNumTriangles()==VerifiedTriangles;
 }
 
 bool MakeTerrainResidencySource(const FBox& WorldBounds,FWorldPartitionStreamingSource& Source)
@@ -295,6 +305,9 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
         if (!NativeSourceMatches(OriginalTerrain,*OriginalSource,Triangles) ||
             !NativeSourceMatches(RevisedTerrain,*RevisedSource,Triangles))
         { Error=TEXT("Native terrain source differs from verified collision geometry");return false; }
+        if (Triangles>double(MAX_int32) || Triangles!=FMath::FloorToDouble(Triangles) ||
+            !HasFullTerrainFallback(RevisedTerrain,static_cast<int64>(Triangles)))
+        { Error=TEXT("Verified terrain lacks its complete collision-matched render fallback");return false; }
         if (World->HasBegunPlay() || !World->IsGameWorld() || !World->GetWorldPartition() ||
             TerrainResidencies().Sources.Contains(World))
         { Error=TEXT("Paired terrain residency must be established once before game BeginPlay");return false; }
@@ -337,6 +350,18 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
     Component->SetMaterial(0,Material);Component->SetCollisionProfileName(TEXT("BlockAll"));
     if (TerrainActor && !TerrainActor->GetStaticMeshComponent()->SetStaticMesh(RevisedTerrain))
     { Actor->Destroy();Error=TEXT("Could not replace original terrain; paired water not installed");return false; }
+    if (TerrainActor)
+    {
+        // The normal-map fix is scoped to the original asset name, so it
+        // cannot recognize this ephemeral, hash-verified replacement. Preserve
+        // its exact-source rendering policy here, without broadening that rule
+        // to arbitrary GeneratedLocalReview assets or changing saved packages.
+        auto* TerrainComponent=TerrainActor->GetStaticMeshComponent();
+        TerrainComponent->bDisallowNanite=true;
+        TerrainComponent->MarkRenderStateDirty();
+        UE_LOG(LogTemp,Display,TEXT("RaftSim verified replacement exact fallback enabled: mesh=%s triangles=%u"),
+            *RevisedTerrain->GetPathName(),RevisedTerrain->GetRenderData()->LODResources[0].GetNumTriangles());
+    }
     Actor->Tags.Add(TEXT("RaftSimPhysicalGround"));Actor->Tags.Add(TEXT("RaftSimJointReconstructionPreview"));
     Actor->SetActorLabel(TEXT("UNACCEPTED joint source-rock / water preview"));
     Config->CookedFieldsDir=FieldsDir;Config->StreamingManifestPath=Files[TEXT("streaming_manifest")];

@@ -1,6 +1,8 @@
 #include "Misc/AutomationTest.h"
 #include "../RaftSimJointReconstructionPreview.h"
 #include "RaftSimLiveWaterWindow.h"
+#include "Engine/StaticMesh.h"
+#include "StaticMeshResources.h"
 #include "WorldPartition/WorldPartitionStreamingSource.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -31,6 +33,19 @@ bool FRaftSimJointPreviewContract::RunTest(const FString&)
     TestTrue(TEXT("Block on incomplete source loading"),Source.bBlockOnSlowLoading);
     TestFalse(TEXT("Invalid bounds rejected"),MakeTerrainResidencySource(FBox(ForceInit),Source));
     TestFalse(TEXT("Degenerate footprint rejected"),MakeTerrainResidencySource(FBox(FVector::ZeroVector,FVector::ZeroVector),Source));
+    auto* Cube=LoadObject<UStaticMesh>(nullptr,TEXT("/Engine/BasicShapes/Cube.Cube"));
+    auto* Ground=LoadObject<UStaticMesh>(nullptr,TEXT("/Game/RaftSim/Environment/SouthForkReconstruction/Troublemaker/SM_TroublemakerCapturedGround.SM_TroublemakerCapturedGround"));
+    if (!TestNotNull(TEXT("Independent unrelated fixture"),Cube) ||
+        !TestNotNull(TEXT("Captured full-fallback fixture"),Ground)) return false;
+    if (const auto* Data=Cube->GetRenderData())
+        AddInfo(FString::Printf(TEXT("Engine cube: collision LOD=%d render LODs=%d first triangles=%u"),
+            Cube->LODForCollision,Data->LODResources.Num(),Data->LODResources.IsEmpty()?0:Data->LODResources[0].GetNumTriangles()));
+    TestTrue(TEXT("Complete sole collision LOD accepted"),HasFullTerrainFallback(Ground,803842));
+    TestFalse(TEXT("Missing terrain rejected"),HasFullTerrainFallback(nullptr,12));
+    TestFalse(TEXT("Zero triangle contract rejected"),HasFullTerrainFallback(Ground,0));
+    TestFalse(TEXT("Negative triangle contract rejected"),HasFullTerrainFallback(Ground,-12));
+    TestFalse(TEXT("Reduced or mismatched fallback rejected"),HasFullTerrainFallback(Ground,803843));
+    TestFalse(TEXT("Captured terrain count cannot qualify an unrelated cube"),HasFullTerrainFallback(Cube,803842));
 #if RAFTSIM_HAS_LIVE_SOLVER
     TestEqual(TEXT("Portable empty SHA256"),RaftSimCookedArtifactSha256({}),
         FString(TEXT("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")));

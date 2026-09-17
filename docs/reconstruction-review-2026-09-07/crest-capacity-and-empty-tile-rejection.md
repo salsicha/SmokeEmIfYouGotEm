@@ -101,3 +101,8 @@ region_0002 rectangle correction and minimum 10 m raft-interior margin.
 Prepared 25,600 native water queries at the same comparison center
 (-5437.499999998952, 3606.5) m. Native terrain/collision and visual comparison
 must pass before drawing conclusions; neither export nor settling is acceptance.
+
+Subsequent native verification, paired captures and the exposed terrain-rendering
+correction are recorded in [joint-preview exact ground](joint-preview-exact-ground.md).
+Those close the pending native-query check above, not hydraulic settling, water
+realism, performance or release acceptance.
