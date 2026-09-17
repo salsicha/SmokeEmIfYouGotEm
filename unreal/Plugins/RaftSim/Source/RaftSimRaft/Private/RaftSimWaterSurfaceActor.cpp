@@ -15,6 +15,7 @@
 #include "RaftSimWaterFlowFrame.h"
 #include "RaftSimIndexedBreakingProfile.h"
 #include "RaftSimFineCrestIndexAudit.h"
+#include "RaftSimInlineCrestAudit.h"
 #include "RaftSimBreakingHeightRange.h"
 #include "RaftSimPreparedBreakingHeightRange.h"
 #include "RaftSimWaterFlowHistory.h"
@@ -5880,6 +5881,29 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 UE_LOG(LogTemp,Display,TEXT("Fine crest index candidate active: tile_m=2 indexed=%d tiles=%d dense_tiles=%d audit=%d; unchanged physical evaluator and refinement tolerance"),
                     Fine->IsIndexed(),Fine->TileCount(),Fine->DenseTileCount(),int32(bFineAudit));
                 bLoggedFine=true;
+            }
+        }
+        // Isolated-module timings improved, but installed whole-frame A/B
+        // failed repeatability. Retain as a diagnostic, never a default.
+        static const bool bInlinePhysical=FParse::Param(FCommandLine::Get(),TEXT("RaftSimInlinePhysicalCrests"));
+        static const bool bInlineAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimInlinePhysicalCrestAudit"));
+        if((bInlinePhysical || bInlineAudit) && !bFullCrestScan && !bFineIndex && !bFineAudit && GetWorld() &&
+            GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")))
+        {
+            const auto Audit=bInlineAudit ? MakeShared<FRaftSimInlineCrestAudit,ESPMode::ThreadSafe>()
+                : TSharedPtr<FRaftSimInlineCrestAudit,ESPMode::ThreadSafe>();
+            CartesianCrestInput.HeightAtWorldXYCm=[IndexedProfile,Audit,Scale,Sign](const FVector2D& P)
+            {
+                const FVector2D Field(P.X*.01,P.Y*.01*Sign);
+                const float Result=IndexedProfile->SamplePhysicalInline(Field)*Scale*100.f;
+                if(Audit)Audit->Compare(IndexedProfile->Sample(Field)*Scale*100.f,Result);
+                return Result;
+            };
+            static bool bLoggedInline=false;
+            if(!bLoggedInline)
+            {
+                UE_LOG(LogTemp,Display,TEXT("Inline physical crest candidate active: audit=%d; original 8m index, profile and tolerances unchanged"),int32(bInlineAudit));
+                bLoggedInline=true;
             }
         }
 #endif

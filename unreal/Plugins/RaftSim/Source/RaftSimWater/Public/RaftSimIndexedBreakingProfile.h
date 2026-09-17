@@ -1,6 +1,7 @@
 #pragma once
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterFlowFrame.h"
+#include "RaftSimPhysicalBreakingSample.h"
 
 // Immutable broad phase for the SAME continuous crest function. No height
 // interpolation, quantization, profile-history reuse or site-order changes.
@@ -80,6 +81,23 @@ public:
     int32 DenseTileCount() const { return DenseTiles.Num(); }
     float Sample(const FVector2D& P,float* Foam=nullptr,bool bDense=true) const
     { return SampleWithEmptyTileSkip(P,Foam,bDense,false); }
+    float SamplePhysicalInline(const FVector2D& P,float* Foam=nullptr) const
+    {
+        FIntPoint Key;
+        if(!bIndexed || !Tile(P,Key))
+            return URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(P,Sites,Lift,Spacing,Foam);
+        const TArray<FSite>* Found=nullptr;
+        if(!DenseTiles.IsEmpty())
+        {
+            const int32 X=Key.X-DenseOrigin.X,Y=Key.Y-DenseOrigin.Y;
+            if(X>=0 && Y>=0 && X<DenseSize.X && Y<DenseSize.Y)
+                Found=&DenseTiles[Y*DenseSize.X+X];
+        }
+        else Found=Tiles.Find(Key);
+        const TConstArrayView<FSite> Local=Found ? TConstArrayView<FSite>(*Found) : TConstArrayView<FSite>();
+        return Foam ? RaftSimPhysicalBreakingSample::Evaluate<true>(P,Local,GlobalCap,Foam)
+                    : RaftSimPhysicalBreakingSample::Evaluate<false>(P,Local,GlobalCap,nullptr);
+    }
     float SampleWithEmptyTileSkip(const FVector2D& P,float* Foam,bool bDense,bool bSkipEmpty) const
     {
         FIntPoint Key;

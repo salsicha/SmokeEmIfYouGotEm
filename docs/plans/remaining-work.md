@@ -3,7 +3,19 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [local affine-front common fluxes](../reconstruction-review-2026-09-07/normal-river-affine-front-flux.md).
+Latest: [physical crest specialization rejected after installed trial](../reconstruction-review-2026-09-07/inline-physical-crest.md).
+125,497,187 actual queries and 233,275 native height/foam comparisons are exact.
+Isolated A/B improved, but installed no-plugin A/B failed whole-frame repeatability;
+the temporary installation was rolled back byte-for-byte and source defaults
+are OFF. Final original gameplay remains installed. No 30 FPS or visual pass:
+temporary default runs 27.800739/27.918171 FPS, p95 42.1015/41.3688 ms.
+30 native PASS; Python 47 PASS/5 pre-existing source-contract FAIL, reproduced
+against HEAD. Captured broad smooth froth/abrupt face remains unaccepted.
+Same cook: 4600 and 4650s state AND all dry-bank checks PASS, NOT settled
+(4650s 108.161862 out / 45.306955 in). Next 4700/local22000 needs BOTH audits.
+Full ordered physical, playable, scene, crew, regression and release scope OPEN.
+
+Previous: [local affine-front common fluxes](../reconstruction-review-2026-09-07/normal-river-affine-front-flux.md).
 Exact shared-edge mass, momentum and energy rates now accompany the local
 finite-time predictor. All eleven supported original-source predictors pass
 independent time-balance checks at two probe sizes; 65 focused PASS, broader
