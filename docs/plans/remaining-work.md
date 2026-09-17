@@ -3,7 +3,20 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [shoreline validation and full-face SM5 evidence](../reconstruction-review-2026-09-07/shoreline-validation-and-full-face-sm5.md).
+Latest: [standalone SM5 transport qualification, pending](../reconstruction-review-2026-09-07/standalone-transport-sm5.md).
+Original six-phase transport runner compiled/linked; two CLI rejection checks
+PASS and13 GPU tests collected, NOT run. Candidate compile40945/PID8220 is LIVE:
+phases0–2 compiled, phase3 pending, no full transport/pressure/RK2 acceptance.
+Preserve this exact process and its inputs, plus original SM5replay9319/PID9976
+and workers31736/36256; do not restart on an observation timeout. Installed
+modules/shaders unchanged. Same cook11316 reached1750s: state AND86,720 exact-dry
+banks PASS, NOT settled (91.271027 out versus45.306955 in m3/s). Next1800/local24000
+both audits plus original terminal result. Last27.068531FPS/p9543.391ms FAIL30.
+Nonlinear wet-front physics, visible wave/froth integration, terrain/boulders/
+collision, safe installation, source closure/normalization, Colorado -> Pacuare
+-> Futaleufu, Chilko/Zambezi/all-scene water, crew and release remain OPEN.
+
+Previous: [shoreline validation and full-face SM5 evidence](../reconstruction-review-2026-09-07/shoreline-validation-and-full-face-sm5.md).
 Final isolated shoreline candidate passes eight native tests;64 actual-input
 pairs preserve exact decisions and reduce validation1.842108->0.400478ms,
 faster in both orders. Ordinary300-frame1280x720D3D12 capture still FAILS30:
