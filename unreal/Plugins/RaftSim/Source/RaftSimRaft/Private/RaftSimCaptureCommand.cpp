@@ -17,6 +17,8 @@
 #include "Engine/Engine.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/GameInstance.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/LocalPlayer.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
@@ -28,6 +30,10 @@
 #include "Misc/Paths.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "Misc/FileHelper.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonSerializer.h"
+#include "SceneView.h"
 #include "NiagaraComponent.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimRaftActor.h"
@@ -44,6 +50,45 @@
 
 namespace RaftSimCaptureCommand
 {
+
+// Game-thread camera observation paired with the submitted carrier export.
+// This is not a GPU fence or a claim that the carrier is the visible occluder.
+static bool SaveCarrierViewAudit(UWorld* World, const FString& Path)
+{
+    if (!World || FPaths::FileExists(Path)) return false;
+    const APlayerController* PC = World->GetFirstPlayerController();
+    const ULocalPlayer* Player = PC ? PC->GetLocalPlayer() : nullptr;
+    FSceneViewProjectionData View;
+    if (!Player || !Player->ViewportClient || !Player->ViewportClient->Viewport ||
+        !Player->GetProjectionData(Player->ViewportClient->Viewport, View) ||
+        !View.IsValidViewRectangle()) return false;
+    const FMatrix Matrix = View.ComputeViewProjectionMatrix();
+    TArray<TSharedPtr<FJsonValue>> MatrixRows;
+    for (int32 Row = 0; Row < 4; ++Row)
+    {
+        TArray<TSharedPtr<FJsonValue>> Values;
+        for (int32 Col = 0; Col < 4; ++Col)
+        {
+            if (!FMath::IsFinite(Matrix.M[Row][Col])) return false;
+            Values.Add(MakeShared<FJsonValueNumber>(Matrix.M[Row][Col]));
+        }
+        MatrixRows.Add(MakeShared<FJsonValueArray>(Values));
+    }
+    const FIntRect Rect = View.GetConstrainedViewRect();
+    TArray<TSharedPtr<FJsonValue>> RectValues;
+    for (int32 Value : {Rect.Min.X, Rect.Min.Y, Rect.Max.X, Rect.Max.Y})
+        RectValues.Add(MakeShared<FJsonValueNumber>(Value));
+    auto Report = MakeShared<FJsonObject>();
+    Report->SetStringField(TEXT("schema"), TEXT("raftsim.carrier_view.v1"));
+    Report->SetNumberField(TEXT("game_frame"), double(GFrameCounter));
+    Report->SetNumberField(TEXT("world_seconds"), World->GetTimeSeconds());
+    Report->SetArrayField(TEXT("world_cm_to_clip_row_matrix"), MatrixRows);
+    Report->SetArrayField(TEXT("constrained_view_rect"), RectValues);
+    Report->SetStringField(TEXT("scope"), TEXT("LocalPlayer game-thread projection at the screenshot request. Row-vector world centimeters to UE reversed-Z clip coordinates. No render-thread fence, temporal jitter, terrain/crew occlusion or pixel visibility acceptance."));
+    FString Json;
+    return FJsonSerializer::Serialize(Report, TJsonWriterFactory<>::Create(&Json)) &&
+        FFileHelper::SaveStringToFile(Json, *Path);
+}
 
 // Inspect the material actually bound to gameplay water, not just the saved
 // parent or an editor-only capture sheet. Overrides live only in this process.
@@ -906,8 +951,10 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                         { Surface=*It;++Surfaces; }
                         const FString ShapePath=OutPath+TEXT(".carrier.json");
                         const bool Saved=Surfaces==1 && Surface->SavePresentedCarrierShapeAudit(ShapePath);
+                        const bool ViewSaved=Saved && SaveCarrierViewAudit(W2,OutPath+TEXT(".view.json"));
                         if (Saved) { UE_LOG(LogTemp,Display,TEXT("CaptureSeries first carrier shape frame=%llu saved=%s"),GFrameCounter,*ShapePath); }
                         else { UE_LOG(LogTemp,Error,TEXT("CaptureSeries first carrier shape refused: surfaces=%d path=%s"),Surfaces,*ShapePath); }
+                        if (!ViewSaved) { UE_LOG(LogTemp,Error,TEXT("CaptureSeries first carrier camera export refused: %s"),*OutPath); }
                     }
                     const UGameInstance* GI = W2->GetGameInstance();
                     URaftSimPhysicsBridgeSubsystem* Bridge = GI ?

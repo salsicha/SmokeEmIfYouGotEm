@@ -3,7 +3,23 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact render conversion installed](../reconstruction-review-2026-09-07/render-values-installed.md).
+Latest: [camera-paired startup boundary evidence](../reconstruction-review-2026-09-07/startup-carrier-camera-rays.md).
+Exact engine projection and carrier exported at the same game frame2/world0.627753s.
+Two visible green-edge probe rays meet CPU base faces32.261/42.204degrees, with
+zero crest/detail contributions; implicated high wet sources have4.08/4.47cm
+depth. Dry-boundary comparisons stay unavailable, not extrapolated. Next resolve
+actual terrain/optical response and source-consistent subcell wet support at
+these exact faces; no wave-detail reduction or arbitrary film deletion.
+Isolated build/capture terminal0;22 native and21 Python tests PASS. Installed
+game/material unchanged, visual acceptance FALSE; no GPU visibility fence claimed.
+Both reference players were accessible in the earlier September17 retry; sparse
+observations are recorded in reference-review.md, not calibrated measurements.
+Same hydraulic36872 verified LIVE;2700 AND2750 state AND86,720 dry banks PASS,
+NOT settled(2750:92.809506out/45.306955in). Next2800/local20000 needs BOTH audits.
+Last ordinary30.285471FPS/p9541.4455ms still FAIL30. Full ordered scene/physics/
+crew/regression/release scope stays OPEN; Troublemaker is not a scenario.
+
+Previous: [exact render conversion installed](../reconstruction-review-2026-09-07/render-values-installed.md).
 All64 actual-frame pairs/1,674,036 rendered vertices match; conversion1.036548
 to0.507145ms, faster in both call orders. Default-enabled build22 native PASS;
 43 Python audit/profiler PASS. Gameplay DLL/PDB installed with verified backup.

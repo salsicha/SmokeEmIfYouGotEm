@@ -1,5 +1,28 @@
 # Troublemaker reference cross-check
 
+## September 17: both reference players accessible again
+
+Earlier in the startup-carrier investigation, the computer-use skill and its
+required guidance were read before the in-app browser retry. Both public
+players worked; no login, media download, upload or security change was used.
+
+- Qweniden bank-side video, duration3:24: inspected paused0:56, started playback,
+  then inspected and paused at1:05. Exposed angular shelf/rocks constrain narrow
+  overfalls; localized white crests have dark gray-green gaps. The raft moved
+  through the constriction while the camera panned. This is sparse playback
+  observation, not quantified continuous motion or a calibrated fixed camera.
+- John Elkins raft-level video, duration1:08: the ordinary initial advertisement
+  completed; inspected actual footage at0:02 and paused at0:21. Dark approach
+  water, narrow patchy white crests and exposed channel rock are visible, with
+  passengers and paddles obscuring part of the view.
+
+Both reference tabs were left paused. These observations support the qualitative
+rapid-shape/froth target; they do not measure discharge, submerged bathymetry,
+wave dimensions or prove current scene acceptance. The subsequent
+[camera-paired startup probe](startup-carrier-camera-rays.md) locates actual
+engine base-water faces for further correction. It is not a video-matched
+physical or photographic qualification. Troublemaker remains within South Fork.
+
 ## September 15: access reconfirmed alongside corrected engine cameras
 
 Both players are accessible again. Inspected Qweniden bank-side 0:08/0:13
