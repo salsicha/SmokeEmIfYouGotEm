@@ -41,10 +41,10 @@ def test_static_water_presentation_cannot_block_terrain_or_boats():
     assert 'Terrain' not in visibility.split('if (bBakedFoamOverlay || bIsBandPresentation)', 1)[0]
 
 
-def test_south_fork_crest_spray_experiment_is_opt_in_and_map_scoped():
+def test_south_fork_crest_spray_is_enabled_and_map_scoped():
     source = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp').read_text()
     cvar = source.split('CVarSouthForkCrestSpray(', 1)[1].split(';', 1)[0]
-    assert 'TEXT("raftsim.SouthForkCrestSpray"), 0,' in cvar
+    assert 'TEXT("raftsim.SouthForkCrestSpray"), 1,' in cvar
     gating = source.split('const bool bSouthForkCrestOwnedSpray =', 1)[1].split('TArray<int32> RankedSiteIndices', 1)[0]
     assert 'IsSouthForkSprayReviewMap(GetWorld()->GetMapName()) &&' in gating
     scope = source.split('bool ARaftSimWaterVfxActor::IsSouthForkSprayReviewMap(', 1)[1].split(
@@ -122,7 +122,7 @@ def test_visible_carrier_spray_lookup_uses_rendered_triangles_without_physics_qu
     assert 'SampleRaftSupport' not in attachment and 'LineTrace' not in attachment
     footprint = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimSpraySourceFootprint.h').read_text()
     assert 'Across(-Along.Y,Along.X)' in footprint
-    assert 'for (double D:{-.8,0.,.8}) for (double A:{-1.5,0.,1.5})' in footprint
+    assert 'for (double D:{-1.05,-.8,0.,.8,1.05}) for (double A:{-1.5,0.,1.5})' in footprint
     assert 'Sampler(CentreM+Along*D+Across*A,Point)' in footprint
 
 

@@ -37,8 +37,8 @@ static TAutoConsoleVariable<int32> CVarChilkoSprayPlane(
     TEXT("raftsim.ChilkoSprayPlane"), 1,
     TEXT("Keep Chilko rapid source strips horizontal independently of the upward launch direction. 0 restores tilted source planes."));
 static TAutoConsoleVariable<int32> CVarSouthForkCrestSpray(
-    TEXT("raftsim.SouthForkCrestSpray"), 0,
-    TEXT("South Fork review: attach rapid spray to wet persistent crests with horizontal source planes. Does not change particle assets or emitter budgets."));
+    TEXT("raftsim.SouthForkCrestSpray"), 1,
+    TEXT("South Fork: attach rapid spray to wet visible crests with horizontal source planes. 0 restores legacy source placement for comparison. Particle assets and emitter budgets are unchanged."));
 // Translucent whitewater is deliberately local. Rendering every detected
 // hydraulic jump along the kilometre-scale reach spends fill rate on effects
 // that contribute only a few pixels (or are fully hidden by the canyon). Keep

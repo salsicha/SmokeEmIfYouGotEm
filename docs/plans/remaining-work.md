@@ -3,7 +3,20 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [base-vertex parallel trial rejected and committed runtime restored](../reconstruction-review-2026-09-07/base-vertex-parallel-review.md).
+Latest: [visible-carrier spray attached in normal South Fork](../reconstruction-review-2026-09-07/spray-source-attachment.md).
+Ordinary play now uses horizontal source planes, visible-water centre anchors,
+and fifteen flow-oriented wet-footprint probes; the original probes remain.
+Assets and budgets unchanged, alternate falling assets still opt-in. Five native
+and 28 targeted Python tests PASS; editor and standalone builds succeed. Three real recordings
+fully decoded; normal default source audit confirms all five observed sites.
+Reference video accessed again. This corrects placement, NOT convincing froth:
+soft foam, smooth wave forms and tuft-like particles remain unaccepted.
+Ordinary audit-free28.573702FPS / p9541.4636ms still FAIL30. Hydraulic5650,
+5700 and5750 state AND dry-bank audits PASS, NOT settled; same cook32728 continues.
+Next5800/local8000 needs BOTH audits. Installed4950 water stays unchanged.
+Full physical, ordered scene, crew, normalization, regression and release queue OPEN.
+
+Previous: [base-vertex parallel trial rejected and committed runtime restored](../reconstruction-review-2026-09-07/base-vertex-parallel-review.md).
 All sixteen same-input pairs preserve outputs, but one execution-order group
 regresses. The trial is removed; restored editor build and eight native tests
 PASS. Final restored29.219141FPS / p9541.7484ms remains FAIL30.

@@ -15,12 +15,12 @@ bool FRaftSimSpraySourceFootprintTest::RunTest(const FString&)
         const auto Wet=[&](const FVector2D& P,FVector& Out)
         {Queries.Add(P);Out=FVector(P.X*100,-P.Y*100,150.+P.X*.01);return true;};
         TestTrue(TEXT("wet current-oriented source accepted"),RaftSimSpraySourceFootprint::Sample(Centre,Flow,Wet,Actual));
-        TestEqual(TEXT("centre and eight boundary probes"),Queries.Num(),9);
+        TestEqual(TEXT("centre, original boundaries and offset-aware outer probes"),Queries.Num(),15);
         TestTrue(TEXT("actual centre height and reflected world placement retained"),Actual==FVector(Centre.X*100,-Centre.Y*100,150.+Centre.X*.01));
-        for (double D:{-.8,0.,.8}) for (double A:{-1.5,0.,1.5})
+        for (double D:{-1.05,-.8,0.,.8,1.05}) for (double A:{-1.5,0.,1.5})
             TestTrue(TEXT("flow-oriented footprint includes each corner and edge midpoint"),
                 Queries.ContainsByPredicate([&](const FVector2D& P){return P.Equals(Centre+Flow*D+Across*A,1.e-9);}));
-        for (int32 Failed=0;Failed<9;++Failed)
+        for (int32 Failed=0;Failed<15;++Failed)
         {
             int32 Call=0;
             const auto Dry=[&](const FVector2D& P,FVector& Out)

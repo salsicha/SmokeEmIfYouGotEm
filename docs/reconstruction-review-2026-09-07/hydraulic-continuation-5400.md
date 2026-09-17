@@ -39,7 +39,19 @@ volume 2,791,013.887468 m3 and outflow 120.411979 m3/s versus the same inflow.
 Still not settled. Both reports:
 `tmp/control-ablation-5600s-{state,banks}-v1-20260917.json`; depth SHA256
 `80cbfbde1ca4a56ff79731790a84fb920f598bb882c1b86cf821353ce5813c0d`.
-Next 5650 seconds is local step5000 in the NEW continuation output.
+5650 and 5700 seconds now pass both full-state and artificial-bank audits.
+Reports: `tmp/control-ablation-{5650,5700}s-{state,banks}-v1-20260917.json`.
+At 5700 seconds maximum depth is 3.697731395 m, speed 5.413853960 m/s,
+volume 2,783,158.975307 m3 and maximum step residual 1.424946e-8 m3.
+Outflow 124.765308 m3/s still exceeds inflow 45.306955 m3/s: NOT settled.
+All 86,720 artificial bank cells remain exactly dry. 5700-second depth SHA256:
+`c9cb6c3b1af0884ce836d0b729384550f586ef51a7db05cba6dc4b65d91848ce`.
+5750 seconds/local7000 also passes BOTH audits. Maximum depth 3.699409066 m,
+speed 5.461326199 m/s, volume 2,779,227.603968 m3; outflow 126.197287 m3/s
+versus the same 45.306955 inflow, still NOT settled. Reports:
+`tmp/control-ablation-5750s-{state,banks}-v1-20260917.json`; depth SHA256:
+`57c7822afefbc64ac76bc15bfdce7117751b99160b7e6c58f933229997a842e5`.
+Next 5800 seconds is local step8000 in the NEW continuation output.
 
 Each later checkpoint requires its completion marker and both independent
 audits. Bounded depth/speed, exact restart and conservation do not prove settled
