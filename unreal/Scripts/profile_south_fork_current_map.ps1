@@ -10,6 +10,7 @@ param(
     [switch]$DetailStreamingReplay,
     [switch]$StartupRenderReplay,
     [ValidateSet('WorldNormal', 'Roughness', 'SceneDepth')][string]$StartupBufferVisualization = '',
+    [ValidateRange(0, 1)][Nullable[double]]$StartupOpticalNormalStrength = $null,
     [switch]$RecordStartupMotion,
     [switch]$CheckpointResetReplay
 )
@@ -22,6 +23,9 @@ function Test-RaftSimBufferDiagnosticLog([string]$LogText, [string]$Target) {
 }
 if ($StartupBufferVisualization -and -not $StartupRenderReplay) {
     throw 'Buffer visualization requires StartupRenderReplay; it is not an FPS capture'
+}
+if ($null -ne $StartupOpticalNormalStrength -and -not $StartupRenderReplay) {
+    throw 'Optical normal control requires StartupRenderReplay; it is not an FPS capture'
 }
 if ($RecordStartupMotion -and -not $StartupRenderReplay) {
     throw 'Motion recording requires StartupRenderReplay; it is not an FPS capture'
@@ -116,6 +120,7 @@ $report.detail_replay = [bool]$DetailStreamingReplay
 $report.detail_replay_passed = $null
 $report.startup_render_replay = [bool]$StartupRenderReplay
 $report.startup_buffer_visualization = $StartupBufferVisualization
+$report.startup_optical_normal_strength = $StartupOpticalNormalStrength
 $report.startup_buffer_commands_confirmed = $null
 $report.checkpoint_reset_replay = [bool]$CheckpointResetReplay
 if ($StartupRenderReplay) { $report.visual_accepted = $false }
@@ -172,7 +177,11 @@ try {
         $bufferCommands = if ($StartupBufferVisualization) {
             "viewmode VisualizeBuffer,r.BufferVisualizationTarget $StartupBufferVisualization,"
         } else { '' }
-        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption")
+        $normalCommands = if ($null -ne $StartupOpticalNormalStrength) {
+            $strengthText = $StartupOpticalNormalStrength.ToString('R', [cultureinfo]::InvariantCulture)
+            "RaftSim.WaterMaterialProbe SouthForkCurrentNormalStrength $strengthText delay=0.05,"
+        } else { '' }
+        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}${normalCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption")
     } else {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.

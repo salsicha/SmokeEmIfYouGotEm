@@ -1509,6 +1509,25 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     }
 #if !UE_BUILD_SHIPPING
     if(GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimEphemeralProfile")) &&
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimOpticalNormalFilterReview")))
+    {
+        FString Variant;
+        FParse::Value(FCommandLine::Get(),TEXT("RaftSimOpticalNormalVariant="),Variant);
+        FString ReviewPath=TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/OpticalNormalFilter/M_SouthForkOpticalNormalFilter");
+        if(Variant==TEXT("constant"))ReviewPath+=TEXT("_constant");
+        else if(Variant==TEXT("zero-flow"))ReviewPath+=TEXT("_zero_flow");
+        else if(Variant==TEXT("integer-hash"))ReviewPath+=TEXT("_integer_hash");
+        else if(!Variant.IsEmpty())ReviewPath.Empty();
+        auto* Review=ReviewPath.IsEmpty() ? nullptr : LoadObject<UMaterialInterface>(nullptr,*ReviewPath);
+        if(Review)
+        {
+            LiveVolumeCoreMaterial=Review;
+            UE_LOG(LogTemp,Display,TEXT("Optical normal filter review: existing South Fork carrier; not appearance acceptance"));
+        }
+        else UE_LOG(LogTemp,Error,TEXT("Optical normal filter review unavailable; no diagnostic acceptance"));
+    }
+    if(GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
         FParse::Param(FCommandLine::Get(),TEXT("RaftSimPairedFoamFlowReview")))
     {
         auto* Review=LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/PairedFoamFlow/M_SouthForkPairedFoamFlow"));

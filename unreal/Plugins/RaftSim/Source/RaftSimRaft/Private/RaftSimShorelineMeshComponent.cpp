@@ -149,6 +149,13 @@ public:
         // and subsequently upload only the exact referenced dense prefix.
         Vertices.Init(RenderVertex(Component->GetWaterVertices()[0]),Component->GetWaterVertices().Num());
         for (int32 I=0; I<Packet.Vertices.Num(); ++I) Vertices[I]=Packet.Vertices[I];
+        // Isolated precision control, never inferred from a diagnostic pass.
+        if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimEphemeralProfile")) &&
+            FParse::Param(FCommandLine::Get(),TEXT("RaftSimFullPrecisionWaterUVs")))
+        {
+            Buffers.StaticMeshVertexBuffer.SetUseFullPrecisionUVs(true);
+            UE_LOG(LogTemp,Display,TEXT("Water UV precision review: four full-float UV channels; topology and normals unchanged"));
+        }
         Buffers.InitFromDynamicVertex(&VertexFactory, Vertices, 4);
         IndexBuffer.Indices.Init(0, Component->GetIndexCapacity());
         FMemory::Memcpy(IndexBuffer.Indices.GetData(), Packet.Indices.GetData(), ActiveIndices*sizeof(uint32));

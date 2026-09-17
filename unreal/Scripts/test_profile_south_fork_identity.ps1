@@ -80,3 +80,23 @@ foreach ($invalidLog in @('', 'r.BufferVisualizationTarget = "WorldNormal"', ($v
 }
 if (Test-RaftSimBufferDiagnosticLog $validLog 'Roughness') { throw 'Wrong buffer accepted' }
 'PASS: rejected, absent and wrong-buffer command evidence fails closed'
+$rejected = $false
+try {
+    & $source -Label 'south-fork-test-invalid-normal' -CookProcessId 0 -CookStartUtc 'invalid' -StartupOpticalNormalStrength 0
+} catch {
+    if ($_.Exception.Message -ne 'Optical normal control requires StartupRenderReplay; it is not an FPS capture') { throw }
+    $rejected = $true
+}
+if (-not $rejected) { throw 'Optical normal control was allowed in a performance capture' }
+$normalAssignment = @($ast.FindAll({
+    param($node)
+    $node -is [Management.Automation.Language.AssignmentStatementAst] -and
+    $node.Left.Extent.Text -eq '$normalCommands'
+}, $true))
+if ($normalAssignment.Count -ne 1) { throw 'Expected one production optical normal command builder' }
+$buildNormal = [scriptblock]::Create($normalAssignment[0].Extent.Text + '; $normalCommands')
+foreach ($StartupOpticalNormalStrength in @($null, 0.0, 0.18, 1.0)) {
+    $expected = if ($null -ne $StartupOpticalNormalStrength) { 'RaftSim.WaterMaterialProbe SouthForkCurrentNormalStrength ' + $StartupOpticalNormalStrength.ToString('R', [cultureinfo]::InvariantCulture) + ' delay=0.05,' } else { '' }
+    if ((& $buildNormal) -cne $expected) { throw 'Optical control changed default capture or lost its explicit value' }
+}
+'PASS: optical normal controls are explicit, startup-only and invariant-culture'
