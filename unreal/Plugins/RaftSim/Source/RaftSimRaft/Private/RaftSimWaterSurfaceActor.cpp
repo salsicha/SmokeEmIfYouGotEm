@@ -8540,6 +8540,26 @@ void ARaftSimWaterSurfaceActor::SampleBoatWakeState()
     bBoatWakeValid = true;
 }
 
+bool ARaftSimWaterSurfaceActor::SavePresentedCarrierShapeAudit(const FString& Path) const
+{
+#if !UE_BUILD_SHIPPING
+    if (!GetWorld() || !WaterAdapter || !WaterAdapter->HasCartesianWaterCoordinates() ||
+        !CartesianShorelineMesh) return false;
+    const auto Detail=MovingDetail ? MovingDetail->GetPresentedFrame() : nullptr;
+    const float Sign=WaterAdapter->GetRiverWorldYSign();
+    const FVector Focus=FoamOcclusionRaft ? FoamOcclusionRaft->GetActorLocation() : GetActorLocation();
+    return RaftSimCarrierShapeAudit::Save(Path,
+        CartesianShorelineMesh->GetWaterVertices(),CartesianShorelineMesh->GetWaterIndices(),
+        CartesianShorelineMesh->GetActiveVertexCount(),CartesianShorelineMesh->GetCrestRefinement(),
+        [&](const FVector& P)->double { return Detail ? Detail->DisplacementCm(P,Sign) : 0.; },
+        GetWorld()->GetTimeSeconds(),Detail ? Detail->Sequence : 0,GetResolvedLiveSurfaceRenderLiftCm(),
+        Focus,GridStationN,GridLateralN,RiverCoordinatesM,CartesianShoreWet,
+        CartesianShoreDepthM,CartesianShoreBedM,Sign,LiveVolumeCoreVertices,MacroCrestDisplacementCm);
+#else
+    return false;
+#endif
+}
+
 void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Positions,
     const TArray<FVector>& VertexNormals, const TArray<FLinearColor>& Colors,
     const TArray<FVector2D>& Flow, const TArray<FVector2D>& Wake, bool bCreate,float CrestBlendAlpha)
@@ -8603,17 +8623,7 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             !FPaths::FileExists(ShapeAuditPath))
         {
             // Inspect the already presented payload; do not force a new commit.
-            const auto Detail=MovingDetail ? MovingDetail->GetPresentedFrame() : nullptr;
-            const float Sign=WaterAdapter->GetRiverWorldYSign();
-            const FVector Focus=FoamOcclusionRaft ? FoamOcclusionRaft->GetActorLocation() : GetActorLocation();
-            const bool Saved=RaftSimCarrierShapeAudit::Save(ShapeAuditPath,
-                CartesianShorelineMesh->GetWaterVertices(),CartesianShorelineMesh->GetWaterIndices(),
-                CartesianShorelineMesh->GetActiveVertexCount(),CartesianShorelineMesh->GetCrestRefinement(),
-                [&](const FVector& P)->double { return Detail ? Detail->DisplacementCm(P,Sign) : 0.; },
-                GetWorld()->GetTimeSeconds(),Detail ? Detail->Sequence : 0,GetResolvedLiveSurfaceRenderLiftCm(),
-                Focus,GridStationN,GridLateralN,RiverCoordinatesM,CartesianShoreWet,
-                CartesianShoreDepthM,CartesianShoreBedM,Sign,
-                LiveVolumeCoreVertices,MacroCrestDisplacementCm);
+            const bool Saved=SavePresentedCarrierShapeAudit(ShapeAuditPath);
             if (Saved) { UE_LOG(LogTemp,Display,TEXT("Submitted carrier shape saved: %s"),*ShapeAuditPath); }
             else { UE_LOG(LogTemp,Error,TEXT("Submitted carrier shape capture refused: %s"),*ShapeAuditPath); }
         }

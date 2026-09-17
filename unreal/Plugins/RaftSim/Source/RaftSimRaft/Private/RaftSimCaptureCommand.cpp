@@ -26,6 +26,8 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
 #include "Misc/Paths.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "NiagaraComponent.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimRaftActor.h"
@@ -894,6 +896,19 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                     FScreenshotRequest::RequestScreenshot(
                         OutPath, /*bShowUI=*/false,
                         /*bAddFilenameSuffix=*/false);
+                    if (*Taken==0 && FParse::Param(FCommandLine::Get(),TEXT("RaftSimCaptureFirstCarrierShape")))
+                    {
+                        // Observe at the screenshot request, not at an earlier
+                        // publication. Still not a render-thread/GPU fence.
+                        ARaftSimWaterSurfaceActor* Surface=nullptr;
+                        int32 Surfaces=0;
+                        for (TActorIterator<ARaftSimWaterSurfaceActor> It(W2);It;++It)
+                        { Surface=*It;++Surfaces; }
+                        const FString ShapePath=OutPath+TEXT(".carrier.json");
+                        const bool Saved=Surfaces==1 && Surface->SavePresentedCarrierShapeAudit(ShapePath);
+                        if (Saved) { UE_LOG(LogTemp,Display,TEXT("CaptureSeries first carrier shape frame=%llu saved=%s"),GFrameCounter,*ShapePath); }
+                        else { UE_LOG(LogTemp,Error,TEXT("CaptureSeries first carrier shape refused: surfaces=%d path=%s"),Surfaces,*ShapePath); }
+                    }
                     const UGameInstance* GI = W2->GetGameInstance();
                     URaftSimPhysicsBridgeSubsystem* Bridge = GI ?
                         GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;

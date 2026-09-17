@@ -39,6 +39,10 @@ class RAFTSIMRAFT_API ARaftSimWaterSurfaceActor : public AActor
 public:
     ARaftSimWaterSurfaceActor();
 
+    // Read-only observation of the currently submitted carrier and presented
+    // detail. Does not update simulation, history or GPU presentation.
+    bool SavePresentedCarrierShapeAudit(const FString& Path) const;
+
     // Terrain-only measurement; every ray, including skipped blockers, consumes
     // the caller's budget. Never changes collision responses or wet physics.
     static bool TraceTerrainSurface(UWorld* World, const FVector& Start,
