@@ -9,9 +9,13 @@ param(
     [switch]$NativePerformanceGate,
     [switch]$DetailStreamingReplay,
     [switch]$StartupRenderReplay,
+    [switch]$RecordStartupMotion,
     [switch]$CheckpointResetReplay
 )
 $ErrorActionPreference = 'Stop'
+if ($RecordStartupMotion -and -not $StartupRenderReplay) {
+    throw 'Motion recording requires StartupRenderReplay; it is not an FPS capture'
+}
 if ($Label -notmatch '^south-fork-[a-z0-9-]+$') { throw 'Use a fresh scoped capture label' }
 if (([int][bool]$NativePerformanceGate + [int][bool]$DetailStreamingReplay + [int][bool]$StartupRenderReplay + [int][bool]$CheckpointResetReplay) -gt 1) {
     throw 'Choose one capture or validation mode'
@@ -149,7 +153,8 @@ try {
         # Observe the ordinary gameplay camera from startup. No warm-up skip,
         # teleport, solver/time override, CSV shutdown or FPS acceptance.
         $start.ArgumentList.Add('-ForceRes')
-        $start.ArgumentList.Add("-ExecCmds=RaftSim.CaptureSeries 0.1 24 0.5 $Label")
+        $motionOption = if ($RecordStartupMotion) { ' record' } else { '' }
+        $start.ArgumentList.Add("-ExecCmds=RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption")
     } else {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.
@@ -197,6 +202,10 @@ try {
         }
         if ($CheckpointResetReplay) { $report.checkpoint_frames = $frameEvidence }
         else { $report.startup_frames = $frameEvidence }
+    }
+    if ($RecordStartupMotion) {
+        . (Join-Path $PSScriptRoot 'raftsim_startup_motion_evidence.ps1')
+        $report.startup_motion = Get-RaftSimStartupMotionEvidence -LogText (Get-Content -LiteralPath $logFile -Raw) -VideoRoot (Join-Path $projectRoot 'unreal/Saved/VideoCaptures')
     }
     if ($CheckpointResetReplay) {
         if (-not (Test-Path -LiteralPath $checkpointReplayFile)) { throw 'Native checkpoint report was not produced' }

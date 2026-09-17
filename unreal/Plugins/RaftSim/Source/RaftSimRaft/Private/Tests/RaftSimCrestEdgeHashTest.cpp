@@ -1,5 +1,6 @@
 #include "Misc/AutomationTest.h"
 #include "RaftSimSurfaceRefinement.h"
+#include "RaftSimIndexedBreakingProfile.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrestEdgeHashTest,
@@ -141,6 +142,67 @@ bool FRaftSimCrestTopologyStorageTest::RunTest(const FString&)
         Compared+=A.Num();
     }
     AddInfo(FString::Printf(TEXT("Exact topology storage reuse over36 moving/deformed roots, crops, winding, flat/nonflat profiles,0/1/3 levels and explicit invalidation: %lld vertices"),Compared));
+    return !HasAnyErrors();
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrestEmptyTileTest,
+    "RaftSim.M4.CrestEmptyTile",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FRaftSimCrestEmptyTileTest::RunTest(const FString&)
+{
+    using FSite=URaftSimWaterRuntimeAdapter::FSupportBreakingSite;
+    FRandomStream Random(842619);int64 Compared=0,EmptySamples=0,NonzeroSamples=0;
+    for(int32 Case=0;Case<11;++Case)
+    {
+        TArray<FSite> Sites;
+        for(int32 I=0;I<24 && Case!=8;++I)
+        {
+            auto& S=Sites.AddDefaulted_GetRef();
+            S.RiverCoordinatesMeters=FVector2D(-5460.+(I%6)*14.,3590.+(I/6)*11.);
+            S.FlowDirection=RaftSimWaterFlowFrame::FromAngle(I*.71f)*(Case==3 ? 1.31 : 1.);
+            S.PhysicalCrestHeightMeters=Case==10 ? 0.f : (I==23 ? 1.7f : .12f+(I%5)*.15f);
+            S.PhysicalCrestLengthMeters=1.f+(I%9);S.SpillingFraction=(I%4)*.41f;
+            S.bLocalEnvelopeCap=Case==0 || (Case!=1 && I%2==0);S.Intensity=.7f;
+        }
+        if(Case==4)Sites[11].PhysicalCrestHeightMeters=-1.f;
+        if(Case==5)Sites[8].FlowDirection=FVector2D::ZeroVector;
+        if(Case==6)Sites[7].RiverCoordinatesMeters.X=1.e9;
+        if(Case==7)Algo::Reverse(Sites);
+        if(Case==9)Sites[7].RiverCoordinatesMeters=FVector2D(20000.,20000.);
+        FRaftSimIndexedBreakingProfile Index(Sites,.35f,.7f),Copy=Index;
+        const FRaftSimIndexedBreakingProfile Moved=MoveTemp(Copy);
+        TestEqual(TEXT("unsupported index stays on full evaluator"),Index.IsIndexed(),Case!=4 && Case!=5 && Case!=6);
+        const auto Compare=[&](const FVector2D& P)
+        {
+            float FullFoam=-1.f;
+            const float Full=URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(P,Sites,.35f,.7f,&FullFoam);
+            for(bool Dense:{false,true})
+            {
+                float OldFoam=-1.f,FastFoam=-1.f,MovedFoam=-1.f;
+                const float Old=Index.Sample(P,&OldFoam,Dense);
+                const float Fast=Index.SampleWithEmptyTileSkip(P,&FastFoam,Dense,true);
+                const float AfterMove=Moved.SampleWithEmptyTileSkip(P,&MovedFoam,Dense,true);
+                if(Full!=Old || Full!=Fast || Full!=AfterMove || FullFoam!=OldFoam || FullFoam!=FastFoam || FullFoam!=MovedFoam ||
+                    Index.Sample(P)!=Index.SampleWithEmptyTileSkip(P,nullptr,Dense,true))
+                {AddError(FString::Printf(TEXT("Empty-tile mismatch case%d at %.17g,%.17g"),Case,P.X,P.Y));return false;}
+            }
+            EmptySamples+=Full==0 && FullFoam==0;NonzeroSamples+=Full!=0 || FullFoam!=0;
+            ++Compared;return true;
+        };
+        for(int32 I=0;I<16000;++I)
+            if(!Compare(FVector2D(Random.FRandRange(-5540.f,-5280.f),Random.FRandRange(3480.f,3740.f))))return false;
+        for(const auto& Site:Sites)
+        {
+            const double Norm=Site.FlowDirection.SizeSquared();
+            if(Norm==0 || Site.PhysicalCrestHeightMeters<0)continue;
+            const float L=FMath::Clamp(Site.PhysicalCrestLengthMeters,2.f,7.f);
+            for(double D:{-3.*L,0.,7.*L})for(double A:{-12.,0.,12.})for(double E:{-.00001,0.,.00001})
+                if(!Compare(Site.RiverCoordinatesMeters+RaftSimWaterFlowFrame::ToField(FVector2D(D+E,A+E),Site.FlowDirection)/Norm))return false;
+        }
+        for(int32 I=-20;I<20;++I)for(double E:{-.00001,0.,.00001})
+            if(!Compare(FVector2D(-5464.+I*8.+E,3592.+I*8.-E)))return false;
+        if(!Compare(FVector2D::ZeroVector) || !Compare(FVector2D(1.e9,-1.e9)))return false;
+    }
+    TestTrue(TEXT("both zero and contributing samples exercised"),EmptySamples>0 && NonzeroSamples>0);
+    AddInfo(FString::Printf(TEXT("Exact empty-tile/full/reference height and foam at %lld points; dense/hash, copy/move, support/tile seams, caps, zero-lift emitters and fallbacks"),Compared));
     return !HasAnyErrors();
 }
 #endif

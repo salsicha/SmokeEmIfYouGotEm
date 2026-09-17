@@ -13,6 +13,7 @@
 #include "RaftSimCrestEdgeHashAudit.h"
 #include "RaftSimCrestIndexedEdgeAudit.h"
 #include "RaftSimCrestTopologyStorageAudit.h"
+#include "RaftSimCrestEmptyTileAudit.h"
 #include "RaftSimCrestLevelMemoAudit.h"
 #include "RaftSimCrestRangeAudit.h"
 #include "RaftSimCrestPreparedRangeAudit.h"
@@ -185,6 +186,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         RaftSimCrestEdgeHashAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestIndexedEdgeAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestTopologyStorageAudit::Run(CachedXY,Triangles,Input,Refinement);
+        RaftSimCrestEmptyTileAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestLevelMemoAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestPreparedRangeAudit::Run(CachedXY,Triangles,Input,Refinement);

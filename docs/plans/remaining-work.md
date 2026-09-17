@@ -3,7 +3,20 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [paired foam current installed](../reconstruction-review-2026-09-07/paired-foam-current-installed.md).
+Latest: [crest capacity and empty-tile candidates rejected](../reconstruction-review-2026-09-07/crest-capacity-and-empty-tile-rejection.md).
+Both preserve exact output but fail robust both-order speed qualification;
+neither enabled or installed. Empty-tile native34 PASS,183,768 exact height/foam
+samples; Python60 PASS. Two actual64-pair captures retained, including v2 failure.
+Last ordinary27.565906FPS/p9542.8224ms still FAIL30; no new FPS claim.
+Reference players work again; installed broad faces/sheet-like froth still fail
+qualitative comparison. Same cook36872:3300/3350 state AND86,720 dry banks PASS,
+NOT settled(3350:88.040640out/45.306955in). Fresh3350s atlas verifies841 tiles,
+799 packets/42,185,039 source-bed intersections and full-route coverage.
+Native terrain/field verification and actual matching preview remain required;
+no candidate source data promoted. Next3400/local32000 needs BOTH audits.
+Full ordered scene/physics/crew/normalization/regression/release scope stays OPEN.
+
+Previous: [paired foam current installed](../reconstruction-review-2026-09-07/paired-foam-current-installed.md).
 Actual paired capture found2.001822m/s RMS difference in3,310 foamy interior
 vertices;355 CPU optical vectors opposed the GPU mean current. Ordinary South
 Fork now pairs optical flow with displayed density/origin/clock on the existing

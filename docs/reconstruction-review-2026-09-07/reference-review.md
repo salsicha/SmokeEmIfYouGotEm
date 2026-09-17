@@ -1,5 +1,24 @@
 # Troublemaker reference cross-check
 
+## September 17 continuation: reference playback and installed shape recheck
+
+Used the computer-use skill and browser UI; no login, download, upload or security
+change. John Elkins' player initially retained an ended/unavailable state, but
+Replay recovered actual footage. Inspected the raft approach and paused at0:21.
+Qweniden's bank-side player resumed at1:05 and was paused/inspected at1:23. Both
+tabs remain available. These are sparse observations during playback, not a
+continuous calibrated recording or measured discharge/bathymetry.
+
+The bank view shows exposed rock constrictions, separated spilling tongues,
+bright irregular aeration and darker gaps; the raft advances through them.
+Reinspected ordinary installed engine frame
+`unreal/Saved/Screenshots/south-fork-paired-foam-installed-startup-v1-20260917_012.png`:
+broad smooth water faces and sheet-like white regions remain. Different camera,
+flow and lighting prevent pixel matching. This does not justify an optical-only
+mask change or acceptance of the inferred bed. The next source-consistent
+comparison uses the completed3350s candidate, matching terrain AND collision;
+it remains separate from production until its physical/visual gates pass.
+
 ## September 17: both reference players accessible again
 
 Earlier in the startup-carrier investigation, the computer-use skill and its
