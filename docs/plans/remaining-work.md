@@ -15,7 +15,9 @@ Full installed ordinary-map replay58473 is now TERMINAL0/PASS: eight handoffs,
 Same hydraulic11316 resumed;1400s state AND86,720 dry-bank checks PASS, NOT
 settled (outflow82.238582 versus inflow45.306955m3/s). Next1450/local17000
 requires both audits. Last26.784840FPS/p9543.5724ms remains FAIL30.
-NEXT engine result, remaining exact-hydrostatic return audit, compatible nonlinear
+The dyadic rounder separately reproduces781/64,078 failures; a local integer-return
+candidate passes hardware/WARP but is NOT applied to the frozen engine inputs.
+NEXT engine result, dyadic correction plus exact-face gates, compatible nonlinear
 physics and visible wave/froth integration, source-consistent geometry/collision,
 distant in-run reset,30FPS, normalization/source closure, Colorado -> Pacuare ->
 Futaleufu, all-scene water including Chilko/Zambezi, crew and release checks.

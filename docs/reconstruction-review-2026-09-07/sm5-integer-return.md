@@ -90,10 +90,27 @@ ReconstructedPolynomialGPU require SM6/FP64 in the current test implementation;
 their original SM5 failures remain open, not waived or counted as passes.
 The original51 clean passes and one warned pass were not silently reclassified.
 
-An additional branch-local encoding pattern exists in `RaftSimDyadicRound` in
-`RaftSimExactHydrostatic.ush`. It is not changed during this live engine replay;
-its exact-face fixtures need a scoped compiler/GPU audit next. Do not assume the
-scalar repair resolves every full-step or reconstructed-pressure failure.
+The additional encoding defect in `RaftSimDyadicRound` in
+`RaftSimExactHydrostatic.ush` is now reproduced independently: a dyadic-addition
+probe fails781 of the same64,078 exact-add cases, with zero transported-input
+errors and zero failures in the already-corrected wide control. The finite dyadic
+rounder has no signed-zero/nonfinite-input policy, so those scalar-fixture cases
+are handled explicitly outside it; the expected fixture bytes are unchanged.
+This is a rounder check, not the full reconstructed-face or pressure oracle.
+
+A mechanically generated local candidate merges its encoded integer returns
+before the bitcast and passes all64,078 cases on hardware and WARP. Candidate
+`tmp/sm5-dyadic-return-candidate-v1-20260917.ush`, SHA256
+`521b50bac053ebebe1c6fe52ee39b96ede91fd76c85d5a7181f62d6211e987e0`.
+Baseline probe/compile/assembly/GPU evidence uses
+`tmp/sm5-dyadic-return-probe-v1-20260917*`; candidate evidence uses
+`tmp/sm5-dyadic-return-candidate-v1-20260917*`. This candidate is NOT applied to
+production while the engine replay is live. Next, retain that terminal result,
+integrate the dyadic return correction, then run exact-face and full-step gates.
+Do not assume the scalar repair resolves every reconstructed-pressure failure.
+
+The hand-written `physics/tests/*.hlsl` regression source is explicitly normal
+Git text. The existing LFS rule for captured HLSL dumps elsewhere is unchanged.
 
 ## Ordinary play and hydraulic continuation
 
