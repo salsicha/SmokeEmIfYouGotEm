@@ -16,7 +16,7 @@ from package_runtime_bundle import verify_staged, sha
 
 
 def main():
-    bundle = ROOT/'physics/data/runtime_bundles/south_fork_saved_scene_v1'
+    bundle = ROOT/'physics/data/runtime_bundles/south_fork_source_matched_v2'
     staged = Path(os.environ['RAFTSIM_RUNTIME_BUNDLE_ROOT']).resolve()
     report = Path(os.environ['RAFTSIM_RUNTIME_BUNDLE_REPORT']).resolve()
     if report.exists() or not report.is_relative_to(ROOT/'tmp'):
@@ -88,4 +88,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    finally:
+        unreal.SystemLibrary.quit_editor()

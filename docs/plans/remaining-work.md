@@ -3,7 +3,22 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [qualified faster offline cook and exact handoff](../reconstruction-review-2026-09-07/offline-cook-workers.md).
+Latest: [source-matched reconstruction installed in normal South Fork](../reconstruction-review-2026-09-07/source-matched-installed.md).
+Normal FullReach now saves matching revised terrain, captured-rock/inferred-flank
+solid and 4950 s water together; no preview flag or new rapid scenario. Exact
+prior scene packages are backed up. Five wet/finite native launch preflights,
+fresh saved-scene reload and 131 focused plus 13 terrain Python tests PASS. New versioned runtime
+bundle contains 2,405 payloads / 917,948,199 bytes. Actual no-preview gameplay
+recording decoded and inspected; broad soft froth/rock/vegetation remain unaccepted.
+Editor and standalone Development builds succeed; six focused native tests PASS.
+Fresh staged native route/water comparisons are exact; ordinary put-in also checked.
+Rebuilt normal run 35.535635 FPS / p95 37.5995 ms still
+FAIL30's p95 budget. All 2,405 actual staged files match with no source fallback.
+Not settled, full-raft/contact, traversal, packaged or final visual acceptance.
+5000/5050/5100 state AND dry-bank audits PASS; same LIVE cook6968 continues toward5400.
+The ordered scene, physics, crew, regression, normalization and release queue stays OPEN.
+
+Previous: [qualified faster offline cook and exact handoff](../reconstruction-review-2026-09-07/offline-cook-workers.md).
 Explicit eight-lane standalone cook is about 30% faster across four alternating
 full-river pairs; all physical records and saved h/u/v arrays are exact. Default
 gameplay remains four lanes. Six native and 20 combined Python tests PASS.

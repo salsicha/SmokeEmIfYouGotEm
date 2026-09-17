@@ -8,8 +8,7 @@ import json
 import math
 from pathlib import Path
 
-from south_fork_rock_union import sha
-from south_fork_rock_union_packets import dependencies as source_dependencies
+from package_runtime_bundle import sha
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -139,6 +138,10 @@ def bind_terrain_replacement(deps,geometry,collision,material,translation):
 
 
 def prepare(args):
+    # Native Unreal Python reuses the evidence/hash checks without NumPy.
+    # Geometry reconstruction is needed only while constructing a descriptor.
+    from south_fork_rock_union_packets import dependencies as source_dependencies
+
     output = args.output.resolve()
     require(not output.exists() and output.is_relative_to(ROOT / 'tmp'), 'Fresh project tmp output required')
     deps = Dependencies()
