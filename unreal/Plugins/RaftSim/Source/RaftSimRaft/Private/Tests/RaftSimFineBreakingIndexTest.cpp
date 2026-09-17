@@ -33,7 +33,7 @@ bool FRaftSimFineBreakingIndexTest::RunTest(const FString&)
         {
             FSite S;S.RiverCoordinatesMeters=FVector2D(I*2.1-8.,I%3*3.7-4.);
             S.PhysicalCrestHeightMeters=I%4*.37f;S.PhysicalCrestLengthMeters=1.4f+I*.83f;
-            S.SpillingFraction=I%3*.42f;S.bLocalEnvelopeCap=(I+Pass)%2;
+            S.SpillingFraction=I%3*.42f;S.bLocalEnvelopeCap=(I+Pass)%2!=0;
             const double Angle=(I+Pass)*.37,Norm=Pass%3==0?.8:1.;
             S.FlowDirection=Norm*FVector2D(FMath::Cos(Angle),FMath::Sin(Angle));Sites.Add(S);
         }

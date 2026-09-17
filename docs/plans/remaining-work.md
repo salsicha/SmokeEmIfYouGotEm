@@ -3,7 +3,18 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [complete registered front sources](../reconstruction-review-2026-09-07/normal-river-registered-front-sources.md).
+Latest: [finer crest lookup rejected](../reconstruction-review-2026-09-07/fine-crest-index-rejected.md).
+29 native PASS,398,145 exact fixture queries; actual1,200-frame audit preserves
+125,947,647 queries exactly. Four audit-free coarse/fine/fine/coarse runs fail
+repeatable speed qualification and30FPS: fine27.312398/27.768909FPS,
+p9542.1879/42.0379ms. Do NOT enable/install or sweep more tile sizes.
+Installed gameplay unchanged; physical/visual/motion gates remain OPEN.
+Nine frame-audit tests and PowerShell profile checks PASS. Same LIVE cook17516:
+4250 state AND86,720 dry banks PASS, NOT settled(97.843669out/45.306955in).
+Next4300/local14000 needs marker AND both audits. Full scene/crew/release scope
+remains; Troublemaker is a rapid within South Fork, never a menu scenario.
+
+Previous: [complete registered front sources](../reconstruction-review-2026-09-07/normal-river-registered-front-sources.md).
 Whole original-terrain search resolves the positive ray outside the water-state
 audit block without snapping or extrapolation. All11 conditional rays now have
 terrain owners; captured rock/inferred flank provenance stays explicit. Old
