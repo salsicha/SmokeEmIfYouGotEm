@@ -3,7 +3,17 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [original initial-water front support](../reconstruction-review-2026-09-07/normal-river-initial-front-support.md).
+Latest: [finite-time local affine-bed dry fan](../reconstruction-review-2026-09-07/normal-river-affine-dry-fan.md).
+Local rarefaction now evolves donor/fan depth and momentum with original bed
+work; exact polygon budgets and independent time/PDE controls pass. 51 focused
+PASS; broader suite 717 PASS / 13 unchanged FAIL. All eleven actual-source local predictors retain positive dry-side water
+and exact budget partitions. They freeze one interface state, NOT the full
+varying inlet: spatial coupling, slope junctions and dispersive work remain OPEN.
+Same live cook 17516: 4500s state AND dry banks PASS; NOT settled
+(103.557730 out / 45.306955 in). Next 4550/local19000 needs BOTH audits.
+No installed, visual, motion or FPS acceptance; full ordered queue remains.
+
+Previous: [original initial-water front support](../reconstruction-review-2026-09-07/normal-river-initial-front-support.md).
 Exact stage/bed trace partition now guards conditional dry-front rates against
 wet or unknown initial state. The same original 16x16 patch resolves all eleven
 outward rays, including cell 171 / triangle 198093 outside the small audit block.
