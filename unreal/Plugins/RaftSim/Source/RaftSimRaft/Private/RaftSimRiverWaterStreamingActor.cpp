@@ -16,6 +16,7 @@
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimTerrainProbeSources.h"
 #include "RaftSimDetailSourceFootprint.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -410,7 +411,7 @@ void ARaftSimRiverWaterStreamingActor::HandleLevelAddedToWorld(
     for (AActor* Actor : Level->Actors)
     {
         ApplyStaticFlowBandVisibilityToActor(Actor);
-        bTerrainArrived |= Actor && Actor->ActorHasTag(TEXT("RaftSimFullReachTerrain"));
+        bTerrainArrived |= RaftSimTerrainProbeSources::ActorHasSource(Actor);
     }
     if (bTerrainArrived)
     {

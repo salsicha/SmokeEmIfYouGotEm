@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from audit_carrier_camera_rays import camera_ray, nearest_triangle, probe
+from audit_carrier_camera_rays import camera_ray, nearest_triangle, probe, terrain_comparison
 
 
 class CarrierCameraRaysTest(unittest.TestCase):
@@ -80,6 +80,27 @@ class CarrierCameraRaysTest(unittest.TestCase):
         args[5][:, 0] = [3, 2, 1, 0]
         with self.assertRaisesRegex(ValueError, 'normals'):
             probe(*args, [[110, 70]])
+
+    def test_signed_terrain_gap_is_not_clamped_or_invented(self):
+        view = self.view()
+        view['world_cm_to_clip_row_matrix'] = [[2, 0, 0, 0], [0, 3, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]]
+        origin, direction = camera_ray(view, view, [110, 70])
+        hit = dict(world_m=[0., 0., 1.])
+        self.assertIsNone(terrain_comparison(view, [110, 70], hit, origin, direction))
+        row = dict(pixel=[110, 70], hit=True, ray_origin_cm=(origin*100).tolist(),
+                   ray_direction=direction.tolist(), ground_world_cm=[0, 0, 150])
+        view['terrain_ray_probes'] = [row]
+        result = terrain_comparison(view, [110, 70], hit, origin, direction)
+        self.assertEqual(result['signed_distance_behind_water_m'], .5)
+        self.assertEqual(result['signed_camera_depth_gap_cm'], 50.)
+        self.assertEqual(result['independent_direction_error'], 0.)
+        row['ground_world_cm'][2] = 50
+        self.assertEqual(terrain_comparison(view, [110, 70], hit, origin, direction)['signed_camera_depth_gap_cm'], -50.)
+        row['hit'] = False
+        self.assertNotIn('signed_camera_depth_gap_cm', terrain_comparison(view, [110, 70], hit, origin, direction))
+        view['terrain_ray_probes'].append(row)
+        with self.assertRaisesRegex(ValueError, 'Duplicate'):
+            terrain_comparison(view, [110, 70], hit, origin, direction)
 
 
 if __name__ == '__main__':

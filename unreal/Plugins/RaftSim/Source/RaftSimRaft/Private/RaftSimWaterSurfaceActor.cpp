@@ -4,6 +4,7 @@
 #include "RaftSimBreakingTileAudit.h"
 #include "RaftSimWetEdgeAudit.h"
 #include "RaftSimGroundSourceRegistry.h"
+#include "RaftSimTerrainProbeSources.h"
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimWaterSourcePacking.h"
@@ -723,16 +724,20 @@ bool ARaftSimWaterSurfaceActor::TraceTerrainSurface(UWorld* World,
                 ECC_WorldStatic, TerrainParams)) return false;
         const AActor* Actor = Hit.GetActor();
         if (!Actor) return false;
-        // Keep the runtime film-cull scope unchanged: South Fork's tagged
-        // terrain only. Other rivers retain their existing shoreline policy.
-        if (Actor->ActorHasTag(TEXT("RaftSimFullReachTerrain")))
+        // Reconstructed physical ground replaced the legacy full-reach tiles.
+        // Water probes must recognize the same captured sources as contact.
+        if (RaftSimTerrainProbeSources::IsSource(Hit.GetComponent()))
         {
             OutHit = Hit;
             return true;
         }
         // Multi-by-channel also stops at the first blocker. Explicitly skip
         // unrelated proxies, dressing and boats, then repeat the same ray.
-        TerrainParams.AddIgnoredActor(Actor);
+        // A non-ground sibling component must not hide a tagged source on the
+        // same actor. Keep each retry inside the original four-ray/budget bound.
+        if (const UPrimitiveComponent* Component=Hit.GetComponent())
+            TerrainParams.AddIgnoredComponent(Component);
+        else TerrainParams.AddIgnoredActor(Actor);
     }
     return false;
 }

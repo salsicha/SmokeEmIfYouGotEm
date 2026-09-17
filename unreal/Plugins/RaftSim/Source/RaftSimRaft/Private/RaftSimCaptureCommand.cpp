@@ -84,6 +84,58 @@ static bool SaveCarrierViewAudit(UWorld* World, const FString& Path)
     Report->SetNumberField(TEXT("world_seconds"), World->GetTimeSeconds());
     Report->SetArrayField(TEXT("world_cm_to_clip_row_matrix"), MatrixRows);
     Report->SetArrayField(TEXT("constrained_view_rect"), RectValues);
+    FString ProbeText;
+    // Commas/semicolons belong to the probe list, not command-line separators.
+    if (FParse::Value(FCommandLine::Get(), TEXT("RaftSimCaptureTerrainPixels="), ProbeText, false))
+    {
+        TArray<FString> Probes;
+        ProbeText.ParseIntoArray(Probes, TEXT(";"), true);
+        if (Probes.IsEmpty() || Probes.Num() > 32) return false;
+        TArray<TSharedPtr<FJsonValue>> Hits;
+        int32 Budget = 128;
+        const auto VectorJson = [](const FVector& V)
+        {
+            TArray<TSharedPtr<FJsonValue>> Values;
+            for (double X : {V.X,V.Y,V.Z}) Values.Add(MakeShared<FJsonValueNumber>(X));
+            return Values;
+        };
+        for (const FString& Probe : Probes)
+        {
+            FString X, Y;
+            if (!Probe.Split(TEXT(","), &X, &Y) || !X.IsNumeric() || !Y.IsNumeric()) return false;
+            const FVector2D Pixel(FCString::Atod(*X), FCString::Atod(*Y));
+            if (Pixel.ContainsNaN() || Pixel.X < Rect.Min.X || Pixel.Y < Rect.Min.Y ||
+                Pixel.X >= Rect.Max.X || Pixel.Y >= Rect.Max.Y) return false;
+            FVector Origin, Direction;
+            FSceneView::DeprojectScreenToWorld(Pixel, Rect, Matrix.Inverse(), Origin, Direction);
+            FCollisionQueryParams Params(TEXT("RaftSimCarrierCameraTerrain"), true);
+            Params.bReturnFaceIndex = true;
+            FHitResult Hit;
+            const int32 Before = Budget;
+            const bool Found = ARaftSimWaterSurfaceActor::TraceTerrainSurface(World,
+                Origin, Origin + Direction*100000.f, Params, Budget, Hit);
+            auto Row = MakeShared<FJsonObject>();
+            TArray<TSharedPtr<FJsonValue>> Pixels;
+            Pixels.Add(MakeShared<FJsonValueNumber>(Pixel.X));
+            Pixels.Add(MakeShared<FJsonValueNumber>(Pixel.Y));
+            Row->SetArrayField(TEXT("pixel"), Pixels);
+            Row->SetArrayField(TEXT("ray_origin_cm"), VectorJson(Origin));
+            Row->SetArrayField(TEXT("ray_direction"), VectorJson(Direction));
+            Row->SetBoolField(TEXT("hit"), Found);
+            Row->SetNumberField(TEXT("rays_used"), Before-Budget);
+            if (Found)
+            {
+                Row->SetArrayField(TEXT("ground_world_cm"), VectorJson(Hit.ImpactPoint));
+                Row->SetNumberField(TEXT("distance_cm"), Hit.Distance);
+                Row->SetNumberField(TEXT("face_index"), Hit.FaceIndex);
+                Row->SetStringField(TEXT("actor"), Hit.GetActor()->GetPathName());
+                Row->SetStringField(TEXT("component"), Hit.GetComponent() ? Hit.GetComponent()->GetPathName() : TEXT("unavailable"));
+            }
+            Hits.Add(MakeShared<FJsonValueObject>(Row));
+        }
+        Report->SetArrayField(TEXT("terrain_ray_probes"), Hits);
+        Report->SetStringField(TEXT("terrain_ray_scope"), TEXT("Current complex collision against legacy full-reach terrain or actor/component-tagged physical-ground static meshes via the bounded trace helper. Maximum 1km, at most four attempts per probe; missing hit is unavailable. Not GPU scene depth, refraction, or unrestricted scene occlusion."));
+    }
     Report->SetStringField(TEXT("scope"), TEXT("LocalPlayer game-thread projection at the screenshot request. Row-vector world centimeters to UE reversed-Z clip coordinates. No render-thread fence, temporal jitter, terrain/crew occlusion or pixel visibility acceptance."));
     FString Json;
     return FJsonSerializer::Serialize(Report, TJsonWriterFactory<>::Create(&Json)) &&
@@ -171,13 +223,24 @@ static void HandleWaterMaterialProbe(const TArray<FString>& Args, UWorld* World)
                     TEXT("HydraulicFoamIntensity"), TEXT("WaterRoughness"),
                     TEXT("HydraulicFoamCoverageGain"), TEXT("HydraulicFoamColorBreakupGain"),
                     TEXT("HydraulicFoamColorCoreGain"), TEXT("WhitewaterFrothLaceModulationFloor"),
-                    TEXT("SouthForkTravelingWaveWPOStrength"), TEXT("RaftSimLocalFluidWPOStrength")})
+                    TEXT("SouthForkTravelingWaveWPOStrength"), TEXT("RaftSimLocalFluidWPOStrength"),
+                    TEXT("ShallowWaterOpacity"), TEXT("DeepWaterOpacity"),
+                    TEXT("OpticalDepthResponseExponent"), TEXT("ApplyLiveLevelShoreClip")})
                 {
                     float Value = 0;
                     const bool Found = Material->GetScalarParameterValue(
                         FHashedMaterialParameterInfo(FName(Name)), Value);
                     UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s material=%s parameter=%s found=%d value=%.4f"),
                         *Component->GetName(), *Material->GetName(), Name, Found, Value);
+                }
+                for (const TCHAR* Name : {TEXT("WaterScattering"), TEXT("WaterAbsorption"),
+                    TEXT("RiverbedColorScale"), TEXT("ShallowWaterColor"), TEXT("DeepWaterColor")})
+                {
+                    FLinearColor Value;
+                    const bool Found = Material->GetVectorParameterValue(
+                        FHashedMaterialParameterInfo(FName(Name)), Value);
+                    if (Found) { UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s material=%s vector=%s value=%s"),
+                        *Component->GetName(), *Material->GetName(), Name, *Value.ToString()); }
                 }
             }
         }
@@ -933,6 +996,55 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                     // single slot: overwriting it silently dropped numbered
                     // evidence frames. Count only accepted requests.
                     if (FScreenshotRequest::IsScreenshotRequested()) return;
+                    if (*Taken == 0)
+                    {
+                        float ExtinctionScale = 0.f;
+                        if (FParse::Value(FCommandLine::Get(), TEXT("RaftSimCaptureWaterExtinctionScale="), ExtinctionScale) &&
+                            FMath::IsFinite(ExtinctionScale) && ExtinctionScale >= 0.f && ExtinctionScale <= 1.f)
+                        {
+                            for (TActorIterator<ARaftSimWaterSurfaceActor> It(W2); It; ++It)
+                            {
+                                TInlineComponentArray<UMeshComponent*> Components(*It);
+                                for (UMeshComponent* Component : Components)
+                                    if (Component->GetName() == TEXT("CartesianShorelineMesh"))
+                                        if (auto* Material = Cast<UMaterialInstanceDynamic>(Component->GetMaterial(0)))
+                                            for (const TCHAR* Name : {TEXT("WaterScattering"), TEXT("WaterAbsorption"), TEXT("AeratedWaterScattering")})
+                                            {
+                                                FLinearColor Value;
+                                                if (Material->GetVectorParameterValue(FHashedMaterialParameterInfo(FName(Name)), Value))
+                                                {
+                                                    Material->SetVectorParameterValue(FName(Name), Value * ExtinctionScale);
+                                                    UE_LOG(LogTemp, Display, TEXT("Capture extinction control: %s scale=%.6f"), Name, ExtinctionScale);
+                                                }
+                                            }
+                            }
+                        }
+                        if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimCaptureHideLiveCarrier")))
+                        {
+                            for (TActorIterator<ARaftSimWaterSurfaceActor> It(W2); It; ++It)
+                            {
+                                TInlineComponentArray<UMeshComponent*> Components(*It);
+                                for (UMeshComponent* Component : Components)
+                                    if (Component->GetName() == TEXT("CartesianShorelineMesh"))
+                                    {
+                                        Component->SetHiddenInGame(true);
+                                        UE_LOG(LogTemp, Display, TEXT("Capture visibility ablation: hidden %s"), *Component->GetPathName());
+                                    }
+                            }
+                            LogVisibleWaterPresentationInventory(W2);
+                        }
+                        float Opacity = 0.f;
+                        if (FParse::Value(FCommandLine::Get(), TEXT("RaftSimCaptureShallowOpacity="), Opacity))
+                        {
+                            // Explicit, process-local optical control. Does not
+                            // change wet membership, geometry or conserved state.
+                            if (FMath::IsFinite(Opacity) && Opacity >= 0.f && Opacity <= 1.f)
+                                HandleWaterMaterialProbe({TEXT("ShallowWaterOpacity"), FString::SanitizeFloat(Opacity)}, W2);
+                            else { UE_LOG(LogTemp, Error, TEXT("Invalid capture shallow opacity; no override applied")); }
+                        }
+                        else if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimCaptureFirstCarrierShape")))
+                            HandleWaterMaterialProbe({}, W2);
+                    }
                     const FString OutPath = FPaths::Combine(
                         FPaths::ProjectSavedDir(),
                         TEXT("Screenshots"),

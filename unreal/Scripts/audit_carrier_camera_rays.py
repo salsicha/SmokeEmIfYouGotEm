@@ -60,6 +60,38 @@ def nearest_triangle(origin, direction, xyz):
     return index, float(distance[index]), np.array([1-u[index]-v[index], u[index], v[index]])
 
 
+def terrain_comparison(view, pixel, water_hit, origin, direction):
+    """Signed collision gap on the camera ray, not shader/refraction depth."""
+    records = [r for r in view.get('terrain_ray_probes', []) if r['pixel'] == list(pixel)]
+    if len(records) > 1:
+        raise ValueError('Duplicate terrain probe')
+    if not records:
+        return None
+    record = records[0]
+    if not isinstance(record['hit'], bool):
+        raise ValueError('Invalid terrain hit flag')
+    engine_origin = np.asarray(record['ray_origin_cm'], dtype=float)*.01
+    engine_direction = np.asarray(record['ray_direction'], dtype=float)
+    if engine_origin.shape != (3,) or engine_direction.shape != (3,) or not all(
+            np.isfinite(a).all() for a in (engine_origin, engine_direction)):
+        raise ValueError('Invalid engine ray')
+    result = dict(hit=record['hit'],
+        independent_origin_error_m=float(np.linalg.norm(engine_origin-origin)),
+        independent_direction_error=float(np.linalg.norm(engine_direction-direction)))
+    if record['hit']:
+        ground = np.asarray(record['ground_world_cm'], dtype=float)*.01
+        if ground.shape != (3,) or not np.isfinite(ground).all():
+            raise ValueError('Invalid terrain position')
+        result.update(ground_world_m=ground.tolist(), actor=record.get('actor'),
+                      face_index=record.get('face_index'))
+        if water_hit is not None:
+            delta = ground-np.asarray(water_hit['world_m'])
+            result['signed_distance_behind_water_m'] = float(np.dot(delta, direction))
+            matrix = np.asarray(view['world_cm_to_clip_row_matrix'])
+            result['signed_camera_depth_gap_cm'] = float(np.dot(delta*100, matrix[:3, 3]))
+    return result
+
+
 def probe(meta, view, vertices, triangles, source, normals, pixels):
     if meta.get('schema') != 'raftsim.submitted_carrier_shape.v2':
         raise ValueError('Current source/target export required')
@@ -114,11 +146,13 @@ def probe(meta, view, vertices, triangles, source, normals, pixels):
                 fully_wet_source_comparison=bool(valid.all()), cpu_normal=normal.tolist(),
                 cpu_normal_face_angle_degrees=float(np.degrees(np.arccos(np.clip(
                     np.dot(normal, face_normal)/(normal_length*face_length), -1., 1.)))) if normal_length else None)
+        row['terrain_collision'] = terrain_comparison(view, pixel, row['hit'], origin, direction)
         rows.append(row)
     return dict(schema='raftsim.carrier_camera_rays.v1', accepted=False,
         game_frame=meta['game_frame'], world_seconds=meta['world_seconds'],
         detail_sequence=meta['detail_sequence'], probes=rows,
-        limitations='Nearest exported CPU water triangle, NOT guaranteed visible water. No terrain/crew occlusion, material vertex displacement, GPU latency, jitter or refraction. CPU normals are not optical normals. Same request epoch is not a GPU fence. Dry-boundary source comparisons are unavailable, not extrapolated.')
+        terrain_scope=view.get('terrain_ray_scope', 'No current terrain ray measurements.'),
+        limitations='Nearest exported CPU water triangle, NOT guaranteed visible water. Optional signed terrain gaps use the recorded terrain-only collision ray, not all occluders or GPU scene depth. No material vertex displacement, GPU latency, jitter or refraction. CPU normals are not optical normals. Same request epoch is not a GPU fence. Dry-boundary source comparisons are unavailable, not extrapolated.')
 
 
 def main():

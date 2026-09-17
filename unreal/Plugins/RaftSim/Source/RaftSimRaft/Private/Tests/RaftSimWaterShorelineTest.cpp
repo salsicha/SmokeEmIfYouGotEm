@@ -2,6 +2,7 @@
 #include "RaftSimWaterSourcePacking.h"
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimTerrainProbeSources.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "Engine/World.h"
@@ -15,6 +16,75 @@
 #include "Engine/StaticMeshActor.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimShorelineTerrainProbeTest,"RaftSim.M4.ShorelineTerrainProbe",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimShorelineTerrainProbeTest::RunTest(const FString&)
+{
+    UWorld* World=UWorld::CreateWorld(EWorldType::Editor,false);
+    if (!World) return false;
+    ON_SCOPE_EXIT { World->DestroyWorld(false); World->RemoveFromRoot(); FlushRenderingCommands(); };
+    auto* Cube=LoadObject<UStaticMesh>(nullptr,TEXT("/Engine/BasicShapes/Cube.Cube"));
+    auto* Ground=World->SpawnActor<AStaticMeshActor>();
+    auto* Blocker=World->SpawnActor<AStaticMeshActor>();
+    if (!TestNotNull(TEXT("ground fixture"),Ground) || !TestNotNull(TEXT("blocker fixture"),Blocker) || !Cube) return false;
+    for (auto* Actor : {Ground,Blocker})
+    {
+        auto* Mesh=Actor->GetStaticMeshComponent();
+        Mesh->SetMobility(EComponentMobility::Movable);
+        Mesh->SetStaticMesh(Cube);
+        Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+        Mesh->SetCollisionResponseToAllChannels(ECR_Block);
+    }
+    Ground->SetActorLocation(FVector::ZeroVector);
+    Blocker->SetActorLocation(FVector(0,0,200));
+    const FVector Start(0,0,500),End(0,0,-500);
+    FCollisionQueryParams Params(SCENE_QUERY_STAT(RaftSimTerrainProbeTest),true);
+    FHitResult Hit;
+    if (!TestTrue(TEXT("independent world trace reaches unrelated foreground blocker"),
+        World->LineTraceSingleByChannel(Hit,Start,End,ECC_WorldStatic,Params) && Hit.GetActor()==Blocker)) return false;
+    const auto CheckGround=[&](const TCHAR* Label)
+    {
+        int32 Budget=2;
+        const bool Found=ARaftSimWaterSurfaceActor::TraceTerrainSurface(World,Start,End,Params,Budget,Hit);
+        TestTrue(Label,Found && Hit.GetComponent()==Ground->GetStaticMeshComponent());
+        TestEqual(TEXT("every attempted ray including skipped blocker consumes budget"),Budget,0);
+        if (Found) TestTrue(TEXT("ground top is the actual collision surface"),FMath::Abs(Hit.ImpactPoint.Z-50.)<.001);
+    };
+    Ground->Tags.Add(TEXT("RaftSimPhysicalGround"));
+    TestTrue(TEXT("streaming arrival recognizes rebuilt actor source"),RaftSimTerrainProbeSources::ActorHasSource(Ground));
+    CheckGround(TEXT("rebuilt actor-tagged physical ground is accepted"));
+    Ground->Tags.Reset();
+    Ground->GetStaticMeshComponent()->ComponentTags.Add(TEXT("RaftSimPhysicalGround"));
+    TestTrue(TEXT("streaming arrival recognizes component source"),RaftSimTerrainProbeSources::ActorHasSource(Ground));
+    CheckGround(TEXT("component-tagged physical ground is accepted"));
+    Ground->GetStaticMeshComponent()->ComponentTags.Reset();
+    Ground->Tags.Add(TEXT("RaftSimFullReachTerrain"));
+    CheckGround(TEXT("legacy full-reach ground remains accepted"));
+    int32 Budget=1;
+    TestFalse(TEXT("one-ray budget cannot pass the foreground blocker"),
+        ARaftSimWaterSurfaceActor::TraceTerrainSurface(World,Start,End,Params,Budget,Hit));
+    TestEqual(TEXT("exhausted budget stays zero"),Budget,0);
+    TestFalse(TEXT("zero budget performs no trace"),
+        ARaftSimWaterSurfaceActor::TraceTerrainSurface(World,Start,End,Params,Budget,Hit));
+    Ground->Tags.Reset(); Budget=4;
+    TestFalse(TEXT("unmarked scenery is not physical ground"),
+        ARaftSimWaterSurfaceActor::TraceTerrainSurface(World,Start,End,Params,Budget,Hit));
+    TestFalse(TEXT("unmarked actor cannot invalidate ground misses"),RaftSimTerrainProbeSources::ActorHasSource(Ground));
+    Blocker->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    auto* Sibling=NewObject<UStaticMeshComponent>(Ground);
+    Sibling->SetMobility(EComponentMobility::Movable);
+    Sibling->SetStaticMesh(Cube);
+    Sibling->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    Sibling->SetCollisionResponseToAllChannels(ECR_Block);
+    Sibling->RegisterComponent();
+    Sibling->SetWorldLocation(FVector(0,0,200));
+    Ground->GetStaticMeshComponent()->ComponentTags.Add(TEXT("RaftSimPhysicalGround"));
+    CheckGround(TEXT("unmarked sibling does not hide a component-tagged ground source"));
+    TestEqual(TEXT("caller ignore state is not mutated"),Params.GetIgnoredSourceObjects().Num(),0);
+    TestEqual(TEXT("caller ignored components are not mutated"),Params.GetIgnoredComponents().Num(),0);
+    return true;
+}
+
 namespace
 {
 TArray<FProcMeshVertex> Grid(int32 Nx, int32 Ny, double Angle=0., double Sign=1.)
