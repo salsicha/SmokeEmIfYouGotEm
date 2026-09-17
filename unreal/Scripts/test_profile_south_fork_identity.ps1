@@ -100,3 +100,21 @@ foreach ($StartupOpticalNormalStrength in @($null, 0.0, 0.18, 1.0)) {
     if ((& $buildNormal) -cne $expected) { throw 'Optical control changed default capture or lost its explicit value' }
 }
 'PASS: optical normal controls are explicit, startup-only and invariant-culture'
+foreach ($taskMode in @('NativePerformanceGate','DetailStreamingReplay','StartupRenderReplay','CheckpointResetReplay')) {
+    $taskModeArgs=@{}; $taskModeArgs[$taskMode]=$true; $rejected=$false
+    try { & $source -Label 'south-fork-test-invalid-profile-length' -CookProcessId 0 -CookStartUtc 'invalid' -ProfileFrames 1200 @taskModeArgs }
+    catch { if ($_.Exception.Message -ne 'ProfileFrames only applies to ordinary CSV capture') { throw }; $rejected=$true }
+    if (-not $rejected) { throw 'CSV length changed a native/replay mode' }
+}
+$profileAssignment=@($ast.FindAll({param($node)
+    $node -is [Management.Automation.Language.AssignmentStatementAst] -and $node.Left.Extent.Text -eq '$profileCommands'
+},$true))
+if ($profileAssignment.Count -ne 1) { throw 'Expected one production CSV command builder' }
+$buildProfile=[scriptblock]::Create($profileAssignment[0].Extent.Text+'; $profileCommands')
+$Label='south-fork-test-profile-length'
+foreach ($ProfileFrames in @(300,1200,2400)) {
+    if ((& $buildProfile) -cne "-ExecCmds=csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames") { throw 'CSV duration changed unrelated commands' }
+}
+$profileParam=@($ast.ParamBlock.Parameters | Where-Object {$_.Name.VariablePath.UserPath -eq 'ProfileFrames'})
+if ($profileParam.Count -ne 1 -or $profileParam[0].DefaultValue.Extent.Text -ne '300') { throw 'Default profiling duration changed' }
+'PASS: longer CSV histories are explicit; replay/native gates and 300-frame default unchanged'

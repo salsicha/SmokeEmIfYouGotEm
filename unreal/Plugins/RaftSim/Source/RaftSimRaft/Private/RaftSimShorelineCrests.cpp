@@ -19,14 +19,12 @@
 #include "RaftSimCrestPreparedRangeAudit.h"
 #include "RaftSimCrestBoundMemoAudit.h"
 #include "RaftSimCrestTopologyPublish.h"
+#include "RaftSimCrestBoundaryAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
 namespace
 {
-uint64 EdgeKey(int32 A,int32 B)
-{ return (uint64(FMath::Min(A,B))<<32)|uint32(FMath::Max(A,B)); }
-
 FProcMeshVertex Midpoint(const FProcMeshVertex& A,const FProcMeshVertex& B)
 {
     FProcMeshVertex V;
@@ -149,22 +147,12 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
             // Boundary membership is combinatorial too. Reusing ALL levels
             // guarantees identical root indices and ordered parents, even
             // when the shoreline's current coordinates have moved.
-            TMap<uint64,int32> EdgeUses;
-            for (int32 T=0; T<Triangles.Num(); T+=3) for (int32 E=0; E<3; ++E)
-                ++EdgeUses.FindOrAdd(EdgeKey(Triangles[T+E],Triangles[T+(E+1)%3]));
-            TSet<uint64> Boundary;
-            for (const auto& E:EdgeUses) if (E.Value==1) Boundary.Add(E.Key);
-            BoundaryMidpoints.Init(0,Refinement.MidpointParents.Num());
-            for (int32 I=0; I<Refinement.MidpointParents.Num(); ++I)
-            {
-                const auto P=Refinement.MidpointParents[I]; const int32 Node=Source.Num()+I;
-                const uint64 Key=EdgeKey(P.X,P.Y);
-                if (Boundary.Contains(Key))
-                {
-                    BoundaryMidpoints[I]=1;
-                    Boundary.Remove(Key); Boundary.Add(EdgeKey(P.X,Node)); Boundary.Add(EdgeKey(Node,P.Y));
-                }
-            }
+            // Two complete actual-input captures preserve every boundary flag
+            // and reduce classification cost in both execution orders.
+            static const bool bIndexedBoundaries=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyCrestBoundaries"));
+            if(bIndexedBoundaries)RaftSimCrestBoundaries::Indexed(Triangles,Refinement.MidpointParents,Source.Num(),BoundaryMidpoints);
+            else RaftSimCrestBoundaries::Reference(Triangles,Refinement.MidpointParents,Source.Num(),BoundaryMidpoints);
+            RaftSimCrestBoundaryAudit::Run(Triangles,Refinement.MidpointParents,Source.Num(),BoundaryMidpoints);
         }
         FineProfileCm.Init(0,ExpandedXY.Num());
         // Same pure current profile used by parallel selection; each worker

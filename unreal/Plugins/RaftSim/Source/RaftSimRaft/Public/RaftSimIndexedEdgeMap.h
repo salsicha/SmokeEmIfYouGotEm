@@ -28,6 +28,21 @@ public:
     }
     bool Contains(uint64 Key) const { return Find(Key)!=nullptr; }
     bool IsEmpty() const { return Entries.IsEmpty() && Overflow.IsEmpty(); }
+    int32& FindOrAdd(uint64 Key,int32 Default=0)
+    {
+        const uint32 Lower=uint32(Key>>32),Other=uint32(Key);
+        check(Lower<uint32(Heads.Num()));
+        int32 Count=0;
+        for(int32 I=Heads[Lower];I!=INDEX_NONE;I=Entries[I].Next)
+        {
+            if(Entries[I].Other==Other)return Entries[I].Value;
+            ++Count;
+        }
+        if(Count==8)return Overflow.FindOrAdd(Key,Default);
+        const int32 Index=Entries.Add(FEntry{Other,Default,Heads[Lower]});
+        Heads[Lower]=Index;
+        return Entries[Index].Value;
+    }
     void Add(uint64 Key,int32 Value)
     {
         const uint32 Lower=uint32(Key>>32),Other=uint32(Key);

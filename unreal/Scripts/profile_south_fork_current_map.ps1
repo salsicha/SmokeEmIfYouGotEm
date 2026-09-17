@@ -6,6 +6,7 @@ param(
     [string]$ShaderWorkloadManifest = '',
     [string]$ExtraGameArgument = '',
     [string[]]$ExtraGameArguments = @(),
+    [ValidateRange(300, 2400)][int]$ProfileFrames = 300,
     [switch]$NativePerformanceGate,
     [switch]$DetailStreamingReplay,
     [switch]$StartupRenderReplay,
@@ -23,6 +24,9 @@ function Test-RaftSimBufferDiagnosticLog([string]$LogText, [string]$Target) {
 }
 if ($StartupBufferVisualization -and -not $StartupRenderReplay) {
     throw 'Buffer visualization requires StartupRenderReplay; it is not an FPS capture'
+}
+if ($ProfileFrames -ne 300 -and ($NativePerformanceGate -or $DetailStreamingReplay -or $StartupRenderReplay -or $CheckpointResetReplay)) {
+    throw 'ProfileFrames only applies to ordinary CSV capture'
 }
 if ($null -ne $StartupOpticalNormalStrength -and -not $StartupRenderReplay) {
     throw 'Optical normal control requires StartupRenderReplay; it is not an FPS capture'
@@ -117,6 +121,7 @@ $paused = @()
 $game = $null
 $report = [ordered]@{ cook_pid=$CookProcessId; cook_start_utc=$CookStartUtc; cook_executable=$cookExe; cook_sha256=(Get-FileHash -LiteralPath $cookExe).Hash.ToLowerInvariant(); shader_manifest=$ShaderWorkloadManifest; label=$Label; native_gate=[bool]$NativePerformanceGate; gate_passed=$null; suspend_status=$null; resume_status=$null; processes=@(); game_exit_code=$null; game_timeout=$false }
 $report.detail_replay = [bool]$DetailStreamingReplay
+$report.profile_frames = if ($NativePerformanceGate -or $DetailStreamingReplay -or $StartupRenderReplay -or $CheckpointResetReplay) { $null } else { $ProfileFrames }
 $report.detail_replay_passed = $null
 $report.startup_render_replay = [bool]$StartupRenderReplay
 $report.startup_buffer_visualization = $StartupBufferVisualization
@@ -186,7 +191,8 @@ try {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.
         $start.ArgumentList.Add('-ExitAfterCsvProfiling')
-        $start.ArgumentList.Add("-ExecCmds=csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=300")
+        $profileCommands = "-ExecCmds=csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames"
+        $start.ArgumentList.Add($profileCommands)
     }
     if ($ExtraGameArgument) { $start.ArgumentList.Add($ExtraGameArgument) }
     foreach ($argument in $ExtraGameArguments) { $start.ArgumentList.Add($argument) }
