@@ -113,9 +113,17 @@ def test_visible_carrier_spray_lookup_uses_rendered_triangles_without_physics_qu
     assert 'SampleWater' not in lookup and 'LineTrace' not in lookup
     assert 'WorldToRiverCoordinates' not in lookup
     vfx = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp').read_text()
-    assert 'bCrestOwnedSpray && (!bSouthForkBallisticReview || bLogSprayReview)' in vfx
-    assert 'FVector2D(0, -1.5), FVector2D(0, 1.5)' in vfx
-    assert 'FVector2D(-0.8, 0), FVector2D(0.8, 0)' in vfx
+    assert 'if (bCrestOwnedSpray && !bSouthForkCrestOwnedSpray)' in vfx
+    attachment = vfx.split('if (bSouthForkCrestOwnedSpray && bWetCrest)', 1)[1].split(
+        'const float DistanceCm', 1)[0]
+    assert 'RaftSimSpraySourceFootprint::Sample(' in attachment
+    assert 'Site.RiverCoordinatesMeters,Site.FlowDirection' in attachment
+    assert 'BreakingSurface->SampleVisibleCarrierAtRiverCoordinates(P,Out)' in attachment
+    assert 'SampleRaftSupport' not in attachment and 'LineTrace' not in attachment
+    footprint = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimSpraySourceFootprint.h').read_text()
+    assert 'Across(-Along.Y,Along.X)' in footprint
+    assert 'for (double D:{-.8,0.,.8}) for (double A:{-1.5,0.,1.5})' in footprint
+    assert 'Sampler(CentreM+Along*D+Across*A,Point)' in footprint
 
 
 def test_carrier_triangle_lookup_matches_diagonal_and_linear_grade():

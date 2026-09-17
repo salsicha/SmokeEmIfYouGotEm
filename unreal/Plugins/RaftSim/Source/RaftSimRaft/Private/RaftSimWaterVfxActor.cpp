@@ -1,4 +1,5 @@
 #include "RaftSimWaterVfxActor.h"
+#include "RaftSimSpraySourceFootprint.h"
 
 #include "Camera/PlayerCameraManager.h"
 #include "Components/InstancedStaticMeshComponent.h"
@@ -2951,9 +2952,10 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 CVarChilkoCrestSpray.GetValueOnGameThread() != 0);
         const bool bHorizontalSourcePlane = bSouthForkCrestOwnedSpray ||
             (bCrestOwnedSpray && CVarChilkoSprayPlane.GetValueOnGameThread() != 0);
-        const bool bLogSprayReview = bSouthForkCrestOwnedSpray &&
+        const bool bLogSprayReview = IsSouthForkSprayReviewMap(GetWorld()->GetMapName()) &&
             !bLoggedSouthForkSprayReview && GetWorld()->GetTimeSeconds() >= 10.0f &&
-            FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray"));
+            (FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray")) ||
+                FParse::Param(FCommandLine::Get(), TEXT("RaftSimSpraySourceAudit")));
         TArray<int32> RankedSiteIndices;
         RankedSiteIndices.Reserve(Sites.Num());
         for (int32 SiteIndex = 0; SiteIndex < Sites.Num(); ++SiteIndex)
@@ -3012,7 +3014,7 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             FVector SurfaceOrigin = Site.WorldPositionCm;
             float SupportHeightM = SurfaceOrigin.Z / CmPerM;
             bool bWetCrest = true;
-            if (bCrestOwnedSpray && (!bSouthForkBallisticReview || bLogSprayReview))
+            if (bCrestOwnedSpray && !bSouthForkCrestOwnedSpray)
             {
                 FRaftSimWaterSample Support;
                 bWetCrest = WaterAdapter && WaterAdapter->SampleRaftSupportSurfaceAtWorldPosition(
@@ -3030,20 +3032,15 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                     }
                 }
             }
-            if (bSouthForkBallisticReview && bWetCrest)
+            if (bSouthForkCrestOwnedSpray && bWetCrest)
             {
-                // Check the bounded source strip's centre and cardinal
-                // extents: a wet centre alone can scatter spray over the bank.
-                bWetCrest = BreakingSurface->SampleVisibleCarrierAtRiverCoordinates(
-                    Site.RiverCoordinatesMeters, SurfaceOrigin);
-                for (const FVector2D Offset : {FVector2D(0, -1.5), FVector2D(0, 1.5),
-                     FVector2D(-0.8, 0), FVector2D(0.8, 0)})
-                {
-                    if (!bWetCrest) break;
-                    FVector FootprintPoint;
-                    bWetCrest = BreakingSurface->SampleVisibleCarrierAtRiverCoordinates(
-                        Site.RiverCoordinatesMeters + Offset, FootprintPoint);
-                }
+                // The normal Cartesian carrier query includes submitted
+                // triangles, paired detail and captured-rock occlusion.
+                // This source check does not claim per-particle collision.
+                bWetCrest = RaftSimSpraySourceFootprint::Sample(
+                    Site.RiverCoordinatesMeters,Site.FlowDirection,
+                    [&](const FVector2D& P,FVector& Out)
+                    {return BreakingSurface->SampleVisibleCarrierAtRiverCoordinates(P,Out);},SurfaceOrigin);
             }
             const float DistanceCm = bHasCamera
                 ? FVector::Distance(CameraLocation, Site.WorldPositionCm)
@@ -3064,11 +3061,22 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             const float OwnedDensity = DistanceDensity * CrestOwnership;
             if (bLogSprayReview)
             {
+                FVector VisibleAnchor = FVector::ZeroVector;
+                const bool bVisibleAnchor=BreakingSurface->SampleVisibleCarrierAtRiverCoordinates(
+                    Site.RiverCoordinatesMeters,VisibleAnchor);
+                // Gaps are relative to the site-centre anchor, not the surface
+                // at each horizontally shifted emitter. Valid only when visible and enabled.
+                UE_LOG(LogTemp,Display,TEXT("SprayAttachmentAudit slot=%d owned=%d horizontal=%d visible=%d footprint_checked=%d wet_footprint=%d enabled=%d site_z_cm=%.6f visible_z_cm=%.6f origin_z_cm=%.6f aerosol_centre_gap_cm=%.6f roller_centre_gap_cm=%.6f spray_centre_gap_cm=%.6f"),
+                    PoolIndex,bSouthForkCrestOwnedSpray,bHorizontalSourcePlane,bVisibleAnchor,bSouthForkCrestOwnedSpray,bWetCrest,bEnabled,
+                    Site.WorldPositionCm.Z,VisibleAnchor.Z,SurfaceOrigin.Z,
+                    SurfaceOrigin.Z-VisibleAnchor.Z+(bCrestOwnedSpray?6.f:38.f),
+                    SurfaceOrigin.Z-VisibleAnchor.Z+(bCrestOwnedSpray?3.f:32.f),
+                    SurfaceOrigin.Z-VisibleAnchor.Z+(bCrestOwnedSpray?3.f:60.f));
                 FVector2D Projected = FVector2D::ZeroVector;
                 FVector Tangent, Left;
                 const bool bProjected = WaterAdapter && WaterAdapter->WorldToRiverCoordinates(
                     Site.WorldPositionCm, Projected, Tangent, Left);
-                UE_LOG(LogTemp, Display, TEXT("South Fork spray source: slot=%d station=%.3f lateral=%.3f projected=%d projected_s=%.3f projected_l=%.3f site_z_m=%.3f support_z_m=%.3f carrier_z_m=%.3f intensity=%.3f ownership=%.3f geometry_weight=%.3f crest_height_m=%.3f wet=%d enabled=%d density=%.3f"),
+                UE_LOG(LogTemp, Display, TEXT("South Fork spray source: slot=%d station=%.3f lateral=%.3f projected=%d projected_s=%.3f projected_l=%.3f site_z_m=%.3f legacy_anchor_z_m=%.3f carrier_z_m=%.3f intensity=%.3f ownership=%.3f geometry_weight=%.3f crest_height_m=%.3f wet=%d enabled=%d density=%.3f"),
                     PoolIndex, Site.RiverCoordinatesMeters.X, Site.RiverCoordinatesMeters.Y,
                     bProjected, Projected.X, Projected.Y, Site.WorldPositionCm.Z / CmPerM,
                     SupportHeightM, SurfaceOrigin.Z / CmPerM, Intensity, CrestOwnership,
