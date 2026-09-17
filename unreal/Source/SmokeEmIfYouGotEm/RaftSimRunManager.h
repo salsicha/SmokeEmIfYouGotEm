@@ -133,6 +133,7 @@ protected:
     bool SampleRiverStation(float& OutStationM, FVector* OutTangent = nullptr,
         FVector* OutSamplePositionCm = nullptr) const;
     void TryRestoreSessionCheckpoint();
+    bool PrepareCheckpointReset(FTransform& Destination);
     void RecordCheckpointIfNeeded();
 
     UPROPERTY()

@@ -2378,6 +2378,37 @@ void ARaftSimRaftActor::ForceCrewOverboardForTesting(int32 Count)
 
 void ARaftSimRaftActor::ResetToCheckpoint()
 {
+    TryResetToCheckpoint();
+}
+
+void ARaftSimRaftActor::SetCheckpointPreparation(FRaftSimCheckpointPreparation Preparation)
+{
+    CheckpointPreparation=MoveTemp(Preparation);
+    // A destroyed scenario owner must not silently fall back to an unprepared
+    // teleport. Worlds that never install a handler retain legacy tank resets.
+    bCheckpointPreparationRequired=true;
+}
+
+bool ARaftSimRaftActor::TryResetToCheckpoint()
+{
+    return TryRestoreCheckpoint(CheckpointTransform);
+}
+
+bool ARaftSimRaftActor::TryRestoreCheckpoint(const FTransform& Destination)
+{
+    if (!Destination.IsValid() || bCheckpointResetInProgress) return false;
+    TGuardValue<bool> ResetGuard(bCheckpointResetInProgress,true);
+    FTransform Prepared=Destination;
+    if (bCheckpointPreparationRequired &&
+        (!CheckpointPreparation.IsBound() || !CheckpointPreparation.Execute(Prepared)))
+    {
+        UE_LOG(LogTemp,Display,TEXT("CHECKPOINT_RESET_REJECTED destination unavailable; raft and crew retained"));
+        return false;
+    }
+    if (!Prepared.IsValid()) return false;
+    // No crew repair, pose, velocity or saved checkpoint changes until the
+    // scenario has activated terrain and verified destination water.
+    CheckpointTransform=Prepared;
     for (const FRaftSimSwimmerRescueFrame& Swimmer : Swimmers)
     {
         if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmer.PassengerId))
@@ -2409,6 +2440,7 @@ void ARaftSimRaftActor::ResetToCheckpoint()
         State.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
         RaftAdapter->SetKinematicState(State);
     }
+    return true;
 }
 
 void ARaftSimRaftActor::SetCheckpointTransform(
@@ -2418,11 +2450,11 @@ void ARaftSimRaftActor::SetCheckpointTransform(
     {
         return;
     }
-    CheckpointTransform = NewCheckpoint;
     if (bRestoreImmediately)
     {
-        ResetToCheckpoint();
+        TryRestoreCheckpoint(NewCheckpoint);
     }
+    else CheckpointTransform = NewCheckpoint;
 }
 
 void ARaftSimRaftActor::UpdateRaftCondition(float DeltaSeconds)

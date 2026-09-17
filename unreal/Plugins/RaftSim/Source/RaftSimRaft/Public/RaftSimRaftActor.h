@@ -16,6 +16,9 @@ enum class ERaftSimCrewAvatarAction : uint8;
 class URaftSimChronoRuntimeAdapter;
 class URaftSimPhysicsBridgeSubsystem;
 
+/** Scenario-owned destination preparation; no project dependency in the raft module. */
+DECLARE_DELEGATE_RetVal_OneParam(bool, FRaftSimCheckpointPreparation, FTransform&);
+
 /** Which side of the raft a paddle stroke acts on. */
 UENUM(BlueprintType)
 enum class ERaftSimPaddleSide : uint8
@@ -232,6 +235,11 @@ public:
     /** Section checkpoint reset and field repair after a failed rescue. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Checkpoint")
     void ResetToCheckpoint();
+
+    /** Native callers can retain run state when a destination is unavailable. */
+    bool TryResetToCheckpoint();
+    bool TryRestoreCheckpoint(const FTransform& Destination);
+    void SetCheckpointPreparation(FRaftSimCheckpointPreparation Preparation);
 
     /** Replace the recovery checkpoint and optionally move the live body now. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Checkpoint")
@@ -596,4 +604,7 @@ private:
 
     /** Seconds between runtime rock-authority scans. */
     float RockObstacleRefreshRemaining = 0.0f;
+    FRaftSimCheckpointPreparation CheckpointPreparation;
+    bool bCheckpointPreparationRequired = false;
+    bool bCheckpointResetInProgress = false;
 };

@@ -40,6 +40,8 @@ void ARaftSimRunManager::BeginPlay()
     }
     if (Raft != nullptr)
     {
+        Raft->SetCheckpointPreparation(FRaftSimCheckpointPreparation::CreateUObject(
+            this,&ARaftSimRunManager::PrepareCheckpointReset));
         LastSwimmerCount = Raft->GetSwimmerCount();
     }
 
@@ -279,6 +281,26 @@ static bool BuildStationStartTransform(
     return true;
 }
 
+bool ARaftSimRunManager::PrepareCheckpointReset(FTransform& Destination)
+{
+    if (!RaftSimCheckpointStreaming::Prepare(GetWorld(),Destination)) return false;
+    auto* Instance=GetGameInstance();
+    auto* Bridge=Instance ? Instance->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
+    auto* Water=Bridge ? Bridge->GetWaterRuntime() : nullptr;
+    ARaftSimRiverWaterConfig* Config=nullptr;
+    for (TActorIterator<ARaftSimRiverWaterConfig> It(GetWorld()); It; ++It)
+    {
+        if (Config) return false; // Ambiguous scenario ownership is not a fallback.
+        Config=*It;
+    }
+    if (Config && (!Water || ((!Config->StreamingManifestPath.IsEmpty() ||
+        Config->bEnableMovingWindowStreaming) && !Water->HasRiverCoordinateMap()))) return false;
+    // Legacy static ribbon/tank recovery is unchanged; geographic Cartesian
+    // crops must select and validate the destination packet before the move.
+    if (!Water || !Water->HasCartesianWaterCoordinates()) return true;
+    return SeedCartesianCheckpointWater(Config,Water,Destination);
+}
+
 bool ARaftSimRunManager::SeedCartesianCheckpointWater(const ARaftSimRiverWaterConfig* Config,
     URaftSimWaterRuntimeAdapter* Water, FTransform& Checkpoint)
 {
@@ -420,7 +442,11 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
         bCheckpointRestorePending = false;
         return;
     }
-    Raft->SetCheckpointTransform(Checkpoint, true);
+    if (!Raft->TryRestoreCheckpoint(Checkpoint))
+    {
+        bCheckpointRestorePending = false;
+        return;
+    }
     CurrentStationM = StartStationM;
     FurthestStationM = StartStationM;
     LastCheckpointStationM = StartStationM;
@@ -586,11 +612,8 @@ void ARaftSimRunManager::RecordCheckpointIfNeeded()
 
 void ARaftSimRunManager::RestartRun()
 {
+    if (Raft != nullptr && !Raft->TryResetToCheckpoint()) return;
     LastProgressSample.bValid = false;
-    if (Raft != nullptr)
-    {
-        Raft->ResetToCheckpoint();
-    }
     RunState = ERaftSimRunState::Ready;
     FinalScore = FRaftSimGameplayScoreBreakdown{};
     AwardedMedal = ERaftSimMedal::None;

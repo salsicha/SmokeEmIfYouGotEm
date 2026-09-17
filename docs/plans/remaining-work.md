@@ -3,7 +3,26 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [SM5 encoded-return correction](../reconstruction-review-2026-09-07/sm5-integer-return.md).
+Latest: [checkpoint reset destination preparation](../reconstruction-review-2026-09-07/checkpoint-reset-preparation.md).
+Rescue/restart resets now invoke a scenario-owned terrain/water preparation hook
+before moving the raft or repairing crew state. Cartesian destinations select a
+verified wet geographic packet; failed and reentrant resets retain the old pose
+and checkpoint, and failed Restart Run retains score/progress state. Native eight
+tests PASS,90 focused Python checks PASS; both isolated modules compiled/linked.
+Not deployed: installed DLLs remain unchanged while SM5 replay9319/PID9976 runs.
+Actual rendered distant-reset/return, detail-domain continuity and30FPS remain
+OPEN. Source integration and native tests are not normal-play acceptance.
+Same hydraulic11316:1500s state AND86,720 dry-bank checks PASS, NOT settled
+(outflow85.275663 versus inflow45.306955m3/s); next1550/local19000 both audits.
+NEXT retain SM5 terminal result, apply validated local dyadic-return correction
+and qualify exact faces/full steps; actual reset/startup replay with both new
+modules, safe installation, coupled nonlinear physics and convincing wave/froth,
+source-consistent terrain/boulders/collision,30FPS, normalization/source closure,
+Colorado -> Pacuare -> Futaleufu, Chilko/Zambezi/all-scene water, crew and release.
+Last26.784840FPS/p9543.5724ms still FAIL30. Troublemaker is only a South Fork rapid,
+never a menu scenario. Full objective remains open.
+
+Previous: [SM5 encoded-return correction](../reconstruction-review-2026-09-07/sm5-integer-return.md).
 FXC was folding branch-local subnormal/signed-zero bitcasts to zero. Production
 addition, wide affine rounding, multiplication, division and power scaling now
 merge integer returns before bitcasting, with unchanged arithmetic and oracles.

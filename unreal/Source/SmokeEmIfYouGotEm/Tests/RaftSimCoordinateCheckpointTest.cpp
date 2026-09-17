@@ -8,12 +8,66 @@
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimRaftActor.h"
 #include "Misc/FileHelper.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCheckpointResetPreparationTest,"RaftSim.Survey.CheckpointResetPreparation",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimCheckpointResetPreparationTest::RunTest(const FString&)
+{
+    UWorld* World=UWorld::CreateWorld(EWorldType::Editor,false);
+    if (!World) return false;
+    ON_SCOPE_EXIT { World->DestroyWorld(false);World->RemoveFromRoot(); };
+    auto* Raft=World->SpawnActor<ARaftSimRaftActor>();
+    if (!TestNotNull(TEXT("test raft"),Raft)) return false;
+    const FTransform Here(FRotator(0,21,0),FVector(1200,2500,70));
+    const FTransform Saved(FRotator(0,103,0),FVector(-541800,-359800,240));
+    Raft->SetActorTransform(Here);
+    Raft->SetCheckpointTransform(Saved,false);
+    int32 Calls=0;
+    Raft->SetCheckpointPreparation(FRaftSimCheckpointPreparation::CreateLambda([&](FTransform& Proposed)
+    {
+        ++Calls;
+        TestTrue(TEXT("prepare runs at old pose"),Raft->GetActorTransform().Equals(Here,0.001));
+        TestTrue(TEXT("exact saved destination supplied"),Proposed.Equals(Saved,0.001));
+        Proposed.SetLocation(FVector(1,2,3));
+        return false;
+    }));
+    TestFalse(TEXT("unavailable destination rejects reset"),Raft->TryResetToCheckpoint());
+    TestEqual(TEXT("one preparation attempt"),Calls,1);
+    TestTrue(TEXT("failure leaves actor at current pose"),Raft->GetActorTransform().Equals(Here,0.001));
+    FTransform Ready=Saved;Ready.AddToTranslation(FVector(0,0,85));
+    bool NestedRejected=false;
+    Raft->SetCheckpointPreparation(FRaftSimCheckpointPreparation::CreateLambda([&](FTransform& Proposed)
+    {
+        TestTrue(TEXT("failed prepare did not replace saved checkpoint"),Proposed.Equals(Saved,0.001));
+        NestedRejected=!Raft->TryResetToCheckpoint();
+        Proposed=Ready;
+        return true;
+    }));
+    TestTrue(TEXT("prepared reset succeeds"),Raft->TryResetToCheckpoint());
+    TestTrue(TEXT("nested reset rejected"),NestedRejected);
+    TestTrue(TEXT("prepared water height is used"),Raft->GetActorTransform().Equals(Ready,0.001));
+    Raft->SetCheckpointPreparation(FRaftSimCheckpointPreparation::CreateLambda([](FTransform&){return false;}));
+    Raft->SetCheckpointTransform(Here,true);
+    TestTrue(TEXT("failed immediate setter does not move raft"),Raft->GetActorTransform().Equals(Ready,0.001));
+    Raft->SetCheckpointPreparation(FRaftSimCheckpointPreparation::CreateLambda([&](FTransform& Proposed)
+    { return TestTrue(TEXT("failed setter retained previous checkpoint"),Proposed.Equals(Ready,0.001)); }));
+    TestTrue(TEXT("previous checkpoint still usable"),Raft->TryResetToCheckpoint());
+    Raft->SetCheckpointPreparation(FRaftSimCheckpointPreparation{});
+    TestFalse(TEXT("lost required provider fails closed"),Raft->TryResetToCheckpoint());
+    auto* Legacy=World->SpawnActor<ARaftSimRaftActor>();
+    if (!TestNotNull(TEXT("legacy tank raft"),Legacy)) return false;
+    Legacy->SetCheckpointTransform(Here,false);
+    TestTrue(TEXT("never-configured legacy reset preserved"),Legacy->TryResetToCheckpoint());
+    TestTrue(TEXT("legacy pose restored"),Legacy->GetActorTransform().Equals(Here,0.001));
+    return !HasAnyErrors();
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCheckpointDestinationSourcesTest,"RaftSim.Survey.CheckpointDestinationSources",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FRaftSimCheckpointDestinationSourcesTest::RunTest(const FString&)
