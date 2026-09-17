@@ -3,6 +3,7 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "../RaftSimRunManager.h"
+#include "../RaftSimCheckpointStreaming.h"
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
@@ -13,6 +14,53 @@
 #include "Serialization/JsonSerializer.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCheckpointDestinationSourcesTest,"RaftSim.Survey.CheckpointDestinationSources",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimCheckpointDestinationSourcesTest::RunTest(const FString&)
+{
+    FWorldPartitionStreamingSource Player;
+    Player.Name=TEXT("OriginalPlayer");Player.Location=FVector(150,250,350);
+    Player.TargetState=EStreamingSourceTargetState::Loaded;
+    Player.Velocity=FVector(200,0,0);Player.bUseVelocityContributionToCellsSorting=true;
+    Player.TargetGrids.Add(TEXT("TerrainGrid"));Player.bForce2D=true;
+    FStreamingSourceShape Shape;Shape.bUseGridLoadingRange=false;Shape.Radius=23456;
+    Shape.Location=FVector(10,20,30);Player.Shapes.Add(Shape);
+    TArray<FWorldPartitionStreamingSource> Input={Player},Output;
+    const FTransform Destination(FRotator(0,117,0),FVector(-541800,-359800,850));
+    TestTrue(TEXT("destination source built"),RaftSimCheckpointStreaming::MakeDestinationSources(Input,Destination,Output));
+    TestEqual(TEXT("one source per player source"),Output.Num(),1);
+    if (Output.Num()!=1) return false;
+    const auto& Source=Output[0];
+    TestTrue(TEXT("destination uses exact world pose"),Source.Location.Equals(Destination.GetLocation()) && Source.Rotation.Equals(Destination.Rotator()));
+    TestTrue(TEXT("target activation, no inherited travel velocity"),Source.TargetState==EStreamingSourceTargetState::Activated &&
+        Source.bBlockOnSlowLoading && Source.Velocity.IsZero() && !Source.bUseVelocityContributionToCellsSorting);
+    TestTrue(TEXT("grid and shape policy preserved"),Source.TargetGrids.Includes(Player.TargetGrids) &&
+        Source.TargetGrids.Num()==Player.TargetGrids.Num() && Source.Shapes.Num()==1 &&
+        GetTypeHash(Source.Shapes[0])==GetTypeHash(Shape) && Source.bForce2D==Player.bForce2D && Source.Priority==Player.Priority);
+    TestTrue(TEXT("original source untouched"),Input[0].Name==Player.Name && Input[0].Location==Player.Location &&
+        Input[0].TargetState==Player.TargetState && Input[0].Velocity==Player.Velocity && Input[0].bUseVelocityContributionToCellsSorting);
+    TestFalse(TEXT("empty player policy rejected"),RaftSimCheckpointStreaming::MakeDestinationSources({},Destination,Output));
+    TestTrue(TEXT("failure clears stale output"),Output.IsEmpty());
+    TestFalse(TEXT("missing world rejected"),RaftSimCheckpointStreaming::Prepare(nullptr,Destination));
+    UWorld* World=UWorld::CreateWorld(EWorldType::Editor,false);
+    if (!TestNotNull(TEXT("ephemeral test world"),World)) return false;
+    ON_SCOPE_EXIT { World->DestroyWorld(false);World->RemoveFromRoot(); };
+    TestTrue(TEXT("nonpartitioned world is unchanged"),RaftSimCheckpointStreaming::Prepare(World,Destination));
+    auto* Partition=World->GetSubsystem<UWorldPartitionSubsystem>();
+    if (!TestNotNull(TEXT("streaming subsystem"),Partition)) return false;
+    const int32 Before=Partition->GetStreamingSourceProviders().Num();
+    RaftSimCheckpointStreaming::MakeDestinationSources(Input,Destination,Output);
+    {
+        RaftSimCheckpointStreaming::FScopedDestination Scoped(Partition,MoveTemp(Output));
+        TestEqual(TEXT("temporary provider registered"),Partition->GetStreamingSourceProviders().Num(),Before+1);
+        TArray<FWorldPartitionStreamingSource> Actual;
+        TestTrue(TEXT("provider exposes destination source"),Scoped.GetStreamingSources(Actual) && Actual.Num()==1 &&
+            Actual[0].Location.Equals(Destination.GetLocation()));
+    }
+    TestEqual(TEXT("scope exit removes provider; no permanent terrain residency"),Partition->GetStreamingSourceProviders().Num(),Before);
+    return !HasAnyErrors();
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimStartupWaterOrderingTest,"RaftSim.Survey.StartupWaterAfterSessionRestore",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FRaftSimStartupWaterOrderingTest::RunTest(const FString&)

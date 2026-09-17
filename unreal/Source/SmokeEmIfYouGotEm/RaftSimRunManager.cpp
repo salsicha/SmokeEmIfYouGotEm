@@ -1,4 +1,5 @@
 #include "RaftSimRunManager.h"
+#include "RaftSimCheckpointStreaming.h"
 
 #include "Components/BoxComponent.h"
 #include "Engine/GameInstance.h"
@@ -357,6 +358,12 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
     // A resumed section is an intentional discontinuity. Seed a fresh live
     // window at its saved station before moving the authoritative raft body;
     // normal downstream handoffs remain overlap-preserving after this point.
+    if (!RaftSimCheckpointStreaming::Prepare(GetWorld(),Checkpoint))
+    {
+        UE_LOG(LogTemp,Warning,TEXT("RaftSim section start rejected: destination terrain is not activated; water and raft not moved"));
+        bCheckpointRestorePending = false;
+        return;
+    }
     bool bHydraulicRegionVerified = Progress == Water;
     if (TActorIterator<ARaftSimRiverWaterConfig> It(GetWorld()); It)
     {

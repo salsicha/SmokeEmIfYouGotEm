@@ -1,5 +1,8 @@
 # First-frame water readiness — 2026-09-17 UTC
 
+Follow-up: [installed checkpoint terrain startup](checkpoint-terrain-startup.md)
+corrects the ordinary terrain startup gap described below.
+
 ## Implemented and installed; not scene acceptance
 
 The ordinary South Fork first capture now contains water. The unchanged installed

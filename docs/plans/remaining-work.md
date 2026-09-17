@@ -3,7 +3,25 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [installed first-frame water readiness](../reconstruction-review-2026-09-07/startup-water-readiness.md).
+Latest: [installed checkpoint terrain startup](../reconstruction-review-2026-09-07/checkpoint-terrain-startup.md).
+Ordinary installed South Fork now shows terrain, water and crew colors in first
+unskipped image000; all24 actual1280x720 frames retained, no preview/override flags.
+Checkpoint destination activation precedes hydraulic reseed and raft movement,
+using copied player streaming policy and a scope-cleaned temporary provider.
+Six native tests PASS,87 focused Python checks PASS; project DLLf11c1bc6... installed
+after backing up the previous DLL/PDB. Assets and other modules unchanged.
+Full ordinary-map detail replay58473/PID28488 LIVE, not passed; actual loaded
+installed module paths/hashes witnessed. Runner owns temporary cook11316 pause.
+1350s state AND86,720 dry-bank audits PASS, NOT settled (outflow80.573710 versus
+inflow45.306955m3/s); next1400/local16000 both audits. Last26.784840FPS/p9543.5724ms
+still FAIL30. NEXT full replay result, distant in-run reset residency/reseed,
+coupled nonlinear water, consistent evidence-based terrain/boulders/collision/
+hydraulics, convincing crests/froth,30FPS, SM5 failures, source closure, remaining
+normalization, Colorado -> Pacuare -> Futaleufu, all-scene water, crew and release.
+Startup visibility is not physical/geographic/visual completion. Troublemaker
+remains a rapid inside South Fork, never a menu scenario. Full goal stays open.
+
+Previous: [installed first-frame water readiness](../reconstruction-review-2026-09-07/startup-water-readiness.md).
 Ordinary installed South Fork now shows water in first unskipped image000;
 24 actual1280x720 frames retained, no module override/preview/full-hull/audit flags.
 Scoped editor-game material preparation fixes water depth/velocity readiness;
