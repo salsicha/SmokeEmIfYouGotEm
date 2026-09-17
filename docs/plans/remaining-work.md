@@ -3,7 +3,23 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [simultaneous conditional inlet-stream separation](../reconstruction-review-2026-09-07/normal-river-inlet-stream-separation.md).
+Latest: [original source-face transport of conditional inlet profiles](../reconstruction-review-2026-09-07/normal-river-inlet-face-transport.md).
+Time-integrated advective flux now balances the non-horizontal stored profile
+on all 17 routed sources / 60 edges, with explicit original donor withdrawal.
+All 11 represented donor balances close exactly, including the sub-float stream;
+two receding/fan records remain unsupported. Maximum relative source balance
+width 2.094718213952378e-34, 599 source/implementation hashes checked, original
+water unchanged. 65 focused tests PASS; broad 599 PASS / 13 unchanged FAIL.
+No gate relaxation. This is not a coupled physical step.
+Next couple transport to donor evolution, pressure/curvature/bed forces and
+branch transitions, then integrate the accepted solver into normal South Fork.
+Same native SM5 replay/editor36412 and worker37836 LIVE, shaders frozen.
+Same cook36872: 2250s state AND 86,720 dry banks PASS, NOT settled
+(97.130536 out versus45.306955 in m3/s); next2300/local10000 needs both audits.
+No installed/playable change; last28.057157FPS/p9541.2354ms still FAIL30.
+Full terrain/physical/visual/ordered-river/all-scene/crew/release scope OPEN.
+
+Previous: [simultaneous conditional inlet-stream separation](../reconstruction-review-2026-09-07/normal-river-inlet-stream-separation.md).
 All 55 pairs of 11 represented streams are provably separated at common
 observation times and throughout their common original conditional windows.
 The positive sub-float stream is retained; two receding/fan records remain

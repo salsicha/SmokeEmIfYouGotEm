@@ -204,10 +204,19 @@ class InletSweep:
         meet the requested fraction of each incoming moment or this raises.
         This does not normalize fragment totals to hide lost/overlapping water.
         """
+        result = self._constraint_moments(*self._constraints(fragment), relative_bound, max_depth)
+        return dict(source_id=fragment.source_id, **result)
+
+    def _constraint_moments(self, lower, upper, vertical,
+                            relative_bound=F(1, 10**12), max_depth=48):
+        """Integrate original parcel coordinates over polynomial constraints.
+
+        Shared by storage clipping and time-integrated source-face transport;
+        callers supply inequalities, never a fitted depth or rounded polygon.
+        """
         relative_bound = F(relative_bound)
         if not 0 < relative_bound < 1 or not isinstance(max_depth, int) or not 1 <= max_depth <= 128:
             raise ValueError('Strict relative integration bound and depth 1..128 required')
-        lower, upper, vertical = self._constraints(fragment)
         exact, uncertainty = [F(0)]*4, [F(0)]*4
         pending = [(F(0), self.time_root, 0)]
         visited, switches = 0, 0
@@ -219,7 +228,12 @@ class InletSweep:
             high = min(upper, key=lambda p: _value(p, middle))
             width = _add(high, _scale(low, -1))
             vertical_ranges = [polynomial_bounds(p, lo, hi) for p in vertical]
-            if any(b < 0 for a, b in vertical_ranges) or polynomial_bounds(width, lo, hi)[1] <= 0:
+            # A nonzero polynomial bounded above by zero is nonnegative only
+            # at finitely many roots: zero entry-time measure, not a sliver.
+            # An identically zero constraint, including birth on the inlet,
+            # imposes no restriction and must NOT discard any water.
+            if (any(b <= 0 and any(p) for p, (a, b) in zip(vertical, vertical_ranges))
+                    or polynomial_bounds(width, lo, hi)[1] <= 0):
                 continue
             stable = (all(a >= 0 for a, b in vertical_ranges)
                 and polynomial_bounds(width, lo, hi)[0] >= 0
@@ -242,8 +256,7 @@ class InletSweep:
                 pending.extend(((lo, middle, depth+1), (middle, hi, depth+1)))
         if any(uncertainty[p] > relative_bound*self.full_moment(p) for p in range(4)):
             raise ValueError('Source clipping integration bound unresolved; no sliver deletion')
-        return dict(source_id=fragment.source_id,
-                    lower=tuple(exact), upper=tuple(x+y for x, y in zip(exact, uncertainty)),
+        return dict(lower=tuple(exact), upper=tuple(x+y for x, y in zip(exact, uncertainty)),
                     intervals_visited=visited, bounded_switch_intervals=switches,
                     full_force_or_time_or_native_or_gameplay_accepted=False)
 

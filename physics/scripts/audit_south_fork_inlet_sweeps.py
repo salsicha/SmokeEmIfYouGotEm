@@ -19,6 +19,7 @@ from subcell_exact_geometry import SourceFragment
 from subcell_inlet_sweep_geometry import InletSweep, shared_inlet_edge
 from subcell_inlet_contact_time import initial_wet_contact
 from subcell_inlet_stream_overlap import simultaneous_pairs, signed_area
+from subcell_inlet_face_transport import source_transport_balance
 from subcell_source_activation import assembly
 
 
@@ -66,6 +67,7 @@ def route(part, fronts, on_face=None):
                      front['asymptotic_branch_height_bound'], branch_bound)/100
         sweep = InletSweep(edge, u, k, height/k)
         sweep.validate_receiver(fragments[receiver])
+        donor_transport = source_transport_balance(sweep, fragments[donor], birth_donor=True)
         incoming = tuple(sweep.full_moment(p) for p in range(4))
         root_limit = min(F(front['rows'][0]['height']), F(front['asymptotic_branch_height_bound']),
                          branch_bound, sweep.bed_span)/k
@@ -75,6 +77,7 @@ def route(part, fronts, on_face=None):
             original_isolated_geometry_time_limit=root_limit**3,
             time_root=sweep.time_root, physical_time=sweep.time_root**3,
             primary_height=height, full_incoming_moments=incoming,
+            original_donor_transport=donor_transport,
             above_receiver_minimum=not front['receiving_face_contact']['contact_starts_at_birth'],
             physical_update_accepted=False)
         if float(incoming[1]) == 0 or float(sweep.time_root**3) == 0:
@@ -96,7 +99,8 @@ def route(part, fronts, on_face=None):
                     initial_ownership=('wet' if key in occupied else 'primary-birth' if key in primary else 'unowned'),
                     positive_water_proven=value['lower'][1] > 0,
                     moment_lower=value['lower'], moment_upper=value['upper'],
-                    bounded_switch_intervals=value['bounded_switch_intervals'])
+                    bounded_switch_intervals=value['bounded_switch_intervals'],
+                    conditional_face_transport=(donor_transport if key == donor else source_transport_balance(sweep, fragment)))
                 if key in occupied:
                     pool_index, form = occupied[key]
                     piece['initial_wet_support'] = dict(pool_index=pool_index,
@@ -200,6 +204,9 @@ def main():
         pair_time_scope='Each pair uses the earlier of its two original valid observation times. This is not one evolved global multi-stream state. Sub-float positive exact streams are retained; receding/fan streams remain unsupported.',
         conditional_geometry_controls_passed=bool(routed),
         maximum_relative_moment_uncertainty=max(r['maximum_relative_moment_uncertainty'] for r in routed),
+        maximum_relative_face_balance_width=max(
+            p['conditional_face_transport']['maximum_relative_balance_width'] for r in routed for p in r['pieces']),
+        face_transport_scope='Time-integrated conditional advective flux on every original edge of every routed source; incoming minus outgoing balances the non-horizontal stored profile. Original inlet inflow requires coupled donor debit. No pressure, bed-force, receding/fan or physical time-step acceptance.',
         initially_owned_source_streams=sum(r['enters_initially_owned_source'] for r in routed),
         proven_initial_wet_overlap_streams=sum(r['initial_wet_overlap_proven'] for r in routed),
         possible_initial_wet_overlap_streams=sum(r['initial_wet_overlap_possible'] for r in routed),
