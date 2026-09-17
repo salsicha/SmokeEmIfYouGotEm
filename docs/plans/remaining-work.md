@@ -3,7 +3,16 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [eight-worker gameplay review rejected; four-worker runtime restored](../reconstruction-review-2026-09-07/gameplay-worker-review.md).
+Latest: [exact combined source sampling installed in normal South Fork](../reconstruction-review-2026-09-07/combined-source-sampling.md).
+All 16 alternating same-input pairs across two actual states preserve outputs
+and reduce this component's cost. Whole-frame comparisons remain mixed; the
+final ordinary profile is 37.070557 FPS / p95 36.3204 ms, still FAIL30.
+Editor and standalone Development builds succeed; eight native and 98 Python
+tests PASS. Recorded motion still has broad soft froth and unaccepted scene
+detail. No packaged, full-traversal or final visual/physical acceptance.
+The full ordered queue remains OPEN. Entries below are historical checkpoints.
+
+Previous: [eight-worker gameplay review rejected; four-worker runtime restored](../reconstruction-review-2026-09-07/gameplay-worker-review.md).
 The completed fixed 4/8/8/4 comparison reduces solver cost but not frame p95 in
 both orders; every run FAIL30. The temporary gameplay flag is removed, the
 restoration build succeeds, six native and 35 Python tests PASS. Final ordinary

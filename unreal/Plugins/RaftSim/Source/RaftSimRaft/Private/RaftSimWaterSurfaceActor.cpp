@@ -19,6 +19,7 @@
 #include "RaftSimBreakingHeightRange.h"
 #include "RaftSimPreparedBreakingHeightRange.h"
 #include "RaftSimWaterFlowHistory.h"
+#include "RaftSimRefreshBaselineSample.h"
 #include "RaftSimWaterCarrierMeshComponent.h"
 #include "RaftSimWaterTextureHistory.h"
 #include "RaftSimFoamTransportFrame.h"
@@ -4114,7 +4115,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     const FTransform BaselineKeepTransform =
             SurfaceMesh ? SurfaceMesh->GetComponentTransform()
                         : GetActorTransform();
-    const auto SampleVertex = [&](int32 Index)
+    const auto SampleBaseline = [&](int32 Index,FRaftSimWaterSample& Out,FRaftSimRefreshBaselineSample* Cached)
+    {
+        const auto Query=[&](FRaftSimWaterSample& Value)
+        { return WaterAdapter->SamplePresentationBaselineFieldAtRiverCoordinates(RiverCoordinatesM[Index],Value); };
+        return Cached ? Cached->Read(Query,Out) : Query(Out);
+    };
+    const auto SampleVertex = [&](int32 Index,FRaftSimRefreshBaselineSample* Cached=nullptr)
     {
                 const FVector& V = Vertices[Index];
                 FRaftSimWaterSample& Sample = WaterSamples[Index];
@@ -4130,9 +4137,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 bool bBaselineSampled =
                     !bSampled && bSingleLiveWaterSurfaceEnabled &&
                     bUsesCurvedRiverCoordinates &&
-                    WaterAdapter->
-                        SamplePresentationBaselineFieldAtRiverCoordinates(
-                            RiverCoordinatesM[Index], Sample);
+                    SampleBaseline(Index,Sample,Cached);
                 SolverSampledVertexMask[Index] = bSampled ? 1 : 0;
                 if (bCartesianFlow) CartesianShoreAvailable[Index] = bSampled || bBaselineSampled;
                 LiveSolverWetVertexMask[Index] =
@@ -4186,9 +4191,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     bUsesCurvedRiverCoordinates)
                 {
                     FRaftSimWaterSample BaselineSample;
-                    if (WaterAdapter->
-                            SamplePresentationBaselineFieldAtRiverCoordinates(
-                                RiverCoordinatesM[Index], BaselineSample) &&
+                    if (SampleBaseline(Index,BaselineSample,Cached) &&
                         BaselineSample.bWet)
                     {
                         Sample = BaselineSample;
@@ -4241,9 +4244,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                             BaselineKeepProbeWanted[Index] = 1;
                         }
                         FRaftSimWaterSample BaselineSample;
-                        const bool bBaselineWet = WaterAdapter->
-                            SamplePresentationBaselineFieldAtRiverCoordinates(
-                                RiverCoordinatesM[Index], BaselineSample) &&
+                        const bool bBaselineWet = SampleBaseline(Index,BaselineSample,Cached) &&
                             BaselineSample.bWet;
                         if (!bMeasuredBedAligned && !bBaselineWet &&
                             Sample.DepthMeters < kShoreSolverBleedMaxDepthM)
@@ -4281,11 +4282,18 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // probe, field resize, or following presentation pass. Legacy world /
         // route queries retain their original serial execution and ordering.
         if (bConcurrent) ParallelFor(TEXT("RaftSimCartesianSourceSamples"),Vertices.Num(),256,
-            SampleVertex,EParallelForFlags::Unbalanced);
+            [&](int32 I) { SampleVertex(I); },EParallelForFlags::Unbalanced);
         else for (int32 I=0; I<Vertices.Num(); ++I) SampleVertex(I);
     };
     const bool bConcurrentSource=bCartesianFlow && bUsesCurvedRiverCoordinates;
-    SampleLiveVertices(bConcurrentSource);
+    // Two independent actual-state captures: all 16 alternating-order pairs
+    // preserve every field/mask and reduce this stage's cost. Whole-frame
+    // timings remain mixed and still fail the 30 FPS gate. Qualify other
+    // scenes separately; retain the original schedule for regression controls.
+    static const bool bSeparateSource=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSeparateSourceHandover"));
+    const bool bFusedSource=bConcurrentSource && bSingleLiveWaterSurfaceEnabled && !bSeparateSource &&
+        GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
+    if (!bFusedSource) SampleLiveVertices(bConcurrentSource);
 
     // Recompute the crop's per-station wet/dry authority for the next
     // refresh: full solver ownership deep inside the covered stations,
@@ -4345,7 +4353,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // bar moving with the raft. This modifies the local render samples only;
     // the adapter's solver field, force sampling and wet/dry authority remain
     // untouched.
-    const auto BlendSourceVertex = [&](int32 Index)
+    const auto BlendSourceVertex = [&](int32 Index,FRaftSimRefreshBaselineSample* Cached=nullptr)
     {
             if (SolverSampledVertexMask[Index] == 0 ||
                 WetVertexMask[Index] == 0)
@@ -4358,8 +4366,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 return;
             }
             FRaftSimWaterSample BaselineSample;
-            if (!WaterAdapter->SamplePresentationBaselineFieldAtRiverCoordinates(
-                    RiverCoordinatesM[Index], BaselineSample) ||
+            if (!SampleBaseline(Index,BaselineSample,Cached) ||
                 !BaselineSample.bWet)
             {
                 return;
@@ -4383,15 +4390,40 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             PresentationSurfaceHeightMeters[Index] =
                 Sample.SurfaceHeightMeters;
     };
-    const auto BlendSourceVertices = [&](bool bConcurrent)
+    const auto BlendSourceVertices = [&](bool bConcurrent,bool bAlreadyBlended=false)
     {
         CSV_SCOPED_TIMING_STAT(RaftSimSurface,SourceHandover);
-        if (!bSingleLiveWaterSurfaceEnabled || !bUsesCurvedRiverCoordinates || !WaterAdapter) return;
+        if (bAlreadyBlended || !bSingleLiveWaterSurfaceEnabled || !bUsesCurvedRiverCoordinates || !WaterAdapter) return;
         if (bConcurrent) ParallelFor(TEXT("RaftSimCartesianSourceHandover"),WaterSamples.Num(),256,
-            BlendSourceVertex,EParallelForFlags::Unbalanced);
+            [&](int32 I) { BlendSourceVertex(I); },EParallelForFlags::Unbalanced);
         else for (int32 I=0; I<WaterSamples.Num(); ++I) BlendSourceVertex(I);
     };
-    BlendSourceVertices(bConcurrentSource);
+    const auto SampleCombinedVertices = [&]()
+    {
+        // Both passes depend only on this vertex and the same immutable source;
+        // Cartesian crop authority does not depend on the intervening legacy
+        // station sweep. Join before any solver/probe/mesh update. This scope
+        // includes sampling AND handover; the separate handover scope below
+        // measures only its already-completed guard on the combined path.
+        CSV_SCOPED_TIMING_STAT(RaftSimSurface,SourceSamples);
+        ParallelFor(TEXT("RaftSimCartesianCombinedSource"),Vertices.Num(),256,[&](int32 I)
+        {
+            FRaftSimRefreshBaselineSample Cached;
+            SampleVertex(I,&Cached);
+            BlendSourceVertex(I,&Cached);
+        },EParallelForFlags::Unbalanced);
+    };
+    if (bFusedSource)
+    {
+        SampleCombinedVertices();
+        static bool bLogged=false;
+        if (!bLogged)
+        {
+            UE_LOG(LogTemp,Display,TEXT("Within-refresh source/handover fusion active: one vertex-local baseline query; SourceSamples includes both passes, SourceHandover is the completed guard"));
+            bLogged=true;
+        }
+    }
+    BlendSourceVertices(bConcurrentSource,bFusedSource);
 
     // Opt-in actual-state equivalence audit, excluded from ordinary/timing runs.
     // Restore the parallel outputs after rerunning both passes from clean arrays.
@@ -4408,11 +4440,29 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         auto SavedProbeWanted=BaselineKeepProbeWanted;
         auto SavedFeather=FeatheredBaselineWet, SavedHeights=PresentationSurfaceHeightMeters;
         const int32 Count=Vertices.Num();
-        WaterSamples.Init(FRaftSimWaterSample{},Count);
-        WetVertexMask.Init(0,Count); LiveSolverWetVertexMask.Init(0,Count);
-        SolverSampledVertexMask.Init(0,Count); CartesianShoreAvailable.Init(0,Count);
-        BaselineKeepProbeWanted.Init(0,Count); FeatheredBaselineWet.Init(0.f,Count);
-        PresentationSurfaceHeightMeters.Init(0.f,Count);
+        const auto ResetSourceOutputs=[&]()
+        {
+            WaterSamples.Init(FRaftSimWaterSample{},Count);
+            WetVertexMask.Init(0,Count); LiveSolverWetVertexMask.Init(0,Count);
+            SolverSampledVertexMask.Init(0,Count); CartesianShoreAvailable.Init(0,Count);
+            BaselineKeepProbeWanted.Init(0,Count); FeatheredBaselineWet.Init(0.f,Count);
+            PresentationSurfaceHeightMeters.Init(0.f,Count);
+        };
+        const auto MatchesSaved=[&]()
+        {
+            for (int32 I=0;I<Count;++I)
+            {
+                const auto& A=SavedSamples[I];const auto& B=WaterSamples[I];
+                if (!(A.WorldPosition==B.WorldPosition && A.SurfaceHeightMeters==B.SurfaceHeightMeters &&
+                    A.BedHeightMeters==B.BedHeightMeters && A.DepthMeters==B.DepthMeters &&
+                    A.VelocityMetersPerSecond==B.VelocityMetersPerSecond && A.SurfaceNormal==B.SurfaceNormal && A.bWet==B.bWet)) return false;
+            }
+            return SavedWet==WetVertexMask && SavedLiveWet==LiveSolverWetVertexMask &&
+                SavedSampled==SolverSampledVertexMask && SavedAvailable==CartesianShoreAvailable &&
+                SavedProbeWanted==BaselineKeepProbeWanted && SavedFeather==FeatheredBaselineWet &&
+                SavedHeights==PresentationSurfaceHeightMeters;
+        };
+        ResetSourceOutputs();
         SampleLiveVertices(false); BlendSourceVertices(false);
         int32 DifferentSamples=0;
         for (int32 I=0; I<Count; ++I)
@@ -4426,6 +4476,36 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             SavedSampled==SolverSampledVertexMask && SavedAvailable==CartesianShoreAvailable &&
             SavedProbeWanted==BaselineKeepProbeWanted && SavedFeather==FeatheredBaselineWet &&
             SavedHeights==PresentationSurfaceHeightMeters;
+        TArray<TSharedPtr<FJsonValue>> Pairs;
+        bool AllPairsExact=true;
+        if (bSingleLiveWaterSurfaceEnabled)
+        {
+            // Compare the TWO production parallel schedules on the same frozen
+            // state, not a serial baseline against parallel work. Allocation /
+            // reset and validation are outside both timed intervals. Fixed
+            // alternating order; preserve every pair, including slower ones.
+            for (int32 Pair=0;Pair<8;++Pair)
+            {
+                double Ms[2]={0.,0.};bool Exact=true;
+                for (int32 Order=0;Order<2;++Order)
+                {
+                    const int32 Kind=(Order+Pair)%2;
+                    ResetSourceOutputs();
+                    const double Begin=FPlatformTime::Seconds();
+                    if (Kind==0) { SampleLiveVertices(true);BlendSourceVertices(true); }
+                    else { SampleCombinedVertices();BlendSourceVertices(true,true); }
+                    Ms[Kind]=(FPlatformTime::Seconds()-Begin)*1000.;
+                    Exact &= MatchesSaved();
+                }
+                auto Row=MakeShared<FJsonObject>();
+                Row->SetBoolField(TEXT("fused_first"),Pair%2!=0);
+                Row->SetNumberField(TEXT("separate_ms"),Ms[0]);
+                Row->SetNumberField(TEXT("fused_ms"),Ms[1]);
+                Row->SetBoolField(TEXT("all_samples_and_masks_exact"),Exact);
+                AllPairsExact &= Exact;
+                Pairs.Add(MakeShared<FJsonValueObject>(Row));
+            }
+        }
         WaterSamples=MoveTemp(SavedSamples); WetVertexMask=MoveTemp(SavedWet);
         LiveSolverWetVertexMask=MoveTemp(SavedLiveWet); SolverSampledVertexMask=MoveTemp(SavedSampled);
         CartesianShoreAvailable=MoveTemp(SavedAvailable); BaselineKeepProbeWanted=MoveTemp(SavedProbeWanted);
@@ -4437,7 +4517,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         Audit->SetNumberField(TEXT("samples"),Count);
         Audit->SetNumberField(TEXT("different_samples"),DifferentSamples);
         Audit->SetBoolField(TEXT("identical_masks_probe_requests_feather_and_heights"),SameFields);
-        Audit->SetBoolField(TEXT("passed"),DifferentSamples==0 && SameFields);
+        Audit->SetArrayField(TEXT("paired_parallel_passes"),Pairs);
+        Audit->SetBoolField(TEXT("paired_parallel_passes_exact"),AllPairsExact);
+        Audit->SetBoolField(TEXT("passed"),DifferentSamples==0 && SameFields && AllPairsExact);
         FString Json; auto Writer=TJsonWriterFactory<>::Create(&Json); FJsonSerializer::Serialize(Audit,Writer);
         if (!IFileManager::Get().FileExists(*SourceAuditPath)) FFileHelper::SaveStringToFile(Json,*SourceAuditPath);
     }
