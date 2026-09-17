@@ -17,6 +17,7 @@
 #include "Misc/Parse.h"
 #include "Engine/World.h"
 #include "ProfilingDebugging/CsvProfiler.h"
+#include "Async/ParallelFor.h"
 
 CSV_DEFINE_CATEGORY(RaftSimShoreline,true);
 
@@ -69,13 +70,27 @@ struct FShorelineRenderPacket
 
 FShorelineRenderPacket MakeRenderPacket(const TArray<FProcMeshVertex>& Source,
     const TArray<uint32>& SourceIndices,bool bIncludeIndices,
-    TArray<uint32>* DenseSources=nullptr,bool bReuseMapping=false)
+    TArray<uint32>* DenseSources=nullptr,bool bReuseMapping=false,bool bParallelValues=false)
 {
     CSV_SCOPED_TIMING_STAT(RaftSimShoreline,RenderPacket);
     FShorelineRenderPacket Packet;
     if (bReuseMapping)
     {
         check(DenseSources && !bIncludeIndices);
+        if (bParallelValues)
+        {
+            // Membership is already exact; every current attribute is still
+            // converted by RenderVertex. Workers own disjoint output ranges.
+            Packet.Vertices.SetNumUninitialized(DenseSources->Num());
+            constexpr int32 BatchSize=1024;
+            ParallelFor(FMath::DivideAndRoundUp(DenseSources->Num(),BatchSize),[&](int32 Batch)
+            {
+                const int32 End=FMath::Min((Batch+1)*BatchSize,DenseSources->Num());
+                for (int32 I=Batch*BatchSize;I<End;++I)
+                    Packet.Vertices[I]=RenderVertex(Source[(*DenseSources)[I]]);
+            });
+            return Packet;
+        }
         Packet.Vertices.Reserve(DenseSources->Num());
         for (uint32 I:*DenseSources) Packet.Vertices.Add(RenderVertex(Source[I]));
         return Packet;
@@ -97,6 +112,20 @@ FShorelineRenderPacket MakeRenderPacket(const TArray<FProcMeshVertex>& Source,
     // No coordinate welding, triangle removal or attribute interpolation.
     // Identical index order yields an identical remap when only values change.
     return Packet;
+}
+
+bool SameRenderPacket(const FShorelineRenderPacket& A,const FShorelineRenderPacket& B)
+{
+    if (A.Indices!=B.Indices || A.Vertices.Num()!=B.Vertices.Num()) return false;
+    for (int32 I=0;I<A.Vertices.Num();++I)
+    {
+        const auto& X=A.Vertices[I];const auto& Y=B.Vertices[I];
+        if (X.Position!=Y.Position || X.Color!=Y.Color ||
+            FMemory::Memcmp(&X.TangentX,&Y.TangentX,sizeof(X.TangentX)) ||
+            FMemory::Memcmp(&X.TangentZ,&Y.TangentZ,sizeof(X.TangentZ))) return false;
+        for (int32 UV=0;UV<4;++UV) if (X.TextureCoordinate[UV]!=Y.TextureCoordinate[UV]) return false;
+    }
+    return true;
 }
 
 class FShorelineSceneProxy final : public FPrimitiveSceneProxy
@@ -439,8 +468,26 @@ void URaftSimShorelineMeshComponent::SendRenderDynamicData_Concurrent()
         static const bool bOriginalRemap=FParse::Param(FCommandLine::Get(),TEXT("RaftSimOriginalUploadRemap"));
         // Exact index-order equality is already checked by the topology owner.
         // Cache membership only; every active vertex attribute is rebuilt now.
+        const bool bReuse=!bOriginalRemap && bHasRenderVertexSources && !bIndicesChanged;
+        // Exact actual-game pairs qualify this in both execution orders.
+        static const bool bParallelValues=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialRenderValues"));
+        static const bool bPair=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRenderValuesAudit"));
+        if (bPair && GFrameCounter>=120 && GFrameCounter<184)
+        {
+            FShorelineRenderPacket P[2];double Seconds[2];
+            for (int32 Order=0;Order<2;++Order)
+            {
+                const int32 Kind=(Order+int32(GFrameCounter%2))%2;
+                auto Mapping=RenderVertexSources;
+                const double Start=FPlatformTime::Seconds();
+                P[Kind]=MakeRenderPacket(WaterVertices,WaterIndices,bIndicesChanged,&Mapping,bReuse,Kind==1);
+                Seconds[Kind]=FPlatformTime::Seconds()-Start;
+            }
+            UE_LOG(LogTemp,Display,TEXT("RENDER_VALUES_PAIR frame=%llu original_first=%d reuse=%d vertices=%d exact=%d original_ms=%.9f candidate_ms=%.9f"),
+                GFrameCounter,GFrameCounter%2==0,bReuse,P[0].Vertices.Num(),SameRenderPacket(P[0],P[1]),Seconds[0]*1000.,Seconds[1]*1000.);
+        }
         auto Packet=MakeRenderPacket(WaterVertices,WaterIndices,bIndicesChanged,
-            &RenderVertexSources,!bOriginalRemap && bHasRenderVertexSources && !bIndicesChanged);
+            &RenderVertexSources,bReuse,bParallelValues);
         bHasRenderVertexSources=true;
         static const bool bTiming=FParse::Param(FCommandLine::Get(),TEXT("RaftSimWaterStageTimings"));
         if (bTiming) UE_LOG(LogTemp,Display,TEXT("WaterUpload frame=%llu source_vertices=%d upload_vertices=%d indices=%d index_update=%d"),
@@ -453,6 +500,39 @@ void URaftSimShorelineMeshComponent::SendRenderDynamicData_Concurrent()
 }
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimShorelineParallelValuesTest,"RaftSim.M4.ShorelineParallelValues",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimShorelineParallelValuesTest::RunTest(const FString&)
+{
+    for (int32 Count:{0,1,1023,1024,1025,65536})
+    {
+        TArray<FProcMeshVertex> Source;Source.SetNum(Count);
+        TArray<uint32> Indices;
+        for (int32 I=Count-1;I>=0;--I)
+        {
+            auto& V=Source[I];V.Position=FVector(I*.37,-I*.19,I*.071);
+            V.Normal=FVector(.2,.3,.9).GetSafeNormal();V.Color=FColor(I%251,83,147,217);
+            V.Tangent=FProcMeshTangent(FVector(.9,-.2,.1).GetSafeNormal(),I%2!=0);
+            V.UV0=FVector2D(I*.007,1.);V.UV1=FVector2D(-2.7,3.1);
+            V.UV2=FVector2D(.17,.91);V.UV3=FVector2D(.35,-.6);
+            Indices.Add(I);if (I%7==0) Indices.Add(I);
+        }
+        TArray<uint32> Mapping;
+        MakeRenderPacket(Source,Indices,true,&Mapping);
+        for (int32 Epoch=0;Epoch<3;++Epoch)
+        {
+            for (auto& V:Source) {V.Position.Z+=.031;V.UV3.X-=.015;V.Tangent.bFlipTangentY=!V.Tangent.bFlipTangentY;}
+            const auto Serial=MakeRenderPacket(Source,Indices,false,&Mapping,true,false);
+            const auto Parallel=MakeRenderPacket(Source,Indices,false,&Mapping,true,true);
+            TestTrue(TEXT("all current packed attributes and source order match"),SameRenderPacket(Serial,Parallel));
+        }
+        MakeRenderPacket(Source,{},true,&Mapping);
+        const auto Dry=MakeRenderPacket(Source,{},false,&Mapping,true,true);
+        TestTrue(TEXT("dry cache emits no stale vertices"),Dry.Vertices.IsEmpty());
+    }
+    return !HasAnyErrors();
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimShorelineCompactUploadTest,"RaftSim.M4.ShorelineCompactUpload",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FRaftSimShorelineCompactUploadTest::RunTest(const FString&)

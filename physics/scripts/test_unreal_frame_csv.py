@@ -56,6 +56,17 @@ class UnrealFrameCsvTest(unittest.TestCase):
         self.assertNotIn(GROUND_SCOPES[0], summarize(legacy, 0, 0))
         self.assertNotIn(RELIEF_SCOPES[0], summarize(legacy, 0, 0))
         self.assertNotIn("RaftSimCrests/GameThread/Normals", summarize(legacy, 0, 0))
+        self.assertNotIn("RaftSimShoreline/GameThread/RenderPacket", summarize(legacy, 0, 0))
+
+    def test_render_packet_timing_is_optional_and_not_added_to_frame_time(self):
+        name = "RaftSimShoreline/GameThread/RenderPacket"
+        header = HEADER.rstrip() + ',' + name + '\n'
+        text = header + '20,18,4,2,5,1.5\n30,28,4,2,5,0.5\n' + header + '[HasHeaderRowAtEnd],1\n'
+        samples, _ = parse_capture(io.StringIO(text))
+        result = summarize(samples, 0, 1)
+        self.assertEqual(result[name]['mean_ms'], 1)
+        self.assertEqual(result['FrameTime']['mean_ms'], 25)
+        self.assertEqual(result['elapsed_frame_fps'], 40)
 
     def test_duplicate_unrelated_columns_are_rejected(self):
         header = HEADER.rstrip() + ",FMsgLogf/FMsgLogfCount,FMsgLogf/FMsgLogfCount\n"

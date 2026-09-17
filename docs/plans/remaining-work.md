@@ -3,7 +3,24 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [native compensated-clock recovery](../reconstruction-review-2026-09-07/sm5-compensated-clock-recovery.md).
+Latest: [exact render conversion installed](../reconstruction-review-2026-09-07/render-values-installed.md).
+All64 actual-frame pairs/1,674,036 rendered vertices match; conversion1.036548
+to0.507145ms, faster in both call orders. Default-enabled build22 native PASS;
+43 Python audit/profiler PASS. Gameplay DLL/PDB installed with verified backup.
+Normal South Fork capture has NO module override:30.285471FPS average but
+p9541.4455ms still FAIL30. Standalone/packaged executable not updated or accepted.
+Installed and old-runtime startup sequences show the same preexisting angular
+water edge and sheet-like foam; visual acceptance remains FALSE. Address these
+actual defects and current-profile selection cost without freezing/lowering detail.
+[Prescribed-normal native correction](../reconstruction-review-2026-09-07/sm5-prescribed-normal-recovery.md)
+now passes all33 native tests, zero warnings/failures;69 standalone regressions
+PASS. All64 shader hashes verified, no live native freeze. Physical/playable
+solver acceptance does not follow from these tests. Same hydraulic36872 LIVE:
+2650s state AND86,720 dry banks PASS, NOT settled (93.189388 out/45.306955 in).
+Next2700/local18000 requires both audits. Full ordered scene/physics/crew/release
+scope below stays OPEN; Troublemaker is not a scenario.
+
+Previous: [native compensated-clock recovery](../reconstruction-review-2026-09-07/sm5-compensated-clock-recovery.md).
 Original native SM5 replay55459 is TERMINAL:5 PASS/28 FAIL, not hung/waiting.
 Portable clock normalization/addition preserves the low word without changing
 dt, endpoint, state or rejection gates. Same33-test replay43990 is TERMINAL:
