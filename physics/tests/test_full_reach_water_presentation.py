@@ -14,7 +14,14 @@ def test_bank_terrain_probes_skip_blockers_without_expanding_the_ray_budget():
     assert 'Attempt < 4 && RemainingRayBudget > 0' in helper
     assert '--RemainingRayBudget' in helper
     assert 'TerrainParams.AddIgnoredActor(Actor)' in helper
-    assert 'Actor->ActorHasTag(TEXT("RaftSimFullReachTerrain"))' in helper
+    assert 'RaftSimTerrainProbeSources::IsSource(Hit.GetComponent())' in helper
+    classifier = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimTerrainProbeSources.h').read_text()
+    classifier = classifier.split('inline bool IsSource(', 1)[1].split('inline bool ActorHasSource(', 1)[0]
+    assert 'if (!Actor) return false;' in classifier
+    assert 'Actor->ActorHasTag(TEXT("RaftSimFullReachTerrain"))' in classifier
+    assert '(Cast<UStaticMeshComponent>(Component) &&' in classifier
+    assert 'Actor->ActorHasTag(TEXT("RaftSimPhysicalGround"))' in classifier
+    assert 'Component->ComponentHasTag(TEXT("RaftSimPhysicalGround"))' in classifier
     assert 'ALandscapeProxy' not in helper
     assert source.count('ProbeParams, ProbeBudget, Hit)') == 2
     assert source.count('VisualBankProbeState[Index] = ProbeBudget == 0 ? 0 : 2') == 2

@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -60,10 +61,25 @@ def test_live_solver_cannot_enter_a_render_frame_catch_up_spiral() -> None:
     )[1].split(
         "void URaftSimPhysicsBridgeSubsystem::RecordContactTelemetryEvent", 1
     )[0]
-    assert "kMaximumRaftCatchUpTicksPerFrame = 4" in tick_bridge
-    assert "CatchUpTickCount == 0" in tick_bridge
-    assert "FMath::Fmod(AccumulatedSeconds, WaterStepSeconds)" in tick_bridge
-    assert "Config.spatial_order = 1;" in live_window
+    compact = re.sub(r'\s+', '', tick_bridge)
+    assert 'LastOutput.bFixedTickFailed=!FixedClock.Advance(double(Input.FrameDeltaSeconds),double(WaterStepSeconds),4,' in compact
+    assert '[this]{returnRunOneFixedWaterTick();},Completed)' in compact
+    assert 'LastOutput.FixedTicksThisFrame=Completed;' in compact
+    assert 'LastOutput.SimulationBacklogSeconds=FixedClock.BacklogSeconds;' in compact
+    # Fmod discarded hitch debt in the former implementation. Its presence is
+    # now a regression, not something a performance test should demand.
+    assert 'Fmod(' not in tick_bridge
+    clock = (PHYSICS_BRIDGE_SOURCE.parents[1] / 'Public/RaftSimFixedStepClock.h').read_text()
+    clock = re.sub(r'\s+', '', clock)
+    assert 'while(Completed<MaximumTicks&&BacklogSeconds>=StepSeconds)' in clock
+    assert 'if(!RunTick())returnfalse;' in clock
+    assert 'BacklogSeconds-=StepSeconds;CommittedSeconds+=StepSeconds;' in clock
+    assert 'Fmod(' not in clock
+    # The current coupled Cartesian path must retain source MUSCL2; the old
+    # unrelated legacy first-order branch is not the normal-path authority.
+    coupled = live_window.split('double Manning = 0., SpatialOrder = 0.;', 1)[1].split('Scenario.boundaries.clear();', 1)[0]
+    assert 'SpatialOrder != 2.' in coupled
+    assert 'Config.spatial_order = 2;' in coupled
 
 
 def test_single_surface_disables_periodic_bars_and_bounds_surface_detail() -> None:
@@ -84,8 +100,11 @@ def test_single_surface_disables_periodic_bars_and_bounds_surface_detail() -> No
 
 def test_single_surface_accepts_real_near_bank_hydraulic_jumps() -> None:
     source = RUNTIME_SOURCE.read_text(encoding="utf-8")
-    assert "bSingleLiveWaterSurfaceEnabled ? 0.55f : 0.999f" in source
-    assert "FMath::Max(ResolvedVertexSpacingMeters, 3.0f)" in source
+    policy = source.split('const float MinimumBreakingCoverage =', 1)[1].split('if (bAuditBreakingHeight)', 1)[0]
+    compact = re.sub(r'\s+', '', policy)
+    assert '(bSingleLiveWaterSurfaceEnabled||bSharedBreakingReliefEnabled)?0.55f:0.999f;' in compact
+    assert '(bSingleLiveWaterSurfaceEnabled||bSharedBreakingReliefEnabled)?FMath::Max(ResolvedVertexSpacingMeters,3.0f):BreakingSiteInteriorClearanceMeters;' in compact
+    assert re.search(r'if \(PresentationCoverage < MinimumBreakingCoverage \|\|\s*PresentationEdgeClearanceMeters <\s*MinimumBreakingClearanceMeters\)', source)
 
 
 def test_optical_smoothing_review_keeps_hydraulic_sources_and_other_rivers_fixed() -> None:
@@ -93,10 +112,20 @@ def test_optical_smoothing_review_keeps_hydraulic_sources_and_other_rivers_fixed
     assert "bSouthForkOpticalSmoothingReview = bUsesSouthForkFullReachSingleSurface" in source
     assert 'TEXT("raftsim.SouthForkOpticalSmoothingPasses"), 16' in source
     assert "const int32 HydraulicPassCount = bSingleLiveWaterSurfaceEnabled ? 4 : 1" in source
-    assert "FMath::Max(OpticalPassCount, HydraulicPassCount)" in source
-    assert "PassIndex + 1 == HydraulicPassCount" in source
-    assert "PassIndex + 1 == OpticalPassCount" in source
-    assert "PresentationSurfaceHeightMeters = MoveTemp(OpticalSurfaceHeightMeters)" in source
+    compact = re.sub(r'\s+', '', source)
+    assert 'RaftSimWaterSmoothing::OpticalPassCount(bNativeMean,bNeedsOptical,ConfiguredOpticalPassCount)' in compact
+    assert 'RaftSimWaterSmoothing::Apply(PresentationSurfaceHeightMeters,WetVertexMask,GridStationN,GridLateralN,Stride,ResolvedPresentationSurfaceSmoothingStrength,OpticalPassCount,HydraulicPassCount,HydraulicSourceSurfaceHeightMeters)' in compact
+    smoothing = (WATER_SURFACE_HEADER.parent / 'RaftSimWaterSmoothing.h').read_text()
+    smoothing = re.sub(r'\s+', '', smoothing)
+    assert 'returnbNativeMean&&!bNeedsOptical?0:Configured;' in smoothing
+    assert 'FMath::Max(OpticalPasses,HydraulicPasses)' in smoothing
+    assert 'constTArray<float>Previous=Surface;' in smoothing
+    assert 'if(!Wet[I]||!Wet[U]||!Wet[D]||!Wet[R]||!Wet[L])continue;' in smoothing
+    assert 'if(Pass+1==HydraulicPasses)Hydraulic=Surface;' in smoothing
+    assert 'if(Pass+1==OpticalPasses&&OpticalPasses<Passes)Optical=Surface;' in smoothing
+    assert 'if(!Optical.IsEmpty())Surface=MoveTemp(Optical);' in smoothing
+    native_restore = source.split('    if (bNativeMean)\n    {', 1)[1].split('Perf.Mark(TEXT("optical_filter"))', 1)[0]
+    assert 'if(WetVertexMask[I])PresentationSurfaceHeightMeters[I]=WaterSamples[I].SurfaceHeightMeters;' in re.sub(r'\s+', '', native_restore)
 
 
 def test_carrier_uv_rebasing_preserves_full_precision_shader_phase() -> None:

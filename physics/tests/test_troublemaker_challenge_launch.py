@@ -1,6 +1,9 @@
 """South Fork owns Troublemaker; the rapid is not a separate menu scenario."""
 
 from pathlib import Path
+import hashlib
+import json
+import re
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -18,11 +21,29 @@ def test_troublemaker_is_not_a_standalone_scenario() -> None:
     menu = FRONTEND_SOURCE.with_name('RaftSimMainMenuWidget.cpp').read_text()
     assert 'troublemaker_challenge' not in menu
     assert 'Troublemaker Rapid' not in menu
-    scenario = source.split('TEXT("south_fork_full_descent")', 1)[1].split(
-        'TEXT("hance_challenge")', 1
-    )[0]
-    assert 'TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach")' in scenario
-    assert '120.0f, 48900.0f, false, true' in scenario
+    # The old 48.9 km endpoint belongs to the superseded axis. Validate every
+    # launch against the registered session contract, not another copied extent.
+    contract_path = REPO_ROOT / 'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach/playable_route/session_contracts.json'
+    contract = json.loads(contract_path.read_text())
+    assert contract['schema'] == 'raftsim.river_session_contracts.v1'
+    assert contract['parent_scenario_id'] == 'south_fork_full_descent'
+    assert contract['rapid_has_no_menu_entry'] is True
+    coordinate_map = REPO_ROOT / contract['coordinate_map']
+    assert hashlib.sha256(coordinate_map.read_bytes()).hexdigest() == contract['coordinate_map_sha256']
+    sessions = contract['sessions']
+    assert {s['id'] for s in sessions} == {
+        'south_fork_upper', 'south_fork_coloma', 'south_fork_gorge',
+        'south_fork_lower', 'south_fork_full_descent'}
+    for session in sessions:
+        scenario = source.split(f'TEXT("{session["id"]}")', 1)[1].split('MakeScenario(', 1)[0]
+        assert f'TEXT("{contract["level"]}")' in scenario
+        extent = re.search(r'ERaftSimLicenseTier::\w+,\s*\d+,\s*([\d.]+)f,\s*([\d.]+)f', scenario)
+        assert extent is not None
+        assert tuple(map(float, extent.groups())) == (session['start_m'], session['finish_m'])
+        assert contract['source_route_extent_m'][0] <= session['start_m'] < session['finish_m'] <= contract['source_route_extent_m'][1]
+        if session['id'] == contract['parent_scenario_id']:
+            assert list(map(float, extent.groups())) == contract['playable_extent_m']
+            assert re.search(r'false,\s*true\)', scenario)
 
 
 def test_retired_rapid_selection_does_not_reuse_local_checkpoint():

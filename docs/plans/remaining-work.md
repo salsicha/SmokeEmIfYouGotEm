@@ -3,7 +3,13 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [physical crest specialization rejected after installed trial](../reconstruction-review-2026-09-07/inline-physical-crest.md).
+Latest: [current runtime contract checks](../reconstruction-review-2026-09-07/current-runtime-contracts.md).
+Five stale source checks repaired; 18 negative controls guard actual regressions.
+70 focused Python tests and six ordinary installed native tests PASS. No runtime
+or asset change, no new hydraulic/visual/FPS acceptance; the thirteen previously
+recorded physical-suite failures and full ordered work queue remain OPEN.
+
+Previous: [physical crest specialization rejected after installed trial](../reconstruction-review-2026-09-07/inline-physical-crest.md).
 125,497,187 actual queries and 233,275 native height/foam comparisons are exact.
 Isolated A/B improved, but installed no-plugin A/B failed whole-frame repeatability;
 the temporary installation was rolled back byte-for-byte and source defaults
