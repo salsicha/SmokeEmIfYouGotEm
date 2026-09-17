@@ -3,7 +3,18 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [original source-face transport of conditional inlet profiles](../reconstruction-review-2026-09-07/normal-river-inlet-face-transport.md).
+Latest: [current solver whole-program optimization not promoted](../reconstruction-review-2026-09-07/solver-lto-current-rejection.md).
+Four native CTest fixtures pass. Two original-input600-step/four-pair comparisons
+preserve all44 saved frame pairs each, but Cartesian baseline-first timing is
+0.3882% slower. LTO remains isolated; no production compiler/library/DLL change.
+Do not repeat the same compiler trial; target measured runtime work instead.
+Same cook36872:2300s state AND86,720 dry banks PASS, NOT settled
+(96.550977 out versus45.306955 in m3/s); next2350/local11000 needs both audits.
+Original native SM5 replay/editor36412 and worker37836 remain LIVE, inputs frozen.
+Last28.057157FPS/p9541.2354ms still FAIL30. No visible gameplay improvement here.
+Full terrain/physical/visual/ordered-river/all-scene/crew/release scope stays OPEN.
+
+Previous: [original source-face transport of conditional inlet profiles](../reconstruction-review-2026-09-07/normal-river-inlet-face-transport.md).
 Time-integrated advective flux now balances the non-horizontal stored profile
 on all 17 routed sources / 60 edges, with explicit original donor withdrawal.
 All 11 represented donor balances close exactly, including the sub-float stream;
