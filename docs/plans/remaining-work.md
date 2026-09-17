@@ -3,7 +3,26 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [installed checkpoint terrain startup](../reconstruction-review-2026-09-07/checkpoint-terrain-startup.md).
+Latest: [SM5 encoded-return correction](../reconstruction-review-2026-09-07/sm5-integer-return.md).
+FXC was folding branch-local subnormal/signed-zero bitcasts to zero. Production
+addition, wide affine rounding, multiplication, division and power scaling now
+merge integer returns before bitcasting, with unchanged arithmetic and oracles.
+170,068 existing scalar cases PASS on both hardware SM5 and WARP;52 Python
+checks and64,078 CPU addition cases PASS. Engine replay9319/PID9976 is LIVE,
+29 applicable original failures selected, NOT passed. Keep shader inputs frozen.
+Full installed ordinary-map replay58473 is now TERMINAL0/PASS: eight handoffs,
+11,945 fresh frames,471.816691 detail seconds; no visual or FPS acceptance.
+Same hydraulic11316 resumed;1400s state AND86,720 dry-bank checks PASS, NOT
+settled (outflow82.238582 versus inflow45.306955m3/s). Next1450/local17000
+requires both audits. Last26.784840FPS/p9543.5724ms remains FAIL30.
+NEXT engine result, remaining exact-hydrostatic return audit, compatible nonlinear
+physics and visible wave/froth integration, source-consistent geometry/collision,
+distant in-run reset,30FPS, normalization/source closure, Colorado -> Pacuare ->
+Futaleufu, all-scene water including Chilko/Zambezi, crew and release checks.
+No physical/geographic/visual completion. Troublemaker remains only a rapid
+within South Fork, never a menu scenario; the full goal remains open.
+
+Previous: [installed checkpoint terrain startup](../reconstruction-review-2026-09-07/checkpoint-terrain-startup.md).
 Ordinary installed South Fork now shows terrain, water and crew colors in first
 unskipped image000; all24 actual1280x720 frames retained, no preview/override flags.
 Checkpoint destination activation precedes hydraulic reseed and raft movement,

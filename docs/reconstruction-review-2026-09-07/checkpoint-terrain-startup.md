@@ -65,21 +65,33 @@ need verification/integration. Cooked startup also remains unverified.
   First image SHA256
   `0787a3421e55b5e5081ed676ba54879a9ff5f957d4306a64356f60764a649749`.
 
-## Full ordinary-map streaming replay is live, not passed
+## Full ordinary-map streaming replay passed its technical gate
 
 Session58473 / PID28488, process start2026-09-17T00:25:35.7891550Z,
 label `south-fork-checkpoint-terrain-installed-detail-v3-20260917`, uses installed
 modules and the ordinary map without preview/full-hull/override flags. Original
 120-world-second, eight post-ready handoff,100-fresh-frame,60-detail-second and
-900-second observation gates are unchanged. It has reached world51.049s with
-sequence1278, clock50.900003s and total handoffs3; this is not completion.
+900-second observation gates are unchanged. Session58473 is now terminal0;
+the engine exits0 without timeout. It records11,945 fresh presented frames,
+eight post-ready handoffs and471.81669127382338 detail seconds. This proves
+the technical continuity gate, not physical, visual or performance acceptance.
 
 A fresh live process-module witness confirms installed projectf11c1bc6...,
 gameplay947f5a53... and detail650f80ca... from their ordinary Binaries directories.
 `tmp/checkpoint-terrain-installed-detail-v3-20260917-modules.json`, SHA256
 `908cc90a79876cc7f96d465f1cf94561fc1314c0fd73817e1bf5b4273d34e657`.
-The runner owns temporary suspension of hydraulic cook11316 and will resume it
-in its finally block. Keep its existing session/process handles and inputs.
+The runner resumed its owned hydraulic cook11316 in its finally block (status0);
+the same cook process was independently observed consuming CPU afterward.
+
+Detail report SHA256:
+`821f696da43ca830c4fd1fd485daee5b30e296b9ddab29668c55548e8daf73ba`.
+Process report SHA256:
+`d2bc126cb211745850e9b8b19d54573d678ddabb3eeb42712fed24e016045c0f`.
+The report's conservative `normal_project_binary_deployed:false` field is not
+a module audit; the independent live module witness above verifies the actual
+installed paths and hashes. No binary deployment is inferred from that field.
+The final handoff010 image was inspected directly: water and ground are present,
+but the bare banks, crew fit and water appearance are still unaccepted.
 
 No new FPS claim: last ordinary installed check remains26.784840FPS,
 p9543.5724ms, FAIL30. Long-run rendering/contact/reentry and all physical gates

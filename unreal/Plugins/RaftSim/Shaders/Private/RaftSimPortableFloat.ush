@@ -35,7 +35,9 @@ void RaftSimAccumulateFloat(inout uint words[RAFTSIM_FLOAT_LIMBS],uint value)
     uint mantissa=(value&0x7fffffu)|(exponent!=0?0x800000u:0);
     RaftSimAccumulate(words,mantissa,0,max(exponent,1u)+150u,(value>>31)!=0);
 }
-float RaftSimRoundAccumulator(inout uint words[RAFTSIM_FLOAT_LIMBS],bool halve,uint zeroSign)
+// Merge encoded integer returns before converting to float. In SM5, FXC can
+// replace branch-local asfloat(subnormal/signed-zero) with +0, even with /Gis.
+uint RaftSimRoundAccumulatorBits(inout uint words[RAFTSIM_FLOAT_LIMBS],bool halve,uint zeroSign)
 {
     uint sign=words[RAFTSIM_FLOAT_LIMBS-1]&0x80000000u;
     if(sign!=0)
@@ -46,7 +48,7 @@ float RaftSimRoundAccumulator(inout uint words[RAFTSIM_FLOAT_LIMBS],bool halve,u
     }
     int highest=-1;
     [unroll]for(uint i=0;i<RAFTSIM_FLOAT_LIMBS;++i)if(words[i]!=0)highest=int(32*i)+firstbithigh(words[i]);
-    if(highest<0)return asfloat(zeroSign);
+    if(highest<0)return zeroSign;
     int exponent=highest-300-int(halve);
     uint cut=uint(max(highest-23,151+int(halve))),index=cut>>5,offset=cut&31u;
     uint rounded=words[index]>>offset;
@@ -59,12 +61,14 @@ float RaftSimRoundAccumulator(inout uint words[RAFTSIM_FLOAT_LIMBS],bool halve,u
         if(i==roundIndex && roundOffset!=0)sticky=sticky || (words[i]&((1u<<roundOffset)-1u))!=0;
     }
     if(roundBit && (sticky || (rounded&1u)!=0))++rounded;
-    if(rounded==0)return asfloat(sign);
+    if(rounded==0)return sign;
     if(rounded>=0x1000000u){rounded>>=1;++exponent;}
-    if(exponent>127)return asfloat(sign|0x7f800000u);
-    if(exponent< -126 && rounded<0x800000u)return asfloat(sign|rounded);
-    return asfloat(sign|(uint(max(exponent,-126)+127)<<23)|(rounded&0x7fffffu));
+    if(exponent>127)return sign|0x7f800000u;
+    if(exponent< -126 && rounded<0x800000u)return sign|rounded;
+    return sign|(uint(max(exponent,-126)+127)<<23)|(rounded&0x7fffffu);
 }
+float RaftSimRoundAccumulator(inout uint words[RAFTSIM_FLOAT_LIMBS],bool halve,uint zeroSign)
+{return asfloat(RaftSimRoundAccumulatorBits(words,halve,zeroSign));}
 float RaftSimPortableAffine(float state,float stage,float dt,float rate,bool rk2)
 {
     uint s=asuint(state),t=asuint(stage),a=asuint(dt),b=asuint(rate);
@@ -93,7 +97,7 @@ float RaftSimPortableAffine(float state,float stage,float dt,float rate,bool rk2
 }
 float RaftSimPortableEuler(float state,float dt,float rate){return RaftSimPortableAffine(state,0,dt,rate,false);}
 float RaftSimPortableRK2(float state,float stage,float dt,float rate){return RaftSimPortableAffine(state,stage,dt,rate,true);}
-float RaftSimPortableMul(float a,float b)
+uint RaftSimPortableMulBits(float a,float b)
 {
     // A product needs only its exact48-bit significand, not the18-limb affine
     // accumulator needed by cancellation between widely separated addends.
@@ -103,8 +107,8 @@ float RaftSimPortableMul(float a,float b)
     int ea=int((ba>>23)&255u),eb=int((bb>>23)&255u);
     // Match the existing finite-physical-input helper: nonfinite operands are
     // explicitly invalid rather than manufactured into a usable state.
-    if(ea==255 || eb==255)return asfloat(0x7fc00000u);
-    if((ba&0x7fffffffu)==0 || (bb&0x7fffffffu)==0)return asfloat(sign);
+    if(ea==255 || eb==255)return 0x7fc00000u;
+    if((ba&0x7fffffffu)==0 || (bb&0x7fffffffu)==0)return sign;
     if(ea==0){int s=23-firstbithigh(ma);ma<<=s;ea=1-s;}else ma|=0x800000u;
     if(eb==0){int s=23-firstbithigh(mb);mb<<=s;eb=1-s;}else mb|=0x800000u;
     uint baseProduct=(ma&0xffffu)*(mb&0xffffu);
@@ -113,8 +117,8 @@ float RaftSimPortableMul(float a,float b)
     uint high=(ma>>16)*(mb>>16)+(middle>>16)+uint(low<baseProduct);
     uint upper=uint(high>=0x8000u);
     int exponent=ea+eb-254+int(upper);
-    if(exponent>127)return asfloat(sign|0x7f800000u);
-    if(exponent< -150)return asfloat(sign);
+    if(exponent>127)return sign|0x7f800000u;
+    if(exponent< -150)return sign;
     uint cut=23u+upper+uint(max(-126-exponent,0)); //23..48
     uint q;
     if(cut<32)q=(low>>cut)|(high<<(32-cut));
@@ -126,12 +130,13 @@ float RaftSimPortableMul(float a,float b)
     else
     {roundBit=((high>>(cut-33))&1u)!=0;sticky=low!=0 || (high&((1u<<(cut-33))-1u))!=0;}
     if(roundBit && (sticky || (q&1u)!=0))++q;
-    if(q==0)return asfloat(sign);
+    if(q==0)return sign;
     if(q>=0x1000000u){q>>=1;++exponent;}
-    if(exponent>127)return asfloat(sign|0x7f800000u);
-    if(exponent< -126 && q<0x800000u)return asfloat(sign|q);
-    return asfloat(sign|(uint(max(exponent,-126)+127)<<23)|(q&0x7fffffu));
+    if(exponent>127)return sign|0x7f800000u;
+    if(exponent< -126 && q<0x800000u)return sign|q;
+    return sign|(uint(max(exponent,-126)+127)<<23)|(q&0x7fffffu);
 }
+float RaftSimPortableMul(float a,float b){return asfloat(RaftSimPortableMulBits(a,b));}
 // Two-operand addition preserves the wide accumulator's exact rounded result
 // without expanding an eighteen-limb product-and-add at every call site.
 #include "RaftSimPortableAdd.ush"
@@ -173,24 +178,24 @@ bool RaftSimPortableFiniteRatio(uint numerator,uint denominator)
     // <=127 is therefore precisely the finite rounded-velocity condition.
     return en-ed-int(n<d)<=127;
 }
-float RaftSimPortableDivide(float numerator,float denominator)
+uint RaftSimPortableDivideBits(float numerator,float denominator)
 {
     uint a=asuint(numerator),b=asuint(denominator),sign=(a^b)&0x80000000u;
     uint n=a&0x7fffffu,d=b&0x7fffffu;
     int en=int((a>>23)&255u),ed=int((b>>23)&255u);
     bool zn=(a&0x7fffffffu)==0,zd=(b&0x7fffffffu)==0;
-    if((en==255 && n!=0) || (ed==255 && d!=0) || (en==255 && ed==255) || (zn && zd))return asfloat(0x7fc00000u);
-    if(en==255 || zd)return asfloat(sign|0x7f800000u);
-    if(ed==255 || zn)return asfloat(sign);
+    if((en==255 && n!=0) || (ed==255 && d!=0) || (en==255 && ed==255) || (zn && zd))return 0x7fc00000u;
+    if(en==255 || zd)return sign|0x7f800000u;
+    if(ed==255 || zn)return sign;
     if(en==0){int shift=23-firstbithigh(n);n<<=shift;en=1-shift;}else n|=0x800000u;
     if(ed==0){int shift=23-firstbithigh(d);d<<=shift;ed=1-shift;}else d|=0x800000u;
     int exponent=en-ed;
     if(n<d){n<<=1;--exponent;}
     // The normalized exact ratio is in [1,2). Extract only the significand
     // bits that survive final FP32 rounding, retaining an exact remainder.
-    if(exponent>127)return asfloat(sign|0x7f800000u);
-    if(exponent< -150)return asfloat(sign);
-    if(exponent== -150)return asfloat(sign|uint(n>d)); // exact halfway rounds to even zero
+    if(exponent>127)return sign|0x7f800000u;
+    if(exponent< -150)return sign;
+    if(exponent== -150)return sign|uint(n>d); // exact halfway rounds to even zero
     uint count=uint(min(23,exponent+149)),q=1,remainder=n-d;
     [loop]for(uint i=0;i<count;++i)
     {
@@ -200,10 +205,12 @@ float RaftSimPortableDivide(float numerator,float denominator)
     uint twice=remainder<<1;
     if(twice>d || (twice==d && (q&1u)!=0))++q;
     if(q>=0x1000000u){q>>=1;++exponent;}
-    if(exponent>127)return asfloat(sign|0x7f800000u);
-    if(exponent< -126 && q<0x800000u)return asfloat(sign|q);
-    return asfloat(sign|(uint(max(exponent,-126)+127)<<23)|(q&0x7fffffu));
+    if(exponent>127)return sign|0x7f800000u;
+    if(exponent< -126 && q<0x800000u)return sign|q;
+    return sign|(uint(max(exponent,-126)+127)<<23)|(q&0x7fffffu);
 }
+float RaftSimPortableDivide(float numerator,float denominator)
+{return asfloat(RaftSimPortableDivideBits(numerator,denominator));}
 bool RaftSimPortableValidState(float4 state)
 {
     uint4 bits=asuint(state),magnitude=bits&0x7fffffffu;
@@ -215,20 +222,21 @@ bool RaftSimPortableValidState(float4 state)
 }
 // Exact power-of-two scaling with one nearest/even rounding at the storage
 // boundary. The scale is an integer exponent, so it cannot itself underflow.
-float RaftSimPortableScale(float value,int power)
+uint RaftSimPortableScaleBits(float value,int power)
 {
     uint bits=asuint(value),m=bits&0x7fffffu,sign=bits&0x80000000u;
     int e=int((bits>>23)&255u);
-    if((bits&0x7fffffffu)==0 || e==255)return value;
+    if((bits&0x7fffffffu)==0 || e==255)return bits;
     if(e==0){int shift=23-firstbithigh(m);m<<=shift;e=1-shift;}else m|=0x800000u;
     e=e-127+power;
-    if(e>127)return asfloat(sign|0x7f800000u);
-    if(e>=-126)return asfloat(sign|(uint(e+127)<<23)|(m&0x7fffffu));
-    if(e< -150)return asfloat(sign);
+    if(e>127)return sign|0x7f800000u;
+    if(e>=-126)return sign|(uint(e+127)<<23)|(m&0x7fffffu);
+    if(e< -150)return sign;
     uint shift=uint(-126-e),q=m>>shift,remainder=m&((1u<<shift)-1u),midpoint=1u<<(shift-1u);
     if(remainder>midpoint || (remainder==midpoint && (q&1u)!=0))++q;
-    return asfloat(sign|q);
+    return sign|q;
 }
+float RaftSimPortableScale(float value,int power){return asfloat(RaftSimPortableScaleBits(value,power));}
 int RaftSimPortableExponent(float value)
 {
     uint bits=asuint(value)&0x7fffffffu,e=bits>>23,m=bits&0x7fffffu;

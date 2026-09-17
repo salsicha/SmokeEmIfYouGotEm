@@ -9,15 +9,18 @@ uint RaftSimAddShiftRightJam(uint value,uint shift)
     if(shift>=32)return uint(value!=0);
     return (value>>shift)|uint((value&((1u<<shift)-1u))!=0);
 }
-float RaftSimPortableAdd(float a,float b)
+// Keep every return encoded until control flow has merged. FXC folds an
+// asfloat(sign|subnormal) branch to +0, even under /Gis; integer returns retain
+// the bits. The float wrapper below preserves the public storage interface.
+uint RaftSimPortableAddBits(float a,float b)
 {
     uint ba=asuint(a),bb=asuint(b),aa=ba&0x7fffffffu,ab=bb&0x7fffffffu;
     // Preserve the existing finite-physical-helper contract, not a new NaN
     // payload or infinity arithmetic policy.
-    if(aa>=0x7f800000u || ab>=0x7f800000u)return asfloat(0x7fc00000u);
-    if(aa==0 && ab==0)return asfloat(ba&bb&0x80000000u);
-    if(aa==0)return b;
-    if(ab==0)return a;
+    if(aa>=0x7f800000u || ab>=0x7f800000u)return 0x7fc00000u;
+    if(aa==0 && ab==0)return ba&bb&0x80000000u;
+    if(aa==0)return bb;
+    if(ab==0)return ba;
     if(aa<ab){uint swap=ba;ba=bb;bb=swap;}
     uint sign=ba&0x80000000u,ma=ba&0x7fffffu,mb=bb&0x7fffffu;
     int ea=int((ba>>23)&255u),eb=int((bb>>23)&255u);
@@ -34,8 +37,9 @@ float RaftSimPortableAdd(float a,float b)
     uint rounded=magnitude>>3,remainder=magnitude&7u;
     if(remainder>4u || (remainder==4u && (rounded&1u)!=0))++rounded;
     if(rounded>=0x1000000u){rounded>>=1;++exponent;}
-    if(exponent>=255)return asfloat(sign|0x7f800000u);
-    if(rounded<0x800000u)return asfloat(sign|rounded);
-    return asfloat(sign|(uint(exponent)<<23)|(rounded&0x7fffffu));
+    if(exponent>=255)return sign|0x7f800000u;
+    if(rounded<0x800000u)return sign|rounded;
+    return sign|(uint(exponent)<<23)|(rounded&0x7fffffu);
 }
+float RaftSimPortableAdd(float a,float b){return asfloat(RaftSimPortableAddBits(a,b));}
 #endif
