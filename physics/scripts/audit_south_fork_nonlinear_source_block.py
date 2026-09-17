@@ -17,14 +17,17 @@ from subcell_nonlinear_metric_stage import stage
 from subcell_nonlinear_time_stage import history
 
 
-def load_original_block(args):
+def load_original_block(args, shape=(4, 4)):
     """Shared unchanged-source loader for block rate and birth-geometry audits.
 
-    args supplies source_report, atlas, block_col and block_row. Preserve the
+    args supplies source_report, atlas, block_col and block_row. An explicit
+    shape may recover surrounding state within the SAME recorded 16x16 patch.
+    Preserve the
     original registration arithmetic and field/source hash checks verbatim.
     """
-    if args.block_col not in range(13) or args.block_row not in range(13):
-        raise ValueError('Original 4x4 block must lie inside the 16x16 source patch')
+    if (len(shape) != 2 or any(type(n) is not int or not 1 <= n <= 16 for n in shape)
+            or args.block_col not in range(17-shape[1]) or args.block_row not in range(17-shape[0])):
+        raise ValueError('Original region must lie inside the 16x16 source patch')
     source, atlas = read(args.source_report), read(args.atlas)
     if (source['schema'] != 'raftsim.south_fork.subcell_pressure_kinetic_geometry.v1'
             or source['pool_geometry'] != 'exact-source-relative' or source['total_cells'] != 256
@@ -48,7 +51,7 @@ def load_original_block(args):
     with np.load(mesh_path, allow_pickle=False) as mesh:
         sampler = RegisteredMeshSampler(mesh)
         authority = np.asarray(mesh['authority']).ravel().copy()
-    row, col = np.indices((4, 4))
+    row, col = np.indices(shape)
     offsets = np.stack((col.ravel()+args.block_col, row.ravel()+args.block_row), axis=1)
     world = np.asarray(source['source_origin_m'])+offsets
     located = exact_cells(world, [tile['origin_m'] for tile in atlas['tiles']], atlas['tile_shape'], 1.)
@@ -62,7 +65,7 @@ def load_original_block(args):
         if values.shape != tuple(record['shape']) or values.dtype != np.dtype('<f8'):
             raise ValueError('Original snapshot array shape/type changed')
         tile, iy, ix = located.T
-        fields[key] = np.array(values[tile*atlas['tile_shape'][0]+iy, ix]).reshape(4, 4)
+        fields[key] = np.array(values[tile*atlas['tile_shape'][0]+iy, ix]).reshape(shape)
     records = {r['index']: r for r in source['records']}
     indices = [int(16*y+x) for x, y in offsets]
     for index, volume in zip(indices, fields['h'].ravel()):
@@ -72,7 +75,7 @@ def load_original_block(args):
     origin = (np.asarray(source['source_origin_m'])
               +(np.asarray(coordinates['world_origin_utm_m'])-np.asarray(geometry['rapid_origin_utm_m']))
               +[args.block_col, args.block_row])
-    patch = SubcellGeometryPatch(sampler, origin, (4, 4), relative_stages=True, exact_sources=True)
+    patch = SubcellGeometryPatch(sampler, origin, shape, relative_stages=True, exact_sources=True)
     momentum = fields['h'][..., None]*np.stack((fields['u'], fields['v']), axis=-1)
     pools = WetPoolPartition(patch, sampler, origin, fields['h'], momentum)
     return pools, source, indices, origin, authority, sampler, hashes

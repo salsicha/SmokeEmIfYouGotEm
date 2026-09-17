@@ -9,6 +9,7 @@ from fractions import Fraction as F
 import json
 from pathlib import Path
 import math
+from types import SimpleNamespace
 
 import numpy as np
 from exact_rational_json import json_default
@@ -26,6 +27,7 @@ from subcell_inlet_lateral_flux import lateral_flux
 from subcell_inlet_lateral_energy import lateral_energy_flux
 from subcell_inlet_front_ownership import owned_front_transfers
 from subcell_registered_front_sources import RegisteredFrontSources
+from subcell_front_initial_support import initial_front_support, initially_dry_front_transfers
 from subcell_source_activation import assembly
 
 
@@ -44,7 +46,18 @@ def original_fragments(part):
     return result
 
 
-def route(part, fronts, on_face=None, source_index=None):
+def original_initial_states(part):
+    states = {(parent, f.source_id):None for parent, cell in enumerate(part.patch.cells) for f in cell.fragments}
+    for pool_index, pool in enumerate(part.pools):
+        for source_id in pool['source_triangle_indices']:
+            key = (pool['parent'], int(source_id))
+            if states[key] is not None:
+                raise ValueError('Duplicate original wet-pool state')
+            states[key] = dict(pool_id=pool_index, stage_offset=pool['form']['stage_offset'], datum=pool['form']['datum'])
+    return states
+
+
+def route(part, fronts, on_face=None, source_index=None, initial_context=None):
     fragments = original_fragments(part)
     occupied = {}
     for pool_index, pool in enumerate(part.pools):
@@ -54,6 +67,7 @@ def route(part, fronts, on_face=None, source_index=None):
                 raise ValueError('Duplicate original wet-pool source ownership')
             occupied[key] = (pool_index, pool['form'])
     primary = {tuple(f['donor']) for f in fronts['faces']}
+    initial_states = original_initial_states(part)
     records = []
     for front in fronts['faces']:
         if front['asymptotic_branch'] != 'outward-wet':
@@ -87,6 +101,7 @@ def route(part, fronts, on_face=None, source_index=None):
             original_receiver_lateral_flux=lateral_flux(sweep, fragments[receiver]),
             original_receiver_lateral_energy=lateral_energy_flux(sweep, fragments[receiver]),
             single_stream_owned_lateral_front=owned_front_transfers(sweep, fragments),
+            initial_lateral_front_support=initial_front_support(sweep, fragments, initial_states),
             above_receiver_minimum=not front['receiving_face_contact']['contact_starts_at_birth'],
             physical_update_accepted=False)
         if source_index is not None:
@@ -95,6 +110,12 @@ def route(part, fronts, on_face=None, source_index=None):
                 source_key_kind='original-registered-triangle-index',
                 candidate_source_ids=list(source_faces),
                 outside_block_water_state_known=False)
+        if initial_context is not None:
+            context_fragments, context_states = initial_context
+            # Fail closed if the original surrounding patch does not establish
+            # dry support. Do not label absent water state as a dry receiver.
+            base['original_patch_dry_front_transfers'] = initially_dry_front_transfers(
+                sweep, context_fragments, context_states)
         if float(incoming[1]) == 0 or float(sweep.time_root**3) == 0:
             records.append(dict(base, status='positive-exact-sweep-below-float-time-or-volume-range'))
             if on_face: on_face(records[-1])
@@ -177,9 +198,26 @@ def main():
     if args.report.exists():
         raise FileExistsError(args.report)
     part, source, indices, origin, authority, sampler, hashes = load_original_block(args)
+    context, _, context_indices, _, _, _, context_hashes = load_original_block(
+        SimpleNamespace(source_report=args.source_report, atlas=args.atlas, block_col=0, block_row=0), (16,16))
+    if hashes != context_hashes:
+        raise ValueError('Surrounding water state belongs to a different source epoch')
+    context_fragments, context_states = original_fragments(context), original_initial_states(context)
+    # The expanded context must preserve every original block geometry/stage;
+    # pool indices are local labels, not physical identities across partitions.
+    for (parent, source_id), fragment in original_fragments(part).items():
+        key = (indices[parent], source_id)
+        if context_indices[key[0]] != key[0] or context_fragments[key] != fragment:
+            raise ValueError('Expanded context moved original source geometry')
+    for key, state in original_initial_states(part).items():
+        other = context_states[(indices[key[0]], key[1])]
+        if ((state is None) != (other is None) or (state is not None and
+                any(state[k] != other[k] for k in ('datum','stage_offset')))):
+            raise ValueError('Expanded context changed original wet support')
     before = [(p['volume'], p['momentum'].copy()) for p in part.pools]
     fronts = analyze(part, assembly(part, face_scheme='donor')['new_region_rates'])
-    records = route(part, fronts, source_index=RegisteredFrontSources(sampler), on_face=lambda r: print(json.dumps(dict(
+    records = route(part, fronts, source_index=RegisteredFrontSources(sampler),
+        initial_context=(context_fragments,context_states), on_face=lambda r: print(json.dumps(dict(
         donor=r['donor'], receiver=r['receiver'], status=r['status'], pieces=len(r.get('pieces', [])))), flush=True))
     fragments = original_fragments(part)
     lows = [min(p[j] for f in fragments.values() for p in f.polygon) for j in range(2)]
@@ -230,6 +268,9 @@ def main():
         original_block_col_row=[args.block_col, args.block_row], origin_registered_m=origin,
         records=records, provenance=provenance, original_water_unchanged=True,
         registered_lateral_front_provenance=registered_provenance,
+        initial_water_context_scope='Same original 16x16 atlas patch, exact source storage and reconstructed pool stages. Expanded-context parent ids are original 16x16 cell ids. Original 4x4 geometry and stages independently match. No state outside the recorded patch is invented; all old block-only records remain controls. Initial dry support is a necessary condition, not evolving dry support or finite-time acceptance.',
+        initial_water_context_cells=len(context.patch.cells),
+        initial_water_context_pools=len(context.pools),
         registered_lateral_front_scope='Complete original terrain search, independent of the water-state audit block. Source ids are original registered triangles, not pool or cell ids. Whole-source vertices and mixed authority codes are retained. Original block-only ownership remains as a control. No outside-block water state, finite-time or gameplay acceptance is inferred.',
         simultaneous_stream_pairs=pairs, pair_domain_original_xy=domain,
         isolated_window_stream_pair_bounds=closure_pairs,

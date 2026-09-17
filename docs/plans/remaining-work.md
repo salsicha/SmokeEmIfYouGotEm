@@ -3,7 +3,18 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [frozen-current froth experiment](../reconstruction-review-2026-09-07/froth-frozen-characteristics.md).
+Latest: [original initial-water front support](../reconstruction-review-2026-09-07/normal-river-initial-front-support.md).
+Exact stage/bed trace partition now guards conditional dry-front rates against
+wet or unknown initial state. The same original 16x16 patch resolves all eleven
+outward rays, including cell 171 / triangle 198093 outside the small audit block.
+59 focused PASS; broad suite 699 PASS / 13 unchanged FAIL. Original 337 record
+fields and 616 hashes verified. Not a finite-time/energy/pressure or playable
+visual fix. Same live cook 17516: 4400s and 4450s state AND 86,720 dry-bank checks
+PASS, NOT settled (4450s: 103.497669 out / 45.306955 in).
+Next 4500/local18000 requires completion marker AND both audits. Full ordered
+scene/crew/regression/release scope remains OPEN; no new FPS qualification.
+
+Previous: [frozen-current froth experiment](../reconstruction-review-2026-09-07/froth-frozen-characteristics.md).
 Opt-in single-carrier review only; installed gameplay/material unchanged.
 28 focused tests PASS including hardware/WARP shader execution. Frozen-field
 departures improve numerically, but inspected captures do not establish
