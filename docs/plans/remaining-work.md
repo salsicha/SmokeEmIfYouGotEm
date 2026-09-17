@@ -3,7 +3,23 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [water normal/reflection isolation](../reconstruction-review-2026-09-07/water-normal-reflection-isolation.md).
+Latest: [integer optical normal correction installed](../reconstruction-review-2026-09-07/integer-optical-normal-installed.md).
+Integer lattice hash removes the obvious rectangular patches in inspected lit
+and WorldNormal candidate captures; now installed in the ordinary South Fork
+material with exact rollback and fresh persisted-graph verification. Ordinary
+no-override24-image run exits0; broad sheet-like froth/angular wave boundary
+remain. Three recordings fully decoded, not calibrated motion/FPS acceptance.
+Native27 PASS; focused Python30 PASS, including correction of a stale foam
+callsite assertion with negative controls. Installed26.340117FPS/p9543.9981ms
+still FAIL30; slower result retained, no robust speed improvement claimed.
+Old36872 remains terminal. Exact3600s restart is new LIVE PID17516, start UTC
+2026-09-17T12:52:03.0749210Z. All5,382,400 original cells bit-exact; no retuning.
+3650/3700 state AND86,720 dry banks PASS, NOT settled(3700:88.223760out/45.306955in).
+Next3750/local3000 needs marker AND both audits. Continue breaking/froth, physical
+terrain/flow consistency and ordinary CPU cost; full ordered scene/crew/release
+scope remains OPEN. Troublemaker remains a rapid within South Fork, not a menu scenario.
+
+Previous: [water normal/reflection isolation](../reconstruction-review-2026-09-07/water-normal-reflection-isolation.md).
 Actual WorldNormal buffer exposes stepped patches; higher precision alone fails.
 Capture-list/composite controls also fail. Scene reflections conceal the obvious
 patch but introduce noise; no rendering defaults or material/geometry promoted.

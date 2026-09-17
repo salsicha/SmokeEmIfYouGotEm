@@ -19,6 +19,22 @@ def sample(p, velocity, t):
 
 
 class LocalFrothPhaseTest(unittest.TestCase):
+    def assert_current_coverage_contract(self, author, coverage):
+        # The current author loads thresholded cell coverage rather than the
+        # superseded inline lace blend. Check its real dependency and callsite.
+        self.assertIn('FFileHelper::LoadFileToString(CoverageCode', author)
+        self.assertIn('TEXT("RaftSim/Shaders/Private/RaftSimFrothCells.ush")', author)
+        self.assertIn('Coverage->Code = CoverageCode + TEXT(', author)
+        self.assertIn('cells.Sample(VertexFoam.r,OpticalDensity,worldM,FrothFlow.xy,FrothTime,footprintM)', author)
+        for expression in (
+                'return 1-smoothstep(p-band,p+band,Random(cell));',
+                'lerp(lerp(Occupancy(cell,p),Occupancy(cell+int2(1,0),p),f.x)',
+                'lerp(Occupancy(cell+int2(0,1),p),Occupancy(cell+int2(1,1),p),f.x),f.y)',
+                'float a=frac(time),b=frac(a+0.5),weight=1-abs(2*a-1);',
+                'return lerp(Phase(worldM-velocityMps*b,p,footprintM),',
+                'Phase(worldM-velocityMps*a,p,footprintM),weight);'):
+            self.assertIn(expression, coverage)
+
     def test_phase_reset_is_continuous(self):
         for t in (0, .5, 1, 1.5, 2, 4, 6, 40000, 40000.5):
             self.assertAlmostEqual(sample((3.4,-6.2),(2,-.85),t-1e-8),
@@ -57,7 +73,18 @@ class LocalFrothPhaseTest(unittest.TestCase):
         self.assertNotIn('VertexFoam',shader)
         self.assertIn('return float3(laceA, laceB, weightA);',shader)
         author=(ROOT/'unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorCurrentWaterMaterial.cpp').read_text()
-        self.assertIn('float cells = lerp(cellsB, cellsA, saturate(Lace.b));',author)
+        coverage=(ROOT/'unreal/Plugins/RaftSim/Shaders/Private/RaftSimFrothCells.ush').read_text()
+        self.assert_current_coverage_contract(author, coverage)
+
+    def test_current_coverage_contract_rejects_missing_threshold_or_phase_blend(self):
+        author=(ROOT/'unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorCurrentWaterMaterial.cpp').read_text()
+        coverage=(ROOT/'unreal/Plugins/RaftSim/Shaders/Private/RaftSimFrothCells.ush').read_text()
+        for token in ('return 1-smoothstep(p-band,p+band,Random(cell));',
+                      'return lerp(Phase(worldM-velocityMps*b,p,footprintM),'):
+            with self.subTest(token=token), self.assertRaises(AssertionError):
+                self.assert_current_coverage_contract(author, coverage.replace(token, ''))
+        with self.assertRaises(AssertionError):
+            self.assert_current_coverage_contract(author.replace('Coverage->Code = CoverageCode + TEXT(', ''), coverage)
 
     def test_blend_coverage_not_unthresholded_lace(self):
         # At either dense or sparse thresholds, complementary texture holes
