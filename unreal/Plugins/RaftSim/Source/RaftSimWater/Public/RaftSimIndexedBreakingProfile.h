@@ -6,10 +6,12 @@
 // interpolation, quantization, profile-history reuse or site-order changes.
 // Only physical sites have finite support suitable for this index. Unsupported
 // inputs retain the full evaluator, including the legacy branch.
-class FRaftSimIndexedBreakingProfile
+template<int32 TileSizeMeters=8>
+class TRaftSimIndexedBreakingProfile
 {
+    static_assert(TileSizeMeters>0);
     using FSite=URaftSimWaterRuntimeAdapter::FSupportBreakingSite;
-    static constexpr double TileMeters=8.;
+    static constexpr double TileMeters=double(TileSizeMeters);
     TArray<FSite> Sites;
     TMap<FIntPoint,TArray<FSite>> Tiles;
     // Immutable direct lookup of exactly the same ordered site subsets.
@@ -26,7 +28,7 @@ class FRaftSimIndexedBreakingProfile
         return true;
     }
 public:
-    FRaftSimIndexedBreakingProfile(TConstArrayView<FSite> Input,float InLift,float InSpacing)
+    TRaftSimIndexedBreakingProfile(TConstArrayView<FSite> Input,float InLift,float InSpacing)
         : Lift(InLift),Spacing(InSpacing)
     {
         Sites.Append(Input.GetData(),Input.Num());
@@ -103,3 +105,8 @@ public:
         return URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(P,Local,Lift,Spacing,Foam,GlobalCap);
     }
 };
+
+// The ordinary qualified index remains 8 m. A finer broad phase is opt-in;
+// both variants call the SAME evaluator in original site order with its full cap.
+using FRaftSimIndexedBreakingProfile=TRaftSimIndexedBreakingProfile<8>;
+using FRaftSimFineIndexedBreakingProfile=TRaftSimIndexedBreakingProfile<2>;

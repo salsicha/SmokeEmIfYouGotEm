@@ -14,6 +14,7 @@
 #include "RaftSimWaterSmoothing.h"
 #include "RaftSimWaterFlowFrame.h"
 #include "RaftSimIndexedBreakingProfile.h"
+#include "RaftSimFineCrestIndexAudit.h"
 #include "RaftSimBreakingHeightRange.h"
 #include "RaftSimPreparedBreakingHeightRange.h"
 #include "RaftSimWaterFlowHistory.h"
@@ -5845,6 +5846,31 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             return (bFullCrestScan ? URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
                 Field,Sites,Lift,Spacing) : IndexedProfile->SampleWithEmptyTileSkip(Field,nullptr,!bHashed,bSkipEmpty))*Scale*100.f;
         };
+#if !UE_BUILD_SHIPPING
+        static const bool bFineIndex=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFineCrestIndex"));
+        static const bool bFineAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFineCrestIndexAudit"));
+        if((bFineIndex || bFineAudit) && !bFullCrestScan && GetWorld() &&
+            GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")))
+        {
+            const auto Fine=MakeShared<FRaftSimFineIndexedBreakingProfile,ESPMode::ThreadSafe>(SupportSites,Lift,Spacing);
+            const auto Audit=bFineAudit ? MakeShared<FRaftSimFineCrestIndexAudit,ESPMode::ThreadSafe>()
+                : TSharedPtr<FRaftSimFineCrestIndexAudit,ESPMode::ThreadSafe>();
+            CartesianCrestInput.HeightAtWorldXYCm=[Fine,IndexedProfile,Audit,Scale,Sign](const FVector2D& P)
+            {
+                const FVector2D Field(P.X*.01,P.Y*.01*Sign);
+                const float Result=Fine->Sample(Field)*Scale*100.f;
+                if(Audit)Audit->Compare(IndexedProfile->Sample(Field)*Scale*100.f,Result);
+                return Result;
+            };
+            static bool bLoggedFine=false;
+            if(!bLoggedFine)
+            {
+                UE_LOG(LogTemp,Display,TEXT("Fine crest index candidate active: tile_m=2 indexed=%d tiles=%d dense_tiles=%d audit=%d; unchanged physical evaluator and refinement tolerance"),
+                    Fine->IsIndexed(),Fine->TileCount(),Fine->DenseTileCount(),int32(bFineAudit));
+                bLoggedFine=true;
+            }
+        }
+#endif
         static const bool bEmptyTileAudit=[]{FString P;return FParse::Value(FCommandLine::Get(),TEXT("RaftSimCrestEmptyTileAudit="),P);}();
         if(bEmptyTileAudit)for(int32 Kind=0;Kind<2;++Kind)
             CartesianCrestInput.EmptyTileComparisonHeight[Kind]=[IndexedProfile,Scale,Sign,Kind](const FVector2D& P)
