@@ -3,7 +3,22 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [SM5 pressure activity and exact-rounding corrections](../reconstruction-review-2026-09-07/sm5-pressure-activity-and-exact-rounding.md).
+Latest: [crest-normal work rejection and qualification recovery](../reconstruction-review-2026-09-07/crest-normal-work-rejection.md).
+All64 actual-input normal pairs are exact across4,302,641 vertices, but the
+candidate is slower when called first. Rejected and removed from production.
+Restored runtime plus all-coarse/all-fine regression:7 native D3D12 tests PASS;
+40 Python audit/profiler checks PASS. Quoted SM5 process validation corrected.
+Standalone60207 is terminal50 PASS/4 FAIL: incorrectly compiled model1 against
+the unchanged version3 fixture. Corrected fixture-derived compile26355/PID37212
+LIVE at phase3; its combined54-test suite is queued. No oracle/gate changes.
+Original native SM5 replay55459/PID36412 remains LIVE, all63 shader inputs frozen.
+Same hydraulic36872:2050s state AND86,720 dry banks PASS, NOT settled
+(95.712019 out versus45.306955 in m3/s). Next2100/local6000 both audits.
+No snapshot promotion or runtime visual/performance acceptance. Last ordinary
+28.057157FPS/p9541.2354ms still FAIL30; adaptive selection remains a larger cost.
+Full remaining physical/scene/later-river/crew/release scope below stays OPEN.
+
+Previous: [SM5 pressure activity and exact-rounding corrections](../reconstruction-review-2026-09-07/sm5-pressure-activity-and-exact-rounding.md).
 Hardware treated active `(1,1)` flags as inactive; an equivalent encoded-bit
 zero guard fixes the isolated phase and all 18 coupled hardware/WARP fixtures.
 54 focused tests PASS, including eight coupled/guard checks; the old shader fails the new guard

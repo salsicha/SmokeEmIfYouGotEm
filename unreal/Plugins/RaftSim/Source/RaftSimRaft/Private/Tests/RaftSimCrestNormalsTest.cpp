@@ -22,6 +22,8 @@ bool FRaftSimCrestNormalsTest::RunTest(const FString&)
     for(int32 Frame=0;Frame<24;++Frame)
     {
         int32 SourceCount=Frame<15 ? N*N/2 : N*N/3;
+        if(Frame==0)SourceCount=N*N; // No vertices consume recomputed normals.
+        if(Frame==2)SourceCount=0; // All incident faces must still be evaluated.
         for(int32 I=0;I<Input.Num();++I)Input[I].Position.Z=FMath::Sin(I*.39+Frame*.17)*20.+I%7;
         if(Frame==3)Input[14].Position=Input[15].Position;
         if(Frame==7)for(int32 T=0;T<Triangles.Num();T+=3)Swap(Triangles[T+1],Triangles[T+2]);
@@ -32,7 +34,7 @@ bool FRaftSimCrestNormalsTest::RunTest(const FString&)
         auto A=Input,B=Input;const uint64 Before=Cached.Builds;
         FRaftSimCrestNormals::Reference(A,Triangles,SourceCount);
         if(!TestTrue(TEXT("parallel path accepts valid changing mesh"),Cached.Apply(B,Triangles,SourceCount)))return false;
-        if(Frame==1)TestEqual(TEXT("unchanged topology reuses incidence with new heights"),Cached.Builds,Before);
+        if(Frame==4)TestEqual(TEXT("unchanged topology reuses incidence with new heights"),Cached.Builds,Before);
         for(int32 I=0;I<A.Num();++I)
         {
             if(!FRaftSimCrestMidpointExpansion::EqualAttributes(A[I],B[I]))

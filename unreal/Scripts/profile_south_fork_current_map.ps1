@@ -80,7 +80,7 @@ if ($ShaderWorkloadManifest) {
         if ($identity.role -eq 'shader_worker' -and $identity.parent_id -ne $roots[0].pid) { throw 'Worker is outside the explicitly owned shader job' }
         if ($identity.role -eq 'shader_editor' -and
             ($actual.CommandLine -notlike '*Automation RunTests RaftSim.*' -or
-             $actual.CommandLine -notmatch '(?i)(?:^|\s)-sm5(?:\s|$)' -or
+             $actual.CommandLine -notmatch '(?i)(?:^|\s)(?:-sm5|"-sm5")(?:\s|$)' -or
              -not $actual.CommandLine.Replace('\','/').Contains($projectRoot.Replace('\','/')+'/unreal/SmokeEmIfYouGotEm.uproject'))) {
             throw 'Owned editor is not this project SM5 automation job'
         }
