@@ -1,19 +1,33 @@
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimWaterVertexCopy.h"
+#include "RaftSimShorelineValidationAudit.h"
+#include "Misc/AutomationTest.h"
+#include "Async/ParallelFor.h"
+#include <limits>
 
 namespace
 {
-bool ValidInput(int32 Nx, int32 Ny, TConstArrayView<FProcMeshVertex> Source,
+bool ValidShape(int32 Nx, int32 Ny, TConstArrayView<FProcMeshVertex> Source,
     TConstArrayView<uint8> Wet, TConstArrayView<uint8> Available,
     TConstArrayView<float> DepthM, TConstArrayView<float> BedM)
 {
     const int64 Count=int64(Nx)*Ny;
     if (Nx<2 || Ny<2 || Count>MAX_int32/12 || Source.Num()!=Count || Wet.Num()!=Count ||
         Available.Num()!=Count || DepthM.Num()!=Count || BedM.Num()!=Count) return false;
-    for (int32 I=0; I<Count; ++I)
-        if (Source[I].Position.ContainsNaN() || Source[I].Normal.ContainsNaN() ||
-            !FMath::IsFinite(DepthM[I]) || DepthM[I]<0 || !FMath::IsFinite(BedM[I]) ||
-            (Wet[I] && DepthM[I]<=0)) return false;
+    return true;
+}
+bool ValidVertex(const FProcMeshVertex& Vertex,uint8 Wet,float Depth,float Bed)
+{
+    return !(Vertex.Position.ContainsNaN() || Vertex.Normal.ContainsNaN() ||
+        !FMath::IsFinite(Depth) || Depth<0 || !FMath::IsFinite(Bed) || (Wet && Depth<=0));
+}
+bool ValidInput(int32 Nx,int32 Ny,TConstArrayView<FProcMeshVertex> Source,
+    TConstArrayView<uint8> Wet,TConstArrayView<uint8> Available,
+    TConstArrayView<float> DepthM,TConstArrayView<float> BedM)
+{
+    if(!ValidShape(Nx,Ny,Source,Wet,Available,DepthM,BedM))return false;
+    for(int32 I=0;I<Source.Num();++I)
+        if(!ValidVertex(Source[I],Wet[I],DepthM[I],BedM[I]))return false;
     return true;
 }
 double Crossing(int32 W, int32 D, TConstArrayView<float> DepthM, TConstArrayView<float> BedM)
@@ -193,14 +207,59 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
     bool& bTopologyRebuilt, bool bCompactEdges, bool bOppositeDryFan)
 {
     bTopologyRebuilt=false;
-    if (!ValidInput(Nx,Ny,Source,Wet,Available,DepthM,BedM)) return false;
+    // Exact actual-input pairs qualify the independent batches in both call
+    // orders. Keep serial fusion and the original two-pass path as controls.
+    static const bool Parallel=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialShorelineValidation"));
+    const auto CheckInput=[&](bool Fused,bool& Reuse)
+    {
+        Reuse=false;
+        if(!(Fused ? ValidShape(Nx,Ny,Source,Wet,Available,DepthM,BedM)
+                   : ValidInput(Nx,Ny,Source,Wet,Available,DepthM,BedM)))return false;
+        const int32 Count=Nx*Ny;
+        Reuse=CachedNx==Nx && CachedNy==Ny && XY.Num()==Count && bCachedCompactEdges==bCompactEdges && bCachedOppositeDryFan==bOppositeDryFan &&
+            Vertices.Num()==Count+(bCompactEdges ? Edges.Num() : (Nx-1)*Ny+Nx*(Ny-1)) && Indices.Num()==CachedIndexCount &&
+            CellOffsets.Num()==(Nx-1)*(Ny-1)+1;
+        if(Fused && Parallel)
+        {
+            constexpr int32 BatchSize=1024;
+            const int32 Batches=FMath::DivideAndRoundUp(Count,BatchSize);
+            TArray<uint8,TInlineAllocator<256>> Results;Results.SetNumUninitialized(Batches);
+            const bool CouldReuse=Reuse;
+            ParallelFor(TEXT("RaftSimShorelineValidation"),Batches,1,[&](int32 Batch)
+            {
+                bool LocalReuse=CouldReuse;
+                const int32 End=FMath::Min((Batch+1)*BatchSize,Count);
+                for(int32 I=Batch*BatchSize;I<End;++I)
+                {
+                    if(!ValidVertex(Source[I],Wet[I],DepthM[I],BedM[I])){Results[Batch]=0;return;}
+                    if(LocalReuse)LocalReuse=WetMask[I]==Wet[I] && AvailableMask[I]==Available[I] &&
+                        XY[I].X==Source[I].Position.X && XY[I].Y==Source[I].Position.Y;
+                }
+                Results[Batch]=LocalReuse ? 3 : 1;
+            },EParallelForFlags::Unbalanced);
+            for(uint8 Result:Results){if(!(Result&1))return false;Reuse&=bool(Result&2);}
+        }
+        else if(Fused)
+        {
+            // Read each current vertex once, but finish ALL validation even
+            // after a cache mismatch. Never mutate outputs on invalid input.
+            for(int32 I=0;I<Count;++I)
+            {
+                if(!ValidVertex(Source[I],Wet[I],DepthM[I],BedM[I]))return false;
+                if(Reuse)Reuse=WetMask[I]==Wet[I] && AvailableMask[I]==Available[I] &&
+                    XY[I].X==Source[I].Position.X && XY[I].Y==Source[I].Position.Y;
+            }
+        }
+        else for(int32 I=0;Reuse && I<Count;++I)
+            Reuse=WetMask[I]==Wet[I] && AvailableMask[I]==Available[I] &&
+                XY[I].X==Source[I].Position.X && XY[I].Y==Source[I].Position.Y;
+        return true;
+    };
+    RaftSimShorelineValidationAudit::Run(CheckInput,Source.Num(),Parallel);
+    static const bool Fused=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSeparateShorelineValidation"));
+    bool bReuse=false;
+    if(!CheckInput(Fused,bReuse))return false;
     const int32 Count=Nx*Ny;
-    bool bReuse=CachedNx==Nx && CachedNy==Ny && XY.Num()==Count && bCachedCompactEdges==bCompactEdges && bCachedOppositeDryFan==bOppositeDryFan &&
-        Vertices.Num()==Count+(bCompactEdges ? Edges.Num() : (Nx-1)*Ny+Nx*(Ny-1)) && Indices.Num()==CachedIndexCount &&
-        CellOffsets.Num()==(Nx-1)*(Ny-1)+1;
-    for (int32 I=0; bReuse && I<Count; ++I)
-        bReuse=WetMask[I]==Wet[I] && AvailableMask[I]==Available[I] &&
-            XY[I].X==Source[I].Position.X && XY[I].Y==Source[I].Position.Y;
     if (bReuse)
     {
         // Unreferenced reserve nodes need no per-frame work. Their previous
@@ -272,3 +331,56 @@ bool RaftSimWaterShoreline::Sample(const FVector2D& PositionXY, int32 Begin, int
     }
     return false;
 }
+
+#if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimShorelineValidationTest,"RaftSim.M4.ShorelineInputValidation",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimShorelineValidationTest::RunTest(const FString&)
+{
+    constexpr int32 N=65; // Five1024-node batches; invalid tail is in the last.
+    TArray<FProcMeshVertex> Source;Source.SetNum(N*N);
+    for(int32 Y=0;Y<N;++Y)for(int32 X=0;X<N;++X)
+    {Source[Y*N+X].Position=FVector(X*100.,Y*100.,30.);Source[Y*N+X].Normal=FVector::UpVector;}
+    TArray<uint8> Wet,Available;Wet.Init(1,N*N);Available.Init(1,N*N);
+    TArray<float> Depth,Bed;Depth.Init(1.f,N*N);Bed.Init(0.f,N*N);
+    RaftSimWaterShoreline::FTopologyCache Cache;
+    TArray<FProcMeshVertex> Vertices;TArray<uint32> Indices;TArray<int32> Offsets;
+    bool Rebuilt=false;
+    auto Initial=Source;
+    if(!TestTrue(TEXT("valid initial topology"),Cache.Update(N,N,MoveTemp(Initial),Wet,Available,Depth,Bed,
+        Vertices,Indices,Offsets,Rebuilt,true)))return false;
+    const auto BeforeVertices=Vertices;const auto BeforeIndices=Indices;const auto BeforeOffsets=Offsets;
+    const uint64 BeforeBuilds=Cache.GetRebuildCount();
+    const float NaN=std::numeric_limits<float>::quiet_NaN(),Infinity=std::numeric_limits<float>::infinity();
+    for(int32 Kind=0;Kind<9;++Kind)
+    {
+        auto Bad=Source;auto BadDepth=Depth;auto BadBed=Bed;
+        // Fail cache identity at the FIRST vertex; invalid LAST data must
+        // still be checked before rewriting ANY output or cache membership.
+        Bad[0].Position.X+=.125;
+        switch(Kind)
+        {
+        case 0:Bad.Last().Position.Z=NaN;break;
+        case 1:Bad.Last().Normal.Y=Infinity;break;
+        case 2:BadDepth.Last()=-.001f;break;
+        case 3:BadDepth.Last()=0;break;
+        case 4:BadDepth.Last()=NaN;break;
+        case 5:BadDepth.Last()=Infinity;break;
+        case 6:BadBed.Last()=NaN;break;
+        case 7:BadBed.Last()=Infinity;break;
+        case 8:BadDepth.Pop();break;
+        }
+        Rebuilt=true;
+        TestFalse(TEXT("invalid tail rejects despite first-node cache miss"),Cache.Update(N,N,MoveTemp(Bad),
+            Wet,Available,BadDepth,BadBed,Vertices,Indices,Offsets,Rebuilt,true));
+        TestTrue(TEXT("rejection preserves every output byte and topology"),!Rebuilt &&
+            Vertices.Num()==BeforeVertices.Num() && FMemory::Memcmp(Vertices.GetData(),BeforeVertices.GetData(),
+            SIZE_T(Vertices.Num())*sizeof(FProcMeshVertex))==0 && Indices==BeforeIndices && Offsets==BeforeOffsets &&
+            Cache.GetRebuildCount()==BeforeBuilds);
+    }
+    auto ValidAgain=Source;
+    TestTrue(TEXT("old cache remains reusable after invalid inputs"),Cache.Update(N,N,MoveTemp(ValidAgain),
+        Wet,Available,Depth,Bed,Vertices,Indices,Offsets,Rebuilt,true) && !Rebuilt);
+    return !HasAnyErrors();
+}
+#endif
