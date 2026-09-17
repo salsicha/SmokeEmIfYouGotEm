@@ -5,6 +5,8 @@
 #include "RaftSimWetEdgeAudit.h"
 #include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimTerrainProbeSources.h"
+#include "RaftSimCapturedGroundRendering.h"
+#include "Engine/Level.h"
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimWaterSourcePacking.h"
@@ -1081,12 +1083,26 @@ FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingDownstreamBoilPresentation(
 void ARaftSimWaterSurfaceActor::BeginPlay()
 {
     Super::BeginPlay();
+    // The current live carrier also owns reconstructed-ground arrival. It must
+    // not depend on a separate legacy water-streaming actor being present.
+    FWorldDelegates::LevelAddedToWorld.AddWeakLambda(this, [this](ULevel* Level,UWorld* World)
+    {
+        if (!Level || World!=GetWorld()) return;
+        bool bGroundArrived=false;
+        for (AActor* Actor:Level->Actors)
+        {
+            RaftSimCapturedGroundRendering::ApplyToActor(Actor);
+            bGroundArrived |= RaftSimTerrainProbeSources::ActorHasSource(Actor);
+        }
+        if (bGroundArrived) InvalidateMissedTerrainProbes();
+    });
     // The carrier can arrive through World Partition after the run manager's
     // BeginPlay. Bind here, on the consumer, and let the first ordered tick
     // build the surface after any checkpoint/section-start water transaction.
     // BeginPlay itself is not tick-ordered and must not publish the old launch.
     for (TActorIterator<AActor> It(GetWorld()); It; ++It)
     {
+        RaftSimCapturedGroundRendering::ApplyToActor(*It);
         if (Cast<IRaftSimRunCoordinateProvider>(*It))
         {
             AddTickPrerequisiteActor(*It);
@@ -3717,6 +3733,7 @@ void ARaftSimWaterSurfaceActor::ReleaseMacroHistory()
 
 void ARaftSimWaterSurfaceActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+    FWorldDelegates::LevelAddedToWorld.RemoveAll(this);
     if(FoamClockRefreshes){UE_LOG(LogTemp,Display,TEXT("Foam committed-water clock: origin=%.9f water=%.9f target=%.9f refreshes=%llu holds=%llu initializations=%llu; no wall-time fallback"),
         FoamWaterClock.Origin,FoamWaterClock.Last,FoamWaterClock.TargetSeconds(),FoamClockRefreshes,FoamClockHolds,FoamClockInitializations);}
     if (WaterAdapter) WaterAdapter->ClearRaftSupportCarrierSampler(this);

@@ -17,6 +17,7 @@
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "RaftSimTerrainProbeSources.h"
+#include "RaftSimCapturedGroundRendering.h"
 #include "RaftSimDetailSourceFootprint.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -361,6 +362,7 @@ void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibilityToActor(
     {
         return;
     }
+    RaftSimCapturedGroundRendering::ApplyToActor(Actor);
     static const FName SolverFoamOverlayTag(TEXT("RaftSimSolverFoamOverlay"));
     const FName ActiveTag(*FString::Printf(
         TEXT("RaftSimFlowBand_%s"), *CachedFlowBand.ToString()));

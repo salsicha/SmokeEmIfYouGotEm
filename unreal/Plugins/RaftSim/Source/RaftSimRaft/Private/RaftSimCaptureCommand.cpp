@@ -998,6 +998,17 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                     if (FScreenshotRequest::IsScreenshotRequested()) return;
                     if (*Taken == 0)
                     {
+                        if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimCaptureZeroWaterSpecular")))
+                        {
+                            // Optical control only: in Single Layer Water, zero
+                            // dielectric specular gives IOR=1 and no refraction.
+                            // Also removes surface specular reflection, so this
+                            // is not an isolated reflection or appearance gate.
+                            for (const TCHAR* Name : {TEXT("Specular"), TEXT("FresnelSpecular"),
+                                TEXT("ShoreMarginSpecular"), TEXT("DriftFoamSpecular")})
+                                HandleWaterMaterialProbe({Name, TEXT("0")}, W2);
+                            UE_LOG(LogTemp, Display, TEXT("Capture water specular control: four connected inputs set to zero; extinction and geometry unchanged"));
+                        }
                         float ExtinctionScale = 0.f;
                         if (FParse::Value(FCommandLine::Get(), TEXT("RaftSimCaptureWaterExtinctionScale="), ExtinctionScale) &&
                             FMath::IsFinite(ExtinctionScale) && ExtinctionScale >= 0.f && ExtinctionScale <= 1.f)

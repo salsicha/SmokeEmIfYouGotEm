@@ -3,6 +3,7 @@
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "RaftSimTerrainProbeSources.h"
+#include "RaftSimCapturedGroundRendering.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "Engine/World.h"
@@ -16,6 +17,33 @@
 #include "Engine/StaticMeshActor.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCapturedGroundRenderingTest,"RaftSim.M4.ShorelineCapturedGroundRendering",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimCapturedGroundRenderingTest::RunTest(const FString&)
+{
+    UWorld* World=UWorld::CreateWorld(EWorldType::Editor,false);
+    if (!World) return false;
+    ON_SCOPE_EXIT { World->DestroyWorld(false); World->RemoveFromRoot(); FlushRenderingCommands(); };
+    auto* Actor=World->SpawnActor<AStaticMeshActor>();
+    if (!Actor) return false;
+    auto* Component=Actor->GetStaticMeshComponent();
+    auto* Mesh=LoadObject<UStaticMesh>(nullptr,TEXT("/Game/RaftSim/Environment/SouthForkReconstruction/Troublemaker/SM_TroublemakerCapturedGround.SM_TroublemakerCapturedGround"));
+    if (!TestNotNull(TEXT("captured full-resolution source asset"),Mesh)) return false;
+    Component->SetStaticMesh(Mesh);
+    TestFalse(TEXT("unmarked source is unchanged"),RaftSimCapturedGroundRendering::Apply(Component));
+    Actor->Tags.Add(TEXT("RaftSimPhysicalGround"));
+    TestFalse(TEXT("source outside reconstructed scenario is unchanged"),RaftSimCapturedGroundRendering::Apply(Component));
+    Actor->Tags.Add(TEXT("RaftSimSouthForkReconstruction20260912"));
+    TestTrue(TEXT("exact captured fallback is selected"),RaftSimCapturedGroundRendering::Apply(Component));
+    TestTrue(TEXT("only component rendering changes"),Component->IsDisallowNanite() && Component->GetStaticMesh()==Mesh);
+    TestFalse(TEXT("repeated streaming pass is idempotent"),RaftSimCapturedGroundRendering::Apply(Component));
+    Component->bDisallowNanite=false;
+    Component->SetStaticMesh(LoadObject<UStaticMesh>(nullptr,TEXT("/Engine/BasicShapes/Cube.Cube")));
+    TestFalse(TEXT("unrelated tagged mesh keeps its rendering path"),RaftSimCapturedGroundRendering::Apply(Component));
+    TestFalse(TEXT("unrelated mesh retains Nanite permission"),Component->IsDisallowNanite());
+    return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimShorelineTerrainProbeTest,"RaftSim.M4.ShorelineTerrainProbe",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FRaftSimShorelineTerrainProbeTest::RunTest(const FString&)

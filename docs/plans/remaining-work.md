@@ -3,7 +3,39 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [camera-paired startup boundary evidence](../reconstruction-review-2026-09-07/startup-carrier-camera-rays.md).
+Latest: [captured-ground rendering correction installed](../reconstruction-review-2026-09-07/physical-ground-probes-and-optics.md).
+The current SM_TroublemakerCapturedGround now renders all803,842 fallback source
+triangles on its tagged reconstructed component only; Nanite stays unchanged
+elsewhere. Actual normal installed startup now shows the rock bank instead of
+the angular green collar. Ground, collision and water assets are unchanged.
+Current live carrier handles startup/streamed ground arrival and cached misses.
+Corrected24 native tests PASS;34 Python tests PASS. Installed gameplay DLL/PDB
+have verified rollback copies. Ordinary installed25.310283FPS/p9546.2835ms FAIL30,
+slower than earlier baseline; recover frame budget without sacrificing the bank
+correction. Sheet-like froth, crew and physical/motion acceptance remain OPEN.
+An earlier residency trial targeted a superseded survey asset: restored exactly,
+NOT evidence about current ground residency. Preserve this distinction.
+Same cook36872 LIVE:2800/2850/2900/2950 state AND86,720 dry banks PASS, NOT settled
+(2950:89.800957out/45.306955in). Next3000/local24000 requires marker AND both audits.
+Full ordered scene/physics/crew/normalization/regression/release scope stays OPEN.
+
+Earlier in this continuation: physical-ground integration and optical controls.
+Committed source fix9a1df91fd recognizes reconstructed actor/component ground
+tags and streaming arrivals. Red regression fails old helper; corrected23 native
+PASS. Actual capture now hits7/7 terrain rays; positive shallow faces are within
+0.914/7.843cm camera-depth of collision ground, while two upper-band rays have
+ground in front of CPU water. These are NOT GPU depth/visibility measurements.
+Green angular edge and sheet-like froth remain. Zero opacity does not clear the
+edge; zero extinction clears body colour; zero specular/refraction retains green.
+No optical control is a final fix. Candidate timing23.266427 then27.922477FPS,
+p9550.7846 then42.5975ms; interleaved installed baseline30.899418/p9540.3356ms.
+All FAIL unchanged30FPS gate. Candidate remains uninstalled pending timing and
+visual resolution;31 geometry/profile Python tests PASS. Same cook36872 LIVE:
+2800 AND2850 state AND86,720 dry banks PASS, NOT settled(2850:91.246921out/
+45.306955in). Next2900/local22000 needs completion marker AND both audits.
+Full physical/ordered-scene/crew/regression/release scope below stays OPEN.
+
+Previous: [camera-paired startup boundary evidence](../reconstruction-review-2026-09-07/startup-carrier-camera-rays.md).
 Exact engine projection and carrier exported at the same game frame2/world0.627753s.
 Two visible green-edge probe rays meet CPU base faces32.261/42.204degrees, with
 zero crest/detail contributions; implicated high wet sources have4.08/4.47cm
