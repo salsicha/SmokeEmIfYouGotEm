@@ -46,3 +46,37 @@ foreach ($modes in @(
     if (-not $rejected) { throw 'Conflicting validation modes were accepted' }
 }
 'PASS: conflicting validation modes rejected before process access'
+$rejected = $false
+try {
+    & $source -Label 'south-fork-test-invalid-buffer' -CookProcessId 0 -CookStartUtc 'invalid' -StartupBufferVisualization WorldNormal
+} catch {
+    if ($_.Exception.Message -ne 'Buffer visualization requires StartupRenderReplay; it is not an FPS capture') { throw }
+    $rejected = $true
+}
+if (-not $rejected) { throw 'Buffer visualization was allowed in a performance capture' }
+$bufferAssignment = @($ast.FindAll({
+    param($node)
+    $node -is [Management.Automation.Language.AssignmentStatementAst] -and
+    $node.Left.Extent.Text -eq '$bufferCommands'
+}, $true))
+if ($bufferAssignment.Count -ne 1) { throw 'Expected one production buffer command builder' }
+$buildBuffer = [scriptblock]::Create($bufferAssignment[0].Extent.Text + '; $bufferCommands')
+foreach ($StartupBufferVisualization in @('', 'WorldNormal', 'Roughness', 'SceneDepth')) {
+    $expected = if ($StartupBufferVisualization) { "viewmode VisualizeBuffer,r.BufferVisualizationTarget $StartupBufferVisualization," } else { '' }
+    if ((& $buildBuffer) -cne $expected) { throw 'Diagnostic command ordering or ordinary capture changed' }
+}
+'PASS: buffer diagnostics are opt-in, ordered, and excluded from performance captures'
+$logFunction = @($ast.FindAll({
+    param($node)
+    $node -is [Management.Automation.Language.FunctionDefinitionAst] -and
+    $node.Name -eq 'Test-RaftSimBufferDiagnosticLog'
+}, $true))
+if ($logFunction.Count -ne 1) { throw 'Expected one production buffer log validator' }
+. ([scriptblock]::Create($logFunction[0].Extent.Text))
+$validLog = "Set new viewmode: VisualizeBuffer`nr.BufferVisualizationTarget = ""WorldNormal"""
+if (-not (Test-RaftSimBufferDiagnosticLog $validLog 'WorldNormal')) { throw 'Valid debug commands rejected' }
+foreach ($invalidLog in @('', 'r.BufferVisualizationTarget = "WorldNormal"', ($validLog + "`nError: view mode not recognized: buffervisualization"), ($validLog + "`nDebug viewmodes not allowed in Test or Shipping builds."))) {
+    if (Test-RaftSimBufferDiagnosticLog $invalidLog 'WorldNormal') { throw 'Unconfirmed/rejected debug commands accepted' }
+}
+if (Test-RaftSimBufferDiagnosticLog $validLog 'Roughness') { throw 'Wrong buffer accepted' }
+'PASS: rejected, absent and wrong-buffer command evidence fails closed'

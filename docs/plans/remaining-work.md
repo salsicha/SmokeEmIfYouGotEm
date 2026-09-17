@@ -3,7 +3,20 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [joint-preview exact terrain rendering](../reconstruction-review-2026-09-07/joint-preview-exact-ground.md).
+Latest: [water normal/reflection isolation](../reconstruction-review-2026-09-07/water-normal-reflection-isolation.md).
+Actual WorldNormal buffer exposes stepped patches; higher precision alone fails.
+Capture-list/composite controls also fail. Scene reflections conceal the obvious
+patch but introduce noise; no rendering defaults or material/geometry promoted.
+Fresh ordinary baseline25.427685FPS/p9548.4452ms and denoised25.240387/p9544.9878
+both FAIL30. Six recordings fully decoded; not FPS or physical acceptance.
+Guarded startup buffer diagnostics now reject unsupported/wrong command evidence;
+PowerShell checks and34 Python regressions PASS. Indexed carrier native27 PASS.
+Cook36872 is now TERMINAL with final3600s snapshot.3550/3600 state AND86,720 dry
+banks PASS, NOT settled(3600:88.244859out/45.306955in). Do not reuse old live PID.
+Next isolate material/vertex normal contributions and assess fresh checkpoint
+continuation/convergence; full ordered scene/crew/regression/release scope OPEN.
+
+Previous: [joint-preview exact terrain rendering](../reconstruction-review-2026-09-07/joint-preview-exact-ground.md).
 3350s native terrain/field check complete:64,935 collision and25,600 field queries
 PASS, zero wet mismatches;803,842 exact directed triangles compared. Paired motion
 exposed the replacement mesh bypassing the original's exact-render policy.

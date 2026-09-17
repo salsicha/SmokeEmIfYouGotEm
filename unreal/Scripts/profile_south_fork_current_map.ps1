@@ -9,10 +9,20 @@ param(
     [switch]$NativePerformanceGate,
     [switch]$DetailStreamingReplay,
     [switch]$StartupRenderReplay,
+    [ValidateSet('WorldNormal', 'Roughness', 'SceneDepth')][string]$StartupBufferVisualization = '',
     [switch]$RecordStartupMotion,
     [switch]$CheckpointResetReplay
 )
 $ErrorActionPreference = 'Stop'
+function Test-RaftSimBufferDiagnosticLog([string]$LogText, [string]$Target) {
+    # Command confirmation is not pixel/physical acceptance; still inspect PNGs.
+    return ($LogText -match 'Set new viewmode: VisualizeBuffer' -and
+        $LogText -match ('r\.BufferVisualizationTarget = "' + [regex]::Escape($Target) + '"') -and
+        $LogText -notmatch 'view mode not recognized|Debug viewmodes not allowed|view mode is currently not supported')
+}
+if ($StartupBufferVisualization -and -not $StartupRenderReplay) {
+    throw 'Buffer visualization requires StartupRenderReplay; it is not an FPS capture'
+}
 if ($RecordStartupMotion -and -not $StartupRenderReplay) {
     throw 'Motion recording requires StartupRenderReplay; it is not an FPS capture'
 }
@@ -105,6 +115,8 @@ $report = [ordered]@{ cook_pid=$CookProcessId; cook_start_utc=$CookStartUtc; coo
 $report.detail_replay = [bool]$DetailStreamingReplay
 $report.detail_replay_passed = $null
 $report.startup_render_replay = [bool]$StartupRenderReplay
+$report.startup_buffer_visualization = $StartupBufferVisualization
+$report.startup_buffer_commands_confirmed = $null
 $report.checkpoint_reset_replay = [bool]$CheckpointResetReplay
 if ($StartupRenderReplay) { $report.visual_accepted = $false }
 try {
@@ -154,7 +166,13 @@ try {
         # teleport, solver/time override, CSV shutdown or FPS acceptance.
         $start.ArgumentList.Add('-ForceRes')
         $motionOption = if ($RecordStartupMotion) { ' record' } else { '' }
-        $start.ArgumentList.Add("-ExecCmds=RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption")
+        # Debug-view CVars are ECVF_Cheat: DeviceProfile overrides reject them.
+        # Use the development console path, before scheduling any screenshots.
+        # Only an explicit diagnostic request changes the ordinary lit capture.
+        $bufferCommands = if ($StartupBufferVisualization) {
+            "viewmode VisualizeBuffer,r.BufferVisualizationTarget $StartupBufferVisualization,"
+        } else { '' }
+        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption")
     } else {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.
@@ -176,6 +194,10 @@ try {
         }
     }
     $report.game_exit_code = $game.ExitCode
+    if ($StartupBufferVisualization) {
+        $report.startup_buffer_commands_confirmed = Test-RaftSimBufferDiagnosticLog (Get-Content -LiteralPath $logFile -Raw) $StartupBufferVisualization
+        if (-not $report.startup_buffer_commands_confirmed) { throw 'Buffer visualization commands were not confirmed; no buffer evidence' }
+    }
     if (-not $NativePerformanceGate -and -not $DetailStreamingReplay -and -not $StartupRenderReplay -and -not $CheckpointResetReplay -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
         $csvFile = Join-Path $projectRoot "unreal/Saved/Profiling/CSV/$Label.csv"
         if (-not (Test-Path -LiteralPath $csvFile) -or (Get-Item -LiteralPath $csvFile).Length -eq 0) {
