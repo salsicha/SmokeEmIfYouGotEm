@@ -131,6 +131,17 @@ not promoted into the ordinary map. Next1450s/local17000 requires both audits.
 - Bank report `tmp/control-ablation-1400s-banks-v1-20260917.json`, SHA256
   `f1bf0184dfcdf3c994a001aeaad96c6731decaa70e86952d28224954d2a71051`.
 
+The same live cook subsequently completed1450s/local17000. Both audits PASS;
+all86,720 artificial-bank faces remain exactly dry. Maximum depth4.537939m,
+speed6.462338m/s, volume3,011,916.407m3; maximum step residual remains1.707900e-8m3.
+Outflow83.804253 versus inflow45.306955m3/s still fails settling. Next1500s/
+local18000 requires both audits; no transient snapshot is promoted.
+
+- State report `tmp/control-ablation-1450s-state-v1-20260917.json`, SHA256
+  `9839012492bba62927d9e7f7a35ece89965ee91282df51347a6dfc2d5017c628`.
+- Bank report `tmp/control-ablation-1450s-banks-v1-20260917.json`, SHA256
+  `9162d861b1619a8a94708e0c99c29f4355303225c4179be5dc30c6d53b2862f2`.
+
 Continue the full South Fork reconstruction and coupled physical/visible water,
 30FPS, distant in-run reset, source closure, normalization, Colorado -> Pacuare
 -> Futaleufu, Chilko/Zambezi/all-scene reviews, crew and release queue. Troublemaker

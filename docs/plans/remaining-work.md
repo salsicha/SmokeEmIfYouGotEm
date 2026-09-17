@@ -12,8 +12,8 @@ checks and64,078 CPU addition cases PASS. Engine replay9319/PID9976 is LIVE,
 29 applicable original failures selected, NOT passed. Keep shader inputs frozen.
 Full installed ordinary-map replay58473 is now TERMINAL0/PASS: eight handoffs,
 11,945 fresh frames,471.816691 detail seconds; no visual or FPS acceptance.
-Same hydraulic11316 resumed;1400s state AND86,720 dry-bank checks PASS, NOT
-settled (outflow82.238582 versus inflow45.306955m3/s). Next1450/local17000
+Same hydraulic11316 resumed;1400/1450s state AND86,720 dry-bank checks PASS, NOT
+settled (1450s outflow83.804253 versus inflow45.306955m3/s). Next1500/local18000
 requires both audits. Last26.784840FPS/p9543.5724ms remains FAIL30.
 The dyadic rounder separately reproduces781/64,078 failures; a local integer-return
 candidate passes hardware/WARP but is NOT applied to the frozen engine inputs.
