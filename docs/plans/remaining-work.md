@@ -3,7 +3,21 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [flow-direction-aware foam onset installed](../reconstruction-review-2026-09-07/directional-foam-source.md).
+Latest: [qualified faster offline cook and exact handoff](../reconstruction-review-2026-09-07/offline-cook-workers.md).
+Explicit eight-lane standalone cook is about 30% faster across four alternating
+full-river pairs; all physical records and saved h/u/v arrays are exact. Default
+gameplay remains four lanes. Six native and 20 combined Python tests PASS.
+4850/4900 s state AND dry-bank audits PASS; NOT settled (4900: 114.200305 out /
+45.306955 in). Original PID17516 is now TERMINAL after a verified intentional
+handoff, not a timeout. New LIVE PID6968 / start2026-09-17T19:38:25.9811777Z uses
+tmp/solver-worker-limit-v1-20260917/raftsim_cartesian_cook.exe and output
+tmp/control-ablation-4900to5400s-workers8-v1-20260917. All 5,382,400 native restart
+cells are bit-exact; no geometry, boundary, clock or roughness change. Old outputs
+are preserved; the 4900-4928 s overlap is recomputed. Next4950/local1000 in NEW
+output needs completion marker and BOTH audits. Installed gameplay unchanged;
+not visible-scene, settled-water or 30 FPS acceptance. Full queue remains OPEN.
+
+Previous: [flow-direction-aware foam onset installed](../reconstruction-review-2026-09-07/directional-foam-source.md).
 Normal South Fork generic foam now follows positive along-current surface rise;
 crest/wake sources and transported foam remain. Same-input generic source sum
 263.615591 -> 20.453188; NOT an air-volume or visual acceptance measurement.
