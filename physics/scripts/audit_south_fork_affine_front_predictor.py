@@ -27,6 +27,43 @@ def exact(value):
     return decode_fraction(value) if isinstance(value,(str,dict)) else F(value)
 
 
+def magnitude(value):return -value if value<0 else value
+
+
+def rate_vector(value):
+    return (value['volume_rate'],*value['momentum_rate'],value['energy_rate_per_density'])
+
+
+def budget_vector(value):
+    return (value['volume'],*value['momentum'],value['energy_per_density'])
+
+
+def temporal_balance(fan,fragment,time,datum,rates):
+    """Independent centered time probes; keep every refinement and original gate.
+
+    Scale by gross boundary/bed work, not a possibly cancelling net rate or a
+    float floor. This numerical derivative validates the local operator only;
+    it is NOT the time step used to evolve the actual spatially varying inlet.
+    """
+    scale=[sum((magnitude(rate_vector(face)[j]) for face in rates['faces']),fan.zero)
+           for j in range(4)]
+    for j in range(2):scale[j+1]+=magnitude(rates['bed_force'][j])
+    history=[]
+    for divisor in (256,512,1024,2048,4096,8192,16384):
+        eps=time/divisor
+        a=budget_vector(fan.integrate(fragment,time-eps,energy_datum=datum))
+        b=budget_vector(fan.integrate(fragment,time+eps,energy_datum=datum))
+        error=tuple(magnitude((y-x)/(2*eps)-z) for x,y,z in zip(a,b,rate_vector(rates)))
+        ratios=tuple(e/s if s>0 else fan.zero if e==0 else None for e,s in zip(error,scale))
+        passed=all(r is not None and r<=F(1,10**10) for r in ratios)
+        history.append(dict(divisor=divisor,epsilon=eps,absolute_errors=error,
+                            scaled_errors=ratios,passed=passed))
+        # Two scales must independently pass; retain the earlier coarse probe.
+        if passed and len(history)>1 and history[-2]['passed']:break
+    return dict(refinements=history,gross_rate_scales=scale,
+                relative_gate=F(1,10**10),passed=passed and len(history)>1 and history[-2]['passed'])
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source-report',required=True,type=Path)
@@ -87,6 +124,11 @@ def main():
             if wet[key]+dry[key]!=whole[key]:raise ValueError('Exact source budget partition failed')
         if any(wet['momentum'][j]+dry['momentum'][j]!=whole['momentum'][j] for j in range(2)):
             raise ValueError('Exact source momentum partition failed')
+        rates=fan.boundary_rates(fragment,dt,energy_datum=bed)
+        split_rates=[fan.boundary_rates(p,dt,energy_datum=bed) for p in parts]
+        if tuple(a+b for a,b in zip(*map(rate_vector,split_rates)))!=rate_vector(rates):
+            raise ValueError('Shared source face rates do not cancel exactly')
+        temporal=temporal_balance(fan,fragment,dt,bed,rates)
         row=dict(donor=record['donor'],receiver=record['receiver'],source_id=sid,
                  original_patch_cell=owner['wet_source'][0],point=point,normal=normal,
                  local_depth=depth,local_velocity=sweep.velocity,original_bed=bed,
@@ -94,10 +136,14 @@ def main():
                  original_authority=next(p['authority_codes'] for p in source['registered_lateral_front_provenance'] if p['source_id']==sid),
                  before=before,whole=whole,wet_side=wet,dry_side=dry,
                  exact_partition_passed=True,status='local-uniform-state-predictor-only',
+                 boundary_rates=rates,wet_side_rates=split_rates[0],dry_side_rates=split_rates[1],
+                 exact_common_face_partition_passed=True,temporal_balance=temporal,
+                 local_rate_controls_passed=temporal['passed'],
                  actual_inlet_or_river_step_accepted=False)
         rows.append(row)
         print(json.dumps(dict(source_id=sid,cell=row['original_patch_cell'],positive_dry_receipt=True,
-                              exact_partition_passed=True)),flush=True)
+                              exact_partition_passed=True,time_balance=temporal['passed'],
+                              derivative_divisors=[v['divisor'] for v in temporal['refinements']])),flush=True)
     files=[args.source_report,Path(__file__),Path(__file__).with_name('subcell_affine_dry_fan.py')]
     hashes={str(p.resolve()):digest(p) for p in files}
     for path,value in source['source_sha256'].items():
@@ -105,9 +151,12 @@ def main():
     result=dict(schema='raftsim.south_fork.affine_front_predictor.v1',source_sha256=source['source_sha256'],
                 predictor_sha256=hashes,records=rows,accepted=False,source_water_unchanged=True,
                 scope=__doc__,boundary_note='Original triangle boundaries exchange mass, momentum and energy. Sum of wet/dry budgets equals the full local solution, not a closed-triangle time conservation claim. Adjacent slope junctions, spatial gradients of inlet state, multi-stream interactions and dispersive coupling remain unresolved.')
+    supported=[r for r in rows if r['status']=='local-uniform-state-predictor-only']
+    result['local_rate_controls_passed']=bool(supported) and all(r['local_rate_controls_passed'] for r in supported)
     def serialize(value):return value.record() if isinstance(value,Radical) else json_default(value)
     payload=json.dumps(result,indent=2,allow_nan=False,default=serialize)
     with args.report.open('x') as stream:stream.write(payload)
+    return 0 if result['local_rate_controls_passed'] else 1
 
 
-if __name__=='__main__':main()
+if __name__=='__main__':raise SystemExit(main())

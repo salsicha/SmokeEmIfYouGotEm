@@ -119,6 +119,21 @@ def _integrate(triangle, forms, zero):
                            for (i,j,k),coefficient in polynomial.items()),zero)
 
 
+def _line_integral(points,forms,zero):
+    """Integral on a unit edge parameter; no rounded length/unit normal."""
+    coefficients=[zero+1]
+    for form in forms:
+        a,b=(form(p) for p in points)
+        product=[zero]*(len(coefficients)+1)
+        for i,value in enumerate(coefficients):
+            product[i]+=value*a
+            product[i+1]+=value*b
+        coefficients=product
+    degree=len(coefficients)-1
+    return sum((value*F(factorial(i)*factorial(degree-i),factorial(degree+1))
+                for i,value in enumerate(coefficients)),zero)
+
+
 class AffineDryFan:
     def __init__(self, origin, normal, depth, velocity, bed_at_origin, gradient, gravity=F(981,100)):
         try:
@@ -163,6 +178,73 @@ class AffineDryFan:
         if q<=head: return self.zero+self.depth,tuple(self.zero+u for u in wet)
         if q>=front: return self.zero,(self.zero,self.zero)
         return linear(p)*linear(p)/(9*self.gravity*self.norm2),tuple(u(p) for u in velocity)
+
+    def face_flux(self,first,last,time,*,energy_datum=0):
+        """Common mass, XY momentum and total-energy flux on a directed edge.
+
+        The outward normal times edge length is (dy,-dx): CCW polygon edges
+        debit their interior; reversing the edge returns its exact credit.
+        Includes advective and pressure work ONCE. No post-hoc force residual,
+        unit-normal rounding, or separately reconstructed left/right rates.
+        This local predictor cannot resolve a different bed/state on its other side.
+        """
+        a,b=tuple(map(F,first)),tuple(map(F,last));datum=F(energy_datum)
+        if len(a)!=3 or len(b)!=3 or a[:2]==b[:2]:
+            raise ValueError('Distinct original XYZ edge endpoints required')
+        if any(p[2]!=self.bed+sum(g*(x-o) for g,x,o in zip(self.gradient,p,self.origin)) for p in (a,b)):
+            raise ValueError('Face leaves the original affine bed')
+        head,front,linear,velocity,wet=self._profile(time)
+        qa,qb=self._coordinate(a),self._coordinate(b)
+        cuts=[self.zero,self.zero+1]
+        if qb!=qa:
+            for bound in (head,front):
+                fraction=(bound-qa)/(qb-qa)
+                if 0<fraction<1:cuts.append(fraction)
+        cuts=sorted(cuts)
+        normal=(b[1]-a[1],a[0]-b[0])
+        point=lambda s:tuple(x+(y-x)*s for x,y in zip(a,b))
+        mass=self.zero;momentum=[self.zero,self.zero];energy=self.zero
+        for lo,hi in zip(cuts,cuts[1:]):
+            if lo==hi:continue
+            middle=self._coordinate(point((lo+hi)/2))
+            if middle>=front:continue
+            if middle<=head:
+                coefficient=self.depth;forms=[]
+                speed=tuple((lambda p,u=u:self.zero+u) for u in wet)
+            else:
+                coefficient=F(1,9)/(self.gravity*self.norm2);forms=[linear,linear];speed=velocity
+            endpoints=(point(lo),point(hi))
+            un=lambda p:sum((n*u(p) for n,u in zip(normal,speed)),self.zero)
+            measure=hi-lo
+            mass+=measure*coefficient*_line_integral(endpoints,forms+[un],self.zero)
+            pressure=measure*self.gravity*coefficient*coefficient/2*_line_integral(endpoints,forms+forms,self.zero)
+            for j in range(2):
+                momentum[j]+=measure*coefficient*_line_integral(endpoints,forms+[un,speed[j]],self.zero)+normal[j]*pressure
+                energy+=measure*coefficient/2*_line_integral(endpoints,forms+[un,speed[j],speed[j]],self.zero)
+            energy+=measure*self.gravity*coefficient*coefficient*_line_integral(endpoints,forms+forms+[un],self.zero)
+            energy+=measure*self.gravity*coefficient*_line_integral(endpoints,forms+[un,lambda p:p[2]-datum],self.zero)
+        return dict(volume_rate=mass,momentum_rate=tuple(momentum),energy_rate_per_density=energy)
+
+    def boundary_rates(self,fragment,time,*,energy_datum=0):
+        """Local finite-volume RHS from common edge fluxes and actual bed force.
+
+        The integral validates the original polygon and supplies its bed force;
+        no time difference of that integral is used to manufacture boundary flux.
+        Total energy includes bed potential, hence no extra bed-energy source.
+        """
+        budget=self.integrate(fragment,time,energy_datum=energy_datum)
+        vertices=fragment.polygon
+        orientation=sum(a[0]*b[1]-a[1]*b[0] for a,b in zip(vertices,vertices[1:]+vertices[:1]))
+        if orientation<0:vertices=tuple(reversed(vertices))
+        faces=[dict(first=a,last=b,**self.face_flux(a,b,time,energy_datum=energy_datum))
+               for a,b in zip(vertices,vertices[1:]+vertices[:1]) if a[:2]!=b[:2]]
+        return dict(volume_rate=-sum((f['volume_rate'] for f in faces),self.zero),
+                    momentum_rate=tuple(budget['bed_force'][j]-sum((f['momentum_rate'][j] for f in faces),self.zero)
+                                        for j in range(2)),
+                    energy_rate_per_density=-sum((f['energy_rate_per_density'] for f in faces),self.zero),
+                    bed_force=budget['bed_force'],faces=faces,
+                    source_id=fragment.source_id,time=F(time),
+                    varying_state_or_slope_junction_or_dispersive_or_gameplay_accepted=False)
 
     def integrate(self,fragment,time,*,energy_datum=0):
         """Conserved budgets on a fixed ORIGINAL polygon, at a physical time.

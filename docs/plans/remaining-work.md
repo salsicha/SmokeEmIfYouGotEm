@@ -3,7 +3,17 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [finite-time local affine-bed dry fan](../reconstruction-review-2026-09-07/normal-river-affine-dry-fan.md).
+Latest: [local affine-front common fluxes](../reconstruction-review-2026-09-07/normal-river-affine-front-flux.md).
+Exact shared-edge mass, momentum and energy rates now accompany the local
+finite-time predictor. All eleven supported original-source predictors pass
+independent time-balance checks at two probe sizes; 65 focused PASS, broader
+suite 731 PASS / 13 unchanged FAIL. Not the varying inlet, slope-junction or
+dispersive coupling, and not playable integration or 30 FPS acceptance.
+Same cook: 4550s state AND dry banks PASS, NOT settled (104.842436 out /
+45.306955 in). Next 4600/local20000 requires completion marker AND both audits.
+Full ordered scene, crew, regression and release queue remains OPEN.
+
+Previous: [finite-time local affine-bed dry fan](../reconstruction-review-2026-09-07/normal-river-affine-dry-fan.md).
 Local rarefaction now evolves donor/fan depth and momentum with original bed
 work; exact polygon budgets and independent time/PDE controls pass. 51 focused
 PASS; broader suite 717 PASS / 13 unchanged FAIL. All eleven actual-source local predictors retain positive dry-side water
