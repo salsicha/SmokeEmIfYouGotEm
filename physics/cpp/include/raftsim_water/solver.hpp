@@ -10,6 +10,11 @@ namespace raftsim {
 // Call during host module shutdown, before DLL unloading/Windows loader lock.
 // Waits for in-flight row work and joins the bounded persistent workers.
 void shutdown_solver_workers();
+// Optional one-shot process setting, before the first worker-pool use.
+// Default remains four total execution lanes (caller included), bounded by
+// hardware concurrency. Offline cooks may explicitly request 1..64 lanes.
+// Late/repeated configuration is rejected; no in-flight pool is resized.
+void configure_solver_workers(unsigned maximum_lanes);
 
 struct DerivedFields {
     Array2D normal_x;

@@ -37,7 +37,13 @@ void write_field(const fs::path& path,const raftsim::CartesianWaterDomain& domai
 
 int main(int argc,char** argv) {
     try {
-        require(argc==5,"Usage: raftsim_cartesian_cook manifest.json fresh-output-directory steps frame-interval");
+        require(argc==5 || argc==6,"Usage: raftsim_cartesian_cook manifest.json fresh-output-directory steps frame-interval [maximum-worker-lanes]");
+        if (argc==6) {
+            std::size_t used=0;
+            const auto lanes=std::stoul(argv[5],&used);
+            require(used==std::string(argv[5]).size() && lanes>0 && lanes<=64,"Worker lanes must be an integer in [1,64]");
+            raftsim::configure_solver_workers(static_cast<unsigned>(lanes));
+        }
         const fs::path input=fs::absolute(argv[1]), output=fs::absolute(argv[2]);
         const int steps=std::stoi(argv[3]), interval=std::stoi(argv[4]);
         require(steps>0 && interval>0 && !fs::exists(output),"Require positive steps/interval and a fresh output directory");

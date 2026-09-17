@@ -40,9 +40,14 @@ def main():
     parser.add_argument('--candidate', type=Path, required=True)
     parser.add_argument('--steps', type=int, default=20)
     parser.add_argument('--repeats', type=int, default=4)
+    parser.add_argument('--baseline-workers', type=int)
+    parser.add_argument('--candidate-workers', type=int)
     args = parser.parse_args()
     if args.steps < 1 or args.repeats < 2:
         parser.error('Positive steps and at least two alternating pairs required')
+    workers = dict(baseline=args.baseline_workers, candidate=args.candidate_workers)
+    if any(value is not None and not 1 <= value <= 64 for value in workers.values()):
+        parser.error('Explicit worker limits must be in [1,64]')
     manifest_path = args.manifest.resolve()
     manifest = json.loads(manifest_path.read_text())
     if manifest['schema'] != 'raftsim.cartesian_flow_cook.v1':
@@ -61,6 +66,7 @@ def main():
     report = dict(schema='raftsim.cartesian_cook_binary_comparison.v1',
                   input_manifest=str(manifest_path), input_manifest_sha256=inputs[manifest_path],
                   input_files=len(inputs), binary_sha256=binary_hashes,
+                  requested_worker_limits=workers,
                   steps=args.steps, repeats=args.repeats, runs=[], pairs=[],
                   physical_acceptance=False, engine_fps_accepted=False, passed=False)
     try:
@@ -71,6 +77,8 @@ def main():
                     raise ValueError('Executable changed during comparison')
                 destination = output / f'{repeat}-{variant}'
                 command = [str(binaries[variant]), str(manifest_path), str(destination), str(args.steps), str(args.steps)]
+                if workers[variant] is not None:
+                    command.append(str(workers[variant]))
                 start = time.perf_counter()
                 with (output/f'{repeat}-{variant}.log').open('w') as log:
                     process = subprocess.Popen(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)

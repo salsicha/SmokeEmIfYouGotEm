@@ -62,6 +62,10 @@ target_link_libraries(raftsim_cartesian_domain_tests PRIVATE raftsim_water)
 if(BUILD_TESTING)
   add_test(NAME water_cartesian_domain COMMAND raftsim_cartesian_domain_tests)
   set_tests_properties(water_cartesian_domain PROPERTIES TIMEOUT 120)
+  foreach(lanes 1 8)
+    add_test(NAME water_cartesian_domain_workers${lanes} COMMAND raftsim_cartesian_domain_tests --workers ${lanes})
+    set_tests_properties(water_cartesian_domain_workers${lanes} PROPERTIES TIMEOUT 120)
+  endforeach()
   foreach(fixture wet_dry_shoreline lake_at_rest_balance transcritical_bump)
     add_test(NAME water_${fixture}
       COMMAND raftsim_water_tests

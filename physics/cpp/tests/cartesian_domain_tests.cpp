@@ -346,13 +346,34 @@ void mixed_regime_discharge_profiles() {
 
 int main(int argc, char** argv) {
     try {
+        for (unsigned invalid : {0u,65u}) {
+            bool rejected=false;
+            try { raftsim::configure_solver_workers(invalid); }
+            catch(const std::invalid_argument&) { rejected=true; }
+            expect(rejected,"invalid worker limit accepted");
+        }
+        int source_argument=1;
+        if(argc>=3 && std::string(argv[1])=="--workers") {
+            std::size_t used=0;const auto lanes=std::stoul(argv[2],&used);
+            expect(used==std::string(argv[2]).size() && lanes>0 && lanes<=64,"invalid test worker limit");
+            raftsim::configure_solver_workers(static_cast<unsigned>(lanes));
+            bool repeated=false;
+            try { raftsim::configure_solver_workers(static_cast<unsigned>(lanes)); }
+            catch(const std::logic_error&) { repeated=true; }
+            expect(repeated,"repeated worker configuration accepted");
+            source_argument=3;
+        }
         equivalence(true); equivalence(false); equivalence(false,4); equivalence(false,4,true);
+        bool late=false;
+        try { raftsim::configure_solver_workers(8); }
+        catch(const std::logic_error&) { late=true; }
+        expect(late,"in-use worker pool was reconfigured");
         profiles_and_rejections();
         discharge_profiles();
         mixed_regime_discharge_profiles();
         parallel_tile_cfl_rounding();
         checkpoint_continuation();
-        if (argc>1) source_package_equivalence(argv[1]);
+        if (argc>source_argument) source_package_equivalence(argv[source_argument]);
         raftsim::shutdown_solver_workers();
         std::cout << "Cartesian domain tests passed\n";
         return 0;

@@ -12,17 +12,36 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <stdexcept>
 #if defined(_M_X64) || defined(__SSE__)
 #include <xmmintrin.h>
 #endif
 
 namespace raftsim::solver_detail {
 
+// 0 means the unchanged default; bit 7 seals configuration once the shared pool
+// starts. Compare/exchange makes configuration versus first use race-safe.
+inline std::atomic<unsigned> solver_worker_configuration{0};
+inline void configure_solver_worker_limit(unsigned lanes) {
+    if (lanes == 0 || lanes > 64) throw std::invalid_argument("Solver worker limit must be in [1,64].");
+    unsigned expected=0;
+    if (!solver_worker_configuration.compare_exchange_strong(expected,lanes))
+        throw std::logic_error("Solver worker limit must be configured once before first use.");
+}
+inline unsigned take_solver_worker_limit() {
+    // Retain the requested limit if static initialization retries after a
+    // thread-construction exception; it must not turn the seal into a count.
+    const unsigned value=solver_worker_configuration.fetch_or(128u)&127u;
+    return value == 0 ? 4u : value;
+}
+
 class SolverRowExecutor {
 public:
     using Task = std::function<void(std::size_t, std::size_t)>;
-    SolverRowExecutor() {
-        const unsigned count = std::min(4u, std::max(1u, std::thread::hardware_concurrency()));
+    explicit SolverRowExecutor(unsigned requested_lanes=4u) {
+        if (requested_lanes == 0 || requested_lanes > 64)
+            throw std::invalid_argument("Solver worker limit must be in [1,64].");
+        const unsigned count = std::min(requested_lanes, std::max(1u, std::thread::hardware_concurrency()));
         try {
             for (unsigned i = 1; i < count; ++i)
                 workers_.emplace_back([this] { worker(); });
@@ -135,7 +154,7 @@ private:
 };
 
 inline SolverRowExecutor& solver_row_executor() {
-    static SolverRowExecutor executor;
+    static SolverRowExecutor executor(take_solver_worker_limit());
     return executor;
 }
 

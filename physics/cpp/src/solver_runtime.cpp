@@ -8,6 +8,10 @@ namespace raftsim {
 
 using namespace solver_detail;
 
+void configure_solver_workers(unsigned maximum_lanes) {
+    solver_detail::configure_solver_worker_limit(maximum_lanes);
+}
+
 void shutdown_solver_workers() {
     solver_detail::solver_row_executor().shutdown();
 }
