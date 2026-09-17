@@ -42,7 +42,23 @@ bool FRaftSimCrestEdgeHashTest::RunTest(const FString&)
         XY.Emplace(-544000.+100.*X,-360000.+100.*Y);
         if(X<N-1 && Y<N-1){const int32 A=Y*N+X;Triangles.Append({A,A+N,A+1,A+1,A+N,A+N+1});}
     }
-    FRaftSimSurfaceRefinement Original,Candidate,Serial;
+    // Exercise empty lookup, endpoint zero/self edges, repeated updates and
+    // high-degree nonmanifold fans beyond the bounded eight-entry chain.
+    FRaftSimIndexedEdgeMap Indexed(70000);
+    TestTrue(TEXT("indexed map starts empty"),Indexed.IsEmpty());
+    bool ExactIndexed=true;
+    for(uint32 I=0;I<70000;++I)Indexed.Add(uint64(I),int32(I));
+    for(uint32 I=0;I<70000;++I)
+    {
+        const int32* Found=Indexed.Find(uint64(I));
+        ExactIndexed &= Found && *Found==int32(I);
+        Indexed.Add(uint64(I),-int32(I));
+        ExactIndexed &= *Indexed.Find(uint64(I))==-int32(I);
+    }
+    ExactIndexed &= !Indexed.Contains((uint64(69999)<<32)|69999);
+    TestTrue(TEXT("indexed bounded and spill lookups preserve every high-degree edge"),ExactIndexed);
+    FRaftSimSurfaceRefinement Original,Candidate,Serial,Direct;
+    Direct.bIndexedEdges=true;
     Candidate.bStrongEdgeHash=true;
     int64 Compared=0;
     for(int32 Frame=0;Frame<24;++Frame)
@@ -59,10 +75,13 @@ bool FRaftSimCrestEdgeHashTest::RunTest(const FString&)
         const FBox2D* Detail=Frame%4 ? nullptr : &Window;
         TArray<FBox2D> Regions;
         if(Frame%5==0)Regions.Add(FBox2D(XY[N*N/2]-FVector2D(1100),XY[N*N/2]+FVector2D(1100)));
-        for(auto* W:{&Original,&Candidate})
+        for(auto* W:{&Original,&Candidate,&Direct})
             if(!W->BuildAdaptive(XY,Triangles,Height,3,.5f,Regions,nullptr,true,true,Detail,25.f,Frame!=14))return false;
         if(!Serial.BuildAdaptive(XY,Triangles,Height,3,.5f,Regions,nullptr,false,false,Detail,25.f))return false;
-        TArray<FVector2D> A,B,C;Original.Expand(XY,A);Candidate.Expand(XY,B);Serial.Expand(XY,C);
+        TArray<FVector2D> A,B,C,D;Original.Expand(XY,A);Candidate.Expand(XY,B);Serial.Expand(XY,C);Direct.Expand(XY,D);
+        TestTrue(TEXT("indexed edges preserve ordered topology, ownership and exact expanded coordinates"),
+            Original.MidpointParents==Direct.MidpointParents && Original.Triangles==Direct.Triangles &&
+            Original.TriangleOrigins==Direct.TriangleOrigins && A==D);
         TestTrue(TEXT("edge hash preserves original and serial ordered topology, ownership and coordinates"),
             Original.MidpointParents==Candidate.MidpointParents && Original.Triangles==Candidate.Triangles &&
             Original.TriangleOrigins==Candidate.TriangleOrigins && A==B && B==C &&

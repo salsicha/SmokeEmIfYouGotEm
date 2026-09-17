@@ -11,6 +11,7 @@
 #include "RaftSimFlatMemoAudit.h"
 #include "RaftSimCrestInlineAudit.h"
 #include "RaftSimCrestEdgeHashAudit.h"
+#include "RaftSimCrestIndexedEdgeAudit.h"
 #include "RaftSimCrestLevelMemoAudit.h"
 #include "RaftSimCrestRangeAudit.h"
 #include "RaftSimCrestPreparedRangeAudit.h"
@@ -109,6 +110,11 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
             Refinement.bInlineSelection=bInlineSelection;
             static const bool bStrongEdgeHash=FParse::Param(FCommandLine::Get(),TEXT("RaftSimStrongCrestEdgeHash"));
             Refinement.bStrongEdgeHash=bStrongEdgeHash;
+            // Two independent actual-input captures preserve exact topology
+            // and improve whole-build timing in both execution orders.
+            // Keep the original map available for same-build controls.
+            static const bool bIndexedEdges=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyCrestEdges"));
+            Refinement.bIndexedEdges=bIndexedEdges;
             static const bool bLevelLocalMemos=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLevelLocalCrestMemos"));
             Refinement.bLevelLocalMemos=bLevelLocalMemos;
             static const bool bBoundMemo=FParse::Param(FCommandLine::Get(),TEXT("RaftSimBoundCrestMemo"));
@@ -174,6 +180,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         RaftSimFlatMemoAudit::Run(CachedXY,Triangles,Input);
         RaftSimCrestInlineAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestEdgeHashAudit::Run(CachedXY,Triangles,Input,Refinement);
+        RaftSimCrestIndexedEdgeAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestLevelMemoAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestPreparedRangeAudit::Run(CachedXY,Triangles,Input,Refinement);

@@ -3,7 +3,19 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [captured-ground rendering correction installed](../reconstruction-review-2026-09-07/physical-ground-probes-and-optics.md).
+Latest: [exact indexed crest edges installed](../reconstruction-review-2026-09-07/crest-indexed-edges-installed.md).
+Two actual-input captures preserve all 128 pairs/8,639,003 expanded vertices.
+Whole refinement build improves in both call orders: 8.381602 to 7.674349 ms,
+then 7.434027 to 6.874956 ms. Default-enabled native24 PASS; Python29 PASS.
+Verified gameplay DLL/PDB installed with exact rollback copies. Ordinary installed
+31.116381 FPS/p95 38.8109 ms still FAIL30; slower candidate25.687239/p95 46.1073
+is retained, not discarded. Captured bank correction survives normal installed
+startup; sheet-like froth, crew and physical/motion acceptance remain OPEN.
+Same cook36872:3000/3050 state AND86,720 dry banks PASS, NOT settled
+(3050:88.320213out/45.306955in). Next3100/local26000 requires marker AND both audits.
+Full ordered scene/physics/crew/normalization/regression/release scope stays OPEN.
+
+Previous: [captured-ground rendering correction installed](../reconstruction-review-2026-09-07/physical-ground-probes-and-optics.md).
 The current SM_TroublemakerCapturedGround now renders all803,842 fallback source
 triangles on its tagged reconstructed component only; Nanite stays unchanged
 elsewhere. Actual normal installed startup now shows the rock bank instead of

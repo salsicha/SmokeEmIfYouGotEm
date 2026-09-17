@@ -6,6 +6,7 @@
 #include "RaftSimCrestCornerSamples.h"
 #include "RaftSimCrestRegionIndex.h"
 #include "RaftSimEdgeMap.h"
+#include "RaftSimIndexedEdgeMap.h"
 #include "RaftSimBoundCoordinateMemo.h"
 
 // Conforming red/green triangle refinement. Midpoints retain parent indices so
@@ -32,6 +33,7 @@ struct FRaftSimSurfaceRefinement
     bool bIndexedRegions=false; // Candidate until actual paired timing qualifies it.
     bool bFlatCoordinateMemo=false; // Candidate: exact keys, unchanged profile epochs.
     bool bStrongEdgeHash=false; // Candidate until exact actual-input timing qualifies it.
+    bool bIndexedEdges=false; // Shoreline enables the qualified indexed lookup.
     bool bLevelLocalMemos=false; // Candidate: retain coordinate slots separately per level.
     bool bInlineSelection=false; // Candidate: typed predicate, identical evaluations.
     bool bBoundCoordinateMemo=false; // Candidate: exact per-triangle lookup bindings.
@@ -383,7 +385,9 @@ private:
                 return true;
             };
             bool HasMidpoints=false;
-            if(bStrongEdgeHash)
+            if(bIndexedEdges)
+            { FRaftSimIndexedEdgeMap Midpoints(Points.Num()); HasMidpoints=Assemble(Midpoints); }
+            else if(bStrongEdgeHash)
             { TRaftSimEdgeMap<int32> Midpoints; HasMidpoints=Assemble(Midpoints); }
             else
             { TMap<uint64,int32> Midpoints; HasMidpoints=Assemble(Midpoints); }
