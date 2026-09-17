@@ -20,7 +20,7 @@ def _linear_bounds(terms):
     return lower, upper
 
 
-def lateral_front_moment(sweep, fragment, relative_bound=F(1, 10**12), max_depth=48, *, include_boundary=False):
+def lateral_front_intervals(sweep, fragment, relative_bound=F(1, 10**12), max_depth=48, *, include_boundary=False):
     """Bound integral r**4 dr on the s=0 ray STRICTLY INSIDE this source.
 
     Its h=k*r jump has a distributional pressure gradient. A ray lying on
@@ -39,23 +39,31 @@ def lateral_front_moment(sweep, fragment, relative_bound=F(1, 10**12), max_depth
     # means the entire ray is on that source boundary, not an interior front.
     constraints = [tuple(-c for c in p) for p in lower[1:]]+upper[1:]+vertical
     if not include_boundary and any(not any(p) for p in constraints):
-        return F(0), F(0)
+        return (), ()
     constraints = [p for p in constraints if any(p)]
-    exact = uncertainty = F(0)
+    inside, unresolved = [], []
     pending = [(F(0), sweep.time_root, 0)]
     while pending:
         lo, hi, depth = pending.pop()
         ranges = [polynomial_bounds(p, lo, hi) for p in constraints]
         if any(b <= 0 for a, b in ranges):
             continue
-        amount = (hi**5-lo**5)/5
         if all(a >= 0 for a, b in ranges):
-            exact += amount
+            inside.append((lo, hi))
         elif depth == max_depth:
-            uncertainty += amount
+            unresolved.append((lo, hi))
         else:
             mid = (lo+hi)/2
             pending.extend(((lo,mid,depth+1),(mid,hi,depth+1)))
+    return tuple(inside), tuple(unresolved)
+
+
+def lateral_front_moment(sweep, fragment, relative_bound=F(1, 10**12), max_depth=48, *, include_boundary=False):
+    """Bound integral r**4 dr without dropping unresolved source crossings."""
+    inside, unresolved = lateral_front_intervals(sweep, fragment, relative_bound, max_depth,
+                                                include_boundary=include_boundary)
+    exact = sum(((hi**5-lo**5)/5 for lo, hi in inside), F(0))
+    uncertainty = sum(((hi**5-lo**5)/5 for lo, hi in unresolved), F(0))
     if uncertainty > F(relative_bound)*sweep.time_root**5/5:
         raise ValueError('Lateral-front integration bound unresolved; no front deletion')
     return exact, exact+uncertainty

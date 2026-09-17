@@ -3,7 +3,22 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [inlet pressure residual and finite-depth lateral fronts](../reconstruction-review-2026-09-07/normal-river-inlet-pressure-fronts.md).
+Latest: [common local inlet lateral flux](../reconstruction-review-2026-09-07/normal-river-inlet-lateral-flux.md).
+Bounded mass/XY momentum transfer now uses the existing zero-normal dry-front
+rarefaction on the original side ray, with matching wet-debit/dry-credit bounds.
+Nine of17 actual routed pieces have positive sideways transfer. All11 original
+receivers queried, including the retained sub-float record;601 hashes checked.
+48 focused PASS; broad622 PASS/13 unchanged FAIL. Original water unchanged.
+This is an instantaneous local flux, NOT a coupled update or scene acceptance.
+Next single ownership, finite-time lateral spreading, energy/donor evolution
+and compatible bed/pressure/curvature coupling before native playable integration.
+Same native replay/editor36412 and worker37836 LIVE after watchdog error;
+63 shader hashes frozen and unchanged. Same cook36872:2400s state AND86,720
+dry banks PASS, NOT settled (95.504756 out versus45.306955 in m3/s).
+Next2450/local13000 requires both audits. No installed/playable changes.
+Last28.057157FPS/p9541.2354ms still FAIL30. Full ordered scope below OPEN.
+
+Previous: [inlet pressure residual and finite-depth lateral fronts](../reconstruction-review-2026-09-07/normal-river-inlet-pressure-fronts.md).
 Added source-resolved hydrostatic/bed residuals on the actual non-horizontal
 profile. Independent diagonal-flow traction exposed a missing side-front
 pressure jump; now included without epsilon depth/time or relaxed tolerances.

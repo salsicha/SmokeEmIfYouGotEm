@@ -21,6 +21,7 @@ from subcell_inlet_contact_time import initial_wet_contact
 from subcell_inlet_stream_overlap import simultaneous_pairs, signed_area
 from subcell_inlet_face_transport import source_transport_balance
 from subcell_inlet_hydrostatic_force import source_hydrostatic_force
+from subcell_inlet_lateral_flux import lateral_flux
 from subcell_source_activation import assembly
 
 
@@ -79,6 +80,7 @@ def route(part, fronts, on_face=None):
             time_root=sweep.time_root, physical_time=sweep.time_root**3,
             primary_height=height, full_incoming_moments=incoming,
             original_donor_transport=donor_transport,
+            original_receiver_lateral_flux=lateral_flux(sweep, fragments[receiver]),
             above_receiver_minimum=not front['receiving_face_contact']['contact_starts_at_birth'],
             physical_update_accepted=False)
         if float(incoming[1]) == 0 or float(sweep.time_root**3) == 0:
@@ -104,6 +106,7 @@ def route(part, fronts, on_face=None):
                     conditional_face_transport=(donor_transport if key == donor else source_transport_balance(sweep, fragment)))
                 if key != donor:
                     piece['conditional_hydrostatic_force'] = source_hydrostatic_force(sweep, fragment)
+                    piece['conditional_lateral_flux'] = lateral_flux(sweep, fragment)
                 if key in occupied:
                     pool_index, form = occupied[key]
                     piece['initial_wet_support'] = dict(pool_index=pool_index,
