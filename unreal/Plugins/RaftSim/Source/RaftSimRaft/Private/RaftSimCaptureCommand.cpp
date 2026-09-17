@@ -30,6 +30,7 @@
 #include "Misc/Paths.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "Misc/AutomationTest.h"
 #include "Misc/FileHelper.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
@@ -698,6 +699,33 @@ static bool ResolveShorelineCameraPose(
 // Burst variant of CaptureAfter for temporal artifacts: after the start
 // delay, resolve the camera once, then take <count> numbered screenshots at
 // <interval> seconds and exit. One -ExecCmds command, like CaptureAfter.
+static bool ResolveCarrierCaptureIndex(const TCHAR* CommandLine,int32 Count,int32& Index)
+{
+    Index=FParse::Param(CommandLine,TEXT("RaftSimCaptureFirstCarrierShape")) ? 0 : INDEX_NONE;
+    FString Token;
+    if (!FParse::Value(CommandLine,TEXT("RaftSimCaptureCarrierShapeIndex="),Token)) return Count>0;
+    int32 Parsed=INDEX_NONE;
+    if (!LexTryParseString(Parsed,*Token) || Token!=FString::FromInt(Parsed) ||
+        Parsed<0 || Parsed>=Count || (Index==0 && Parsed!=0)) return false;
+    Index=Parsed;return true;
+}
+
+#if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCarrierCaptureIndexTest,
+    "RaftSim.M4.CarrierCaptureIndex",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FRaftSimCarrierCaptureIndexTest::RunTest(const FString&)
+{
+    int32 Index=123;
+    TestTrue(TEXT("No observation by default"),ResolveCarrierCaptureIndex(TEXT(""),24,Index) && Index==INDEX_NONE);
+    TestTrue(TEXT("Legacy first-frame observation"),ResolveCarrierCaptureIndex(TEXT("-RaftSimCaptureFirstCarrierShape"),24,Index) && Index==0);
+    TestTrue(TEXT("Later accepted screenshot index"),ResolveCarrierCaptureIndex(TEXT("-RaftSimCaptureCarrierShapeIndex=22"),24,Index) && Index==22);
+    for (const TCHAR* Token:{TEXT("-1"),TEXT("24"),TEXT("1.5"),TEXT("22oops"),TEXT("2147483648")})
+        TestFalse(TEXT("Invalid or out-of-range index rejected"),ResolveCarrierCaptureIndex(*(FString(TEXT("-RaftSimCaptureCarrierShapeIndex="))+Token),24,Index));
+    TestFalse(TEXT("Conflicting requests rejected"),ResolveCarrierCaptureIndex(TEXT("-RaftSimCaptureFirstCarrierShape -RaftSimCaptureCarrierShapeIndex=22"),24,Index));
+    return !HasAnyErrors();
+}
+#endif
+
 static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
 {
     if (World == nullptr)
@@ -708,6 +736,9 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
         Args.Num() > 0 ? FMath::Max(FCString::Atof(*Args[0]), 0.1f) : 3.0f;
     const int32 Count =
         Args.Num() > 1 ? FMath::Clamp(FCString::Atoi(*Args[1]), 1, 120) : 10;
+    int32 CarrierCaptureIndex=INDEX_NONE;
+    if (!ResolveCarrierCaptureIndex(FCommandLine::Get(),Count,CarrierCaptureIndex))
+    { UE_LOG(LogTemp,Error,TEXT("CaptureSeries: invalid/conflicting carrier screenshot index; no capture started"));return; }
     const float Interval =
         Args.Num() > 2 ? FMath::Max(FCString::Atof(*Args[2]), 0.05f) : 0.2f;
     const FString Label = Args.Num() > 3 ? Args[3] : TEXT("RaftSimSeries");
@@ -865,7 +896,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
         StartHandle,
         FTimerDelegate::CreateLambda(
             [WeakWorld, Count, Interval, Label, CameraPreset, bHasPose,
-             CamLoc, CamRot, FocusStationM, FocusLateralM, bRecord, bLegacyHydraulicFrame]()
+             CamLoc, CamRot, FocusStationM, FocusLateralM, bRecord, bLegacyHydraulicFrame, CarrierCaptureIndex]()
         {
             UWorld* W = WeakWorld.Get();
             if (W == nullptr)
@@ -984,7 +1015,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
             W->GetTimerManager().SetTimer(
                 *LoopHandle,
                 FTimerDelegate::CreateLambda(
-                    [WeakWorld, Taken, Count, Label, LoopHandle]()
+                    [WeakWorld, Taken, Count, Label, LoopHandle, CarrierCaptureIndex]()
                 {
                     UWorld* W2 = WeakWorld.Get();
                     if (W2 == nullptr)
@@ -1064,7 +1095,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                     FScreenshotRequest::RequestScreenshot(
                         OutPath, /*bShowUI=*/false,
                         /*bAddFilenameSuffix=*/false);
-                    if (*Taken==0 && FParse::Param(FCommandLine::Get(),TEXT("RaftSimCaptureFirstCarrierShape")))
+                    if (*Taken==CarrierCaptureIndex)
                     {
                         // Observe at the screenshot request, not at an earlier
                         // publication. Still not a render-thread/GPU fence.
@@ -1075,8 +1106,8 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                         const FString ShapePath=OutPath+TEXT(".carrier.json");
                         const bool Saved=Surfaces==1 && Surface->SavePresentedCarrierShapeAudit(ShapePath);
                         const bool ViewSaved=Saved && SaveCarrierViewAudit(W2,OutPath+TEXT(".view.json"));
-                        if (Saved) { UE_LOG(LogTemp,Display,TEXT("CaptureSeries first carrier shape frame=%llu saved=%s"),GFrameCounter,*ShapePath); }
-                        else { UE_LOG(LogTemp,Error,TEXT("CaptureSeries first carrier shape refused: surfaces=%d path=%s"),Surfaces,*ShapePath); }
+                        if (Saved) { UE_LOG(LogTemp,Display,TEXT("CaptureSeries carrier shape index=%d frame=%llu saved=%s"),*Taken,GFrameCounter,*ShapePath); }
+                        else { UE_LOG(LogTemp,Error,TEXT("CaptureSeries carrier shape refused: surfaces=%d path=%s"),Surfaces,*ShapePath); }
                         if (!ViewSaved) { UE_LOG(LogTemp,Error,TEXT("CaptureSeries first carrier camera export refused: %s"),*OutPath); }
                     }
                     const UGameInstance* GI = W2->GetGameInstance();
