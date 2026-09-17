@@ -25,6 +25,7 @@ from subcell_inlet_hydrostatic_force import source_hydrostatic_force
 from subcell_inlet_lateral_flux import lateral_flux
 from subcell_inlet_lateral_energy import lateral_energy_flux
 from subcell_inlet_front_ownership import owned_front_transfers
+from subcell_registered_front_sources import RegisteredFrontSources
 from subcell_source_activation import assembly
 
 
@@ -43,7 +44,7 @@ def original_fragments(part):
     return result
 
 
-def route(part, fronts, on_face=None):
+def route(part, fronts, on_face=None, source_index=None):
     fragments = original_fragments(part)
     occupied = {}
     for pool_index, pool in enumerate(part.pools):
@@ -88,6 +89,12 @@ def route(part, fronts, on_face=None):
             single_stream_owned_lateral_front=owned_front_transfers(sweep, fragments),
             above_receiver_minimum=not front['receiving_face_contact']['contact_starts_at_birth'],
             physical_update_accepted=False)
+        if source_index is not None:
+            source_faces = source_index.fragments(sweep)
+            base['registered_source_lateral_front'] = dict(owned_front_transfers(sweep, source_faces),
+                source_key_kind='original-registered-triangle-index',
+                candidate_source_ids=list(source_faces),
+                outside_block_water_state_known=False)
         if float(incoming[1]) == 0 or float(sweep.time_root**3) == 0:
             records.append(dict(base, status='positive-exact-sweep-below-float-time-or-volume-range'))
             if on_face: on_face(records[-1])
@@ -172,7 +179,7 @@ def main():
     part, source, indices, origin, authority, sampler, hashes = load_original_block(args)
     before = [(p['volume'], p['momentum'].copy()) for p in part.pools]
     fronts = analyze(part, assembly(part, face_scheme='donor')['new_region_rates'])
-    records = route(part, fronts, on_face=lambda r: print(json.dumps(dict(
+    records = route(part, fronts, source_index=RegisteredFrontSources(sampler), on_face=lambda r: print(json.dumps(dict(
         donor=r['donor'], receiver=r['receiver'], status=r['status'], pieces=len(r.get('pieces', [])))), flush=True))
     fragments = original_fragments(part)
     lows = [min(p[j] for f in fragments.values() for p in f.polygon) for j in range(2)]
@@ -210,11 +217,20 @@ def main():
     provenance = [dict(parent=p, source_id=s, original_cell=indices[p],
         authority_codes=sorted(set(map(int, authority[sampler.faces[s]].ravel()))))
         for p, s in sorted({(p['parent'], p['source_id']) for r in routed for p in r['pieces']} | witness_sources | front_sources)]
+    registered_sources = {key for r in records
+        for t in r.get('registered_source_lateral_front', {}).get('transfers', [])
+        for key in (t['wet_source'], t['dry_source']) if key is not None}
+    registered_provenance = [dict(source_id=s, original_vertex_indices=sampler.faces[s],
+        original_xyz=sampler.xyz[sampler.faces[s]],
+        authority_codes=sorted(set(map(int,authority[sampler.faces[s]].ravel()))))
+        for s in sorted(registered_sources)]
     report = dict(schema='raftsim.south_fork.inlet_sweep_geometry.v1', accepted=False,
         rational_encoding='decimal-string-or-tagged-fraction_hex.v1',
         source_sha256=hashes, source_time_seconds=source['source_time_seconds'],
         original_block_col_row=[args.block_col, args.block_row], origin_registered_m=origin,
         records=records, provenance=provenance, original_water_unchanged=True,
+        registered_lateral_front_provenance=registered_provenance,
+        registered_lateral_front_scope='Complete original terrain search, independent of the water-state audit block. Source ids are original registered triangles, not pool or cell ids. Whole-source vertices and mixed authority codes are retained. Original block-only ownership remains as a control. No outside-block water state, finite-time or gameplay acceptance is inferred.',
         simultaneous_stream_pairs=pairs, pair_domain_original_xy=domain,
         isolated_window_stream_pair_bounds=closure_pairs,
         pair_closure_scope='At each common original window limit, footprint closures enclose ALL earlier conditional footprints. Zero upper overlap area proves separation throughout that common window. Positive witnesses are also verified at an explicitly earlier time. This does not evolve pressure or extend the law beyond its original window.',

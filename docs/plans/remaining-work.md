@@ -3,7 +3,18 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [single front ownership](../reconstruction-review-2026-09-07/normal-river-front-ownership.md).
+Latest: [complete registered front sources](../reconstruction-review-2026-09-07/normal-river-registered-front-sources.md).
+Whole original-terrain search resolves the positive ray outside the water-state
+audit block without snapping or extrapolation. All11 conditional rays now have
+terrain owners; captured rock/inferred flank provenance stays explicit. Old
+block-only controls unchanged;614 source hashes verified.59 focused PASS;
+683 PASS/13 unchanged FAIL overall. NOT outside-block water-state, finite-time,
+pressure or gameplay acceptance. Same LIVE cook17516:4200 state AND86,720 dry
+banks PASS, NOT settled(97.460484out/45.306955in). Next4250/local13000 needs marker
+AND both audits. No new FPS/visual claim; last25.907729/p9544.7123ms FAIL30.
+Full ordered scene/crew/normalization/regression/release scope remains OPEN.
+
+Previous: [single front ownership](../reconstruction-review-2026-09-07/normal-river-front-ownership.md).
 Exact whole-ray source partitions assign one common transfer with signed wet/dry
 domain references; overlap and mismatched beds reject, missing owners stay explicit.
 69 focused PASS; actual11 streams:10 paired,1 positive ray outside the audited
