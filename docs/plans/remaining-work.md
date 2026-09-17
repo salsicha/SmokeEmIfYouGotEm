@@ -3,7 +3,18 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [source-matched reconstruction installed in normal South Fork](../reconstruction-review-2026-09-07/source-matched-installed.md).
+Latest: [eight-worker gameplay review rejected; four-worker runtime restored](../reconstruction-review-2026-09-07/gameplay-worker-review.md).
+The completed fixed 4/8/8/4 comparison reduces solver cost but not frame p95 in
+both orders; every run FAIL30. The temporary gameplay flag is removed, the
+restoration build succeeds, six native and 35 Python tests PASS. Final ordinary
+profile is 27.726765 FPS / p95 43.0055 ms, still FAIL30. One earlier comparison
+is preserved as invalid due to duplicate renderer CSV headers; no auditor gate
+was relaxed. The 5350 s state AND all 86,720 dry-bank checks PASS, NOT settled
+(119.970991 out / 45.306955 in). Same cook6968 continues toward5400/local10000;
+that completed checkpoint needs BOTH audits. Installed4950 state and source-matched
+map remain unchanged. No new visual/physical acceptance; full ordered queue OPEN.
+
+Previous: [source-matched reconstruction installed in normal South Fork](../reconstruction-review-2026-09-07/source-matched-installed.md).
 Normal FullReach now saves matching revised terrain, captured-rock/inferred-flank
 solid and 4950 s water together; no preview flag or new rapid scenario. Exact
 prior scene packages are backed up. Five wet/finite native launch preflights,
@@ -4916,10 +4927,12 @@ South Fork is the scenario; Troublemaker is a rapid within it, never a separate
 menu entry. The erroneous Troublemaker scenario and main-menu button are removed.
 The five South Fork launch contracts still use the full river map; do not replace
 that river with the bounded 273 m reconstruction or claim a renamed rapid is
-full-river integration. The captured rapid assets and matched collision/flow are
-retained, but their integration into the normal South Fork run is still pending
-and is the next playable-delivery priority. Historical standalone-launch evidence
-does not establish that the current South Fork menu entry contains those assets.
+full-river integration. The source-matched rapid terrain, captured-rock/inferred-
+flank solid, collision and 4950 s initial water are now installed together in
+normal FullReach; see [the saved-scene and rebuilt-game evidence](../reconstruction-review-2026-09-07/source-matched-installed.md).
+This is bounded rapid reconstruction within the full river, not complete
+full-river reconstruction, settled flow or visual/contact acceptance. Historical
+standalone-launch evidence alone would not establish normal-map integration.
 Old `-RaftSimScenario=troublemaker_challenge` validation commands are obsolete;
 future rapid validation must use an explicit fixture without adding a scenario.
 The volume refinement remains an offline CPU reference
