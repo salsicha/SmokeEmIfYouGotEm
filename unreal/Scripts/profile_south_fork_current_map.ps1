@@ -8,11 +8,12 @@ param(
     [string[]]$ExtraGameArguments = @(),
     [switch]$NativePerformanceGate,
     [switch]$DetailStreamingReplay,
-    [switch]$StartupRenderReplay
+    [switch]$StartupRenderReplay,
+    [switch]$CheckpointResetReplay
 )
 $ErrorActionPreference = 'Stop'
 if ($Label -notmatch '^south-fork-[a-z0-9-]+$') { throw 'Use a fresh scoped capture label' }
-if (([int][bool]$NativePerformanceGate + [int][bool]$DetailStreamingReplay + [int][bool]$StartupRenderReplay) -gt 1) {
+if (([int][bool]$NativePerformanceGate + [int][bool]$DetailStreamingReplay + [int][bool]$StartupRenderReplay + [int][bool]$CheckpointResetReplay) -gt 1) {
     throw 'Choose one capture or validation mode'
 }
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
@@ -20,10 +21,18 @@ $logFile = Join-Path $projectRoot "unreal/Saved/Logs/$Label.log"
 $reportFile = Join-Path $projectRoot "unreal/Saved/RaftSimValidation/$Label-process.json"
 $gateFile = Join-Path $projectRoot "unreal/Saved/RaftSimValidation/$Label-gate.json"
 $detailReplayFile = Join-Path $projectRoot "unreal/Saved/RaftSimValidation/$Label-detail.json"
+$checkpointReplayFile = Join-Path $projectRoot "unreal/Saved/RaftSimValidation/$Label-checkpoint.json"
 if ((Test-Path -LiteralPath $logFile) -or (Test-Path -LiteralPath $reportFile)) { throw 'Preserve previous capture evidence' }
 if ($NativePerformanceGate -and (Test-Path -LiteralPath $gateFile)) { throw 'Preserve previous native gate evidence' }
 if ($DetailStreamingReplay -and (Test-Path -LiteralPath $detailReplayFile)) { throw 'Preserve previous detail replay evidence' }
+if ($CheckpointResetReplay -and (Test-Path -LiteralPath $checkpointReplayFile)) { throw 'Preserve previous checkpoint replay evidence' }
 $startupFrames = @(0..23 | ForEach-Object { Join-Path $projectRoot ('unreal/Saved/Screenshots/{0}_{1:000}.png' -f $Label, $_) })
+$checkpointFrames = @(foreach ($phase in 0..2) { foreach ($capture in 0..3) {
+    Join-Path $projectRoot "unreal/Saved/RaftSimValidation/$Label-checkpoint-phase-$phase-$capture.png"
+} })
+if ($CheckpointResetReplay -and @($checkpointFrames | Where-Object { Test-Path -LiteralPath $_ }).Count) {
+    throw 'Preserve previous checkpoint replay images'
+}
 if ($StartupRenderReplay -and @($startupFrames | Where-Object { Test-Path -LiteralPath $_ }).Count) {
     throw 'Preserve previous startup replay evidence'
 }
@@ -92,6 +101,7 @@ $report = [ordered]@{ cook_pid=$CookProcessId; cook_start_utc=$CookStartUtc; coo
 $report.detail_replay = [bool]$DetailStreamingReplay
 $report.detail_replay_passed = $null
 $report.startup_render_replay = [bool]$StartupRenderReplay
+$report.checkpoint_reset_replay = [bool]$CheckpointResetReplay
 if ($StartupRenderReplay) { $report.visual_accepted = $false }
 try {
     foreach ($item in $owned) {
@@ -130,6 +140,11 @@ try {
         # unchanged 900-second observation timeout. Never truncate it with CSV.
         $start.ArgumentList.Add('-ForceRes')
         $start.ArgumentList.Add("-RaftSimDetailStreamingReport=$detailReplayFile")
+    } elseif ($CheckpointResetReplay) {
+        # Real checkpoint APIs own the two discontinuities. No capture command
+        # may exit before both destination observation phases have completed.
+        $start.ArgumentList.Add('-ForceRes')
+        $start.ArgumentList.Add("-RaftSimCheckpointPlayReport=$checkpointReplayFile")
     } elseif ($StartupRenderReplay) {
         # Observe the ordinary gameplay camera from startup. No warm-up skip,
         # teleport, solver/time override, CSV shutdown or FPS acceptance.
@@ -146,7 +161,7 @@ try {
     $game = [Diagnostics.Process]::Start($start)
     # Native replay still fails itself at 900 seconds. The outer watchdog only
     # allows startup/report flushing; it does not alter a native acceptance gate.
-    $deadline = [DateTime]::UtcNow.AddSeconds($(if ($DetailStreamingReplay) { 960 } else { 240 }))
+    $deadline = [DateTime]::UtcNow.AddSeconds($(if ($DetailStreamingReplay -or $CheckpointResetReplay) { 960 } else { 240 }))
     while (-not $game.WaitForExit(1000)) {
         if ([DateTime]::UtcNow -ge $deadline) {
             $report.game_timeout = $true
@@ -156,7 +171,7 @@ try {
         }
     }
     $report.game_exit_code = $game.ExitCode
-    if (-not $NativePerformanceGate -and -not $DetailStreamingReplay -and -not $StartupRenderReplay -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
+    if (-not $NativePerformanceGate -and -not $DetailStreamingReplay -and -not $StartupRenderReplay -and -not $CheckpointResetReplay -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
         $csvFile = Join-Path $projectRoot "unreal/Saved/Profiling/CSV/$Label.csv"
         if (-not (Test-Path -LiteralPath $csvFile) -or (Get-Item -LiteralPath $csvFile).Length -eq 0) {
             throw 'Profiler exited without a nonempty CSV; no timing evidence'
@@ -164,21 +179,34 @@ try {
         $report.csv_file = $csvFile
         $report.csv_sha256 = (Get-FileHash -LiteralPath $csvFile -Algorithm SHA256).Hash.ToLowerInvariant()
     }
-    if ($StartupRenderReplay -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
-        $report.startup_frames = @()
-        foreach ($frame in $startupFrames) {
-            if (-not (Test-Path -LiteralPath $frame)) { throw 'Startup replay did not capture all 24 frames' }
+    if (($StartupRenderReplay -or $CheckpointResetReplay) -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
+        $frames = if ($CheckpointResetReplay) { $checkpointFrames } else { $startupFrames }
+        $frameEvidence = @()
+        foreach ($frame in $frames) {
+            if (-not (Test-Path -LiteralPath $frame)) { throw 'Rendered replay did not capture every required frame' }
             $header = [byte[]]::new(24)
             $stream = [IO.File]::OpenRead($frame)
             try { $read = $stream.Read($header, 0, $header.Length) } finally { $stream.Dispose() }
             if ($read -ne 24 -or [BitConverter]::ToString($header, 0, 16) -ne '89-50-4E-47-0D-0A-1A-0A-00-00-00-0D-49-48-44-52') {
-                throw 'Startup replay frame lacks a PNG IHDR'
+                throw 'Rendered replay frame lacks a PNG IHDR'
             }
             $width = ([int]$header[16] -shl 24) -bor ([int]$header[17] -shl 16) -bor ([int]$header[18] -shl 8) -bor $header[19]
             $height = ([int]$header[20] -shl 24) -bor ([int]$header[21] -shl 16) -bor ([int]$header[22] -shl 8) -bor $header[23]
-            if ($width -ne 1280 -or $height -ne 720) { throw 'Startup replay is not actual 1280x720' }
-            $report.startup_frames += [ordered]@{ path=$frame; width=$width; height=$height; sha256=(Get-FileHash -LiteralPath $frame).Hash.ToLowerInvariant() }
+            if ($width -ne 1280 -or $height -ne 720) { throw 'Rendered replay is not actual 1280x720' }
+            $frameEvidence += [ordered]@{ path=$frame; width=$width; height=$height; sha256=(Get-FileHash -LiteralPath $frame).Hash.ToLowerInvariant() }
         }
+        if ($CheckpointResetReplay) { $report.checkpoint_frames = $frameEvidence }
+        else { $report.startup_frames = $frameEvidence }
+    }
+    if ($CheckpointResetReplay) {
+        if (-not (Test-Path -LiteralPath $checkpointReplayFile)) { throw 'Native checkpoint report was not produced' }
+        $checkpointReplay = Get-Content -LiteralPath $checkpointReplayFile -Raw | ConvertFrom-Json
+        if ($checkpointReplay.schema -ne 'raftsim.checkpoint_actual_play.v1' -or $checkpointReplay.passed -isnot [bool]) {
+            throw 'Invalid native checkpoint replay report'
+        }
+        $report.checkpoint_replay_passed = $checkpointReplay.passed
+        $report.checkpoint_replay_file = $checkpointReplayFile
+        $report.checkpoint_replay_sha256 = (Get-FileHash -LiteralPath $checkpointReplayFile).Hash.ToLowerInvariant()
     }
     if ($NativePerformanceGate) {
         # Unreal's requested status can differ from the host process status.
@@ -218,3 +246,4 @@ if (@($report.processes | Where-Object { $_.suspend -eq 0 -and $_.resume -ne 0 }
 if ($report.game_timeout -or $report.game_exit_code -ne 0) { throw 'Capture did not finish successfully' }
 if ($NativePerformanceGate -and -not $report.gate_passed) { throw 'Native performance gate failed; see preserved gate report' }
 if ($DetailStreamingReplay -and -not $report.detail_replay_passed) { throw 'Native detail replay failed; see preserved replay report' }
+if ($CheckpointResetReplay -and -not $report.checkpoint_replay_passed) { throw 'Native checkpoint replay failed; see preserved replay report' }

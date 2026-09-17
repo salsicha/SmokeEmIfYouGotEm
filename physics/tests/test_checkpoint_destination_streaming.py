@@ -73,3 +73,32 @@ def test_failed_restart_keeps_score_and_progress_state():
     guard = restart.index("if (Raft != nullptr && !Raft->TryResetToCheckpoint()) return;")
     for mutation in ("LastProgressSample.bValid = false", "RunState =", "FinalScore =", "AwardedMedal ="):
         assert guard < restart.index(mutation)
+
+
+def test_actual_play_probe_uses_checkpoint_apis_without_repairing_observed_water():
+    probe = (ROOT / "Tests/RaftSimCheckpointPlayProbe.h").read_text(encoding="utf-8")
+    assert "RaftSimEphemeralProfile" in probe
+    assert "RaftSimCheckpointPlayReport=" in probe
+    assert "Raft->TryRestoreCheckpoint(Destination)" in probe
+    assert "Raft->TryResetToCheckpoint()" in probe
+    assert "Frame->Validate()" in probe and "if(!Covered)" in probe
+    assert "FreshFrames<100" in probe and "LastClock-FirstClock<3." in probe
+    assert "Phase==2" in probe and "GetStreamingSourceProviders().Num()!=ProvidersBefore" in probe
+    for forbidden in ("TeleportForTesting", "SetActorTransform", "Detail->Initialize",
+                      "SetScalarParameterValue", "ConfigureAtWorldPosition", "TimeDilation"):
+        assert forbidden not in probe
+
+
+def test_checkpoint_runner_requires_report_and_preserves_existing_replay_gates():
+    runner = (ROOT.parents[1] / "Scripts/profile_south_fork_current_map.ps1").read_text(encoding="utf-8")
+    assert "[switch]$CheckpointResetReplay" in runner
+    assert '"-RaftSimCheckpointPlayReport=$checkpointReplayFile"' in runner
+    assert "'raftsim.checkpoint_actual_play.v1'" in runner
+    assert "$checkpointReplay.passed -isnot [bool]" in runner
+    assert "$CheckpointResetReplay -and -not $report.checkpoint_replay_passed" in runner
+    assert "foreach ($phase in 0..2)" in runner and "foreach ($capture in 0..3)" in runner
+    assert "$width -ne 1280 -or $height -ne 720" in runner
+    assert "$report.checkpoint_frames = $frameEvidence" in runner
+    assert "finally {" in runner and "NtResumeProcess($item.item.handle)" in runner
+    detail = (ROOT / "Tests/RaftSimDetailStreamingPlayProbe.h").read_text(encoding="utf-8")
+    assert "Elapsed>=120. && Handoffs-FirstHandoff>=8 && NewFrames>=100 && LastClock-FirstClock>=60." in detail

@@ -3,7 +3,24 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [checkpoint reset destination preparation](../reconstruction-review-2026-09-07/checkpoint-reset-preparation.md).
+Latest: [actual-game checkpoint round trip](../reconstruction-review-2026-09-07/checkpoint-actual-play.md).
+Candidate actual South Fork reset >8km away and return PASS: three10s phases,
+168/256/182 fresh registered detail frames, wet contact, no leaked temporary
+terrain provider; all12 actual1280x720 captures retained. Startup24-frame replay
+also PASS with terrain/water/crew visible initially. Eight native tests and92
+focused Python checks PASS. Visual terrain/crest/froth/crew remain unaccepted;
+not30FPS evidence. Installed modules remain unchanged while SM5session9319/
+PID9976 runs; all63 shader inputs preserved, original workers still live.
+Same hydraulic11316:1550s state AND86,720 dry-bank checks PASS, NOT settled
+(outflow86.619794 versus inflow45.306955m3/s); next1600/local20000 both audits.
+NEXT terminal SM5 result, dyadic-return/exact-face correction, safe candidate
+installation and ordinary play, coupled nonlinear physics/convincing waves and
+froth, source-consistent terrain/boulders/collision,30FPS, normalization/source
+closure, Colorado -> Pacuare -> Futaleufu, Chilko/Zambezi/all-scene water, crew
+and release. Last26.784840FPS/p9543.5724ms still FAIL30. Troublemaker is only a
+South Fork rapid, never a menu scenario. Full objective remains open.
+
+Previous: [checkpoint reset destination preparation](../reconstruction-review-2026-09-07/checkpoint-reset-preparation.md).
 Rescue/restart resets now invoke a scenario-owned terrain/water preparation hook
 before moving the raft or repairing crew state. Cartesian destinations select a
 verified wet geographic packet; failed and reentrant resets retain the old pose
