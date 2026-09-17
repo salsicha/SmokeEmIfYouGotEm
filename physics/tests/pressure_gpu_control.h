@@ -48,6 +48,54 @@ std::vector<U> float_words(std::initializer_list<float> input)
 {
     std::vector<U> words(input.size());std::memcpy(words.data(),input.begin(),words.size()*4);return words;
 }
+bool test_pressure_activity_guard(const fs::path& bytecode,bool warp)
+{
+    ComPtr<ID3D11Device> device;ComPtr<ID3D11DeviceContext> context;
+    D3D_FEATURE_LEVEL level=D3D_FEATURE_LEVEL_11_0,got;
+    check(D3D11CreateDevice(nullptr,warp?D3D_DRIVER_TYPE_WARP:D3D_DRIVER_TYPE_HARDWARE,
+        nullptr,0,&level,1,D3D11_SDK_VERSION,&device,&got,&context));
+    const auto program=shader(device.Get(),bytecode);bool passed=true;U cases=0;
+    // Actual production phase 6, with an identity operator and exact integer
+    // sums. Include partial final groups, multi-group dispatch, each active
+    // pole, signed zero, and invalid-input early return. Sentinels prove that
+    // inactive/invalid dispatches leave outputs untouched rather than simply
+    // producing the same zero-force result as a skipped solve.
+    const U flags[][2]={{0,0},{0x80000000u,0},{0x3f800000u,0},{0,0x3f800000u},{0x3f800000u,0x3f800000u}};
+    for(U rows:{13u,33u})for(const auto& active:flags)for(U invalid:{0u,1u})
+    {
+        const U count=17*rows,groups=(count+255)/256;
+        Buffers b;std::vector<float> direction(count*4),sentinel(count*4,-7.f),partial(groups*4,-9.f),fraction(count,1.f);
+        for(U i=0;i<count*4;++i)direction[i]=float(i%4+1);
+        for(auto name:{"Center","Edges"})b.emplace(name,buffer(device.Get(),16,count));
+        b.emplace("Direction",buffer(device.Get(),16,count,direction.data()));
+        b.emplace("Scratch",buffer(device.Get(),16,count,sentinel.data()));
+        b.emplace("WValue",buffer(device.Get(),8,count));
+        b.emplace("Partial",buffer(device.Get(),16,groups,partial.data()));
+        b.emplace("NonbreakingFraction",buffer(device.Get(),4,count,fraction.data()));
+        U control[20]={};control[12]=active[0];control[13]=active[1];
+        U diagnostics[4]={invalid,0,0,0};
+        b.emplace("Control",buffer(device.Get(),16,5,control));
+        b.emplace("Diagnostics",buffer(device.Get(),4,4,diagnostics));
+        b.emplace("HarnessTag",buffer(device.Get(),4,32));
+        Constants values{{"GridSize",{17,rows}},{"Lengths",float_words({.4052787713439809f,.03916567310046354f})},
+            {"UseDispersionFraction",{1}}};
+        dispatch(device.Get(),context.Get(),program,b,values,groups);
+        const bool running=invalid==0 && ((active[0]|active[1])&0x7fffffffu)!=0;
+        const auto scratch=download(device.Get(),context.Get(),b.at("Scratch"));
+        std::vector<U> expectedScratch(count*4);const auto& expected=running?direction:sentinel;
+        std::memcpy(expectedScratch.data(),expected.data(),expectedScratch.size()*4);
+        if(running)for(U g=0;g<groups;++g)
+        {const U cells=std::min(256u,count-256*g);partial[4*g]=float(5*cells);partial[4*g+1]=float(25*cells);partial[4*g+2]=partial[4*g+3]=0;}
+        std::vector<U> expectedPartial(groups*4);std::memcpy(expectedPartial.data(),partial.data(),expectedPartial.size()*4);
+        const auto tags=download(device.Get(),context.Get(),b.at("HarnessTag"));
+        std::vector<U> expectedTags(32);expectedTags[13]=1;expectedTags[31]=14;
+        const bool match=scratch==expectedScratch && download(device.Get(),context.Get(),b.at("Partial"))==expectedPartial && tags==expectedTags;
+        passed &= match;++cases;
+        std::cout<<"guard_case="<<cases<<" cells="<<count<<" invalid="<<invalid<<" active_bits="<<active[0]<<'/'<<active[1]<<" pass="<<match<<'\n';
+    }
+    std::cout<<"activity_guard_cases="<<cases<<" activity_guard_pass="<<passed<<" step_accepted=0\n";
+    return passed;
+}
 bool run_pressure(ID3D11Device* device,ID3D11DeviceContext* context,const std::vector<Shader>& shaders,
     Buffers& transport,Constants values,U count,U groups,const std::vector<float>& fraction,
     const std::vector<float>& expectedForce,U index,const fs::path& trace={})

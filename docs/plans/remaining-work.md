@@ -3,7 +3,21 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [coupled SM5 pressure diagnostic checkpoint](../reconstruction-review-2026-09-07/coupled-pressure-sm5-checkpoint.md).
+Latest: [SM5 pressure activity and exact-rounding corrections](../reconstruction-review-2026-09-07/sm5-pressure-activity-and-exact-rounding.md).
+Hardware treated active `(1,1)` flags as inactive; an equivalent encoded-bit
+zero guard fixes the isolated phase and all 18 coupled hardware/WARP fixtures.
+54 focused tests PASS, including eight coupled/guard checks; the old shader fails the new guard
+regression. Production exact-rounding correction now applied: fresh 4,301-face
+fixtures PASS on both backends. No tolerances or physics gates relaxed.
+Native 33-test SM5 replay55459/PID36412 LIVE, all63 shader inputs now frozen.
+Installed DLLs unchanged; full-step, scene and 30FPS acceptance still OPEN.
+Fresh transport compile60207/PID28144 LIVE at phase3; combined suite queued.
+Same hydraulic36872:2000s state AND86,720 dry banks PASS, NOT settled
+(95.235040 out versus45.306955 in m3/s). Next2050/local5000 both audits.
+No snapshot promotion. Full remaining scene, later-river, crew and release scope
+below stays open; Troublemaker is only a rapid within South Fork.
+
+Previous: [coupled SM5 pressure diagnostic checkpoint](../reconstruction-review-2026-09-07/coupled-pressure-sm5-checkpoint.md).
 Standalone transport-to-pressure GPU integration is now testable without CPU
 pressure injection. Original transport tests: 13 PASS. Initial coupled tests:
 5 PASS / 1 FAIL; WARP passes all 18 cases, hardware fails eight moving cases.

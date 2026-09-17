@@ -268,7 +268,11 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
     {
         GroupInvalid=Diagnostics[0];
 #if RAFTSIM_ACCELERATION_PHASE >= 6 && RAFTSIM_ACCELERATION_PHASE <= 10
-        GroupInactive=all(Control[3].xy==0)?1:0;
+        // These are encoded boolean activity flags. On affected SM5 hardware,
+        // the float comparison can classify (1,1) as both zero. Compare the
+        // representations instead; masking the sign preserves +/-zero.
+        uint2 activeBits=asuint(Control[3].xy)&0x7fffffffu;
+        GroupInactive=(activeBits.x|activeBits.y)==0?1u:0u;
 #endif
     }
     GroupMemoryBarrierWithGroupSync();

@@ -153,6 +153,11 @@ int main(int argc,char** argv)
 {
     try
     {
+        if(argc==4 && std::string(argv[1])=="test-pressure-guard")
+        {
+            if(std::string(argv[3])!="hardware" && std::string(argv[3])!="warp")return 2;
+            return test_pressure_activity_guard(argv[2],std::string(argv[3])=="warp")?0:1;
+        }
         if((argc==4 || argc==5) && std::string(argv[1])=="compile-pressure")
         { compile_pressure(argv[2],argv[3],argc==5?argv[4]:"");return 0; }
         if(argc==6 && std::string(argv[1])=="compile")

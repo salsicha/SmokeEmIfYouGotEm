@@ -41,6 +41,15 @@ def test_original_full_coupled_fixture(artifacts, backend):
     assert all('pressure_tags=1' in row and 'coupled_pressure_pass=1' in row for row in rows)
 
 
+@pytest.mark.parametrize('backend', ['hardware', 'warp'])
+def test_actual_activity_guard_preserves_inactive_outputs(artifacts, backend):
+    result = subprocess.run([str(artifacts[0]), 'test-pressure-guard',
+                             str(artifacts[3] / 'acceleration-6.cso'), backend],
+                            capture_output=True, text=True, timeout=60)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert 'activity_guard_cases=20 activity_guard_pass=1 step_accepted=0' in result.stdout
+
+
 def resting_fixture(artifacts, tmp_path, damage=None):
     data = artifacts[2].read_bytes()
     x,y = struct.unpack_from('<2I', data, 12)

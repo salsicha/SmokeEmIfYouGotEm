@@ -51,7 +51,7 @@ RaftSimDyadic RaftSimDyadicMC(RaftSimDyadic back,RaftSimDyadic front)
     if(RaftSimDyadicSign(RaftSimDyadicSub(result,hi))==sign)result=hi;
     return result;
 }
-float RaftSimDyadicRound(RaftSimDyadic a)
+uint RaftSimDyadicRoundBits(RaftSimDyadic a)
 {
     uint sign=a.w[9]&0x80000000u;if(sign!=0)a=RaftSimDyadicNegate(a);
     int highest=-1;[unroll]for(uint i=0;i<10;++i)if(a.w[i]!=0)highest=int(32*i)+firstbithigh(a.w[i]);
@@ -63,12 +63,13 @@ float RaftSimDyadicRound(RaftSimDyadic a)
     [unroll]for(uint i=0;i<10;++i)
     {if(i<ri)sticky=sticky || a.w[i]!=0;if(i==ri && ro!=0)sticky=sticky || (a.w[i]&((1u<<ro)-1u))!=0;}
     if(rb && (sticky || (q&1u)!=0))++q;
-    if(q==0)return asfloat(sign);
+    if(q==0)return sign;
     if(q>=0x1000000u){q>>=1;++exponent;}
-    if(exponent>127)return asfloat(sign|0x7f800000u);
-    if(exponent< -126 && q<0x800000u)return asfloat(sign|q);
-    return asfloat(sign|(uint(max(exponent,-126)+127)<<23)|(q&0x7fffffu));
+    if(exponent>127)return sign|0x7f800000u;
+    if(exponent< -126 && q<0x800000u)return sign|q;
+    return sign|(uint(max(exponent,-126)+127)<<23)|(q&0x7fffffu);
 }
+float RaftSimDyadicRound(RaftSimDyadic a){return asfloat(RaftSimDyadicRoundBits(a));}
 bool RaftSimPositiveDepth(float h){uint b=asuint(h);return b>0 && b<0x7f800000u;}
 struct RaftSimExactPolynomial { RaftSimDyadic h; RaftSimDyadic z; };
 RaftSimExactPolynomial RaftSimExactPolynomialAt(float3 depth,float3 bed,bool active,float direction)
