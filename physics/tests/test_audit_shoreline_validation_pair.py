@@ -41,6 +41,11 @@ def test_missing_pairs_or_single_frame_rejected():
     data = fixture(); data['pairs'].pop()
     with pytest.raises(ValueError):
         summarize(data)
+    data = fixture()
+    for row in data['pairs']:
+        row['frame'] = 120
+    with pytest.raises(ValueError):
+        summarize(data)
 
 
 def test_versioned_report_requires_explicit_candidate_identity():
@@ -50,10 +55,5 @@ def test_versioned_report_requires_explicit_candidate_identity():
     data['candidate_kind'] = 'parallel-fused'
     assert summarize(data)['candidate_kind'] == 'parallel-fused'
     data['schema'] = 'unknown'
-    with pytest.raises(ValueError):
-        summarize(data)
-    data = fixture()
-    for row in data['pairs']:
-        row['frame'] = 120
     with pytest.raises(ValueError):
         summarize(data)

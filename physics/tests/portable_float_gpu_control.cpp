@@ -1,5 +1,7 @@
 // Windows SM5 regression: execute FXC output, not a CPU translation of HLSL.
-// Usage: portable_float_gpu_control shader.cso exact-scalar-fixture.bin [warp]
+// Usage: portable_float_gpu_control shader.cso exact-fixture.bin [warp]
+// Scalar records remain unchanged; face records carry four float4 inputs and
+// eight exact output words. Check every output plus an independent dispatch tag.
 // Compile with cl /EHsc /std:c++17 ... d3d11.lib (Windows SDK required).
 #include <d3d11.h>
 #include <wrl/client.h>
@@ -28,15 +30,17 @@ int main(int argc,char** argv)
         std::vector<char> code{std::istreambuf_iterator<char>(codeFile),{}};
         Word header[3]={};fixture.read(reinterpret_cast<char*>(header),sizeof(header));
         if(code.empty() || !fixture || header[0]!=0x52534650 || header[1]<1 || header[1]>10 ||
-            header[1]==5 || header[1]==9 || header[2]<32 || header[2]>65536)return 2;
+            header[2]<32 || header[2]>65536)return 2;
         const Word operation=header[1]-1;
+        const bool face=operation==4 || operation==8;
+        const Word inputVectors=face?4:1,outputVectors=face?3:1,expectedWords=face?8:1;
         const Word count=header[2],padded=(count+255u)/256u*256u;
-        std::vector<Vector> input(padded);
-        std::vector<Word> expected(count);
+        std::vector<Vector> input(padded*inputVectors);
+        std::vector<Word> expected(count*expectedWords);
         for(Word i=0;i<count;++i)
         {
-            fixture.read(reinterpret_cast<char*>(input[i].data()),operation==0?12:16);
-            fixture.read(reinterpret_cast<char*>(&expected[i]),4);
+            fixture.read(reinterpret_cast<char*>(input[i*inputVectors].data()),face?64:operation==0?12:16);
+            fixture.read(reinterpret_cast<char*>(&expected[i*expectedWords]),4*expectedWords);
             if(!fixture)return 2;
         }
         char extra;if(fixture.read(&extra,1))return 2;
@@ -48,12 +52,13 @@ int main(int argc,char** argv)
             nullptr,0,&requested,1,D3D11_SDK_VERSION,&device,&obtained,&context));
         ComPtr<ID3D11ComputeShader> shader;
         Check(device->CreateComputeShader(code.data(),code.size(),nullptr,&shader));
-        D3D11_BUFFER_DESC desc={};desc.ByteWidth=padded*sizeof(Vector);
+        D3D11_BUFFER_DESC desc={};desc.ByteWidth=padded*inputVectors*sizeof(Vector);
         desc.Usage=D3D11_USAGE_DEFAULT;desc.BindFlags=D3D11_BIND_SHADER_RESOURCE;
         desc.MiscFlags=D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;desc.StructureByteStride=sizeof(Vector);
         D3D11_SUBRESOURCE_DATA initial={};initial.pSysMem=input.data();
         ComPtr<ID3D11Buffer> in,out,read;
         Check(device->CreateBuffer(&desc,&initial,&in));
+        desc.ByteWidth=padded*outputVectors*sizeof(Vector);
         desc.BindFlags=D3D11_BIND_UNORDERED_ACCESS;
         Check(device->CreateBuffer(&desc,nullptr,&out));
         desc.Usage=D3D11_USAGE_STAGING;desc.BindFlags=0;desc.CPUAccessFlags=D3D11_CPU_ACCESS_READ;
@@ -74,6 +79,24 @@ int main(int argc,char** argv)
         Word wrong=0,wideWrong=0,transportWrong=0,operationWrong=0;
         for(Word i=0;i<count;++i)
         {
+            if(face)
+            {
+                for(Word word=0;word<expectedWords;++word)
+                {
+                    const Word got=actual[i*outputVectors+word/4][word%4];
+                    const Word want=expected[i*expectedWords+word];
+                    if(got!=want)
+                    {
+                        if(wrong<16)std::cerr<<"case="<<i<<" word="<<word<<std::hex
+                            <<" expected="<<want<<" actual="<<got<<std::dec<<'\n';
+                        ++wrong;
+                    }
+                }
+                const auto& tag=actual[i*outputVectors+2];
+                transportWrong+=tag[0]!=input[i*inputVectors][0];
+                operationWrong+=tag[1]!=operation || tag[2]!=i || tag[3]!=0xface0001u;
+                continue;
+            }
             if(actual[i][0]!=expected[i])
             {
                 if(wrong<16)std::cerr<<"case="<<i<<std::hex<<" expected="<<expected[i]

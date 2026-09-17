@@ -3,7 +3,23 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [actual-game checkpoint round trip](../reconstruction-review-2026-09-07/checkpoint-actual-play.md).
+Latest: [shoreline validation and full-face SM5 evidence](../reconstruction-review-2026-09-07/shoreline-validation-and-full-face-sm5.md).
+Final isolated shoreline candidate passes eight native tests;64 actual-input
+pairs preserve exact decisions and reduce validation1.842108->0.400478ms,
+faster in both orders. Ordinary300-frame1280x720D3D12 capture still FAILS30:
+27.068531FPS/p9543.391ms, unchanged60–240 window. Not visual/sustained acceptance.
+Standalone full-face SM5 harness reproduces245 bad output words on4,301 exact
+faces; local dyadic-return correction passes all4,301 faces on hardware/WARP.
+Scaled4,317 faces and64,078 scalar cases also pass both;47 focused tests PASS.
+Correction remains unapplied while original SM5session9319/PID9976/workers run;
+all63 shader inputs and installed modules preserved. Cook11316 reached1700s,
+state AND86,720 dry-bank checks PASS, NOT settled:90.210308 out versus45.306955
+in m3/s. Next1750/local23000 both audits after complete marker. Full physics,
+terrain/boulders/collision, convincing waves/froth,30FPS, safe installation,
+source closure/normalization, Colorado -> Pacuare -> Futaleufu, Chilko/Zambezi/
+all-scene water, crew and release remain OPEN. Troublemaker is only a rapid.
+
+Previous: [actual-game checkpoint round trip](../reconstruction-review-2026-09-07/checkpoint-actual-play.md).
 Candidate actual South Fork reset >8km away and return PASS: three10s phases,
 168/256/182 fresh registered detail frames, wet contact, no leaked temporary
 terrain provider; all12 actual1280x720 captures retained. Startup24-frame replay
