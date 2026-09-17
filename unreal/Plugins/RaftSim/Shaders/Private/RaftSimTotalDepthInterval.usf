@@ -1,4 +1,5 @@
 #include "/Engine/Public/Platform.ush"
+#include "RaftSimPortableClock.ush"
 float2 FirstTime;
 float Duration;
 uint BoundaryMode;
@@ -12,9 +13,8 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     float4 p=PreviousProgress[0];
     // Error-free normalization accepts equivalent high/low encodings without
     // accepting a different instant, resetting the clock, or adding a tolerance.
-    precise float hi=p.x+p.y;
-    precise float v=hi-p.x;
-    precise float lo=(p.x-(hi-v))+(p.y-v);
+    float2 normalized=RaftSimClockTwoSum(p.x,p.y);
+    float hi=normalized.x,lo=normalized.y;
     bool valid=all(isfinite(p)) && hi==FirstTime.x && lo==FirstTime.y && p.z==0 && p.w>=0 && p.w<=1./120. &&
         PreviousSummary[2]==1 && PreviousSummary[3]==BoundaryMode &&
         PreviousSummary[0]<=4096 && PreviousSummary[1]<=PreviousSummary[0] &&

@@ -1,0 +1,23 @@
+#ifndef RAFTSIM_PORTABLE_CLOCK
+#define RAFTSIM_PORTABLE_CLOCK
+#include "RaftSimPortableFloat.ush"
+// Preserve each nearest/even operation of compensated clock arithmetic across
+// shader compiler paths. Integer-rounded add/sub prevents contraction or
+// algebraic elimination of the low word; no clock reset or tolerance is added.
+float2 RaftSimClockTwoSum(float a,float b)
+{
+    float hi=RaftSimPortableAdd(a,b);
+    float v=RaftSimPortableSub(hi,a);
+    float lo=RaftSimPortableAdd(RaftSimPortableSub(a,RaftSimPortableSub(hi,v)),RaftSimPortableSub(b,v));
+    return float2(hi,lo);
+}
+float2 RaftSimClockAdvance(float2 previous,float dt)
+{
+    float2 base=RaftSimClockTwoSum(previous.x,previous.y);
+    float2 step=RaftSimClockTwoSum(base.x,dt);
+    float error=RaftSimPortableAdd(step.y,base.y);
+    float hi=RaftSimPortableAdd(step.x,error);
+    float lo=RaftSimPortableSub(error,RaftSimPortableSub(hi,step.x));
+    return float2(hi,lo);
+}
+#endif

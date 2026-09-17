@@ -3,7 +3,22 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [common local inlet lateral flux](../reconstruction-review-2026-09-07/normal-river-inlet-lateral-flux.md).
+Latest: [native compensated-clock recovery](../reconstruction-review-2026-09-07/sm5-compensated-clock-recovery.md).
+Original native SM5 replay55459 is TERMINAL:5 PASS/28 FAIL, not hung/waiting.
+Portable clock normalization/addition preserves the low word without changing
+dt, endpoint, state or rejection gates. Same33-test replay43990 is TERMINAL:
+32 PASS/1 FAIL;27 recovered tests,64 shader hashes verified, fixtures unchanged.
+Only LiquidPrescribedNormalGPU cases44/56 still fail exact position comparison.
+Combined standalone hardware/WARP regression60 PASS, no skips or gate changes.
+Direct-FXC baseline AND candidate pass isolated clock tests; the exact native
+compiler-path cause remains unproven. No live native shader freeze remains.
+Same hydraulic cook36872 LIVE:2450s state AND86,720 dry banks PASS, NOT settled
+(96.111428 out versus45.306955 in m3/s). Next2500/local14000 needs both audits.
+Next remaining native position correction, coupled front/energy/bed physics,
+actual playable integration/reference comparisons and performance validation.
+Last28.057157FPS/p9541.2354ms still FAIL30. Full ordered scope below stays OPEN.
+
+Previous: [common local inlet lateral flux](../reconstruction-review-2026-09-07/normal-river-inlet-lateral-flux.md).
 Bounded mass/XY momentum transfer now uses the existing zero-normal dry-front
 rarefaction on the original side ray, with matching wet-debit/dry-credit bounds.
 Nine of17 actual routed pieces have positive sideways transfer. All11 original

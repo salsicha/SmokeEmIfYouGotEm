@@ -1,5 +1,6 @@
 #include "/Engine/Public/Platform.ush"
 #include "RaftSimPortableFloat.ush"
+#include "RaftSimPortableClock.ush"
 uint Count;
 uint BoundaryCount;
 uint UseIntervalEnd;
@@ -33,17 +34,14 @@ bool ValidState(float4 s)
 }
 float2 TwoSum(float a,float b)
 {
-    precise float hi=a+b;
-    precise float v=hi-a;
-    precise float lo=(a-(hi-v))+(b-v);
-    return float2(hi,lo);
+    return RaftSimClockTwoSum(a,b);
 }
 float RemainingToEnd(float2 time)
 {
     precise float2 a=TwoSum(IntervalEnd.x,-time.x);
     precise float2 b=TwoSum(IntervalEnd.y,-time.y);
     precise float2 c=TwoSum(a.x,b.x);
-    precise float tail=(a.y+b.y)+c.y;
+    float tail=RaftSimPortableAdd(RaftSimPortableAdd(a.y,b.y),c.y);
     precise float2 r=TwoSum(c.x,tail);
     // Round DOWN only the proposed duration, never the conserved state or clock.
     // Any residual remains real unconsumed time for a subsequent accepted step.
@@ -108,15 +106,9 @@ void MainCS(uint3 id:SV_DispatchThreadID)
         // Normalize an equivalent hi/lo encoding before adding dt. Otherwise
         // adding the new rounding residual to a large low word loses it.
         // Canonical inputs retain exactly their original two words.
-        precise float baseHi=previous.x+previous.y;
-        precise float baseV=baseHi-previous.x;
-        precise float baseLo=(previous.x-(baseHi-baseV))+(previous.y-baseV);
-        precise float sum=baseHi+dt;
-        precise float v=sum-baseHi;
-        precise float error=(baseHi-(sum-v))+(dt-v)+baseLo;
-        precise float hi=sum+error;
-        precise float lo=error-(hi-sum);
-        float remaining=UseIntervalEnd!=0?RemainingToEnd(float2(hi,lo)):(dt==previous.z?0:previous.z-dt);
+        float2 advanced=RaftSimClockAdvance(previous.xy,dt);
+        float hi=advanced.x,lo=advanced.y;
+        float remaining=UseIntervalEnd!=0?RemainingToEnd(float2(hi,lo)):(dt==previous.z?0:RaftSimPortableSub(previous.z,dt));
         if(!isfinite(hi) || !isfinite(lo) || !isfinite(remaining) || remaining<0 || remaining==previous.z || (hi==previous.x && lo==previous.y))
         {Diagnostics[2]|=16u;accept=false;}
         else next=float4(hi,lo,remaining,min(1./120.,remaining));
