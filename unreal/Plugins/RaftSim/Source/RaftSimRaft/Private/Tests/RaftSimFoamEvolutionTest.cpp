@@ -1,6 +1,7 @@
 #include "Misc/AutomationTest.h"
 #include "RaftSimCommittedWaterClock.h"
 #include "RaftSimFoamEvolution.h"
+#include "RaftSimFoamTransportFrame.h"
 #include <limits>
 
 #if WITH_DEV_AUTOMATION_TESTS
@@ -39,6 +40,33 @@ bool FRaftSimFoamEvolutionTest::RunTest(const FString&)
         FMath::Lerp(FMath::Lerp(Field[0],Field[1],.5f),FMath::Lerp(Field[3],Field[4],.5f),.5f));
     for(const auto P : {FVector2f(-.01f,1),FVector2f(2.01f,1),FVector2f(1,-.01f),FVector2f(1,2.01f)})
         TestEqual(TEXT("new domain cannot inherit extrapolated edge foam"),RaftSimFoamEvolution::RemapHeld(Field,3,3,P.X,P.Y),0.f);
+    return true;
+}
+#endif
+
+#if WITH_DEV_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimDirectionalFoamSourceTest,"RaftSim.Water.DirectionalFoamSource",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimDirectionalFoamSourceTest::RunTest(const FString&)
+{
+    using RaftSimFoamTransport::RisingSurfaceSlope;
+    TestEqual(TEXT("descending supercritical chute is not itself aeration"),RisingSurfaceSlope({-.4,0},{8,0}),0.f);
+    TestEqual(TEXT("rising face has directional steepness"),RisingSurfaceSlope({.4,0},{8,0}),.4f);
+    TestEqual(TEXT("cross-current bank slope is not a rising wave"),RisingSurfaceSlope({0,.9},{8,0}),0.f);
+    TestEqual(TEXT("northbound rising wave is retained"),RisingSurfaceSlope({0,.4},{0,8}),.4f);
+    TestEqual(TEXT("opposed relief cancels instead of manufacturing steepness"),RisingSurfaceSlope({.4-.4,0},{8,0}),0.f);
+    TestEqual(TEXT("still water cannot generate directional source"),RisingSurfaceSlope({.4,.4},{0,0}),0.f);
+    for(double Angle : {0.,.37,1.2,2.7,4.1})
+    {
+        const auto Rotate=[Angle](FVector2D V){return FVector2D(V.X*FMath::Cos(Angle)-V.Y*FMath::Sin(Angle),
+            V.X*FMath::Sin(Angle)+V.Y*FMath::Cos(Angle));};
+        TestTrue(TEXT("rotation does not change source"),FMath::Abs(RisingSurfaceSlope(Rotate({.3,.2}),Rotate({4,3}))-.36f)<1.e-7f);
+    }
+    TestEqual(TEXT("reflection preserves source"),RisingSurfaceSlope({.3,-.2},{4,-3}),.36f);
+    TestEqual(TEXT("speed scale does not change slope"),RisingSurfaceSlope({.3,.2},{40,30}),.36f);
+    TestEqual(TEXT("nonfinite state does not produce source"),RisingSurfaceSlope({.3,.2},{std::numeric_limits<double>::quiet_NaN(),1}),0.f);
+    TestEqual(TEXT("old foam still travels through a nonbreaking chute"),
+        RaftSimFoamEvolution::Resolve(.6f,RisingSurfaceSlope({-.4,0},{8,0}),.3f,0.f,1.f,false),.6f);
     return true;
 }
 #endif

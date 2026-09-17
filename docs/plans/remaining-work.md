@@ -3,7 +3,20 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [current runtime contract checks](../reconstruction-review-2026-09-07/current-runtime-contracts.md).
+Latest: [flow-direction-aware foam onset installed](../reconstruction-review-2026-09-07/directional-foam-source.md).
+Normal South Fork generic foam now follows positive along-current surface rise;
+crest/wake sources and transported foam remain. Same-input generic source sum
+263.615591 -> 20.453188; NOT an air-volume or visual acceptance measurement.
+37 candidate / eight ordinary installed native tests PASS. Expanded Python
+79 PASS / seven older source-contract FAIL, reproduced against HEAD unchanged.
+Actual recordings fully decoded and sampled; broad froth/abrupt mean face remain.
+Installed default ABBA runs 28.287908/27.489729 FPS, p95 39.8540/41.6582 ms:
+FAIL 30 FPS; mixed comparison, no repeatable performance gain claimed.
+Cook 4700/4750/4800 s passes BOTH state and dry-bank audits, NOT settled
+(4800 s 111.692445 out / 45.306955 in). Next 4850/local25000 needs BOTH audits.
+Full physical, scene, crew, regression and release scope remains OPEN.
+
+Previous: [current runtime contract checks](../reconstruction-review-2026-09-07/current-runtime-contracts.md).
 Five stale source checks repaired; 18 negative controls guard actual regressions.
 70 focused Python tests and six ordinary installed native tests PASS. No runtime
 or asset change, no new hydraulic/visual/FPS acceptance; the thirteen previously

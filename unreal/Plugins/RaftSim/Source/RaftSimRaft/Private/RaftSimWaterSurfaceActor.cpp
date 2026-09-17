@@ -4038,6 +4038,18 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     const double RefreshStartSeconds = FPlatformTime::Seconds();
     const bool bCrestLocalizedFoam = bSharedBreakingReliefEnabled &&
         CVarRaftSimChilkoCrestFoam.GetValueOnGameThread() != 0;
+    bool bDirectionalFoamSource = bCartesianFlow && bSingleLiveWaterSurfaceEnabled &&
+        GetWorld() && GetWorld()->GetMapName().Contains(TEXT("L_SouthForkAmerican_FullReach"));
+    FString FoamSourceAuditPath;
+#if !UE_BUILD_SHIPPING
+    static const bool bLegacyGenericFoamSource=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyGenericFoamSource"));
+    bDirectionalFoamSource=bDirectionalFoamSource && !bLegacyGenericFoamSource;
+    if (GetWorld() && GetWorld()->GetTimeSeconds()>=10.f)
+        FParse::Value(FCommandLine::Get(),TEXT("RaftSimFoamSourceAudit="),FoamSourceAuditPath);
+    if (!FoamSourceAuditPath.IsEmpty() && FPaths::FileExists(FoamSourceAuditPath))FoamSourceAuditPath.Reset();
+#endif
+    TArray<FVector4f> FoamSourceAudit;
+    if (!FoamSourceAuditPath.IsEmpty())FoamSourceAudit.SetNumZeroed(Vertices.Num());
     const float PreviousGridCenterStationM = CurvedGridCenterStationM;
     const float PreviousGridCenterNorthM = CartesianGridCenterNorthM;
     RecenterCurvedGrid();
@@ -5320,7 +5332,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // chutes stay green while rough-bed riffles still break
                 // white; the explicit site, tail, wake, and pocket sources
                 // add their aeration regardless of this gate.
-                const float SurfaceWorkingSlope =
+                const float LegacyWorkingSlope =
                     FMath::Abs(BaseStationSlope) +
                     FMath::Abs(StandingWave.StationSlope *
                         ResolvedPresentationStandingWaveScale) +
@@ -5330,10 +5342,22 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     FMath::Abs(ReliefLateralSlope) +
                     FMath::Abs(BoulderWakeStationSlope) +
                     FMath::Abs(BoulderWakeLateralSlope);
+                const FVector2D WorkingGradient(
+                    BaseStationSlope+StandingWave.StationSlope*ResolvedPresentationStandingWaveScale+
+                        ReliefStationSlope+BoulderWakeStationSlope,
+                    BaseLateralSlope+StandingWave.LateralSlope*ResolvedPresentationStandingWaveScale+
+                        ReliefLateralSlope+BoulderWakeLateralSlope);
+                const float SurfaceWorkingSlope = bDirectionalFoamSource
+                    ? RaftSimFoamTransport::RisingSurfaceSlope(WorkingGradient,
+                        FVector2D(Sample.VelocityMetersPerSecond.X,Sample.VelocityMetersPerSecond.Y))
+                    : LegacyWorkingSlope;
                 const float RoughnessGate = FMath::SmoothStep(
                     0.015f, 0.06f, SurfaceWorkingSlope);
                 Foam = RoughnessGate *
                     FMath::Clamp((Froude - 0.78f) / 1.25f, 0.0f, 1.0f);
+                float LegacyFoam = FoamSourceAudit.IsEmpty() ? 0.f : FMath::SmoothStep(0.015f,0.06f,LegacyWorkingSlope)*
+                    FMath::Clamp((Froude-.78f)/1.25f,0.f,1.f);
+                if (!FoamSourceAudit.IsEmpty())FoamSourceAudit[Index]=FVector4f(LegacyFoam,Foam,0,0);
                 // Standing-wave crests aerate at their tops: a wave train
                 // below a drop reads as alternating white crest caps over
                 // green troughs, not a uniform sheet. Keyed to the same
@@ -5344,6 +5368,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     ResolvedPresentationStandingWaveScale;
                 if (StandingCrestM > 0.045f && Froude > 0.6f)
                 {
+                    LegacyFoam = FMath::Max(LegacyFoam,
+                        0.55f*FMath::Clamp((StandingCrestM-0.045f)/0.14f,0.f,1.f));
                     Foam = FMath::Max(
                         Foam,
                         0.55f * FMath::Clamp(
@@ -5362,9 +5388,15 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                 ? FMath::Max(HydraulicRelief, 0.0f)
                                 : HydraulicRelief);
                 Foam = FMath::Max(Foam, 0.72f * HydraulicFeatureEnergy);
+                LegacyFoam=FMath::Max(LegacyFoam,0.72f*HydraulicFeatureEnergy);
                 // Wake aeration joins solver foam; the boulder core fade
                 // keeps froth off the hole opened over exposed rock.
                 Foam = FMath::Max(Foam * BoulderCoreFade, WakeFoamAdd);
+                if (!FoamSourceAudit.IsEmpty())
+                {
+                    FoamSourceAudit[Index].Z=FMath::Max(LegacyFoam*BoulderCoreFade,WakeFoamAdd);
+                    FoamSourceAudit[Index].W=Foam;
+                }
                 if (WakeFoamAdd > 0.04f)
                 {
                     ++WakeFoamVertexCount;
@@ -6455,6 +6487,39 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
 
     Perf.Mark(TEXT("breaking_carve"));
     // --- Persistent advected foam ----------------------------------------
+    if (!FoamSourceAudit.IsEmpty())
+    {
+        double OldGeneric=0,NewGeneric=0,OldFinal=0,OldFinalLower=0,NewFinal=0;
+        int32 Wet=0,Reduced=0,Increased=0;
+        for(int32 I=0;I<Vertices.Num();++I)if(WetVertexMask[I])
+        {
+            const auto& A=FoamSourceAudit[I];
+            // Every intervening crest/pocket/boil operation takes a maximum.
+            // Recover their independent contribution where they exceed the
+            // candidate background; keep equality ambiguous rather than
+            // claiming an exact legacy total in that case.
+            OldGeneric+=A.X;NewGeneric+=A.Y;NewFinal+=SourceFoam[I];
+            OldFinal+=FMath::Max(A.Z,SourceFoam[I]);
+            OldFinalLower+=SourceFoam[I]>A.W ? FMath::Max(A.Z,SourceFoam[I]) : A.Z;
+            ++Wet;Reduced+=A.Y<A.X;Increased+=A.Y>A.X;
+        }
+        const auto Report=MakeShared<FJsonObject>();
+        Report->SetStringField(TEXT("schema"),TEXT("raftsim.directional_foam_source.v1"));
+        Report->SetStringField(TEXT("scope"),TEXT("Same live source input; optical source onset only, not air-entrainment measurement or visual acceptance"));
+        Report->SetBoolField(TEXT("directional_source"),bDirectionalFoamSource);
+        Report->SetNumberField(TEXT("wet_vertices"),Wet);
+        Report->SetNumberField(TEXT("generic_reduced_vertices"),Reduced);
+        Report->SetNumberField(TEXT("generic_increased_vertices"),Increased);
+        Report->SetNumberField(TEXT("legacy_generic_sum"),OldGeneric);
+        Report->SetNumberField(TEXT("directional_generic_sum"),NewGeneric);
+        Report->SetNumberField(TEXT("legacy_final_source_sum_upper_bound"),OldFinal);
+        Report->SetNumberField(TEXT("legacy_final_source_sum_lower_bound"),OldFinalLower);
+        Report->SetNumberField(TEXT("current_final_source_sum"),NewFinal);
+        Report->SetNumberField(TEXT("committed_water_seconds"),WaterAdapter->GetCommittedStepSeconds());
+        FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
+        const bool Saved=FFileHelper::SaveStringToFile(Json,*FoamSourceAuditPath);
+        UE_LOG(LogTemp,Display,TEXT("DirectionalFoamSourceAudit wet=%d reduced=%d increased=%d saved=%d"),Wet,Reduced,Increased,Saved);
+    }
     // Semi-Lagrangian: each wet vertex looks upstream along the sampled flow
     // into the previous foam field, decays what it finds through the half-life,
     // and takes the maximum with this refresh's generation. Foam therefore

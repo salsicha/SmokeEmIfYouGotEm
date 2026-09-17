@@ -4,6 +4,18 @@
 
 namespace RaftSimFoamTransport
 {
+// A smooth descending chute is not a breaking source merely because it is
+// steep. Use rise along the current, in the same hydraulic coordinate frame.
+// This is an optical source-onset proxy, not a measured air-entrainment rate.
+// Resolved crest/wake sources and previously transported foam are independent.
+inline float RisingSurfaceSlope(const FVector2D& Gradient,const FVector2D& Velocity)
+{
+    const double Speed=Velocity.Size();
+    if (!FMath::IsFinite(Speed) || Speed<=0. || !FMath::IsFinite(Gradient.X) ||
+        !FMath::IsFinite(Gradient.Y)) return 0.f;
+    return float(FMath::Max(0.,FVector2D::DotProduct(Gradient,Velocity/Speed)));
+}
+
 // Source-generation budget only. Existing advected foam is not multiplied by
 // this weight: a nonspilling wave can still receive a transported foam trail.
 inline float BreakingSourceWeight(float PresentationWeight,float SpillingFraction,bool bUseHydraulicBudget)
