@@ -1,5 +1,6 @@
 #pragma once
 #include "/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidPhysicalFrame.ush"
+#include "RaftSimPortableClock.ush"
 
 // Finish an ALREADY prescribed inlet-plane displacement in the native float
 // position representation. A tangential move on a rotated plane generally has
@@ -7,16 +8,42 @@
 // dominant component, instead of allowing roundoff to accumulate outwards.
 // Only roundoff residual from the prior normal projection is corrected here.
 // This is not an exit-classifier tolerance or an extension of the physical box.
+FDFScalar RaftSimPrescribedTwoProduct(float a,float b)
+{
+    float high=RaftSimPortableMul(a,b);
+    // Exact product-minus-rounded-product, independent of SM5 mad/fusion.
+    float low=RaftSimPortableEuler(-high,a,b);
+    return MakeDFScalar(high,low);
+}
+FDFScalar RaftSimPrescribedAdd(FDFScalar a,FDFScalar b)
+{
+    float2 s=RaftSimClockTwoSum(a.High,b.High),t=RaftSimClockTwoSum(a.Low,b.Low);
+    s=RaftSimClockTwoSum(s.x,RaftSimPortableAdd(s.y,t.x));
+    s=RaftSimClockTwoSum(s.x,RaftSimPortableAdd(s.y,t.y));
+    return MakeDFScalar(s.x,s.y);
+}
+FDFScalar RaftSimPrescribedNormalDot(float3 position,float3 start,float3 normal)
+{
+    FDFScalar result=DFPromote(0.f);
+    [loop]for(int j=0;j<3;++j)
+    {
+        float2 displacement=RaftSimClockTwoSum(position[j],-start[j]);
+        result=RaftSimPrescribedAdd(result,RaftSimPrescribedAdd(
+            RaftSimPrescribedTwoProduct(displacement.x,normal[j]),
+            RaftSimPrescribedTwoProduct(displacement.y,normal[j])));
+    }
+    return result;
+}
 float3 RaftSimLiquidPrescribedNormalPosition(float3 start,float3 candidate,float3 inwardNormal,float travel)
 {
     int axis=abs(inwardNormal.x)>=abs(inwardNormal.y)?0:1;
-    FDFScalar actual=RaftSimLiquidPhysicalDot(DFTwoSum(candidate,-start),inwardNormal);
+    FDFScalar actual=RaftSimPrescribedNormalDot(candidate,start,inwardNormal);
     FDFScalar residual=DFSubtract(actual,travel);
     float corrected=DFDemote(DFSubtract(DFPromote(candidate[axis]),DFDivide(residual,inwardNormal[axis])));
     // FXC cannot address a vector component through a variable l-value. Keep
     // the same dominant-axis arithmetic and store only that named component.
     if(axis==0) candidate.x=corrected; else candidate.y=corrected;
-    actual=RaftSimLiquidPhysicalDot(DFTwoSum(candidate,-start),inwardNormal);
+    actual=RaftSimPrescribedNormalDot(candidate,start,inwardNormal);
     if(DFLess(actual,travel))
     {
         float value=candidate[axis];
