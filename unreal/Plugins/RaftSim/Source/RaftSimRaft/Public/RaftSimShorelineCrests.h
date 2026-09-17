@@ -14,6 +14,8 @@ struct FRaftSimShorelineCrestInput
     TArray<double> ProfileKey;
     TArray<FBox2D> NonzeroRegionsCm;
     TFunction<float(const FVector2D&)> HeightAtWorldXYCm;
+    // Allocated only for the explicit actual-input empty-tile comparison.
+    TFunction<float(const FVector2D&)> EmptyTileComparisonHeight[2];
     TFunction<float(const FBox2D&)> HeightRangeWidthAtWorldXYCm;
     TFunction<float(const FBox2D&)> PreparedHeightRangeWidthAtWorldXYCm;
     double PreparedRangeConstructionMs=0.;

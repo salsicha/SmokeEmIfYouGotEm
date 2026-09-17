@@ -77,6 +77,8 @@ public:
     int32 TileCount() const { return Tiles.Num(); }
     int32 DenseTileCount() const { return DenseTiles.Num(); }
     float Sample(const FVector2D& P,float* Foam=nullptr,bool bDense=true) const
+    { return SampleWithEmptyTileSkip(P,Foam,bDense,false); }
+    float SampleWithEmptyTileSkip(const FVector2D& P,float* Foam,bool bDense,bool bSkipEmpty) const
     {
         FIntPoint Key;
         if (!bIndexed || !Tile(P,Key))
@@ -90,6 +92,14 @@ public:
         }
         else Found=Tiles.Find(Key);
         const TConstArrayView<FSite> Local=Found ? TConstArrayView<FSite>(*Found) : TConstArrayView<FSite>();
+        // A validated physical index has a finite nonnegative global cap.
+        // No local sites means Total=0 and Foam=0, regardless of that cap.
+        // Unsupported/invalid queries took the original full path above.
+        if(bSkipEmpty && Local.IsEmpty())
+        {
+            if(Foam)*Foam=0.f;
+            return 0.f;
+        }
         return URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(P,Local,Lift,Spacing,Foam,GlobalCap);
     }
 };

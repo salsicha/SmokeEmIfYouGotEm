@@ -5821,10 +5821,15 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         CartesianCrestInput.HeightAtWorldXYCm=[Sites=SupportSites,IndexedProfile,Lift,Spacing,Scale,Sign](const FVector2D& P)
         {
             static const bool bHashed=FParse::Param(FCommandLine::Get(),TEXT("RaftSimHashedBreakingTiles"));
+            static const bool bSkipEmpty=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSkipEmptyCrestTiles"));
             const FVector2D Field(P.X*.01,P.Y*.01*Sign);
             return (bFullCrestScan ? URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
-                Field,Sites,Lift,Spacing) : IndexedProfile->Sample(Field,nullptr,!bHashed))*Scale*100.f;
+                Field,Sites,Lift,Spacing) : IndexedProfile->SampleWithEmptyTileSkip(Field,nullptr,!bHashed,bSkipEmpty))*Scale*100.f;
         };
+        static const bool bEmptyTileAudit=[]{FString P;return FParse::Value(FCommandLine::Get(),TEXT("RaftSimCrestEmptyTileAudit="),P);}();
+        if(bEmptyTileAudit)for(int32 Kind=0;Kind<2;++Kind)
+            CartesianCrestInput.EmptyTileComparisonHeight[Kind]=[IndexedProfile,Scale,Sign,Kind](const FVector2D& P)
+            {return IndexedProfile->SampleWithEmptyTileSkip(FVector2D(P.X*.01,P.Y*.01*Sign),nullptr,true,Kind==1)*Scale*100.f;};
     }
     if (WaterAdapter)
     {

@@ -34,6 +34,7 @@ struct FRaftSimSurfaceRefinement
     bool bFlatCoordinateMemo=false; // Candidate: exact keys, unchanged profile epochs.
     bool bStrongEdgeHash=false; // Candidate until exact actual-input timing qualifies it.
     bool bIndexedEdges=false; // Shoreline enables the qualified indexed lookup.
+    bool bRetainTopologyStorage=false; // Reuse capacity, never stale selection/profile values.
     bool bLevelLocalMemos=false; // Candidate: retain coordinate slots separately per level.
     bool bInlineSelection=false; // Candidate: typed predicate, identical evaluations.
     bool bBoundCoordinateMemo=false; // Candidate: exact per-triangle lookup bindings.
@@ -252,9 +253,12 @@ private:
     TArray<TRaftSimFlatCoordinateMap<FProfileMemoSample>> RetainedFlatParallelValues;
     TArray<FRaftSimBoundCoordinateMemo> RetainedBoundValues;
     uint64 ProfileMemoEpoch=0;
+    TArray<FVector2D> RetainedPoints;
+    TArray<int32> RetainedNextTriangles,RetainedNextOrigins;
     struct FTopologyLevel
     {
         TArray<uint8> Selection;
+        TArray<uint8> WorkingSelection;
         TArray<FIntPoint> Parents;
         TArray<int32> Triangles,Origins;
     };
@@ -275,10 +279,14 @@ private:
             ParallelBatchSize<1 || ParallelBatchSize>4096)return false;
         for (int32 I:SourceTriangles)if (!Coordinates.IsValidIndex(I))return false;
         bool SamePrefix=CachedRootPointCount==Coordinates.Num() && CachedRootTriangles==SourceTriangles;
-        if (!SamePrefix) CachedLevels.Reset();
+        // A changed root still makes SamePrefix false for EVERY visited level.
+        // Keeping allocation capacity must never authorize cached topology.
+        if (!SamePrefix && !bRetainTopologyStorage) CachedLevels.Reset();
         CachedRootTriangles=SourceTriangles; CachedRootPointCount=Coordinates.Num();
         CachedLevels.SetNum(Levels);
-        TArray<FVector2D> Points=Coordinates;Triangles=SourceTriangles;
+        TArray<FVector2D> LocalPoints;
+        auto& Points=bRetainTopologyStorage ? RetainedPoints : LocalPoints;
+        Points=Coordinates;Triangles=SourceTriangles;
         for (int32 I=0; I<SourceTriangles.Num()/3; ++I) TriangleOrigins.Add(I);
         const auto Key=[](int32 A,int32 B) { return (uint64(FMath::Min(A,B))<<32)|uint32(FMath::Max(A,B)); };
         if(bMeasureStages)InputSeconds=FPlatformTime::Seconds()-InputStarted;
@@ -286,7 +294,9 @@ private:
         {
             const double SelectionStarted=bMeasureStages ? FPlatformTime::Seconds() : 0.;
             if(PrepareLevel)PrepareLevel(Points,Triangles);
-            TArray<uint8> Selection;
+            auto& Cached=CachedLevels[Level];
+            TArray<uint8> LocalSelection;
+            auto& Selection=bRetainTopologyStorage ? Cached.WorkingSelection : LocalSelection;
             Selection.SetNumUninitialized(Triangles.Num()/3);
             if (bParallel)
             {
@@ -309,7 +319,6 @@ private:
                     Points[Triangles[T*3+2]],Level,0,T) ? 1 : 0;
             const double AssemblyStarted=bMeasureStages ? FPlatformTime::Seconds() : 0.;
             if(bMeasureStages)SelectionSeconds+=AssemblyStarted-SelectionStarted;
-            auto& Cached=CachedLevels[Level];
             SamePrefix=SamePrefix && Cached.Selection==Selection;
             if (SamePrefix)
             {
@@ -326,7 +335,8 @@ private:
             }
             const int32 FirstParent=MidpointParents.Num();
             ++TopologyBuildCount;
-            Cached.Selection=MoveTemp(Selection);
+            if(bRetainTopologyStorage)Swap(Cached.Selection,Selection);
+            else Cached.Selection=MoveTemp(Selection);
             const auto Assemble=[&](auto& Midpoints)
             {
                 for (int32 I=0;I<Triangles.Num();I+=3)
@@ -352,8 +362,11 @@ private:
                     Cached.Triangles=Triangles; Cached.Origins=TriangleOrigins;
                     return false;
                 }
-                TArray<int32> Next;Next.Reserve(Triangles.Num()*4);
-                TArray<int32> NextOrigins; NextOrigins.Reserve(Triangles.Num()*4/3);
+                TArray<int32> LocalNext,LocalNextOrigins;
+                auto& Next=bRetainTopologyStorage ? RetainedNextTriangles : LocalNext;
+                auto& NextOrigins=bRetainTopologyStorage ? RetainedNextOrigins : LocalNextOrigins;
+                Next.Reset();Next.Reserve(Triangles.Num()*4);
+                NextOrigins.Reset();NextOrigins.Reserve(Triangles.Num()*4/3);
                 int32 Origin=0;
                 const auto Add=[&](int32 A,int32 B,int32 C)
                 { Next.Add(A);Next.Add(B);Next.Add(C);NextOrigins.Add(Origin); };
@@ -379,8 +392,8 @@ private:
                     if (Count==1) { Add(A,AB,C);Add(AB,B,C); }
                     else { const int32 BC=M[(Start+1)%3];Add(B,BC,AB);Add(A,AB,C);Add(AB,BC,C); }
                 }
-                Triangles=MoveTemp(Next);
-                TriangleOrigins=MoveTemp(NextOrigins);
+                if(bRetainTopologyStorage){Swap(Triangles,Next);Swap(TriangleOrigins,NextOrigins);}
+                else {Triangles=MoveTemp(Next);TriangleOrigins=MoveTemp(NextOrigins);}
                 Cached.Triangles=Triangles; Cached.Origins=TriangleOrigins;
                 return true;
             };
@@ -398,6 +411,14 @@ private:
     }
 
 public:
+    uint64 GetTopologyAllocatedBytes() const
+    {
+        uint64 Bytes=CachedRootTriangles.GetAllocatedSize()+CachedLevels.GetAllocatedSize()+
+            RetainedPoints.GetAllocatedSize()+RetainedNextTriangles.GetAllocatedSize()+RetainedNextOrigins.GetAllocatedSize();
+        for(const auto& L:CachedLevels)Bytes+=L.Selection.GetAllocatedSize()+L.WorkingSelection.GetAllocatedSize()+
+            L.Parents.GetAllocatedSize()+L.Triangles.GetAllocatedSize()+L.Origins.GetAllocatedSize();
+        return Bytes;
+    }
     template<class T> void Expand(const TArray<T>& Source,TArray<T>& Output) const
     {
         check(Source.Num()==SourceVertexCount);

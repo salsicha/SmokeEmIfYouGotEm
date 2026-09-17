@@ -92,4 +92,55 @@ bool FRaftSimCrestEdgeHashTest::RunTest(const FString&)
     AddInfo(FString::Printf(TEXT("Strong/default/serial exact over %lld vertices and 24 moving profiles, crops, winding, regions, detail windows and cache epochs"),Compared));
     return !HasAnyErrors();
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrestTopologyStorageTest,
+    "RaftSim.M4.CrestTopologyStorage",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FRaftSimCrestTopologyStorageTest::RunTest(const FString&)
+{
+    FRaftSimSurfaceRefinement Original,Retained,Serial;
+    Original.bIndexedEdges=Retained.bIndexedEdges=true;
+    Retained.bRetainTopologyStorage=true;
+    int64 Compared=0;uint64 Queries[2]={};
+    for(int32 Frame=0;Frame<36;++Frame)
+    {
+        const int32 N=Frame%6<3?17:13;
+        TArray<FVector2D> XY;TArray<int32> Triangles;
+        for(int32 Y=0;Y<N;++Y)for(int32 X=0;X<N;++X)
+        {
+            XY.Emplace(-544000.+100.*X+Frame*.173,-360000.+100.*Y-Frame*.241);
+            if(X<N-1 && Y<N-1 && (Frame%5!=1 || X!=3))
+            {
+                const int32 A=Y*N+X;
+                if(Frame%7==0)Triangles.Append({A,A+1,A+N,A+1,A+N+1,A+N});
+                else Triangles.Append({A,A+N,A+1,A+1,A+N,A+N+1});
+            }
+        }
+        const auto Height=[&](const FVector2D& P)
+        {
+            const auto D=(P-XY[N*N/2])*.01;
+            return float(Frame%4==0?0:(10.+Frame)*FMath::Exp(-.4*D.X*D.X-.7*D.Y*D.Y));
+        };
+        const FBox2D Window(XY[N*N/2]-FVector2D(210),XY[N*N/2]+FVector2D(210));
+        const auto* Detail=Frame%4==2?&Window:nullptr;
+        const int32 Levels=Frame%9==0?0:(Frame%9==1?1:3);
+        if(Frame==20){Original.InvalidateTopologyCache();Retained.InvalidateTopologyCache();}
+        for(int32 Kind=0;Kind<2;++Kind)
+        {
+            TAtomic<uint64> Calls{0};auto& W=Kind?Retained:Original;
+            const auto Counted=[&](const FVector2D& P){++Calls;return Height(P);};
+            if(!W.BuildAdaptive(XY,Triangles,Counted,Levels,.5f,{},nullptr,true,true,Detail,25.f,true))return false;
+            Queries[Kind]=Calls.Load();
+        }
+        if(!Serial.BuildAdaptive(XY,Triangles,Height,Levels,.5f,{},nullptr,false,false,Detail,25.f))return false;
+        TArray<FVector2D> A,B,C;Original.Expand(XY,A);Retained.Expand(XY,B);Serial.Expand(XY,C);
+        TestTrue(TEXT("storage reuse preserves every current height query, topology cache decision and output"),
+            Queries[0]==Queries[1] && Original.TopologyBuildCount==Retained.TopologyBuildCount &&
+            Original.TopologyReuseCount==Retained.TopologyReuseCount && A==B && B==C &&
+            Original.MidpointParents==Retained.MidpointParents && Original.Triangles==Retained.Triangles &&
+            Original.TriangleOrigins==Retained.TriangleOrigins && Retained.MidpointParents==Serial.MidpointParents &&
+            Retained.Triangles==Serial.Triangles && Retained.TriangleOrigins==Serial.TriangleOrigins);
+        Compared+=A.Num();
+    }
+    AddInfo(FString::Printf(TEXT("Exact topology storage reuse over36 moving/deformed roots, crops, winding, flat/nonflat profiles,0/1/3 levels and explicit invalidation: %lld vertices"),Compared));
+    return !HasAnyErrors();
+}
 #endif
