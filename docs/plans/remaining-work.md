@@ -3,7 +3,19 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact combined source sampling installed in normal South Fork](../reconstruction-review-2026-09-07/combined-source-sampling.md).
+Latest: [base-vertex parallel trial rejected and committed runtime restored](../reconstruction-review-2026-09-07/base-vertex-parallel-review.md).
+All sixteen same-input pairs preserve outputs, but one execution-order group
+regresses. The trial is removed; restored editor build and eight native tests
+PASS. Final restored29.219141FPS / p9541.7484ms remains FAIL30.
+No new visible or physical improvement is claimed. Continue physical
+breaking/froth and larger publication work, not small scheduling variants.
+[Exact 5400-second hydraulic continuation](../reconstruction-review-2026-09-07/hydraulic-continuation-5400.md)
+supersedes older PID6968 records: PID32728/start2026-09-17T22:01:07.6154364Z
+continues toward7200. Completed5450/5500/5550/5600 state AND dry-bank audits PASS,
+NOT settled. Next5650/local5000 requires its completion marker and BOTH audits.
+Installed4950 water remains unchanged; full ordered queue remains OPEN.
+
+Previous: [exact combined source sampling installed in normal South Fork](../reconstruction-review-2026-09-07/combined-source-sampling.md).
 All 16 alternating same-input pairs across two actual states preserve outputs
 and reduce this component's cost. Whole-frame comparisons remain mixed; the
 final ordinary profile is 37.070557 FPS / p95 36.3204 ms, still FAIL30.
