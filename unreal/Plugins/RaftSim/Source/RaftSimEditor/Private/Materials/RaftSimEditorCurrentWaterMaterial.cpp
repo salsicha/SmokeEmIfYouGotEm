@@ -288,6 +288,43 @@ bool ConfigureSouthForkTransportedFoam(UMaterial* Material)
         if (!Existing) { FCustomInput I;I.InputName=Target;Existing=&Coverage->Inputs.Add_GetRef(I); }
         Existing->Input=Source.Input;
     }
+    // GPU density and its optical phase must use the SAME captured current.
+    // Outside that registered window retain the existing CPU foam backtrace.
+    if(Authority)
+    {
+        UMaterialExpressionCustom* PairedFlow=nullptr;
+        UMaterialExpressionTextureObjectParameter* FlowTexture=nullptr;
+        for(UMaterialExpression* Expression:Material->GetExpressions())
+        {
+            if(auto* Custom=Cast<UMaterialExpressionCustom>(Expression))
+                if(Custom->Desc==TEXT("SouthForkPairedFoamFlowV1"))PairedFlow=Custom;
+            if(auto* Texture=Cast<UMaterialExpressionTextureObjectParameter>(Expression))
+                if(Texture->ParameterName==TEXT("StatefulFoamFlowTexture"))FlowTexture=Texture;
+        }
+        const auto* CPUFlow=LocalLace->Inputs.FindByPredicate([](const FCustomInput& I){return I.InputName==TEXT("Flow");});
+        const auto* DetailInput=Authority->Inputs.FindByPredicate([](const FCustomInput& I){return I.InputName==TEXT("Texture");});
+        auto* DetailTexture=DetailInput?Cast<UMaterialExpressionTextureObjectParameter>(DetailInput->Input.Expression):nullptr;
+        if(!CPUFlow || !CPUFlow->Input.Expression || !DetailTexture)return false;
+        if(!FlowTexture)FlowTexture=AddCurrentWaterExpression<UMaterialExpressionTextureObjectParameter>(Material);
+        FlowTexture->ParameterName=TEXT("StatefulFoamFlowTexture");
+        FlowTexture->Texture=DetailTexture->Texture;FlowTexture->SamplerType=SAMPLERTYPE_LinearColor;
+        if(!PairedFlow)PairedFlow=AddCurrentWaterExpression<UMaterialExpressionCustom>(Material);
+        PairedFlow->Desc=TEXT("SouthForkPairedFoamFlowV1");PairedFlow->OutputType=CMOT_Float2;
+        PairedFlow->Inputs.Reset();PairedFlow->IncludeFilePaths.Reset();
+        FCustomInput CPU=*CPUFlow;CPU.InputName=TEXT("CPUFlow");PairedFlow->Inputs.Add(CPU);
+        FCustomInput Texture;Texture.InputName=TEXT("FlowTexture");Texture.Input.Connect(0,FlowTexture);PairedFlow->Inputs.Add(Texture);
+        for(const TCHAR* Name:{TEXT("Texture"),TEXT("World"),TEXT("Sign"),TEXT("Enable")})
+        {
+            const auto* Input=Authority->Inputs.FindByPredicate([Name](const FCustomInput& I){return I.InputName==Name;});
+            if(!Input || !Input->Input.Expression)return false;
+            PairedFlow->Inputs.Add(*Input);
+        }
+        PairedFlow->Code=TEXT("return RaftSimRegisteredFoamFlow(Texture,FlowTexture,World.xy*float2(.01,.01*Sign),CPUFlow.xy,Enable);");
+        PairedFlow->IncludeFilePaths.Add(TEXT("/Plugin/RaftSimWaterDetail/Private/RaftSimRegisteredFoamFlow.ush"));
+        auto* FlowInput=Coverage->Inputs.FindByPredicate([](const FCustomInput& I){return I.InputName==TEXT("FrothFlow");});
+        if(!FlowInput)return false;
+        FlowInput->Input.Connect(0,PairedFlow);
+    }
     Coverage->Code = CoverageCode + TEXT("\nfloat2 worldM=(FrothUV+FrothOrigin.xy)*3;\nfloat footprintM=max(length(ddx(worldM)),length(ddy(worldM)));\nRaftSimFrothCells cells; return cells.Sample(VertexFoam.r,OpticalDensity,worldM,FrothFlow.xy,FrothTime,footprintM);\n");
     UMaterialExpression* Legacy = nullptr;
     for (const FCustomInput& Input : Coverage->Inputs)

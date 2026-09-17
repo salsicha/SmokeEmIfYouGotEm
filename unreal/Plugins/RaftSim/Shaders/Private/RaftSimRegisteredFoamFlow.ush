@@ -1,0 +1,24 @@
+#ifndef RAFTSIM_REGISTERED_FOAM_FLOW
+#define RAFTSIM_REGISTERED_FOAM_FLOW
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimRegisteredDetailSample.ush"
+// H,U,V,source from the exact mean input used by the displayed foam step.
+// This changes optical transport only, not foam amount or fluid momentum.
+float2 RaftSimRegisteredFoamFlow(Texture2D<float4> detail,Texture2D<float4> flow,
+    float2 fieldPositionM,float2 cpuFlow,float enable)
+{
+    uint width,height,flowWidth,flowHeight;
+    detail.GetDimensions(width,height);flow.GetDimensions(flowWidth,flowHeight);
+    if(width<2 || height<3 || flowWidth!=width || flowHeight!=height)return cpuFlow;
+    float4 origin=detail.Load(int3(0,height-1,0));
+    float4 clock=detail.Load(int3(1,height-1,0));
+    if(!all(isfinite(origin)) || origin.w!=1 || origin.z<=0 ||
+        !all(isfinite(clock)) || (clock.w!=2 && clock.w!=3) || clock.z!=0 ||
+        any(origin!=flow.Load(int3(0,height-1,0))) ||
+        any(clock!=flow.Load(int3(1,height-1,0))))return cpuFlow;
+    float weight=RaftSimRegisteredDetailWindowWeight(detail,fieldPositionM)*saturate(enable);
+    if(weight<=0)return cpuFlow;
+    float4 paired=RaftSimRegisteredDetailSample(flow,fieldPositionM);
+    if(!all(isfinite(paired)))return cpuFlow;
+    return lerp(cpuFlow,paired.yz,weight);
+}
+#endif

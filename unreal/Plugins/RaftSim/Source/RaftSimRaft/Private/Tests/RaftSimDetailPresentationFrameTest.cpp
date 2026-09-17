@@ -1,5 +1,6 @@
 #include "RaftSimDetailPresentationFrame.h"
 #include "../RaftSimDetailFrameReadback.h"
+#include "../RaftSimDetailFrameUpload.h"
 #include "RaftSimDetailWaterGPU.h"
 #include "RenderingThread.h"
 #include "Misc/AutomationTest.h"
@@ -79,15 +80,22 @@ bool FRaftSimDetailPresentationFrameTest::RunTest(const FString&)
     for (int32 Y=-1;Y<=Ny;++Y) for (int32 X=-1;X<=Nx;++X)
         Queries.Add(FVector4f(-5439+X*.5f+.125f,3606+Y*.5f+.375f,0,0));
     Queries.Add(FVector4f(-5439+(Nx-1)*.5f,3606+(Ny-1)*.5f,0,0));
+    for(bool TestFlow:{false,true})
+    {
     auto Read=MakeShared<FRHIGPUBufferReadback,ESPMode::ThreadSafe>(TEXT("ContactPresentedParity"));
     bool GPUOK=false;FString Error;
     ENQUEUE_RENDER_COMMAND(RaftSimContactFramePresent)([&](FRHICommandListImmediate& Cmd)
     {
         auto Presented=Cmd.CreateTexture(FRHITextureCreateDesc::Create2D(TEXT("ContactPresented"),Nx,Ny+1,PF_A32B32G32R32F)
             .SetFlags(ETextureCreateFlags::ShaderResource).SetInitialState(ERHIAccess::CopyDest));
-        Cmd.UpdateTexture2D(Presented,0,FUpdateTextureRegion2D(0,0,0,0,Nx,Ny+1),Nx*sizeof(FVector4f),reinterpret_cast<const uint8*>(Frame->Pixels.GetData()));
-        Cmd.Transition(FRHITransitionInfo(Presented,ERHIAccess::CopyDest,ERHIAccess::SRVMask));
-        GPUOK=RaftSimValidateRegisteredDetailSamplingGPU(Cmd,Presented,Queries,&Read.Get(),Error);
+        auto FlowPresented=Cmd.CreateTexture(FRHITextureCreateDesc::Create2D(TEXT("FoamFlowPresented"),Nx,Ny+1,PF_A32B32G32R32F)
+            .SetFlags(ETextureCreateFlags::ShaderResource).SetInitialState(ERHIAccess::CopyDest));
+        auto Missing=*Frame;Missing.FoamFlowPixels.Reset();
+        if(RaftSimUploadDetailFrame(Cmd,Missing,Presented,FlowPresented))
+        { Error=TEXT("Incomplete pair incorrectly published");return; }
+        if(!RaftSimUploadDetailFrame(Cmd,*Frame,Presented,FlowPresented))
+        { Error=TEXT("Production paired upload rejected complete frame");return; }
+        GPUOK=RaftSimValidateRegisteredDetailSamplingGPU(Cmd,TestFlow?FlowPresented:Presented,Queries,&Read.Get(),Error);
     });
     FlushRenderingCommands();
     if (!GPUOK) { AddError(Error);return false; }
@@ -102,7 +110,8 @@ bool FRaftSimDetailPresentationFrameTest::RunTest(const FString&)
         ReadOK=true;
         for (int32 I=0;I<Queries.Num();++I)
         {
-            const auto CPU=Frame->SampleField(FVector2f(Queries[I].X,Queries[I].Y));
+            const auto P=FVector2f(Queries[I].X,Queries[I].Y);
+            const auto CPU=TestFlow?Frame->SampleFoamFlow(P):Frame->SampleField(P);
             for (int32 C=0;C<4;++C)
             { Finite &= FMath::IsFinite(Values[I][C]);MaxError=FMath::Max(MaxError,FMath::Abs(Values[I][C]-CPU[C])); }
         }
@@ -110,7 +119,8 @@ bool FRaftSimDetailPresentationFrameTest::RunTest(const FString&)
     });
     FlushRenderingCommands();
     TestTrue(TEXT("CPU support samples the same reuploaded registered frame as the actual GPU material helper"),ReadOK && Finite && MaxError<1.e-6f);
-    AddInfo(FString::Printf(TEXT("Completed GPU frame copy/reupload/registered sampler: %d queries, max RGBA error %.9g; includes far data edge, outside and overwritten simulation candidate"),Queries.Num(),MaxError));
+    AddInfo(FString::Printf(TEXT("Completed GPU frame production paired upload/registered sampler: flow=%d %d queries, max RGBA error %.9g; includes far data edge, outside and overwritten simulation candidate"),TestFlow,Queries.Num(),MaxError));
+    }
     return !HasAnyErrors();
 }
 

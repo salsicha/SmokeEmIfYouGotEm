@@ -3,7 +3,22 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact indexed crest edges installed](../reconstruction-review-2026-09-07/crest-indexed-edges-installed.md).
+Latest: [paired foam current installed](../reconstruction-review-2026-09-07/paired-foam-current-installed.md).
+Actual paired capture found2.001822m/s RMS difference in3,310 foamy interior
+vertices;355 CPU optical vectors opposed the GPU mean current. Ordinary South
+Fork now pairs optical flow with displayed density/origin/clock on the existing
+carrier; density/geometry/normal/mask unchanged. Hardware and WARP900 queries
+each exact; default native32 PASS; focused Python27 PASS. Adjacent historical
+3 PASS/6 FAIL reproduced with committed sources, not relaxed. Exact runtime and
+material rollback copies retained. Installer's abnormal post-save exit retained;
+fresh read-only reload and ordinary24-image startup exit0 with exact graphs.
+Installed27.565906FPS/p9542.8224ms still FAIL30; broad sheet-like froth and crew
+remain unaccepted. Still sequences do not prove continuous/reference motion.
+Same cook36872:3100/3150/3200/3250 state AND86,720 dry banks PASS, NOT settled
+(3250:87.545168out/45.306955in). Next3300/local30000 needs marker AND both audits.
+Full ordered scene/physics/crew/normalization/regression/release scope stays OPEN.
+
+Previous: [exact indexed crest edges installed](../reconstruction-review-2026-09-07/crest-indexed-edges-installed.md).
 Two actual-input captures preserve all 128 pairs/8,639,003 expanded vertices.
 Whole refinement build improves in both call orders: 8.381602 to 7.674349 ms,
 then 7.434027 to 6.874956 ms. Default-enabled native24 PASS; Python29 PASS.

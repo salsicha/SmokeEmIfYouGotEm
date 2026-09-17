@@ -1,6 +1,7 @@
 #include "RaftSimStatefulDetailComponent.h"
 #include "RaftSimDetailSnapshot.h"
 #include "RaftSimDetailFrameReadback.h"
+#include "RaftSimDetailFrameUpload.h"
 #include "RaftSimDetailFrameAudit.h"
 #include "RaftSimDetailWaterGPU.h"
 #include "RaftSimTotalDepthSourceGPU.h"
@@ -117,6 +118,15 @@ bool URaftSimStatefulDetailComponent::Initialize(URaftSimWaterRuntimeAdapter* Ad
     SurfaceTexture->bCanCreateUAV=true;
     SurfaceTexture->InitCustomFormat(DetailSize,TextureHeight,PF_A32B32G32R32F,true);
     SurfaceTexture->UpdateResourceImmediate(true);
+    if(bVerifiedFullReach && !FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyFoamFlow")))
+    {
+        FoamFlowTexture.Reset(NewObject<UTextureRenderTarget2D>(this));
+        FoamFlowTexture->ClearColor=FLinearColor::Transparent;
+        FoamFlowTexture->InitCustomFormat(DetailSize,TextureHeight,PF_A32B32G32R32F,true);
+        FoamFlowTexture->UpdateResourceImmediate(true);
+        SurfaceMaterial->SetTextureParameterValue(TEXT("StatefulFoamFlowTexture"),FoamFlowTexture.Get());
+        UE_LOG(LogTemp,Display,TEXT("Paired foam flow: displayed density and captured mean current share one publication; no solver or geometry change"));
+    }
     if (bMovingWindow)
     {
         ComputeTexture=NewObject<UTextureRenderTarget2D>(this);
@@ -167,13 +177,16 @@ void URaftSimStatefulDetailComponent::CommitCompletedFrame()
     {
         PresentedFrame=Frame;++PresentationCommits;
         auto* Target=SurfaceTexture->GameThread_GetRenderTargetResource();
-        ENQUEUE_RENDER_COMMAND(RaftSimCommitDetailFrame)([Frame,Target](FRHICommandListImmediate& Cmd)
+        auto* FlowTarget=FoamFlowTexture.IsValid()?FoamFlowTexture->GameThread_GetRenderTargetResource():nullptr;
+        auto Shared=RenderState;
+        ENQUEUE_RENDER_COMMAND(RaftSimCommitDetailFrame)([Frame,Target,FlowTarget,Shared](FRHICommandListImmediate& Cmd)
         {
-            auto Texture=Target->GetRenderTargetTexture();
-            Cmd.Transition(FRHITransitionInfo(Texture,ERHIAccess::Unknown,ERHIAccess::CopyDest));
-            Cmd.UpdateTexture2D(Texture,0,FUpdateTextureRegion2D(0,0,0,0,Frame->Size.X,Frame->Size.Y+1),
-                Frame->Size.X*sizeof(FVector4f),reinterpret_cast<const uint8*>(Frame->Pixels.GetData()));
-            Cmd.Transition(FRHITransitionInfo(Texture,ERHIAccess::CopyDest,ERHIAccess::SRVMask));
+            if(!RaftSimUploadDetailFrame(Cmd,*Frame,Target->GetRenderTargetTexture(),
+                FlowTarget?FlowTarget->GetRenderTargetTexture():nullptr))
+            {
+                Shared->bFailed.Store(true);
+                UE_LOG(LogTemp,Error,TEXT("Paired detail publication rejected: incomplete or mismatched texture payload"));
+            }
         });
     }
     else ++PresentationHolds;
@@ -523,8 +536,9 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
     const FVector CaptureCenter=bMovingWindow ? FVector::ZeroVector : Center;
     const FVector CaptureDownstream=Downstream,CaptureLeft=Left;
     const bool bFrameContact=bMovingWindow;
+    const bool bPairedFoamFlow=FoamFlowTexture.IsValid();
     FTextureRenderTargetResource* Target=(bFrameContact ? ComputeTexture : SurfaceTexture)->GameThread_GetRenderTargetResource();
-    ENQUEUE_RENDER_COMMAND(RaftSimDetailLive)([Shared,Grid,Flow=MoveTemp(Flow),TotalSource,TemporalAuditPath,CaptureGeometry=MoveTemp(CaptureGeometry),CaptureMeanElapsed,Steps,Target,CapturePrefix,CaptureElapsed,CaptureCenter,CaptureDownstream,CaptureLeft,bFrameContact](FRHICommandListImmediate& Cmd)
+    ENQUEUE_RENDER_COMMAND(RaftSimDetailLive)([Shared,Grid,Flow=MoveTemp(Flow),TotalSource,TemporalAuditPath,CaptureGeometry=MoveTemp(CaptureGeometry),CaptureMeanElapsed,Steps,Target,CapturePrefix,CaptureElapsed,CaptureCenter,CaptureDownstream,CaptureLeft,bFrameContact,bPairedFoamFlow](FRHICommandListImmediate& Cmd)
     {
         if (Shared->ContactAudit && Shared->ContactAudit->Poll()) Shared->ContactAudit.Reset();
         if (Shared->TemporalAudit && Shared->TemporalAudit->Poll())Shared->TemporalAudit.Reset();
@@ -593,7 +607,7 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
             {
                 static const bool CaptureFoamFlow=[]{FString P;return FParse::Value(FCommandLine::Get(),TEXT("RaftSimFoamFlowPairAudit="),P);}();
                 Slot->Enqueue(Cmd,Target->GetRenderTargetTexture(),Grid.Size,Shared->FrameSequence,
-                    CaptureElapsed,Shared->Simulation.GetSimulationSeconds(),false,CaptureFoamFlow?&Flow:nullptr);bCopied=true;break;
+                    CaptureElapsed,Shared->Simulation.GetSimulationSeconds(),false,(CaptureFoamFlow || bPairedFoamFlow)?&Flow:nullptr);bCopied=true;break;
             }
             if (!bCopied) ++Shared->SkippedFrameCopies; // Hold the paired presented frame, never stall the PDE.
         }
@@ -670,5 +684,6 @@ void URaftSimStatefulDetailComponent::EndPlay(const EEndPlayReason::Type EndPlay
         });
         RenderState.Reset();
     }
+    FoamFlowTexture.Reset();
     Super::EndPlay(EndPlayReason);
 }

@@ -1509,6 +1509,17 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     }
 #if !UE_BUILD_SHIPPING
     if(GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimPairedFoamFlowReview")))
+    {
+        auto* Review=LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/PairedFoamFlow/M_SouthForkPairedFoamFlow"));
+        if(Review)
+        {
+            LiveVolumeCoreMaterial=Review;
+            UE_LOG(LogTemp,Display,TEXT("Paired foam flow material review enabled on existing South Fork carrier"));
+        }
+        else UE_LOG(LogTemp,Error,TEXT("Paired foam flow material unavailable; no review acceptance"));
+    }
+    if(GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
         FParse::Param(FCommandLine::Get(),TEXT("RaftSimCurrentFoamCoverageAudit")))
     {
         auto* Audit=LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/CurrentFoamAudit/M_CurrentSouthForkFoamAudit"));

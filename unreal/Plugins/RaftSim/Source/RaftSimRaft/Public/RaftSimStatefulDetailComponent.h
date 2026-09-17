@@ -4,6 +4,7 @@
 #include "RaftSimDetailPresentationFrame.h"
 #include "RaftSimDetailSampleGrid.h"
 #include "RaftSimCommittedWaterClock.h"
+#include "UObject/StrongObjectPtr.h"
 #include "RaftSimStatefulDetailComponent.generated.h"
 class URaftSimWaterRuntimeAdapter;
 class UMaterialInstanceDynamic;
@@ -11,8 +12,7 @@ class UTextureRenderTarget2D;
 struct FRaftSimDetailRenderState;
 struct FRaftSimTotalDepthSource;
 
-// Persistent detail on the existing carrier. Playable Cartesian rivers remap
-// exact overlapping state; legacy review maps may retain a fixed local basis.
+// Existing carrier: Cartesian windows remap exact state; legacy reviews may use a fixed basis.
 UCLASS()
 class RAFTSIMRAFT_API URaftSimStatefulDetailComponent : public UActorComponent
 {
@@ -82,4 +82,6 @@ private:
     float DetailOriginMeters=-32.0f;
     FString SnapshotPrefix;
     int32 SnapshotRequests=0;
+    // Native GC ownership for the paired optical texture, released at EndPlay.
+    TStrongObjectPtr<UTextureRenderTarget2D> FoamFlowTexture;
 };
