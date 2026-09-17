@@ -20,6 +20,7 @@ from subcell_inlet_sweep_geometry import InletSweep, shared_inlet_edge
 from subcell_inlet_contact_time import initial_wet_contact
 from subcell_inlet_stream_overlap import simultaneous_pairs, signed_area
 from subcell_inlet_face_transport import source_transport_balance
+from subcell_inlet_hydrostatic_force import source_hydrostatic_force
 from subcell_source_activation import assembly
 
 
@@ -101,6 +102,8 @@ def route(part, fronts, on_face=None):
                     moment_lower=value['lower'], moment_upper=value['upper'],
                     bounded_switch_intervals=value['bounded_switch_intervals'],
                     conditional_face_transport=(donor_transport if key == donor else source_transport_balance(sweep, fragment)))
+                if key != donor:
+                    piece['conditional_hydrostatic_force'] = source_hydrostatic_force(sweep, fragment)
                 if key in occupied:
                     pool_index, form = occupied[key]
                     piece['initial_wet_support'] = dict(pool_index=pool_index,
@@ -207,6 +210,7 @@ def main():
         maximum_relative_face_balance_width=max(
             p['conditional_face_transport']['maximum_relative_balance_width'] for r in routed for p in r['pieces']),
         face_transport_scope='Time-integrated conditional advective flux on every original edge of every routed source; incoming minus outgoing balances the non-horizontal stored profile. Original inlet inflow requires coupled donor debit. No pressure, bed-force, receding/fan or physical time-step acceptance.',
+        hydrostatic_force_scope='Instantaneous interior-trace hydrostatic/bed momentum residual of the non-horizontal profile, including finite-depth lateral-front pressure jumps. Boundary-aligned wet/dry traces are NOT a common numerical flux. Lateral spreading/front law and nonhydrostatic/curvature/time coupling remain unaccepted.',
         initially_owned_source_streams=sum(r['enters_initially_owned_source'] for r in routed),
         proven_initial_wet_overlap_streams=sum(r['initial_wet_overlap_proven'] for r in routed),
         possible_initial_wet_overlap_streams=sum(r['initial_wet_overlap_possible'] for r in routed),

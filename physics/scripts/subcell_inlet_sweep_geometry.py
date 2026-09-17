@@ -163,14 +163,17 @@ class InletSweep:
         if side*_cross(self.delta, self.velocity) <= 0:
             raise ValueError('Inlet velocity does not enter the original receiver')
 
-    def full_moment(self, power, lo=F(0), hi=None):
+    def full_moment(self, power, lo=F(0), hi=None, *, radial_power=2):
         if power not in range(4):
             raise ValueError('Depth moment power must be 0..3')
+        if type(radial_power) is not int or radial_power not in (0, 2):
+            raise ValueError('Original radial Jacobian power 2 or pressure-weighted power 0 required')
         lo, hi = F(lo), self.time_root if hi is None else F(hi)
         if not 0 <= lo <= hi <= self.time_root:
             raise ValueError('Entry-time interval is outside sweep')
+        exponent = power+radial_power+2
         return (3*self.jacobian*self.height_scale**(power+1)
-                *(hi**(power+4)-lo**(power+4))/(self.bed_span*(power+1)*(power+4)))
+                *(hi**exponent-lo**exponent)/(self.bed_span*(power+1)*exponent))
 
     def _constraints(self, fragment):
         if not isinstance(fragment, SourceFragment) or fragment.area <= 0:
@@ -208,13 +211,16 @@ class InletSweep:
         return dict(source_id=fragment.source_id, **result)
 
     def _constraint_moments(self, lower, upper, vertical,
-                            relative_bound=F(1, 10**12), max_depth=48):
+                            relative_bound=F(1, 10**12), max_depth=48, *, radial_power=2):
         """Integrate original parcel coordinates over polynomial constraints.
 
         Shared by storage clipping and time-integrated source-face transport;
         callers supply inequalities, never a fitted depth or rounded polygon.
         """
         relative_bound = F(relative_bound)
+        # radial_power=0 integrates h**p/r**2 against the original 3*J*r**2
+        # area Jacobian. The cancellation is analytic at birth, not a floor.
+        totals = tuple(self.full_moment(p, radial_power=radial_power) for p in range(4))
         if not 0 < relative_bound < 1 or not isinstance(max_depth, int) or not 1 <= max_depth <= 128:
             raise ValueError('Strict relative integration bound and depth 1..128 required')
         exact, uncertainty = [F(0)]*4, [F(0)]*4
@@ -244,17 +250,17 @@ class InletSweep:
                 hhigh = _add((F(0), self.height_scale), _scale(high, -self.bed_span))
                 for power in range(4):
                     polynomial = _add(_power(hlow, power+1), _scale(_power(hhigh, power+1), -1))
-                    value = _integral((F(0), F(0))+polynomial, lo, hi)*3*self.jacobian/(self.bed_span*(power+1))
+                    value = _integral((F(0),)*radial_power+polynomial, lo, hi)*3*self.jacobian/(self.bed_span*(power+1))
                     if value < 0:
                         raise ValueError('Negative certified source moment')
                     exact[power] += value
             elif depth == max_depth:
                 switches += 1
                 for power in range(4):
-                    uncertainty[power] += self.full_moment(power, lo, hi)
+                    uncertainty[power] += self.full_moment(power, lo, hi, radial_power=radial_power)
             else:
                 pending.extend(((lo, middle, depth+1), (middle, hi, depth+1)))
-        if any(uncertainty[p] > relative_bound*self.full_moment(p) for p in range(4)):
+        if any(uncertainty[p] > relative_bound*totals[p] for p in range(4)):
             raise ValueError('Source clipping integration bound unresolved; no sliver deletion')
         return dict(lower=tuple(exact), upper=tuple(x+y for x, y in zip(exact, uncertainty)),
                     intervals_visited=visited, bounded_switch_intervals=switches,

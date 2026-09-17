@@ -3,7 +3,23 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [current solver whole-program optimization not promoted](../reconstruction-review-2026-09-07/solver-lto-current-rejection.md).
+Latest: [inlet pressure residual and finite-depth lateral fronts](../reconstruction-review-2026-09-07/normal-river-inlet-pressure-fronts.md).
+Added source-resolved hydrostatic/bed residuals on the actual non-horizontal
+profile. Independent diagonal-flow traction exposed a missing side-front
+pressure jump; now included without epsilon depth/time or relaxed tolerances.
+Nine of17 routed pieces have proven finite-depth lateral fronts inside original
+sources. Next resolve lateral spreading/common wet-dry flux from the start;
+stream separation and later inlet branch limits do not remove this requirement.
+One-sided boundary tractions explicitly remain unaccepted as common face fluxes.
+75 focused PASS; broad609 PASS/13 unchanged FAIL;600 source hashes checked.
+Same native SM5 replay/editor36412 and worker37836 remain LIVE after a7200s
+hung-shadermap error, not a pass or terminal;63 shader inputs stay frozen.
+Same cook36872:2350s state AND86,720 dry banks PASS, NOT settled
+(94.847330 out versus45.306955 in m3/s); next2400/local12000 needs both audits.
+No installed/playable change; last28.057157FPS/p9541.2354ms still FAIL30.
+Full terrain/physical/visual/ordered-river/all-scene/crew/release scope OPEN.
+
+Previous: [current solver whole-program optimization not promoted](../reconstruction-review-2026-09-07/solver-lto-current-rejection.md).
 Four native CTest fixtures pass. Two original-input600-step/four-pair comparisons
 preserve all44 saved frame pairs each, but Cartesian baseline-first timing is
 0.3882% slower. LTO remains isolated; no production compiler/library/DLL change.
