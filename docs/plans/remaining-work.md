@@ -3,7 +3,20 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [landscape foliage split and completed transport checks](../reconstruction-review-2026-09-07/landscape-foliage-split.md).
+Latest: [exact crest topology publication and hydraulic continuation](../reconstruction-review-2026-09-07/crest-topology-publication.md).
+Final isolated candidate compiles/links and passes six native tests;19 Python
+audit checks pass. All64 actual-game pairs preserve exact indices/ownership;
+publication0.384391→0.168537ms, faster in both orders. Enabled with original
+reference control retained. Ordinary300-frame1280x720D3D12 capture still FAILS30:
+28.057157FPS/p9541.2354ms, unchanged60–240 window. Installed modules unchanged;
+original SM5editor9976/worker31736 LIVE, all63 shader inputs preserved.
+New exact1800→3600s continuation51728/PID36872 LIVE:5,382,400 cells bit-exact,
+zero added water/context, unchanged geometry/roughness/boundaries. Latest1835.5s;
+next1850/local1000 requires BOTH state and dry-bank audits. NOT settled/promoted.
+All remaining physics, visible scene/water, later-river, crew and release work
+remains open; this is not scene or30FPS acceptance.
+
+Previous: [landscape foliage split and completed transport checks](../reconstruction-review-2026-09-07/landscape-foliage-split.md).
 Five isolated editor CPP units compile and the module links; all six source
 members meet the original 3,000-line bound. Ten focused tests pass; the broader
 suite remains 91 passed / 25 failed. Existing 1,234 biome assertions are unchanged.

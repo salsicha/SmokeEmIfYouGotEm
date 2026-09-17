@@ -15,6 +15,7 @@
 #include "RaftSimCrestRangeAudit.h"
 #include "RaftSimCrestPreparedRangeAudit.h"
 #include "RaftSimCrestBoundMemoAudit.h"
+#include "RaftSimCrestTopologyPublish.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
@@ -263,16 +264,33 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         TargetCorrectionsCm,Alpha,RenderedCorrectionsCm,!bMappedHistory);
     CSV_CUSTOM_STAT(RaftSimCrests,DenseHistoryUpdates,int32(bDenseHistory),ECsvCustomStatOp::Accumulate);
     const double VerticesDone=bTiming ? FPlatformTime::Seconds() : 0.;
-    Indices.Reset(Refinement.Triangles.Num());
-    for (int32 I:Refinement.Triangles) Indices.Add(uint32(I));
-    CellOffsets.SetNumUninitialized(SourceCellOffsets.Num());
-    int32 Triangle=0;
-    for (int32 Cell=0; Cell<SourceCellOffsets.Num(); ++Cell)
+    // Sixty-four actual-game pairs preserve all bits and improve both call
+    // orders. Keep the original publisher as an independent regression control.
+    static const bool bPartitionedTopology=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceCrestTopology"));
+    static const bool bTopologyAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrestTopologyPublishAudit"));
+    if (bTopologyAudit && GFrameCounter>=120 && GFrameCounter<184)
     {
-        while (Triangle<Refinement.TriangleOrigins.Num() &&
-            Refinement.TriangleOrigins[Triangle]<SourceCellOffsets[Cell]/3) ++Triangle;
-        CellOffsets[Cell]=Triangle*3;
+        TArray<uint32> CandidateIndices;
+        // The caller supplies fresh indices but retains cell-offset storage.
+        // Give both measured paths the same initialized output size.
+        TArray<int32> CandidateOffsets=CellOffsets;
+        double ReferenceMs=0.,CandidateMs=0.;
+        const auto Reference=[&]() { const double Start=FPlatformTime::Seconds();
+            RaftSimCrestTopologyPublish::Reference(Refinement.Triangles,Refinement.TriangleOrigins,SourceCellOffsets,Indices,CellOffsets);
+            ReferenceMs=(FPlatformTime::Seconds()-Start)*1000.; };
+        const auto Candidate=[&]() { const double Start=FPlatformTime::Seconds();
+            RaftSimCrestTopologyPublish::Partitioned(Refinement.Triangles,Refinement.TriangleOrigins,SourceCellOffsets,CandidateIndices,CandidateOffsets);
+            CandidateMs=(FPlatformTime::Seconds()-Start)*1000.; };
+        if (GFrameCounter%2) { Candidate(); Reference(); } else { Reference(); Candidate(); }
+        const bool Exact=Indices==CandidateIndices && CellOffsets==CandidateOffsets;
+        UE_LOG(LogTemp,Display,TEXT("CrestTopologyPublishAudit frame=%llu exact=%d candidate_first=%d indices=%d cells=%d reference_ms=%.9f candidate_ms=%.9f"),
+            GFrameCounter,Exact,int32(GFrameCounter%2),Indices.Num(),CellOffsets.Num(),ReferenceMs,CandidateMs);
+        if (!Exact) return false;
+        if (bPartitionedTopology) { Indices=MoveTemp(CandidateIndices); CellOffsets=MoveTemp(CandidateOffsets); }
     }
+    else if (bPartitionedTopology)
+        RaftSimCrestTopologyPublish::Partitioned(Refinement.Triangles,Refinement.TriangleOrigins,SourceCellOffsets,Indices,CellOffsets);
+    else RaftSimCrestTopologyPublish::Reference(Refinement.Triangles,Refinement.TriangleOrigins,SourceCellOffsets,Indices,CellOffsets);
     const double TopologyDone=bTiming ? FPlatformTime::Seconds() : 0.;
     {
     CSV_SCOPED_TIMING_STAT(RaftSimCrests,Normals);
