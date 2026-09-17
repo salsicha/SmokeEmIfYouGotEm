@@ -18,6 +18,7 @@ from audit_south_fork_subcell_energy_flux import sha
 from subcell_exact_geometry import SourceFragment
 from subcell_inlet_sweep_geometry import InletSweep, shared_inlet_edge
 from subcell_inlet_contact_time import initial_wet_contact
+from subcell_inlet_stream_overlap import simultaneous_pairs, signed_area
 from subcell_source_activation import assembly
 
 
@@ -66,7 +67,12 @@ def route(part, fronts, on_face=None):
         sweep = InletSweep(edge, u, k, height/k)
         sweep.validate_receiver(fragments[receiver])
         incoming = tuple(sweep.full_moment(p) for p in range(4))
+        root_limit = min(F(front['rows'][0]['height']), F(front['asymptotic_branch_height_bound']),
+                         branch_bound, sweep.bed_span)/k
         base = dict(donor=list(donor), receiver=list(receiver), original_inlet_xyz=edge,
+            constant_inlet_velocity_mps=u, primary_height_scale=k,
+            original_isolated_geometry_time_root_limit=root_limit,
+            original_isolated_geometry_time_limit=root_limit**3,
             time_root=sweep.time_root, physical_time=sweep.time_root**3,
             primary_height=height, full_incoming_moments=incoming,
             above_receiver_minimum=not front['receiving_face_contact']['contact_starts_at_birth'],
@@ -116,8 +122,7 @@ def route(part, fronts, on_face=None):
                 contacts.append(dict(parent=key[0], source_id=key[1], pool_index=pool_index, **contact))
         first_contact = (dict(lower=min(c['time_lower'] for c in contacts),
                               upper=min(c['time_upper'] for c in contacts)) if contacts else None)
-        time_limit = (min(F(front['rows'][0]['height']), front['asymptotic_branch_height_bound'],
-                          branch_bound, sweep.bed_span)/k)**3
+        time_limit = root_limit**3
         if first_contact and sweep.time_root**3 < first_contact['lower']:
             if any(p.get('initial_wet_support', {}).get('positive_initial_wet_overlap_possible', False) for p in pieces):
                 raise ValueError('First-contact bound conflicts with actual wet-support intersection')
@@ -153,6 +158,30 @@ def main():
     fronts = analyze(part, assembly(part, face_scheme='donor')['new_region_rates'])
     records = route(part, fronts, on_face=lambda r: print(json.dumps(dict(
         donor=r['donor'], receiver=r['receiver'], status=r['status'], pieces=len(r.get('pieces', [])))), flush=True))
+    fragments = original_fragments(part)
+    lows = [min(p[j] for f in fragments.values() for p in f.polygon) for j in range(2)]
+    highs = [max(p[j] for f in fragments.values() for p in f.polygon) for j in range(2)]
+    domain = ((lows[0], lows[1]), (highs[0], lows[1]), (highs[0], highs[1]), (lows[0], highs[1]))
+    if sum((f.area for f in fragments.values()), F(0)) != signed_area(domain):
+        raise ValueError('Original source fragments do not cover the rectangular pair-audit domain')
+    pairs = simultaneous_pairs(records, domain=domain)
+    closure_pairs = simultaneous_pairs(records, domain=domain, window_closure=True)
+    witness_sources = set()
+    for pair in pairs['pairs']+closure_pairs['pairs']:
+        if pair['witness_xy'] is None:
+            continue
+        x, y = pair['witness_xy']
+        owners = []
+        for key, fragment in fragments.items():
+            xy = tuple(p[:2] for p in fragment.polygon)
+            sign = 1 if signed_area(xy) > 0 else -1
+            if all(sign*((b[0]-a[0])*(y-a[1])-(b[1]-a[1])*(x-a[0])) >= 0
+                   for a, b in zip(xy, xy[1:]+xy[:1])):
+                owners.append(key)
+                witness_sources.add(key)
+        if not owners:
+            raise ValueError('Positive overlap witness lacks an original source owner')
+        pair['witness_original_sources'] = owners
     if any(p['volume'] != v or not np.array_equal(p['momentum'], m) for p, (v, m) in zip(part.pools, before)):
         raise ValueError('Geometry routing mutated original water')
     if any(sha(Path(path)) != digest for path, digest in hashes.items()):
@@ -160,11 +189,15 @@ def main():
     routed = [r for r in records if r['status'] == 'source-clipped-conditional-geometry']
     provenance = [dict(parent=p, source_id=s, original_cell=indices[p],
         authority_codes=sorted(set(map(int, authority[sampler.faces[s]].ravel()))))
-        for p, s in sorted({(p['parent'], p['source_id']) for r in routed for p in r['pieces']})]
+        for p, s in sorted({(p['parent'], p['source_id']) for r in routed for p in r['pieces']} | witness_sources)]
     report = dict(schema='raftsim.south_fork.inlet_sweep_geometry.v1', accepted=False,
         source_sha256=hashes, source_time_seconds=source['source_time_seconds'],
         original_block_col_row=[args.block_col, args.block_row], origin_registered_m=origin,
         records=records, provenance=provenance, original_water_unchanged=True,
+        simultaneous_stream_pairs=pairs, pair_domain_original_xy=domain,
+        isolated_window_stream_pair_bounds=closure_pairs,
+        pair_closure_scope='At each common original window limit, footprint closures enclose ALL earlier conditional footprints. Zero upper overlap area proves separation throughout that common window. Positive witnesses are also verified at an explicitly earlier time. This does not evolve pressure or extend the law beyond its original window.',
+        pair_time_scope='Each pair uses the earlier of its two original valid observation times. This is not one evolved global multi-stream state. Sub-float positive exact streams are retained; receding/fan streams remain unsupported.',
         conditional_geometry_controls_passed=bool(routed),
         maximum_relative_moment_uncertainty=max(r['maximum_relative_moment_uncertainty'] for r in routed),
         initially_owned_source_streams=sum(r['enters_initially_owned_source'] for r in routed),

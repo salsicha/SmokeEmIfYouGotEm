@@ -3,7 +3,18 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact initial wet support and conditional first contact](../reconstruction-review-2026-09-07/normal-river-inlet-wet-contact.md).
+Latest: [simultaneous conditional inlet-stream separation](../reconstruction-review-2026-09-07/normal-river-inlet-stream-separation.md).
+All 55 pairs of 11 represented streams are provably separated at common
+observation times and throughout their common original conditional windows.
+The positive sub-float stream is retained; two receding/fan records remain
+unsupported. No merged state, pressure/time update or gameplay change accepted.
+54 focused tests PASS; broad 588 PASS / 13 unchanged FAIL, no gate relaxation.
+598 source/implementation hashes checked; original water unchanged. Next:
+source-face transport and branch transitions for non-horizontal incoming support,
+with compatible pressure/curvature/time evolution. Full playable integration,
+30 FPS, ordered rivers, crew and release work remain open.
+
+Previous: [exact initial wet support and conditional first contact](../reconstruction-review-2026-09-07/normal-river-inlet-wet-contact.md).
 Corrected coarse source-ownership inference: three apparent existing-water
 overlaps have exactly zero incoming overlap with actual initial wet support.
 All10 representable conditional streams first contact STATIC existing water
