@@ -3,7 +3,18 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact crest topology publication and hydraulic continuation](../reconstruction-review-2026-09-07/crest-topology-publication.md).
+Latest: [coupled SM5 pressure diagnostic checkpoint](../reconstruction-review-2026-09-07/coupled-pressure-sm5-checkpoint.md).
+Standalone transport-to-pressure GPU integration is now testable without CPU
+pressure injection. Original transport tests: 13 PASS. Initial coupled tests:
+5 PASS / 1 FAIL; WARP passes all 18 cases, hardware fails eight moving cases.
+Case 2 first diverges at acceleration phase 6; cause remains unresolved.
+Original engine SM5 replay is terminal: 1 PASS / 28 FAIL, shader freeze ended.
+No production shader/module changes or scene acceptance in this checkpoint.
+Hydraulic 1850s and 1900s state AND 86,720 dry-bank audits PASS, NOT settled;
+1900s outflow 93.953068 versus inflow 45.306955 m3/s. No snapshot promoted.
+30 FPS, visible water/terrain, later rivers, crew and release remain OPEN.
+
+Previous: [exact crest topology publication and hydraulic continuation](../reconstruction-review-2026-09-07/crest-topology-publication.md).
 Final isolated candidate compiles/links and passes six native tests;19 Python
 audit checks pass. All64 actual-game pairs preserve exact indices/ownership;
 publication0.384391→0.168537ms, faster in both orders. Enabled with original
