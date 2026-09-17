@@ -12,6 +12,7 @@
 #include "SceneView.h"
 #include "RayTracingInstance.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/App.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "Engine/World.h"
@@ -21,6 +22,30 @@ CSV_DEFINE_CATEGORY(RaftSimShoreline,true);
 
 namespace
 {
+void PrepareStartupWaterShaders(URaftSimShorelineMeshComponent* Component)
+{
+#if WITH_EDITOR
+    // Editor gameplay can load an incomplete on-demand shader map. Prepare the
+    // actual water material before its first mesh publication, including its
+    // depth/velocity passes; BasePass shaders alone still leave the river dry.
+    // Cooked builds use cooked shaders and never enter this compilation path.
+    // This is initialization work, not a per-frame wait or screenshot warmup.
+    if (!FApp::CanEverRender() || !IsInGameThread() || !Component->GetWorld() ||
+        !Component->GetWorld()->IsGameWorld() || !Component->GetWorld()->Scene) return;
+    UMaterialInterface* Material=Component->GetMaterial(0);
+    FMaterialResource* Resource=Material ? Material->GetMaterialResource(Component->GetWorld()->Scene->GetShaderPlatform()) : nullptr;
+    if (!Resource || !Resource->GetShadingModels().HasShadingModel(MSM_SingleLayerWater) ||
+        Resource->IsGameThreadShaderMapComplete()) return;
+    const double Start=FPlatformTime::Seconds();
+    Resource->CacheShaders(EMaterialShaderPrecompileMode::Synchronous);
+    Resource->FinishCompilation();
+    if (!Resource->IsGameThreadShaderMapComplete())
+        UE_LOG(LogTemp,Error,TEXT("Startup water material shaders remain incomplete: %s"),*Material->GetPathName());
+    UE_LOG(LogTemp,Display,TEXT("STARTUP_WATER_PREPARED game_frame=%llu seconds=%.6f material=%s"),
+        GFrameCounter,FPlatformTime::Seconds()-Start,*Material->GetPathName());
+#endif
+}
+
 FDynamicMeshVertex RenderVertex(const FProcMeshVertex& V)
 {
     FDynamicMeshVertex Out;
@@ -228,7 +253,7 @@ public:
                 TMap<FShaderId,TShaderRef<FShader>> Shaders;
                 ShaderMap->GetShaderList(Shaders);
                 for (const auto& Pair:Shaders)
-                    if (Pair.Key.VFType==VertexFactory.GetType() && FString(Pair.Key.Type->GetName()).Contains(TEXT("BasePass")))
+                    if (Pair.Key.VFType==VertexFactory.GetType())
                         UE_LOG(LogTemp,Display,TEXT("STARTUP_WATER_SHADER render_frame=%u type=%s permutation=%d"),
                             Family.FrameNumber,Pair.Key.Type->GetName(),Pair.Key.PermutationId);
             }
@@ -315,6 +340,7 @@ bool URaftSimShorelineMeshComponent::SetWaterMesh(TArray<FProcMeshVertex>&& Vert
         if (V.Position.ContainsNaN() || V.Normal.ContainsNaN()) return false;
         NewBounds += V.Position;
     }
+    if (WaterVertices.IsEmpty()) PrepareStartupWaterShaders(this);
     const bool bShapeChanged = WaterVertices.Num()!=Vertices.Num() || WaterIndexCapacity!=IndexCapacity;
     WaterVertices = MoveTemp(Vertices);
     WaterIndices = MoveTemp(Indices);
@@ -338,6 +364,7 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
     CSV_SCOPED_TIMING_STAT(RaftSimShoreline,SetMesh);
     if (Crests && (Crests->SourceCrestCm.Num()!=Nx*Ny || Crests->SourceShoreWeight.Num()!=Nx*Ny)) return false;
     const int32 BeforeVertices=WaterVertices.Num(), BeforeCapacity=WaterIndexCapacity;
+    if (!BeforeVertices) PrepareStartupWaterShaders(this);
     bool bTopologyRebuilt=false;
     auto& BaseVertices=Crests ? ClippedVertices : WaterVertices;
     auto& BaseIndices=Crests ? ClippedIndices : WaterIndices;

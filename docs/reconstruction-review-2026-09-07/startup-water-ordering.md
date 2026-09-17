@@ -1,5 +1,8 @@
 # Startup water ordering — 2026-09-16
 
+Follow-up: [installed first-frame water correction and remaining gates](startup-water-readiness.md).
+The observations below describe the earlier ordering-only builds.
+
 ## Verified correction, not visual acceptance
 
 The 24-frame, actual 1280x720 startup replay reproduces an absent-water first

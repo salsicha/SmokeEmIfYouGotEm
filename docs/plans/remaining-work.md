@@ -1,9 +1,28 @@
 # Remaining requested work
 
-Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
+Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [startup water ordering and hydraulic continuation](../reconstruction-review-2026-09-07/startup-water-ordering.md).
+Latest: [installed first-frame water readiness](../reconstruction-review-2026-09-07/startup-water-readiness.md).
+Ordinary installed South Fork now shows water in first unskipped image000;
+24 actual1280x720 frames retained, no module override/preview/full-hull/audit flags.
+Scoped editor-game material preparation fixes water depth/velocity readiness;
+BasePass-only experiment was insufficient. Installed gameplay DLL947f5a53...,
+previous DLL/PDB backed up locally; other modules and assets unchanged.
+Five native tests PASS;84 focused Python checks PASS. NOT scene acceptance:
+ordinary terrain still arrives late (also in unchanged baseline), crew colors
+arrive late, crests/froth/terrain/crew remain unfinished. Cooked readiness unverified.
+Installed ordinary300-frame CSV:26.784840FPS/p9543.5724ms FAIL30, unchanged60–240
+sample window; no improvement claim from an unpaired run. Same hydraulic11316
+LIVE;1250/1300 state AND86,720 dry-bank checks PASS, NOT settled.1300s outflow
+78.768740 versus inflow45.306955m3/s; next1350/local15000 needs BOTH audits.
+NEXT ordinary terrain startup, coupled nonlinear water and physical gates,
+source-consistent terrain/rapid/boulders/collision/wave/froth integration,30FPS,
+source closure/default delivery, SM5 failures, normalization, Colorado -> Pacuare
+-> Futaleufu, all-scene water, crew and release. Troublemaker is only a South Fork
+rapid, never a menu scenario. Full objective remains open.
+
+Previous: [startup water ordering and hydraulic continuation](../reconstruction-review-2026-09-07/startup-water-ordering.md).
 Water now initializes after checkpoint restoration at the actual rapid, not the
 authored launch. Consumer-side tick dependency handles late-streamed carriers;
 native four-test replay PASS and targeted Python80 PASS. Isolated compiled/linked
