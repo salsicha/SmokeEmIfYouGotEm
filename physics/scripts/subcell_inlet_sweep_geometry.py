@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from fractions import Fraction as F
 from math import comb
 
-from subcell_exact_geometry import SourceFragment
+from subcell_exact_geometry import SourceFragment, clip
 
 
 def _add(a, b):
@@ -246,3 +246,44 @@ class InletSweep:
                     lower=tuple(exact), upper=tuple(x+y for x, y in zip(exact, uncertainty)),
                     intervals_visited=visited, bounded_switch_intervals=switches,
                     full_force_or_time_or_native_or_gameplay_accepted=False)
+
+    def initial_wet_support_moments(self, fragment, stage_offset, datum,
+                                    relative_bound=F(1, 10**12), max_depth=48):
+        """Partition incoming moments by the ORIGINAL hydrostatic wet support.
+
+        Owning a source triangle does not make its entire footprint wet. Clip
+        the original bed polygon at datum+offset BEFORE any float conversion.
+        These are moments of incoming depth, not existing-pool depth, and not
+        a merged physical state. Both disjoint portions and uncertainty remain.
+        """
+        whole = self.moments(fragment, relative_bound, max_depth)
+        try:
+            surface = F(datum)+F(stage_offset)
+        except (ValueError, TypeError, OverflowError, ZeroDivisionError) as exc:
+            raise ValueError('Finite exact original stage offset and datum required') from exc
+        levels = [p[2] for p in fragment.polygon]
+        zero = dict(source_id=fragment.source_id, lower=(F(0),)*4, upper=(F(0),)*4,
+                    intervals_visited=0, bounded_switch_intervals=0,
+                    full_force_or_time_or_native_or_gameplay_accepted=False)
+        if surface <= min(levels):
+            wet, dry = zero, whole
+        elif surface >= max(levels):
+            wet, dry = whole, zero
+        else:
+            parts = [SourceFragment(fragment.source_id, clip(fragment.polygon, 2, surface, greater),
+                                    fragment.gradient) for greater in (False, True)]
+            wet, dry = [self.moments(part, relative_bound, max_depth) if part.area > 0 else zero
+                        for part in parts]
+        # The common shoreline has zero projected area, except a constant-bed
+        # polygon at exactly its stage, handled as strictly dry above.
+        for p in range(4):
+            lower = wet['lower'][p]+dry['lower'][p]
+            upper = wet['upper'][p]+dry['upper'][p]
+            if lower > whole['upper'][p] or upper < whole['lower'][p]:
+                raise ValueError('Wet/dry support partition violates original incoming moments')
+        return dict(source_id=fragment.source_id, original_stage=surface,
+                    original_source_moments=whole, on_initial_wet_support=wet,
+                    on_initial_dry_support=dry,
+                    positive_initial_wet_overlap_proven=wet['lower'][1] > 0,
+                    positive_initial_wet_overlap_possible=wet['upper'][1] > 0,
+                    merged_state_or_force_or_time_or_gameplay_accepted=False)

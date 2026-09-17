@@ -17,6 +17,7 @@ from audit_south_fork_secondary_fronts import analyze
 from audit_south_fork_subcell_energy_flux import sha
 from subcell_exact_geometry import SourceFragment
 from subcell_inlet_sweep_geometry import InletSweep, shared_inlet_edge
+from subcell_inlet_contact_time import initial_wet_contact
 from subcell_source_activation import assembly
 
 
@@ -37,7 +38,13 @@ def original_fragments(part):
 
 def route(part, fronts, on_face=None):
     fragments = original_fragments(part)
-    occupied = {(p['parent'], int(s)) for p in part.pools for s in p['source_triangle_indices']}
+    occupied = {}
+    for pool_index, pool in enumerate(part.pools):
+        for source_id in pool['source_triangle_indices']:
+            key = (pool['parent'], int(source_id))
+            if key in occupied:
+                raise ValueError('Duplicate original wet-pool source ownership')
+            occupied[key] = (pool_index, pool['form'])
     primary = {tuple(f['donor']) for f in fronts['faces']}
     records = []
     for front in fronts['faces']:
@@ -79,11 +86,16 @@ def route(part, fronts, on_face=None):
                 continue
             value = sweep.moments(fragment)
             if value['upper'][1] > 0:
-                pieces.append(dict(parent=key[0], source_id=key[1], original_gradient=fragment.gradient,
+                piece = dict(parent=key[0], source_id=key[1], original_gradient=fragment.gradient,
                     initial_ownership=('wet' if key in occupied else 'primary-birth' if key in primary else 'unowned'),
                     positive_water_proven=value['lower'][1] > 0,
                     moment_lower=value['lower'], moment_upper=value['upper'],
-                    bounded_switch_intervals=value['bounded_switch_intervals']))
+                    bounded_switch_intervals=value['bounded_switch_intervals'])
+                if key in occupied:
+                    pool_index, form = occupied[key]
+                    piece['initial_wet_support'] = dict(pool_index=pool_index,
+                        **sweep.initial_wet_support_moments(fragment, form['stage_offset'], form['datum']))
+                pieces.append(piece)
         lower = tuple(sum((p['moment_lower'][j] for p in pieces), F(0)) for j in range(4))
         upper = tuple(sum((p['moment_upper'][j] for p in pieces), F(0)) for j in range(4))
         if any(lower[j] > incoming[j] or upper[j]-lower[j] > F(1, 10**10)*incoming[j] for j in range(4)):
@@ -95,7 +107,30 @@ def route(part, fronts, on_face=None):
         geometry_flux_error = abs(float(jacobian)/length-front['normal_velocity'])/abs(front['normal_velocity'])
         if geometry_flux_error > 1e-10:
             raise ValueError('Exact source sweep and original represented normal flux disagree')
+        contacts = []
+        # A future contact may lie OUTSIDE the current sweep bounding box.
+        # Inspect every originally wet source, not just current routed pieces.
+        for key, (pool_index, form) in occupied.items():
+            contact = initial_wet_contact(sweep, fragments[key], form['stage_offset'], form['datum'])
+            if contact['positive_contact_possible']:
+                contacts.append(dict(parent=key[0], source_id=key[1], pool_index=pool_index, **contact))
+        first_contact = (dict(lower=min(c['time_lower'] for c in contacts),
+                              upper=min(c['time_upper'] for c in contacts)) if contacts else None)
+        time_limit = (min(F(front['rows'][0]['height']), front['asymptotic_branch_height_bound'],
+                          branch_bound, sweep.bed_span)/k)**3
+        if first_contact and sweep.time_root**3 < first_contact['lower']:
+            if any(p.get('initial_wet_support', {}).get('positive_initial_wet_overlap_possible', False) for p in pieces):
+                raise ValueError('First-contact bound conflicts with actual wet-support intersection')
         records.append(dict(base, status='source-clipped-conditional-geometry', pieces=pieces,
+            initial_wet_contacts=contacts, first_initial_wet_contact_time=first_contact,
+            original_isolated_geometry_time_limit=time_limit,
+            first_contact_proven_inside_isolated_window=bool(first_contact and first_contact['upper'] < time_limit),
+            first_contact_possible_inside_isolated_window=bool(first_contact and first_contact['lower'] < time_limit),
+            enters_initially_owned_source=any(p['initial_ownership'] == 'wet' for p in pieces),
+            initial_wet_overlap_proven=any(p.get('initial_wet_support', {}).get(
+                'positive_initial_wet_overlap_proven', False) for p in pieces),
+            initial_wet_overlap_possible=any(p.get('initial_wet_support', {}).get(
+                'positive_initial_wet_overlap_possible', False) for p in pieces),
             receiver_mass_fraction_bounds=tuple(v/incoming[1] for v in target_mass),
             out_of_block_moment_bounds=outside,
             maximum_relative_moment_uncertainty=max(float((upper[j]-lower[j])/incoming[j]) for j in range(4)),
@@ -132,7 +167,12 @@ def main():
         records=records, provenance=provenance, original_water_unchanged=True,
         conditional_geometry_controls_passed=bool(routed),
         maximum_relative_moment_uncertainty=max(r['maximum_relative_moment_uncertainty'] for r in routed),
-        scope='Constant-velocity leading outward inlet geometry only. Independent streams are not merged or stepped. Fan, source crossings, pressure/force, time and native/gameplay integration remain open.',
+        initially_owned_source_streams=sum(r['enters_initially_owned_source'] for r in routed),
+        proven_initial_wet_overlap_streams=sum(r['initial_wet_overlap_proven'] for r in routed),
+        possible_initial_wet_overlap_streams=sum(r['initial_wet_overlap_possible'] for r in routed),
+        initial_ownership_scope='Source membership only; initial_wet_support separately clips at each original pool stage.',
+        contact_time_scope='First positive-overlap infimum for the conditional constant-velocity sweep against STATIC original wet support. All wet sources tested, including outside the current footprint. Does not evolve the existing pool, couple pressure or merge streams.',
+        scope='Constant-velocity leading outward inlet geometry only. Exact initial wet-support intersections do not merge or step independent streams. Fan, source crossings, pressure/force, time and native/gameplay integration remain open.',
         authority_note='1 captured DEM; 3 exposed rock; 2 submerged prior, 4 interpolation, 5 inferred flank. Rational coordinates add no measured precision.')
     with args.report.open('x') as stream:
         json.dump(report, stream, indent=2, allow_nan=False,

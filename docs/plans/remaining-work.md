@@ -3,7 +3,22 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact sample-order rejection and fresh transport qualification](../reconstruction-review-2026-09-07/crest-sample-order-rejection.md).
+Latest: [exact initial wet support and conditional first contact](../reconstruction-review-2026-09-07/normal-river-inlet-wet-contact.md).
+Corrected coarse source-ownership inference: three apparent existing-water
+overlaps have exactly zero incoming overlap with actual initial wet support.
+All10 representable conditional streams first contact STATIC existing water
+beyond their original geometry windows; no extrapolated physical time accepted.
+Earlier source crossings/stream-stream support/branch transitions remain next,
+before full coupled pressure/curvature/time/native water integration.
+35 focused tests PASS; broad562 PASS/13 unchanged FAIL, no gate relaxation.
+597 source/implementation hashes checked; original water unchanged.
+Native SM5 replay55459/PID36412 LIVE; worker32072 completed,37836 continues;
+all63 shader inputs frozen. Same cook36872:2150s state AND86,720 dry banks PASS,
+NOT settled (95.500087 out versus45.306955 in m3/s); next2200/local8000 both audits.
+No installed/gameplay change or scene acceptance. Last28.057157FPS/p9541.2354ms
+still FAIL30. Full ordered-river/all-scene/crew/normalization/release scope OPEN.
+
+Previous: [exact sample-order rejection and fresh transport qualification](../reconstruction-review-2026-09-07/crest-sample-order-rejection.md).
 Fresh fixture-derived production transport compile26355 is terminal0;54 combined
 GPU/arithmetic/binding tests PASS, no skips, original18 fixtures on hardware/WARP.
 Wrong-model setup issue closed; no full RK2/native-engine/physical acceptance.

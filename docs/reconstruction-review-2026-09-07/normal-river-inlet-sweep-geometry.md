@@ -59,8 +59,11 @@ Of 13 immediate faces:
   updates; no tiny-speed cutoff or epsilon water is introduced.
 - Two receding faces remain outside this outward construction.
 - Seven routed streams have proven positive portions in additional sources;
-  three enter already-wet regions. Streams cannot simply be appended as
-  independent, non-overlapping physical water states.
+  three enter sources with initial wet-pool ownership. The later
+  [exact wet-support audit](normal-river-inlet-wet-contact.md) corrects the earlier
+  inference that these are already-wet regions: all three incoming portions
+  have zero overlap with actual initial wet support at the audited times.
+  This does not resolve stream-stream overlap or permit unconditional merging.
 - Maximum combined moment-bound width / incoming moment is
   4.973799150320648e-14. Maximum exact projected inlet versus represented-normal
   flux relative discrepancy is 1.7967382807780432e-16.
