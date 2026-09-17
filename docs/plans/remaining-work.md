@@ -3,7 +3,21 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [crest-normal work rejection and qualification recovery](../reconstruction-review-2026-09-07/crest-normal-work-rejection.md).
+Latest: [exact sample-order rejection and fresh transport qualification](../reconstruction-review-2026-09-07/crest-sample-order-rejection.md).
+Fresh fixture-derived production transport compile26355 is terminal0;54 combined
+GPU/arithmetic/binding tests PASS, no skips, original18 fixtures on hardware/WARP.
+Wrong-model setup issue closed; no full RK2/native-engine/physical acceptance.
+Interior-first selection preserves all64 actual meshes across4,296,459 vertices,
+but is slower in one execution order. Rejected; runtime restored, no promotion.
+Eight candidate native tests PASS;37 Python audit/process checks PASS.
+Original native SM5 replay55459/PID36412 and workers32072/37836 remain LIVE,
+all63 shader inputs frozen. Compiler37212 is now terminal; do not pause/restart it.
+Same hydraulic36872:2100s state AND86,720 dry banks PASS, NOT settled
+(96.158823 out versus45.306955 in m3/s). Next2150/local7000 both audits.
+Last ordinary28.057157FPS/p9541.2354ms still FAIL30. Installed modules unchanged.
+Full physical/visual/scene/later-river/crew/normalization/release scope below OPEN.
+
+Previous: [crest-normal work rejection and qualification recovery](../reconstruction-review-2026-09-07/crest-normal-work-rejection.md).
 All64 actual-input normal pairs are exact across4,302,641 vertices, but the
 candidate is slower when called first. Rejected and removed from production.
 Restored runtime plus all-coarse/all-fine regression:7 native D3D12 tests PASS;
