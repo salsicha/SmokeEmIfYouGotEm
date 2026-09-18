@@ -21,6 +21,7 @@
 #include "RaftSimCrestTopologyPublish.h"
 #include "RaftSimCrestBoundaryAudit.h"
 #include "RaftSimCrestAdjacentRangeAudit.h"
+#include "RaftSimCrestIntervalAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
@@ -131,6 +132,9 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
                 ? (bPreparedRange && Input.PreparedHeightRangeWidthAtWorldXYCm
                     ? Input.PreparedHeightRangeWidthAtWorldXYCm : Input.HeightRangeWidthAtWorldXYCm)
                 : TFunction<float(const FBox2D&)>();
+            static const bool bTightRange=FParse::Param(FCommandLine::Get(),TEXT("RaftSimTightCrestRange"));
+            if(bTightRange && bRangeBound && bPreparedRange && Input.TightHeightRangeWidthAtWorldXYCm)
+                Refinement.HeightRangeWidthCm=Input.TightHeightRangeWidthAtWorldXYCm;
             const uint64 OldBuilds=Refinement.TopologyBuildCount,OldReuses=Refinement.TopologyReuseCount;
             // Two actual-input histories preserve exact output, but the
             // second fails the both-order speed gate. Diagnostic only.
@@ -184,6 +188,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         RaftSimCrestPreparedRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestBoundMemoAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestAdjacentRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
+        RaftSimCrestIntervalAudit::Run(CachedXY,Triangles,Input,Refinement);
         ++BuildCount;
         TargetsMs=bTiming ? (FPlatformTime::Seconds()-Selected)*1000. : 0.;
     }

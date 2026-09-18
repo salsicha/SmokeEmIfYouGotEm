@@ -5950,6 +5950,19 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     return Prepared->WidthMeters(Field)*FMath::Abs(Scale)*100.f;
                 };
                 CartesianCrestInput.PreparedRangeConstructionMs=(FPlatformTime::Seconds()-PrepareStart)*1000.;
+                static const bool bTightRange=[]
+                {
+                    FString Path;
+                    return FParse::Param(FCommandLine::Get(),TEXT("RaftSimTightCrestRange")) ||
+                        FParse::Value(FCommandLine::Get(),TEXT("RaftSimCrestIntervalAudit="),Path);
+                }();
+                if(bTightRange)CartesianCrestInput.TightHeightRangeWidthAtWorldXYCm=[Prepared,Scale,Sign](const FBox2D& Box)
+                {
+                    FBox2D Field(ForceInit);
+                    Field+=FVector2D(Box.Min.X*.01,Box.Min.Y*.01*Sign);
+                    Field+=FVector2D(Box.Max.X*.01,Box.Max.Y*.01*Sign);
+                    return Prepared->WidthMeters<true>(Field)*FMath::Abs(Scale)*100.f;
+                };
                 static bool bLoggedPreparedRange=false;
                 if(!bLoggedPreparedRange)
                 {

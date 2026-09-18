@@ -10,9 +10,11 @@ class FRaftSimPreparedBreakingHeightRange
         FVector2D RiverCoordinatesMeters,FlowDirection,AbsDirection;
         double CoordinateMagnitude,LateralWidth;
         float Lift,Length;
+        bool bLocalCap;
     };
     TArray<FSite> Sites;
     bool bValid=true;
+    float GlobalCap=0.f;
     // Query centers inside this finite domain and half extents <= 8 m have
     // a bounded reference roundoff pad. Other queries use the full scan.
     FBox2D QueryDomain=FBox2D(ForceInit);
@@ -84,13 +86,15 @@ public:
                 !FMath::IsFinite(Norm) || Norm<.25 || Norm>4.)
             {bValid=false;Sites.Reset();return;}
             const float Length=FMath::Clamp(S.PhysicalCrestLengthMeters,2.f,7.f);
+            if(!S.bLocalEnvelopeCap)GlobalCap=FMath::Max(GlobalCap,FMath::Clamp(S.PhysicalCrestHeightMeters,0.f,1.2f));
             Sites.Add({S.RiverCoordinatesMeters,S.FlowDirection,
                 FVector2D(FMath::Abs(S.FlowDirection.X),FMath::Abs(S.FlowDirection.Y)),
                 S.RiverCoordinatesMeters.GetAbsMax(),double(FMath::Clamp(Length,3.f,5.f)),
-                FMath::Clamp(S.PhysicalCrestHeightMeters,0.f,1.2f),Length});
+                FMath::Clamp(S.PhysicalCrestHeightMeters,0.f,1.2f),Length,S.bLocalEnvelopeCap});
         }
         BuildIndex();
     }
+template<bool Tight=false>
 float WidthMeters(const FBox2D& Bounds) const
 {
     if(!bValid || !Bounds.bIsValid || Bounds.Min.ContainsNaN() || Bounds.Max.ContainsNaN())return MAX_flt;
@@ -106,6 +110,7 @@ float WidthMeters(const FBox2D& Bounds) const
         Active=X>=0 && Y>=0 && X<TileSize.X && Y<TileSize.Y ? &Tiles[Y*TileSize.X+X] : &Empty;
     }
     double Sum=0.;
+    double Lower=0.,Upper=0.,CapLower=GlobalCap,CapUpper=GlobalCap;
     const auto Nearest=[](double Low,double High)
     {return Low>0. ? Low : (High<0. ? -High : 0.);};
     const auto Gaussian=[&](double Low,double High,double Offset,float Scale)
@@ -141,8 +146,61 @@ float WidthMeters(const FBox2D& Bounds) const
         // Smooth edge envelopes are in [0,1]; omitting them is conservative.
         // Relative/absolute cushions cover float exp/product/sum rounding.
         Sum+=double(Lift)*(Crest+Toe+TailA+TailB)*Lateral*1.0001+1.e-6;
+        if constexpr(Tight)
+        {
+            // Unlike the original zero-containing range, enclose the local
+            // value of each signed term. All endpoints include the SAME input
+            // and bend roundoff padding above. These bounds never replace a
+            // sampled height or change an interpolation/selection tolerance.
+            const auto GaussianMinimum=[](double A,double B,double Offset,float Scale)
+            {
+                const double Distance=FMath::Max(FMath::Abs(A-Offset),FMath::Abs(B-Offset))/double(Scale);
+                return FMath::Exp(-Distance*Distance);
+            };
+            const auto CrestEnd=[&](double X)
+            {const double Width=X<0. ? double(L) : double(.42f*L);return FMath::Exp(-FMath::Square(X/Width));};
+            const double CrestMin=FMath::Min(CrestEnd(Low),CrestEnd(High));
+            const double ToeMin=.32f*GaussianMinimum(Low,High,.95f*L,.5f*L);
+            const double TailAMin=.35f*GaussianMinimum(Low,High,2.8f*L,.75f*L);
+            const double TailBMin=.16f*GaussianMinimum(Low,High,5.1f*L,L);
+            const auto Step=[](double A,double B,double X)
+            {const double T=FMath::Clamp((X-A)/(B-A),0.,1.);return T*T*(3.-2.*T);};
+            const double EdgeLow=Step(-3.f*L,-2.f*L,DLow)*(1.-Step(6.f*L,7.f*L,DHigh));
+            const double EdgeHigh=Step(-3.f*L,-2.f*L,DHigh)*(1.-Step(6.f*L,7.f*L,DLow));
+            const double LateralLow=FMath::Exp(-FMath::Square(AMax/Site.LateralWidth))*(1.-Step(10.,12.,AMax));
+            const double LateralHigh=Lateral*(1.-Step(10.,12.,AMin));
+            const double EnvelopeLow=FMath::Max(0.,EdgeLow*LateralLow-1.e-5);
+            const double EnvelopeHigh=FMath::Min(1.,EdgeHigh*LateralHigh+1.e-5);
+            const double WaveLow=CrestMin-Toe+TailAMin+TailBMin;
+            const double WaveHigh=Crest-ToeMin+TailA+TailB;
+            const double Products[]={WaveLow*EnvelopeLow,WaveLow*EnvelopeHigh,
+                                     WaveHigh*EnvelopeLow,WaveHigh*EnvelopeHigh};
+            double TermLow=Products[0],TermHigh=Products[0];
+            for(int32 I=1;I<4;++I){TermLow=FMath::Min(TermLow,Products[I]);TermHigh=FMath::Max(TermHigh,Products[I]);}
+            // Exp, smoothstep, float products and ordered float accumulation
+            // all receive an explicit absolute/relative cushion. Cap and sum
+            // dependence is deliberately discarded to enlarge the enclosure.
+            const double Roundoff=double(Lift)*1.e-4+1.e-6;
+            Lower+=double(Lift)*TermLow-Roundoff;
+            Upper+=double(Lift)*TermHigh+Roundoff;
+            if(Site.bLocalCap)
+            {
+                CapLower=FMath::Max(CapLower,FMath::Max(0.,double(Lift)*EnvelopeLow-Roundoff));
+                CapUpper=FMath::Max(CapUpper,double(Lift)*EnvelopeHigh+Roundoff);
+            }
+        }
         if(!FMath::IsFinite(Sum) || Sum>MAX_flt/2.)return MAX_flt;
     }
-    return float(Sum*1.0001+1.e-6);
+    const float Original=float(Sum*1.0001+1.e-6);
+    if constexpr(Tight)
+    {
+        // clamp(t,-c,c) is monotone in t, but not in c for both signs.
+        // Its extrema on the interval product occur at these four corners.
+        const double Low=FMath::Min(FMath::Clamp(Lower,-CapLower,CapLower),FMath::Clamp(Lower,-CapUpper,CapUpper));
+        const double High=FMath::Max(FMath::Clamp(Upper,-CapLower,CapLower),FMath::Clamp(Upper,-CapUpper,CapUpper));
+        const double Width=(High-Low)*1.0001+2.e-6;
+        if(FMath::IsFinite(Width) && Width>=0.)return FMath::Min(Original,float(Width));
+    }
+    return Original;
 }
 };
