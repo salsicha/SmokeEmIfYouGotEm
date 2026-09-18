@@ -12,14 +12,14 @@ finishes870 PASS/1 unchanged storage-face consistency FAIL (871 tests); four
 older block-preconditioner failures in a separate related suite also remain.
 Neither test migration nor coordinate differentiation enables nonlinear runtime.
 No new playable visual improvement or30FPS acceptance is claimed.
-7800/local2000 AND7850/local3000 state and artificial-bank audits PASS, NOT settled;
+7800/local2000,7850/local3000 AND7900/local4000 state and artificial-bank audits PASS, NOT settled;
 all86,720 bank cells remain exactly dry. Same cook8900/startUTC
 2026-09-18T06:34:59.2598919Z/session68256 remains LIVE; installed4950 stays.
-Next7900/local4000 needs its complete marker and BOTH audits.
+Next7950/local5000 needs its complete marker and BOTH audits.
 An explicit nonshipping RaftSimSolverLanes option is being built to compare
 four/eight native solver lanes in actual FullReach; the gameplay default is
 UNCHANGED at four. Native domain tests pass at both limits. Editor build
-session85099 is still running (tmp/solver-lanes-editor-build-v1-20260918.log),
+session85099/dotnet5088 is still running (tmp/solver-lanes-editor-build-v1-20260918.log),
 after rebuilding the solver archive. Do not launch performance captures while
 it runs or restart it merely for an observation timeout. After completion,
 run RaftSim.Water.SolverLaneOption and same-build alternating4/8 game captures,

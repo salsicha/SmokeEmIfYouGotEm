@@ -92,3 +92,15 @@ The dependent editor rebuild is still running as session85099 with log
 whole-build/native option-test/performance completion remains unproven.
 Default gameplay is unchanged. Do not promote eight lanes without actual
 game measurements or call this pending comparison a visual improvement.
+
+The subsequent continuation directly revalidates that SAME build session85099
+and dotnet5088, advancing through action71/163. It is not terminal and is not
+restarted. No timing runs are overlapped with compilation. The complete7900/
+local4000 checkpoint also passes BOTH audits: 5,382,400 finite/in-bounds cells,
+86,720 exactly dry artificial-bank cells, maximum depth3.8095960630208774m,
+speed5.350402523076331m/s and maximum step residual1.4395798775268531e-8m3.
+Outflow104.71106839956684m3/s against inflow45.30695454719997m3/s still fails
+settling; installed4950 remains untouched. Reports:
+`tmp/control-ablation-7900s-{state,banks}-v1-20260918.json`.
+Depth SHA256 `8cee9f81d4ca96d4eb032fa7a97772171a8064e6694fcf582eb90097465560e4`.
+Next7950/local5000 requires its complete marker and both independent audits.
