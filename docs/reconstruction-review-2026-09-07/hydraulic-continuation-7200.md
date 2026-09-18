@@ -59,6 +59,14 @@ Revalidate the exact process identity before control; this record alone is not
 proof of future liveness. Next7250/local1000 needs its completion marker and
 BOTH state and artificial-bank audits. Do not restart on observation timeout.
 
+7250/local1000 now passes BOTH audits: maximum depth3.810673992m,
+speed5.341889311m/s, volume2,669,461.529309m3 and maximum step residual1.256855e-8m3.
+Outflow108.931459m3/s still exceeds45.306955m3/s inflow: NOT settled.
+All86,720 artificial-bank cells remain exactly dry. Reports:
+`tmp/control-ablation-7250s-{state,banks}-v1-20260918.json`; depth SHA256
+`a8fbd26603f4620e76499332e760ad310d9066968546094cbb2fe5ec708a49cd`.
+The same process28776 is verified live; next7300/local2000 needs BOTH audits.
+
 The independent original-front pressure verifier also completed exit0:11
 supported cases, two preserved unsupported records,369 original fields and631
 hashes checked. See [its evidence and limits](original-front-pressure-variation.md).

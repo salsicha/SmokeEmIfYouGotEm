@@ -3,7 +3,22 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [verified7200 hydraulic continuation](../reconstruction-review-2026-09-07/hydraulic-continuation-7200.md).
+Latest: [moving-front total energy](../reconstruction-review-2026-09-07/normal-river-front-total-energy.md).
+Original depth-weighted spatial moments now supply gravity/bed potential and
+the complete energy derivative in BOTH momentum coordinates, alongside the
+unchanged two-pole kinetic derivative.50 focused checks PASS. Full physical
+suite832 PASS/13 unchanged FAIL,845 tests; no gate waived. All11 supported
+original source cases preserve every old metric field exactly and new potential/
+spatial moments partition exactly; two unsupported records remain explicit.
+This is energy variation, NOT the changing-support conservative force/transport,
+wetting/open-boundary law or playable breaking-water integration. Nonlinear OFF.
+7250 state AND artificial-bank audits PASS, NOT settled; installed4950 stays.
+Same verified cook28776/startUTC2026-09-18T04:30:27.5746990Z/session93831 continues.
+Next7300/local2000 needs completion marker and BOTH audits. No new visual or
+30FPS acceptance; prior normal p9538.6731ms still FAIL30. Entire ordered scene,
+crew, normalization, physical-regression and release scope stays OPEN.
+
+Previous: [verified7200 hydraulic continuation](../reconstruction-review-2026-09-07/hydraulic-continuation-7200.md).
 Both7150 and7200 full-state AND artificial-bank audits PASS, still NOT settled.
 Original cook32728 is terminal, confirmed by absent handle and completed marker;
 no captured exit code. New exact7200-to9000 continuation28776/startUTC

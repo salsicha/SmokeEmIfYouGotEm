@@ -32,6 +32,7 @@ def front_metric(fan, fragment, time):
     varying=_clip(_clip(fragment.polygon,lambda p:fan._coordinate(p)-head,True),
                   lambda p:fan._coordinate(p)-front,False)
     moments=[fan.zero]*4;rates=[fan.zero]*3;rate_scales=[fan.zero]*3
+    spatial=[fan.zero]*2;spatial_rates=[fan.zero]*2
     for polygon,variable in ((wet,False),(varying,True)):
         # Algebraic vertices must not pass through the rational-only geometry
         # helper or a float projection. Zero-area triangles integrate to zero.
@@ -44,6 +45,15 @@ def front_metric(fan, fragment, time):
                 if variable and k:
                     rates[k-1]+=2*k*coefficient**k*_integrate(
                         triangle,[linear]*(2*k-1)+[linear_rate],fan.zero)
+            # Bed potential needs integral((x-origin)*h), not the centroid of
+            # the footprint times volume. Preserve the curved depth profile.
+            for axis in range(2):
+                coordinate=lambda p,axis=axis:p[axis]-fan.origin[axis]
+                spatial[axis]+=coefficient*_integrate(
+                    triangle,([linear,linear] if variable else [])+[coordinate],fan.zero)
+                if variable:
+                    spatial_rates[axis]+=2*coefficient*_integrate(
+                        triangle,[linear,linear_rate,coordinate],fan.zero)
     # Gross actual work is a meaningful derivative-audit scale even when
     # opposite changes cancel. Never divide pre-existing mass by a tiny time
     # to obtain an arbitrarily permissive normalization.
@@ -69,6 +79,8 @@ def front_metric(fan, fragment, time):
 
     return dict(source_id=fragment.source_id,time=t,depth_moments=tuple(moments),
                 depth_moment_rates=tuple(rates),depth_moment_rate_scales=tuple(rate_scales),
+                depth_spatial_moments=tuple(spatial),depth_spatial_moment_rates=tuple(spatial_rates),
+                spatial_origin=fan.origin,bed_at_origin=fan.bed,gravity=fan.gravity,
                 gram=gram(*moments[1:]),
                 gram_rate=gram(*rates),
                 rate_coordinate='physical time on a fixed original source polygon',
