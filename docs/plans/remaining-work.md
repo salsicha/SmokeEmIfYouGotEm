@@ -8,10 +8,11 @@ The original two poles and both changing mass normalizations now have exact
 momentum/rate reconstruction and independent positive-energy identities.
 69 focused PASS; broader768 PASS/13 unchanged FAIL, no gates waived.
 Original-source audit17228/start2026-09-18T01:51:57.8200933Z/session43933 is LIVE:
-case0 passed, case1 computing; no all-case, native40-CG or gameplay acceptance.
+case0 passed, case1 metric-ready/evaluation computing; no all-case, native40-CG
+or gameplay acceptance.
 Preserve the same job and verify its fresh report and hashes after completion.
-6450/6500 hydraulic state AND dry-bank audits PASS, NOT settled; installed4950
-unchanged. Next6550/local23000 requires completion marker and BOTH audits.
+6450/6500/6550 hydraulic state AND dry-bank audits PASS, NOT settled; installed4950
+unchanged. Next6600/local24000 requires completion marker and BOTH audits.
 Conservative nonlinear mass/force evolution, interacting fronts/open boundary,
 playable physical breaking/froth and30FPS remain OPEN; nonlinear runtime OFF.
 No new visual/runtime change. South Fork, then Colorado, Pacuare, Futaleufu;

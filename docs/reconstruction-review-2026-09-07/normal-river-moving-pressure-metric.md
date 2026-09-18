@@ -86,7 +86,8 @@ must remain unchanged at completion.
 
 The original process17228, started2026-09-18T01:51:57.8200933Z, session43933,
 is verified LIVE. Case0/source601454 passed in96.7073165 seconds; case1/source
-601453 is still computing. Increasing process CPU time confirms active work;
+601453 has reached metric-ready and is computing evaluation. Increasing process
+CPU time confirms active work;
 there is no terminal result or all-case acceptance yet. Do not restart because
 a polling interval has no output. Intended fresh output:
 `tmp/south-fork-moving-pressure-metric-v1-20260918.json`.
