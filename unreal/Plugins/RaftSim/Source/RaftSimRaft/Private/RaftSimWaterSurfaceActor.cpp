@@ -11,8 +11,6 @@
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimWaterSourcePacking.h"
 #include "RaftSimSourcePackingAudit.h"
-#include "RaftSimWaterInterpolationPacking.h"
-#include "RaftSimWaterInterpolationPackingAudit.h"
 #include "RaftSimWaterSmoothing.h"
 #include "RaftSimWaterFlowFrame.h"
 #include "RaftSimIndexedBreakingProfile.h"
@@ -8831,8 +8829,7 @@ bool ARaftSimWaterSurfaceActor::SavePresentedCarrierShapeAudit(const FString& Pa
 
 void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Positions,
     const TArray<FVector>& VertexNormals, const TArray<FLinearColor>& Colors,
-    const TArray<FVector2D>& Flow, const TArray<FVector2D>& Wake, bool bCreate,float CrestBlendAlpha,
-    TArray<FProcMeshVertex>* PreparedSource)
+    const TArray<FVector2D>& Flow, const TArray<FVector2D>& Wake, bool bCreate,float CrestBlendAlpha)
 {
     if (WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates())
     {
@@ -8845,8 +8842,7 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
         // Same-input live pairs preserve every attribute and improve both
         // orders. Retain capacity only; Pack still writes every current field.
         static const bool bReuseSource=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimFreshSourcePacking"));
-        if(PreparedSource && PreparedSource->Num()!=N)return;
-        auto& Source=PreparedSource ? *PreparedSource : bReuseSource ? CartesianSourcePackingScratch : FreshSource;
+        auto& Source=bReuseSource ? CartesianSourcePackingScratch : FreshSource;
         {
             CSV_SCOPED_TIMING_STAT(RaftSimSurface,PackSource);
             // Exact packing is not necessarily faster in parallel. Keep it
@@ -8854,14 +8850,13 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             static const bool bParallelSourcePacking = FParse::Param(
                 FCommandLine::Get(), TEXT("RaftSimParallelSourcePacking"));
             static const bool bVectorColors=FParse::Param(FCommandLine::Get(),TEXT("RaftSimVectorSourceColors"));
-            if (!PreparedSource && !RaftSimWaterSourcePacking::Pack(Positions,VertexNormals,Colors,UVs,
+            if (!RaftSimWaterSourcePacking::Pack(Positions,VertexNormals,Colors,UVs,
                 Flow,Wake,Tangents,Source,bParallelSourcePacking,
                 FoamTransportVelocityMetersPerSecond.Num()==N
                     ? TConstArrayView<FVector2D>(FoamTransportVelocityMetersPerSecond) : TConstArrayView<FVector2D>(Flow),bVectorColors)) return;
         }
         RaftSimSourcePackingAudit::Run(Positions,VertexNormals,Colors,UVs,Flow,Wake,Tangents,
             FoamTransportVelocityMetersPerSecond.Num()==N ? TConstArrayView<FVector2D>(FoamTransportVelocityMetersPerSecond) : TConstArrayView<FVector2D>(Flow),Source);
-        RaftSimWaterInterpolationPackingAudit::Production(Source);
         Perf.Mark(TEXT("pack_source"));
         if (CartesianShorelineMesh->GetMaterial(0)!=LiveVolumeCoreMesh->GetMaterial(0))
             CartesianShorelineMesh->SetMaterial(0, LiveVolumeCoreMesh->GetMaterial(0));
@@ -9138,28 +9133,29 @@ void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
         FlowVelocityMetersPerSecond.Num());
     RenderedLiveVolumeCoreWakeData.SetNumUninitialized(
         BoatWakePresentationData.Num());
-    const RaftSimWaterInterpolationPacking::FRead Target{LiveVolumeCoreVertices,LiveVolumeCoreNormals,
-        LiveVolumeCoreVertexColors,FlowVelocityMetersPerSecond,BoatWakePresentationData};
-    const RaftSimWaterInterpolationPacking::FWrite Rendered{RenderedLiveVolumeCoreVertices,RenderedLiveVolumeCoreNormals,
-        RenderedLiveVolumeCoreVertexColors,RenderedLiveVolumeCoreFlowVelocity,RenderedLiveVolumeCoreWakeData};
-    const TConstArrayView<FVector2D> Transport=FoamTransportVelocityMetersPerSecond.Num()==LiveVolumeCoreVertices.Num()
-        ? TConstArrayView<FVector2D>(FoamTransportVelocityMetersPerSecond) : TConstArrayView<FVector2D>();
-    const bool bPackingShape=UVs.Num()==LiveVolumeCoreVertices.Num() && Tangents.Num()==LiveVolumeCoreVertices.Num();
-    if(bCartesianFlow && bPackingShape)RaftSimWaterInterpolationPackingAudit::Run(Target,Rendered.Read(),Alpha,UVs,Tangents,Transport);
-    // Candidate remains opt-in until exact actual-state comparisons qualify it.
-    static const bool bFused=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFusedWaterInterpolation")) &&
-        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimFreshSourcePacking")) &&
-        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimVectorSourceColors")) &&
-        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimParallelSourcePacking"));
-    TArray<FProcMeshVertex>* Prepared=nullptr;
-    if(bFused && bCartesianFlow && bPackingShape)
+    for (int32 Index = 0; Index < LiveVolumeCoreVertices.Num(); ++Index)
     {
-        CSV_SCOPED_TIMING_STAT(RaftSimSurface,BlendAndPack);
-        if(!RaftSimWaterInterpolationPacking::BlendAndPack(Target,Rendered,Alpha,UVs,Tangents,Transport,
-            CartesianSourcePackingScratch))return;
-        Prepared=&CartesianSourcePackingScratch;
+        RenderedLiveVolumeCoreVertices[Index] = FMath::Lerp(
+            RenderedLiveVolumeCoreVertices[Index],
+            LiveVolumeCoreVertices[Index],
+            Alpha);
+        RenderedLiveVolumeCoreNormals[Index] = FMath::Lerp(
+            RenderedLiveVolumeCoreNormals[Index],
+            LiveVolumeCoreNormals[Index],
+            Alpha).GetSafeNormal();
+        RenderedLiveVolumeCoreVertexColors[Index] = FMath::Lerp(
+            RenderedLiveVolumeCoreVertexColors[Index],
+            LiveVolumeCoreVertexColors[Index],
+            Alpha);
+        RenderedLiveVolumeCoreFlowVelocity[Index] = FMath::Lerp(
+            RenderedLiveVolumeCoreFlowVelocity[Index],
+            FlowVelocityMetersPerSecond[Index],
+            Alpha);
+        RenderedLiveVolumeCoreWakeData[Index] = FMath::Lerp(
+            RenderedLiveVolumeCoreWakeData[Index],
+            BoatWakePresentationData[Index],
+            Alpha);
     }
-    else if(!RaftSimWaterInterpolationPacking::Blend(Target,Rendered,Alpha))return;
 
     const TArray<FVector2D> EmptyUVs;
     // R/G/B store foam/depth/speed, not display colour. Creation defaults to
@@ -9169,7 +9165,7 @@ void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
     // both exaggerated whitening and different local-fluid displacement.
     PublishLiveVolumeCore(RenderedLiveVolumeCoreVertices, RenderedLiveVolumeCoreNormals,
         RenderedLiveVolumeCoreVertexColors, RenderedLiveVolumeCoreFlowVelocity,
-        RenderedLiveVolumeCoreWakeData, false,Alpha,Prepared);
+        RenderedLiveVolumeCoreWakeData, false,Alpha);
     // The chase never "completes": it keeps easing toward the latest
     // refresh targets every frame until a hard swap or grid teardown
     // deactivates it.

@@ -3,7 +3,22 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [pressure-energy geometry variation](../reconstruction-review-2026-09-07/normal-river-pressure-variation.md).
+Latest: [interpolation/packing trial rejected](../reconstruction-review-2026-09-07/interpolation-packing-review.md).
+All128 actual-game same-input pairs preserve floating rendered fields and packed
+attributes, but one capture loses an execution order. The opt-in trial from
+88b6f9fe5 is removed, not promoted; original actor code is restored.94 Python
+checks and eight native checks PASS; restored editor build succeeds. Final
+ordinary28.171491FPS / p9543.1591ms still FAIL30; no new performance acceptance.
+6700/6750/6800 hydraulic state AND bank audits PASS, NOT settled; installed4950 stays.
+Next6850/local29000 requires completion marker and BOTH audits. Original-source
+pressure audit17228 is TERMINAL exit0: all11 supported local cases PASS, two
+unsupported records preserved. Independent reload verifies358 original fields,
+628 hashes and exact serialized energy/time-work identities. Verifier38768 also
+finished exit0. No native40-CG, nonlinear force or gameplay acceptance is claimed.
+No new visual, physical or30FPS acceptance. Full ordered scene, crew, regression,
+normalization and release scope remains OPEN; nonlinear runtime remains OFF.
+
+Previous: [pressure-energy geometry variation](../reconstruction-review-2026-09-07/normal-river-pressure-variation.md).
 Exact derivatives now reach original depth moments, shared-face columns,
 both owner-volume denominators and bed slopes in BOTH momentum coordinates.
 Independent primitive derivatives and complete time-work identities PASS.

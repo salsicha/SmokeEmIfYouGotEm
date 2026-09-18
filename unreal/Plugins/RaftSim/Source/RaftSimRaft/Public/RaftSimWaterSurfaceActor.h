@@ -682,8 +682,7 @@ private:
     friend class FRaftSimCartesianShorelineSurfaceTest;
     void PublishLiveVolumeCore(const TArray<FVector>& Positions, const TArray<FVector>& VertexNormals,
         const TArray<FLinearColor>& Colors, const TArray<FVector2D>& Flow,
-        const TArray<FVector2D>& Wake, bool bCreate,float CrestBlendAlpha=1.f,
-        TArray<FProcMeshVertex>* PreparedSource=nullptr);
+        const TArray<FVector2D>& Wake, bool bCreate,float CrestBlendAlpha=1.f);
     FRaftSimShorelineCrestInput CartesianCrestInput;
     TArray<uint8> CartesianShoreWet;
     TArray<uint8> CartesianShoreAvailable;

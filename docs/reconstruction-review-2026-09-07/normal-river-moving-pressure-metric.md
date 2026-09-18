@@ -85,15 +85,20 @@ Input and imported implementation hashes are captured before evaluation and
 must remain unchanged at completion.
 
 The original process17228, started2026-09-18T01:51:57.8200933Z, session43933,
-is verified LIVE. Case0/source601454 passed in96.7073165 seconds; case1/source
-601453 has reached metric-ready and is computing evaluation. Increasing process
-CPU time confirms active work;
-there is no terminal result or all-case acceptance yet. Do not restart because
-a polling interval has no output. Intended fresh output:
-`tmp/south-fork-moving-pressure-metric-v1-20260918.json`.
-After completion, independently reload the serialized report, verify all13
-original records and every protected hash, and distinguish11 supported cases
-from the two unsupported cases. No full source-case pass is claimed here.
+is now TERMINAL with exit0, not restarted. All11 supported original local cases
+pass exact original-pole and differentiated-pole equations, momentum/rate
+reconstruction and positive-energy/time-work identities. Two unsupported records
+remain unsupported and unchanged. The completed fresh report is
+`tmp/south-fork-moving-pressure-metric-v1-20260918.json` (93,752,809 bytes), SHA256
+`3fbd2603d037de54c6fa0ca0d921e1c1c76f8ab50815c878b3906727bb84b5ef`.
+
+A separate reload independently verifies all358 original top-level record fields,
+all628 current source/implementation hashes, all13 original records, and the
+serialized exact kinetic-energy, positive auxiliary-energy sum and time-work
+identities for all11 supported cases. It does not repeat the expensive matrix
+solves or claim a native iteration result. Review record:
+`tmp/moving-pressure-report-review-v1-20260918.json`; verifier process38768 /
+session41387 also finished exit0. No unsupported case is relabeled as passed.
 
 ## Remaining integration
 
@@ -103,10 +108,11 @@ slope junctions, open boundaries, conservative nonlinear mass/force evolution,
 native iteration-budget validation and shared render/contact integration are
 still required. The thirteen existing physical regressions remain unwaived.
 
-The publication-path inspection found no newly qualified runtime optimization;
-adaptive crest sampling and geometry publication remain material costs. No
-new engine build, capture, visual improvement or FPS acceptance is claimed.
-Physical breaking and convincing froth remain unfinished. The last ordinary
-profile's p9538.0726ms still exceeds the unchanged33.333333ms requirement.
+The later [interpolation/packing trial](interpolation-packing-review.md) provides
+actual publication-path comparisons but no newly qualified optimization;
+adaptive crest sampling and geometry publication remain material costs. This
+pressure-map result supplies no new visual improvement or FPS acceptance.
+Physical breaking and convincing froth remain unfinished. The later restored
+ordinary profile's p9543.1591ms exceeds the unchanged33.333333ms requirement.
 South Fork precedes Colorado, Pacuare and Futaleufu; Chilko/Zambezi, crew,
 normalization, outstanding regressions and release qualification remain open.
