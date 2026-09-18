@@ -1,5 +1,6 @@
 #include "RaftSimStatefulDetailComponent.h"
 #include "RaftSimDetailSnapshot.h"
+#include "RaftSimFrothFlowHistory.h"
 #include "RaftSimDetailFrameReadback.h"
 #include "RaftSimDetailFrameUpload.h"
 #include "RaftSimDetailFrameAudit.h"
@@ -50,6 +51,7 @@ struct FRaftSimDetailRenderState
     TUniquePtr<FRaftSimTemporalBoundaryAudit> TemporalAudit;
     bool bTemporalAuditRequested=false;
     TUniquePtr<FRaftSimNonlinearEvolutionAudit> NonlinearAudit;
+    FRaftSimFrothFlowHistory FrothFlowHistory;
 };
 
 URaftSimStatefulDetailComponent::URaftSimStatefulDetailComponent()
@@ -537,8 +539,13 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
     const FVector CaptureDownstream=Downstream,CaptureLeft=Left;
     const bool bFrameContact=bMovingWindow;
     const bool bPairedFoamFlow=FoamFlowTexture.IsValid();
+    bool bCaptureFrothHistory=false;
+#if !UE_BUILD_SHIPPING
+    bCaptureFrothHistory=bMovingWindow && !SnapshotPrefix.IsEmpty() &&
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimFrothHistoryAudit"));
+#endif
     FTextureRenderTargetResource* Target=(bFrameContact ? ComputeTexture : SurfaceTexture)->GameThread_GetRenderTargetResource();
-    ENQUEUE_RENDER_COMMAND(RaftSimDetailLive)([Shared,Grid,Flow=MoveTemp(Flow),TotalSource,TemporalAuditPath,CaptureGeometry=MoveTemp(CaptureGeometry),CaptureMeanElapsed,Steps,Target,CapturePrefix,CaptureElapsed,CaptureCenter,CaptureDownstream,CaptureLeft,bFrameContact,bPairedFoamFlow](FRHICommandListImmediate& Cmd)
+    ENQUEUE_RENDER_COMMAND(RaftSimDetailLive)([Shared,Grid,Flow=MoveTemp(Flow),TotalSource,TemporalAuditPath,CaptureGeometry=MoveTemp(CaptureGeometry),CaptureMeanElapsed,Steps,Target,CapturePrefix,CaptureElapsed,CaptureCenter,CaptureDownstream,CaptureLeft,bFrameContact,bPairedFoamFlow,bCaptureFrothHistory](FRHICommandListImmediate& Cmd)
     {
         if (Shared->ContactAudit && Shared->ContactAudit->Poll()) Shared->ContactAudit.Reset();
         if (Shared->TemporalAudit && Shared->TemporalAudit->Poll())Shared->TemporalAudit.Reset();
@@ -590,15 +597,23 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
             {
                 // An explicit teleport has no overlap. Never pretend to have
                 // retained state from a different reach or wrap old foam in.
-                Shared->Simulation.Reset();++Shared->Teleports;
+                Shared->Simulation.Reset();Shared->FrothFlowHistory.Reset();++Shared->Teleports;
             }
             else if (!Shared->Simulation.RemapWindow(Cmd,Grid,Flow,Error))
             { Shared->bFailed.Store(true);UE_LOG(LogTemp,Error,TEXT("Stateful detail remap rejected: %s"),*Error);return; }
             else ++Shared->Remaps;
         }
+        const double IntervalStart=Shared->Simulation.GetSimulationSeconds();
         if (!Shared->Simulation.Advance(Cmd,Grid,Flow,Steps,nullptr,bCapture ? &Shared->Snapshot->StateReadback : nullptr,Error) ||
             !Shared->Simulation.Resolve(Cmd,Target->GetRenderTargetTexture(),Error))
         { Shared->bFailed.Store(true);UE_LOG(LogTemp,Error,TEXT("Stateful detail dispatch rejected: %s"),*Error);return; }
+        if(bCaptureFrothHistory)
+        {
+            const bool Appended=Shared->FrothFlowHistory.Append(IntervalStart,Shared->Simulation.GetSimulationSeconds(),
+                CaptureMeanElapsed,Grid.Size,Grid.OriginMeters,Grid.CellMeters,Flow);
+            if(!Appended || (bCapture && !Shared->FrothFlowHistory.Save(CapturePrefix)))
+                UE_LOG(LogTemp,Error,TEXT("Froth flow history capture failed: %s"),*CapturePrefix);
+        }
         Shared->OriginMeters=Grid.OriginMeters;Shared->bHasWindow=true;
         if (bFrameContact)
         {
