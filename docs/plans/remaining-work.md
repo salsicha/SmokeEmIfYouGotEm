@@ -3,7 +3,21 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [explicit cap pulse-selection experiment](../reconstruction-review-2026-09-07/cap-pulse-selection.md).
+Latest: [local cap outlier inference rejected as a spike repair](../reconstruction-review-2026-09-07/cap-interior-inference.md).
+Explicit inferred-height experiments change three/five vertices but leave ALL
+eight actual downstream cap hit triangles exactly unchanged. Neither is a
+repair or installed; no new cook/old-state transfer. Registered original NAIP
+shows a green/dark western extension versus the pale eastern mass, but 2019/2022
+date mismatch and 3m registration uncertainty prohibit automatic vegetation
+classification. Next qualify coherent source-selection/rock-envelope alternatives
+against fixed landmarks/dated footage, not more threshold tuning. 103 focused
+tests PASS. Baseline10050..10350 pass BOTH audits, NOT settled; only13584 is live,
+next10400/local28000 requires both audits. Known exact-float clipping trial
+failed again and was fully reverted; do not repeat it or weaken the gate.
+No normal-play change/build/capture/FPS acceptance. Installed map/4950 unchanged,
+nonlinear OFF, latest24.937420FPS still FAIL30. Full ordered queue OPEN.
+
+Previous: [explicit cap pulse-selection experiment](../reconstruction-review-2026-09-07/cap-pulse-selection.md).
 Replayed all2,815,491 original XYZ/classification IDs exactly to recover pulse
 metadata. Opt-in last/only-return extension candidate retains549 seed vertices/
 all seed roof triangles; no raw data or classification changes. It still has
