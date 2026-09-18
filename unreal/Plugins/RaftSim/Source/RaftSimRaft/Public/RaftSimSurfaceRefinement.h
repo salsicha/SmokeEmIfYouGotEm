@@ -87,6 +87,10 @@ struct FRaftSimSurfaceRefinement
     // have one owner per parallel batch. Retained tables keep coordinate slots
     // only: a new epoch forces current HeightCm evaluation on every build.
     // Final topology order stays serial/exact.
+    // Corner-first range evaluation lost both actual-game timing orders.
+    // Retain its compile-time specialization for comparisons only. Ordinary
+    // callers compile the original ordering without a new per-triangle switch.
+    template<bool bCornerRangeVeto=false>
     bool BuildAdaptive(const TArray<FVector2D>& Coordinates,const TArray<int32>& SourceTriangles,
         TFunctionRef<float(const FVector2D&)> HeightCm,int32 Levels,float ToleranceCm,
         TConstArrayView<FBox2D> NonzeroRegions={},TMap<FVector2D,float>* ProfileValues=nullptr,
@@ -176,7 +180,31 @@ struct FRaftSimSurfaceRefinement
                     else for (const auto& Region:NonzeroRegions) if (Bounds.Intersect(Region)) { Intersects=true; break; }
                     if (!Intersects) return false; // The supplied profile is exactly zero here.
                 }
-                if(HeightRangeWidthCm)
+                const int32 BindingBase=bBoundCoordinateMemo ? (MemoLevel*ParallelBatchSize+Triangle%ParallelBatchSize)*15 : 0;
+                float VA=0.f,VB=0.f,VC=0.f;
+                bool bHaveCorners=false;
+                const auto SampleCorners=[&]()
+                {
+                    VA=ShareCorners ? Corners.Get(Triangle,0) : Value(A,Context,BindingBase);
+                    VB=ShareCorners ? Corners.Get(Triangle,1) : Value(B,Context,BindingBase+1);
+                    VC=ShareCorners ? Corners.Get(Triangle,2) : Value(C,Context,BindingBase+2);
+                    bHaveCorners=true;
+                };
+                bool bNeedRange=true;
+                if constexpr(bCornerRangeVeto)
+                {
+                    if(HeightRangeWidthCm)
+                    {
+                    SampleCorners();
+                    // A conservative range containing all three corners has
+                    // width >= their spread. If that exceeds the tolerance,
+                    // this bound CANNOT reject selection. Still evaluate the
+                    // original quarter-point tests; never select from spread.
+                    if(FMath::IsFinite(VA) && FMath::IsFinite(VB) && FMath::IsFinite(VC))
+                        bNeedRange=FMath::Max3(VA,VB,VC)-FMath::Min3(VA,VB,VC)<=ToleranceCm;
+                    }
+                }
+                if(HeightRangeWidthCm && bNeedRange)
                 {
                     const float Width=bMemoizeAdjacentRanges
                         ? RangeMemos[Context].Width(Bounds,HeightRangeWidthCm)
@@ -189,10 +217,7 @@ struct FRaftSimSurfaceRefinement
                 // Each level keeps distinct triangle bindings, but exact
                 // coordinate samples share ONE bounded table per worker.
                 // Levels join before reuse, and all heights expire together.
-                const int32 BindingBase=bBoundCoordinateMemo ? (MemoLevel*ParallelBatchSize+Triangle%ParallelBatchSize)*15 : 0;
-                const float VA=ShareCorners ? Corners.Get(Triangle,0) : Value(A,Context,BindingBase);
-                const float VB=ShareCorners ? Corners.Get(Triangle,1) : Value(B,Context,BindingBase+1);
-                const float VC=ShareCorners ? Corners.Get(Triangle,2) : Value(C,Context,BindingBase+2);
+                if(!bHaveCorners)SampleCorners();
                 int32 SampleBinding=BindingBase+3;
                 for (int32 U=0; U<=4; ++U) for (int32 V=0; V<=4-U; ++V)
                 {

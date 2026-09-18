@@ -22,6 +22,7 @@
 #include "RaftSimCrestBoundaryAudit.h"
 #include "RaftSimCrestAdjacentRangeAudit.h"
 #include "RaftSimCrestIntervalAudit.h"
+#include "RaftSimCrestCornerRangeAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
@@ -193,6 +194,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         RaftSimCrestBoundMemoAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestAdjacentRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestIntervalAudit::Run(CachedXY,Triangles,Input,Refinement);
+        RaftSimCrestCornerRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
         ++BuildCount;
         TargetsMs=bTiming ? (FPlatformTime::Seconds()-Selected)*1000. : 0.;
     }

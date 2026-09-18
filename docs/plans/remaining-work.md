@@ -3,7 +3,21 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [velocity-resolved front transport](../reconstruction-review-2026-09-07/normal-river-profile-transport.md).
+Latest: [corner-first crest range rejected](../reconstruction-review-2026-09-07/crest-corner-range-review.md).
+Both64-pair actual-game histories preserve exact topology but lose BOTH timing
+orders. The gameplay switch is removed; only a compile-time comparison remains.
+Final editor build and9 native D3D12 checks PASS;22 Python audit checks PASS.
+Initial NullRHI8PASS/1 rendering-proxy FAIL is retained, not silently waived.
+The separate900-frame normal FullReach run is25.667690FPS/p9547.2797ms: FAIL30.
+No quality, physics, contact, geometry or clock gate was reduced. No new visual
+or motion acceptance. Next address substantive integrated refresh/selection or
+physical coupling, not another eager-corner ordering trial. Nonlinear stays OFF.
+8150/local9000 and8200/local10000 state AND artificial-bank audits PASS, NOT settled;
+installed4950 stays. Cook8900/startUTC2026-09-18T06:34:59.2598919Z/session68256 is
+verified LIVE after captures. Next8250/local11000 needs complete marker and BOTH
+audits. Full ordered scene/crew/regression/normalization/release scope remains OPEN.
+
+Previous: [velocity-resolved front transport](../reconstruction-review-2026-09-07/normal-river-profile-transport.md).
 Actual within-fan velocity now enters shared depth-weighted transport moments
 and the spatial connection; the owner-average operator remains unchanged as
 an explicit separate model. Conservative shallow-water receipts share the same
