@@ -66,7 +66,16 @@ def test_chilko_crest_foam_does_not_regenerate_trough_and_raw_tail_foam():
     # Existing transport/attack/release remains after localized generation.
     assert "FieldPosition - FieldVelocity * FoamDeltaSeconds" in source
     assert "Advected *= DecayFactor" in source
-    assert "-FoamAttackDeltaSeconds / 0.22f" in source
+    import re
+    # Guard the 220 ms exponential attack, not its whitespace/decimal spelling.
+    assert re.search(r'const\s+float\s+FoamAttackBlend\s*=\s*1\.f\s*-\s*FMath::Exp\(\s*-FoamAttackDeltaSeconds\s*/\s*(?:0)?\.22f\s*\)', source)
+    compact = ''.join(source.split())
+    assert 'RaftSimFoamEvolution::Resolve(Advected,SourceFoam[Index],FoamAttackBlend,TongueFoamSuppression[Index],ShoreDisplacementWeight[Index],bHoldFoam)' in compact
+    assert 'OutputColors[Index].R=FinalFoam;' in compact
+    evolution = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimFoamEvolution.h').read_text()
+    compact = ''.join(evolution.split())
+    assert 'if(bHold)returnAdvected;' in compact
+    assert 'FMath::Lerp(Advected,Source,FMath::Clamp(AttackBlend,0.f,1.f))' in compact
 
 
 def test_terrain_survey_compares_fixed_coordinate_water_and_terrain():
@@ -82,11 +91,19 @@ def test_every_water_data_update_preserves_linear_foam_depth_and_speed():
     from collections import Counter
     source = (ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp").read_text()
     calls = re.findall(r"(\w+)->UpdateMeshSection_LinearColor\((.*?)\);", source, re.S)
-    # The refined/macro uploads added two SurfaceMesh paths and replaced the
-    # former single upload. Guard all seven actual sites, not a stale total.
+    # Volume-core publication now has one shared fallback upload; Cartesian
+    # publication uses the packed/clipped carrier, checked separately below.
+    # Guard every current upload rather than the former duplicated call sites.
     assert Counter(owner for owner, _ in calls) == {
-        'SurfaceMesh': 3, 'LiveVolumeCoreMesh': 3, 'RapidFoamMesh': 1}
+        'SurfaceMesh': 3, 'LiveVolumeCoreMesh': 1, 'RapidFoamMesh': 1}
     assert all(_has_explicit_linear_upload_argument(call) for _, call in calls)
+    publication = source.split('void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(', 1)[1].split(
+        'void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(', 1)[0]
+    compact = ''.join(publication.split())
+    assert 'RaftSimWaterSourcePacking::Pack(Positions,VertexNormals,Colors,UVs,Flow,Wake,Tangents,Source,' in compact
+    assert 'CartesianShorelineMesh->SetClippedWaterMesh(GridStationN,GridLateralN,MoveTemp(Source),' in compact
+    packing = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSourcePacking.h').read_text()
+    assert 'V.Color=bVectorColors ? VectorColor(Colors[I]) : Colors[I].ToFColor(false);' in packing
 
 
 def _has_explicit_linear_upload_argument(arguments):

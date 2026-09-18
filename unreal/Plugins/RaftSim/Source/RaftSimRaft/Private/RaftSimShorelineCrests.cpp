@@ -21,7 +21,6 @@
 #include "RaftSimCrestTopologyPublish.h"
 #include "RaftSimCrestBoundaryAudit.h"
 #include "RaftSimCrestAdjacentRangeAudit.h"
-#include "RaftSimCrestRootWorksetAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
@@ -104,8 +103,6 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         {
             CSV_SCOPED_TIMING_STAT(RaftSimCrests,Selection);
             Refinement.bMeasureStages=bTiming;
-            static const bool bSparseRoots=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSparseCrestRoots"));
-            Refinement.bSparseRoots=bSparseRoots;
             static const bool bIndexedRegions=FParse::Param(FCommandLine::Get(),TEXT("RaftSimIndexedCrestRegions"));
             Refinement.bIndexedRegions=bIndexedRegions;
             static const bool bFlatMemo=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFlatCrestMemo"));
@@ -187,7 +184,6 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         RaftSimCrestPreparedRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestBoundMemoAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestAdjacentRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
-        RaftSimCrestRootWorksetAudit::Run(CachedXY,Triangles,Input,Refinement);
         ++BuildCount;
         TargetsMs=bTiming ? (FPlatformTime::Seconds()-Selected)*1000. : 0.;
     }

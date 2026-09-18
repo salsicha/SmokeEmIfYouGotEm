@@ -9,7 +9,6 @@
 #include "RaftSimIndexedEdgeMap.h"
 #include "RaftSimBoundCoordinateMemo.h"
 #include "RaftSimCrestRangeMemo.h"
-#include "RaftSimCrestRootWorkset.h"
 
 // Conforming red/green triangle refinement. Midpoints retain parent indices so
 // every render attribute uses the same piecewise-linear hydraulic authority;
@@ -40,8 +39,6 @@ struct FRaftSimSurfaceRefinement
     bool bLevelLocalMemos=false; // Candidate: retain coordinate slots separately per level.
     bool bInlineSelection=false; // Candidate: typed predicate, identical evaluations.
     bool bBoundCoordinateMemo=false; // Candidate: exact per-triangle lookup bindings.
-    bool bSparseRoots=false; // Opt-in: current-support workset, complete output retained.
-    int32 RootTrianglesConsidered=0,RootTrianglesRetained=0;
     // Optional conservative width of a range containing the current profile
     // on a box. Only skips selection when every error test is provably below
     // the SAME tolerance. It never changes a sampled or published height.
@@ -99,22 +96,6 @@ struct FRaftSimSurfaceRefinement
         bool bMemoizeAdjacentRanges=false)
     {
         if (!FMath::IsFinite(ToleranceCm) || ToleranceCm<=0) return false;
-        RootTrianglesConsidered=RootTrianglesRetained=SourceTriangles.Num()/3;
-        if(bSparseRoots)
-        {
-            FRaftSimCrestRootWorkset Work;
-            if(!Work.Prepare(Coordinates,SourceTriangles,NonzeroRegions,DetailWindow,DetailSpanCm))return false;
-            if(Work.Triangles.Num()!=SourceTriangles.Num())
-            {
-                TGuardValue<bool> Guard(bSparseRoots,false);
-                const bool Built=BuildAdaptive(Coordinates,Work.Triangles,HeightCm,Levels,ToleranceCm,
-                    NonzeroRegions,ProfileValues,bParallel,bMemoizeParallel,DetailWindow,DetailSpanCm,
-                    bRetainParallelMemo,bFastCoordinateHash,bKeepParallelContexts,bShareCornerSamples,bMemoizeAdjacentRanges);
-                RootTrianglesConsidered=SourceTriangles.Num()/3;
-                RootTrianglesRetained=Work.Triangles.Num()/3;
-                return Built && Work.Merge(SourceTriangles,Triangles,TriangleOrigins);
-            }
-        }
         // Batch-owned, not thread-local: a task may run on any worker. The
         // array is resized only between joined levels and discarded on return.
         TArray<FRaftSimCrestRangeMemo> RangeMemos;

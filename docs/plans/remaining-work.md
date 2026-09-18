@@ -3,7 +3,21 @@
 Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [visible-carrier spray attached in normal South Fork](../reconstruction-review-2026-09-07/spray-source-attachment.md).
+Latest: [sparse crest-root workset rejected in actual gameplay](../reconstruction-review-2026-09-07/crest-root-workset-review.md).
+All sixteen actual changed-input comparisons are exact, but every pair is
+slower. The candidate from5d4e8730b is removed, not promoted; normal visible
+spray placement and complete water geometry remain unchanged. No new FPS,
+physical or visual acceptance. Hydraulic5800/5850/5900 state AND dry-bank audits
+PASS, NOT settled; installed4950 stays unchanged. Next5950/local11000 needs
+its completion marker and BOTH audits. Full ordered work queue remains OPEN.
+Two additional stale shared-water contracts are repaired, with ten new
+negative controls; [78 focused tests PASS](../reconstruction-review-2026-09-07/current-runtime-contracts.md).
+Restored editor build succeeds; ten native D3D12 checks PASS.
+Final ordinary profile34.854890FPS / p9538.0726ms still FAIL30; fixed CSV
+rows60–240, not a controlled speedup or sustained/release qualification.
+The thirteen physical-suite failures are not waived or reclassified.
+
+Previous: [visible-carrier spray attached in normal South Fork](../reconstruction-review-2026-09-07/spray-source-attachment.md).
 Ordinary play now uses horizontal source planes, visible-water centre anchors,
 and fifteen flow-oriented wet-footprint probes; the original probes remain.
 Assets and budgets unchanged, alternate falling assets still opt-in. Five native

@@ -41,3 +41,31 @@ These checks do not establish convincing breaking/froth, settled hydraulics,
 full playable integration, or sustained 30 FPS. The previously recorded thirteen
 physical-suite failures remain open and were not reclassified or waived here.
 The complete scene, crew, regression, and release queue remains open.
+
+## Current shared foam and colour paths
+
+Later September 17: two additional stale Chilko/shared-water source contracts
+are reproduced before edits: 12 PASS / 2 FAIL, report
+`tmp/chilko-contract-before-v1-20260917.xml`. One requires the former spelling
+of the unchanged 220 ms exponential attack; the other expects three duplicated
+volume-core uploads where the current publisher has one shared fallback and
+a separate packed/clipped Cartesian carrier.
+
+The repaired checks preserve the attack constant and additionally require its
+actual Resolve call, final red-channel write, held-clock preservation and
+attack interpolation in the extracted helper. Linear-colour checks still
+inspect every explicit procedural upload and now also follow the actual
+source packer into the clipped carrier. They require non-sRGB colour packing;
+merely lowering the expected call count would leave that path unguarded.
+
+Ten new in-memory mutation controls reject changed/bypassed attack, lost final
+foam, regenerated held foam, wrong interpolation, sRGB/erased packed colours,
+bypassed packing/clipping and a gamma-converted fallback upload. Together with
+the earlier controls, the focused suite now passes 78 tests, no skips:
+`tmp/current-water-contracts-v2-20260917.xml`, SHA256
+`dc0b147b9a84dcb99629ae3c878cc87a543dbd84f39bf7c2e6b3ad68d407cd9b`.
+This test repair changes no runtime behaviour and is not a Chilko visual review.
+The restored ordinary native D3D12 run also passes SurfaceSourcePacking and
+FoamCommittedEvolution alongside eight mesh/contact regressions, ten total,
+zero warnings/failures/not-run tests. Report:
+`tmp/crest-root-workset-restored-native-v1-20260917/index.json`.

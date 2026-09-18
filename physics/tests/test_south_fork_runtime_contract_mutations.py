@@ -10,15 +10,28 @@ import pytest
 import test_troublemaker_challenge_launch as launch
 import test_full_reach_water_presentation as terrain
 import test_south_fork_water_performance_and_banding as water
+import test_chilko_current_water_presentation as chilko
 
 
 SURFACE = water.RUNTIME_SOURCE
 CLASSIFIER = SURFACE.with_name('RaftSimTerrainProbeSources.h')
 SMOOTHING = water.WATER_SURFACE_HEADER.with_name('RaftSimWaterSmoothing.h')
 CLOCK = water.PHYSICS_BRIDGE_SOURCE.parents[1] / 'Public/RaftSimFixedStepClock.h'
+PACKING = water.WATER_SURFACE_HEADER.with_name('RaftSimWaterSourcePacking.h')
+FOAM = water.WATER_SURFACE_HEADER.with_name('RaftSimFoamEvolution.h')
 
 
 CASES = [
+    ('changed-foam-attack', SURFACE, '-FoamAttackDeltaSeconds/.22f', '-FoamAttackDeltaSeconds/.44f', chilko.test_chilko_crest_foam_does_not_regenerate_trough_and_raw_tail_foam),
+    ('bypassed-foam-attack', SURFACE, 'Resolve(Advected,SourceFoam[Index],FoamAttackBlend,', 'Resolve(Advected,SourceFoam[Index],1.f,', chilko.test_chilko_crest_foam_does_not_regenerate_trough_and_raw_tail_foam),
+    ('lost-final-foam-channel', SURFACE, 'OutputColors[Index].R=FinalFoam;', 'OutputColors[Index].R=SourceFoam[Index];', chilko.test_chilko_crest_foam_does_not_regenerate_trough_and_raw_tail_foam),
+    ('held-foam-regenerated', FOAM, 'if(bHold)return Advected;', 'if(bHold)return Source;', chilko.test_chilko_crest_foam_does_not_regenerate_trough_and_raw_tail_foam),
+    ('wrong-attack-interpolation', FOAM, 'FMath::Lerp(Advected,Source,FMath::Clamp(AttackBlend,0.f,1.f))', 'FMath::Lerp(Advected,Source,1.f)', chilko.test_chilko_crest_foam_does_not_regenerate_trough_and_raw_tail_foam),
+    ('source-color-srgb', PACKING, 'Colors[I].ToFColor(false)', 'Colors[I].ToFColor(true)', chilko.test_every_water_data_update_preserves_linear_foam_depth_and_speed),
+    ('source-color-erased', PACKING, 'V.Color=bVectorColors ? VectorColor(Colors[I]) : Colors[I].ToFColor(false);', 'V.Color=FColor::Black;', chilko.test_every_water_data_update_preserves_linear_foam_depth_and_speed),
+    ('bypassed-source-packing', SURFACE, 'RaftSimWaterSourcePacking::Pack(Positions,VertexNormals,Colors,UVs,', 'WrongPacking::Pack(Positions,VertexNormals,Colors,UVs,', chilko.test_every_water_data_update_preserves_linear_foam_depth_and_speed),
+    ('bypassed-clipped-carrier', SURFACE, 'CartesianShorelineMesh->SetClippedWaterMesh(GridStationN,GridLateralN,MoveTemp(Source),', 'CartesianShorelineMesh->WrongMesh(GridStationN,GridLateralN,MoveTemp(Source),', chilko.test_every_water_data_update_preserves_linear_foam_depth_and_speed),
+    ('fallback-srgb-upload', SURFACE, 'UVs, Flow, Wake, Empty, Colors, Tangents, false);', 'UVs, Flow, Wake, Empty, Colors, Tangents, true);', chilko.test_every_water_data_update_preserves_linear_foam_depth_and_speed),
     ('obsolete-route', launch.FRONTEND_SOURCE, '33280.0f', '48900.0f', launch.test_troublemaker_is_not_a_standalone_scenario),
     ('section-endpoint', launch.FRONTEND_SOURCE, '120.0f, 9012.3264f', '120.0f, 9013.3264f', launch.test_troublemaker_is_not_a_standalone_scenario),
     ('rapid-menu-scenario', launch.FRONTEND_SOURCE, 'TEXT("hance_challenge")', 'TEXT("troublemaker_challenge")', launch.test_troublemaker_is_not_a_standalone_scenario),
