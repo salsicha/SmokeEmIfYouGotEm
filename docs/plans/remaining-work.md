@@ -3,7 +3,23 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [foreground rock source identification and isolated candidate](../reconstruction-review-2026-09-07/constriction-source-review.md).
+Latest: [source-supported full-map union and fresh flow](../reconstruction-review-2026-09-07/constriction-union-review.md).
+Fresh native reload verifies every directed source triangle; actual FullReach
+actor reuse passes70,017 collision queries within unchanged0.1cm, with474 saved
+files unchanged. New probe coverage includes XYZ/topology and both partitions;
+old height-only gate remains strict.71 focused tests PASS. Candidate50s passes
+state/artificial-bank audits but is startup, NOT settled. Baseline9300..9450
+also passes both audits, NOT settled. Both exact cooks are LIVE:13584/session95293
+next9500/local10000;30276/session91191 next100/local2000. Both need completed
+snapshots and BOTH audits; future timing must account for BOTH jobs. Reference
+videos accessible; inspected rock/chute frames do not classify class1 returns.
+Source-space approach shows72 quarter-metre axis samples at/above source stage;
+old8330 review start must not be reused without fresh-flow/hull clearance.
+No map/installed4950 change, playable promotion, new FPS or visual acceptance.
+Next joint native-flow/physical-union and upstream approach/motion qualification;
+full ordered scope remains OPEN, nonlinear OFF, latest24.937420FPS still FAIL30.
+
+Previous: [foreground rock source identification and isolated candidate](../reconstruction-review-2026-09-07/constriction-source-review.md).
 Actual FullReach capture and11 independent source intersections identify the
 foreground wall as inferred registered-ground flanks, not separate cap walls.
 Original returns extend beyond the old interpreted search edge. Candidate v2

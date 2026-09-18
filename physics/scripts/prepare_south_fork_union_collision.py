@@ -33,22 +33,37 @@ def physical_union_samples(union,xy,parent):
     return after,rock
 
 
+def changed_face_ids(old,new):
+    if old.xyz.shape!=new.xyz.shape or old.faces.shape!=new.faces.shape:
+        raise ValueError('Matching registered vertex/face counts required')
+    changed=np.any(old.xyz!=new.xyz,axis=1)
+    affected=np.any(changed[old.faces],axis=1)|np.any(changed[new.faces],axis=1)
+    affected|=np.any(old.faces!=new.faces,axis=1)
+    return np.flatnonzero(affected)
+
+
 def revision_triangle_probes(union,world_origin,datum):
     revision=union.terrain_revision
     if revision is None:return [],[]
     old,new=revision.original,revision.revised
-    changed=old.xyz[:,2]!=new.xyz[:,2]
-    ids=np.flatnonzero(np.any(changed[old.faces],axis=1))
+    ids=changed_face_ids(old,new)
     xy=old.xyz[old.faces[ids],:2].mean(axis=1)+revision.origin
+    new_xy=new.xyz[new.faces[ids],:2].mean(axis=1)+revision.origin
+    moved=np.any(new_xy!=xy,axis=1)
+    # Both partitions need coverage when captured XY or a diagonal changes.
+    # Height-only revisions retain their original query set exactly.
+    xy=np.concatenate((xy,new_xy[moved]))
+    ids=np.r_[ids,ids[moved]]
+    partitions=['original']*(len(ids)-int(moved.sum()))+['revised']*int(moved.sum())
     # Round-trip the absolute frame exactly as the shared union does.
     before=old.sample(*(xy-revision.origin).T)+revision.datum
     after,rock=physical_union_samples(union,xy,before)
     baseline=[];combined=[]
     for i,face in enumerate(ids):
         baseline.append(dict(kind='original_changed_triangle_centroid',source_triangle_index=int(face),
-            world_position_cm=engine_position(xy[i],before[i],world_origin,datum)))
+            source_partition=partitions[i],world_position_cm=engine_position(xy[i],before[i],world_origin,datum)))
         combined.append(dict(kind='revised_triangle_union_centroid',source_triangle_index=int(face),
-            world_position_cm=engine_position(xy[i],after[i],world_origin,datum),expected_candidate=bool(rock[i])))
+            source_partition=partitions[i],world_position_cm=engine_position(xy[i],after[i],world_origin,datum),expected_candidate=bool(rock[i])))
     return baseline,combined
 
 
@@ -152,7 +167,7 @@ def prepare(geometry_path,output,source_visible_probes=None):
         baseline=baseline,combined=combined,prior_vertical_tangent_gate_closed=False)
     if union.terrain_revision is not None:
         old=union.terrain_revision.original.xyz;new=union.terrain_revision.revised.xyz
-        changed=np.flatnonzero(old[:,2]!=new[:,2])
+        changed=np.flatnonzero(np.any(old!=new,axis=1))
         result.update(terrain_revision=union.terrain_revision.identity,
             terrain_replacement_required=True,changed_triangle_probe_count=len(revised_faces),
             terrain_vertex_changes_cm=[dict(source_vertex_index=int(i),before=(old[i]*100).tolist(),
