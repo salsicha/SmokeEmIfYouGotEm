@@ -3,7 +3,24 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [bounded foam transport and actual engine comparison](../reconstruction-review-2026-09-07/foam-transport-correction.md).
+Latest: [foreground rock source identification and isolated candidate](../reconstruction-review-2026-09-07/constriction-source-review.md).
+Actual FullReach capture and11 independent source intersections identify the
+foreground wall as inferred registered-ground flanks, not separate cap walls.
+Original returns extend beyond the old interpreted search edge. Candidate v2
+adds338 original class1 returns (still unclassified) and432 inferred flank
+vertices; all prior captured XYZ preserved. All803,842 source triangles sample
+within2.05e-12m;23 focused tests PASS. Raw insertion v1 makes sharp faces worse
+and is retained. Neither candidate is installed/accepted. Crucially the old
+capture's near-plane origins lie1.19..1.22m INSIDE v2 terrain: new extent, fresh
+flow, incoming channel and hull approach must be qualified TOGETHER, not a
+cosmetic mesh swap or copied old-bed state. Installed map/4950flow unchanged.
+9200/9250 both state/artificial-bank audits PASS, NOT settled. Same cook13584/
+startUTC2026-09-18T12:17:39.4321093Z/session95293 is LIVE; next9300/local6000 needs
+completion and BOTH audits. No new FPS/visual/motion acceptance; full ordered
+scope remains OPEN and nonlinear OFF. Continue substantive source-supported
+rapid/physical breaking integration, not scalar-foam micro-optimization.
+
+Previous: [bounded foam transport and actual engine comparison](../reconstruction-review-2026-09-07/foam-transport-correction.md).
 Review-only BFECC preserves donor bounds and greatly improves translated-profile
 accuracy. Its initial varying-flow carrier regression FAIL is retained and fixed
 by inverting the original departure map, not relaxing the1e-6 gate. Final five
