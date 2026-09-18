@@ -3,7 +3,29 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [fixed-budget pressure-coordinate accuracy](../reconstruction-review-2026-09-07/symmetric-pressure-blocks.md).
+Latest: [Chili Bar canopy in normal South Fork play](../reconstruction-review-2026-09-07/chili-bar-canopy-review.md).
+5,244 source-supported inferred canopy instances are now saved in twelve spatial
+actors in FullReach, visible from the ordinary scenario start. All 34,614,725
+retained provider returns independently replay exactly; complete 936-node EPT
+hierarchy retained, no depth/resolution shortcut. Provider-reprojected points
+are distinguished from original LAS, and inferred trees from measured ground.
+All 5,244 roots match actual engine collision before save, after reload and in
+a separate fresh editor (max 0.003905 cm). Existing 457 actors/source assets/profile
+unchanged; all five South Fork catalog entries use FullReach, no Troublemaker menu.
+54 focused Python tests and PowerShell capture guards PASS. Both actual engine
+movies fully decoded and before/after player views inspected. Visible coverage
+improved, but repeated angular crown forms remain NOT photoreal accepted.
+Water/breaking/froth unchanged. Put-in 900-frame before: 23.740287 FPS/p95 49.2505 ms;
+after: 23.460393 FPS/p95 49.7534 ms: both FAIL 30, no speedup claimed. Source downloads
+and audits terminal before timing; exact cook paused/resumed. Installed4950
+water unchanged; 8600/8650/8700/8750 both state/artificial-bank audits PASS, NOT settled.
+Cook 8900/start UTC 2026-09-18T06:34:59.2598919Z is verified LIVE after captures.
+Next 8800/local22000 requires its completion marker and BOTH audits.
+Full ordered water/river/crew/normalization/regression/release scope remains OPEN.
+Return to substantive physical breaking/froth and refresh work, not further
+source-only bookkeeping. Nonlinear runtime stays OFF until qualified.
+
+Previous: [fixed-budget pressure-coordinate accuracy](../reconstruction-review-2026-09-07/symmetric-pressure-blocks.md).
 Four retained block-preconditioner energy-coordinate failures are resolved on
 the SAME original source states AND frozen old-stage directions. Symmetric
 two-component block sweeps replace local Jacobi in the research block path;

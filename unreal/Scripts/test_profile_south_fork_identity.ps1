@@ -167,3 +167,30 @@ foreach ($ProfileFrames in @(300,1200,2400)) {
 $profileParam=@($ast.ParamBlock.Parameters | Where-Object {$_.Name.VariablePath.UserPath -eq 'ProfileFrames'})
 if ($profileParam.Count -ne 1 -or $profileParam[0].DefaultValue.Extent.Text -ne '300') { throw 'Default profiling duration changed' }
 'PASS: longer CSV histories are explicit; replay/native gates and 300-frame default unchanged'
+foreach ($taskOverride in @(
+    @{ExtraGameArgument='-RaftSimWaterReviewStation=8330'},
+    @{ExtraGameArguments=@('-RaftSimWaterReviewStation=8330')}
+)) {
+    $rejected=$false
+    try { & $source -Label 'south-fork-test-normal-start-conflict' -CookProcessId 0 -CookStartUtc 'invalid' -NormalScenarioStart @taskOverride }
+    catch {
+        if ($_.Exception.Message -ne 'NormalScenarioStart must not be combined with a review-station override') { throw }
+        $rejected=$true
+    }
+    if (-not $rejected) { throw 'Normal scenario start accepted a review-station override' }
+}
+$stationGuard=@($ast.FindAll({param($node)
+    $node -is [Management.Automation.Language.IfStatementAst] -and
+    $node.Extent.Text -eq "if (-not `$NormalScenarioStart) { `$start.ArgumentList.Add('-RaftSimWaterReviewStation=8330') }"
+},$true))
+if ($stationGuard.Count -ne 1) { throw 'Expected an explicit default-only review station' }
+$buildStation=[scriptblock]::Create($stationGuard[0].Extent.Text)
+foreach ($NormalScenarioStart in @($false,$true)) {
+    $start=[Diagnostics.ProcessStartInfo]::new()
+    & $buildStation
+    if ($NormalScenarioStart -and $start.ArgumentList.Count) { throw 'Normal start gained a review station' }
+    if (-not $NormalScenarioStart -and ($start.ArgumentList.Count -ne 1 -or $start.ArgumentList[0] -cne '-RaftSimWaterReviewStation=8330')) {
+        throw 'Default diagnostic station changed'
+    }
+}
+'PASS: ordinary put-in capture has no station override; existing diagnostic default preserved'

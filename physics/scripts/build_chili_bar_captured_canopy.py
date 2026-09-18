@@ -78,6 +78,8 @@ def extract():
             horizontal = crs.sub_crs_list[0] if crs and crs.is_compound else crs
             if horizontal is None or horizontal.to_epsg() != 6418:
                 raise ValueError('Unexpected original LAZ CRS')
+            if not crs.is_compound or crs.sub_crs_list[1].to_epsg() != 6360:
+                raise ValueError('Expected NAVD88 US survey foot vertical CRS')
             headers.append(dict(tile_id=source['tile_id'], original_crs_wkt=crs.to_wkt(),
                 scales=reader.header.scales.tolist(), offsets=reader.header.offsets.tolist(),
                 point_count=int(reader.header.point_count), source_sha256=source['sha256']))
@@ -101,6 +103,8 @@ def extract():
                     values['native_xyz_integer'].append(np.column_stack((points.X[ids], points.Y[ids], points.Z[ids])))
                 offset += len(points)
         print('Extracted original returns:', source['tile_id'], flush=True)
+    if not values['east_m']:
+        raise ValueError('No original returns in source footprint')
     packed = {key: np.concatenate(parts) for key, parts in values.items()}
     if not len(packed['east_m']):
         raise ValueError('No original returns in source footprint')
@@ -133,6 +137,10 @@ def triangle_root_metrics(z, valid, water, x0, y0, cell, xy):
     Check every grid vertex and quad touched by a +/-2m XY square. Return
     indices instead of clamping queries into missing terrain or inferred bed.
     """
+    if (z.ndim != 2 or water.shape != z.shape or valid.shape != (z.shape[0]-1,z.shape[1]-1)
+            or valid.dtype != bool or not np.isfinite(cell) or cell <= 0
+            or xy.ndim != 2 or xy.shape[1] != 2 or not np.isfinite(xy).all()):
+        raise ValueError('Registered finite XY and matching terrain topology required')
     cf, rf = (xy[:, 0]-x0)/cell, (y0-xy[:, 1])/cell
     col, row = np.floor(cf).astype(int), np.floor(rf).astype(int)
     radius = int(np.ceil(2/cell))+1
@@ -166,6 +174,11 @@ def prepare():
     source_path = OUT/'source.json'
     source = json.loads(source_path.read_text())
     check_sources(source['sources'])
+    # Alternate EPT metadata is durable; large raw provider nodes remain a
+    # reproducible local cache. Verify all retained lineage/hierarchy records.
+    for name, record in source.get('provider_sources', {}).items():
+        if not name.startswith('ept-data/'):
+            check_sources({record['file']: record['sha256']})
     point_path = OUT/'classified_returns.npz'
     if sha(point_path) != source['payload_sha256']:
         raise ValueError('Extracted original returns changed')
@@ -203,7 +216,14 @@ def prepare():
             raise ValueError('Current terrain source changed: '+name)
     with rasterio.open(extension/'coarse_bed_navd88_m.tif') as ds:
         z = ds.read(1)
+        transform, crs, grid_shape = ds.transform, ds.crs, ds.shape
+        if (crs.to_epsg() != 32610 or list(ds.xy(0,0)) != manifest['grid']['first_vertex_utm_m']
+                or transform.a != manifest['grid']['cell_m'] or transform.e != -transform.a
+                or transform.b != 0 or transform.d != 0):
+            raise ValueError('Terrain raster is not registered to its source grid')
     with rasterio.open(extension/'unknown_submerged_bed_mask.tif') as ds:
+        if ds.transform != transform or ds.crs != crs or ds.shape != grid_shape:
+            raise ValueError('Water mask is not registered to the terrain grid')
         water = ds.read(1)
     with np.load(extension/'topology.npz') as data:
         valid = data['valid_quads']
