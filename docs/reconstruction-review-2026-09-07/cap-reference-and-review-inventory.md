@@ -113,3 +113,13 @@ interpolation whenever refresh is due would therefore remove the frame's mesh
 update and change subsequent history/support. No such optimization was made,
 and no new speedup, motion test or scene acceptance is claimed. The cap fidelity
 question is still unanswered; no repeat question or assumed permission.
+
+21:47 UTC continuation: five additional completed checkpoints 11150 through
+11350, local steps 43000 through 47000, pass both existing audits. At 11350:
+maximum depth 3.990974 m, speed 5.378074 m/s, volume 2,429,451.532412 m³;
+all 86,720 artificial-bank cells remain exactly dry. Maximum step residual
+remains 1.429428e-8 m³. Outflow 103.189433 m³/s exceeds inflow 45.306955 m³/s:
+NOT settled. Final 47000 audit pair is retained here; all five pairs remain in
+ignored tmp. Next unaudited checkpoint is 11400/local48000. No process changes,
+new source interpretation, normal-play delivery, build or performance claim.
+The pending fidelity question and failed 30 FPS gate remain unchanged.

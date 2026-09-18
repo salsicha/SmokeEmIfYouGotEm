@@ -16,10 +16,10 @@ for that choice. This is a fidelity decision for that cap, not permission to
 relax collision, shared bed/water consistency, performance or solver gates.
 Other independent South Fork work remains open; no river is accepted.
 
-20:47 UTC follow-up: no reply to that decision; do not ask again or infer approval.
-Existing cook13584 remains the sole job. Newly completed10650..11100/local
-33000..42000 each pass BOTH full-state and artificial-bank audits, NOT settled;
-next11150/local43000 needs both. Final pair retained with the review-inventory
+21:47 UTC follow-up: no reply to that decision; do not ask again or infer approval.
+Existing cook13584 remains the sole job. Newly completed11150..11350/local
+43000..47000 each pass BOTH full-state and artificial-bank audits, NOT settled;
+next11400/local48000 needs both. Final pair retained with the review-inventory
 evidence. No new cook, geometry experiment, build or playable promotion.
 Independent publication-cost inspection rules out simply skipping interpolation
 on refresh ticks: ordinary non-recenter RefreshSurface only retargets the core
