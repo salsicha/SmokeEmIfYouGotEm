@@ -3,7 +3,20 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [particle-only spray comparison, not promoted](../reconstruction-review-2026-09-07/spray-asset-only-review.md).
+Latest: [actual time-dependent foam-flow history](../reconstruction-review-2026-09-07/froth-flow-history.md).
+Three complete original histories pass the unchanged 0.1 mm reference
+convergence gate. At 0.75 s, freezing the current adds only 0.16-0.43 mm RMS
+error on common foamy cells, versus 18-21 cm for straight tracing; maxima and
+unsupported cells remain explicit. This does not fix appearance: the earlier
+curved-trace material was already visually rejected. No history material,
+density change or solver promotion. Editor build, one native history test and
+34 focused Python tests PASS. Capture is diagnostic, not FPS qualification.
+6200/6250 hydraulic state AND dry-bank audits PASS, NOT settled; installed4950
+unchanged. Next6300/local18000 requires completion marker and BOTH audits.
+Physical breaking/surface shape, convincing froth and 30 FPS remain open,
+as does the complete ordered scenario, crew, normalization and release queue.
+
+Previous: [particle-only spray comparison, not promoted](../reconstruction-review-2026-09-07/spray-asset-only-review.md).
 Removed hidden density/attachment changes from the opt-in particle comparison;
 normal-play defaults unchanged. Two actual recordings fully decoded and inspected
 against accessible reference footage: falling assets remain visibly tuft-like,
