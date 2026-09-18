@@ -124,6 +124,17 @@ speed 5.348518614677382 m/s and outflow 107.54468491711939 m3/s, still NOT settl
 Reports: `tmp/control-ablation-7650s-{state,banks}-v1-20260918.json`;
 depth SHA256 `02ea69f5d49562d1a634ff31a9fb39486b743edc6bf56bb2bee095e866fa2216`.
 
+The subsequent queued-river follow-up verified the SAME cook handle live at
+7707 s/local10140, then completed both 7700 s/local10000 audits after checking
+the completion marker. All 5,382,400 cells pass; all 86,720 artificial-bank
+face cells remain exactly dry. Maximum depth is 3.813751164992087 m, speed
+5.348983956669725 m/s, and maximum step mass residual remains
+1.4194163622249789e-8 m3. Outflow 102.74726920680162 m3/s still exceeds inflow
+45.30695454719997 m3/s: NOT settled, no new runtime installation or scene
+acceptance. Reports: `tmp/control-ablation-7700s-{state,banks}-v1-20260918.json`;
+depth SHA256 `fa0c22c41b0b4a95b10ab06854e0a275d72ead3b1e2e88f0ce82f0f479d1950f`.
+Next complete 7750 s/local11000 requires both audits; no process was restarted.
+
 ## Remaining delivery
 
 Next couple actual profile transport, conservative mass and physical momentum,

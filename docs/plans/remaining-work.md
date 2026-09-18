@@ -15,9 +15,9 @@ native/gameplay integration or visible water improvement. Nonlinear stays OFF.
 Final67-module physical suite851 PASS/13 unchanged FAIL,864 tests; no gates waived.
 The fresh refresh timing investigation confirmed existing costs, not a new
 dominant optimization. Latest ordinary p9541.7264ms still FAIL30.
-7500/7550/7600/7650 state AND artificial-bank audits PASS, NOT settled;
+7500/7550/7600/7650/7700 state AND artificial-bank audits PASS, NOT settled;
 installed4950 stays. Same cook28776/startUTC2026-09-18T04:30:27.5746992Z remains LIVE.
-Next7700/local10000 needs its completion marker and BOTH audits. Full ordered
+Next7750/local11000 needs its completion marker and BOTH audits. Full ordered
 scene/terrain/breaking/froth/contact/crew/normalization/regression/release scope
 remains OPEN. Next couple these actual-profile force components to conservative
 mass/momentum and the joint interface law, not another energy-only acceptance.
