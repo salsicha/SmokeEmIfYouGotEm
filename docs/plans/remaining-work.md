@@ -3,7 +3,23 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [local signed crest interval review](../reconstruction-review-2026-09-07/crest-interval-review.md).
+Latest: [verified7200 hydraulic continuation](../reconstruction-review-2026-09-07/hydraulic-continuation-7200.md).
+Both7150 and7200 full-state AND artificial-bank audits PASS, still NOT settled.
+Original cook32728 is terminal, confirmed by absent handle and completed marker;
+no captured exit code. New exact7200-to9000 continuation28776/startUTC
+2026-09-18T04:30:27.5746990Z/session93831 is LIVE. All5,382,400 native restart
+cells match bit-exactly, no added cells/water. Strengthened restart auditing
+now rejects changed retained physical settings, features/probes and acceptance
+claims;34 tests PASS and BOTH full old/new restart audits PASS. Next7250/local1000
+requires its completion marker and BOTH audits. Installed4950 stays unchanged.
+Independent pressure verifier38716/session9281 completed exit0: all11 supported
+cases, two preserved unsupported records,369 original fields and631 hashes checked.
+No new visual, nonlinear force/wetting, physical or30FPS acceptance. The previous
+normal p9538.6731ms remains FAIL30, and froth/crest appearance remains unaccepted.
+Full ordered scenario, crew, normalization, regression and release scope stays
+OPEN; nonlinear runtime OFF. No new particle-only trial was promoted.
+
+Previous: [local signed crest interval review](../reconstruction-review-2026-09-07/crest-interval-review.md).
 All128 alternating actual-game comparisons preserve topology and production
 geometry; both execution-order groups improve adaptive-build time in BOTH
 captures. The normal path now enables that conservative bound, retaining

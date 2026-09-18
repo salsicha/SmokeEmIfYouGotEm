@@ -183,7 +183,18 @@ speed5.337065169m/s, volume2,679,320.236017m3. Outflow113.893921m3/s
 still exceeds inflow45.306955m3/s; NOT settled. All86,720 bank cells remain dry.
 Reports:`tmp/control-ablation-7100s-{state,banks}-v1-20260918.json`;
 depth SHA256:`b5df097f0b044cb17c31c715d2f29fe3584bc5eafd4caa5dd2b37ec6d4c01143`.
-Next7150 seconds is local step35000 in the NEW continuation output.
+7150/local35000 and7200/local36000 also pass BOTH audits. At7200 seconds,
+maximum depth3.809049499m, speed5.340487366m/s, volume2,672,717.720963m3;
+outflow111.286852m3/s exceeds inflow45.306955m3/s, still NOT settled.
+All86,720 artificial-bank cells remain exactly dry. Reports:
+`tmp/control-ablation-{7150,7200}s-{state,banks}-v1-20260918.json`.
+7150 depth SHA256:
+`7d28ee909d7137249a063712c564e5ba4ea0c4700d5611a7c67cbb094ac07764`.
+7200 depth SHA256:
+`331bf70291a5ba83b487a1bdf397a689ed2437509d11a31940e1331efd6d19ef`.
+Process32728 is now TERMINAL: its handle is absent and `completed.json` reports
+completed=true. No captured exit code is available; exit0 is not inferred.
+Installed4950 remains unchanged. See [the exact next continuation](hydraulic-continuation-7200.md).
 
 Each later checkpoint requires its completion marker and both independent
 audits. Bounded depth/speed, exact restart and conservation do not prove settled

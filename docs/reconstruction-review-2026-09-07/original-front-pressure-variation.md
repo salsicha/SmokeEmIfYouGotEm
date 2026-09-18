@@ -70,14 +70,16 @@ remain. The expensive case1/source601453 takes2382.3269975s. Output is202,206,83
 bytes, SHA256`9ba9e4387631fddbe66ce06c4773e292095ad260c6e5a82e778a6803500948db`.
 It has not been restarted. All in-job protected/imported hashes match at exit.
 
-Independent reloader `tmp/verify-front-pressure-variation-v1-20260918.py` is
-LIVE as38716/startUTC2026-09-18T04:09:43.6775796Z/session9281. It reconstructs
+Independent reloader `tmp/verify-front-pressure-variation-v1-20260918.py` completed
+exit0 as38716/startUTC2026-09-18T04:09:43.6775796Z/session9281. It reconstructs
 the original geometry and independently contracts the serialized primitive
 gradients with original moment/face/momentum rates in BOTH coordinates. It
-checks preserved source records and all current hashes. Case0 passes; the
-expensive next contraction is running. Preserve this same process; no
-independent all-case verification is claimed until it completes and produces
-`tmp/front-pressure-variation-review-v1-20260918.json`. It does not repeat the
+checks preserved source records and all current hashes. All11 supported cases
+pass independent serialized contractions; both unsupported records are preserved,
+369 original fields match, and631 current hashes match at verification.
+Report: `tmp/front-pressure-variation-review-v1-20260918.json`, SHA256
+`39c482f5d6009fa4a0890988c2a9be503695b204b8c969ddfb11ee93ac31b275`.
+The same job completed without a restart. It does not repeat the
 original pole solves or establish a conservative force/wetting/native/gameplay
 law. All full-acceptance flags remain false.
 

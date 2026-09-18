@@ -8,6 +8,32 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def verify_retained_inputs(previous, current, *, scenario=False):
+    """Only explicitly regenerated restart bookkeeping may differ.
+
+    Compare complete remaining dictionaries, not a physical-field whitelist:
+    a newly introduced solver setting must not silently escape this audit.
+    Source-file and geometry-manifest hashes are checked separately.
+    """
+    if scenario:
+        ignored = {'metadata'}
+        metadata_ignored = {'generator', 'description', 'provenance'}
+        assert ({k: v for k, v in previous['metadata'].items() if k not in metadata_ignored}
+                == {k: v for k, v in current['metadata'].items() if k not in metadata_ignored}), 'Retained scenario identity changed'
+    else:
+        ignored = {'initial_time_seconds', 'initial_velocity_method', 'inputs', 'packages',
+                   'initialization_is_fresh_not_restart', 'settled_hydraulics',
+                   'normal_map_integrated', 'maximum_initial_depth_m',
+                   'maximum_initial_speed_mps', 'restart', 'geometry_manifest',
+                   'geometry_manifest_sha256'}
+        assert current['initialization_is_fresh_not_restart'] is False
+        assert current['settled_hydraulics'] is False
+        assert current['normal_map_integrated'] is False
+        assert current['dt_seconds'] > 0 and np.isfinite(current['dt_seconds'])
+    assert ({k: v for k, v in previous.items() if k not in ignored}
+            == {k: v for k, v in current.items() if k not in ignored}), 'Retained physical inputs changed'
+
+
 def sha(path):
     with path.open("rb") as source:
         return hashlib.file_digest(source, "sha256").hexdigest()
@@ -27,6 +53,7 @@ def main():
     previous_path = Path(restart["source_manifest"])
     assert sha(previous_path) == restart["source_manifest_sha256"]
     previous = json.loads(previous_path.read_text())
+    verify_retained_inputs(previous, manifest)
     source_frame = Path(restart["source_frame"])
     before = json.loads((source_frame/"complete.json").read_text())
     after = json.loads((root/"frame_000000/complete.json").read_text())
@@ -67,10 +94,13 @@ def main():
             volume += float(state["depth"].sum()*grid["dx"]*grid["dy"])
             if i < original_count:
                 old_scenario = json.loads((previous_path.parent/name/"scenario.json").read_text())
+                verify_retained_inputs(old_scenario, scenario, scenario=True)
                 assert scenario["grid"] == old_scenario["grid"]
                 assert scenario["boundaries"] == old_scenario["boundaries"]
                 assert scenario["roughness"] == old_scenario["roughness"]
                 assert sha(package/"bed.npy") == sha(previous_path.parent/name/"bed.npy")
+                for retained_file in ("features.json", "probes.json"):
+                    assert sha(package/retained_file) == sha(previous_path.parent/name/retained_file)
                 verified_cells += nx*ny
             else:
                 record = geometry["regions"][i]
@@ -99,6 +129,7 @@ def main():
                   native_restart_time_seconds=after["time_seconds"], volume_m3=volume,
                   restart_volume_error_m3=volume-before["volume_m3"]-added_volume,
                   original_grid_bed_roughness_and_boundaries_unchanged=True,
+                  all_retained_physical_settings_features_and_probes_unchanged=True,
                   settling_accepted=False, normal_map_integrated=False)
     args.report.write_text(json.dumps(result, indent=2)+"\n", encoding="utf-8")
     print(json.dumps(result, indent=2))
