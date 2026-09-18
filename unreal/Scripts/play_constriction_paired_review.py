@@ -62,7 +62,17 @@ def tick(delta):
             state.update(verified_play_world=world.get_path_name(),source_time_seconds=descriptor['source_time_seconds'],
                 review_start_station_m=descriptor['review_start_station_m'],terrain_actor=revised[0].get_name())
             unreal.log('Source-supported actual PIE geometry and water verified: '+str(counts))
-            unreal.SystemLibrary.execute_console_command(world,'RaftSim.CaptureSeries 0.1 24 0.5 '+label+' record')
+            resize=unreal.RaftSimReviewViewportLibrary.set_offscreen_play_viewport_size
+            assert not resize(None,1280,720)
+            assert not resize(world,0,720) and not resize(world,1280,0)
+            assert not resize(world,3841,720) and not resize(world,1280,2161)
+            assert resize(world,1280,720)
+            state['offscreen_viewport_guard_checks_passed']=True
+            # Slate applies its new backing target over subsequent frames. Keep
+            # the initial raft samples, but start recording after this explicit
+            # two-second presentation delay; the PNG gate still checks every frame.
+            state['capture_presentation_delay_seconds']=2.
+            unreal.SystemLibrary.execute_console_command(world,'RaftSim.CaptureSeries 2 '+str(capture_count)+' 0.5 '+label+' record')
         now=unreal.GameplayStatics.get_time_seconds(world)
         if now>=state.get('next_motion_sample',0.):
             rafts=unreal.GameplayStatics.get_all_actors_of_class(world,unreal.RaftSimRaftActor)
@@ -71,9 +81,9 @@ def tick(delta):
                 p=raft.get_actor_location();r=raft.get_actor_rotation()
                 rows.append(dict(actor=raft.get_name(),location_cm=[p.x,p.y,p.z],rotation_deg=[r.pitch,r.yaw,r.roll]))
             state.setdefault('raft_motion',[]).append(dict(time_seconds=now,rafts=rows));state['next_motion_sample']=now+.25
-        final=ROOT/'unreal/Saved/Screenshots'/(label+'_023.png')
+        final=ROOT/'unreal/Saved/Screenshots'/(label+f'_{capture_count-1:03d}.png')
         if final.exists():
-            paths=[ROOT/'unreal/Saved/Screenshots'/(label+f'_{i:03d}.png') for i in range(24)]
+            paths=[ROOT/'unreal/Saved/Screenshots'/(label+f'_{i:03d}.png') for i in range(capture_count)]
             sizes=[]
             for path in paths:
                 with path.open('rb') as stream:header=stream.read(24)
@@ -88,6 +98,8 @@ def tick(delta):
 try:
     config_path=(ROOT/os.environ['RAFTSIM_CONSTRICTION_PLAY_CONFIG']).resolve()
     raw=json.loads(config_path.read_text());label=raw['label']
+    capture_count=raw.get('capture_count',24)
+    assert type(capture_count) is int and 24<=capture_count<=120
     destination=(ROOT/raw['report']).resolve()
     assert config_path.is_relative_to(ROOT/'tmp') and destination.is_relative_to(ROOT/'tmp') and not destination.exists()
     assert label.replace('-','').replace('_','').isalnum();report=destination

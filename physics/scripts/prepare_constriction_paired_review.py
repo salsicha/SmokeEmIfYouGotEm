@@ -4,7 +4,7 @@ import json
 import math
 from pathlib import Path
 from prepare_south_fork_joint_preview import Dependencies, asset_file, require, verify_audits, verify_native_state, add_cap_dependencies
-from south_fork_rock_union import sha
+from package_runtime_bundle import sha
 
 ROOT=Path(__file__).resolve().parents[2]
 LEVEL='/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach'

@@ -1132,6 +1132,27 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                         Raft ? Raft->GetActorRotation().Yaw : 0.,
                         Camera && Raft ? *Raft->GetActorTransform().InverseTransformPosition(
                             Camera->GetCameraLocation()).ToCompactString() : TEXT("unavailable"));
+                    // FScreenshotRequest is global. In offscreen PIE an editor
+                    // viewport can consume it first (producing an empty editor
+                    // grid instead of this player's view). Read the existing
+                    // game backbuffer explicitly before yielding to Slate. No
+                    // resampling or extra simulation/render step is introduced;
+                    // this is the last rendered player frame, not a GPU fence
+                    // for the game-thread pose logged above. Standalone capture
+                    // retains its ordinary asynchronous path.
+                    if (W2->WorldType == EWorldType::PIE &&
+                        FParse::Param(FCommandLine::Get(), TEXT("RenderOffscreen")))
+                    {
+                        UGameViewportClient* Client = GI ? GI->GetGameViewportClient() : nullptr;
+                        const bool Saved = Client && Client->GetWorld() == W2 && Client->Viewport &&
+                            Client->ProcessScreenShots(Client->Viewport);
+                        UE_LOG(LogTemp, Display, TEXT("RaftSim PIE player-backbuffer capture: index=%d saved=%d"), *Taken, Saved);
+                        if (!Saved)
+                        {
+                            FScreenshotRequest::Reset();
+                            UE_LOG(LogTemp, Error, TEXT("PIE player capture failed; refusing editor viewport fallback"));
+                        }
+                    }
                     ++(*Taken);
                     if (*Taken >= Count)
                     {

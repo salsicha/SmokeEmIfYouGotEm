@@ -3,7 +3,24 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [source-supported full-map union and fresh flow](../reconstruction-review-2026-09-07/constriction-union-review.md).
+Latest: [paired actual motion and wrong-viewport capture fix](../reconstruction-review-2026-09-07/constriction-paired-motion.md).
+The source-supported candidate and matching50s atlas now run together in actual
+unsaved FullReach play from8300, original ground reused and cap retained.
+All25,600 native water queries and70,017 collision probes PASS. The final47.479s
+movie fully decodes;96 actual1280x720 player-view captures and140 raft poses
+show motion through station8385.913. Earlier failed frames revealed an empty
+editor viewport consuming the global screenshot request; offscreen PIE now
+explicitly captures the game's backbuffer. This is a capture fix, NOT a normal
+play terrain/water promotion. Broad smooth foam and spiky/angular flanks remain
+unaccepted; identify the downstream mass before altering inferred geometry.
+Editor AND standalone builds, one native capture test,119 Python tests and
+exact dual-cook/capture guards PASS. Baseline9500/9550/9600
+and candidate100s pass BOTH state/bank audits, NOT settled. Same cooks13584 and
+30276 continue; next9650/local13000 and150/local3000 each require completion
+plus BOTH audits. Installed map/4950flow unchanged; no new FPS acceptance.
+Full ordered scope OPEN, nonlinear OFF, latest24.937420FPS still FAIL30.
+
+Previous: [source-supported full-map union and fresh flow](../reconstruction-review-2026-09-07/constriction-union-review.md).
 Fresh native reload verifies every directed source triangle; actual FullReach
 actor reuse passes70,017 collision queries within unchanged0.1cm, with474 saved
 files unchanged. New probe coverage includes XYZ/topology and both partitions;
