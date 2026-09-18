@@ -1,5 +1,6 @@
 #include "RaftSimLiveWaterWindow.h"
 #include "RaftSimWetSurfaceInterpolation.h"
+#include "RaftSimAtlasStencil.h"
 
 #if RAFTSIM_HAS_LIVE_SOLVER
 
@@ -342,6 +343,7 @@ struct FSharedCartesianAtlas
         return (*Tile*TileNy + Y)*TileNx + X;
     }
 
+    template<bool bCacheStencil=false>
     FRaftSimLiveWaterSampleResult Sample(const FVector2D& Position) const
     {
         FRaftSimLiveWaterSampleResult Result;
@@ -352,6 +354,15 @@ struct FSharedCartesianAtlas
             return Result;
         const int64 X = int64(FMath::FloorToDouble(Grid.X));
         const int64 Y = int64(FMath::FloorToDouble(Grid.Y));
+        const auto Lookup=[this](int64 C,int64 R){return CellIndex(C,R);};
+        // Compile the old sampler without any additional lookup or branch.
+        TOptional<FRaftSimAtlasStencil> Stencil;
+        if constexpr(bCacheStencil)Stencil.Emplace(X,Y,TileNx,TileNy,Lookup);
+        const auto Index=[&](int64 C,int64 R)
+        {
+            if constexpr(bCacheStencil)return Stencil->At(C,R,Lookup);
+            else return CellIndex(C,R);
+        };
         const double Fx = Grid.X-X, Fy = Grid.Y-Y;
         double BedValue = 0., Depth = 0., VelX = 0., VelY = 0.;
         double CornerBed[4]={},CornerDepth[4]={};
@@ -359,7 +370,7 @@ struct FSharedCartesianAtlas
         for (int32 DY = 0; DY < 2; ++DY) for (int32 DX = 0; DX < 2; ++DX)
         {
             const double Weight = (DX ? Fx : 1.-Fx)*(DY ? Fy : 1.-Fy);
-            const int32 I = CellIndex(X+DX, Y+DY);
+            const int32 I = Index(X+DX, Y+DY);
             // Interpolation may cross a real tile seam, but must never bridge
             // an unavailable hole or extrapolate past a physical river end.
             if (I == INDEX_NONE) { if (Weight!=0.) return Result; else continue; }
@@ -376,10 +387,10 @@ struct FSharedCartesianAtlas
         Result.SurfaceHeightM = float(BedValue + Depth + Datum);
         Result.VelocityMps = FVector2D(float(VelX), float(VelY));
         Result.bWet = Depth > 1.e-4; // Same presentation wet threshold as the live sampler.
-        const int32 Center = CellIndex(X, Y);
+        const int32 Center = Index(X, Y);
         const auto Surface = [this](int32 I) { return Bed.Float64[I] + H.Float64[I]; };
-        const int32 L = CellIndex(X-1, Y), R = CellIndex(X+1, Y);
-        const int32 D = CellIndex(X, Y-1), Up = CellIndex(X, Y+1);
+        const int32 L = Index(X-1, Y), R = Index(X+1, Y);
+        const int32 D = Index(X, Y-1), Up = Index(X, Y+1);
         const auto Gradient = [&](int32 Before, int32 After)
         {
             if (Before != INDEX_NONE && After != INDEX_NONE)
@@ -1223,9 +1234,10 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     return Window;
 }
 
-FRaftSimLiveWaterSampleResult FRaftSimLiveWaterWindow::SamplePresentationSource(const FVector2D& PositionM) const
+FRaftSimLiveWaterSampleResult FRaftSimLiveWaterWindow::SamplePresentationSource(const FVector2D& PositionM,bool bCacheStencil) const
 {
-    return PresentationState.IsValid() ? PresentationState->Atlas->Sample(PositionM) : FRaftSimLiveWaterSampleResult{};
+    if(!PresentationState.IsValid())return {};
+    return bCacheStencil ? PresentationState->Atlas->Sample<true>(PositionM) : PresentationState->Atlas->Sample(PositionM);
 }
 
 bool FRaftSimLiveWaterWindow::GetFieldBoundsM(FBox2D& OutBounds) const

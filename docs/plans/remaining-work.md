@@ -3,7 +3,25 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [corner-first crest range rejected](../reconstruction-review-2026-09-07/crest-corner-range-review.md).
+Latest: [query-local atlas lookup reuse](../reconstruction-review-2026-09-07/atlas-stencil-review.md).
+Both independent64-pair actual-game comparisons preserve ALL source fields and
+bank masks exactly and improve both execution orders. Normal South Fork FullReach
+now enables query-local tile-address reuse, retaining the original sampler via
+`-RaftSimReferenceAtlasStencil`; no data, interpolation or physics changes.
+The whole source/handover pass saves only0.077..0.084ms: a SMALL component gain,
+not a substantial refresh fix or visible water improvement. Final editor build
+and11 native D3D12 tests PASS;23 strict report tests PASS. Audit-free900-frame
+ABBA p95=47.4820/44.8907/45.1838/44.8950ms: all FAIL30. Final default26.713908FPS.
+Whole-game pairs are mixed; no whole-frame speedup or visual acceptance claimed.
+Standalone Development game build also PASS; no packaged/release acceptance.
+8250/local11000 AND8300/local12000 state/artificial-bank audits PASS, NOT settled;
+installed4950 stays. Same cook8900/startUTC2026-09-18T06:34:59.2598919Z/session68256
+is verified LIVE after all captures. Next8350/local13000 needs complete marker
+and BOTH audits. Prioritize substantive refresh/physical coupling and actual
+breaking/froth delivery, not further tiny lookup-order experiments. Nonlinear
+stays OFF; all ordered scene/crew/regression/normalization/release scope stays OPEN.
+
+Previous: [corner-first crest range rejected](../reconstruction-review-2026-09-07/crest-corner-range-review.md).
 Both64-pair actual-game histories preserve exact topology but lose BOTH timing
 orders. The gameplay switch is removed; only a compile-time comparison remains.
 Final editor build and9 native D3D12 checks PASS;22 Python audit checks PASS.

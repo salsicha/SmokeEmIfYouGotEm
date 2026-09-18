@@ -4115,10 +4115,16 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     const FTransform BaselineKeepTransform =
             SurfaceMesh ? SurfaceMesh->GetComponentTransform()
                         : GetActorTransform();
+    // Two independent actual-state captures preserve every field/mask and
+    // improve both timing orders. Qualify other scenes separately; retain
+    // same-binary original lookup for performance and regression controls.
+    static const bool bReferenceAtlasStencil=FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceAtlasStencil"));
+    bool bCacheAtlasStencil=!bReferenceAtlasStencil && bCartesianFlow && GetWorld() &&
+        GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
     const auto SampleBaseline = [&](int32 Index,FRaftSimWaterSample& Out,FRaftSimRefreshBaselineSample* Cached)
     {
         const auto Query=[&](FRaftSimWaterSample& Value)
-        { return WaterAdapter->SamplePresentationBaselineFieldAtRiverCoordinates(RiverCoordinatesM[Index],Value); };
+        { return WaterAdapter->SamplePresentationBaselineFieldAtRiverCoordinates(RiverCoordinatesM[Index],Value,bCacheAtlasStencil); };
         return Cached ? Cached->Read(Query,Out) : Query(Out);
     };
     const auto SampleVertex = [&](int32 Index,FRaftSimRefreshBaselineSample* Cached=nullptr)
@@ -4427,10 +4433,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
 
     // Opt-in actual-state equivalence audit, excluded from ordinary/timing runs.
     // Restore the parallel outputs after rerunning both passes from clean arrays.
+    static const FString AtlasStencilAuditPath=[]()
+    { FString P; FParse::Value(FCommandLine::Get(),TEXT("RaftSimAtlasStencilAudit="),P); return P; }();
     static const FString SourceAuditPath=[]()
     { FString P; FParse::Value(FCommandLine::Get(),TEXT("RaftSimWaterSourceAudit="),P); return P; }();
+    const bool bAtlasStencilAudit=!AtlasStencilAuditPath.IsEmpty();
+    const FString& SelectedSourceAuditPath=bAtlasStencilAudit ? AtlasStencilAuditPath : SourceAuditPath;
     static bool bSourceAuditWritten=false;
-    if (!SourceAuditPath.IsEmpty() && !bSourceAuditWritten && bConcurrentSource &&
+    if (!SelectedSourceAuditPath.IsEmpty() && !bSourceAuditWritten && bConcurrentSource &&
         GetWorld() && GetWorld()->GetTimeSeconds()>=10.)
     {
         bSourceAuditWritten=true;
@@ -4439,6 +4449,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         auto SavedSampled=SolverSampledVertexMask, SavedAvailable=CartesianShoreAvailable;
         auto SavedProbeWanted=BaselineKeepProbeWanted;
         auto SavedFeather=FeatheredBaselineWet, SavedHeights=PresentationSurfaceHeightMeters;
+        const bool SavedCacheAtlasStencil=bCacheAtlasStencil;
         const int32 Count=Vertices.Num();
         const auto ResetSourceOutputs=[&]()
         {
@@ -4462,6 +4473,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 SavedProbeWanted==BaselineKeepProbeWanted && SavedFeather==FeatheredBaselineWet &&
                 SavedHeights==PresentationSurfaceHeightMeters;
         };
+        if(bAtlasStencilAudit)bCacheAtlasStencil=false;
         ResetSourceOutputs();
         SampleLiveVertices(false); BlendSourceVertices(false);
         int32 DifferentSamples=0;
@@ -4484,44 +4496,50 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // state, not a serial baseline against parallel work. Allocation /
             // reset and validation are outside both timed intervals. Fixed
             // alternating order; preserve every pair, including slower ones.
-            for (int32 Pair=0;Pair<8;++Pair)
+            for (int32 Pair=0;Pair<(bAtlasStencilAudit ? 64 : 8);++Pair)
             {
                 double Ms[2]={0.,0.};bool Exact=true;
                 for (int32 Order=0;Order<2;++Order)
                 {
                     const int32 Kind=(Order+Pair)%2;
                     ResetSourceOutputs();
+                    if(bAtlasStencilAudit)bCacheAtlasStencil=Kind==1;
                     const double Begin=FPlatformTime::Seconds();
-                    if (Kind==0) { SampleLiveVertices(true);BlendSourceVertices(true); }
+                    if (bAtlasStencilAudit) { SampleCombinedVertices();BlendSourceVertices(true,true); }
+                    else if (Kind==0) { SampleLiveVertices(true);BlendSourceVertices(true); }
                     else { SampleCombinedVertices();BlendSourceVertices(true,true); }
                     Ms[Kind]=(FPlatformTime::Seconds()-Begin)*1000.;
                     Exact &= MatchesSaved();
                 }
                 auto Row=MakeShared<FJsonObject>();
-                Row->SetBoolField(TEXT("fused_first"),Pair%2!=0);
-                Row->SetNumberField(TEXT("separate_ms"),Ms[0]);
-                Row->SetNumberField(TEXT("fused_ms"),Ms[1]);
+                Row->SetBoolField(bAtlasStencilAudit ? TEXT("candidate_first") : TEXT("fused_first"),Pair%2!=0);
+                Row->SetNumberField(bAtlasStencilAudit ? TEXT("reference_ms") : TEXT("separate_ms"),Ms[0]);
+                Row->SetNumberField(bAtlasStencilAudit ? TEXT("candidate_ms") : TEXT("fused_ms"),Ms[1]);
                 Row->SetBoolField(TEXT("all_samples_and_masks_exact"),Exact);
                 AllPairsExact &= Exact;
                 Pairs.Add(MakeShared<FJsonValueObject>(Row));
             }
         }
+        bCacheAtlasStencil=SavedCacheAtlasStencil;
         WaterSamples=MoveTemp(SavedSamples); WetVertexMask=MoveTemp(SavedWet);
         LiveSolverWetVertexMask=MoveTemp(SavedLiveWet); SolverSampledVertexMask=MoveTemp(SavedSampled);
         CartesianShoreAvailable=MoveTemp(SavedAvailable); BaselineKeepProbeWanted=MoveTemp(SavedProbeWanted);
         FeatheredBaselineWet=MoveTemp(SavedFeather); PresentationSurfaceHeightMeters=MoveTemp(SavedHeights);
         TSharedRef<FJsonObject> Audit=MakeShared<FJsonObject>();
-        Audit->SetStringField(TEXT("scope"),TEXT("Exact serial/parallel live-source sampling, bank decisions and crop handover on the same actual runtime state; excludes later relief/foam/mesh stages and full visual acceptance."));
+        Audit->SetStringField(TEXT("schema"),bAtlasStencilAudit ? TEXT("raftsim.atlas_stencil_pair.v1") : TEXT("raftsim.source_handover_pair.v1"));
+        Audit->SetStringField(TEXT("scope"),bAtlasStencilAudit
+            ? TEXT("Same immutable live/atlas inputs and current render coordinates; 64 alternating parallel source+handover passes. Only atlas address lookup changes. All source fields and bank masks checked exactly; outputs restored. Not visual or whole-frame performance acceptance.")
+            : TEXT("Exact serial/parallel live-source sampling, bank decisions and crop handover on the same actual runtime state; excludes later relief/foam/mesh stages and full visual acceptance."));
         Audit->SetStringField(TEXT("map"),GetWorld()->GetMapName());
         Audit->SetNumberField(TEXT("world_seconds"),GetWorld()->GetTimeSeconds());
         Audit->SetNumberField(TEXT("samples"),Count);
         Audit->SetNumberField(TEXT("different_samples"),DifferentSamples);
         Audit->SetBoolField(TEXT("identical_masks_probe_requests_feather_and_heights"),SameFields);
-        Audit->SetArrayField(TEXT("paired_parallel_passes"),Pairs);
+        Audit->SetArrayField(bAtlasStencilAudit ? TEXT("atlas_stencil_pairs") : TEXT("paired_parallel_passes"),Pairs);
         Audit->SetBoolField(TEXT("paired_parallel_passes_exact"),AllPairsExact);
         Audit->SetBoolField(TEXT("passed"),DifferentSamples==0 && SameFields && AllPairsExact);
         FString Json; auto Writer=TJsonWriterFactory<>::Create(&Json); FJsonSerializer::Serialize(Audit,Writer);
-        if (!IFileManager::Get().FileExists(*SourceAuditPath)) FFileHelper::SaveStringToFile(Json,*SourceAuditPath);
+        if (!IFileManager::Get().FileExists(*SelectedSourceAuditPath)) FFileHelper::SaveStringToFile(Json,*SelectedSourceAuditPath);
     }
 
     Perf.Mark(TEXT("source_samples"));

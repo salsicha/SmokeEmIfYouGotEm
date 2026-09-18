@@ -1103,14 +1103,14 @@ bool URaftSimWaterRuntimeAdapter::LoadPresentationBaselineFieldFromFile(
 bool URaftSimWaterRuntimeAdapter::
     SamplePresentationBaselineFieldAtRiverCoordinates(
         FVector2D StationLateralM,
-        FRaftSimWaterSample& OutSample) const
+        FRaftSimWaterSample& OutSample,bool bCacheAtlasStencil) const
 {
     if (bCartesianWaterCoordinates)
     {
         OutSample = FRaftSimWaterSample{};
 #if RAFTSIM_HAS_LIVE_SOLVER
         if (!LiveWindow.IsValid()) return false;
-        const FRaftSimLiveWaterSampleResult Source = LiveWindow->SamplePresentationSource(StationLateralM);
+        const FRaftSimLiveWaterSampleResult Source = LiveWindow->SamplePresentationSource(StationLateralM,bCacheAtlasStencil);
         if (!Source.bValid) return false;
         OutSample.SurfaceHeightMeters = Source.SurfaceHeightM - RiverVerticalDatumM;
         OutSample.BedHeightMeters = Source.BedHeightM - RiverVerticalDatumM;

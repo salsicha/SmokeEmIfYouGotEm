@@ -450,7 +450,7 @@ public:
      * the live solver remains authoritative wherever its crop is valid.
      */
     bool SamplePresentationBaselineFieldAtRiverCoordinates(
-        FVector2D StationLateralM, FRaftSimWaterSample& OutSample) const;
+        FVector2D StationLateralM, FRaftSimWaterSample& OutSample,bool bCacheAtlasStencil=false) const;
 
     /**
      * Flow-warped presentation wave clock pushed by the visible water surface

@@ -98,7 +98,7 @@ public:
     /** Immutable shared river source for presentation outside the live crop.
      * Never a fallback for gameplay sampling. Missing source remains invalid;
      * valid dry cells retain their source bed/depth. Velocity/normal use field XY. */
-    FRaftSimLiveWaterSampleResult SamplePresentationSource(const FVector2D& PositionM) const;
+    FRaftSimLiveWaterSampleResult SamplePresentationSource(const FVector2D& PositionM,bool bCacheStencil=false) const;
     bool HasSharedPresentationSource() const { return PresentationState.IsValid(); }
     /** Exact inclusive live cell-center bounds, excluding source ghost cells. */
     bool GetFieldBoundsM(FBox2D& OutBounds) const;
