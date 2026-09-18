@@ -3,7 +3,31 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [elapsed-frame phase and longer captures](../reconstruction-review-2026-09-07/frame-time-phase-review.md).
+Latest: [coupled flat-periodic API verification](../reconstruction-review-2026-09-07/coupled-flat-api-review.md).
+Commit c19c2bcae connects the existing full metric-transport stage to the default
+flat-periodic research API, retaining the failed legacy stress variants as
+explicit negative controls on identical source states. All eight original
+source profiles pass unchanged conservation gates. The retained68-module suite
+finishes870 PASS/1 unchanged storage-face consistency FAIL (871 tests); four
+older block-preconditioner failures in a separate related suite also remain.
+Neither test migration nor coordinate differentiation enables nonlinear runtime.
+No new playable visual improvement or30FPS acceptance is claimed.
+7800/local2000 AND7850/local3000 state and artificial-bank audits PASS, NOT settled;
+all86,720 bank cells remain exactly dry. Same cook8900/startUTC
+2026-09-18T06:34:59.2598919Z/session68256 remains LIVE; installed4950 stays.
+Next7900/local4000 needs its complete marker and BOTH audits.
+An explicit nonshipping RaftSimSolverLanes option is being built to compare
+four/eight native solver lanes in actual FullReach; the gameplay default is
+UNCHANGED at four. Native domain tests pass at both limits. Editor build
+session85099 is still running (tmp/solver-lanes-editor-build-v1-20260918.log),
+after rebuilding the solver archive. Do not launch performance captures while
+it runs or restart it merely for an observation timeout. After completion,
+run RaftSim.Water.SolverLaneOption and same-build alternating4/8 game captures,
+verify runtime limit/archive log confirmations and unchanged quality/cadence,
+then decide from measurements. No worker-count speedup has yet been measured
+in gameplay. Full ordered physical/scene/crew/regression/release scope stays OPEN.
+
+Previous: [elapsed-frame phase and longer captures](../reconstruction-review-2026-09-07/frame-time-phase-review.md).
 InstalledUE5.8 default FrameTime describes the PREVIOUS logical frame; optional
 water-workload grouping now uses an explicitly verified phase, never best-fit
 correlation. Runtime mode confirmation/log hashes and50 Python plus PowerShell
