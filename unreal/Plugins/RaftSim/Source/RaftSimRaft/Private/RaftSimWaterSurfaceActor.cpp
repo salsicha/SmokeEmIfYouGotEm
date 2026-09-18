@@ -10,6 +10,7 @@
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimWaterSourcePacking.h"
+#include "RaftSimWaterInterpolation.h"
 #include "RaftSimSourcePackingAudit.h"
 #include "RaftSimWaterSmoothing.h"
 #include "RaftSimWaterFlowFrame.h"
@@ -9201,29 +9202,47 @@ void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
         FlowVelocityMetersPerSecond.Num());
     RenderedLiveVolumeCoreWakeData.SetNumUninitialized(
         BoatWakePresentationData.Num());
-    for (int32 Index = 0; Index < LiveVolumeCoreVertices.Num(); ++Index)
+    // Two actual-game captures preserve every field bit and reduce this pass
+    // in both call orders. Keep an exact serial control; legacy surfaces retain
+    // their original scheduling until separately reviewed.
+    static const bool AllowParallelInterpolation=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialWaterInterpolation"));
+    const bool ParallelInterpolation=bCartesianFlow && AllowParallelInterpolation;
+    static const bool InterpolationAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimWaterInterpolationAudit"));
+    if(InterpolationAudit && GFrameCounter>=120 && GFrameCounter<184)
     {
-        RenderedLiveVolumeCoreVertices[Index] = FMath::Lerp(
-            RenderedLiveVolumeCoreVertices[Index],
-            LiveVolumeCoreVertices[Index],
-            Alpha);
-        RenderedLiveVolumeCoreNormals[Index] = FMath::Lerp(
-            RenderedLiveVolumeCoreNormals[Index],
-            LiveVolumeCoreNormals[Index],
-            Alpha).GetSafeNormal();
-        RenderedLiveVolumeCoreVertexColors[Index] = FMath::Lerp(
-            RenderedLiveVolumeCoreVertexColors[Index],
-            LiveVolumeCoreVertexColors[Index],
-            Alpha);
-        RenderedLiveVolumeCoreFlowVelocity[Index] = FMath::Lerp(
-            RenderedLiveVolumeCoreFlowVelocity[Index],
-            FlowVelocityMetersPerSecond[Index],
-            Alpha);
-        RenderedLiveVolumeCoreWakeData[Index] = FMath::Lerp(
-            RenderedLiveVolumeCoreWakeData[Index],
-            BoatWakePresentationData[Index],
-            Alpha);
+        auto P=RenderedLiveVolumeCoreVertices;auto N=RenderedLiveVolumeCoreNormals;
+        auto C=RenderedLiveVolumeCoreVertexColors;auto F=RenderedLiveVolumeCoreFlowVelocity;
+        auto W=RenderedLiveVolumeCoreWakeData;
+        double SerialMs=0.,ParallelMs=0.;bool Valid=true;
+        const auto Serial=[&]() {const double Start=FPlatformTime::Seconds();
+            Valid &= RaftSimWaterInterpolation::Advance(LiveVolumeCoreVertices,LiveVolumeCoreNormals,
+                LiveVolumeCoreVertexColors,FlowVelocityMetersPerSecond,BoatWakePresentationData,Alpha,
+                RenderedLiveVolumeCoreVertices,RenderedLiveVolumeCoreNormals,RenderedLiveVolumeCoreVertexColors,
+                RenderedLiveVolumeCoreFlowVelocity,RenderedLiveVolumeCoreWakeData,false);
+            SerialMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        const auto Parallel=[&]() {const double Start=FPlatformTime::Seconds();
+            Valid &= RaftSimWaterInterpolation::Advance(LiveVolumeCoreVertices,LiveVolumeCoreNormals,
+                LiveVolumeCoreVertexColors,FlowVelocityMetersPerSecond,BoatWakePresentationData,Alpha,P,N,C,F,W,true);
+            ParallelMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        if(GFrameCounter%2){Parallel();Serial();}else{Serial();Parallel();}
+        const auto Exact=[](const auto& A,const auto& B)
+        {return A.Num()==B.Num() && (!A.Num() || !FMemory::Memcmp(A.GetData(),B.GetData(),A.Num()*sizeof(A[0])));};
+        Valid &= Exact(P,RenderedLiveVolumeCoreVertices) && Exact(N,RenderedLiveVolumeCoreNormals) &&
+            Exact(C,RenderedLiveVolumeCoreVertexColors) && Exact(F,RenderedLiveVolumeCoreFlowVelocity) && Exact(W,RenderedLiveVolumeCoreWakeData);
+        UE_LOG(LogTemp,Display,TEXT("WaterInterpolationPair frame=%llu exact=%d parallel_first=%d vertices=%d serial_ms=%.9f parallel_ms=%.9f"),
+            GFrameCounter,int32(Valid),int32(GFrameCounter%2),P.Num(),SerialMs,ParallelMs);
+        if(!Valid){UE_LOG(LogTemp,Error,TEXT("Water interpolation comparison failed"));return;}
+        if(ParallelInterpolation)
+        {
+            RenderedLiveVolumeCoreVertices=MoveTemp(P);RenderedLiveVolumeCoreNormals=MoveTemp(N);
+            RenderedLiveVolumeCoreVertexColors=MoveTemp(C);RenderedLiveVolumeCoreFlowVelocity=MoveTemp(F);
+            RenderedLiveVolumeCoreWakeData=MoveTemp(W);
+        }
     }
+    else if(!RaftSimWaterInterpolation::Advance(LiveVolumeCoreVertices,LiveVolumeCoreNormals,
+        LiveVolumeCoreVertexColors,FlowVelocityMetersPerSecond,BoatWakePresentationData,Alpha,
+        RenderedLiveVolumeCoreVertices,RenderedLiveVolumeCoreNormals,RenderedLiveVolumeCoreVertexColors,
+        RenderedLiveVolumeCoreFlowVelocity,RenderedLiveVolumeCoreWakeData,ParallelInterpolation)) return;
 
     const TArray<FVector2D> EmptyUVs;
     // R/G/B store foam/depth/speed, not display colour. Creation defaults to

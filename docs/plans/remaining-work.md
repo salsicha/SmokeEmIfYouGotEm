@@ -3,6 +3,17 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest continuation: [parallel water interpolation in default play](../reconstruction-review-2026-09-07/water-interpolation-parallel.md).
+Two actual-game captures preserve all five fields bit-for-bit in 128 pairs;
+the pass drops from about 1.7–1.8 ms to 0.44–0.64 ms in both orders. Cartesian
+default enabled; editor and standalone rebuilt, final ten native tests pass.
+Whole-frame ABBA results are mixed, not a reliable FPS gain: default runs
+25.600678/27.421104 FPS, p95 46.9624/43.7452 ms, both FAIL30. Normal-start
+24-image/15.614 s recording fully decoded; 2,034 support probes pass the scoped
+comparison. No visual, full collision, shoreline, rapid or release acceptance.
+Startup material changes, terrain/crest/froth/crew realism and the pending cap
+decision remain open. No map/installed4950/source changes; nonlinear stays OFF.
+
 Source-interpretation decision requested September 18, 19:47 UTC heartbeat:
 the remaining downstream cap cannot be reconstructed as a source-exact ROCK
 surface from the available evidence. Its class-1 returns are unclassified;
