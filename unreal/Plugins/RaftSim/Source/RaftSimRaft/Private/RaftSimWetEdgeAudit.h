@@ -1,5 +1,6 @@
 #pragma once
 #include "RaftSimWaterFlowFrame.h"
+#include "RaftSimWetEdgeCache.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
 #include "Misc/FileHelper.h"
@@ -64,5 +65,41 @@ inline TArray<int32> Evaluate(int32 Nx,int32 Ny,TConstArrayView<uint8> Wet,int32
     }
 #endif
     return RaftSimWaterFlowFrame::WetEdgeSteps(Nx,Ny,Wet,Sweep);
+}
+
+inline TArray<int32> EvaluateCached(FRaftSimWetEdgeCache& Cache,
+    int32 Nx,int32 Ny,TConstArrayView<uint8> Wet,int32 Phase)
+{
+    // Qualified against every original distance in gameplay and both orders
+    // of whole-frame timing. Retain independent original-computation controls.
+    static const bool Enabled=[]
+    {
+        FString SweepAudit;
+        return !FParse::Param(FCommandLine::Get(),TEXT("RaftSimFreshWetEdges")) &&
+            !FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceWetEdges")) &&
+            !FParse::Value(FCommandLine::Get(),TEXT("RaftSimWetEdgeSweepAudit="),SweepAudit);
+    }();
+    // Original control does not copy or retain masks.
+    if(!Enabled)return Evaluate(Nx,Ny,Wet,Phase);
+    const bool Hit=Cache.Matches(Nx,Ny,Wet);
+    if(!Hit)Cache.Store(Nx,Ny,Wet,Evaluate(Nx,Ny,Wet,Phase));
+#if !UE_BUILD_SHIPPING
+    static const bool Audit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimWetEdgeCacheAudit"));
+    if(Audit)
+    {
+        // Independent original queue, on EVERY call in BOTH uses, including
+        // hits, moving windows and masks differing by only one cell.
+        const auto Reference=RaftSimWaterFlowFrame::WetEdgeStepsReference(Nx,Ny,Wet);
+        if(Reference!=Cache.Get())
+        {
+            UE_LOG(LogTemp,Error,TEXT("WetEdgeCacheAudit mismatch frame=%llu phase=%d"),GFrameCounter,Phase);
+            Cache.Reset();
+            Cache.Store(Nx,Ny,Wet,TArray<int32>(Reference));
+        }
+        else UE_LOG(LogTemp,Display,TEXT("WetEdgeCacheAudit exact frame=%llu phase=%d hit=%d cells=%d"),
+            GFrameCounter,Phase,int32(Hit),Wet.Num());
+    }
+#endif
+    return Cache.Get();
 }
 }

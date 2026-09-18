@@ -8,6 +8,7 @@ class URaftSimShorelineMeshComponent;
 #include "RaftSimSurfaceRefinement.h"
 #include "RaftSimShorelineCrests.h"
 #include "RaftSimCommittedWaterClock.h"
+#include "RaftSimWetEdgeCache.h"
 
 #include "RaftSimWaterSurfaceActor.generated.h"
 
@@ -674,6 +675,7 @@ protected:
     float BreakingCrestLiftMeters = 0.22f;
 
 private:
+    FRaftSimWetEdgeCache WetEdgeDistanceCache;
     friend class FRaftSimVisibleSprayCarrierTest;
     mutable TSharedPtr<FRaftSimGroundSourceRegistry> CarrierGroundSources;
     bool SampleCartesianCarrierPosition(const FVector& WorldPositionCm,FVector& OutPositionCm,bool& OutWet) const;

@@ -4775,7 +4775,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     TArray<float> ShoreDisplacementWeight;
     ShoreDisplacementWeight.SetNumZeroed(Vertices.Num());
     const TArray<int32> CartesianWetEdgeSteps = bCartesianFlow
-        ? RaftSimWetEdgeAudit::Evaluate(GridStationN,GridLateralN,WetVertexMask,1) : TArray<int32>();
+        ? RaftSimWetEdgeAudit::EvaluateCached(WetEdgeDistanceCache,GridStationN,GridLateralN,WetVertexMask,1) : TArray<int32>();
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
         for (int32 X = 0; X < GridStationN; ++X)
@@ -7324,8 +7324,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             };
             if (bCartesianFlow)
             {
-                const auto EdgeSteps = RaftSimWetEdgeAudit::Evaluate(
-                    GridStationN, GridLateralN, VolumeCoreWetMask,2);
+                const auto& EdgeSteps = RaftSimWetEdgeAudit::EvaluateCached(
+                    WetEdgeDistanceCache, GridStationN, GridLateralN, VolumeCoreWetMask,2);
                 for (int32 I=0; I<Vertices.Num(); ++I)
                     if (VolumeCoreWetMask[I] && EdgeSteps[I]<kVisualBankBandRings)
                         EvaluateBandCell(I%GridStationN, I/GridStationN);

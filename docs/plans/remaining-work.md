@@ -3,7 +3,25 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [canopy bundle repair and crest prefetch qualification](../reconstruction-review-2026-09-07/crest-prefetch-and-canopy-bundle.md).
+Latest: [exact shoreline reuse in ordinary play](../reconstruction-review-2026-09-07/wet-edge-cache.md).
+Both Cartesian shoreline uses now reuse distances only when dimensions and
+every wet-mask byte match. Actual game: 46,271,250 distances exactly equal the
+original queue, 533 hits among 914 calls. A/B/B/A mean and p95 both improve in
+both orders (roughly25.6 to26.1–26.3FPS), so reuse is enabled by default with
+original controls retained. Editor AND standalone builds PASS; five native
+default tests and65 related Python tests PASS. Final separate ordinary capture
+24.985236FPS/p9548.4048ms remains FAIL30; retain this worse absolute result.
+Complete new15.814s engine movie decoded; inspected3/9/13s frames still show
+broad smooth foam and angular rock/tree forms. No visual or full traversal pass.
+8950 AND9000 state/artificial-bank audits PASS, NOT settled; installed4950 stays.
+Old cook8900/session68256 finishes normally at9000. Bit-exact continuation of
+all5,382,400 cells adds no water/geometry: PID13584, startUTC2026-09-18T12:17:39.4321093Z,
+session95293, output tmp/control-ablation-9000to12000s-workers8-v1-20260918.
+Next9050 is NEW local1000 and needs completion plus BOTH audits. Full ordered
+scope remains OPEN, nonlinear runtime OFF. Resume substantive coupled physical
+breaking/froth and surface work; this optimization does not close those tasks.
+
+Previous: [canopy bundle repair and crest prefetch qualification](../reconstruction-review-2026-09-07/crest-prefetch-and-canopy-bundle.md).
 The canopy map's stale runtime binding blocked editor builds. Fresh read-only
 native inventory proves unchanged water/route actors and entrypoints; map-only
 manifest repair preserves all 2,405 payloads. Editor build and seven native
