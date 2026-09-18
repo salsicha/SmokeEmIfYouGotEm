@@ -4,6 +4,34 @@ $parseErrors = $null
 $source = Join-Path $PSScriptRoot 'profile_south_fork_current_map.ps1'
 $ast = [Management.Automation.Language.Parser]::ParseFile($source, [ref]$tokens, [ref]$parseErrors)
 if ($parseErrors.Count) { throw 'Profiling script must parse without errors' }
+$laneFunction = @($ast.FindAll({
+    param($node)
+    $node -is [Management.Automation.Language.FunctionDefinitionAst] -and
+    $node.Name -eq 'Test-RaftSimSolverLaneLog'
+}, $true))
+if ($laneFunction.Count -ne 1) { throw 'Expected one production worker-limit validator' }
+. ([scriptblock]::Create($laneFunction[0].Extent.Text))
+$archiveHash = 'a' * 64
+$laneLog = "[time][  0]LogTemp: Display: RaftSim live-water solver archive: $archiveHash`r`n[time][  0]LogTemp: Display: RaftSim live-water solver lane limit: 8 (diagnostic override)`r`n"
+if (-not (Test-RaftSimSolverLaneLog $laneLog 8 $archiveHash)) { throw 'Confirmed worker limit rejected' }
+foreach ($invalid in @('', '-RaftSimSolverLanes=8', $laneLog.Replace('8 (', '4 ('),
+    $laneLog.Replace('diagnostic override', 'default'), $laneLog.Replace($archiveHash, ('b' * 64)),
+    ($laneLog + $laneLog), ($laneLog + 'LogTemp: Display: RaftSim live-water solver lane limit: 4 (default)'))) {
+    if (Test-RaftSimSolverLaneLog $invalid 8 $archiveHash) { throw 'Missing, conflicting or stale worker evidence accepted' }
+}
+foreach ($badExpected in @(0, 65)) {
+    if (Test-RaftSimSolverLaneLog $laneLog $badExpected $archiveHash) { throw 'Invalid expected lane count accepted' }
+}
+foreach ($duplicate in @(@{ ExtraGameArgument='-RaftSimSolverLanes=4' }, @{ ExtraGameArguments=@('-RaftSimSolverLanes=8') })) {
+    $rejected = $false
+    try { & $source -Label 'south-fork-test-duplicate-lanes' -CookProcessId 0 -CookStartUtc 'invalid' -SolverLanes 8 @duplicate }
+    catch {
+        if ($_.Exception.Message -ne 'Use SolverLanes once, not a duplicate extra game argument') { throw }
+        $rejected = $true
+    }
+    if (-not $rejected) { throw 'Duplicate worker override accepted' }
+}
+'PASS: worker comparison requires one runtime limit and the linked archive identity'
 $frameModeFunction = @($ast.FindAll({
     param($node)
     $node -is [Management.Automation.Language.FunctionDefinitionAst] -and

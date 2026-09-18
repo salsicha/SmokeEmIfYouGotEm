@@ -6,6 +6,7 @@ param(
     [string]$ShaderWorkloadManifest = '',
     [string]$ExtraGameArgument = '',
     [string[]]$ExtraGameArguments = @(),
+    [ValidateRange(1, 64)][Nullable[int]]$SolverLanes = $null,
     [ValidateRange(300, 2400)][int]$ProfileFrames = 300,
     [switch]$NativePerformanceGate,
     [switch]$DetailStreamingReplay,
@@ -27,6 +28,17 @@ function Test-RaftSimFrameTimeModeLog([string]$LogText) {
     # a subsequent conflicting setting invalidates the declared timing phase.
     $values = [regex]::Matches($LogText, '(?im)^.*\bcsv\.UseLegacyFrameTime\s*=\s*"([^"]+)"[^\r\n]*\r?$')
     return ($values.Count -gt 0 -and @($values | Where-Object { $_.Groups[1].Value -cnotin @('0', 'false') }).Count -eq 0)
+}
+function Test-RaftSimSolverLaneLog([string]$LogText, [int]$ExpectedLanes, [string]$ArchiveHash) {
+    $limits = [regex]::Matches($LogText, '(?im)^.*LogTemp:\s*Display:\s*RaftSim live-water solver lane limit: ([0-9]+) \(diagnostic override\)\s*\r?$')
+    $archives = [regex]::Matches($LogText, '(?im)^.*LogTemp:\s*Display:\s*RaftSim live-water solver archive: ([0-9a-f]{64})\s*\r?$')
+    return ($ExpectedLanes -ge 1 -and $ExpectedLanes -le 64 -and $ArchiveHash -cmatch '^[0-9a-f]{64}$' -and
+        $limits.Count -eq 1 -and [int]$limits[0].Groups[1].Value -eq $ExpectedLanes -and
+        $archives.Count -eq 1 -and $archives[0].Groups[1].Value -ceq $ArchiveHash -and
+        [regex]::Matches($LogText, '(?im)^.*LogTemp:\s*Display:\s*RaftSim live-water solver lane limit:').Count -eq 1)
+}
+if ($null -ne $SolverLanes -and @(@($ExtraGameArgument) + $ExtraGameArguments | Where-Object { $_ -match '(?i)RaftSimSolverLanes' }).Count) {
+    throw 'Use SolverLanes once, not a duplicate extra game argument'
 }
 if ($StartupBufferVisualization -and -not $StartupRenderReplay) {
     throw 'Buffer visualization requires StartupRenderReplay; it is not an FPS capture'
@@ -134,6 +146,11 @@ $report.startup_buffer_visualization = $StartupBufferVisualization
 $report.startup_optical_normal_strength = $StartupOpticalNormalStrength
 $report.startup_buffer_commands_confirmed = $null
 $report.checkpoint_reset_replay = [bool]$CheckpointResetReplay
+$report.solver_lane_limit_requested = $SolverLanes
+$report.solver_lane_limit_confirmed = $null
+if ($null -ne $SolverLanes) {
+    $report.solver_archive_sha256 = (Get-FileHash -LiteralPath (Join-Path $projectRoot 'physics/cpp/build-ue/raftsim_water.lib')).Hash.ToLowerInvariant()
+}
 if ($StartupRenderReplay) { $report.visual_accepted = $false }
 try {
     foreach ($item in $owned) {
@@ -205,6 +222,8 @@ try {
     }
     if ($ExtraGameArgument) { $start.ArgumentList.Add($ExtraGameArgument) }
     foreach ($argument in $ExtraGameArguments) { $start.ArgumentList.Add($argument) }
+    if ($null -ne $SolverLanes) { $start.ArgumentList.Add("-RaftSimSolverLanes=$SolverLanes") }
+    $report.game_arguments = @($start.ArgumentList)
     $game = [Diagnostics.Process]::Start($start)
     # Native replay still fails itself at 900 seconds. The outer watchdog only
     # allows startup/report flushing; it does not alter a native acceptance gate.
@@ -218,6 +237,13 @@ try {
         }
     }
     $report.game_exit_code = $game.ExitCode
+    if ($null -ne $SolverLanes -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
+        $report.solver_lane_limit_confirmed = Test-RaftSimSolverLaneLog (Get-Content -LiteralPath $logFile -Raw) $SolverLanes $report.solver_archive_sha256
+        if (-not $report.solver_lane_limit_confirmed) { throw 'Runtime solver lane limit or linked archive was not confirmed; no worker comparison evidence' }
+        if ((Get-FileHash -LiteralPath (Join-Path $projectRoot 'physics/cpp/build-ue/raftsim_water.lib')).Hash.ToLowerInvariant() -cne $report.solver_archive_sha256) {
+            throw 'Solver archive changed during capture; no worker comparison evidence'
+        }
+    }
     if ($StartupBufferVisualization) {
         $report.startup_buffer_commands_confirmed = Test-RaftSimBufferDiagnosticLog (Get-Content -LiteralPath $logFile -Raw) $StartupBufferVisualization
         if (-not $report.startup_buffer_commands_confirmed) { throw 'Buffer visualization commands were not confirmed; no buffer evidence' }
