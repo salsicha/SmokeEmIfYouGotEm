@@ -8,14 +8,69 @@
 #include "Components/ChildActorComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/MeshComponent.h"
 #include "Engine/StaticMesh.h"
+#include "Engine/World.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "MaterialShared.h"
+#include "SceneInterface.h"
+#include "Misc/App.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Misc/PackageName.h"
 #include "ProceduralMeshComponent.h"
 
 namespace
 {
+void PrepareStartupCrewMaterials(ARaftSimCrewAvatarActor* Avatar)
+{
+#if WITH_EDITOR
+    // Editor -game/PIE can expose on-demand fallback shaders on the first
+    // visible crew frame. Resolve only the selected body's/gear's materials
+    // during appearance initialization. Cooked games already have shaders;
+    // they never compile here. No ticking, capture warmup or actor hiding.
+    static const bool Audit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrewMaterialAudit"));
+    static const bool Prepare=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimDeferredCrewMaterials"));
+    if((!Audit && !Prepare) || !FApp::CanEverRender() || !IsInGameThread() ||
+        !Avatar->GetWorld() || !Avatar->GetWorld()->IsGameWorld() || !Avatar->GetWorld()->Scene) return;
+    TSet<FMaterialResource*> Seen;
+    for(AActor* Owner:{static_cast<AActor*>(Avatar),Avatar->GetProductionVisualActor()})
+    {
+        if(!Owner) continue;
+        TInlineComponentArray<UMeshComponent*> Meshes(Owner);
+        for(UMeshComponent* Mesh:Meshes)
+        {
+            if(!Mesh->IsVisible()) continue;
+            for(UMaterialInterface* Material:Mesh->GetMaterials())
+            {
+                auto* Resource=Material ? Material->GetMaterialResource(Avatar->GetWorld()->Scene->GetShaderPlatform()) : nullptr;
+                if(!Resource || Seen.Contains(Resource)) continue;
+                Seen.Add(Resource);
+                const bool Before=Resource->IsGameThreadShaderMapComplete();
+                const double Start=FPlatformTime::Seconds();
+                if(Prepare && !Before)
+                {
+                    Resource->CacheShaders(EMaterialShaderPrecompileMode::Synchronous);
+                    Resource->FinishCompilation();
+                }
+                const bool Ready=Resource->IsGameThreadShaderMapComplete();
+                if(Prepare && !Ready)
+                {
+                    UE_LOG(LogTemp,Error,TEXT("Crew startup material shaders remain incomplete: %s"),*Material->GetPathName());
+                }
+                if(Audit || (Prepare && !Before))
+                {
+                    UE_LOG(LogTemp,Display,TEXT("CREW_STARTUP_MATERIAL frame=%llu prepare=%d before=%d after=%d seconds=%.6f actor=%s component=%s material=%s"),
+                        GFrameCounter,int32(Prepare),int32(Before),int32(Ready),
+                        FPlatformTime::Seconds()-Start,*Avatar->GetName(),*Mesh->GetName(),*Material->GetPathName());
+                }
+            }
+        }
+    }
+#endif
+}
+
 constexpr float kBaseRadiusCm = 50.0f;
 const FVector kProductionSeatedPelvisReferenceExtentCm(15.0f, 23.0f, 15.0f);
 constexpr float kProductionHipThighBridgeStartFraction = -0.15f;
@@ -2271,6 +2326,7 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
     RebuildHeadMesh();
     ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide));
     TryActivateProductionVisual();
+    PrepareStartupCrewMaterials(this);
 }
 
 void ARaftSimCrewAvatarActor::UpdatePfdMaterialResponse(float DeltaSeconds)

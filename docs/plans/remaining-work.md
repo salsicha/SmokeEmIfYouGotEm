@@ -3,7 +3,18 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest continuation: [parallel water interpolation in default play](../reconstruction-review-2026-09-07/water-interpolation-parallel.md).
+Latest continuation: [crew startup material readiness](../reconstruction-review-2026-09-07/crew-startup-materials.md).
+Default editor play now prepares selected visible crew materials before frame one;
+all128 observations ready,22 initially incomplete,1.007468s preparation in final
+normal-start capture (earlier candidate4.184962s). Editor/game rebuilt; unchanged
+native crew asset/pose test passes.24 images and15.582s recording fully decoded.
+Control was already colored this time: no consistent visual before/after gain or
+crew-fit/animation acceptance claimed. New900-frame rapid capture23.697381FPS,
+p9550.9549ms FAIL30; no causal FPS improvement/regression inferred from one run.
+No map/4950/source changes; nonlinear OFF. Sole13584 continues; next unaudited
+11400/local48000 still needs BOTH audits. Pending cap decision/full queue OPEN.
+
+Previous continuation: [parallel water interpolation in default play](../reconstruction-review-2026-09-07/water-interpolation-parallel.md).
 Two actual-game captures preserve all five fields bit-for-bit in 128 pairs;
 the pass drops from about 1.7–1.8 ms to 0.44–0.64 ms in both orders. Cartesian
 default enabled; editor and standalone rebuilt, final ten native tests pass.
