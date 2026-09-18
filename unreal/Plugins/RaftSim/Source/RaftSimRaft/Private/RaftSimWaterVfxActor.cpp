@@ -2940,13 +2940,9 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
     }
     if (bProductionNiagaraReady)
     {
-        const bool bSouthForkBallisticReview =
-            IsSouthForkSprayReviewMap(GetWorld()->GetMapName()) &&
-            FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray"));
         const bool bSouthForkCrestOwnedSpray =
             IsSouthForkSprayReviewMap(GetWorld()->GetMapName()) &&
-            (CVarSouthForkCrestSpray.GetValueOnGameThread() != 0 ||
-                FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray")));
+            CVarSouthForkCrestSpray.GetValueOnGameThread() != 0;
         const bool bCrestOwnedSpray = bSouthForkCrestOwnedSpray ||
             (GetWorld()->GetMapName().EndsWith(TEXT("L_LavaCanyon")) &&
                 CVarChilkoCrestSpray.GetValueOnGameThread() != 0);
@@ -2954,14 +2950,14 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             (bCrestOwnedSpray && CVarChilkoSprayPlane.GetValueOnGameThread() != 0);
         const bool bLogSprayReview = IsSouthForkSprayReviewMap(GetWorld()->GetMapName()) &&
             !bLoggedSouthForkSprayReview && GetWorld()->GetTimeSeconds() >= 10.0f &&
-            (FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray")) ||
-                FParse::Param(FCommandLine::Get(), TEXT("RaftSimSpraySourceAudit")));
+            FParse::Param(FCommandLine::Get(), TEXT("RaftSimSpraySourceAudit"));
         TArray<int32> RankedSiteIndices;
         RankedSiteIndices.Reserve(Sites.Num());
         for (int32 SiteIndex = 0; SiteIndex < Sites.Num(); ++SiteIndex)
         {
-            const float SprayPresence = bSouthForkBallisticReview
-                ? Sites[SiteIndex].PersistenceWeight : Sites[SiteIndex].PresentationWeight;
+            // Particle asset comparisons must use identical carrier ownership,
+            // site selection and density. Do not couple these to the asset flag.
+            const float SprayPresence = Sites[SiteIndex].PresentationWeight;
             if (bCrestOwnedSpray && SprayPresence <= 0.01f)
             {
                 continue;
@@ -3009,8 +3005,7 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             const FVector Across(-Downstream.Y, Downstream.X, 0.0f);
             const float Intensity = FMath::Clamp(Site.Intensity, 0.0f, 1.0f);
             const float CrestOwnership = bCrestOwnedSpray
-                ? FMath::Clamp(bSouthForkBallisticReview
-                    ? Site.PersistenceWeight : Site.PresentationWeight, 0.0f, 1.0f) : 1.0f;
+                ? FMath::Clamp(Site.PresentationWeight, 0.0f, 1.0f) : 1.0f;
             FVector SurfaceOrigin = Site.WorldPositionCm;
             float SupportHeightM = SurfaceOrigin.Z / CmPerM;
             bool bWetCrest = true;
@@ -3022,14 +3017,9 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 if (bWetCrest)
                 {
                     SupportHeightM = Support.SurfaceHeightMeters;
-                    // The published site follows the optical carrier. The
-                    // raft-support approximation has a different smoothing
-                    // stencil and was measured 60–78 cm below it here. Retain
-                    // the carrier anchor; support is only the wetness check.
-                    if (!bSouthForkBallisticReview)
-                    {
-                        SurfaceOrigin.Z = SupportHeightM * CmPerM;
-                    }
+                    // This branch is for non-South-Fork support attachment.
+                    // South Fork samples the visible carrier below instead.
+                    SurfaceOrigin.Z = SupportHeightM * CmPerM;
                 }
             }
             if (bSouthForkCrestOwnedSpray && bWetCrest)

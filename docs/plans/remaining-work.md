@@ -3,7 +3,18 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [pressure geometry on the evolving local front](../reconstruction-review-2026-09-07/normal-river-affine-front-metric.md).
+Latest: [particle-only spray comparison, not promoted](../reconstruction-review-2026-09-07/spray-asset-only-review.md).
+Removed hidden density/attachment changes from the opt-in particle comparison;
+normal-play defaults unchanged. Two actual recordings fully decoded and inspected
+against accessible reference footage: falling assets remain visibly tuft-like,
+not a convincing froth fix.73 Python checks and five native placement checks PASS;
+two additional asset checks fail NullRHI readiness and PASS unchanged with D3D12.
+Editor build succeeds; no new FPS/physical/visual acceptance.6100/6150 state AND
+dry-bank audits PASS, NOT settled; installed4950 unchanged. Next6200/local16000
+requires completion marker and BOTH audits. Address crest breakup/advected foam,
+not another gravity/size-only swap. Full ordered scene/crew/release queue OPEN.
+
+Previous: [pressure geometry on the evolving local front](../reconstruction-review-2026-09-07/normal-river-affine-front-metric.md).
 Curved depth moments and analytic physical-time metric work retain original
 source polygons; eleven original local predictors pass exact partitions,
 boundary mass-rate equality and two independent time probes. NOT the complete

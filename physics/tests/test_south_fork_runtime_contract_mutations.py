@@ -19,9 +19,13 @@ SMOOTHING = water.WATER_SURFACE_HEADER.with_name('RaftSimWaterSmoothing.h')
 CLOCK = water.PHYSICS_BRIDGE_SOURCE.parents[1] / 'Public/RaftSimFixedStepClock.h'
 PACKING = water.WATER_SURFACE_HEADER.with_name('RaftSimWaterSourcePacking.h')
 FOAM = water.WATER_SURFACE_HEADER.with_name('RaftSimFoamEvolution.h')
+VFX = SURFACE.with_name('RaftSimWaterVfxActor.cpp')
 
 
 CASES = [
+    ('particle-review-changes-presence', VFX, 'const float SprayPresence = Sites[SiteIndex].PresentationWeight;', 'const float SprayPresence = Sites[SiteIndex].PersistenceWeight;', terrain.test_particle_asset_review_preserves_normal_carrier_ownership_and_density),
+    ('particle-review-changes-density', VFX, '? FMath::Clamp(Site.PresentationWeight, 0.0f, 1.0f) : 1.0f;', '? FMath::Clamp(Site.PersistenceWeight, 0.0f, 1.0f) : 1.0f;', terrain.test_particle_asset_review_preserves_normal_carrier_ownership_and_density),
+    ('particle-review-forces-attachment', VFX, 'CVarSouthForkCrestSpray.GetValueOnGameThread() != 0;', '(CVarSouthForkCrestSpray.GetValueOnGameThread() != 0 || FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray")));', terrain.test_south_fork_falling_spray_review_reuses_assets_without_promoting_defaults),
     ('changed-foam-attack', SURFACE, '-FoamAttackDeltaSeconds/.22f', '-FoamAttackDeltaSeconds/.44f', chilko.test_chilko_crest_foam_does_not_regenerate_trough_and_raw_tail_foam),
     ('bypassed-foam-attack', SURFACE, 'Resolve(Advected,SourceFoam[Index],FoamAttackBlend,', 'Resolve(Advected,SourceFoam[Index],1.f,', chilko.test_chilko_crest_foam_does_not_regenerate_trough_and_raw_tail_foam),
     ('lost-final-foam-channel', SURFACE, 'OutputColors[Index].R=FinalFoam;', 'OutputColors[Index].R=SourceFoam[Index];', chilko.test_chilko_crest_foam_does_not_regenerate_trough_and_raw_tail_foam),

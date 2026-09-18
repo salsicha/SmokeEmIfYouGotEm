@@ -77,19 +77,24 @@ def test_south_fork_falling_spray_review_reuses_assets_without_promoting_default
     assert 'RapidCrestSpraySystem = BallisticSpray;' in selection
     assert 'StaticDuplicateObject' not in selection and 'Save' not in selection
     ownership = source.split('const bool bSouthForkCrestOwnedSpray =', 1)[1].split('TArray<int32> RankedSiteIndices', 1)[0]
-    assert 'TEXT("RaftSimSouthForkBallisticSpray")' in ownership
+    assert 'TEXT("RaftSimSouthForkBallisticSpray")' not in ownership
     assert 'const bool bHorizontalSourcePlane = bSouthForkCrestOwnedSpray' in ownership
 
 
-def test_local_spray_presence_is_independent_of_remote_geometry_ranking():
+def test_particle_asset_review_preserves_normal_carrier_ownership_and_density():
     vfx = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp').read_text()
     surface = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp').read_text()
     assert 'Published.PersistenceWeight = Persistent.Envelope;' in surface
-    assert '? Sites[SiteIndex].PersistenceWeight : Sites[SiteIndex].PresentationWeight' in vfx
-    assert '? Site.PersistenceWeight : Site.PresentationWeight' in vfx
+    refresh = vfx.split('void ARaftSimWaterVfxActor::RefreshRapidAerosol()', 1)[1].split(
+        'void ARaftSimWaterVfxActor::RefreshVfx(', 1)[0]
+    assert 'RaftSimSouthForkBallisticSpray' not in refresh
+    assert 'bSouthForkBallisticReview' not in refresh
+    assert 'PersistenceWeight' not in refresh
+    assert 'const float SprayPresence = Sites[SiteIndex].PresentationWeight;' in refresh
+    assert '? FMath::Clamp(Site.PresentationWeight, 0.0f, 1.0f) : 1.0f;' in refresh
     assert 'RankedSiteIndices.Sort(' in vfx  # retain nearest-site bounded pool
     assert 'MaxActiveRapidNiagaraSites,' in vfx
-    assert 'if (!bSouthForkBallisticReview)' in vfx
+    assert 'if (bCrestOwnedSpray && !bSouthForkCrestOwnedSpray)' in vfx
     assert 'SurfaceOrigin.Z = SupportHeightM * CmPerM;' in vfx
     assert 'bEnabled = Intensity > 0.12f && bWetCrest && CrestOwnership > 0.01f' in vfx
 

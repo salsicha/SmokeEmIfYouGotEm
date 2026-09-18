@@ -125,11 +125,11 @@ def test_linear_upload_guard_rejects_default_and_srgb_conversion():
 def test_chilko_spray_requires_a_wet_owned_crest_and_uses_surface_height():
     source = (ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp").read_text()
     assert 'GetMapName().EndsWith(TEXT("L_LavaCanyon"))' in source
-    assert "? Sites[SiteIndex].PersistenceWeight : Sites[SiteIndex].PresentationWeight" in source
+    assert "const float SprayPresence = Sites[SiteIndex].PresentationWeight;" in source
     assert "bCrestOwnedSpray && SprayPresence <= 0.01f" in source
     assert "SampleRaftSupportSurfaceAtWorldPosition(" in source
     assert "SupportHeightM = Support.SurfaceHeightMeters;" in source
-    assert "if (!bSouthForkBallisticReview)" in source
+    assert "if (bCrestOwnedSpray && !bSouthForkCrestOwnedSpray)" in source
     assert "SurfaceOrigin.Z = SupportHeightM * CmPerM;" in source
     assert "Intensity > 0.12f && bWetCrest && CrestOwnership > 0.01f" in source
     assert "OwnedDensity = DistanceDensity * CrestOwnership" in source
