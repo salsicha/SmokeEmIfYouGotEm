@@ -1,4 +1,4 @@
-"""Base pairing inside the SAME two-pole response; full energy remains a gate."""
+"""Retained failed base stress and repaired default on the SAME two-pole states."""
 import numpy as np
 import pytest
 from conservative_rational_stress import stress_stage, stress_stage_physical, negative_divergence
@@ -13,7 +13,7 @@ def test_constant_physical_velocity_base_energy_obstruction_is_removed(axis, sig
         h = h.T
     u = np.zeros((*h.shape, 2));u[..., 1-axis] = sign*.5
     g = make(h, np.zeros_like(h), .5)
-    legacy = stress_stage_physical(g, h[..., None]*u)
+    legacy = stress_stage_physical(g, h[..., None]*u, flux_scheme='donor-stress')
     paired = stress_stage_physical(g, h[..., None]*u, flux_scheme='paired-base')
     assert abs(legacy['energy_rate']) > 13
     assert abs(paired['energy_rate']) < 1e-10
@@ -69,8 +69,14 @@ def test_unknown_pairing_is_not_silently_selected():
 @pytest.mark.parametrize('resolution', (64, 128))
 @pytest.mark.parametrize('seed', (2200, 2202, 2204, 2206))
 def test_full_nonlinear_energy_conservation_still_required(seed, resolution):
-    # Preserve the actual unmet gate, separately from the successful constant-
-    # velocity, local-conservation and linear-response component controls.
+    # The default now uses coupled metric transport, not the old paired stress.
+    # Keep its failure visible as a negative control on the same original data.
     from audit_conservative_rational_stress import run
-    r = run(seed, resolution, 'primal', 'paired-base')
+    legacy = run(seed, resolution, 'primal', 'paired-base')
+    assert abs(legacy['energy_rate']) > 1e-10
+    r = run(seed, resolution, 'primal')
+    assert r['flux_scheme'] == 'metric-transport'
+    assert r['source_state_sha256'] == legacy['source_state_sha256']
     assert abs(r['energy_rate']) < 1e-10
+    assert r['local_momentum_flux_error'] < 1e-10
+    assert max(map(abs, r['physical_total_momentum_rate'])) < 1e-10

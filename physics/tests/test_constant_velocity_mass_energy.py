@@ -3,7 +3,8 @@
 Manufactured flat, strictly wet, nonbreaking periodic control. With constant
 physical u, Q sqrt(h)u=0 and E_h=g h-|u|²/2, E_p=u. For ANY conservative p_t,
 E_t=g*sum(h*h_t)*area. The mass flux must therefore change as part of the fix.
-The required energy-conservation tests deliberately retain the exposed failure.
+Retain the donor obstruction explicitly; the default coupled stage must satisfy
+the original energy gate on these SAME states, not a manufactured replacement.
 """
 from fractions import Fraction as F
 import numpy as np
@@ -37,7 +38,7 @@ def control(request):
     p = h[...,None]*u
     g = make(h,np.zeros_like(h),.5)
     transport = ContinuousExtremumTransport(h,g.bed,u,.5,periodic=True)
-    stage = stress_stage_physical(g,p)
+    stage = stress_stage_physical(g,p,flux_scheme='donor-stress')
     response = evaluate(g,p)
     eh, _ = depth_gradient(g,p,response,transport.mass_rate)
     return g,u,transport,stage,response,eh,exact_mass_control(sign)
@@ -56,4 +57,10 @@ def test_independent_constant_velocity_obstruction(control):
 
 
 def test_nonbreaking_energy_conservation_still_required(control):
-    assert abs(control[3]['energy_rate'])<1e-10
+    g, u = control[:2]
+    repaired = stress_stage_physical(g, g.h[..., None]*u)
+    assert repaired['flux_scheme'] == 'metric-transport'
+    assert abs(repaired['energy_rate'])<1e-10
+    assert repaired['local_momentum_flux_error']<1e-10
+    assert abs(repaired['physical_momentum_rate'].sum(axis=(0, 1))).max()<1e-10
+    assert not repaired['energy_or_variable_bed_or_dry_or_history_or_gameplay_accepted']

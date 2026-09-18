@@ -36,6 +36,50 @@ def factor_transpose_direction(system, tangent, scalar, *, bottom=False):
     return result
 
 
+def canonical_rate(geometry, physical_momentum, mass_rate, momentum_rate, *, preconditioner='patch'):
+    """Analytic inverse coordinate derivative, not a force/energy correction.
+
+    Differentiate v=R^-1 K(R^-1 p), including BOTH R derivatives and every
+    inverse-pole derivative. The supplied physical rates remain untouched.
+    """
+    from rational_primal_energy import K0, evaluate as primal
+    g = geometry
+    if not isinstance(g, SmoothPressureGeometry):
+        raise ValueError('Matching smooth positive geometry required')
+    p, pt, ht = (np.asarray(x, float) for x in (physical_momentum, momentum_rate, mass_rate))
+    if (p.shape != (*g.h.shape, 2) or pt.shape != p.shape or ht.shape != g.h.shape
+            or not all(np.isfinite(x).all() for x in (p, pt, ht))):
+        raise ValueError('Registered finite physical state and direction required')
+    if preconditioner not in ('block', 'patch', 'spectral-flat', 'spectral-frozen-depth'):
+        raise ValueError('Unknown inverse derivative preconditioner')
+    system_type = ReconstructedAccelerationSystem
+    if preconditioner == 'patch':
+        from patch_pressure_preconditioner import PatchPressureSystem
+        system_type = PatchPressureSystem
+    response = primal(g, p, preconditioner=preconditioner)
+    tangent = SmoothPressureGeometryRate(g, g.bed, ht)
+    root, ell = np.sqrt(g.h), ht/(2*g.h)
+    q = p/root[..., None]
+    qt = pt/root[..., None]-ell[..., None]*q
+    mapped_t = K0*qt
+    residuals = []
+    for pole in response['poles']:
+        s = system_type(g, pole['beta'])
+        z = pole['normalized_auxiliary_velocity']
+        w, b = s.w(z), s.v(z)
+        wt, bt = factor_direction(g, tangent, z)
+        qtz = (factor_transpose_direction(s, tangent, w)+s.transpose_w(wt)
+               +.75*(factor_transpose_direction(s, tangent, b, bottom=True)+s.transpose_v(bt)))
+        zt, info = s.solve(qt-pole['beta']*qtz, iterations=40, preconditioner=preconditioner)
+        residuals.extend((pole['relative_residual'], info['relative_residual']))
+        mapped_t += pole['alpha']*(qtz+s.transpose_w(s.w(zt))+.75*s.transpose_v(s.v(zt)))
+    vt = mapped_t/root[..., None]-ell[..., None]*response['canonical_velocity']
+    if not np.isfinite(vt).all() or max(residuals) > 2e-5:
+        raise ValueError('Unqualified inverse coordinate derivative')
+    return dict(canonical_velocity=response['canonical_velocity'], canonical_velocity_rate=vt,
+                maximum_solve_residual=max(residuals))
+
+
 def physical_rate(geometry,canonical_velocity,mass_rate,canonical_velocity_rate,*,derivative_preconditioner='block',primal_preconditioner='block',include_auxiliary_rates=False):
     g=geometry
     if not isinstance(g,SmoothPressureGeometry):

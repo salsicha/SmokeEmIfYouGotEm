@@ -17,7 +17,7 @@ def run(seed,n):
     before = [a.copy() for a in (source,bed)]
     h, p, dx = source[...,0], source[...,1:], 16/n
     g = make(h,bed,dx)
-    stage = stress_stage_physical(g,p)
+    stage = stress_stage_physical(g,p,flux_scheme='donor-stress')
     start = time.perf_counter()
     work = complete_local_work(g,p,stage['depth_rate'],stage['physical_momentum_rate'])
     wall = time.perf_counter()-start

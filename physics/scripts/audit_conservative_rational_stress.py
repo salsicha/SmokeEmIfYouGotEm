@@ -14,7 +14,7 @@ from smooth_rational_velocity_stage import make
 from conservative_rational_stress import stress_stage,stress_stage_physical
 
 
-def run(seed,n,metric_source='dense',flux_scheme='donor-stress'):
+def run(seed,n,metric_source='dense',flux_scheme='metric-transport'):
     source,bed=fixture(seed,'smooth',n);h=source[...,0];u=source[...,1:]/h[...,None];dx=16/n
     g=make(h,bed,dx)
     if metric_source=='primal':
@@ -48,14 +48,14 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--report',type=Path,required=True)
     parser.add_argument('--metric-source',choices=('dense','primal'),default='dense')
-    parser.add_argument('--flux-scheme',choices=('donor-stress','paired-base'),default='donor-stress');args=parser.parse_args()
+    parser.add_argument('--flux-scheme',choices=('metric-transport','donor-stress','paired-base'),default='metric-transport');args=parser.parse_args()
     if args.report.exists():raise FileExistsError(args.report)
     names=('audit_conservative_rational_stress.py','conservative_rational_stress.py',
            'rational_physical_momentum_rate.py','rational_dual_energy_reference.py',
            'patch_pressure_preconditioner.py','smooth_pressure_geometry.py',
            'smooth_pressure_reverse.py','reverse_rational_depth_gradient.py',
            'continuous_extremum_transport.py','extremum_preserving_transport.py','hydrostatic_energy_transport.py',
-           'rational_primal_energy.py')
+           'rational_primal_energy.py','rational_metric_transport_2d.py')
     hashes=lambda:{name:hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest() for name in names}
     original=hashes();records=[]
     for n in (64,128):
