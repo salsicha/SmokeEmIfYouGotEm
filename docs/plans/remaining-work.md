@@ -3,7 +3,22 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [downstream cap source identification](../reconstruction-review-2026-09-07/downstream-cap-provenance.md).
+Latest: [explicit cap pulse-selection experiment](../reconstruction-review-2026-09-07/cap-pulse-selection.md).
+Replayed all2,815,491 original XYZ/classification IDs exactly to recover pulse
+metadata. Opt-in last/only-return extension candidate retains549 seed vertices/
+all seed roof triangles; no raw data or classification changes. It still has
+100.789m² of steep roof and loses2.194m² previous coverage: not a shape solution.
+Independent source-union replay shows17 bed changes,12 WET at300s, up to2.153m
+lowering. No visual-only swap/state transfer or speculative replacement cook.
+79 focused tests PASS. Baseline9850..10000 and candidate250/300 pass BOTH audits,
+NOT settled. Candidate30276 finished normally at300s; only baseline13584 remains
+live, next10050/local21000 needs both audits. Old dual-cook launch manifest is
+obsolete. No normal-play delivery, engine build/capture or new FPS acceptance;
+installed map/4950 unchanged, nonlinear OFF, latest24.937420FPS still FAIL30.
+Qualify actual cap source selection/missing coverage next; do not rerun this
+unchanged pulse filter or mistake lower steep area for acceptance. Full queue OPEN.
+
+Previous: [downstream cap source identification](../reconstruction-review-2026-09-07/downstream-cap-provenance.md).
 New actual paired play verifies84 player frames and fully decodes41.687s motion.
 All12 independent native/source rays PASS: eight foreground hits belong to the
 RETAINED CAP (four steep original-return roof triangles, four inferred walls),

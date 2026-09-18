@@ -7,6 +7,22 @@ from build_troublemaker_dem_rock_cap import close_cap_below_retained_terrain
 from shapely.geometry import Polygon
 
 
+def test_pulse_selection_requires_exact_bound_archive(tmp_path):
+    from build_troublemaker_source_connected_cap import pulse_eligibility, RETURNS_SHA, sha
+    folder=tmp_path/'tmp';folder.mkdir()
+    fields=folder/'fields.npz'
+    np.savez(fields,return_number=np.array([1,1,2]),number_of_returns=np.array([1,2,2]))
+    manifest=folder/'manifest.json'
+    record=dict(schema='raftsim.original_lidar_pulse_fields.v1',source_returns_sha256=RETURNS_SHA,
+        archive_count=3,exact_archive_order_xyz_classification=True,fields_path='tmp/fields.npz',fields_sha256=sha(fields))
+    manifest.write_text(json.dumps(record))
+    mask,report=pulse_eligibility(manifest,3,tmp_path)
+    assert mask.tolist()==[True,False,True] and report['original_classifications_modified'] is False
+    for key,value in [('source_returns_sha256','0'*64),('fields_sha256','0'*64),('archive_count',2),('exact_archive_order_xyz_classification',False)]:
+        manifest.write_text(json.dumps(record|{key:value}))
+        with pytest.raises(ValueError):pulse_eligibility(manifest,3,tmp_path)
+
+
 def test_lower_bins_keep_actual_lowest_xyz_with_original_id_tie():
     xyz=np.array([[.1,.1,2],[.2,.2,1],[.3,.3,1],[1.1,1.1,5.]])
     ids,keys,counts=lower_bins(xyz,np.array([3,2,1,0]))

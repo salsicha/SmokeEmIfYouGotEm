@@ -229,10 +229,32 @@ def constrained_extension(vertices, preserved_faces, maximum_edge_m=1., allowed_
     return np.concatenate([preserved_faces,np.asarray(outside,dtype=np.int64).reshape(-1,3)])
 
 
-def run(previous_path, output, support_region=None):
+def pulse_eligibility(path, count, root=ROOT):
+    from extract_troublemaker_pulse_fields import last_return_mask
+    record = json.loads(Path(path).read_text())
+    if (record.get('schema') != 'raftsim.original_lidar_pulse_fields.v1' or
+        record.get('source_returns_sha256') != RETURNS_SHA or
+        record.get('archive_count') != count or
+        record.get('exact_archive_order_xyz_classification') is not True):
+        raise ValueError('Exact original archive pulse provenance required')
+    fields = (root/record['fields_path']).resolve()
+    if not fields.is_relative_to(root/'tmp') or sha(fields) != record['fields_sha256']:
+        raise ValueError('Pulse fields identity or project-local scope changed')
+    with np.load(fields, allow_pickle=False) as data:
+        mask = last_return_mask(data['return_number'],data['number_of_returns'])
+    if mask.shape != (count,):
+        raise ValueError('Pulse fields do not cover every original archive ID')
+    return mask, dict(manifest_sha256=sha(path), fields_sha256=record['fields_sha256'],
+        rule='New extension uses only last/only original returns; existing seed roof remains exact. This is a conservative selection hypothesis, NOT rock classification.',
+        original_classifications_modified=False, source_xyz_modified=False)
+
+
+def run(previous_path, output, support_region=None, pulse_manifest=None):
     previous_path, output = Path(previous_path).resolve(), Path(output).resolve()
     if output.exists() or not output.is_relative_to(ROOT / 'tmp'):
         raise ValueError('Fresh project tmp candidate required')
+    if pulse_manifest is not None and support_region is None:
+        raise ValueError('Pulse selection experiment requires an explicit reviewed region')
     if sha(PARENT) != PARENT_SHA or sha(RETURNS) != RETURNS_SHA:
         raise ValueError('Original source changed')
     previous = json.loads(previous_path.read_text())
@@ -254,6 +276,12 @@ def run(previous_path, output, support_region=None):
         valid = np.isfinite(xyz).all(1) & np.isin(classes, [1, 2, 10])
         valid &= (xyz[:, 0] >= sampler.east[0] + sampler.dx / 2) & (xyz[:, 0] <= sampler.east[-1] - sampler.dx / 2)
         valid &= (xyz[:, 1] >= sampler.north[-1] + sampler.dy / 2) & (xyz[:, 1] <= sampler.north[0] - sampler.dy / 2)
+        pulse_selection = None
+        if pulse_manifest is not None:
+            last, pulse_selection = pulse_eligibility(pulse_manifest,len(xyz))
+            pulse_selection['excluded_nonlast_eligible_source_points'] = int((valid & ~last).sum())
+            pulse_selection['protected_old_nonlast_anchors_retained'] = int((~last[old_ids]).sum())
+            valid &= last
         ids, keys, counts = lower_bins(xyz, np.flatnonzero(valid))
         clearance = xyz[ids, 2] - sampler.sample(xyz[ids, 0], xyz[ids, 1])
         reviewed = np.ones(len(ids), dtype=bool) if selection_region is None else intersects_xy(selection_region, xyz[ids,0], xyz[ids,1])
@@ -334,6 +362,7 @@ def run(previous_path, output, support_region=None):
                 unsupported_edges_include_selection_exclusions=selection_region is not None,
                 unsupported_edges_are_not_ground=True,original_region_is_seed_not_outline=True),
             reviewed_extension_selection=selection_identity,
+            experimental_pulse_selection=pulse_selection,
             selection=dict(bin_size_prior_m=.5,minimum_original_returns_per_bin=2,
                 clearance_connectivity_prior_m=.3,maximum_triangle_edge_prior_m=1.,water_mask_required=False,
                 previous_seed_vertices_forced=True,near_ground_collar_uses_original_points=True),
@@ -364,5 +393,7 @@ if __name__ == '__main__':
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--support-region',type=Path,
         help='Source-bound interpreted extension selection; never a measured outline')
+    parser.add_argument('--pulse-manifest',type=Path,
+        help='Explicit last/only-return experiment for NEW extension points, not a classification certificate')
     args=parser.parse_args()
-    print(json.dumps(run(args.previous,args.output,args.support_region),indent=2),flush=True)
+    print(json.dumps(run(args.previous,args.output,args.support_region,args.pulse_manifest),indent=2),flush=True)
