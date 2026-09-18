@@ -1,5 +1,7 @@
 #include "Misc/AutomationTest.h"
 #include "RaftSimCrestHistory.h"
+#include "RaftSimIncrementalCrestHistory.h"
+#include "RaftSimCrestMidpointExpansion.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrestHistoryTest,
@@ -8,11 +10,12 @@ bool FRaftSimCrestHistoryTest::RunTest(const FString&)
 {
     FRaftSimCrestHistory Dense,Mapped;
     FRaftSimFastCrestHistory FastDense,FastMapped;
+    FRaftSimIncrementalCrestHistory Incremental,IncrementalMapped;
     TMap<FVector2D,float> Reference;
-    int64 Compared=0; int32 DenseCalls=0;
+    int64 Compared=0; int32 DenseCalls=0,IncrementalCalls=0;
     for(int32 Frame=0;Frame<36;++Frame)
     {
-        if(Frame==29) { Dense.Reset(); Mapped.Reset(); FastDense.Reset(); FastMapped.Reset(); Reference.Reset(); }
+        if(Frame==29) { Dense.Reset(); Mapped.Reset(); FastDense.Reset(); FastMapped.Reset(); Incremental.Reset(); IncrementalMapped.Reset(); Reference.Reset(); }
         const int32 SourceCount=Frame<24 ? 11 : 7;
         const int32 Count=Frame==27 ? 0 : (Frame>=20 && Frame<26 ? 19031 : 20000);
         TArray<FProcMeshVertex> Original; Original.SetNum(SourceCount+Count);
@@ -25,6 +28,10 @@ bool FRaftSimCrestHistoryTest::RunTest(const FString&)
             // must preserve old-map lookup ownership, not merely index equality.
             int32 Key=I<SourceCount ? -1-I : (I-SourceCount)/2;
             if(Frame>=12 && Frame<20) Key=10000-Key;
+            // Sparse moves remove an owner, insert below an existing owner,
+            // swap groups, and restore duplicate groups on subsequent frames.
+            if(Frame>=2 && Frame<6 && I>=SourceCount && (I-SourceCount)%997==0)
+                Key=(Key+Frame*11)%10000;
             const double Drift=Frame>=8 && Frame<12 ? .137*(Frame-7) : 0.;
             auto& V=Original[I];
             V.Position=FVector(-543700.+Key*3.7+Drift,-359000.+(Key%127)*.23,20.+Frame*.79+I*.003);
@@ -37,7 +44,7 @@ bool FRaftSimCrestHistoryTest::RunTest(const FString&)
             }
         }
         const float Alpha=Frame%5==0 ? 0.f : (Frame%7==0 ? 1.f : .31f);
-        auto Expected=Original,A=Original,B=Original,C=Original,D=Original;
+        auto Expected=Original,A=Original,B=Original,C=Original,D=Original,E=Original,F=Original;
         TArray<float> ExpectedRendered; ExpectedRendered.Init(0,Original.Num());
         TMap<FVector2D,float> Next;
         for(int32 I=0;I<Count;++I)
@@ -54,14 +61,22 @@ bool FRaftSimCrestHistoryTest::RunTest(const FString&)
         Mapped.Apply(B,SourceCount,Boundary,Target,Alpha,RenderedB,false);
         FastDense.Apply(C,SourceCount,Boundary,Target,Alpha,RenderedC);
         FastMapped.Apply(D,SourceCount,Boundary,Target,Alpha,RenderedD,false);
+        TArray<float> RenderedE,RenderedF;
+        Incremental.Apply(E,SourceCount,Boundary,Target,Alpha,RenderedE);
+        IncrementalMapped.Apply(F,SourceCount,Boundary,Target,Alpha,RenderedF,false);
+        IncrementalCalls+=Incremental.bIncrementalUpdate;
         if(!TestTrue(TEXT("all temporal corrections exactly match original serial map"),
             RenderedA==ExpectedRendered && RenderedB==ExpectedRendered &&
-            RenderedC==ExpectedRendered && RenderedD==ExpectedRendered)) return false;
+            RenderedC==ExpectedRendered && RenderedD==ExpectedRendered &&
+            RenderedE==ExpectedRendered && RenderedF==ExpectedRendered)) return false;
         if(!TestTrue(TEXT("candidate vertex bytes equal original hash for dense and mapped histories"),
             FMemory::Memcmp(A.GetData(),C.GetData(),SIZE_T(A.Num())*sizeof(FProcMeshVertex))==0 &&
             FMemory::Memcmp(B.GetData(),D.GetData(),SIZE_T(B.Num())*sizeof(FProcMeshVertex))==0))return false;
         for(int32 I=0;I<Original.Num();++I)
         {
+            if(!FRaftSimCrestMidpointExpansion::EqualAttributes(Expected[I],E[I]) ||
+               !FRaftSimCrestMidpointExpansion::EqualAttributes(Expected[I],F[I]))
+            {AddError(FString::Printf(TEXT("incremental frame%d vertex%d differs"),Frame,I));return false;}
             if(A[I].Position!=Expected[I].Position || B[I].Position!=Expected[I].Position ||
                 A[I].Normal!=Original[I].Normal || A[I].UV0!=Original[I].UV0 ||
                 A[I].Color!=Original[I].Color || A[I].Tangent.TangentX!=Original[I].Tangent.TangentX)
@@ -70,6 +85,7 @@ bool FRaftSimCrestHistoryTest::RunTest(const FString&)
         Compared+=Original.Num();
     }
     TestTrue(TEXT("stable-coordinate dense path was exercised repeatedly"),DenseCalls>=15);
+    TestTrue(TEXT("sparse exact-coordinate membership updates exercised"),IncrementalCalls>=5);
     AddInfo(FString::Printf(TEXT("Exact serial-history comparison: %lld vertices,36 changing frames,%d dense calls; duplicate last-writer ownership, crop/reset/boundary/alpha verified"),Compared,DenseCalls));
     return !HasAnyErrors();
 }

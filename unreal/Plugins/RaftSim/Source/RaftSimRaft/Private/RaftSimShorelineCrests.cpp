@@ -45,6 +45,7 @@ void FRaftSimShorelineCrests::Reset()
     CachedXY.Reset(); CachedIndices.Reset(); CachedProfile.Reset();
     CachedCoarse.Reset(); CachedShore.Reset(); CorrectionHistory.Reset();
     CandidateCorrectionHistory.Reset();
+    IncrementalCorrectionHistory.Reset();
     MidpointExpansion.Reset();
     ParallelNormals.Reset();
     TargetCorrectionsCm.Reset(); RenderedCorrectionsCm.Reset();
@@ -213,10 +214,12 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         CachedCoarse=CoarseCrestCm;CachedShore=Shore;
         if (bTiming)TargetsMs+=(FPlatformTime::Seconds()-TargetStarted)*1000.;
     }
+    const double CopyStarted=bTiming ? FPlatformTime::Seconds() : 0.;
     const int32 Count=Source.Num()+Refinement.MidpointParents.Num();
     // Source prefix and every midpoint are completely assigned before use.
     Vertices.SetNumUninitialized(Count,EAllowShrinking::No);
     RaftSimWaterVertexCopy::Prefix(Source,Vertices);
+    const double CopyDone=bTiming ? FPlatformTime::Seconds() : 0.;
     // Build the uncorrected parent interpolation first. Adding a correction
     // while constructing descendants would double-count parent crest relief.
     // Paired playable runs preserve exact attributes and improve both call orders.
@@ -245,10 +248,34 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     else if(bParallelMidpoints)
     {if(!MidpointExpansion.Expand(Vertices,Source.Num(),Refinement.MidpointParents))return false;}
     else SerialMidpoints(Vertices);
+    const double MidpointsDone=bTiming ? FPlatformTime::Seconds() : 0.;
     const float Alpha=FMath::Clamp(Input.BlendAlpha,0.f,1.f);
     static const bool bHistoryHashAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrestHistoryHashAudit"));
+    // Actual-game timing rejected this candidate. Retain a comparison only;
+    // it cannot supply the ordinary playable surface.
+    static const bool bIncrementalAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimIncrementalCrestHistoryAudit"));
     bool bDenseHistory=false;
-    if(bHistoryHashAudit)
+    if(bIncrementalAudit)
+    {
+        auto CandidateVertices=Vertices;
+        TArray<float> CandidateRendered;
+        double ReferenceMs=0.,CandidateMs=0.;bool CandidateDense=false;
+        const auto Reference=[&]() {const double Start=FPlatformTime::Seconds();
+            bDenseHistory=CorrectionHistory.Apply(Vertices,Source.Num(),BoundaryMidpoints,TargetCorrectionsCm,Alpha,RenderedCorrectionsCm,!bMappedHistory);
+            ReferenceMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        const auto Candidate=[&]() {const double Start=FPlatformTime::Seconds();
+            CandidateDense=IncrementalCorrectionHistory.Apply(CandidateVertices,Source.Num(),BoundaryMidpoints,TargetCorrectionsCm,Alpha,CandidateRendered,!bMappedHistory);
+            CandidateMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        if(GFrameCounter%2){Candidate();Reference();}else{Reference();Candidate();}
+        bool Exact=bDenseHistory==CandidateDense && RenderedCorrectionsCm==CandidateRendered;
+        for(int32 I=0;Exact && I<Vertices.Num();++I)Exact=FRaftSimCrestMidpointExpansion::EqualAttributes(Vertices[I],CandidateVertices[I]);
+        if(!Exact){UE_LOG(LogTemp,Error,TEXT("IncrementalCrestHistoryAudit mismatch frame=%llu"),GFrameCounter);return false;}
+        if(GFrameCounter>=120 && GFrameCounter<184)
+            UE_LOG(LogTemp,Display,TEXT("IncrementalCrestHistoryAudit frame=%llu exact=%d candidate_first=%d dense=%d incremental=%d changed=%d vertices=%d reference_ms=%.9f candidate_ms=%.9f"),
+                GFrameCounter,Exact,int32(GFrameCounter%2),bDenseHistory,IncrementalCorrectionHistory.bIncrementalUpdate,
+                IncrementalCorrectionHistory.ChangedCoordinates,Vertices.Num(),ReferenceMs,CandidateMs);
+    }
+    else if(bHistoryHashAudit)
     {
         auto ReferenceVertices=Vertices;
         TArray<float> ReferenceRendered;
@@ -333,6 +360,11 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     if (bTiming)
     {
         const double End=FPlatformTime::Seconds();
+        // Independent subdivision of the existing vertices stage. Timers and
+        // logging are opt-in; no scheduling, cache, attributes or physics change.
+        UE_LOG(LogTemp,Display,TEXT("WaterCrestVertices frame=%llu copy_ms=%.4f midpoints_ms=%.4f history_ms=%.4f dense=%d source_vertices=%d fine_vertices=%d"),
+            GFrameCounter,(CopyDone-CopyStarted)*1000.,(MidpointsDone-CopyDone)*1000.,
+            (VerticesDone-MidpointsDone)*1000.,int32(bDenseHistory),Source.Num(),Refinement.MidpointParents.Num());
         UE_LOG(LogTemp,Display,TEXT("WaterCrestPerf frame=%llu rebuild=%d total_ms=%.4f selection_ms=%.4f targets_ms=%.4f vertices_ms=%.4f topology_ms=%.4f normals_ms=%.4f fine_vertices=%d xy_changed=%d indices_changed=%d profile_changed=%d coarse_changed=%d shore_changed=%d detail_changed=%d sample_ms=%.4f assembly_ms=%.4f refine_input_ms=%.4f"),
             GFrameCounter,SameGeometry ? 0 : 1,(End-Started)*1000.,SelectionMs,TargetsMs,
             (VerticesDone-Started)*1000.-SelectionMs-TargetsMs,(TopologyDone-VerticesDone)*1000.,

@@ -3,7 +3,23 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [moving-front total energy](../reconstruction-review-2026-09-07/normal-river-front-total-energy.md).
+Latest: [incremental crest history rejected](../reconstruction-review-2026-09-07/incremental-crest-history-review.md).
+Current captures show zero coordinate-only profile rebuilds; immutable-profile
+reuse would not help this workload. New opt-in timing isolates1.70ms moving-
+coordinate history work versus0.31ms stable work. A native-verified incremental
+ownership trial preserves all actual attributes but FAILS the both-order speed
+gate: sparse savings are offset by stable-frame losses. Its gameplay switch is
+removed; only the explicit comparison and regression fixtures remain.
+Final editor build,74 Python and8 native D3D12 checks PASS. Ordinary32.310929FPS /
+p9541.7264ms still FAIL30; no speedup, physical or visual acceptance.
+7300/7350/7400/7450 state AND artificial-bank audits PASS, NOT settled;
+installed4950 stays. Same live cook28776/session93831; direct process start UTC
+is2026-09-18T04:30:27.5746992Z (prior CIM record was rounded). Use that exact
+identity for control. Next7500/local6000 needs completion marker and BOTH audits.
+Nonlinear runtime OFF. All ordered scene, breaking/froth, crew, normalization,
+13 physical-regression and release requirements remain OPEN.
+
+Previous: [moving-front total energy](../reconstruction-review-2026-09-07/normal-river-front-total-energy.md).
 Original depth-weighted spatial moments now supply gravity/bed potential and
 the complete energy derivative in BOTH momentum coordinates, alongside the
 unchanged two-pole kinetic derivative.50 focused checks PASS. Full physical

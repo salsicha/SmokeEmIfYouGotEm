@@ -4,6 +4,7 @@
 #include "ProceduralMeshComponent.h"
 #include "RaftSimSurfaceRefinement.h"
 #include "RaftSimCrestHistory.h"
+#include "RaftSimIncrementalCrestHistory.h"
 #include "RaftSimCrestMidpointExpansion.h"
 #include "RaftSimCrestNormals.h"
 
@@ -54,6 +55,7 @@ private:
     FRaftSimCrestHistory CorrectionHistory;
     // Allocated only by the explicit actual-input hash comparison audit.
     FRaftSimFastCrestHistory CandidateCorrectionHistory;
+    FRaftSimIncrementalCrestHistory IncrementalCorrectionHistory;
     // Exact topology-only dependency schedule; no cached evolving attributes.
     FRaftSimCrestMidpointExpansion MidpointExpansion;
     FRaftSimCrestNormals ParallelNormals;
