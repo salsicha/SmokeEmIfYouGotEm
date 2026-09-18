@@ -22,6 +22,12 @@ function Test-RaftSimBufferDiagnosticLog([string]$LogText, [string]$Target) {
         $LogText -match ('r\.BufferVisualizationTarget = "' + [regex]::Escape($Target) + '"') -and
         $LogText -notmatch 'view mode not recognized|Debug viewmodes not allowed|view mode is currently not supported')
 }
+function Test-RaftSimFrameTimeModeLog([string]$LogText) {
+    # A request alone is not runtime confirmation. Retain every logged value;
+    # a subsequent conflicting setting invalidates the declared timing phase.
+    $values = [regex]::Matches($LogText, '(?im)^.*\bcsv\.UseLegacyFrameTime\s*=\s*"([^"]+)"[^\r\n]*\r?$')
+    return ($values.Count -gt 0 -and @($values | Where-Object { $_.Groups[1].Value -cnotin @('0', 'false') }).Count -eq 0)
+}
 if ($StartupBufferVisualization -and -not $StartupRenderReplay) {
     throw 'Buffer visualization requires StartupRenderReplay; it is not an FPS capture'
 }
@@ -191,7 +197,10 @@ try {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.
         $start.ArgumentList.Add('-ExitAfterCsvProfiling')
-        $profileCommands = "-ExecCmds=csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames"
+        # Match the engine default explicitly and retain runtime confirmation.
+        # Its elapsed interval belongs to the preceding logical frame, not
+        # the water scopes on the same CSV row. No frame limit is changed.
+        $profileCommands = "-ExecCmds=csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames"
         $start.ArgumentList.Add($profileCommands)
     }
     if ($ExtraGameArgument) { $start.ArgumentList.Add($ExtraGameArgument) }
@@ -220,6 +229,10 @@ try {
         }
         $report.csv_file = $csvFile
         $report.csv_sha256 = (Get-FileHash -LiteralPath $csvFile -Algorithm SHA256).Hash.ToLowerInvariant()
+        $report.csv_frame_time_mode_confirmed = Test-RaftSimFrameTimeModeLog (Get-Content -LiteralPath $logFile -Raw)
+        if (-not $report.csv_frame_time_mode_confirmed) { throw 'CSV FrameTime mode was not confirmed; do not infer scope alignment' }
+        $report.csv_frame_time_scope_offset = 1
+        $report.csv_frame_time_mode_log_sha256 = (Get-FileHash -LiteralPath $logFile -Algorithm SHA256).Hash.ToLowerInvariant()
     }
     if (($StartupRenderReplay -or $CheckpointResetReplay) -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
         $frames = if ($CheckpointResetReplay) { $checkpointFrames } else { $startupFrames }

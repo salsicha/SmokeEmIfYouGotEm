@@ -3,7 +3,20 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact7700 hydraulic recovery](../reconstruction-review-2026-09-07/hydraulic-recovery-7700.md).
+Latest: [elapsed-frame phase and longer captures](../reconstruction-review-2026-09-07/frame-time-phase-review.md).
+InstalledUE5.8 default FrameTime describes the PREVIOUS logical frame; optional
+water-workload grouping now uses an explicitly verified phase, never best-fit
+correlation. Runtime mode confirmation/log hashes and50 Python plus PowerShell
+controls PASS. No native/asset/physics/quality changes or speedup claimed.
+Both900-row ordinary captures FAIL30:21.960643FPS/p9561.1927ms and23.672683FPS/
+p9552.5633ms. Final300-row capture24.116386FPS/p9549.8761ms also FAILS. Preserve
+all runs. Separate refresh-only and selection-only groups already exceed budget;
+merely staggering these workloads is insufficient. Physical/visual scope remains OPEN.
+7750/local1000 state AND artificial-bank audits PASS, NOT settled; installed4950
+stays. Same cook8900/startUTC2026-09-18T06:34:59.2598919Z/session68256 is LIVE.
+Next7800/local2000 requires complete marker and BOTH audits. Nonlinear remains OFF.
+
+Previous: [exact7700 hydraulic recovery](../reconstruction-review-2026-09-07/hydraulic-recovery-7700.md).
 Old cook28776/session93831 is terminal after a host restart; no successful exit
 is claimed. Fresh continuation uses the last complete7700 snapshot, never the
 partial7742.5 progress record. Native h/u/v reload is bit-exact for all5,382,400

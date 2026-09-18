@@ -34,7 +34,7 @@ def parse_capture(stream, require_water_scopes=False):
     if missing:
         raise ValueError(f"missing actual frame metrics: {sorted(missing)}")
     if require_water_scopes and set(WATER_SCOPES) - set(header):
-        raise ValueError("capture is missing required same-frame water scopes")
+        raise ValueError("capture is missing required water scope columns")
     columns = {name: header.index(name) for name in METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES + RELIEF_SCOPES if name in header}
     samples, metadata = [], {}
     footer = False
@@ -102,6 +102,58 @@ def summarize(samples, first, last, target_fps=30.0):
     return result
 
 
+def summarize_water_workload(samples, first, last, scope_offset, target_fps=30.0):
+    """Associate elapsed intervals with explicitly phase-selected water scopes.
+
+    Default UE5.8 FrameTime is emitted near BeginFrame, after the limiter wait,
+    and describes the preceding logical frame: scope_offset=1. Legacy EndFrame
+    timing uses offset=0. CSV metadata does not identify this mode, so callers
+    MUST establish it independently. Never infer phase from best correlation.
+    These groups diagnose workload association, not causal cost or acceptance.
+    """
+    if type(scope_offset) is not int or scope_offset not in (0, 1):
+        raise ValueError('Explicit verified FrameTime scope offset 0 or 1 required')
+    overall = summarize([{k: v for k, v in row.items() if k in METRICS}
+                         for row in samples], first, last, target_fps)
+    if first < scope_offset:
+        raise ValueError('Preceding scope row is absent; do not trim the requested interval')
+    required = (WATER_SCOPES[1], WATER_SCOPES[6])  # Refresh, crest Selection.
+    scope_names = WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES + RELIEF_SCOPES
+    available = [name for name in scope_names if name in samples[first-scope_offset]]
+    rows = range(first-scope_offset, last-scope_offset+1)
+    for row in rows:
+        if any(name not in samples[row] for name in required):
+            raise ValueError('Refresh and crest-selection timing columns are required')
+        if any((name in samples[row]) != (name in available) for name in scope_names):
+            raise ValueError('Water scope availability changes inside the selected interval')
+        if any(not math.isfinite(samples[row][name]) or samples[row][name] < 0 for name in available):
+            raise ValueError('Invalid associated water scope time')
+    groups = []
+    for refresh in (False, True):
+        for selection in (False, True):
+            indices = [i for i in range(first, last+1)
+                       if (samples[i-scope_offset][required[0]] > 0) == refresh
+                       and (samples[i-scope_offset][required[1]] > 0) == selection]
+            durations = [samples[i]['FrameTime'] for i in indices]
+            groups.append(dict(refresh_positive_timing=refresh,
+                crest_selection_positive_timing=selection, count=len(indices),
+                frame_time_sample_indices=indices,
+                water_scope_sample_indices=[i-scope_offset for i in indices],
+                mean_frame_ms=statistics.mean(durations) if durations else None,
+                p95_frame_ms_nearest_rank=sorted(durations)[math.ceil(.95*len(durations))-1] if durations else None,
+                frames_over_budget=sum(t > overall['frame_budget_ms'] for t in durations),
+                scope_mean_ms={name: statistics.mean(samples[i-scope_offset][name] for i in indices)
+                               if indices else None for name in available}))
+    return dict(scope_offset=scope_offset,
+        alignment_source='Explicit caller argument; external mode confirmation required, not verified from CSV',
+        sample_indices_inclusive=[first, last], frame_budget_ms=overall['frame_budget_ms'],
+        frame_p95_within_target_budget=overall['frame_p95_within_target_budget'],
+        scope='Workload association only; no causal attribution. Zero timing does not prove no call. '
+              'Nested scopes must not be added. All requested elapsed samples are retained exactly once; '
+              'grouping does not change the overall performance gate. CSV alone does not establish timing mode.',
+        groups=groups)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("captures", nargs="+", type=Path)
@@ -111,6 +163,8 @@ def main():
                         help="Acceptance target, independent of recorded engine metadata (default: 30)")
     parser.add_argument("--report", required=True, type=Path)
     parser.add_argument("--require-water-scopes", action="store_true")
+    parser.add_argument("--frame-time-scope-offset", type=int, choices=(0, 1),
+                        help="Optional workload grouping: caller-verified FrameTime mode, 1 for UE5.8 default, 0 for legacy EndFrame")
     args = parser.parse_args()
     if args.report.exists():
         raise FileExistsError(args.report)
@@ -122,10 +176,16 @@ def main():
                      "total_samples": len(samples), "metadata": metadata,
                      "sample_indices_inclusive": [args.first_sample, args.last_sample],
                      "metrics": summarize(samples, args.first_sample, args.last_sample, args.target_fps)})
+        if args.frame_time_scope_offset is not None:
+            runs[-1]['water_workload'] = summarize_water_workload(samples, args.first_sample,
+                args.last_sample, args.frame_time_scope_offset, args.target_fps)
     report = {"schema": "raftsim.unreal_frame_csv_audit.v2", "release_accepted": False,
               "scope": "Actual Unreal frame/CPU-thread/GPU CSV metrics, not water-actor time. "
               "Sample indices are zero-based CSV rows, not engine frame IDs. Threads overlap; "
-              "water scopes are inclusive and nested (Tick contains Refresh/CartesianPublish; "
+              "UE5.8 default FrameTime is emitted near frame start and describes the preceding logical frame; "
+              "legacy EndFrame timing has a different phase. CSV metadata does not establish this mode. "
+              "Same-row elapsed time and water scopes must not be assumed phase-aligned. "
+              "Water scopes are inclusive and nested (Tick contains Refresh/CartesianPublish; "
               "Refresh contains source samples/handover/optical filter/hydraulic relief/breaking vertices/foam transport; "
               "on the combined source path SourceSamples includes sampling and handover, while SourceHandover measures only its completed guard; "
               "CartesianPublish contains packing/SetMesh; "

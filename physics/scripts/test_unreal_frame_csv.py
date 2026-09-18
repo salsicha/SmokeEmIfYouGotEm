@@ -1,6 +1,6 @@
 import io
 import unittest
-from audit_unreal_frame_csv import parse_capture, summarize, WATER_SCOPES, PUBLISH_SCOPES, SMOOTHING_SCOPES, BREAKING_SCOPES, FOAM_SCOPES, GROUND_SCOPES, RELIEF_SCOPES
+from audit_unreal_frame_csv import parse_capture, summarize, summarize_water_workload, WATER_SCOPES, PUBLISH_SCOPES, SMOOTHING_SCOPES, BREAKING_SCOPES, FOAM_SCOPES, GROUND_SCOPES, RELIEF_SCOPES
 
 HEADER = "FrameTime,GameThreadTime,RenderThreadTime,RHIThreadTime,GPUTime\n"
 FOOTER = HEADER + "[HasHeaderRowAtEnd],1\n"
@@ -30,7 +30,7 @@ class UnrealFrameCsvTest(unittest.TestCase):
             with self.subTest(capture=capture), self.assertRaises(ValueError):
                 parse_capture(io.StringIO(capture + '[HasHeaderRowAtEnd],1\n'))
 
-    def test_same_frame_scopes_and_inactive_rows(self):
+    def test_same_row_scopes_and_inactive_rows(self):
         scopes = WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES + RELIEF_SCOPES
         header = HEADER.rstrip() + "," + ",".join(scopes) + "\n"
         rows = "20,18,4,2,5," + ",".join(["8"] * len(scopes)) + "\n"
@@ -112,6 +112,67 @@ class UnrealFrameCsvTest(unittest.TestCase):
         for target in (0, -30, float("nan"), float("inf")):
             with self.subTest(target=target), self.assertRaises(ValueError):
                 summarize(samples, 0, 0, target)
+
+
+class WaterWorkloadPhaseTest(unittest.TestCase):
+    def samples(self):
+        # Slow logical frames have refresh AND selection; FrameTime is emitted
+        # in the next row. Deliberately anti-correlated same-row timings.
+        return [dict(FrameTime=t, GameThreadTime=9., RenderThreadTime=5., RHIThreadTime=2., GPUTime=4.,
+                     **{WATER_SCOPES[1]: r, WATER_SCOPES[6]: s})
+                for t, r, s in ((10., 20., 5.), (50., 0., 0.), (10., 20., 5.), (50., 0., 0.))]
+
+    def test_explicit_phase_changes_association_not_gate_or_elapsed_samples(self):
+        samples = self.samples()
+        before = [dict(row) for row in samples]
+        shifted = summarize_water_workload(samples, 1, 3, 1)
+        legacy = summarize_water_workload(samples, 1, 3, 0)
+        self.assertEqual(shifted['groups'][3]['frame_time_sample_indices'], [1, 3])
+        self.assertEqual(shifted['groups'][3]['water_scope_sample_indices'], [0, 2])
+        self.assertEqual(shifted['groups'][3]['mean_frame_ms'], 50.)
+        self.assertEqual(shifted['groups'][3]['scope_mean_ms'][WATER_SCOPES[1]], 20.)
+        self.assertEqual(legacy['groups'][3]['frame_time_sample_indices'], [2])
+        self.assertEqual(legacy['groups'][3]['mean_frame_ms'], 10.)
+        for result in (shifted, legacy):
+            self.assertEqual(sorted(i for g in result['groups'] for i in g['frame_time_sample_indices']), [1, 2, 3])
+            self.assertEqual(sum(g['count'] for g in result['groups']), 3)
+            self.assertEqual(sum(g['frames_over_budget'] for g in result['groups']), 2)
+            self.assertFalse(result['frame_p95_within_target_budget'])
+            self.assertIsNone(result['groups'][1]['mean_frame_ms'])
+            self.assertIsNone(result['groups'][1]['scope_mean_ms'][WATER_SCOPES[1]])
+            self.assertNotIn(FOAM_SCOPES[0], result['groups'][0]['scope_mean_ms'])
+        self.assertEqual(samples, before)
+
+    def test_nearest_rank_budget_boundary_and_empty_groups(self):
+        samples = self.samples()
+        for row in samples:
+            row['FrameTime'] = 1000/30
+        result = summarize_water_workload(samples, 1, 3, 1)
+        self.assertTrue(result['frame_p95_within_target_budget'])
+        self.assertEqual(result['groups'][3]['p95_frame_ms_nearest_rank'], 1000/30)
+        self.assertEqual(sum(g['frames_over_budget'] for g in result['groups']), 0)
+
+    def test_missing_predecessor_and_invalid_offset_are_not_silently_trimmed(self):
+        with self.assertRaises(ValueError):
+            summarize_water_workload(self.samples(), 0, 3, 1)
+        for offset in (None, -1, 2, True, 1., '1'):
+            with self.subTest(offset=offset), self.assertRaises(ValueError):
+                summarize_water_workload(self.samples(), 1, 3, offset)
+
+    def test_associated_scopes_must_exist_and_be_finite_in_predecessor_too(self):
+        for name in (WATER_SCOPES[1], WATER_SCOPES[6]):
+            for bad in (None, -1., float('nan'), float('inf')):
+                samples = self.samples()
+                if bad is None:
+                    del samples[0][name]
+                else:
+                    samples[0][name] = bad
+                with self.subTest(name=name, bad=bad), self.assertRaises(ValueError):
+                    summarize_water_workload(samples, 1, 3, 1)
+        samples = self.samples()
+        samples[1][FOAM_SCOPES[0]] = .5
+        with self.assertRaises(ValueError):
+            summarize_water_workload(samples, 1, 3, 1)
 
 
 if __name__ == "__main__":

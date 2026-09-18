@@ -4,6 +4,27 @@ $parseErrors = $null
 $source = Join-Path $PSScriptRoot 'profile_south_fork_current_map.ps1'
 $ast = [Management.Automation.Language.Parser]::ParseFile($source, [ref]$tokens, [ref]$parseErrors)
 if ($parseErrors.Count) { throw 'Profiling script must parse without errors' }
+$frameModeFunction = @($ast.FindAll({
+    param($node)
+    $node -is [Management.Automation.Language.FunctionDefinitionAst] -and
+    $node.Name -eq 'Test-RaftSimFrameTimeModeLog'
+}, $true))
+if ($frameModeFunction.Count -ne 1) { throw 'Expected one production CSV timing-mode validator' }
+. ([scriptblock]::Create($frameModeFunction[0].Extent.Text))
+foreach ($valid in @('csv.UseLegacyFrameTime = "0"', '[time]LogConsoleManager: csv.UseLegacyFrameTime = "0" LastSetBy:Console', '[time][  0]csv.UseLegacyFrameTime = "false"')) {
+    if (-not (Test-RaftSimFrameTimeModeLog $valid)) { throw 'Confirmed default frame-time mode rejected' }
+}
+foreach ($invalid in @('', '-ExecCmds=csv.UseLegacyFrameTime 0', 'csv.UseLegacyFrameTime = "1"',
+    'csv.UseLegacyFrameTime = "0.5"', 'csv.UseLegacyFrameTime = "true"', "csv.UseLegacyFrameTime = `"0`"`ncsv.UseLegacyFrameTime = `"1`"")) {
+    if (Test-RaftSimFrameTimeModeLog $invalid) { throw 'Absent/request-only/conflicting timing-mode evidence accepted' }
+}
+'PASS: CSV frame-time mode requires runtime confirmation, not command intent'
+if (-not (Test-RaftSimFrameTimeModeLog "prefix`r`n[time][  0]csv.UseLegacyFrameTime = `"false`"`r`nnext`r`n")) {
+    throw 'Actual Windows CRLF log format rejected'
+}
+if (Test-RaftSimFrameTimeModeLog "csv.UseLegacyFrameTime = `"false`"`r`ncsv.UseLegacyFrameTime = `"true`"`r`n") {
+    throw 'Conflicting CRLF timing modes accepted'
+}
 # Exercise the production normalization expression without starting, suspending,
 # or resuming any process. No Unreal installation or running cook is required.
 $assignment = @($ast.FindAll({
@@ -113,7 +134,7 @@ if ($profileAssignment.Count -ne 1) { throw 'Expected one production CSV command
 $buildProfile=[scriptblock]::Create($profileAssignment[0].Extent.Text+'; $profileCommands')
 $Label='south-fork-test-profile-length'
 foreach ($ProfileFrames in @(300,1200,2400)) {
-    if ((& $buildProfile) -cne "-ExecCmds=csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames") { throw 'CSV duration changed unrelated commands' }
+    if ((& $buildProfile) -cne "-ExecCmds=csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames") { throw 'CSV duration or explicit timing mode changed unrelated commands' }
 }
 $profileParam=@($ast.ParamBlock.Parameters | Where-Object {$_.Name.VariablePath.UserPath -eq 'ProfileFrames'})
 if ($profileParam.Count -ne 1 -or $profileParam[0].DefaultValue.Extent.Text -ne '300') { throw 'Default profiling duration changed' }
