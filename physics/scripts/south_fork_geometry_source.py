@@ -9,12 +9,13 @@ from pathlib import Path
 import numpy as np
 
 REGISTERED_SCHEMA = 'raftsim.captured_rock_xy_mesh_candidate.v1'
+SOURCE_EXTENSION_SCHEMA = 'raftsim.constriction_source_candidate.v1'
 
 
 def geometry_identity(manifest_path, root, expected_sha=None):
     root = Path(root).resolve()
     source = json.loads(Path(manifest_path).read_text())
-    registered = source.get('schema') == REGISTERED_SCHEMA
+    registered = source.get('schema') in (REGISTERED_SCHEMA, SOURCE_EXTENSION_SCHEMA)
     path_key, hash_key = ('mesh_path', 'mesh_sha256') if registered else ('shared_geometry_path', 'shared_geometry_sha256')
     path = (root/source[path_key]).resolve()
     if not path.is_relative_to(root):
@@ -35,4 +36,3 @@ def load_registered_mesh(path):
 def require_sampling_kind(registered, method):
     if registered != (method == 'registered_triangles'):
         raise ValueError('Registered XY geometry requires explicit registered_triangles sampling; raster modes are incompatible')
-

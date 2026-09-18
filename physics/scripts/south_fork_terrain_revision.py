@@ -60,6 +60,12 @@ def load_revision(manifest_path, root, original_path, origin, datum):
     manifest_path = Path(manifest_path).resolve()
     if not manifest_path.is_relative_to(root):
         raise ValueError('Revision manifest escapes project')
+    # Captured-source extensions are a DIFFERENT contract, not an exception
+    # to the original authority-2 / fixed-XY height-only validation below.
+    header = json.loads(manifest_path.read_text())
+    if header.get('schema') == 'raftsim.source_supported_terrain_revision.v1':
+        from south_fork_source_supported_revision import load_source_revision
+        return load_source_revision(manifest_path, root, original_path, origin, datum)
     record, revised_path, revised_sha, registered = geometry_identity(manifest_path, root)
     original_path = Path(original_path).resolve()
     original_sha = hashlib.sha256(original_path.read_bytes()).hexdigest()

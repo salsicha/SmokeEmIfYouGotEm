@@ -15,7 +15,8 @@ class SourceRockUnion:
 
     Inputs/outputs use absolute UTM / NAVD88 metres. Owner 5 means candidate
     solid, NOT measured rock classification; owner 6 is an explicit registered
-    submerged-bed revision. Without a revision, unsupported cap XY retains the
+    terrain revision (whose identity distinguishes bed priors/source additions).
+    Without a revision, unsupported cap XY retains the
     original bed. Source water masks/stages are never changed here.
     """
     def __init__(self, manifest_path, root, parent_path, origin_utm_m, datum_m, terrain_revision=None):
@@ -89,7 +90,9 @@ class SourceRockUnion:
             self.upper=np.maximum(self.upper,self.terrain_revision.upper)
             self.identity.update(terrain_revision=self.terrain_revision.identity,
                 original_terrain_modified=True,
-                operation='explicit registered submerged-bed revision, then maximum with retained source roof')
+                operation=('explicit source-supported registered terrain revision, then maximum with retained source roof'
+                           if self.terrain_revision.identity['schema']=='raftsim.registered_source_supported_terrain_revision.v1'
+                           else 'explicit registered submerged-bed revision, then maximum with retained source roof'))
 
     def apply(self,east,north,parent,with_owner=False):
         east,north,parent=np.broadcast_arrays(np.asarray(east,float),np.asarray(north,float),np.asarray(parent,float))

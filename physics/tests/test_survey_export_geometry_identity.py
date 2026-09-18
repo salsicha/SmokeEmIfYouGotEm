@@ -47,6 +47,16 @@ class ExportGeometryIdentityTests(unittest.TestCase):
             with self.assertRaises(ValueError):require_sampling_kind(True,method)
         with self.assertRaises(ValueError):require_sampling_kind(False,'registered_triangles')
 
+    def test_source_extension_uses_actual_registered_mesh_hash(self):
+        from south_fork_geometry_source import SOURCE_EXTENSION_SCHEMA, geometry_identity
+        self.record={'schema':SOURCE_EXTENSION_SCHEMA,'mesh_path':'bed.tif','mesh_sha256':self.sha}
+        self.save()
+        _, path, digest, registered = geometry_identity(self.manifest,self.root)
+        self.assertTrue(registered)
+        self.assertEqual((path,digest),(self.bed,self.sha))
+        self.bed.write_bytes(b'changed source extension')
+        with self.assertRaises(ValueError):geometry_identity(self.manifest,self.root)
+
     def test_changed_actual_geometry_rejected(self):
         self.bed.write_bytes(b'changed after cooking')
         with self.assertRaises(ValueError):

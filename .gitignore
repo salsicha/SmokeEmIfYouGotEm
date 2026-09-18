@@ -86,6 +86,8 @@ unreal/Content/RaftSim/Maps/EnvironmentPreviews/
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/
 # Unaccepted, reproducible bed-comparison FBX export; not a shipping source asset.
 /unreal/SourceArt/RaftSim/TroublemakerControlAblation20260916/
+# Regenerable, unaccepted constriction-source geometry export.
+/unreal/SourceArt/RaftSim/TroublemakerConstrictionSource20260918/
 
 # Packaged builds are release artifacts, never repo content (GitHub Releases instead)
 unreal/Packaged/
