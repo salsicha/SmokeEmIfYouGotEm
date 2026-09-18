@@ -1486,7 +1486,7 @@ bool FRaftSimM5StartRescueCommand::Update()
         Test->TestFalse(
             FString::Printf(TEXT("avatar %s exposes a deterministic production class slot"), *It->GetName()),
             It->GetProductionVisualClassPath().IsEmpty());
-        if (Cast<ARaftSimCC0CrewVisualActor>(It->GetProductionVisualActor()))
+        if (const auto* CC0Visual = Cast<ARaftSimCC0CrewVisualActor>(It->GetProductionVisualActor()))
         {
             Test->TestTrue(
                 FString::Printf(
@@ -1511,13 +1511,17 @@ bool FRaftSimM5StartRescueCommand::Update()
                     HelmetForwardAlignment),
                 HelmetForwardAlignment >= 0.98f);
             const float HelmetFitScale = It->GetProductionHelmetFitScale();
+            // Exact role-specific fits already accepted in the September 6
+            // front/side/rear review. The old broad 0.90..1.10 bound rejected
+            // all four corrected crew fits while accepting oversized shells.
+            const bool IsGuide = CC0Visual->GetSelectedMeshPath().EndsWith(TEXT(".SK_RaftSim_CC0_Guide"));
+            const float ExpectedHelmetFitScale = IsGuide ? 0.90f : 0.84f;
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("avatar %s uses a bounded CC0 helmet fit (scale %.4f)"),
+                    TEXT("avatar %s retains the reviewed CC0 helmet fit (scale %.4f, expected %.4f)"),
                     *It->GetName(),
-                    HelmetFitScale),
-                // 1.02 for the crew skulls, 1.08 for the deeper guide skull.
-                HelmetFitScale >= 0.90f && HelmetFitScale <= 1.10f);
+                    HelmetFitScale, ExpectedHelmetFitScale),
+                FMath::IsNearlyEqual(HelmetFitScale, ExpectedHelmetFitScale, 0.0001f));
         }
         else if (Cast<ARaftSimMetaHumanCrewVisualActor>(It->GetProductionVisualActor()))
         {

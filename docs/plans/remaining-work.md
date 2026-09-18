@@ -3,7 +3,22 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest continuation: [crew startup material readiness](../reconstruction-review-2026-09-07/crew-startup-materials.md).
+Latest continuation: [centered, torso-driven crew vests](../reconstruction-review-2026-09-07/crew-vest-torso-fit.md).
+Actual posed torso measurements support4.5cm rearward PFD correction; default
+play now exposes rear panels instead of burying them in the back. A separate
+head-coupled orientation defect is fixed: shoulders/spine drive the vest, so
+reentry no longer turns it sideways. Editor/game rebuilt; new60-case native
+head-independence test passes cleanly. Existing production/rescue tests pass
+(rescue retains known motion-vector warning); exact reviewed helmet scales now
+replace stale oversized bounds. Four helmet/seat source contracts pass.
+All-five turntable plus24-image/15.646s default gameplay capture inspected;
+469 encoded frames decoded, NOT motion/crew-fit acceptance. Straps, shoulder
+edges and some arm overlap remain. New cost25.003520FPS/p9548.329ms FAIL30;
+no causal performance gain claimed. Map/4950/source unchanged, nonlinear OFF.
+Pending cap decision and full ordered queue OPEN; next11400/local48000 needs
+BOTH baseline audits. No new cook or later-river promotion.
+
+Previous continuation: [crew startup material readiness](../reconstruction-review-2026-09-07/crew-startup-materials.md).
 Default editor play now prepares selected visible crew materials before frame one;
 all128 observations ready,22 initially incomplete,1.007468s preparation in final
 normal-start capture (earlier candidate4.184962s). Editor/game rebuilt; unchanged

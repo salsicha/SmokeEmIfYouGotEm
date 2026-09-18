@@ -16,8 +16,11 @@ spec = importlib.util.spec_from_file_location(
 )
 helpers = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(helpers)
-output = Path(unreal.Paths.project_dir()).resolve().parent / "docs/crew-review-2026-09-04"
+output = Path(os.environ.get("RAFTSIM_CREW_REVIEW_ROOT", str(
+    Path(unreal.Paths.project_dir()).resolve().parent / "docs/crew-review-2026-09-04")))
 output /= os.environ.get("RAFTSIM_CREW_REVIEW_LABEL", "baseline")
+if (output / "capture.json").exists():
+    raise RuntimeError(f"Preserve existing crew capture evidence: {output}")
 output.mkdir(parents=True, exist_ok=True)
 helpers.OUTPUT_ROOT = output
 

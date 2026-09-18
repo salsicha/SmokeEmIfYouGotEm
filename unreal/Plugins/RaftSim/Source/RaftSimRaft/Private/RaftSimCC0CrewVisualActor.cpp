@@ -71,6 +71,10 @@ constexpr float ProductionHeadLevelPitchDegrees = 20.0f;
 // the chest anchor than this rig's; lift it along the spine so its top
 // reaches the collarbones instead of the armpits.
 constexpr float ProductionVestLiftAlongSpineCm = 8.0f;
+static TAutoConsoleVariable<float> CVarCC0VestForwardOfSpineCm(
+    TEXT("raftsim.CC0VestForwardOfSpineCm"),
+    4.5f,
+    TEXT("Rendered vest centre forward of the solved spine, in centimetres; fit review control."));
 // The legs need the SAME facing correction as the axial chain: glute flesh
 // weighted to the twisted pelvis rotates -90 degrees about the vertical
 // while thigh-weighted flesh kept the authored +Y facing, and the blend
@@ -350,7 +354,9 @@ bool ARaftSimCC0CrewVisualActor::GetSolvedChestWorldTransform(
         Body->GetBoneIndex(TEXT("spine_01")) == INDEX_NONE ||
         Body->GetBoneIndex(TEXT("spine_02")) == INDEX_NONE ||
         Body->GetBoneIndex(TEXT("spine_03")) == INDEX_NONE ||
-        Body->GetBoneIndex(TEXT("neck_01")) == INDEX_NONE)
+        Body->GetBoneIndex(TEXT("neck_01")) == INDEX_NONE ||
+        Body->GetBoneIndex(TEXT("upperarm_l")) == INDEX_NONE ||
+        Body->GetBoneIndex(TEXT("upperarm_r")) == INDEX_NONE)
     {
         return false;
     }
@@ -370,9 +376,14 @@ bool ARaftSimCC0CrewVisualActor::GetSolvedChestWorldTransform(
     {
         return false;
     }
-    const FVector FaceForward = GetSolvedFaceForwardWorldVector();
-    const FVector ChestForward = (FaceForward -
-        SpineUp * FVector::DotProduct(FaceForward, SpineUp)).GetSafeNormal();
+    // Worn torso gear must not follow the head. Projecting the face direction
+    // onto the chest plane spun the whole vest sideways in reentry and becomes
+    // ill-conditioned when looking down along the spine. The rendered shoulder
+    // line and spine define the chest independently of gaze.
+    const FVector ShoulderRight = ComponentTransform.TransformVectorNoScale(
+        BoneComponentLocation(TEXT("upperarm_r")) -
+        BoneComponentLocation(TEXT("upperarm_l")));
+    const FVector ChestForward = FVector::CrossProduct(ShoulderRight, SpineUp).GetSafeNormal();
     if (ChestForward.IsNearlyZero())
     {
         return false;
@@ -381,8 +392,10 @@ bool ARaftSimCC0CrewVisualActor::GetSolvedChestWorldTransform(
     // spine_03 in HEIGHT, but the spinal column runs along the back of the
     // body while the host anchor is the torso volume centre — the vest mesh
     // is authored around the latter. Push the origin forward by the
-    // spine-to-chest-centre depth or the vest slides rearward off the body.
-    constexpr float ChestCenterForwardOfSpineCm = 9.0f;
+    // spine-to-chest-centre depth. Posed central torso measurements and all-five
+    // front/profile/rear captures place it at 4.5 cm: the former 9 cm floated
+    // the chest panels forward while burying the rear flotation in the back.
+    const float ChestCenterForwardOfSpineCm = CVarCC0VestForwardOfSpineCm.GetValueOnGameThread();
     OutWorld = FTransform(
         FRotationMatrix::MakeFromZX(SpineUp, ChestForward).ToQuat(),
         ComponentTransform.TransformPosition(
@@ -583,15 +596,44 @@ void ARaftSimCC0CrewVisualActor::LogPoseForensics(
         uint32 ApexVertex = Section.BaseVertexIndex;
         FVector ApexDriven = FVector::ZeroVector;
         const uint32 EndVertex = Section.BaseVertexIndex + Section.NumVertices;
+        // Measure the rendered central torso, not bone anchors or the vest
+        // against its own transform. Narrow lateral bands exclude the arms.
+        FTransform ChestWorld;
+        const bool HasChest = GetSolvedChestWorldTransform(ChestWorld);
+        FBox TorsoBands[3] = {FBox(ForceInit), FBox(ForceInit), FBox(ForceInit)};
+        int32 BandCounts[3] = {0, 0, 0};
         for (uint32 VertexIndex = Section.BaseVertexIndex; VertexIndex < EndVertex; ++VertexIndex)
         {
             const FVector Driven(USkinnedMeshComponent::GetSkinnedVertexPosition(
                 Body, VertexIndex, LODData, *SkinWeights, CachedRefToLocals));
+            if (HasChest)
+            {
+                const FVector P = ChestWorld.InverseTransformPosition(
+                    Body->GetComponentTransform().TransformPosition(Driven));
+                if (FMath::Abs(P.Y) <= 8.0 && P.Z >= -12.0 && P.Z < 18.0)
+                {
+                    const int32 Band = FMath::FloorToInt((P.Z + 12.0) / 10.0);
+                    TorsoBands[Band] += P;
+                    ++BandCounts[Band];
+                }
+            }
             if (Driven.Z > ApexZ)
             {
                 ApexZ = Driven.Z;
                 ApexVertex = VertexIndex;
                 ApexDriven = Driven;
+            }
+        }
+        for (int32 Band = 0; Band < 3; ++Band)
+        {
+            if (BandCounts[Band] > 0)
+            {
+                UE_LOG(LogTemp, Display,
+                    TEXT("CC0_VEST_BODY_BAND mesh=%s band=%d count=%d forward=%.4f min_x=%.4f max_x=%.4f min_z=%.4f max_z=%.4f"),
+                    *Mesh->GetName(), Band, BandCounts[Band],
+                    CVarCC0VestForwardOfSpineCm.GetValueOnGameThread(),
+                    TorsoBands[Band].Min.X, TorsoBands[Band].Max.X,
+                    TorsoBands[Band].Min.Z, TorsoBands[Band].Max.Z);
             }
         }
         FString Influences;
