@@ -133,7 +133,9 @@ face cells remain exactly dry. Maximum depth is 3.813751164992087 m, speed
 45.30695454719997 m3/s: NOT settled, no new runtime installation or scene
 acceptance. Reports: `tmp/control-ablation-7700s-{state,banks}-v1-20260918.json`;
 depth SHA256 `fa0c22c41b0b4a95b10ab06854e0a275d72ead3b1e2e88f0ce82f0f479d1950f`.
-Next complete 7750 s/local11000 requires both audits; no process was restarted.
+At that review no process was restarted. The host subsequently restarted and
+the old cook is terminal. See [verified7700 recovery](hydraulic-recovery-7700.md)
+for its replacement identity; next7750 is now NEW local1000 and needs both audits.
 
 ## Remaining delivery
 

@@ -3,7 +3,18 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [original-front auxiliary transport](../reconstruction-review-2026-09-07/normal-river-front-auxiliary-transport.md).
+Latest: [exact7700 hydraulic recovery](../reconstruction-review-2026-09-07/hydraulic-recovery-7700.md).
+Old cook28776/session93831 is terminal after a host restart; no successful exit
+is claimed. Fresh continuation uses the last complete7700 snapshot, never the
+partial7742.5 progress record. Native h/u/v reload is bit-exact for all5,382,400
+cells; no added cells/water or changed physical inputs.34 restart controls PASS.
+The first100 repeated steps reproduce old reported state/flux values exactly.
+New cook8900/startUTC2026-09-18T06:34:59.2598919Z/session68256 is verified LIVE.
+Next7750 is NEW local1000; require completion marker and BOTH state/bank audits.
+Still NOT settled; installed4950 stays. No new visible or30FPS acceptance.
+Continue full ordered scope and missing coupled mass/momentum/interface work.
+
+Previous: [original-front auxiliary transport](../reconstruction-review-2026-09-07/normal-river-front-auxiliary-transport.md).
 The new moving-front operator uses the actual quadratic depth gradient, not
 the invalid hydrostatic substitution grad(h)=-grad(b). Shared factor/difference
 transport, spatial/time connections and direct source/face/wall force ledgers
@@ -16,8 +27,8 @@ Final67-module physical suite851 PASS/13 unchanged FAIL,864 tests; no gates waiv
 The fresh refresh timing investigation confirmed existing costs, not a new
 dominant optimization. Latest ordinary p9541.7264ms still FAIL30.
 7500/7550/7600/7650/7700 state AND artificial-bank audits PASS, NOT settled;
-installed4950 stays. Same cook28776/startUTC2026-09-18T04:30:27.5746992Z remains LIVE.
-Next7750/local11000 needs its completion marker and BOTH audits. Full ordered
+installed4950 stays. Cook28776 was LIVE then; it is now terminal, superseded by
+the verified7700 recovery above. Next7750/new local1000 needs BOTH audits. Full ordered
 scene/terrain/breaking/froth/contact/crew/normalization/regression/release scope
 remains OPEN. Next couple these actual-profile force components to conservative
 mass/momentum and the joint interface law, not another energy-only acceptance.
