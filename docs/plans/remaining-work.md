@@ -3,7 +3,24 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [coupled flat-periodic API verification](../reconstruction-review-2026-09-07/coupled-flat-api-review.md).
+Latest: [gameplay solver-lane comparison](../reconstruction-review-2026-09-07/gameplay-solver-lanes-review.md).
+The SAME editor build85099 finishes successfully; seven native lane/clock/window/
+dry-rock tests PASS with the exact archive and eight-lane override confirmed.
+Nine900-row actual-game captures preserve all results and fixed60..840 windows.
+Eight lanes reduce solver time, but the fresh clean ABBA reverse pair worsens
+whole-frame p9545.4124 ->47.4232ms. Default stays FOUR; no promotion or30FPS pass.
+All nine p95 values fail33.333333ms; best44.1648ms. One source-search-confounded
+capture is retained, marked and repeated, then a separate clean ABBA was run.
+Next address substantive surface refresh/publication work, not another lane-only
+trial or a repeat of rejected tiny optimizations without new evidence.
+7950/local5000 and8000/local6000 BOTH state and artificial-bank audits PASS,
+NOT settled; all86,720 bank cells exactly dry. Installed4950 stays unchanged.
+Cook8900/startUTC2026-09-18T06:34:59.2598919Z/session68256 remains verified LIVE;
+next8050/local7000 needs its complete marker and BOTH audits. No new reference,
+motion, terrain/froth or full-physics acceptance. Nonlinear stays OFF and the
+full ordered scene/crew/regression/normalization/release goal remains OPEN.
+
+Previous: [coupled flat-periodic API verification](../reconstruction-review-2026-09-07/coupled-flat-api-review.md).
 Commit c19c2bcae connects the existing full metric-transport stage to the default
 flat-periodic research API, retaining the failed legacy stress variants as
 explicit negative controls on identical source states. All eight original
