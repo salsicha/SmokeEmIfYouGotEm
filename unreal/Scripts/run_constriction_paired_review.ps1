@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory=$true)][string]$Config,
-    [Parameter(Mandatory=$true)][string]$CookManifest
+    [Parameter(Mandatory=$true)][string]$CookManifest,
+    [switch]$ValidateOnly
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
@@ -17,6 +18,33 @@ function Test-ReviewCookIdentity($Expected, $Actual) {
         $Expected.executable -ieq $Actual.executable -and
         $Expected.sha256 -cmatch '^[a-f0-9]{64}$' -and $Expected.sha256 -ceq $Actual.sha256 -and
         -not [string]::IsNullOrEmpty($Expected.command_line) -and $Expected.command_line -ceq $Actual.command_line
+}
+function Get-ReviewCookProcesses($Manifest) {
+    # Keep old two-cook receipts strict. New manifests explicitly describe the
+    # current inventory, including an empty array after all owned cooks finish.
+    if ($Manifest.processes -isnot [array]) { throw 'Explicit cook process array required' }
+    $count=$Manifest.processes.Count
+    if ($Manifest.schema -ceq 'raftsim.paired_review_cooks.v1') {
+        if ($count -ne 2) { throw 'Legacy manifest requires both cooks' }
+    } elseif ($Manifest.schema -ceq 'raftsim.paired_review_cooks.v2') {
+        if ($count -gt 2) { throw 'At most two explicitly owned cooks supported' }
+    } else { throw 'Unsupported cook manifest schema' }
+    $seen=@()
+    foreach ($entry in $Manifest.processes) {
+        if (($entry.pid -isnot [int] -and $entry.pid -isnot [long]) -or
+            $entry.pid -le 0 -or $entry.pid -in $seen) { throw 'Distinct positive integer cook PIDs required' }
+        $seen+=$entry.pid
+        $entry
+    }
+}
+function Test-ReviewCookInventory($Expected, $Observed) {
+    $expectedIds=@($Expected | ForEach-Object { [long]$_.pid } | Sort-Object)
+    $observedIds=@($Observed | ForEach-Object { [long]$_.ProcessId } | Sort-Object)
+    if ($expectedIds.Count -ne $observedIds.Count) { return $false }
+    for ($i=0; $i -lt $expectedIds.Count; ++$i) {
+        if ($expectedIds[$i] -ne $observedIds[$i]) { return $false }
+    }
+    return $true
 }
 function Test-ReviewPlayerCaptureLog([string]$LogText, [int]$Count) {
     if ($Count -lt 24 -or $Count -gt 120) { return $false }
@@ -66,11 +94,13 @@ foreach ($path in @($playReport,$reportFile,$logFile)) {
     if (Test-Path -LiteralPath $path) { throw 'Preserve previous review evidence' }
 }
 $manifest = Get-Content -LiteralPath (Get-ReviewLocalPath $CookManifest $projectRoot) -Raw | ConvertFrom-Json
-if ($manifest.schema -ne 'raftsim.paired_review_cooks.v1' -or @($manifest.processes).Count -ne 2) { throw 'Both explicitly owned cooks required' }
+$identities=@(Get-ReviewCookProcesses $manifest)
+$inventory=@(Get-CimInstance Win32_Process -Filter "Name='raftsim_cartesian_cook.exe'")
+if (-not (Test-ReviewCookInventory $identities $inventory)) { throw 'Live cook inventory differs from explicit manifest; do not reuse completed PIDs' }
 $owned = @(); $seen = @($PID)
 # Validate every identity before suspending anything, then retain handles for
 # resume: a reused PID must never redirect cleanup to an unrelated process.
-foreach ($identity in $manifest.processes) {
+foreach ($identity in $identities) {
     if ($identity.pid -in $seen) { throw 'Duplicate or launcher process ID' }; $seen += $identity.pid
     $exe = Get-ReviewLocalPath $identity.executable $projectRoot
     if ([IO.Path]::GetFileName($exe) -ne 'raftsim_cartesian_cook.exe') { throw 'Expected local solver' }
@@ -82,6 +112,17 @@ foreach ($identity in $manifest.processes) {
     if (-not (Test-ReviewCookIdentity $identity $actual)) { throw 'Live cook identity changed' }
     $owned += [pscustomobject]@{ process=$process; handle=$process.Handle; identity=$actual }
 }
+if ($ValidateOnly) {
+    # Read-only preflight. In particular, never suspend, start an editor, or
+    # write a success-shaped play/performance report in this mode.
+    $preflight=[ordered]@{schema='raftsim.paired_review_preflight.v1';
+        passed=$true; manifest_schema=$manifest.schema;
+        processes=@($owned | ForEach-Object { $_.identity });
+        process_mutations=$false; editor_started=$false; normal_play_changed=$false}
+    foreach ($item in $owned) { $item.process.Dispose() }
+    $preflight | ConvertTo-Json -Depth 8
+    return
+}
 Add-Type -TypeDefinition @'
 using System;
 using System.Runtime.InteropServices;
@@ -91,15 +132,21 @@ public static class RaftSimPairedReviewProcessControl {
 }
 '@
 $paused=@(); $editor=$null
-$result=[ordered]@{schema='raftsim.paired_review_process.v1'; processes=@(); editor_exit_code=$null; timeout=$false; performance_accepted=$false}
+$result=[ordered]@{schema='raftsim.paired_review_process.v1'; cook_manifest_schema=$manifest.schema; processes=@(); editor_exit_code=$null; timeout=$false; performance_accepted=$false}
 try {
+    $inventory=@(Get-CimInstance Win32_Process -Filter "Name='raftsim_cartesian_cook.exe'")
+    if (-not (Test-ReviewCookInventory $identities $inventory)) { throw 'Cook inventory changed before suspension' }
     foreach ($item in $owned) {
+        $item.process.Refresh()
+        if ($item.process.HasExited) { throw 'Verified cook completed before suspension; refresh manifest' }
         $entry=[ordered]@{identity=$item.identity; cpu_before=$item.process.TotalProcessorTime.TotalSeconds; suspend=$null; resume=$null}
         $result.processes += $entry
         $entry.suspend=[RaftSimPairedReviewProcessControl]::NtSuspendProcess($item.handle)
         if ($entry.suspend -ne 0) { throw 'Cook suspension failed' }
         $paused += @{item=$item; entry=$entry}
     }
+    $inventory=@(Get-CimInstance Win32_Process -Filter "Name='raftsim_cartesian_cook.exe'")
+    if (-not (Test-ReviewCookInventory $identities $inventory)) { throw 'Cook inventory changed before editor launch' }
     $start=[Diagnostics.ProcessStartInfo]::new()
     $start.FileName='C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe'
     $start.UseShellExecute=$false; $start.CreateNoWindow=$true; $start.WorkingDirectory=$projectRoot

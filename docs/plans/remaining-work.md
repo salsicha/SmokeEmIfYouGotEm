@@ -3,7 +3,20 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [local cap outlier inference rejected as a spike repair](../reconstruction-review-2026-09-07/cap-interior-inference.md).
+Latest: [cap reference interpretation and single-cook review preflight](../reconstruction-review-2026-09-07/cap-reference-and-review-inventory.md).
+Bank footage inspected at0:06/0:55: actual fractured rock and surrounding
+vegetation, no calibrated per-return labels.13/18 actual cap hit anchors already
+are their0.5m bin's lowest original eligible return; changing only coverage
+refinement ordering cannot fix most of them. No new geometry candidate/cook.
+Paired-review launcher now accepts explicit v2 zero/one/two-cook inventories,
+still enforces exact identities and rejects missing/extra/stale jobs. Actual
+single13584 read-only preflight PASS; old completed30276 manifest rejected.
+No editor launch or new normal-play/motion/FPS acceptance. Baseline10400..10600
+passes BOTH audits, NOT settled; next10650/local33000. Installed map/4950 and
+24.937420FPS FAIL30 unchanged; nonlinear OFF. Continue coherent source-supported
+rock/bed/water integration, not more local outlier or lower-bin-order tuning.
+
+Previous: [local cap outlier inference rejected as a spike repair](../reconstruction-review-2026-09-07/cap-interior-inference.md).
 Explicit inferred-height experiments change three/five vertices but leave ALL
 eight actual downstream cap hit triangles exactly unchanged. Neither is a
 repair or installed; no new cook/old-state transfer. Registered original NAIP

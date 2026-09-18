@@ -2,7 +2,7 @@ $ErrorActionPreference='Stop'
 $tokens=$null; $errors=$null
 $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot 'run_constriction_paired_review.ps1'),[ref]$tokens,[ref]$errors)
 if ($errors.Count) { throw ($errors | Out-String) }
-foreach ($name in @('Test-ReviewCookIdentity','Get-ReviewLocalPath','Test-ReviewPlayerCaptureLog','Get-ReviewTerrainRayArguments')) {
+foreach ($name in @('Test-ReviewCookIdentity','Get-ReviewCookProcesses','Test-ReviewCookInventory','Get-ReviewLocalPath','Test-ReviewPlayerCaptureLog','Get-ReviewTerrainRayArguments')) {
     $nodes=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -eq $name},$true))
     if ($nodes.Count -ne 1) { throw 'Missing production validator' }
     . ([scriptblock]::Create($nodes[0].Extent.Text))
@@ -26,7 +26,35 @@ foreach ($bad in @('tmp/../README.md','tmp/../../outside.json')) {
     try { $null=Get-ReviewLocalPath $bad $root } catch { $rejected=$true }
     if (-not $rejected) { throw 'Outside path accepted' }
 }
-'PASS: exact dual-cook identities and confined review paths, no process mutations'
+'PASS: exact cook identities and confined review paths, no process mutations'
+foreach ($text in @('{"schema":"raftsim.paired_review_cooks.v2","processes":[]}',
+    '{"schema":"raftsim.paired_review_cooks.v2","processes":[{"pid":42}]}',
+    '{"schema":"raftsim.paired_review_cooks.v2","processes":[{"pid":42},{"pid":43}]}',
+    '{"schema":"raftsim.paired_review_cooks.v1","processes":[{"pid":42},{"pid":43}]}')) {
+    $manifest=$text | ConvertFrom-Json
+    $entries=@(Get-ReviewCookProcesses $manifest)
+    $live=@($entries | ForEach-Object { [pscustomobject]@{ProcessId=$_.pid} })
+    if (-not (Test-ReviewCookInventory $entries $live)) { throw 'Exact explicit inventory rejected' }
+    $extra=@($live)+@([pscustomobject]@{ProcessId=99})
+    if (Test-ReviewCookInventory $entries $extra) { throw 'Unlisted active cook accepted' }
+    if ($live.Count -gt 0 -and (Test-ReviewCookInventory $entries @())) { throw 'Completed cook accepted' }
+}
+foreach ($text in @('{"schema":"raftsim.paired_review_cooks.v1","processes":[]}',
+    '{"schema":"raftsim.paired_review_cooks.v1","processes":[{"pid":42}]}',
+    '{"schema":"raftsim.paired_review_cooks.v2","processes":null}',
+    '{"schema":"raftsim.paired_review_cooks.v2"}',
+    '{"schema":"raftsim.paired_review_cooks.v2","processes":{"pid":42}}',
+    '{"schema":"raftsim.paired_review_cooks.v2","processes":[{"pid":42},{"pid":42}]}',
+    '{"schema":"raftsim.paired_review_cooks.v2","processes":[{"pid":42},{"pid":43},{"pid":44}]}',
+    '{"schema":"raftsim.paired_review_cooks.v2","processes":[{"pid":"42"}]}',
+    '{"schema":"raftsim.paired_review_cooks.v2","processes":[{"pid":0}]}',
+    '{"schema":"unknown","processes":[]}')) {
+    $rejected=$false
+    try { $null=Get-ReviewCookProcesses ($text | ConvertFrom-Json) } catch { $rejected=$true }
+    if (-not $rejected) { throw ('Invalid inventory accepted: '+$text) }
+}
+if (Test-ReviewCookInventory @([pscustomobject]@{pid=42}) @([pscustomobject]@{ProcessId=43})) { throw 'Different same-size inventory accepted' }
+'PASS: explicit zero/one/two cook inventories; legacy receipts stay strict; no process mutations'
 $log=(@(0..23 | ForEach-Object { "LogTemp: Display: RaftSim PIE player-backbuffer capture: index=$_ saved=1" }) -join "`r`n")
 if (-not (Test-ReviewPlayerCaptureLog $log 24)) { throw 'Complete player capture rejected' }
 foreach ($bad in @('',($log+$log),$log.Replace('index=1 saved=1','index=1 saved=0'),$log.Replace('index=1 saved=1','index=0 saved=1'))) {
