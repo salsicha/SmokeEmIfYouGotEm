@@ -132,7 +132,10 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
                 ? (bPreparedRange && Input.PreparedHeightRangeWidthAtWorldXYCm
                     ? Input.PreparedHeightRangeWidthAtWorldXYCm : Input.HeightRangeWidthAtWorldXYCm)
                 : TFunction<float(const FBox2D&)>();
-            static const bool bTightRange=FParse::Param(FCommandLine::Get(),TEXT("RaftSimTightCrestRange"));
+            // Two independent 64-pair gameplay captures preserve topology
+            // exactly and reduce whole adaptive-build time in both orders.
+            // This is a component improvement, not a whole-frame FPS claim.
+            static const bool bTightRange=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceCrestInterval"));
             if(bTightRange && bRangeBound && bPreparedRange && Input.TightHeightRangeWidthAtWorldXYCm)
                 Refinement.HeightRangeWidthCm=Input.TightHeightRangeWidthAtWorldXYCm;
             const uint64 OldBuilds=Refinement.TopologyBuildCount,OldReuses=Refinement.TopologyReuseCount;

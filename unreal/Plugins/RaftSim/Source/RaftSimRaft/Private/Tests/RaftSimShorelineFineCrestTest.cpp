@@ -1,6 +1,7 @@
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterFlowFrame.h"
+#include "RaftSimPreparedBreakingHeightRange.h"
 #include "Engine/World.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/ScopeExit.h"
@@ -28,6 +29,7 @@ bool FRaftSimShorelineFineCrestTest::RunTest(const FString&)
     Site.FlowDirection=FVector2D(-.695725685170176,.718307574089602);
     Site.Intensity=1.f; Site.SpillingFraction=1.f; Site.bLocalEnvelopeCap=true;
     TArray<URaftSimWaterRuntimeAdapter::FSupportBreakingSite> Sites={Site};
+    const FRaftSimPreparedBreakingHeightRange Prepared(Sites);
     const auto Area=[](const TArray<FProcMeshVertex>& V,const TArray<uint32>& T)
     {
         double Sum=0.;
@@ -39,6 +41,20 @@ bool FRaftSimShorelineFineCrestTest::RunTest(const FString&)
     {
         FRaftSimShorelineCrestInput Input;
         Input.ProfileKey={Sign,Site.PhysicalCrestHeightMeters};
+        Input.PreparedHeightRangeWidthAtWorldXYCm=[&](const FBox2D& Box)
+        {
+            FBox2D Field(ForceInit);
+            Field+=FVector2D(Box.Min.X*.01,Box.Min.Y*.01*Sign);
+            Field+=FVector2D(Box.Max.X*.01,Box.Max.Y*.01*Sign);
+            return Prepared.WidthMeters(Field)*100.f;
+        };
+        Input.TightHeightRangeWidthAtWorldXYCm=[&](const FBox2D& Box)
+        {
+            FBox2D Field(ForceInit);
+            Field+=FVector2D(Box.Min.X*.01,Box.Min.Y*.01*Sign);
+            Field+=FVector2D(Box.Max.X*.01,Box.Max.Y*.01*Sign);
+            return Prepared.WidthMeters<true>(Field)*100.f;
+        };
         Input.HeightAtWorldXYCm=[&](const FVector2D& P)
         { return URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
             FVector2D(P.X*.01,P.Y*.01*Sign),Sites,1.f,1.f)*100.f; };

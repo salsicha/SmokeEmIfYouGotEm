@@ -3,7 +3,29 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [original-front pressure variation](../reconstruction-review-2026-09-07/original-front-pressure-variation.md).
+Latest: [local signed crest interval review](../reconstruction-review-2026-09-07/crest-interval-review.md).
+All128 alternating actual-game comparisons preserve topology and production
+geometry; both execution-order groups improve adaptive-build time in BOTH
+captures. The normal path now enables that conservative bound, retaining
+`-RaftSimReferenceCrestInterval`. Same sampled surface/contact, quality,
+0.5cm selection,2cm interior gate and physics cadence; no visual fix claimed.
+Audit-free ABBA p95=43.4283/36.5798/41.0295/40.4931ms: all FAIL30 and whole-frame
+results are mixed.106 focused Python checks and seven native D3D12 checks PASS;
+installed editor AND standalone builds PASS. Default-path final35.365922FPS /
+p9538.6731ms still FAIL30. Fresh recording fully decoded; inspected frames still
+show blurry froth/smooth faces/tuft-like spray, no new visual acceptance.
+Reference footage accessed again; sampled views remain qualitative, not bathymetry.
+6950/7000/7050/7100 hydraulic state AND bank audits PASS, NOT settled; installed4950 stays.
+Next7150/local35000 needs its completion marker and BOTH audits. Cook32728
+is verified LIVE. Original pressure-variation audit21256 is TERMINAL exit0:
+all11 supported local cases PASS, two unsupported records preserved. Independent
+serialized-gradient/primitive-work verifier38716/session9281 is LIVE; case0
+passes, expensive next contraction running. Preserve it, no restart or
+independent all-case verification claim yet. See the original-front variation
+note for exact identities/report hashes. Full ordered scenes/crew/regressions/
+release scope remains OPEN. Nonlinear runtime OFF; no diagnostic pass replaces acceptance.
+
+Previous: [original-front pressure variation](../reconstruction-review-2026-09-07/original-front-pressure-variation.md).
 Exact original solved velocities now feed the primitive derivative without
 repeating the solve; both original pole equations and momentum reconstruction
 are still checked.40 focused tests PASS. Broader65-module regression completes

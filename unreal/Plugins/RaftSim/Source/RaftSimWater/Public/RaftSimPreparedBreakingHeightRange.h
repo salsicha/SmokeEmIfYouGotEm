@@ -1,8 +1,9 @@
 #pragma once
 #include "RaftSimBreakingHeightRange.h"
 
-// Immutable preparation only. Queries retain the reference arithmetic and
-// original site order; no range, height, coordinate or profile-age approximation.
+// Immutable current-profile preparation. Default queries retain reference
+// arithmetic; Tight queries enclose the local signed range including caps.
+// Neither path substitutes a sampled height, coordinate or older profile.
 class FRaftSimPreparedBreakingHeightRange
 {
     struct FSite

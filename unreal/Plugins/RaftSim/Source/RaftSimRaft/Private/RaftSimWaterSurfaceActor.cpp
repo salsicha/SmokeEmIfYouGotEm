@@ -5953,7 +5953,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 static const bool bTightRange=[]
                 {
                     FString Path;
-                    return FParse::Param(FCommandLine::Get(),TEXT("RaftSimTightCrestRange")) ||
+                    return !FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceCrestInterval")) ||
                         FParse::Value(FCommandLine::Get(),TEXT("RaftSimCrestIntervalAudit="),Path);
                 }();
                 if(bTightRange)CartesianCrestInput.TightHeightRangeWidthAtWorldXYCm=[Prepared,Scale,Sign](const FBox2D& Box)
@@ -5966,7 +5966,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 static bool bLoggedPreparedRange=false;
                 if(!bLoggedPreparedRange)
                 {
-                    UE_LOG(LogTemp,Display,TEXT("Prepared crest range active: immutable spatial index with complete-scan fallback; reference arithmetic and tolerances unchanged"));
+                    UE_LOG(LogTemp,Display,TEXT("Prepared crest range active: immutable spatial index with complete-scan fallback; tight_interval=%d; sampled heights and refinement tolerances unchanged"),
+                        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceCrestInterval")));
                     bLoggedPreparedRange=true;
                 }
             }

@@ -64,12 +64,22 @@ No failure is waived or redirected. Report:
 Input: `tmp/south-fork-moving-pressure-metric-v1-20260918.json`, SHA256
 `3fbd2603d037de54c6fa0ca0d921e1c1c76f8ab50815c878b3906727bb84b5ef`.
 Fresh output: `tmp/south-fork-front-pressure-variation-v1-20260918.json`.
-The original running process is21256, start UTC2026-09-18T03:20:39.1088023Z,
-session21082. Case0/source601454 passes in60.8755468s; case1/source601453 has
-rebuilt its geometry and is evaluating. No all-case pass is claimed. Preserve
-this job and its imported implementation; do not restart because a poll is quiet.
-After completion, independently verify all original records and hashes before
-using the report in force development. Its overall acceptance flag remains false.
+Original process21256/startUTC2026-09-18T03:20:39.1088023Z/session21082 has
+completed exit0. All11 supported local cases pass; the two unsupported records
+remain. The expensive case1/source601453 takes2382.3269975s. Output is202,206,834
+bytes, SHA256`9ba9e4387631fddbe66ce06c4773e292095ad260c6e5a82e778a6803500948db`.
+It has not been restarted. All in-job protected/imported hashes match at exit.
+
+Independent reloader `tmp/verify-front-pressure-variation-v1-20260918.py` is
+LIVE as38716/startUTC2026-09-18T04:09:43.6775796Z/session9281. It reconstructs
+the original geometry and independently contracts the serialized primitive
+gradients with original moment/face/momentum rates in BOTH coordinates. It
+checks preserved source records and all current hashes. Case0 passes; the
+expensive next contraction is running. Preserve this same process; no
+independent all-case verification is claimed until it completes and produces
+`tmp/front-pressure-variation-review-v1-20260918.json`. It does not repeat the
+original pole solves or establish a conservative force/wetting/native/gameplay
+law. All full-acceptance flags remain false.
 
 The6850/6900 hydraulic states pass state AND dry-bank audits but are not settled;
 installed4950 stays unchanged. No new native build, rendered-motion comparison,
