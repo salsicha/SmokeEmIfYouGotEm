@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "InputCoreTypes.h"
+#include "RaftSimSeatedHeading.h"
 
 #include "RaftSimGuidePawn.generated.h"
 
@@ -203,6 +204,7 @@ public:
 protected:
     float GetEffectiveMotionIntensity() const;
     void UpdateComfortCamera(float DeltaSeconds);
+    void UpdateSeatedHeading();
     void UpdateChaseCamera();
 
     void HandlePaddleStroke(const FInputActionValue& Value);
@@ -346,6 +348,7 @@ protected:
     FRaftSimGuideCameraRuntimeState CameraRuntimeState;
 
     bool bChaseCameraAllowed = false;
+    FRaftSimSeatedHeading SeatedHeading;
     FVector PreviousRaftVelocityMps = FVector::ZeroVector;
     float IntroCameraRemaining = 0.0f;
     float IntroCameraDuration = 4.0f;

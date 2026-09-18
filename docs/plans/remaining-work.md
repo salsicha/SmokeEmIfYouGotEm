@@ -3,7 +3,25 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [query-local atlas lookup reuse](../reconstruction-review-2026-09-07/atlas-stencil-review.md).
+Latest: [seated heading and fresh playable water review](../reconstruction-review-2026-09-07/seated-heading-review.md).
+Fresh normal South Fork motion confirms broad soft foam and smooth wave faces:
+still NOT accepted. It also exposed a real camera defect: the stern camera stayed
+world-locked while the hull turned, leaving the crew behind the player. Normal
+flat-screen seated play now carries hull yaw while preserving mouse-look offset
+and the level horizon; inspected3s/13s frames keep the crew visible. All24 sampled
+view/hull offsets remain within a0.949-degree band instead of drifting from19 to
+169degrees. Editor AND standalone builds PASS. Three native checks PASS, including
+held-paddle mouse look and shared water contact; runtime-shell render-thread CVar
+warning retained. A missing strong texture-pointer type include is also fixed.
+Ordinary900-frame capture23.476525FPS/p9552.3478ms: FAIL30. This changes the view,
+not water quality or geometry; no speedup or release acceptance claimed. Both
+8350/8400/8450 full-state AND artificial-bank audits PASS, NOT settled; installed
+4950 stays. Cook8900/startUTC2026-09-18T06:34:59.2598919Z verified LIVE. Next8500/
+local16000 needs completion and BOTH audits. Return to substantive physical
+breaking/froth and refresh work; nonlinear stays OFF. All ordered river, crew,
+normalization, regression and release scope remains OPEN.
+
+Previous: [query-local atlas lookup reuse](../reconstruction-review-2026-09-07/atlas-stencil-review.md).
 Both independent64-pair actual-game comparisons preserve ALL source fields and
 bank masks exactly and improve both execution orders. Normal South Fork FullReach
 now enables query-local tile-address reuse, retaining the original sampler via

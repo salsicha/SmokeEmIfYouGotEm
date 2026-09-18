@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/GameInstance.h"
+#include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "EngineUtils.h"
 #include "InputAction.h"
@@ -22,6 +23,8 @@
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace
@@ -233,6 +236,7 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
                 GetActorUpVector() * 4.0f);
         }
     }
+    UpdateSeatedHeading();
     UpdateComfortCamera(DeltaSeconds);
     UpdateChaseCamera();
     UpdateSwimmingAndRescueAim();
@@ -274,6 +278,30 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
         }
         Raft->SetGuideFirstPersonBodyHidden(
             bFirstPersonSeat && bGuideRearGlanceBodyHidden);
+    }
+}
+
+void ARaftSimGuidePawn::UpdateSeatedHeading()
+{
+    const APlayerController* Player = Cast<APlayerController>(GetController());
+    const bool bSeatedView = AttachedRaft && GetAttachParentActor() == AttachedRaft &&
+        MobilityMode == ERaftSimGuideMobilityMode::InRaft &&
+        !CameraRuntimeState.bChaseCameraActive && GuideCamera && GuideCamera->bUsePawnControlRotation &&
+        Player && Player->GetViewTarget() == this &&
+        // Keep tracked-HMD orientation semantics unchanged by this flat-screen fix.
+        !(GEngine && GEngine->IsStereoscopic3D());
+    bool bCarryHeading = bSeatedView;
+#if !UE_BUILD_SHIPPING
+    // Same-build control for actual-game comparisons, not a different camera.
+    static const bool bWorldLocked = FParse::Param(FCommandLine::Get(), TEXT("RaftSimWorldLockedGuideYaw"));
+    bCarryHeading = bCarryHeading && !bWorldLocked;
+#endif
+    const double Delta = SeatedHeading.Advance(AttachedRaft ? AttachedRaft->GetActorRotation().Yaw : 0., bCarryHeading);
+    if (bCarryHeading && Delta != 0.)
+    {
+        FRotator View = GetController()->GetControlRotation();
+        View.Yaw = FMath::UnwindDegrees(View.Yaw + Delta);
+        GetController()->SetControlRotation(View);
     }
 }
 
@@ -720,6 +748,8 @@ void ARaftSimGuidePawn::BeginPlay()
         AttachToComponent(
             Raft->GetSternSeatAttachPoint(),
             FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+        // Read the completed raft/crew pose before placing the seated view.
+        AddTickPrerequisiteActor(Raft);
     }
 }
 

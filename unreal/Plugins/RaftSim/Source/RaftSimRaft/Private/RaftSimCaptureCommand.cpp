@@ -1121,14 +1121,17 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                         Raft->GetActorLocation(), RaftRiver, Tangent, LeftNormal);
                     APlayerController* PC = W2->GetFirstPlayerController();
                     const APlayerCameraManager* Camera = PC ? PC->PlayerCameraManager : nullptr;
-                    UE_LOG(LogTemp, Display, TEXT("RaftSim capture-series request: index=%d world_s=%.3f frame=%llu raft_river_valid=%d raft_station_m=%.3f raft_lateral_m=%.3f camera_valid=%d camera_world_cm=%s camera_pitch_deg=%.6f camera_yaw_deg=%.6f camera_roll_deg=%.6f camera_fov_deg=%.3f raft_coordinates=scenario_downstream"),
+                    UE_LOG(LogTemp, Display, TEXT("RaftSim capture-series request: index=%d world_s=%.3f frame=%llu raft_river_valid=%d raft_station_m=%.3f raft_lateral_m=%.3f camera_valid=%d camera_world_cm=%s camera_pitch_deg=%.6f camera_yaw_deg=%.6f camera_roll_deg=%.6f camera_fov_deg=%.3f raft_coordinates=scenario_downstream raft_yaw_deg=%.6f camera_raft_local_cm=%s"),
                         *Taken, W2->GetTimeSeconds(), static_cast<unsigned long long>(GFrameCounter),
                         bRiver, RaftRiver.X, RaftRiver.Y, Camera != nullptr,
                         Camera ? *Camera->GetCameraLocation().ToCompactString() : TEXT("unavailable"),
                         Camera ? Camera->GetCameraRotation().Pitch : 0.,
                         Camera ? Camera->GetCameraRotation().Yaw : 0.,
                         Camera ? Camera->GetCameraRotation().Roll : 0.,
-                        Camera ? Camera->GetFOVAngle() : 0.f);
+                        Camera ? Camera->GetFOVAngle() : 0.f,
+                        Raft ? Raft->GetActorRotation().Yaw : 0.,
+                        Camera && Raft ? *Raft->GetActorTransform().InverseTransformPosition(
+                            Camera->GetCameraLocation()).ToCompactString() : TEXT("unavailable"));
                     ++(*Taken);
                     if (*Taken >= Count)
                     {

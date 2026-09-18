@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "RaftSimDetailPresentationFrame.h"
 #include "RaftSimDetailSampleGrid.h"
 #include "RaftSimCommittedWaterClock.h"
@@ -8,7 +9,6 @@
 #include "RaftSimStatefulDetailComponent.generated.h"
 class URaftSimWaterRuntimeAdapter;
 class UMaterialInstanceDynamic;
-class UTextureRenderTarget2D;
 struct FRaftSimDetailRenderState;
 struct FRaftSimTotalDepthSource;
 

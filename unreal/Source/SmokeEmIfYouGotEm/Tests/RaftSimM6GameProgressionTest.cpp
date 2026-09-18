@@ -332,6 +332,7 @@ public:
                 return true;
             }
             InitialYaw = Controller->GetControlRotation().Yaw;
+            InitialSeatYaw = SeatYaw(Controller);
             FVector InitialViewLocation;
             FRotator InitialViewRotation;
             Controller->GetPlayerViewPoint(InitialViewLocation, InitialViewRotation);
@@ -345,12 +346,12 @@ public:
         }
 
         const float YawDelta = FMath::Abs(FMath::FindDeltaAngleDegrees(
-            InitialYaw, Controller->GetControlRotation().Yaw));
+            InitialYaw - InitialSeatYaw, Controller->GetControlRotation().Yaw - SeatYaw(Controller)));
         FVector ViewLocation;
         FRotator ViewRotation;
         Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
         const float ViewYawDelta = FMath::Abs(FMath::FindDeltaAngleDegrees(
-            InitialViewYaw, ViewRotation.Yaw));
+            InitialViewYaw - InitialSeatYaw, ViewRotation.Yaw - SeatYaw(Controller)));
         if (YawDelta > 0.1f && ViewYawDelta > 0.1f)
         {
             Test->TestTrue(TEXT("PIE mouse pans rendered camera while W is held"), true);
@@ -376,6 +377,14 @@ public:
     }
 
 private:
+    static float SeatYaw(const APlayerController* Controller)
+    {
+        // A turning raft must not pass the mouse-input test by itself.
+        const APawn* Pawn = Controller->GetPawn();
+        const AActor* Seat = Pawn ? Pawn->GetAttachParentActor() : nullptr;
+        return Seat ? Seat->GetActorRotation().Yaw : 0.f;
+    }
+
     static void InjectSlateMouseMove()
     {
         const FVector2D PreviousPosition(
@@ -390,6 +399,7 @@ private:
     FAutomationTestBase* Test = nullptr;
     bool bInjected = false;
     float InitialYaw = 0.0f;
+    float InitialSeatYaw = 0.0f;
     float InitialViewYaw = 0.0f;
     double StartSeconds = 0.0;
 };
