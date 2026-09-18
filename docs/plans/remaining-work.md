@@ -3,7 +3,23 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [paired actual motion and wrong-viewport capture fix](../reconstruction-review-2026-09-07/constriction-paired-motion.md).
+Latest: [downstream cap source identification](../reconstruction-review-2026-09-07/downstream-cap-provenance.md).
+New actual paired play verifies84 player frames and fully decodes41.687s motion.
+All12 independent native/source rays PASS: eight foreground hits belong to the
+RETAINED CAP (four steep original-return roof triangles, four inferred walls),
+not the new registered-ground flanks.26 original IDs are exactly recovered from
+the four original LAZ tiles, including pulse metadata.18 hit anchors remain
+unclassified; nearby lower points do not justify flattening or automatic
+vegetation classification. Review this cap's source selection/connectivity next;
+do not repeat generic actor identification or modify the wrong ground surface.
+130 focused tests and scoped capture/identity guards PASS. Baseline9650..9800
+and candidate150/200s pass BOTH state/bank audits, NOT settled. Same cooks13584
+and30276 continue; next9850/local17000 and250/local5000 require completion and
+BOTH audits. Supporting evidence only: no normal-play geometry/water promotion,
+new build or FPS claim. Installed map/4950 unchanged; nonlinear OFF; latest
+24.937420FPS/p9549.3295ms FAIL30. Full ordered scope remains OPEN.
+
+Previous: [paired actual motion and wrong-viewport capture fix](../reconstruction-review-2026-09-07/constriction-paired-motion.md).
 The source-supported candidate and matching50s atlas now run together in actual
 unsaved FullReach play from8300, original ground reused and cap retained.
 All25,600 native water queries and70,017 collision probes PASS. The final47.479s

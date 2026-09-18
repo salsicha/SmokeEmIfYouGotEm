@@ -27,8 +27,31 @@ function Test-ReviewPlayerCaptureLog([string]$LogText, [int]$Count) {
     }
     return $true
 }
+function Get-ReviewTerrainRayArguments($Config) {
+    $hasPixels = $null -ne $Config.terrain_pixels
+    $hasIndex = $null -ne $Config.terrain_capture_index
+    if (-not $hasPixels -and -not $hasIndex) { return }
+    if (-not $hasPixels -or -not $hasIndex) { throw 'Terrain pixels and capture index must be paired' }
+    $count = if ($null -eq $Config.capture_count) { 24 } else { $Config.capture_count }
+    if ($count -isnot [long] -and $count -isnot [int]) { throw 'Integer capture count required' }
+    $index = $Config.terrain_capture_index
+    if (($index -isnot [long] -and $index -isnot [int]) -or $index -lt 0 -or $index -ge $count -or $count -lt 24 -or $count -gt 120) { throw 'Terrain capture index outside series' }
+    $pixels = @($Config.terrain_pixels)
+    if ($pixels.Count -lt 1 -or $pixels.Count -gt 32) { throw 'One to 32 terrain pixels required' }
+    $tokens = foreach ($pixel in $pixels) {
+        if ($pixel -isnot [array] -or $pixel.Count -ne 2) { throw 'Pixel coordinate pair required' }
+        foreach ($value in $pixel) {
+            if ($value -isnot [long] -and $value -isnot [int]) { throw 'Integer pixel coordinate required' }
+        }
+        if ($pixel[0] -lt 0 -or $pixel[0] -ge 1280 -or $pixel[1] -lt 0 -or $pixel[1] -ge 720) { throw 'Pixel outside actual player viewport' }
+        '{0},{1}' -f $pixel[0],$pixel[1]
+    }
+    "-RaftSimCaptureCarrierShapeIndex=$index"
+    '-RaftSimCaptureTerrainPixels=' + ($tokens -join ';')
+}
 $configPath = Get-ReviewLocalPath $Config $projectRoot
 $raw = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+$terrainArguments = @(Get-ReviewTerrainRayArguments $raw)
 if ($raw.label -notmatch '^south-fork-[a-z0-9-]+$') { throw 'Scoped fresh review label required' }
 $descriptorPath = Get-ReviewLocalPath $raw.descriptor $projectRoot
 $descriptor = Get-Content -LiteralPath $descriptorPath -Raw | ConvertFrom-Json
@@ -88,6 +111,7 @@ try {
         "-abslog=$logFile",('-ExecCmds=py ' + (Join-Path $PSScriptRoot 'play_constriction_paired_review.py').Replace('\','/')))) {
         $start.ArgumentList.Add($argument)
     }
+    foreach ($argument in $terrainArguments) { $start.ArgumentList.Add($argument) }
     $result.arguments=@($start.ArgumentList)
     $editor=[Diagnostics.Process]::Start($start); $result.editor_pid=$editor.Id
     $deadline=[DateTime]::UtcNow.AddSeconds(600)

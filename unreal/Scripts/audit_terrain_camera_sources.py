@@ -71,18 +71,32 @@ def resolve_ray(record, sources, translation_cm, reflection):
                 slope_degrees=float(np.degrees(np.arccos(np.clip(abs(normal[2]), 0, 1)))))
 
 
-def run(view_path, output):
+def source_identities(ground_source=None, ground_sha256=None):
+    identities = dict(IDENTITIES)
+    if (ground_source is None) != (ground_sha256 is None):
+        raise ValueError('Candidate ground path and immutable SHA256 must be paired')
+    if ground_source is not None:
+        path = Path(ground_source).resolve()
+        if not path.is_relative_to(ROOT/'tmp') or len(ground_sha256) != 64 or any(
+                c not in '0123456789abcdef' for c in ground_sha256):
+            raise ValueError('Project-local candidate and lowercase SHA256 required')
+        identities['ground'] = (path, ground_sha256)
+    if any(sha(path) != expected for path, expected in identities.values()):
+        raise ValueError('Archived or candidate source identity changed')
+    return identities
+
+
+def run(view_path, output, ground_source=None, ground_sha256=None):
     if output.exists():
         raise ValueError('Fresh output required; preserve previous evidence')
     view = json.loads(view_path.read_text(encoding='utf-8-sig'))
     if view.get('schema') != 'raftsim.carrier_view.v1':
         raise ValueError('Actual carrier-view terrain rays required')
-    identities = {name: dict(path=str(path.relative_to(ROOT)), sha256=sha(path))
-                  for name, (path, expected) in IDENTITIES.items()}
-    if any(identities[name]['sha256'] != expected for name, (_, expected) in IDENTITIES.items()):
-        raise ValueError('Archived source identity changed')
+    paths = source_identities(ground_source, ground_sha256)
+    identities = {name: dict(path=str(path.relative_to(ROOT)), sha256=expected)
+                  for name, (path, expected) in paths.items()}
     data = {}
-    for name, (path, _) in IDENTITIES.items():
+    for name, (path, _) in paths.items():
         with np.load(path, allow_pickle=False) as archive:
             data[name] = {key: archive[key] for key in archive.files}
     ground, cap, returns = (data[name] for name in ('ground', 'cap', 'returns'))
@@ -139,5 +153,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('view', type=Path)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--ground-source', type=Path)
+    parser.add_argument('--ground-sha256')
     args = parser.parse_args()
-    run(args.view, args.output)
+    run(args.view, args.output, args.ground_source, args.ground_sha256)

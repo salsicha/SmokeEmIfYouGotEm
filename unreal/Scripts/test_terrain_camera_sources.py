@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from audit_terrain_camera_sources import resolve_ray
+import audit_terrain_camera_sources as audit
 
 
 def test_reflected_ray_chooses_nearest_solid_not_native_index():
@@ -24,3 +25,29 @@ def test_backward_and_parallel_rays_do_not_hit(direction):
 def test_rejects_nonunit_ray():
     with pytest.raises(ValueError, match='Unit ray'):
         resolve_ray(dict(ray_origin_cm=[0., 0., 0.], ray_direction=[0., 0., -2.]), {}, [0., 0., 0.], [1., 1., 1.])
+
+
+def test_candidate_identity_is_explicit_and_default_remains_strict(tmp_path, monkeypatch):
+    monkeypatch.setattr(audit, 'ROOT', tmp_path)
+    local = tmp_path/'tmp'
+    local.mkdir()
+    ground = local/'candidate.npz'
+    ground.write_bytes(b'candidate')
+    baseline = tmp_path/'baseline.npz'
+    baseline.write_bytes(b'baseline')
+    cap = tmp_path/'cap.npz'
+    cap.write_bytes(b'cap')
+    originals = {'ground': (baseline, audit.sha(baseline)), 'cap': (cap, audit.sha(cap))}
+    monkeypatch.setattr(audit, 'IDENTITIES', originals)
+    assert audit.source_identities() == originals
+    selected = audit.source_identities(ground, audit.sha(ground))
+    assert selected['ground'][0] == ground and selected['cap'] == originals['cap']
+    assert audit.IDENTITIES == originals
+    for path, digest in [(ground, None), (None, audit.sha(ground)),
+                         (baseline, audit.sha(baseline)), (ground, '0'*64),
+                         (ground, 'F'*64), (ground, '')]:
+        with pytest.raises(ValueError):
+            audit.source_identities(path, digest)
+    cap.write_bytes(b'changed')
+    with pytest.raises(ValueError, match='identity changed'):
+        audit.source_identities(ground, audit.sha(ground))

@@ -2,7 +2,7 @@ $ErrorActionPreference='Stop'
 $tokens=$null; $errors=$null
 $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot 'run_constriction_paired_review.ps1'),[ref]$tokens,[ref]$errors)
 if ($errors.Count) { throw ($errors | Out-String) }
-foreach ($name in @('Test-ReviewCookIdentity','Get-ReviewLocalPath','Test-ReviewPlayerCaptureLog')) {
+foreach ($name in @('Test-ReviewCookIdentity','Get-ReviewLocalPath','Test-ReviewPlayerCaptureLog','Get-ReviewTerrainRayArguments')) {
     $nodes=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -eq $name},$true))
     if ($nodes.Count -ne 1) { throw 'Missing production validator' }
     . ([scriptblock]::Create($nodes[0].Extent.Text))
@@ -33,3 +33,19 @@ foreach ($bad in @('',($log+$log),$log.Replace('index=1 saved=1','index=1 saved=
     if (Test-ReviewPlayerCaptureLog $bad 24) { throw 'Incomplete or mixed player-viewport capture accepted' }
 }
 'PASS: every numbered capture must confirm its actual player viewport'
+$valid='{"capture_count":96,"terrain_capture_index":80,"terrain_pixels":[[300,350],[500,300]]}' | ConvertFrom-Json
+$argsOut=@(Get-ReviewTerrainRayArguments $valid)
+if ($argsOut.Count -ne 2 -or $argsOut[0] -cne '-RaftSimCaptureCarrierShapeIndex=80' -or $argsOut[1] -cne '-RaftSimCaptureTerrainPixels=300,350;500,300') { throw 'Exact bounded ray arguments changed' }
+if (@(Get-ReviewTerrainRayArguments ([pscustomobject]@{})).Count) { throw 'Default launch acquired ray diagnostics' }
+foreach ($text in @('{"terrain_capture_index":0}', '{"terrain_pixels":[[1,2]]}',
+    '{"terrain_capture_index":24,"terrain_pixels":[[1,2]]}',
+    '{"terrain_capture_index":0,"terrain_pixels":[[1280,2]]}',
+    '{"terrain_capture_index":0,"terrain_pixels":[[1,720]]}',
+    '{"terrain_capture_index":0,"terrain_pixels":[[1.5,2]]}',
+    '{"terrain_capture_index":0,"terrain_pixels":[["1 -ExecCmds=bad",2]]}',
+    '{"terrain_capture_index":0,"terrain_pixels":[]}')) {
+    $rejected=$false
+    try { $null=Get-ReviewTerrainRayArguments ($text | ConvertFrom-Json) } catch { $rejected=$true }
+    if (-not $rejected) { throw ('Invalid ray arguments accepted: '+$text) }
+}
+'PASS: scoped terrain rays cannot escape the capture series or viewport'
