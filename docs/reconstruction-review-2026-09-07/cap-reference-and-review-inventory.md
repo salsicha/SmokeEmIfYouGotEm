@@ -92,3 +92,24 @@ unchanged and fail 30 FPS. Nonlinear runtime remains OFF. South Fork is still
 first; Colorado, Pacuare and Futaleufu remain queued and unfinished.
 The [retained final checkpoint pair and explicit manifest](cap-reference-and-review-inventory/)
 are supporting receipts, not normal-play acceptance.
+
+### 20:47 UTC continuation while the source decision is unanswered
+
+Audited all ten newly completed checkpoints 10650 through 11100, local steps
+33000 through 42000, with both existing independent audit tools. Every
+full-state check passes and all 86,720 artificial-bank cells remain exactly
+dry. At 11100: depth 3.970706 m, speed 5.433088 m/s, volume 2,444,238.036796 m³,
+maximum step residual 1.429428e-8 m³. Outflow 103.095691 m³/s still exceeds
+inflow 45.306955 m³/s; this is NOT a settled field. Retained the final pair here;
+the complete ten pairs remain in ignored `tmp/pending-cap-baseline-*-20260918.json`.
+Next checkpoint is 11150/local43000. Same PID/start/executable/command, no
+suspension, restart, duplicate cook or change to installed water.
+
+Inspected current publication code against the retained actual timing report:
+Tick includes Refresh and CartesianPublish; their nested times must not be
+added. Although interpolation precedes refresh, ordinary non-recenter refresh
+only changes targets and does not issue a second core publication. Skipping
+interpolation whenever refresh is due would therefore remove the frame's mesh
+update and change subsequent history/support. No such optimization was made,
+and no new speedup, motion test or scene acceptance is claimed. The cap fidelity
+question is still unanswered; no repeat question or assumed permission.

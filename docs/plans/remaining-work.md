@@ -8,13 +8,24 @@ the remaining downstream cap cannot be reconstructed as a source-exact ROCK
 surface from the available evidence. Its class-1 returns are unclassified;
 registered imagery/uncalibrated footage does not identify which individual
 observations are vegetation versus rock. The last runs delivered supporting
-work, not playable improvement. Ask whether to replace this ambiguous above-
+work, not playable improvement. Await the user's reply about replacing this ambiguous above-
 water surface with an explicitly approximate, video-matched rock model while
 preserving all captured data, or obtain clearer calibrated photos/a scan.
 Do not repeat failed local-fit/pulse-filter/bin-order experiments while waiting
 for that choice. This is a fidelity decision for that cap, not permission to
 relax collision, shared bed/water consistency, performance or solver gates.
 Other independent South Fork work remains open; no river is accepted.
+
+20:47 UTC follow-up: no reply to that decision; do not ask again or infer approval.
+Existing cook13584 remains the sole job. Newly completed10650..11100/local
+33000..42000 each pass BOTH full-state and artificial-bank audits, NOT settled;
+next11150/local43000 needs both. Final pair retained with the review-inventory
+evidence. No new cook, geometry experiment, build or playable promotion.
+Independent publication-cost inspection rules out simply skipping interpolation
+on refresh ticks: ordinary non-recenter RefreshSurface only retargets the core
+and does NOT publish it; Tick's preceding interpolation supplies that frame's
+mesh. Removing it would change displayed/support history. No scheduling change
+was made. Latest measured30FPS failure and installed4950 remain unchanged.
 
 Latest: [cap reference interpretation and single-cook review preflight](../reconstruction-review-2026-09-07/cap-reference-and-review-inventory.md).
 Bank footage inspected at0:06/0:55: actual fractured rock and surrounding
