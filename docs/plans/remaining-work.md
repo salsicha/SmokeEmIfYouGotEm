@@ -3,7 +3,23 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [gameplay solver-lane comparison](../reconstruction-review-2026-09-07/gameplay-solver-lanes-review.md).
+Latest: [velocity-resolved front transport](../reconstruction-review-2026-09-07/normal-river-profile-transport.md).
+Actual within-fan velocity now enters shared depth-weighted transport moments
+and the spatial connection; the owner-average operator remains unchanged as
+an explicit separate model. Conservative shallow-water receipts share the same
+original face traces.93 focused tests PASS, including positive sub-float support.
+All11 supported original cases reproduce their mass/momentum/energy receipts
+exactly; unsupported2/7 remain unchanged. Source hashes rechecked after reload.
+This is NOT the coupled dispersive physical-momentum/interface law: reflecting
+auxiliary boundaries and prescribed open fan receipts cannot simply be added.
+Nonlinear runtime stays OFF; no new playable visual or30FPS acceptance.
+8050/local7000 and8100/local8000 state AND artificial-bank audits PASS, NOT settled;
+installed4950 stays. Same cook8900/startUTC2026-09-18T06:34:59.2598919Z/session68256
+is verified LIVE. Next8150/local9000 needs its complete marker and BOTH audits.
+Complete physical coupling and substantive surface refresh/selection work next;
+full ordered scenes/crew/regressions/normalization/release scope remains OPEN.
+
+Previous: [gameplay solver-lane comparison](../reconstruction-review-2026-09-07/gameplay-solver-lanes-review.md).
 The SAME editor build85099 finishes successfully; seven native lane/clock/window/
 dry-rock tests PASS with the exact archive and eight-lane override confirmed.
 Nine900-row actual-game captures preserve all results and fixed60..840 windows.
