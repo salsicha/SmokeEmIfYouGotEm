@@ -3,7 +3,23 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact shoreline reuse in ordinary play](../reconstruction-review-2026-09-07/wet-edge-cache.md).
+Latest: [bounded foam transport and actual engine comparison](../reconstruction-review-2026-09-07/foam-transport-correction.md).
+Review-only BFECC preserves donor bounds and greatly improves translated-profile
+accuracy. Its initial varying-flow carrier regression FAIL is retained and fixed
+by inverting the original departure map, not relaxing the1e-6 gate. Final five
+native checks PASS; editor and standalone builds PASS. Both reference videos
+are accessible again, with qualitative frame review but no metric registration.
+Two full new engine movies decode;3/9/13s frames still show broad smooth foam and
+block-like rocks. Actual final-density correction averages only7.65e-5/sample.
+Same-binary900-frame timing: baseline24.937420FPS/p9549.3295ms, candidate23.798155/
+52.9027ms, both FAIL30. No visual/performance promotion; review flag stays OFF.
+9050/9100/9150 both state and artificial-bank audits PASS, NOT settled; installed
+4950 unchanged. Same PID13584/startUTC2026-09-18T12:17:39.4321093Z/session95293
+continues9000->12000. Next9200/local4000 needs completion plus BOTH audits.
+Prioritize coupled breaking/entrainment and source-supported rapid shape, not
+further scalar transport polishing. Full ordered scope OPEN; nonlinear OFF.
+
+Previous: [exact shoreline reuse in ordinary play](../reconstruction-review-2026-09-07/wet-edge-cache.md).
 Both Cartesian shoreline uses now reuse distances only when dimensions and
 every wet-mask byte match. Actual game: 46,271,250 distances exactly equal the
 original queue, 533 hits among 914 calls. A/B/B/A mean and p95 both improve in
@@ -6489,6 +6505,10 @@ output alone do not establish physical, geographic or photographic acceptance.
   28 focused checks pass. Other documented historical source/provenance and
   layout failures remain; do not erase evidence or weaken gates to pass.
   See [maintenance record](../maintenance/project-normalization.md).
+  Actual editor `-game` captures also retain experimental-toolset Python startup
+  errors for absent `unreal.AgentSkill`/`unreal.PythonTestRunner`, confirmed both
+  before and during the September18 foam comparison; resolve their game-mode
+  loading/ownership before claiming clean release logs.
 - **Final delivery:** run relevant engine and release checks, review accumulated
   changes and captured-data licensing, then satisfy the requested final commit.
   No blanket deletion of historical evidence, source data or active dependencies.

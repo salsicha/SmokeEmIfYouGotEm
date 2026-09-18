@@ -926,6 +926,8 @@ private:
     // origin lets a back-trace land in the previous field even across a grid
     // recenter.
     TArray<float> FoamField;
+    // Membership at the published foam time, for boundary-safe transport correction.
+    TArray<uint8> FoamFieldWetMask;
     // Exact effective velocity used by the preceding foam backtrace, including
     // presentation-only roller/eddy return. UV3 on the Cartesian carrier;
     // UV1 remains solver/bulk current for all existing physical consumers.

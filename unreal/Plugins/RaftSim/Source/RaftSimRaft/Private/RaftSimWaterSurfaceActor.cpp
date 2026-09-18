@@ -24,6 +24,7 @@
 #include "RaftSimWaterTextureHistory.h"
 #include "RaftSimFoamTransportFrame.h"
 #include "RaftSimFoamEvolution.h"
+#include "RaftSimFoamAdvection.h"
 #include "RaftSimFoamFlowPairAudit.h"
 #include "RaftSimPlayableCrestMesh.h"
 #include "RaftSimCarrierShapeAudit.h"
@@ -6651,6 +6652,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     const float FoamAttackDeltaSeconds=bCartesianFlow ? FoamDeltaSeconds :
         (FoamDeltaSeconds>0.f ? FoamDeltaSeconds : FMath::Max(RefreshIntervalSeconds,1.f/60.f));
     const float FoamAttackBlend=1.f-FMath::Exp(-FoamAttackDeltaSeconds/.22f);
+    static const bool bFoamBFECCReview=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFoamBFECCReview"));
+    // Same-grid reversible transport only. Recentring, initialization, clock
+    // holds and incomplete history retain the unmodified first-order path.
+    const bool bCorrectFoam=bFoamBFECCReview && bCartesianFlow && !bHoldFoam && bPreviousFoamUsable &&
+        CurrentFieldOriginM==FoamFieldOriginM && FoamFieldWetMask.Num()==Vertices.Num();
+    TArray<FVector2D> FoamBackwardNodes;
+    if(bCorrectFoam)FoamBackwardNodes.Init(FVector2D(-1,-1),Vertices.Num());
     TArray<float> NewFoamField;
     NewFoamField.SetNumZeroed(Vertices.Num());
     FoamTransportVelocityMetersPerSecond.Init(FVector2D::ZeroVector,Vertices.Num());
@@ -6768,6 +6776,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     ResolvedVertexSpacingMeters;
                 const int32 CellX = FMath::FloorToInt(FractionalX);
                 const int32 CellY = FMath::FloorToInt(FractionalY);
+                if(bCorrectFoam)FoamBackwardNodes[Index]=FVector2D(FractionalX,FractionalY);
                 if(bHoldFoam)
                 {
                     // Exact same-grid hold also preserves border-node values.
@@ -6845,6 +6854,29 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         if(Passed && Saved){UE_LOG(LogTemp,Display,TEXT("FoamEvolutionAudit exact vertices=%d path=%s"),Vertices.Num(),*FoamAuditPath);}
         else {UE_LOG(LogTemp,Error,TEXT("FoamEvolutionAudit failed passed=%d saved=%d"),Passed,Saved);}
     }
+    if(bCorrectFoam)
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimSurface,FoamTransport);
+        const auto Correction=RaftSimFoamAdvection::Correct(GridStationN,GridLateralN,FoamField,
+            FoamFieldWetMask,WetVertexMask,FoamBackwardNodes,FoamTransportVelocityMetersPerSecond,
+            ResolvedVertexSpacingMeters,FoamDeltaSeconds);
+        double Change=0;FoamAdvectionSum=0;FoamAdvectionMax=0;
+        for(int32 I=0;I<Vertices.Num();++I)
+        {
+            if(Correction.Corrected.IsValidIndex(I) && Correction.Corrected[I])
+            {
+                const float Value=RaftSimFoamEvolution::Resolve(Correction.Values[I]*DecayFactor,SourceFoam[I],
+                    FoamAttackBlend,TongueFoamSuppression[I],ShoreDisplacementWeight[I],false);
+                Change+=FMath::Abs(Value-NewFoamField[I]);NewFoamField[I]=Value;VertexColors[I].R=Value;
+            }
+            if(WetVertexMask[I]){FoamAdvectionSum+=NewFoamField[I];FoamAdvectionMax=FMath::Max(FoamAdvectionMax,NewFoamField[I]);}
+        }
+        // Per-refresh evidence: the same live field, before/after correction.
+        // This is not a conservation, visual-quality or performance gate.
+        UE_LOG(LogTemp,Verbose,TEXT("FoamBFECC corrected=%d limited=%d absolute_change=%.9g water_seconds=%.9g"),
+            Correction.CorrectedCount,Correction.LimitedCount,Change,NextFoamClock.Last);
+    }
+    if(bFoamBFECCReview)FoamFieldWetMask=WetVertexMask;
     FoamField = MoveTemp(NewFoamField);
     FoamFieldOriginM = CurrentFieldOriginM;
     if(bCartesianFlow)
