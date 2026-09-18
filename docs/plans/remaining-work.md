@@ -3,7 +3,20 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [actual time-dependent foam-flow history](../reconstruction-review-2026-09-07/froth-flow-history.md).
+Latest: [common moving-front pressure geometry](../reconstruction-review-2026-09-07/normal-river-affine-front-pressure.md).
+Exact shared-face depth columns now feed the original divergence/kinetic form,
+including column, volume-normalization and local metric time derivatives.
+60 focused checks PASS; all11 supported original local cases pass exact volume,
+adjoint and independently refined time-work checks. Original records and625
+current hashes verified; source audit19484 is TERMINAL exit0. Broad regression
+758 PASS/13 unchanged FAIL; no gate waived. NOT interacting fronts, open river,
+complete nonlinear forces or playable integration; nonlinear runtime stays OFF.
+6300/6350/6400 hydraulic state AND dry-bank audits PASS, NOT settled; installed4950
+unchanged. Next6450/local21000 requires completion marker and BOTH audits.
+Physical breaking/froth, 30 FPS and the entire ordered scene/crew/release scope
+remain OPEN. No production visual or performance change in this checkpoint.
+
+Previous: [actual time-dependent foam-flow history](../reconstruction-review-2026-09-07/froth-flow-history.md).
 Three complete original histories pass the unchanged 0.1 mm reference
 convergence gate. At 0.75 s, freezing the current adds only 0.16-0.43 mm RMS
 error on common foamy cells, versus 18-21 cm for straight tracing; maxima and
