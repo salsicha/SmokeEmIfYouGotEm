@@ -43,6 +43,7 @@ FProcMeshVertex Midpoint(const FProcMeshVertex& A,const FProcMeshVertex& B)
 
 void FRaftSimShorelineCrests::Reset()
 {
+    ProfilePrefetch.Reset();
     CachedXY.Reset(); CachedIndices.Reset(); CachedProfile.Reset();
     CachedCoarse.Reset(); CachedShore.Reset(); CorrectionHistory.Reset();
     CandidateCorrectionHistory.Reset();
@@ -51,6 +52,20 @@ void FRaftSimShorelineCrests::Reset()
     ParallelNormals.Reset();
     TargetCorrectionsCm.Reset(); RenderedCorrectionsCm.Reset();
     FineProfileCm.Reset();
+}
+
+void FRaftSimShorelineCrests::PrefetchProfile(const FRaftSimShorelineCrestInput& Input)
+{
+    // Experimental scheduling only, never ordinary gameplay before timing and
+    // exact-history qualification. Alternate memo diagnostics stay independent.
+    static const bool Enabled=FParse::Param(FCommandLine::Get(),TEXT("RaftSimPrefetchCrestProfile")) &&
+        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimFreshCrestMemos")) &&
+        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyCrestCoordinateHash")) &&
+        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimLevelLocalCrestMemos")) &&
+        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimFlatCrestMemo")) &&
+        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimBoundCrestMemo"));
+    if(Enabled && CachedProfile!=Input.ProfileKey)
+        ProfilePrefetch.Start(Refinement,Input.ProfileKey,Input.HeightAtWorldXYCm);
 }
 
 bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
@@ -94,6 +109,10 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     CSV_CUSTOM_STAT(RaftSimCrests,DetailWindowChanged,int32(!SameDetail),ECsvCustomStatOp::Accumulate);
     if (!SameGeometry)
     {
+        static const bool bPrefetchAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrestPrefetchAudit"));
+        const bool Prefetched=ProfilePrefetch.AdoptIfReady(Input.ProfileKey,Refinement,
+            bPrefetchAudit ? &Input.HeightAtWorldXYCm : nullptr);
+        CSV_CUSTOM_STAT(RaftSimCrests,PrefetchedProfiles,int32(Prefetched),ECsvCustomStatOp::Accumulate);
         TArray<FVector2D> XY; XY.Reserve(Source.Num());
         for (const auto& V:Source) XY.Emplace(V.Position.X,V.Position.Y);
         TArray<int32> Triangles; Triangles.Reserve(SourceIndices.Num());

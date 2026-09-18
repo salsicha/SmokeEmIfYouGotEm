@@ -3,7 +3,20 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [Chili Bar canopy in normal South Fork play](../reconstruction-review-2026-09-07/chili-bar-canopy-review.md).
+Latest: [canopy bundle repair and crest prefetch qualification](../reconstruction-review-2026-09-07/crest-prefetch-and-canopy-bundle.md).
+The canopy map's stale runtime binding blocked editor builds. Fresh read-only
+native inventory proves unchanged water/route actors and entrypoints; map-only
+manifest repair preserves all 2,405 payloads. Editor build and seven native
+checks PASS; 51 focused Python controls PASS. Background crest prefetch passes
+67,131,005 exact gameplay sample comparisons, but fails both-order performance
+qualification: off/on/on/off FPS 24.751985/24.890203/23.674689/25.742861,
+p95 48.8941/48.1693/52.3125/46.2122 ms. All FAIL 30; prefetch stays OFF by default.
+No water visual or packaged acceptance. Physical states 8800/8850/8900 pass both
+full-state and artificial-bank audits, NOT settled; installed4950 unchanged.
+Next unaudited checkpoint is8950/local25000. Full ordered remaining scope stays
+OPEN and nonlinear runtime stays OFF.
+
+Previous: [Chili Bar canopy in normal South Fork play](../reconstruction-review-2026-09-07/chili-bar-canopy-review.md).
 5,244 source-supported inferred canopy instances are now saved in twelve spatial
 actors in FullReach, visible from the ordinary scenario start. All 34,614,725
 retained provider returns independently replay exactly; complete 936-node EPT

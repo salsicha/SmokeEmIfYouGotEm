@@ -74,6 +74,43 @@ def test_changed_scene_produces_no_output(fixture):
     assert not output.exists()
 
 
+def test_map_only_rebind_retains_all_runtime_payloads(fixture):
+    from package_runtime_bundle import rebind_saved_map
+    root, bindings, output, _ = fixture
+    original = prepare(root, bindings, output)
+    inventory = json.loads(bindings.read_text())
+    scene = root / original['saved_scene_assets'][0]['path']
+    scene.write_bytes(b'new canopy map, unchanged hydraulic actors')
+    inventory['map_sha256'] = sha(scene)
+    bindings.write_text(json.dumps(inventory))
+    revised = rebind_saved_map(output, root, bindings)
+    assert revised['files'] == original['files']
+    assert revised['entrypoints'] == original['entrypoints']
+    assert revised['saved_scene_assets'][1:] == original['saved_scene_assets'][1:]
+    assert revised['saved_scene_assets'][0]['sha256'] == sha(scene)
+    assert revised['native_bindings_sha256'] == sha(bindings)
+    assert verify_bundle(output) == original  # Function must not write/bless inputs.
+
+
+@pytest.mark.parametrize('change', ['entrypoint', 'actor', 'missing', 'duplicate', 'map', 'saved', 'payload'])
+def test_map_rebind_cannot_bypass_existing_gates(fixture, change):
+    from package_runtime_bundle import rebind_saved_map
+    root, bindings, output, _ = fixture
+    original = prepare(root, bindings, output)
+    inventory = json.loads(bindings.read_text())
+    actor_key = next(iter(inventory['bindings']))
+    if change == 'entrypoint': inventory['entrypoints']['streaming_manifest'] = 'another.json'
+    if change == 'actor': inventory['bindings'][actor_key]['sha256'] = '0'*64
+    if change == 'missing': inventory['bindings'] = {}
+    if change == 'duplicate': inventory['bindings']['duplicate'] = inventory['bindings'][actor_key]
+    if change == 'map': inventory['map_sha256'] = '0'*64
+    if change == 'saved': inventory['saved_assets'] = True
+    if change == 'payload': (output/original['files'][0]['source']).write_bytes(b'corrupt')
+    bindings.write_text(json.dumps(inventory))
+    with pytest.raises(ValueError):
+        rebind_saved_map(output, root, bindings)
+
+
 def test_bundle_refuses_to_overwrite_previous_output(fixture):
     root, bindings, output, _ = fixture
     prepare(root, bindings, output)

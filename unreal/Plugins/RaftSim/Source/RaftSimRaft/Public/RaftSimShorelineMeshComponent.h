@@ -28,6 +28,7 @@ public:
     uint64 GetTopologyRebuildCount() const { return TopologyCache.GetRebuildCount(); }
     uint64 GetTopologyReuseCount() const { return TopologyCache.GetReuseCount(); }
     const FRaftSimShorelineCrests& GetCrestRefinement() const { return CrestRefinement; }
+    void PrefetchCrestProfile(const FRaftSimShorelineCrestInput& Input) { CrestRefinement.PrefetchProfile(Input); }
     int32 GetActiveVertexCount() const { return ActiveVertexCount; }
     virtual int32 GetNumMaterials() const override { return 1; }
     virtual FPrimitiveSceneProxy* CreateSceneProxy() override;

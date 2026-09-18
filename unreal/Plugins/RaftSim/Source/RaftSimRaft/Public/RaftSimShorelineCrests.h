@@ -7,6 +7,7 @@
 #include "RaftSimIncrementalCrestHistory.h"
 #include "RaftSimCrestMidpointExpansion.h"
 #include "RaftSimCrestNormals.h"
+#include "RaftSimCrestProfilePrefetch.h"
 
 struct FRaftSimShorelineCrestInput
 {
@@ -36,6 +37,7 @@ public:
         const TArray<float>& Shore,const FRaftSimShorelineCrestInput& Input,
         TArray<FProcMeshVertex>& Vertices,TArray<uint32>& Indices,TArray<int32>& CellOffsets);
     void Reset();
+    void PrefetchProfile(const FRaftSimShorelineCrestInput& Input);
     const TArray<float>& GetTargetCorrectionsCm() const { return TargetCorrectionsCm; }
     const TArray<float>& GetRenderedCorrectionsCm() const { return RenderedCorrectionsCm; }
     const TArray<float>& GetExpandedCoarseCrestCm() const { return ExpandedCoarseCrestCm; }
@@ -43,6 +45,7 @@ public:
     uint64 GetBuildCount() const { return BuildCount; }
 private:
     FRaftSimSurfaceRefinement Refinement;
+    FRaftSimCrestProfilePrefetch ProfilePrefetch;
     TArray<FVector2D> CachedXY;
     TArray<uint32> CachedIndices;
     TArray<double> CachedProfile;

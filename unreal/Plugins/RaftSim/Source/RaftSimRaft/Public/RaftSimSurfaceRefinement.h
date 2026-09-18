@@ -16,6 +16,27 @@
 struct FRaftSimSurfaceRefinement
 {
     struct FProfileMemoSample { float Value=0; uint64 Epoch=0; };
+    using FPreparedProfileSamples=TArray<TRaftSimCoordinateMap<FProfileMemoSample>>;
+    // Snapshot only coordinates actually consumed by the last build. Old
+    // retained hash slots are not a work list. Values never cross profiles.
+    TArray<TArray<FVector2D>> SnapshotProfileSampleCoordinates() const
+    {
+        TArray<TArray<FVector2D>> Result;
+        Result.SetNum(RetainedFastParallelValues.Num());
+        for(int32 I=0;I<Result.Num();++I)
+            for(const auto& Entry:RetainedFastParallelValues[I])
+                if(Entry.Value.Epoch==ProfileMemoEpoch)Result[I].Add(Entry.Key);
+        return Result;
+    }
+    // Caller must verify exact immutable profile identity before adoption.
+    // BuildAdaptive still evaluates every current selection decision. Newly
+    // requested coordinates take the original sampler, including moved banks.
+    void AdoptPreparedProfileSamples(FPreparedProfileSamples&& Prepared)
+    {
+        for(auto& Memo:Prepared)
+            for(auto& Entry:Memo)Entry.Value.Epoch=ProfileMemoEpoch+1;
+        RetainedFastParallelValues=MoveTemp(Prepared);
+    }
     TArray<FIntPoint> MidpointParents;
     TArray<int32> Triangles;
     // Final triangles retain their original cell owner, including green

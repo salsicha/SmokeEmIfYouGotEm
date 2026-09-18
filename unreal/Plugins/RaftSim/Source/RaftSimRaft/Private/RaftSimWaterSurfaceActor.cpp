@@ -8450,6 +8450,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             WaterSamples[Index].DepthMeters >= 0.10f ? 1 : 0;
     }
     Perf.Mark(TEXT("foam_overlay_finish"));
+    // Current immutable profile, next interpolation's known sample positions.
+    // The component's experimental opt-in owns copies and never waits here.
+    if(bCartesianFlow && CartesianShorelineMesh)
+        CartesianShorelineMesh->PrefetchCrestProfile(CartesianCrestInput);
     const double RefreshCpuMilliseconds =
         (FPlatformTime::Seconds() - RefreshStartSeconds) * 1000.0;
     if (!bLoggedPresentationDiagnostics && WetVertexCount > 0)

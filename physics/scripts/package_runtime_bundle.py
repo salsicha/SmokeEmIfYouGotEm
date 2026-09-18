@@ -180,6 +180,48 @@ def verify_staged(folder, data_root):
         external_source_fallback_used=False, physical_acceptance=False, packaged_execution_verified=False)
 
 
+def rebind_saved_map(folder, root, bindings_path):
+    """Return a new manifest for a map-only edit, without writing any files.
+
+    A fresh native inventory must prove the unchanged saved water/route actors
+    and entrypoints. Verify the entire existing payload closure first; rebinding
+    is not a way to bless a new water state or silently repair corrupt payloads.
+    """
+    root, bindings_path = Path(root).resolve(), Path(bindings_path).resolve()
+    manifest = verify_bundle(folder)
+    bindings = json.loads(bindings_path.read_text(encoding='utf-8-sig'))
+    if bindings.get('schema') != 'raftsim.saved_runtime_bindings.v1' or bindings.get('saved_assets') is not False:
+        raise ValueError('Read-only native saved-scene inventory required')
+    if bindings.get('entrypoints') != manifest['entrypoints']:
+        raise ValueError('Map-only rebind cannot change runtime entrypoints')
+    level = bindings.get('level', '')
+    if not level.startswith('/Game/'):
+        raise ValueError('Project scene binding required')
+    map_name = logical_path('unreal/Content/'+level[6:]+'.umap')
+    old = {row['path']: row['sha256'] for row in manifest['saved_scene_assets']}
+    if len(old) != len(manifest['saved_scene_assets']) or map_name not in old:
+        raise ValueError('Unique existing scene bindings required')
+    current = {map_name: bindings['map_sha256']}
+    for row in bindings['bindings'].values():
+        package = row['package']
+        if not package.startswith('/Game/'):
+            raise ValueError('Project scene binding required')
+        name = logical_path('unreal/Content/'+package[6:]+'.uasset')
+        if name in current or name not in old or row['sha256'] != old[name]:
+            raise ValueError('Map-only rebind cannot change water/route actors')
+        current[name] = row['sha256']
+    if set(current) != set(old):
+        raise ValueError('Complete unchanged actor inventory required')
+    for name, digest in current.items():
+        path = (root/name).resolve()
+        if not path.is_relative_to(root) or sha(path) != digest:
+            raise ValueError('Saved scene changed since native inventory')
+    manifest['saved_scene_assets'] = [dict(path=row['path'], sha256=current[row['path']])
+                                    for row in manifest['saved_scene_assets']]
+    manifest['native_bindings_sha256'] = sha(bindings_path)
+    return manifest
+
+
 def prepare(root, bindings_path, output):
     root, bindings_path, output = Path(root).resolve(), Path(bindings_path).resolve(), Path(output).resolve()
     if output.exists() or not output.is_relative_to(root):
