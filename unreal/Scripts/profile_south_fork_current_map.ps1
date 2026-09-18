@@ -14,6 +14,7 @@ param(
     [ValidateSet('WorldNormal', 'Roughness', 'SceneDepth')][string]$StartupBufferVisualization = '',
     [ValidateRange(0, 1)][Nullable[double]]$StartupOpticalNormalStrength = $null,
     [switch]$RecordStartupMotion,
+    [switch]$NormalScenarioStart,
     [switch]$CheckpointResetReplay
 )
 $ErrorActionPreference = 'Stop'
@@ -51,6 +52,9 @@ if ($null -ne $StartupOpticalNormalStrength -and -not $StartupRenderReplay) {
 }
 if ($RecordStartupMotion -and -not $StartupRenderReplay) {
     throw 'Motion recording requires StartupRenderReplay; it is not an FPS capture'
+}
+if ($NormalScenarioStart -and @(@($ExtraGameArgument) + $ExtraGameArguments | Where-Object { $_ -match '(?i)RaftSimWaterReviewStation' }).Count) {
+    throw 'NormalScenarioStart must not be combined with a review-station override'
 }
 if ($Label -notmatch '^south-fork-[a-z0-9-]+$') { throw 'Use a fresh scoped capture label' }
 if (([int][bool]$NativePerformanceGate + [int][bool]$DetailStreamingReplay + [int][bool]$StartupRenderReplay + [int][bool]$CheckpointResetReplay) -gt 1) {
@@ -142,6 +146,7 @@ $report.detail_replay = [bool]$DetailStreamingReplay
 $report.profile_frames = if ($NativePerformanceGate -or $DetailStreamingReplay -or $StartupRenderReplay -or $CheckpointResetReplay) { $null } else { $ProfileFrames }
 $report.detail_replay_passed = $null
 $report.startup_render_replay = [bool]$StartupRenderReplay
+$report.normal_scenario_start = [bool]$NormalScenarioStart
 $report.startup_buffer_visualization = $StartupBufferVisualization
 $report.startup_optical_normal_strength = $StartupOpticalNormalStrength
 $report.startup_buffer_commands_confirmed = $null
@@ -175,8 +180,9 @@ try {
     foreach ($argument in @((Join-Path $projectRoot 'unreal/SmokeEmIfYouGotEm.uproject'),
         '/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach', '-game', '-RenderOffscreen', '-Unattended',
         '-NoSplash', '-NoSound', '-ResX=1280', '-ResY=720', '-Windowed', '-RaftSimEphemeralProfile',
-        '-RaftSimScenario=south_fork_full_descent', '-RaftSimWaterReviewStation=8330', '-csvCompression=0',
+        '-RaftSimScenario=south_fork_full_descent', '-csvCompression=0',
         "-abslog=$logFile")) { $start.ArgumentList.Add($argument) }
+    if (-not $NormalScenarioStart) { $start.ArgumentList.Add('-RaftSimWaterReviewStation=8330') }
     if ($NativePerformanceGate) {
         # The director owns completion. No screenshot auto-exit may truncate
         # its warmup/soak. This short development run is not release acceptance.
