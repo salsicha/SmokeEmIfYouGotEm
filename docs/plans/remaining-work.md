@@ -3,6 +3,19 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Source-interpretation decision requested September 18, 19:47 UTC heartbeat:
+the remaining downstream cap cannot be reconstructed as a source-exact ROCK
+surface from the available evidence. Its class-1 returns are unclassified;
+registered imagery/uncalibrated footage does not identify which individual
+observations are vegetation versus rock. The last runs delivered supporting
+work, not playable improvement. Ask whether to replace this ambiguous above-
+water surface with an explicitly approximate, video-matched rock model while
+preserving all captured data, or obtain clearer calibrated photos/a scan.
+Do not repeat failed local-fit/pulse-filter/bin-order experiments while waiting
+for that choice. This is a fidelity decision for that cap, not permission to
+relax collision, shared bed/water consistency, performance or solver gates.
+Other independent South Fork work remains open; no river is accepted.
+
 Latest: [cap reference interpretation and single-cook review preflight](../reconstruction-review-2026-09-07/cap-reference-and-review-inventory.md).
 Bank footage inspected at0:06/0:55: actual fractured rock and surrounding
 vegetation, no calibrated per-return labels.13/18 actual cap hit anchors already
