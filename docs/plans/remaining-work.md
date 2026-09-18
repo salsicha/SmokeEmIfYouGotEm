@@ -3,7 +3,26 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [seated heading and fresh playable water review](../reconstruction-review-2026-09-07/seated-heading-review.md).
+Latest: [fixed-budget pressure-coordinate accuracy](../reconstruction-review-2026-09-07/symmetric-pressure-blocks.md).
+Four retained block-preconditioner energy-coordinate failures are resolved on
+the SAME original source states AND frozen old-stage directions. Symmetric
+two-component block sweeps replace local Jacobi in the research block path;
+the original local inverse remains an explicit negative control. Physical
+matrix, both poles, 40-CG budget, and acceptance gates are unchanged. Errors
+fall from 2.9e-10..2.0e-9 to 1.1e-16..3.6e-15. Independent final controls:
+25 PASS; related pressure/energy/terrain/transport group: 145 PASS. Prior
+68-module suite plus pressure controls: 902 PASS / 1 unchanged exact storage/
+face FAIL, with its existing metadata warning. Not full-project acceptance.
+Both 8500/local16000 AND 8550/local17000 full-state/artificial-bank audits PASS,
+NOT settled; installed 4950 stays. Cook 8900/start UTC
+2026-09-18T06:34:59.2598919Z is verified LIVE; next 8600/local18000 needs
+completion and BOTH audits. No native/gameplay/terrain/material change or new
+visual/FPS claim. Nonlinear runtime OFF; latest playable 23.476525 FPS /
+p95 52.3478 ms still FAILS 30. Resume substantive physical breaking/froth and
+integrated refresh work; full ordered river/crew/normalization/release scope
+remains OPEN. This accuracy fix does not satisfy playable-first delivery.
+
+Previous: [seated heading and fresh playable water review](../reconstruction-review-2026-09-07/seated-heading-review.md).
 Fresh normal South Fork motion confirms broad soft foam and smooth wave faces:
 still NOT accepted. It also exposed a real camera defect: the stern camera stayed
 world-locked while the hull turned, leaving the crew behind the player. Normal

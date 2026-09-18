@@ -11,6 +11,10 @@ Only static actions and a linear solve are supplied. No nonlinear wet/dry
 forcing, prescribed boundary lifts, evolved history or playable qualification.
 Exact rational coefficient assembly and high-precision square roots are slow
 research choices, not a claim of meeting the production solver budget.
+
+``block`` uses symmetric two-component block sweeps over this same matrix.
+The earlier cell-local inverse remains available as ``block-jacobi`` for
+unchanged negative controls. Diagonal and spectral choices are unaffected.
 """
 from decimal import Decimal, localcontext
 from fractions import Fraction as F
@@ -146,7 +150,10 @@ class ReconstructedAccelerationSystem:
             from flat_spectral_pressure_preconditioner import frozen_depth_precondition
             return frozen_depth_precondition(self, residual)
         if scheme == 'diagonal': return residual/self.diagonal
-        if scheme != 'block': raise ValueError('Unknown pressure preconditioner')
+        if scheme == 'block':
+            from symmetric_pressure_preconditioner import precondition
+            return precondition(self, residual)
+        if scheme != 'block-jacobi': raise ValueError('Unknown pressure preconditioner')
         a, b = self.diagonal[..., 0], self.diagonal[..., 1]
         ratio = self.off_diagonal/a
         schur = b-self.off_diagonal*ratio
