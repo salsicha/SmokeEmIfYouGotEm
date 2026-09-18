@@ -3,7 +3,22 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [moving physical/canonical pressure map](../reconstruction-review-2026-09-07/normal-river-moving-pressure-metric.md).
+Latest: [pressure-energy geometry variation](../reconstruction-review-2026-09-07/normal-river-pressure-variation.md).
+Exact derivatives now reach original depth moments, shared-face columns,
+both owner-volume denominators and bed slopes in BOTH momentum coordinates.
+Independent primitive derivatives and complete time-work identities PASS.
+16 new tests PASS; broader784 PASS/13 unchanged FAIL, no gates waived.
+This is kinetic-energy variation, NOT the conservative nonlinear force/transport,
+gravity, wetting or native/playable integration. Nonlinear runtime remains OFF.
+Original-source map audit17228/start2026-09-18T01:51:57.8200933Z/session43933
+is the same LIVE job; case0 passed, case1 metric-ready/evaluation computing.
+Preserve its unchanged imported code and verify the final report when complete.
+6600/6650 hydraulic state AND dry-bank audits PASS, NOT settled; installed4950
+unchanged. Next6700/local26000 requires completion marker and BOTH audits.
+No new normal-game visual or30FPS acceptance. South Fork, then Colorado,
+Pacuare, Futaleufu; Chilko/Zambezi, crew, normalization and release remain OPEN.
+
+Previous: [moving physical/canonical pressure map](../reconstruction-review-2026-09-07/normal-river-moving-pressure-metric.md).
 The original two poles and both changing mass normalizations now have exact
 momentum/rate reconstruction and independent positive-energy identities.
 69 focused PASS; broader768 PASS/13 unchanged FAIL, no gates waived.
