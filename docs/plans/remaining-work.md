@@ -1,9 +1,20 @@
 # Remaining requested work
 
-Last reviewed 2026-09-17 UTC. This index does not convert diagnostic passes into
+Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [sparse crest-root workset rejected in actual gameplay](../reconstruction-review-2026-09-07/crest-root-workset-review.md).
+Latest: [pressure geometry on the evolving local front](../reconstruction-review-2026-09-07/normal-river-affine-front-metric.md).
+Curved depth moments and analytic physical-time metric work retain original
+source polygons; eleven original local predictors pass exact partitions,
+boundary mass-rate equality and two independent time probes. NOT the complete
+varying-inlet/intercell/dispersive update or playable integration.63 focused
+tests PASS; broader746 PASS/13 unchanged FAIL, no waived gates. Protected data
+unchanged; three unused historical tool versions explicitly verified in Git.
+5950/6000/6050 hydraulic state AND dry-bank audits PASS, NOT settled; installed4950
+stays unchanged. Next6100/local14000 needs completion marker and BOTH audits.
+No new visual or FPS improvement. Full ordered scene/crew/release queue OPEN.
+
+Previous: [sparse crest-root workset rejected in actual gameplay](../reconstruction-review-2026-09-07/crest-root-workset-review.md).
 All sixteen actual changed-input comparisons are exact, but every pair is
 slower. The candidate from5d4e8730b is removed, not promoted; normal visible
 spray placement and complete water geometry remain unchanged. No new FPS,
