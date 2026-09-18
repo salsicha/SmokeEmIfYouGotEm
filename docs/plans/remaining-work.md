@@ -3,7 +3,26 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [incremental crest history rejected](../reconstruction-review-2026-09-07/incremental-crest-history-review.md).
+Latest: [original-front auxiliary transport](../reconstruction-review-2026-09-07/normal-river-front-auxiliary-transport.md).
+The new moving-front operator uses the actual quadratic depth gradient, not
+the invalid hydrostatic substitution grad(h)=-grad(b). Shared factor/difference
+transport, spatial/time connections and direct source/face/wall force ledgers
+preserve exact original geometry and dry-owner semantics.19 focused checks and
+all11 supported original cases PASS; two unsupported records remain explicit.
+Independent reload reconstructs22 local ledgers and rechecks625 current hashes.
+This is NOT the coupled mass/momentum law, interacting-fan or topology evolution,
+native/gameplay integration or visible water improvement. Nonlinear stays OFF.
+Final67-module physical suite851 PASS/13 unchanged FAIL,864 tests; no gates waived.
+The fresh refresh timing investigation confirmed existing costs, not a new
+dominant optimization. Latest ordinary p9541.7264ms still FAIL30.
+7500/7550/7600/7650 state AND artificial-bank audits PASS, NOT settled;
+installed4950 stays. Same cook28776/startUTC2026-09-18T04:30:27.5746992Z remains LIVE.
+Next7700/local10000 needs its completion marker and BOTH audits. Full ordered
+scene/terrain/breaking/froth/contact/crew/normalization/regression/release scope
+remains OPEN. Next couple these actual-profile force components to conservative
+mass/momentum and the joint interface law, not another energy-only acceptance.
+
+Previous: [incremental crest history rejected](../reconstruction-review-2026-09-07/incremental-crest-history-review.md).
 Current captures show zero coordinate-only profile rebuilds; immutable-profile
 reuse would not help this workload. New opt-in timing isolates1.70ms moving-
 coordinate history work versus0.31ms stable work. A native-verified incremental
