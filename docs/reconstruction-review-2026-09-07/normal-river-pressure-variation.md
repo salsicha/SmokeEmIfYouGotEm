@@ -90,14 +90,13 @@ Report `tmp/front-pressure-variation-full-suite-v1-20260918.xml`, SHA256
 
 ## Original-source and runtime limits
 
-The preceding original-source pressure-map audit is still the SAME live
-process17228/start2026-09-18T01:51:57.8200933Z/session43933. Case0 passed;
-case1 has reached metric-ready and continues evaluation. Its CPU time increases
-and the process remains present. None of its imported implementation files
-was modified. No restart, terminal result, all-source variation pass or native
-40-CG qualification is claimed. Consume and independently verify its completed
-report before extending original-case force validation; do not duplicate or
-replace the original expensive solve merely because a poll is quiet.
+The preceding original-source pressure-map audit completed without restart:
+all11 supported cases pass, two unsupported records remain, and an independent
+reload verifies the original records,628 hashes and serialized energy identities.
+See [the completed metric report](normal-river-moving-pressure-metric.md).
+The subsequent [original-case variation audit](original-front-pressure-variation.md)
+reuses only its verified unknowns and rechecks the original equations. It is
+still running; no all-source variation or native40-CG qualification is claimed.
 
 The6600 and6650 hydraulic snapshots pass both full-state and dry-bank audits but are
 not settled or installed. Physical breaking, convincing froth, raft/contact

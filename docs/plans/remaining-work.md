@@ -3,7 +3,19 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [interpolation/packing trial rejected](../reconstruction-review-2026-09-07/interpolation-packing-review.md).
+Latest: [original-front pressure variation](../reconstruction-review-2026-09-07/original-front-pressure-variation.md).
+Exact original solved velocities now feed the primitive derivative without
+repeating the solve; both original pole equations and momentum reconstruction
+are still checked.40 focused tests PASS. Broader65-module regression completes
+808 PASS/13 unchanged FAIL, no waived gates. Source audit21256/start2026-09-18T03:20:39.1088023Z/
+session21082 is LIVE: case0 passed, case1 geometry-ready/evaluating. Preserve
+its imported implementation and verify its completed report; no all-case pass.
+6850/6900 hydraulic state AND bank audits PASS, NOT settled; installed4950 stays.
+Next6950/local31000 needs completion marker and BOTH audits. No new runtime,
+force/wetting, visual or30FPS acceptance. Full ordered scope remains OPEN;
+nonlinear runtime OFF.
+
+Previous: [interpolation/packing trial rejected](../reconstruction-review-2026-09-07/interpolation-packing-review.md).
 All128 actual-game same-input pairs preserve floating rendered fields and packed
 attributes, but one capture loses an execution order. The opt-in trial from
 88b6f9fe5 is removed, not promoted; original actor code is restored.94 Python

@@ -19,21 +19,35 @@ class FrontPressureVariation:
     and EACH owner's volume denominator, then through the depth-moment Gram form.
     Gravitational potential and the transport bracket are NOT included.
     """
-    def __init__(self, geometry, metric, physical_momentum):
+    def __init__(self, geometry, metric, physical_momentum, *, solved_state=None):
         g,m=geometry,metric;zero=m.zero;n=len(g.active)
         if (tuple(m.mass)!=tuple(v for v in g.volumes for _ in range(2)) or
                 m.kinetic!=tuple(map(tuple,g.kinetic))):
             raise ValueError('Matching original source mass and pressure geometry required')
         self.geometry=g;self.zero=zero;self.number=m.number
-        p=m.vector(physical_momentum);v=m.solve_physical.solve(p)
+        p=m.vector(physical_momentum)
+        # An original exact solve may be expensive. Reuse only its unknowns,
+        # never its reported success flags or precomputed gradients. The original
+        # pole equations and physical-momentum reconstruction below still prove
+        # that these are the unique solution for THIS geometry and input.
+        if solved_state is None:
+            v=m.solve_physical.solve(p);auxiliaries=None
+        else:
+            v=m.vector(solved_state['canonical_velocity'])
+            states=solved_state['poles']
+            if len(states)!=len(m.poles) or any(
+                    m.number(state['length'])!=pole['length'] or m.number(state['weight'])!=pole['weight']
+                    for state,pole in zip(states,m.poles)):
+                raise ValueError('Both original pressure poles in original order required')
+            auxiliaries=tuple(m.vector(state['auxiliary_velocity']) for state in states)
         self.momentum_gradient=m.pairs(v)
         mass=[-m.constant*x*x/2 for x in v]
         matrix=[[zero]*(2*n) for _ in range(2*n)]
         grams=[[[zero]*3 for _ in range(3)] for _ in range(n)]
         divergence=[[zero]*(2*n) for _ in range(n)]
         reconstructed=[m.constant*mi*vi for mi,vi in zip(m.mass,v)]
-        for pole in m.poles:
-            a=m.action(pole['auxiliary_map'],v)
+        for index,pole in enumerate(m.poles):
+            a=m.action(pole['auxiliary_map'],v) if auxiliaries is None else auxiliaries[index]
             if m.action(pole['matrix'],a)!=tuple(mi*vi for mi,vi in zip(m.mass,v)):
                 raise ValueError('Original pressure pole residual is nonzero')
             w,lam=pole['weight'],pole['length']
