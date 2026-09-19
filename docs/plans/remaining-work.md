@@ -3,7 +3,18 @@
 Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest continuation: [centered, torso-driven crew vests](../reconstruction-review-2026-09-07/crew-vest-torso-fit.md).
+Latest supporting work: [full-reach hydraulic storage localization](../reconstruction-review-2026-09-07/cartesian-storage-localization.md).
+All5.3824M cells accounted for; 17 new tests pass. Between11500 and11950s,
+station9–26km loses73.15m3/s of storage while26km–end gains14.12m3/s;
+whole-domain loss59.03m3/s closes to integrated exterior flux within2.1e-9m3.
+This rules out outlet-local storage drainage, NOT faulty outlet calibration or
+other causes. Do not tune the outlet just to force balance or claim settling.
+All11400..11950/local48000..59000 snapshots pass both existing audits.
+Sole13584 still advancing; next terminal12000/local60000 needs marker/outcome
+and BOTH audits. No duplicate cook, map/4950/source/build/playable changes;
+nonlinear OFF. Pending cap decision and full river/crew/performance queue OPEN.
+
+Previous visible continuation: [centered, torso-driven crew vests](../reconstruction-review-2026-09-07/crew-vest-torso-fit.md).
 Actual posed torso measurements support4.5cm rearward PFD correction; default
 play now exposes rear panels instead of burying them in the back. A separate
 head-coupled orientation defect is fixed: shoulders/spine drive the vest, so
