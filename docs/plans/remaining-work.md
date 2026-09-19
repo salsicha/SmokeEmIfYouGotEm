@@ -1,9 +1,21 @@
 # Remaining requested work
 
-Last reviewed 2026-09-18 UTC. This index does not convert diagnostic passes into
+Last reviewed 2026-09-19 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest supporting work: [full-reach hydraulic storage localization](../reconstruction-review-2026-09-07/cartesian-storage-localization.md).
+Latest hydraulic continuation: [verified 12000 s restart](../reconstruction-review-2026-09-07/cartesian-continuation-12000.md).
+Old13584 is terminal with native completion; BOTH final12000/local60000 audits
+PASS, NOT settled (102.714834out versus45.306955in m3/s). The distributed
+storage trend supports continuing the same transient, not retuning the outlet.
+All5,382,400 native restart cells are bit-exact; no added water/cells or changed
+physical inputs.51 focused tests PASS. Sole live cook12672 starts UTC
+2026-09-19T00:22:58.0823059Z/session79088, same executable, eight workers,
+12000→15000s. First new complete12050/local1000 needs BOTH audits. Use this
+new process identity for retained-handle profiling; do not duplicate the cook.
+No playable/build/source/collision/4950 changes, nonlinear OFF. No new FPS or
+visual acceptance. Pending cap decision and the full ordered queue remain OPEN.
+
+Previous supporting work: [full-reach hydraulic storage localization](../reconstruction-review-2026-09-07/cartesian-storage-localization.md).
 All5.3824M cells accounted for; 17 new tests pass. Between11500 and11950s,
 station9–26km loses73.15m3/s of storage while26km–end gains14.12m3/s;
 whole-domain loss59.03m3/s closes to integrated exterior flux within2.1e-9m3.
