@@ -9,13 +9,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrestHistoryTest,
 bool FRaftSimCrestHistoryTest::RunTest(const FString&)
 {
     FRaftSimCrestHistory Dense,Mapped;
+    FRaftSimCrestHistory Parallel,ParallelMapped;
     FRaftSimFastCrestHistory FastDense,FastMapped;
     FRaftSimIncrementalCrestHistory Incremental,IncrementalMapped;
     TMap<FVector2D,float> Reference;
     int64 Compared=0; int32 DenseCalls=0,IncrementalCalls=0;
     for(int32 Frame=0;Frame<36;++Frame)
     {
-        if(Frame==29) { Dense.Reset(); Mapped.Reset(); FastDense.Reset(); FastMapped.Reset(); Incremental.Reset(); IncrementalMapped.Reset(); Reference.Reset(); }
+        if(Frame==29) { Dense.Reset(); Mapped.Reset(); Parallel.Reset(); ParallelMapped.Reset(); FastDense.Reset(); FastMapped.Reset(); Incremental.Reset(); IncrementalMapped.Reset(); Reference.Reset(); }
         const int32 SourceCount=Frame<24 ? 11 : 7;
         const int32 Count=Frame==27 ? 0 : (Frame>=20 && Frame<26 ? 19031 : 20000);
         TArray<FProcMeshVertex> Original; Original.SetNum(SourceCount+Count);
@@ -65,6 +66,14 @@ bool FRaftSimCrestHistoryTest::RunTest(const FString&)
         Incremental.Apply(E,SourceCount,Boundary,Target,Alpha,RenderedE);
         IncrementalMapped.Apply(F,SourceCount,Boundary,Target,Alpha,RenderedF,false);
         IncrementalCalls+=Incremental.bIncrementalUpdate;
+        auto ParallelVertices=Original,ParallelMappedVertices=Original;
+        TArray<float> ParallelRendered,ParallelMappedRendered;
+        const bool SameParallel=Parallel.Apply(ParallelVertices,SourceCount,Boundary,Target,Alpha,ParallelRendered,true,true);
+        ParallelMapped.Apply(ParallelMappedVertices,SourceCount,Boundary,Target,Alpha,ParallelMappedRendered,false,true);
+        TestEqual(TEXT("dense and empty histories retain original serial execution"),Parallel.LastParallelValues,!SameParallel && Count>0);
+        TestEqual(TEXT("mapped nonempty histories exercise joined parallel reads"),ParallelMapped.LastParallelValues,Count>0);
+        if(!TestTrue(TEXT("parallel original-map history retains every correction"),
+            ParallelRendered==ExpectedRendered && ParallelMappedRendered==ExpectedRendered))return false;
         if(!TestTrue(TEXT("all temporal corrections exactly match original serial map"),
             RenderedA==ExpectedRendered && RenderedB==ExpectedRendered &&
             RenderedC==ExpectedRendered && RenderedD==ExpectedRendered &&
@@ -74,6 +83,9 @@ bool FRaftSimCrestHistoryTest::RunTest(const FString&)
             FMemory::Memcmp(B.GetData(),D.GetData(),SIZE_T(B.Num())*sizeof(FProcMeshVertex))==0))return false;
         for(int32 I=0;I<Original.Num();++I)
         {
+            if(!FRaftSimCrestMidpointExpansion::EqualAttributes(Expected[I],ParallelVertices[I]) ||
+                !FRaftSimCrestMidpointExpansion::EqualAttributes(Expected[I],ParallelMappedVertices[I]))
+            {AddError(FString::Printf(TEXT("parallel history frame%d vertex%d differs"),Frame,I));return false;}
             if(!FRaftSimCrestMidpointExpansion::EqualAttributes(Expected[I],E[I]) ||
                !FRaftSimCrestMidpointExpansion::EqualAttributes(Expected[I],F[I]))
             {AddError(FString::Printf(TEXT("incremental frame%d vertex%d differs"),Frame,I));return false;}

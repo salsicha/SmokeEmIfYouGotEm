@@ -56,6 +56,8 @@ private:
     TArray<uint8> BoundaryMidpoints;
     TArray<float> TargetCorrectionsCm,RenderedCorrectionsCm,ExpandedCoarseCrestCm,ExpandedShore;
     FRaftSimCrestHistory CorrectionHistory;
+    FRaftSimCrestHistory ParallelCorrectionHistory;
+    TArray<float> ParallelHistoryRendered;
     // Allocated only by the explicit actual-input hash comparison audit.
     FRaftSimFastCrestHistory CandidateCorrectionHistory;
     FRaftSimIncrementalCrestHistory IncrementalCorrectionHistory;

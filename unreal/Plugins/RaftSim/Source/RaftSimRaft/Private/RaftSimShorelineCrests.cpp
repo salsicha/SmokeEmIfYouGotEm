@@ -46,6 +46,7 @@ void FRaftSimShorelineCrests::Reset()
     ProfilePrefetch.Reset();
     CachedXY.Reset(); CachedIndices.Reset(); CachedProfile.Reset();
     CachedCoarse.Reset(); CachedShore.Reset(); CorrectionHistory.Reset();
+    ParallelCorrectionHistory.Reset(); ParallelHistoryRendered.Reset();
     CandidateCorrectionHistory.Reset();
     IncrementalCorrectionHistory.Reset();
     MidpointExpansion.Reset();
@@ -276,7 +277,36 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     // it cannot supply the ordinary playable surface.
     static const bool bIncrementalAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimIncrementalCrestHistoryAudit"));
     bool bDenseHistory=false;
-    if(bIncrementalAudit)
+    // Two actual-game runs preserve every attribute and halve mapped-history
+    // cost in both execution orders. Dense history retains serial scheduling.
+    static const bool bParallelHistory=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialCrestHistory"));
+    static const bool bParallelHistoryAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimParallelCrestHistoryAudit"));
+    if(bParallelHistoryAudit)
+    {
+        auto CandidateVertices=Vertices;
+        double ReferenceMs=0.,CandidateMs=0.;bool CandidateDense=false;
+        const auto Reference=[&](){const double Start=FPlatformTime::Seconds();
+            bDenseHistory=CorrectionHistory.Apply(Vertices,Source.Num(),BoundaryMidpoints,TargetCorrectionsCm,
+                Alpha,RenderedCorrectionsCm,!bMappedHistory,false);
+            ReferenceMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        const auto Candidate=[&](){const double Start=FPlatformTime::Seconds();
+            CandidateDense=ParallelCorrectionHistory.Apply(CandidateVertices,Source.Num(),BoundaryMidpoints,TargetCorrectionsCm,
+                Alpha,ParallelHistoryRendered,!bMappedHistory,true);
+            CandidateMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        // Refresh/dense states often alternate every frame. Alternate order
+        // every TWO frames so both states exercise both execution orders.
+        const bool CandidateFirst=(GFrameCounter/2)%2!=0;
+        if(CandidateFirst){Candidate();Reference();}else{Reference();Candidate();}
+        bool Exact=bDenseHistory==CandidateDense && RenderedCorrectionsCm==ParallelHistoryRendered;
+        for(int32 I=0;Exact && I<Vertices.Num();++I)
+            Exact=FRaftSimCrestMidpointExpansion::EqualAttributes(Vertices[I],CandidateVertices[I]);
+        if(!Exact){UE_LOG(LogTemp,Error,TEXT("ParallelCrestHistory mismatch frame=%llu"),GFrameCounter);return false;}
+        if(GFrameCounter>=120 && GFrameCounter<184)
+            UE_LOG(LogTemp,Display,TEXT("ParallelCrestHistoryPair frame=%llu exact=%d candidate_first=%d dense=%d vertices=%d reference_ms=%.9f candidate_ms=%.9f parallel_used=%d"),
+                GFrameCounter,int32(Exact),int32(CandidateFirst),int32(bDenseHistory),Vertices.Num(),ReferenceMs,CandidateMs,int32(ParallelCorrectionHistory.LastParallelValues));
+        if(bParallelHistory){Vertices=MoveTemp(CandidateVertices);RenderedCorrectionsCm=ParallelHistoryRendered;}
+    }
+    else if(bIncrementalAudit)
     {
         auto CandidateVertices=Vertices;
         TArray<float> CandidateRendered;
@@ -323,7 +353,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
             GFrameCounter,Vertices.Num(),bDenseHistory,FastMs,LegacyMs,int32(GFrameCounter%2));
     }
     else bDenseHistory=CorrectionHistory.Apply(Vertices,Source.Num(),BoundaryMidpoints,
-        TargetCorrectionsCm,Alpha,RenderedCorrectionsCm,!bMappedHistory);
+        TargetCorrectionsCm,Alpha,RenderedCorrectionsCm,!bMappedHistory,bParallelHistory);
     CSV_CUSTOM_STAT(RaftSimCrests,DenseHistoryUpdates,int32(bDenseHistory),ECsvCustomStatOp::Accumulate);
     const double VerticesDone=bTiming ? FPlatformTime::Seconds() : 0.;
     // Sixty-four actual-game pairs preserve all bits and improve both call

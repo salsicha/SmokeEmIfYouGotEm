@@ -3,6 +3,24 @@
 Last reviewed 2026-09-19 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest normal-play CPU improvement: [parallel mapped crest history](../reconstruction-review-2026-09-07/crest-history-parallel.md).
+Original coordinate map and duplicate ownership are retained; mapped reads and
+independent vertex updates run in joined batches, while dense history stays
+serial. Two actual-game captures preserve all attributes/corrections in 128 pairs;
+all 67 mapped pairs improve, about 2.1 to 1.0 ms. The earlier all-history variant
+is rejected; dense audit timings are retained, not claimed as a gain. Four native
+regressions and 17 Python tests pass. Default editor/game rebuilt; normal-start
+24-image/15.604 s capture inspected and all 468 movie frames decoded. All 2,033
+sampled support contacts agree within 0.0002 cm; NOT full collision/visual acceptance.
+Ordinary serial/default/default/serial runs have mixed outcomes: default B/C
+24.953169/25.497627 FPS and p95 48.0971/47.2092 ms, both FAIL 30 FPS. No causal
+whole-frame speedup or new visual detail claimed. Geometry/foam/physics unchanged.
+Sole cook12672 and source replay14076 remain live/resumed; no duplicate jobs.
+BOTH state/bank audits pass through 12300/local6000, NOT settled; next12350/local7000
+needs both. Source case1 still has no completed report. No map/source/4950 change,
+nonlinear OFF; cap decision and complete South Fork→Colorado→Pacuare→Futaleufu
+queue remain OPEN. Raw generated media/builds already ignored; no ignore change.
+
 Latest derivative coupling: [prescribed-boundary primitive energy work](../reconstruction-review-2026-09-07/affine-front-variation.md).
 Both momentum coordinates now retain explicit exterior-flux work and BOTH
 owner-volume denominator derivatives.93 focused tests PASS, including23 new
