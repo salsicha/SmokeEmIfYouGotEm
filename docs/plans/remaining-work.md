@@ -3,6 +3,20 @@
 Last reviewed 2026-09-19 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest derivative coupling: [prescribed-boundary primitive energy work](../reconstruction-review-2026-09-07/affine-front-variation.md).
+Both momentum coordinates now retain explicit exterior-flux work and BOTH
+owner-volume denominator derivatives.93 focused tests PASS, including23 new
+independent primitive/reuse/rejection cases. The old reflecting derivative now
+rejects affine metrics. Its file was proved outside the active replay's two
+protected maps; all protected hashes still match, so no waiting/restart needed.
+These are energy derivatives, NOT a nonlinear force/time law or playable change.
+Source replay14076/session35230 remains live on case1 after case0 passed; its
+eventual report still needs source-derivative qualification. Do not duplicate it.
+Sole cook12672 continues;12200/local4000 passes BOTH audits, NOT settled; next
+12250/local5000 needs both. Normal-play publication/mesh cost can advance while
+the exact replay runs. No map/build/4950/source/FPS change; nonlinear OFF.
+Pending cap decision and full ordered queue remain OPEN.
+
 Latest coupling: [affine boundary momentum through both original poles](../reconstruction-review-2026-09-07/affine-moving-pressure.md).
 Prescribed boundary work now contributes the physical momentum shift and full
 energy/time derivative, with independent positive local-jet reconstruction.

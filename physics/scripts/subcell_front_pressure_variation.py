@@ -20,6 +20,8 @@ class FrontPressureVariation:
     Gravitational potential and the transport bracket are NOT included.
     """
     def __init__(self, geometry, metric, physical_momentum, *, solved_state=None):
+        if hasattr(metric, 'linear'):
+            raise ValueError('Affine prescribed trace requires AffineFrontPressureVariation, not reflecting derivatives')
         g,m=geometry,metric;zero=m.zero;n=len(g.active)
         if (tuple(m.mass)!=tuple(v for v in g.volumes for _ in range(2)) or
                 m.kinetic!=tuple(map(tuple,g.kinetic))):
