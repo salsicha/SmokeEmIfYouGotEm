@@ -3,6 +3,20 @@
 Last reviewed 2026-09-19 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest coupling: [affine boundary momentum through both original poles](../reconstruction-review-2026-09-07/affine-moving-pressure.md).
+Prescribed boundary work now contributes the physical momentum shift and full
+energy/time derivative, with independent positive local-jet reconstruction.
+123 related tests PASS. Original-source replay14076/startUTC2026-09-19T00:58:32.2675546Z,
+session35230 is LIVE: case0 passed, case1 started; no completed source report
+or full acceptance yet. Preserve loaded/protected files and do not duplicate.
+Next carry the affine terms through primitive force derivatives; the old
+FrontPressureVariation is reflecting-only and must NOT consume this new map.
+Add its compatibility guard after the protected replay finishes. No runtime
+enablement: nonlinear force, interacting fronts and natural open pressure remain
+unqualified. Sole cook12672 continues;12150/local3000 passes BOTH audits, NOT
+settled; next12200/local4000 needs both. No map/build/4950/source/playable/FPS
+change. Pending cap decision and full ordered queue remain OPEN.
+
 Latest supporting physics: [prescribed exterior kinetic trace](../reconstruction-review-2026-09-07/front-prescribed-trace.md).
 Original front transport and pressure geometry now have an opt-in matching
 prescribed-velocity kinetic component, including affine boundary work and its
