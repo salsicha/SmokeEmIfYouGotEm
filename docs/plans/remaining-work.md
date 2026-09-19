@@ -3,6 +3,21 @@
 Last reviewed 2026-09-19 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest supporting physics: [prescribed exterior kinetic trace](../reconstruction-review-2026-09-07/front-prescribed-trace.md).
+Original front transport and pressure geometry now have an opt-in matching
+prescribed-velocity kinetic component, including affine boundary work and its
+time derivative.104 focused tests PASS; original-source replay11/13 supported
+cases PASS, unsupported2/7 retained. Current protected hashes all rechecked;
+historical exceptions cover only seven unused tools with exact Git-blob proof.
+NOT a natural open-pressure closure, two-pole coupling, nonlinear time step or
+playable delivery. Current27 energy/rational and8 coordinate-accuracy tests
+pass; the original storage/face consistency gate still fails and is retained.
+Sole cook12672 continues:12050/local1000 and12100/local2000 pass BOTH audits,
+NOT settled. Next12150/local3000 needs both. No map/build/4950/source changes,
+nonlinear OFF; no new visual/FPS acceptance. Pending cap decision and full
+ordered queue remain OPEN. Couple boundary terms through physical momentum
+and force before attempting runtime integration; do not just alter divergence.
+
 Latest hydraulic continuation: [verified 12000 s restart](../reconstruction-review-2026-09-07/cartesian-continuation-12000.md).
 Old13584 is terminal with native completion; BOTH final12000/local60000 audits
 PASS, NOT settled (102.714834out versus45.306955in m3/s). The distributed
