@@ -15,10 +15,16 @@ param(
     [ValidateSet('WorldNormal', 'Roughness', 'SceneDepth')][string]$StartupBufferVisualization = '',
     [ValidateRange(0, 1)][Nullable[double]]$StartupOpticalNormalStrength = $null,
     [switch]$RecordStartupMotion,
+    [switch]$StartupDisableDynamicShadows,
     [switch]$NormalScenarioStart,
     [switch]$CheckpointResetReplay
 )
 $ErrorActionPreference = 'Stop'
+function Test-RaftSimShadowControlLog([string]$LogText) {
+    $values = [regex]::Matches($LogText, '(?im)^.*\bShowFlag\.DynamicShadows\s*=\s*"([^"]+)"[^\r\n]*\r?$')
+    return ($values.Count -gt 0 -and @($values | Where-Object { $_.Groups[1].Value -cne '0' }).Count -eq 0 -and
+        $LogText -notmatch "tries to set the console variable 'ShowFlag\.DynamicShadows'|Command not recognized.*ShowFlag\.DynamicShadows")
+}
 function Test-RaftSimBufferDiagnosticLog([string]$LogText, [string]$Target) {
     # Command confirmation is not pixel/physical acceptance; still inspect PNGs.
     return ($LogText -match 'Set new viewmode: VisualizeBuffer' -and
@@ -53,6 +59,12 @@ if ($null -ne $StartupOpticalNormalStrength -and -not $StartupRenderReplay) {
 }
 if ($RecordStartupMotion -and -not $StartupRenderReplay) {
     throw 'Motion recording requires StartupRenderReplay; it is not an FPS capture'
+}
+if ($StartupDisableDynamicShadows -and -not $StartupRenderReplay) {
+    throw 'Shadow control requires StartupRenderReplay; it is not an FPS capture'
+}
+if ($StartupDisableDynamicShadows -and @(@($ExtraGameArgument) + $ExtraGameArguments | Where-Object { $_ -match '(?i)ShowFlag\.DynamicShadows' }).Count) {
+    throw 'Use StartupDisableDynamicShadows once, not an extra shadow override'
 }
 if ($NormalScenarioStart -and @(@($ExtraGameArgument) + $ExtraGameArguments | Where-Object { $_ -match '(?i)RaftSimWaterReviewStation' }).Count) {
     throw 'NormalScenarioStart must not be combined with a review-station override'
@@ -164,6 +176,8 @@ $report.detail_replay_passed = $null
 $report.startup_render_replay = [bool]$StartupRenderReplay
 $report.normal_scenario_start = [bool]$NormalScenarioStart
 $report.startup_buffer_visualization = $StartupBufferVisualization
+$report.startup_disable_dynamic_shadows = [bool]$StartupDisableDynamicShadows
+$report.startup_shadow_control_confirmed = $null
 $report.startup_optical_normal_strength = $StartupOpticalNormalStrength
 $report.startup_buffer_commands_confirmed = $null
 $report.checkpoint_reset_replay = [bool]$CheckpointResetReplay
@@ -231,7 +245,10 @@ try {
             $strengthText = $StartupOpticalNormalStrength.ToString('R', [cultureinfo]::InvariantCulture)
             "RaftSim.WaterMaterialProbe SouthForkCurrentNormalStrength $strengthText delay=0.05,"
         } else { '' }
-        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}${normalCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption")
+        # ShowFlag overrides are also ECVF_Cheat; a device-profile request can
+        # log its intent yet be rejected. Use and verify the console response.
+        $shadowCommands = if ($StartupDisableDynamicShadows) { 'ShowFlag.DynamicShadows 0,' } else { '' }
+        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}${normalCommands}${shadowCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption")
     } else {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.
@@ -272,6 +289,10 @@ try {
     if ($StartupBufferVisualization) {
         $report.startup_buffer_commands_confirmed = Test-RaftSimBufferDiagnosticLog (Get-Content -LiteralPath $logFile -Raw) $StartupBufferVisualization
         if (-not $report.startup_buffer_commands_confirmed) { throw 'Buffer visualization commands were not confirmed; no buffer evidence' }
+    }
+    if ($StartupDisableDynamicShadows) {
+        $report.startup_shadow_control_confirmed = Test-RaftSimShadowControlLog (Get-Content -LiteralPath $logFile -Raw)
+        if (-not $report.startup_shadow_control_confirmed) { throw 'Shadow control was not confirmed; no shadow-ablation evidence' }
     }
     if (-not $NativePerformanceGate -and -not $DetailStreamingReplay -and -not $StartupRenderReplay -and -not $CheckpointResetReplay -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
         $csvFile = Join-Path $projectRoot "unreal/Saved/Profiling/CSV/$Label.csv"

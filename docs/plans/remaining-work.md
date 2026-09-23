@@ -3,7 +3,22 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest bounded visual investigation: [raft-edge shadow discrimination](../reconstruction-review-2026-09-07/raft-edge-shadow-review.md).
+Four actual camera/carrier/terrain rays show fully wet water present at the
+reviewed raft-edge patches. A confirmed process-local shadow-off control removes
+the patches; the initial rejected ECVF_Cheat attempt is retained as invalid.
+The helper now verifies shadow controls and forbids their use as FPS captures;
+22 Python regressions and new/existing PowerShell guard suites pass. Normal
+shadows remain enabled, with NO geometry/material/field promotion or visual/FPS
+acceptance. Next qualify shadow-preserving water filtering, not hole-filling or
+source edits. All captures terminal; original cook36692 continues unchanged.
+
 Latest bounded playable-performance integration: [reusable MUSCL stage storage](../reconstruction-review-2026-09-07/solver-stage-storage.md).
+Its [retained rapid follow-through](../reconstruction-review-2026-09-07/solver-stage-rapid-review.md)
+is now reviewed: actual8.33→8.35km motion, but broad smooth foam/rock/crew limits
+persist and p9535.4787ms still FAILS. Explicit8330 review placement is not the
+normal start and is not qualified reconstructed hull clearance. No new visual
+delivery or acceptance; do not repeat this unchanged baseline.
 Six native tests and eight alternating-order retained-input comparisons pass;
 all saved fields match byte-for-byte, with component median reductions of
 35.24% and 36.15%. These are NOT game-FPS gains. The normal solver archive is
@@ -38,9 +53,10 @@ One native cook is LIVE: PID36692/start2026-09-23T18:34:26.9266904Z,
 session68019, fresh15000→18000 s output. All5,382,400 native restart h/u/v
 cells match the prior final state bit-for-bit, all retained physical inputs
 are unchanged, zero added cells/water;51 focused regressions pass. New checkpoint
-local6000/15300 s passes BOTH state/exterior-bank audits: all86,720 bank cells dry,
-maximum per-step residual9.48e−9m³; outflow115.981630 versus inflow45.306955m³/s
-still unsettled. Next complete local7000/15350 s needs both audits.
+local7000/15350,8000/15400 and9000/15450 s pass BOTH state/exterior-bank audits:
+all86,720 bank cells dry, maximum per-step residual9.48e−9m³; latest outflow
+113.721042 versus inflow45.306955m³/s still unsettled. Next complete
+local10000/15500 s needs both audits.
 Do not duplicate the cook or reuse historical PID12672. This is supporting
 settling work ONLY: no visible delivery, game rebuild, field promotion or
 acceptance; installed4950 fields and nonlinear OFF state remain unchanged.

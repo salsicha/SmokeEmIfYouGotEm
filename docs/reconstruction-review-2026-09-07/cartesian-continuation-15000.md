@@ -100,7 +100,18 @@ inlet45.306955 m³/s: still unsettled, with no monotonic-outlet claim. Reports:
 `tmp/cartesian-15300-banks-v1-20260923.json`. Depth-array SHA256:
 `530bc9de310610e156ab388a0343e09ae2d62e78f64986e0f12e9555264364c4`.
 
-Next complete local7000/15350 s needs both `audit_cartesian_cook_snapshot.py`
+Local7000/15350,8000/15400 and9000/15450 s now pass both independent audits.
+All5,382,400 cells remain finite and all86,720 artificial-bank cells exactly dry.
+At15450 s maximum depth is3.505866495 m, speed4.979140831 m/s, volume
+2160712.893493 m³ (31564.574669 m³ below restart), maximum per-step residual
+9.483589469e−9 m³. Outlet113.721042 still exceeds inlet45.306955 m³/s.
+This is not settled; no fields are promoted. Reports follow the existing pattern
+`tmp/cartesian-{15350,15400,15450}-{state,banks}-v1-20260923.json`.
+Latest depth SHA256:
+`91395922ee38a462bd0604f629e15a945028e39e0e2d13242c2911b322bf6ebd`.
+The same original cook remains live without a duplicate or input change.
+
+Next complete local10000/15500 s needs both `audit_cartesian_cook_snapshot.py`
 and `audit_cartesian_exterior_banks.py`, then reassess later regional storage trends. Do not launch
 a duplicate while this run is live or treat buffered progress output as a stall.
 
