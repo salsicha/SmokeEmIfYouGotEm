@@ -3,6 +3,18 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest hydraulic advancement: [exact continuation from15000 s](../reconstruction-review-2026-09-07/cartesian-continuation-15000.md).
+One native cook is LIVE: PID36692/start2026-09-23T18:34:26.9266900Z,
+session68019, fresh15000→18000 s output. All5,382,400 native restart h/u/v
+cells match the prior final state bit-for-bit, all retained physical inputs
+are unchanged, zero added cells/water;51 focused regressions pass. First new
+complete checkpoint local1000/15050 s needs both state and exterior-bank audits.
+Do not duplicate the cook or reuse historical PID12672. This is supporting
+settling work ONLY: no visible delivery, game rebuild, field promotion or
+acceptance; installed4950 fields and nonlinear OFF state remain unchanged.
+South Fork remains unfinished and the ordered queue stays open. Earlier
+no-live-job statements below describe their own historical checkpoints.
+
 Latest bounded runtime investigation: [crest ownership publication cache](../reconstruction-review-2026-09-07/crest-publication-cache.md).
 Five native D3D12 and14 parser tests pass;256 actual normal-start input pairs
 preserve every triangle index/cell offset. Component means improve in both
