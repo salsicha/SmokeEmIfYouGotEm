@@ -40,10 +40,33 @@ energy/derivative controls. No tolerance was relaxed. The
 [test receipt](affine-total-energy/source-tests.json) binds the exact scripts,
 new tests and both XML outputs (expanded XML elapsed60.98s).
 
-Source audit9552/session56686 was started using the completed kinetic evidence;
-case0 passed. A complete source report is not claimed until that process exits
-successfully and the final report/hash/coverage checks are recorded. Do not
-duplicate this audit or use the obsolete PID6480 profiling wrapper.
+Source audit9552/session56686 is now TERMINAL exit0. All11 supported original
+cases pass, including the expensive case1 (495.01s); unsupported cases2/7 remain
+verbatim. The complete27,786,902-byte report was written at17:46:55.445UTC with
+SHA256 `2b93022e2c2d9de74001ceba1e3b6b3ff594939394cc523f9b7d3122df4bed0e`.
+Rechecking all638 protected and21 implementation entries finds zero mismatches.
+The [completion receipt](affine-total-energy/source-total-completion.json)
+supersedes the retained historical running receipt. Final live-process inventory
+contains no Python audit, Cartesian cook or Unreal process. Do not duplicate
+this completed audit or use the obsolete PID6480 profiling wrapper.
+
+## The old fan flux is not the new energy law
+
+A separate hash-bound [exact rate comparison](affine-total-energy/source-fan-flux-gap.json)
+compares the composed pressure-model total-energy derivative with the sum of
+the original wet/dry fan's `energy_rate_per_density` receipts. All11 supported
+cases differ exactly in the original quadratic field. Both signs occur; even
+case1's approximately-1.642e-259 difference is retained, not rounded to zero.
+The receipt contains presentation floats, while equality is tested exactly.
+
+This is an expected distinction between different kinetic energies, not a
+failure of the new chain-rule audit or evidence of an evolved river's energy
+leak. It concretely rules out claiming conservative dispersive evolution by
+combining the new pressure energy with the old shallow-water energy flux.
+Neither that difference nor a global energy residual is injected as a force.
+The compatible momentum/transport law and its exterior energy exchange must
+be derived and validated together; the reflecting auxiliary operators and
+closed periodic bracket remain separately scoped references.
 
 ## Remaining gates
 

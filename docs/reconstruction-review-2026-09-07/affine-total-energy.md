@@ -3,6 +3,11 @@
 September23,2026. Supporting physics progress, not a playable water update.
 South Fork and the complete ordered reconstruction/release queue remain open.
 
+Follow-up: [original-source total-energy qualification](affine-total-energy-source.md)
+now completes all11 supported original cases with independent branch gravity
+checks and no repeated pressure solve. The controlled-only/source-replay-open
+statements below describe this earlier checkpoint, not that completed follow-up.
+
 ## The source job actually completed
 
 Original process6480/session50573 is terminal, exit0. The complete145,740,626-byte
