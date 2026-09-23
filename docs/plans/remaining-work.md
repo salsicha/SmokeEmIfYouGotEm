@@ -3,6 +3,18 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest supporting increment: [original-source total-energy qualification](../reconstruction-review-2026-09-07/affine-total-energy-source.md).
+The total-energy gravity helper now also supports a no-pressure-solve source
+audit using the completed hash-qualified kinetic pullback. Independent original
+branch gravity/rates and both momentum-coordinate work sums are checked;
+108 focused tests pass. Sole new source audit9552/session56686 is LIVE, with
+case0 passed and no complete report yet. Check its process/report first; do not
+duplicate it. Its target is `tmp/south-fork-affine-total-energy-v1-20260923.json`.
+Old6480 remains TERMINAL; its profiling wrapper stays obsolete. This is NOT a
+visible playable delivery, complete source qualification or conservative solver.
+No engine/map/collision/4950-field change; nonlinear OFF. Normal26.484402FPS /
+p9547.2133ms remains the last measured failure. All reconstruction gates remain.
+
 Latest physics qualification: [completed source pullback and affine total energy](../reconstruction-review-2026-09-07/affine-total-energy.md).
 Source6480/session50573 is now TERMINAL exit0;11 supported original cases pass,
 unsupported2/7 remain retained. All635 protected/19 implementation entries match.

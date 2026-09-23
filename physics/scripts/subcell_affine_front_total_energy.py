@@ -9,34 +9,40 @@ from fractions import Fraction as F
 from subcell_affine_front_variation import AffineFrontPressureVariation
 
 
+def affine_front_potential(geometry, energy_datum=0):
+    """Gravity and its primitive derivatives, without constructing a pressure metric."""
+    g, datum = geometry, F(energy_datum)
+    energy = g.zero
+    moments, spatial, slopes, heights = [], [], [], []
+    for owner in g.active:
+        form, fragment = g.forms[owner], g.fragments[owner]
+        gravity, bed = F(form['gravity']), F(form['bed_at_origin'])
+        origin = tuple(map(F, form['spatial_origin']))
+        if gravity <= 0 or len(origin) != 2 or any(
+            p[2] != bed+sum(s*(x-o) for s, x, o in zip(fragment.gradient, p, origin))
+            for p in fragment.polygon
+        ):
+            raise ValueError('Positive gravity and matching original affine bed required')
+        h1, h2, _ = form['depth_moments'][1:]
+        xh = form['depth_spatial_moments']
+        moments.append((gravity*(bed-datum), gravity/2, g.zero))
+        spatial.append(tuple(gravity*s for s in fragment.gradient))
+        slopes.append(tuple(gravity*x for x in xh))
+        heights.append(gravity*h1)
+        energy += gravity*((bed-datum)*h1+h2/2+sum(s*x for s, x in zip(fragment.gradient, xh)))
+    return dict(energy=energy, gradients=dict(moments=tuple(moments), spatial=tuple(spatial),
+                                             slopes=tuple(slopes), bed=tuple(heights)))
+
+
 class AffineFrontTotalEnergyVariation:
     def __init__(self, trace, metric, physical_momentum, *, energy_datum=0, solved_state=None):
         self.pressure = pressure = AffineFrontPressureVariation(
             trace, metric, physical_momentum, solved_state=solved_state)
         self.trace, self.geometry, self.metric = trace, trace.geometry, metric
         self.energy_datum = F(energy_datum)
-        g, m = self.geometry, metric
-        self.potential_energy = m.zero
-        moments, spatial, slopes, heights = [], [], [], []
-        for owner in g.active:
-            form, fragment = g.forms[owner], g.fragments[owner]
-            gravity, bed = F(form['gravity']), F(form['bed_at_origin'])
-            origin = tuple(map(F, form['spatial_origin']))
-            if gravity <= 0 or len(origin) != 2 or any(
-                p[2] != bed+sum(s*(x-o) for s, x, o in zip(fragment.gradient, p, origin))
-                for p in fragment.polygon
-            ):
-                raise ValueError('Positive gravity and matching original affine bed required')
-            h1, h2, _ = form['depth_moments'][1:]
-            xh = form['depth_spatial_moments']
-            moments.append((gravity*(bed-self.energy_datum), gravity/2, m.zero))
-            spatial.append(tuple(gravity*s for s in fragment.gradient))
-            slopes.append(tuple(gravity*x for x in xh))
-            heights.append(gravity*h1)
-            self.potential_energy += gravity*((bed-self.energy_datum)*h1+h2/2
-                                              +m.dot(fragment.gradient, xh))
-        self.potential_gradients = dict(moments=tuple(moments), spatial=tuple(spatial),
-                                        slopes=tuple(slopes), bed=tuple(heights))
+        m = metric
+        potential = affine_front_potential(self.geometry, self.energy_datum)
+        self.potential_energy, self.potential_gradients = potential['energy'], potential['gradients']
         # E is not p.v/2: p=Bv+q and the prescribed boundary has a constant.
         v = m.vector(pressure.momentum_gradients['physical'])
         self.kinetic_energy = m.dot(v, m.action(m.physical, v))/2-m.dual_constant
@@ -47,7 +53,7 @@ class AffineFrontTotalEnergyVariation:
             for key in ('moments', 'slopes'):
                 grad[key] = tuple(tuple(a+b for a, b in zip(row, extra))
                                   for row, extra in zip(original[key], self.potential_gradients[key]))
-            grad.update(spatial=tuple(spatial), bed=tuple(heights))
+            grad.update(spatial=self.potential_gradients['spatial'], bed=self.potential_gradients['bed'])
             self.gradients[coordinate] = grad
 
     def work(self, momentum_direction, moment_direction, face_column_direction, bed_gradient_direction,
