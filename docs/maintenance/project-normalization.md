@@ -76,3 +76,16 @@ as completed normalization. Evidence:
 `tmp/normal-installed-review-regressions-final-v1-20260916.xml`.
 See [normal installed rapid review](../reconstruction-review-2026-09-07/normal-installed-rapid-review.md)
 for separate gameplay and hydraulic findings; those are not release acceptance.
+
+## September23 follow-up: editor Python is not a game startup dependency
+
+Normal editor-hosted `-game` no longer defaults to running EditorToolset and
+ToolsetRegistry Python startup against unavailable editor classes. The scoped
+game-module policy preserves editor/PIE and commandlet defaults, explicit engine
+Python overrides and all plugin/user settings; packaged builds compile it out.
+Actual commandlet and D3D12 editor checks pass with the toolsets available.
+Normal South Fork motion and separate ordinary cost captures have zero Python
+error lines. Editor/game builds, two native tests and24 layout/release tests pass.
+Existing warnings remain. No source data, material, geometry or physics change;
+no blanket clean-release, packaged-play, realism or30FPS acceptance. See
+[cause, implementation and retained evidence](../reconstruction-review-2026-09-07/editor-python-game-startup.md).

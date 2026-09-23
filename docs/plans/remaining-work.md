@@ -3,6 +3,18 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest normal-launch correction: [editor Python game-startup ownership](../reconstruction-review-2026-09-07/editor-python-game-startup.md).
+Normal editor-hosted gameplay no longer runs incompatible editor-only Python
+startup by default. Editor/PIE and commandlet defaults, explicit engine overrides,
+plugins and user settings remain intact. Actual commandlet/editor checks pass;
+normal South Fork motion and separate cost logs have zero Python error lines.
+Editor/game rebuilt;2 native and24 existing layout/release checks pass. Normal
+startup has24 images/468 fully decoded movie frames; no new visual detail claimed.
+Ordinary26.484402FPS/p9547.2133ms still FAILS30FPS. This closes the specific startup
+ownership defect, not full release/packaged/river acceptance. Source6480 remains
+live/resumed; protected scientific files and installed4950 fields unchanged.
+All reconstruction, water/crew realism, performance and later-river gates OPEN.
+
 Latest bounded qualification: [prepared physical crest constants](../reconstruction-review-2026-09-07/prepared-physical-crests.md).
 199,806 native comparisons and23,098,795 actual-game queries match exactly,
 but same-binary900-frame ABBA gains are NOT repeatable: candidate B improves
@@ -6829,10 +6841,10 @@ output alone do not establish physical, geographic or photographic acceptance.
   28 focused checks pass. Other documented historical source/provenance and
   layout failures remain; do not erase evidence or weaken gates to pass.
   See [maintenance record](../maintenance/project-normalization.md).
-  Actual editor `-game` captures also retain experimental-toolset Python startup
-  errors for absent `unreal.AgentSkill`/`unreal.PythonTestRunner`, confirmed both
-  before and during the September18 foam comparison; resolve their game-mode
-  loading/ownership before claiming clean release logs.
+  The experimental-toolset Python startup errors retained in earlier `-game`
+  captures are corrected by the September23 game-startup ownership policy above.
+  Actual editor/commandlet and normal-game checks pass; other warnings and
+  historical regressions still prevent claiming clean release logs.
 - **Final delivery:** run relevant engine and release checks, review accumulated
   changes and captured-data licensing, then satisfy the requested final commit.
   No blanket deletion of historical evidence, source data or active dependencies.
