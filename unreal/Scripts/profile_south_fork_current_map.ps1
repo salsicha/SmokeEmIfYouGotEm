@@ -16,6 +16,8 @@ param(
     [ValidateRange(0, 1)][Nullable[double]]$StartupOpticalNormalStrength = $null,
     [switch]$RecordStartupMotion,
     [switch]$StartupPaddle,
+    [switch]$StartupHighSide,
+    [switch]$ProfileHighSide,
     [switch]$StartupDisableDynamicShadows,
     [switch]$NormalScenarioStart,
     [switch]$CheckpointResetReplay
@@ -63,6 +65,13 @@ if ($RecordStartupMotion -and -not $StartupRenderReplay) {
 }
 if ($StartupPaddle -and -not $StartupRenderReplay) {
     throw 'StartupPaddle requires StartupRenderReplay; it is not an ordinary FPS capture'
+}
+if ($StartupHighSide -and -not $StartupRenderReplay) {
+    throw 'StartupHighSide requires StartupRenderReplay; it is not an ordinary FPS capture'
+}
+if ($StartupHighSide -and $StartupPaddle) { throw 'Choose one startup crew command' }
+if ($ProfileHighSide -and ($NativePerformanceGate -or $DetailStreamingReplay -or $StartupRenderReplay -or $CheckpointResetReplay -or $StartupHighSide -or $StartupPaddle)) {
+    throw 'ProfileHighSide requires an ordinary CSV run without replay, recording or other input'
 }
 if ($StartupDisableDynamicShadows -and -not $StartupRenderReplay) {
     throw 'Shadow control requires StartupRenderReplay; it is not an FPS capture'
@@ -240,6 +249,7 @@ try {
         $start.ArgumentList.Add('-ForceRes')
         $motionOption = if ($RecordStartupMotion) { ' record' } else { '' }
         $paddleOption = if ($StartupPaddle) { ' paddle' } else { '' }
+        $highSideOption = if ($StartupHighSide) { ' highside' } else { '' }
         # Debug-view CVars are ECVF_Cheat: DeviceProfile overrides reject them.
         # Use the development console path, before scheduling any screenshots.
         # Only an explicit diagnostic request changes the ordinary lit capture.
@@ -253,7 +263,7 @@ try {
         # ShowFlag overrides are also ECVF_Cheat; a device-profile request can
         # log its intent yet be rejected. Use and verify the console response.
         $shadowCommands = if ($StartupDisableDynamicShadows) { 'ShowFlag.DynamicShadows 0,' } else { '' }
-        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}${normalCommands}${shadowCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption$paddleOption")
+        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}${normalCommands}${shadowCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption$paddleOption$highSideOption")
     } else {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.
@@ -261,7 +271,8 @@ try {
         # Match the engine default explicitly and retain runtime confirmation.
         # Its elapsed interval belongs to the preceding logical frame, not
         # the water scopes on the same CSV row. No frame limit is changed.
-        $profileCommands = "-ExecCmds=csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames"
+        $profileCrewCommands = if ($ProfileHighSide) { 'RaftSim.ProfileHighSide,' } else { '' }
+        $profileCommands = "-ExecCmds=${profileCrewCommands}csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames"
         $start.ArgumentList.Add($profileCommands)
     }
     if ($ExtraGameArgument) { $start.ArgumentList.Add($ExtraGameArgument) }
@@ -285,6 +296,16 @@ try {
     }
     $report.game_exit_code = $game.ExitCode
     $report.startup_paddle_requested = [bool]$StartupPaddle
+    $report.startup_high_side_requested = [bool]$StartupHighSide
+    $report.profile_high_side_requested = [bool]$ProfileHighSide
+    if ($ProfileHighSide) {
+        $report.profile_high_side_confirmed = (Get-Content -LiteralPath $logFile -Raw).Contains('ProfileHighSide input issued: HighSide')
+        if (-not $report.profile_high_side_confirmed) { throw 'Requested profiled high-side command was not issued' }
+    }
+    if ($StartupHighSide) {
+        $report.startup_high_side_confirmed = (Get-Content -LiteralPath $logFile -Raw).Contains('CaptureSeries input issued: HighSide')
+        if (-not $report.startup_high_side_confirmed) { throw 'Requested startup high-side command was not issued' }
+    }
     if ($null -ne $SolverLanes -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
         $report.solver_lane_limit_confirmed = Test-RaftSimSolverLaneLog (Get-Content -LiteralPath $logFile -Raw) $SolverLanes $report.solver_archive_sha256
         if (-not $report.solver_lane_limit_confirmed) { throw 'Runtime solver lane limit or linked archive was not confirmed; no worker comparison evidence' }

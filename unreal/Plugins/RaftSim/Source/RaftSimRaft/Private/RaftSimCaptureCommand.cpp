@@ -746,6 +746,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     const FString FirstOption = Args.Num() > 4 ? Args[4] : FString();
     const bool bFirstIsOption = FirstOption.Contains(TEXT("=")) ||
         FirstOption.Equals(TEXT("record"), ESearchCase::IgnoreCase) ||
+        FirstOption.Equals(TEXT("highside"), ESearchCase::IgnoreCase) ||
         FirstOption.Equals(TEXT("paddle"), ESearchCase::IgnoreCase);
     const FString CameraPreset = bFirstIsOption ? FString() : FirstOption;
     bool bHasPose = false;
@@ -765,6 +766,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
         bHasPose = true;
     }
     bool bPaddle = false;
+    bool bHighSide = false;
     float TargetStationM = -1.0f;
     float TargetLateralM = 0.0f;
     float FocusStationM = -1.0f;
@@ -774,6 +776,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     for (const FString& Arg : Args)
     {
         bPaddle |= Arg.Equals(TEXT("paddle"), ESearchCase::IgnoreCase);
+        bHighSide |= Arg.Equals(TEXT("highside"), ESearchCase::IgnoreCase);
         bRecord |= Arg.Equals(TEXT("record"), ESearchCase::IgnoreCase);
         bLegacyHydraulicFrame |= Arg.Equals(TEXT("legacy_hydraulic_frame"), ESearchCase::IgnoreCase);
         if (Arg.StartsWith(TEXT("station="), ESearchCase::IgnoreCase))
@@ -795,17 +798,20 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     }
 
     TWeakObjectPtr<UWorld> WeakWorld(World);
-    if (bPaddle)
+    if(bPaddle && bHighSide)
+    { UE_LOG(LogTemp,Error,TEXT("CaptureSeries: paddle and highside commands conflict; no capture started"));return; }
+    if (bPaddle || bHighSide)
     {
         // Same paddle-in as CaptureRaft so a burst can happen mid-rapid.
         FTimerHandle PaddleHandle;
         World->GetTimerManager().SetTimer(
             PaddleHandle,
-            FTimerDelegate::CreateLambda([WeakWorld]()
+            FTimerDelegate::CreateLambda([WeakWorld,bHighSide]()
             {
                 if (ARaftSimRaftActor* Raft = FindRaft(WeakWorld.Get()))
                 {
-                    Raft->IssueCrewCommand(ERaftSimCrewCommand::AllForward);
+                    Raft->IssueCrewCommand(bHighSide ? ERaftSimCrewCommand::HighSide : ERaftSimCrewCommand::AllForward);
+                    UE_LOG(LogTemp,Display,TEXT("CaptureSeries input issued: %s"),bHighSide ? TEXT("HighSide") : TEXT("AllForward"));
                 }
             }),
             1.0f,
@@ -1179,6 +1185,25 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
         Count, Interval, StartDelay, *Label, *CameraPreset);
 }
 
+// Input-only cost probe: no screenshots, recording, camera or early shutdown.
+static FAutoConsoleCommandWithWorldAndArgs GProfileHighSideCommand(
+    TEXT("RaftSim.ProfileHighSide"),
+    TEXT("Issue the normal high-side crew command after one second; CSV owns observation and shutdown."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateLambda([](const TArray<FString>&,UWorld* World)
+    {
+        if(!World)return;
+        TWeakObjectPtr<UWorld> WeakWorld(World);
+        FTimerHandle Handle;
+        World->GetTimerManager().SetTimer(Handle,FTimerDelegate::CreateLambda([WeakWorld]()
+        {
+            if(ARaftSimRaftActor* Raft=FindRaft(WeakWorld.Get()))
+            {
+                Raft->IssueCrewCommand(ERaftSimCrewCommand::HighSide);
+                UE_LOG(LogTemp,Display,TEXT("ProfileHighSide input issued: HighSide"));
+            }
+        }),1.f,false);
+    }));
+
 static FAutoConsoleCommandWithWorldAndArgs GCaptureSeriesCommand(
     TEXT("RaftSim.CaptureSeries"),
     TEXT("After a start delay, take a numbered burst of screenshots at a "
@@ -1186,7 +1211,7 @@ static FAutoConsoleCommandWithWorldAndArgs GCaptureSeriesCommand(
          "<startSeconds> <count> <intervalSeconds> [label] "
          "[x y z pitch yaw|shore_left|shore_right|breaking_water|"
          "breaking_water_side|breaking_water_opposite|river_station|"
-         "river_station_side|river_station_downstream] [paddle] "
+         "river_station_side|river_station_downstream] [paddle|highside] "
          "[focusstation=<m>] [focuslateral=<m>] [record] "
          "[legacy_hydraulic_frame (shore comparison only, NOT downstream)] "
          "[station=<m>] [lateral=<m>] (station walks the raft there in "

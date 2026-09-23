@@ -135,6 +135,10 @@ public:
     /** The equipment and owned CC0 body consume the same fitted pose. */
     bool TryGetRenderedPose(ERaftSimCrewAvatarAction Action, float Phase, FRaftSimCrewAvatarPose& OutPose) const;
 
+    /** Contact solve succeeded; independent tread/mesh checks remain required. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
+    bool HasPlantedRenderedFeet() const { return bHasRenderedPose && LastRenderedPose.bFeetPlanted; }
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Animation")
     void SetAvatarAction(ERaftSimCrewAvatarAction NewAction, float Intensity = 1.0f);
 
@@ -341,6 +345,7 @@ private:
     FRaftSimCrewAvatarPose LastRenderedPose;
     bool bHasRenderedPose = false;
     bool bFootPlacementBound = false;
+    int32 BoundFootPlacementMode = INDEX_NONE;
     FVector BoundFootLocalCm[2] = {FVector::ZeroVector, FVector::ZeroVector};
     TWeakObjectPtr<AActor> FootPlacementRaft;
     uint64 CachedFootSupportRevision = 0;

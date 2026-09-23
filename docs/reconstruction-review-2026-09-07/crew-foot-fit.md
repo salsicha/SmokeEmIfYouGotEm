@@ -175,6 +175,15 @@ all acceptance gates below remain open; Colorado/Pacuare/Futaleufu stay queued.
 
 ## Remaining gates
 
+The subsequent [high-side trial](crew-high-side-contact.md) resolves the original
+bow/guide contact failures using staggered stances and an exact support index.
+All50 static boot poses solve; live invalidation recovery gives matching solve
+counters throughout a900-frame high-side run. It remains excluded from normal
+play: command-time cold search still spikes137ms, overall p9542.35ms fails, and
+upper-body pose/transition/collision are not qualified. That record also rejects
+six stale duplicate images and retains corrected distinct views and normal-start
+motion. These scoped passes do not close high-side or river acceptance.
+
 Independent full-tread support, guide and high-side contact, within-action motion,
 normal launch and rebuilt game, deformation/transformed-raft behavior, collision,
 and measured cost must remain separate checks. Initial poses, source-text tests,

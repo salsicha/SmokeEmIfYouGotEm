@@ -70,7 +70,7 @@ class RAFTSIMRAFT_API ARaftSimRaftActor : public AActor
 public:
     /** Exact triangle samples of current uploaded floor and tube/thwart sections, in raft local cm. */
     bool SampleRenderedCrewSupport(const TArray<FVector>& PointsCm,
-        TArray<double>& FloorZCm, TArray<double>& SolidZCm) const;
+        TArray<double>& FloorZCm, TArray<double>& SolidZCm, bool bForceReference = false) const;
     uint64 GetCrewSupportGeometryRevision() const { return CrewSupportGeometryRevision; }
     ARaftSimRaftActor();
 
@@ -546,6 +546,16 @@ private:
     RaftSimRaftMesh::FRaftSimRaftVisualCondition LastRenderedRaftVisualCondition;
     bool bHasRenderedFlexibleRaftState = false;
     uint64 CrewSupportGeometryRevision = 0;
+    struct FCrewSupportTriangle
+    {
+        FVector A,B,C;
+        double Determinant;
+        bool bFloor;
+    };
+    mutable uint64 CrewSupportIndexRevision = MAX_uint64;
+    mutable FTransform CrewSupportIndexTransform;
+    mutable TArray<FCrewSupportTriangle> CrewSupportTriangles;
+    mutable TMap<FIntPoint,TArray<int32>> CrewSupportBins;
 
     /** Authored CPU source is present; shared snapshots alone do not enable full-hull contact. */
     bool bUsingProductionRaftRestMesh = false;

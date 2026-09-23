@@ -6,12 +6,63 @@
 #include "EngineUtils.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/ScopeExit.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "UObject/Script.h"
 #include "RaftSimCC0CrewVisualActor.h"
 #include "RaftSimCrewAvatarActor.h"
 #include "RaftSimRaftActor.h"
+#include "ProceduralMeshComponent.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrewSupportIndexTest,
+    "RaftSim.Crew.SupportIndexMatchesUploadedTriangles",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimCrewSupportIndexTest::RunTest(const FString&)
+{
+    FEditorScriptExecutionGuard ScriptGuard;
+    UWorld* World=nullptr;
+    for(const FWorldContext& Context:GEngine->GetWorldContexts())
+        if(Context.WorldType==EWorldType::Editor){World=Context.World();break;}
+    if(!TestNotNull(TEXT("editor world"),World))return false;
+    auto* Raft=World->SpawnActor<ARaftSimRaftActor>();
+    if(!TestNotNull(TEXT("actual raft"),Raft))return false;
+    ON_SCOPE_EXIT {
+        TArray<AActor*> Owned;
+        for(TActorIterator<ARaftSimCrewAvatarActor> It(World);It;++It)if(It->GetOwner()==Raft)Owned.Add(*It);
+        for(AActor* Host:Owned)World->DestroyActor(Host);
+        World->DestroyActor(Raft);
+    };
+    Raft->InitializeCrewSeatingForValidation();
+    UProceduralMeshComponent* Mesh=nullptr;
+    TInlineComponentArray<UProceduralMeshComponent*> Components(Raft);
+    for(auto* C:Components)if(C->GetName()==TEXT("RaftVisual"))Mesh=C;
+    if(!TestNotNull(TEXT("uploaded raft mesh"),Mesh))return false;
+    TArray<FVector> Points;
+    for(int32 X=-300;X<=300;X+=5)for(int32 Y=-150;Y<=150;Y+=5)Points.Add(FVector(X,Y,0));
+    // Exact vertices and points straddling bin edges complement the broad grid.
+    const FProcMeshSection* Section=Mesh->GetProcMeshSection(0);
+    for(int32 I=0;I<Section->ProcVertexBuffer.Num();I+=37)
+        Points.Add(Mesh->GetRelativeTransform().TransformPosition(FVector(Section->ProcVertexBuffer[I].Position)));
+    for(double Epsilon:{-1.e-7,0.,1.e-7})Points.Add(FVector(80.+Epsilon,20.-Epsilon,0));
+    const FVector Original=Mesh->GetRelativeLocation();
+    for(int32 State=0;State<3;++State)
+    {
+        if(State==1)Mesh->SetRelativeLocation(Original+FVector(0,0,.25));
+        if(State==2){Mesh->SetRelativeLocation(Original);Raft->InitializeCrewSeatingForValidation();}
+        TArray<double> Floor,Solid,ReferenceFloor,ReferenceSolid;
+        const bool Actual=Raft->SampleRenderedCrewSupport(Points,Floor,Solid);
+        const bool Reference=Raft->SampleRenderedCrewSupport(Points,ReferenceFloor,ReferenceSolid,true);
+        TestEqual(TEXT("identical supported/missing status"),Actual,Reference);
+        TestTrue(FString::Printf(TEXT("exact floor samples after lifecycle state%d"),State),Floor==ReferenceFloor);
+        TestTrue(FString::Printf(TEXT("exact solid samples after lifecycle state%d"),State),Solid==ReferenceSolid);
+    }
+    AddInfo(FString::Printf(TEXT("Support reference equality: %d points x3 states; indexed_review=%d"),Points.Num(),
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimReviewHighSideContact"))));
+    return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrewFootContactTest,
     "RaftSim.Crew.PlantedFeetShareBodyTargets",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
@@ -57,11 +108,19 @@ bool FRaftSimCrewFootContactTest::RunTest(const FString&)
             // Non-unit intensity also checks that the body no longer evaluates
             // a differently time-scaled copy of the host's solved pose.
             Host->SetAvatarAction(static_cast<ERaftSimCrewAvatarAction>(Action), Action % 2 ? 1.4f : 0.6f);
+            const bool bContactExpected = Action <= static_cast<int32>(ERaftSimCrewAvatarAction::Brace) ||
+                FParse::Param(FCommandLine::Get(),TEXT("RaftSimReviewHighSideContact"));
+            // Do not let an authored fallback satisfy the anchor-only checks.
+            // Opt-in trial retains the full high-side gate; default exclusion
+            // is not a passing high-side reconstruction/contact result.
+            TestEqual(FString::Printf(TEXT("contact solve matches qualified scope (%s action=%d)"),*Host->GetName(),Action),
+                Host->HasPlantedRenderedFeet(),bContactExpected);
             TArray<FTransform> Planted;
             for (auto* Boot : Boots) Planted.Add(Boot->GetRelativeTransform());
             for (int32 Step = 0; Step < 8; ++Step)
             {
                 Host->Tick(0.1f);
+                TestEqual(FString::Printf(TEXT("contact solve scope remains unchanged in motion (%s action=%d step=%d)"),*Host->GetName(),Action,Step),Host->HasPlantedRenderedFeet(),bContactExpected);
                 TestTrue(TEXT("all renderer transforms remain finite"), Host->HasFiniteVisualTransforms());
                 for (int32 Foot = 0; Foot < Boots.Num(); ++Foot)
                 {

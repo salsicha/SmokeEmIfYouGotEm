@@ -2,11 +2,16 @@
 
 Read-only posed diagnostic, not animation or full crew acceptance. No assets or
 levels are saved. RAFTSIM_FOOT_REVIEW_OUTPUT must name a fresh output directory.
+Launch with -ExecCmds="py <absolute script path>": captures yield editor frames;
+-ExecutePythonScript would close the editor before the callback completes.
 """
 import importlib.util
 import json
 import math
 import os
+import hashlib
+import time
+import traceback
 from pathlib import Path
 
 import unreal
@@ -59,7 +64,7 @@ def main():
     tube_points, tube_indices, _, _, _ = unreal.ProceduralMeshLibrary.get_section_from_procedural_mesh(visual, 0)
     tube_points = [xyz(unreal.MathLibrary.transform_location(visual.get_world_transform(), p)) for p in tube_points]
     solids = triangles + [[tube_points[tube_indices[i+j]] for j in range(3)] for i in range(0, len(tube_indices), 3)]
-    report = dict(schema='raftsim.crew_foot_contact.v2', floor_section=1,
+    report = dict(schema='raftsim.crew_foot_contact.v3', floor_section=1,
                   solid_sections=[0, 1], solid_triangles=len(solids),
                   floor_triangles=len(triangles), poses=[], images=[],
                   assets_saved=False, visual_accepted=False, motion_accepted=False)
@@ -93,8 +98,8 @@ def main():
                                 solid_z_cm=top_at(p, nearby_solids)) for p in sole]
                 clearances = [p['sole_cm'][2]-p['floor_z_cm'] for p in samples if p['floor_z_cm'] is not None]
                 solid_clearances = [p['sole_cm'][2]-p['solid_z_cm'] for p in samples if p['solid_z_cm'] is not None]
-                if not clearances or not all(math.isfinite(v) for v in clearances):
-                    raise RuntimeError('No finite floor support samples')
+                if not all(math.isfinite(v) for v in clearances):
+                    raise RuntimeError('Nonfinite floor support samples')
                 if not solid_clearances or not all(math.isfinite(v) for v in solid_clearances):
                     raise RuntimeError('No finite solid support samples')
                 body = host.get_production_visual_actor().get_component_by_class(unreal.PoseableMeshComponent)
@@ -106,11 +111,15 @@ def main():
                 foot_target.z -= sole_z * (host.get_body_proportion_scale().z-boot.get_editor_property('relative_scale3d').z)
                 foot_target = unreal.MathLibrary.transform_location(host.get_actor_transform(), foot_target)
                 report['poses'].append(dict(action=action, crew=host.get_name(), boot=boot.get_name(),
+                    planted_contact_solve=host.has_planted_rendered_feet(),
                     mesh=mesh.get_path_name(), seat_cm=xyz(host.get_actor_location()),
                     seat_contact_clearance_cm=raft.get_crew_seat_contact_clearance_cm(host),
                     body_foot_world_cm=xyz(body_foot), boot_target_world_cm=xyz(foot_target),
                     body_boot_target_error_cm=math.dist(xyz(body_foot), xyz(foot_target)),
-                    minimum_clearance_cm=min(clearances), maximum_clearance_cm=max(clearances),
+                    # A high-side boot may stand wholly on the tube. Preserve
+                    # missing floor as null, never infer floor beneath it.
+                    minimum_clearance_cm=min(clearances) if clearances else None,
+                    maximum_clearance_cm=max(clearances) if clearances else None,
                     minimum_solid_clearance_cm=min(solid_clearances), maximum_solid_clearance_cm=max(solid_clearances),
                     unsupported_solid_samples=sum(p['solid_z_cm'] is None for p in samples),
                     unsupported_samples=sum(p['floor_z_cm'] is None for p in samples), samples=samples))
@@ -128,18 +137,62 @@ def main():
     component.set_editor_property('texture_target', target)
     for command in ('r.EyeAdaptationQuality 0', 'r.TextureStreaming 0', 'r.Nanite 0'):
         unreal.SystemLibrary.execute_console_command(world, command)
-    for label, eye, aim in (('floor_front', unreal.Vector(400, 150, 210), unreal.Vector(50, 0, 15)),
-                            ('floor_rear', unreal.Vector(-400, 150, 240), unreal.Vector(-70, 0, 15))):
-        capture.set_actor_location(eye, False, False)
-        capture.set_actor_rotation(helpers.look_at(eye, aim), False)
-        component.set_editor_property('fov_angle', 48)
-        report['images'].append(str(helpers.export_capture(world, component, target, label)))
-    (output/'report.json').write_text(json.dumps(report, indent=2, allow_nan=False)+'\n', encoding='utf-8')
-    unreal.log('Actual crew sole/floor diagnostic complete: '+str(output))
+    views = [(action, label, eye, aim)
+             for action in ('SEATED_IDLE', 'HIGH_SIDE_PORT', 'HIGH_SIDE_STARBOARD')
+             for label, eye, aim in (('floor_front', unreal.Vector(400, 150, 210), unreal.Vector(50, 0, 15)),
+                                    ('floor_rear', unreal.Vector(-400, 150, 240), unreal.Vector(-70, 0, 15)))]
+    state = dict(frame=0, index=0, started=time.monotonic(), hashes=set())
+    report['capture_complete'] = False
+
+    def finish(error=None):
+        unreal.unregister_slate_post_tick_callback(state['handle'])
+        report['capture_complete'] = error is None
+        report['capture_error'] = error
+        (output/'report.json').write_text(json.dumps(report, indent=2, allow_nan=False)+'\n', encoding='utf-8')
+        if error:
+            unreal.log_error(error)
+        unreal.SystemLibrary.quit_editor()
+
+    def tick(delta):
+        try:
+            if time.monotonic()-state['started'] > 120:
+                raise RuntimeError('Posed captures exceeded two-minute wall bound')
+            action, label, eye, aim = views[state['index']]
+            if state['frame'] == 0:
+                for host in crew:
+                    host.set_avatar_action(getattr(unreal.RaftSimCrewAvatarAction, action), 1.0)
+                capture.set_actor_location(eye, False, False)
+                capture.set_actor_rotation(helpers.look_at(eye, aim), False)
+                component.set_editor_property('fov_angle', 48)
+            if state['frame'] in (3, 6):
+                component.capture_scene()
+            if state['frame'] == 9:
+                # Export only after the camera, pose and capture have crossed
+                # actual editor/render frames. Synchronous loops exported six
+                # byte-identical stale images in the retained v1 attempt.
+                name = action.lower()+'_'+label+'.png'
+                unreal.RenderingLibrary.export_render_target(world, target, str(output), name)
+                path = output/name
+                digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                if digest in state['hashes']:
+                    raise RuntimeError('Duplicate posed capture: '+name)
+                state['hashes'].add(digest)
+                report['images'].append(str(path))
+                state['index'] += 1
+                if state['index'] == len(views):
+                    finish()
+                    return
+                state['frame'] = -1
+            state['frame'] += 1
+        except Exception:
+            finish(traceback.format_exc())
+
+    state['handle'] = unreal.register_slate_post_tick_callback(tick)
 
 
 if __name__ == '__main__':
     try:
         main()
-    finally:
+    except Exception:
+        unreal.log_error(traceback.format_exc())
         unreal.SystemLibrary.quit_editor()

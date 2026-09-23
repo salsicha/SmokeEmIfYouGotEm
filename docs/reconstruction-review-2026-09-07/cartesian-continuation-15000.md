@@ -189,6 +189,21 @@ Report: `tmp/cartesian-storage-regions-15700-v1-20260923.json`, SHA256
 Session26678 is terminal exit0. This is supporting hydraulic qualification,
 not visible delivery; the same cook continues with unchanged inputs.
 
+## New completed checkpoint at16150 s
+
+Local23000/16150 s now passes both independent state and exterior-bank audits.
+All5,382,400 h/u/v cells are finite; maximum depth3.379908945m, speed4.919573249m/s,
+maximum per-step conservation residual9.483589469e-9m³. All86,720 artificial-bank
+cells remain exactly dry. Volume2113743.264080m³ is down78534.204083m³ from restart.
+Combined instantaneous outflow108.828006m³/s still exceeds inflow45.306955m³/s;
+this is NOT settled and must not be installed into normal gameplay.
+Reports `tmp/cartesian-16150-state-v1-20260923.json` and
+`tmp/cartesian-16150-banks-v1-20260923.json` are terminal exit0 in session21157.
+Depth SHA256 `cd216cae2171798a0301c06811ceaef1ea625dfff9afab7a094150405f8c217e`.
+This jumps forward to a newly completed state; intervening unaudited checkpoints
+are not implicitly marked passed. The original identified cook36692 continues;
+no duplicate cook, input adjustment, source relabeling or field promotion.
+
 ## Unchanged acceptance limits
 
 Captured data, normal playable geometry/collision and installed 4950 s fields

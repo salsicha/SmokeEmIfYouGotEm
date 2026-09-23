@@ -3,6 +3,20 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest bounded crew trial: [high-side contact](../reconstruction-review-2026-09-07/crew-high-side-contact.md).
+The rigid paired v2 search fails bow/guide contact. Exported actual geometry
+identifies feasible staggered stances; v3 now solves all50 audited boot poses
+with0 unsupported/penetrating tread points and passes4 native crew suites.
+An exact rendered-triangle index now passes7,570 probes×3 lifecycle states and
+all5 native suites. Live invalidation recovery then solves every attempted pose
+in a900-frame normal-start high-side run; warmed contact is0.038ms mean, but
+cold search still spikes137ms and overall p9542.35ms FAILS33.333333ms. This remains
+an opt-in candidate pending command hitch, whole-body and transition fixes;
+normal-start motion was decoded and inspected before the recovery edit.
+Six stale v1 captures are rejected; subsequent frame-yielding diagnostics produce
+distinct engine views. No new visible normal-play delivery or river completion
+is claimed. Preserve prior failures; do not rerun unchanged rigid-pair searches.
+
 Latest normal-path performance improvement: [refresh-local station coverage](../reconstruction-review-2026-09-07/station-coverage-reuse.md).
 The original edge calculation is reused per station within each refresh, never
 across a recenter. All4,348,737 actual uses match exactly;15 native shoreline/
