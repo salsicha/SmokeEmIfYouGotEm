@@ -1,7 +1,8 @@
 param(
     [Parameter(Mandatory=$true)][string]$Label,
-    [Parameter(Mandatory=$true)][int]$CookProcessId,
-    [Parameter(Mandatory=$true)][string]$CookStartUtc,
+    [int]$CookProcessId = 0,
+    [string]$CookStartUtc = '',
+    [switch]$NoCookWorkload,
     [string]$CookExecutable = 'tmp/south-fork-checkpoint-solver-v1-20260912/raftsim_cartesian_cook.exe',
     [string]$ShaderWorkloadManifest = '',
     [string]$ExtraGameArgument = '',
@@ -86,11 +87,26 @@ if (-not $cookExe.StartsWith($localCookRoot, [StringComparison]::OrdinalIgnoreCa
     [IO.Path]::GetFileName($cookExe) -ne 'raftsim_cartesian_cook.exe') {
     throw 'Explicit cook executable must be a project-local tmp solver'
 }
-$cook = [Diagnostics.Process]::GetProcessById($CookProcessId)
-if ($cook.StartTime.ToUniversalTime().ToString('o') -ne $CookStartUtc -or $cook.MainModule.FileName -ne $cookExe) {
-    throw 'Live cook identity does not match explicit caller request'
+$owned = @()
+if ($NoCookWorkload) {
+    if ($CookProcessId -ne 0 -or $CookStartUtc -or $PSBoundParameters.ContainsKey('CookExecutable')) {
+        throw 'NoCookWorkload cannot carry a cook identity'
+    }
+    # Explicit absence, not a missing/stale PID interpreted as permission.
+    # Do not suspend or stop any unowned process discovered here.
+    if (@(Get-Process -Name raftsim_cartesian_cook -ErrorAction SilentlyContinue).Count) {
+        throw 'NoCookWorkload requires no running Cartesian cook'
+    }
+} else {
+    if ($CookProcessId -le 0 -or -not $CookStartUtc) {
+        throw 'Supply an exact live cook identity or explicit NoCookWorkload'
+    }
+    $cook = [Diagnostics.Process]::GetProcessById($CookProcessId)
+    if ($cook.StartTime.ToUniversalTime().ToString('o') -ne $CookStartUtc -or $cook.MainModule.FileName -ne $cookExe) {
+        throw 'Live cook identity does not match explicit caller request'
+    }
+    $owned += [pscustomobject]@{ process=$cook; role='cook'; parent_id=0; handle=$cook.Handle }
 }
-$owned = @([pscustomobject]@{ process=$cook; role='cook'; parent_id=0; handle=$cook.Handle })
 if ($ShaderWorkloadManifest) {
     # The caller records the exact existing job, not every editor on the host.
     # Validate ALL identities before suspending ANY process. Retain handles so
@@ -141,7 +157,7 @@ public static class RaftSimProfileProcessControl {
 '@
 $paused = @()
 $game = $null
-$report = [ordered]@{ cook_pid=$CookProcessId; cook_start_utc=$CookStartUtc; cook_executable=$cookExe; cook_sha256=(Get-FileHash -LiteralPath $cookExe).Hash.ToLowerInvariant(); shader_manifest=$ShaderWorkloadManifest; label=$Label; native_gate=[bool]$NativePerformanceGate; gate_passed=$null; suspend_status=$null; resume_status=$null; processes=@(); game_exit_code=$null; game_timeout=$false }
+$report = [ordered]@{ no_cook_workload=[bool]$NoCookWorkload; cook_pid=$(if ($NoCookWorkload) { $null } else { $CookProcessId }); cook_start_utc=$(if ($NoCookWorkload) { $null } else { $CookStartUtc }); cook_executable=$(if ($NoCookWorkload) { $null } else { $cookExe }); cook_sha256=$(if ($NoCookWorkload) { $null } else { (Get-FileHash -LiteralPath $cookExe).Hash.ToLowerInvariant() }); shader_manifest=$ShaderWorkloadManifest; label=$Label; native_gate=[bool]$NativePerformanceGate; gate_passed=$null; suspend_status=$null; resume_status=$null; processes=@(); game_exit_code=$null; game_timeout=$false }
 $report.detail_replay = [bool]$DetailStreamingReplay
 $report.profile_frames = if ($NativePerformanceGate -or $DetailStreamingReplay -or $StartupRenderReplay -or $CheckpointResetReplay) { $null } else { $ProfileFrames }
 $report.detail_replay_passed = $null
@@ -235,6 +251,9 @@ try {
     # allows startup/report flushing; it does not alter a native acceptance gate.
     $deadline = [DateTime]::UtcNow.AddSeconds($(if ($DetailStreamingReplay -or $CheckpointResetReplay) { 960 } else { 240 }))
     while (-not $game.WaitForExit(1000)) {
+        if ($NoCookWorkload -and @(Get-Process -Name raftsim_cartesian_cook -ErrorAction SilentlyContinue).Count) {
+            $report.no_cook_workload = $false
+        }
         if ([DateTime]::UtcNow -ge $deadline) {
             $report.game_timeout = $true
             $game.Kill()
@@ -335,6 +354,7 @@ try {
 }
 if (@($report.processes | Where-Object { $_.suspend -eq 0 -and $_.resume -ne 0 }).Count) { throw 'Owned process resume failed: immediate same-process recovery required' }
 if ($report.game_timeout -or $report.game_exit_code -ne 0) { throw 'Capture did not finish successfully' }
+if ($NoCookWorkload -and -not $report.no_cook_workload) { throw 'Cook appeared during capture; no isolated profile' }
 if ($NativePerformanceGate -and -not $report.gate_passed) { throw 'Native performance gate failed; see preserved gate report' }
 if ($DetailStreamingReplay -and -not $report.detail_replay_passed) { throw 'Native detail replay failed; see preserved replay report' }
 if ($CheckpointResetReplay -and -not $report.checkpoint_replay_passed) { throw 'Native checkpoint replay failed; see preserved replay report' }

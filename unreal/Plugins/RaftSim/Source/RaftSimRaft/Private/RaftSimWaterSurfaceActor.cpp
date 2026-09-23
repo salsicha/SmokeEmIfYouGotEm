@@ -1,4 +1,5 @@
 #include "RaftSimWaterSurfaceActor.h"
+#include <tuple>
 #include "RaftSimRunCoordinateProvider.h"
 #include "RaftSimCartesianHydraulicRelief.h"
 #include "RaftSimBreakingTileAudit.h"
@@ -5068,11 +5069,36 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // displacement remains reserved for solver relief and localized wakes.
     LastMaximumAbsoluteBoulderWakeM = MaximumAbsoluteBoulderWakeM;
     int32 WakeFoamVertexCount = 0;
-    for (int32 Y = 0; Y < GridLateralN; ++Y)
+    // Snapshot game-thread-only settings before joined worker execution.
+    const bool bBaseFlatNormals=CVarRaftSimFlatWaterNormals.GetValueOnGameThread()!=0;
+    const float BaseWorldYSign=WaterAdapter ? WaterAdapter->GetRiverWorldYSign() : 1.f;
+    const float BaseRenderLiftCm=GetResolvedLiveSurfaceRenderLiftCm();
+    const int32 BasePadState=CorridorEndPadState();
+    const int32 BaseUpstreamPad=(BasePadState&1) ? GridStationN : 0;
+    const int32 BaseDownstreamPad=(BasePadState&2) ? GridStationN : 0;
+    static const bool bForceParallelBaseVertices=FParse::Param(FCommandLine::Get(),TEXT("RaftSimParallelBaseVertices"));
+    static const bool bSerialBaseVertices=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialBaseVertices"));
+    // Exact paired component results do not establish a whole-game gain.
+    // Both ordinary candidate runs were slower than both serial controls;
+    // retain the candidate only for explicit diagnostics, not normal play.
+    const bool bParallelBaseVertices=!bSerialBaseVertices && bForceParallelBaseVertices;
+    static bool bLoggedBaseDispatch=false;
+    if(!bLoggedBaseDispatch)
     {
-        for (int32 X = 0; X < GridStationN; ++X)
+        bLoggedBaseDispatch=true;
+        UE_LOG(LogTemp,Display,TEXT("RaftSim base vertex dispatch: parallel=%d forced=%d serial_override=%d"),
+            int32(bParallelBaseVertices),int32(bForceParallelBaseVertices),int32(bSerialBaseVertices));
+    }
+    static const bool bBaseVertexAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimBaseVertexAudit"));
+    const int32 BaseVertexCount=GridStationN*GridLateralN;
+    const auto RunBaseVertices=[&](bool bParallel)
+    {
+        struct FDeferredStats { float Speed,StandingWave; uint8 WakeFoam; };
+        TArray<FDeferredStats> Deferred;
+        if(bParallel)Deferred.SetNumUninitialized(BaseVertexCount);
+        const auto EvaluateVertex=[&](int32 Index)
         {
-            const int32 Index = Y * GridStationN + X;
+            const int32 X=Index%GridStationN,Y=Index/GridStationN;
             // Wet/dry visibility is encoded in vertex alpha below. Dry and
             // out-of-crop vertices are levelled to the nearest same-station
             // wet surface in a second pass. Moving them far below the bed made
@@ -5149,7 +5175,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                             ShoreDisplacementWeight[Index] +
                         HydraulicRelief - LegacyMaterialWPOCounterM) *
                         kSurfCmPerM +
-                    GetResolvedLiveSurfaceRenderLiftCm();
+                    BaseRenderLiftCm;
                 // The visible waterline is the surface/terrain intersection:
                 // on a flat bank a few centimetres of per-refresh wave motion
                 // sweep that line metres sideways, reading as patches of
@@ -5264,8 +5290,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 SurfaceZCm +=
                     (BoulderWakeDisplacementMeters[Index] +
                         BoatWakeDisplacementMeters[Index]) * kSurfCmPerM;
-                StationWetSurfaceZSum[X] += SurfaceZCm;
-                ++StationWetSurfaceCount[X];
+                if(!bParallel)
+                {
+                    StationWetSurfaceZSum[X] += SurfaceZCm;
+                    ++StationWetSurfaceCount[X];
+                }
                 const FVector SampleNormal = Sample.SurfaceNormal.GetSafeNormal();
                 const float SafeNormalZ = FMath::Max(SampleNormal.Z, 0.1f);
                 float BaseStationSlope = -SampleNormal.X / SafeNormalZ;
@@ -5409,7 +5438,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     const FVector FlowTangent = Tangents[Index].TangentX;
                     NormalOut = RaftSimFoamTransport::TransformSurfaceNormal(
                         PresentationLocalNormal, FlowTangent,
-                        WaterAdapter ? WaterAdapter->GetRiverWorldYSign() : 1.0f);
+                        BaseWorldYSign);
                 }
                 else
                 {
@@ -5501,28 +5530,32 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 }
                 if (WakeFoamAdd > 0.04f)
                 {
-                    ++WakeFoamVertexCount;
+                    if(!bParallel)++WakeFoamVertexCount;
                 }
                 SourceFoam[Index] = Foam;
                 DepthNorm = FMath::Clamp(Sample.DepthMeters / 4.0f, 0.0f, 1.0f);
                 SpeedNorm = FMath::Clamp(Speed / 8.0f, 0.0f, 1.0f);
-                ++WetVertexCount;
-                DepthSum += DepthNorm;
-                SpeedSum += SpeedNorm;
-                DepthMetersSum += Sample.DepthMeters;
-                SpeedMpsSum += Speed;
-                MaximumAbsoluteStandingWaveM = FMath::Max(
-                    MaximumAbsoluteStandingWaveM,
-                    FMath::Abs(StandingWave.DisplacementMeters));
-                MaximumAbsoluteHydraulicReliefM = FMath::Max(
-                    MaximumAbsoluteHydraulicReliefM,
-                    FMath::Abs(HydraulicRelief));
+                if(bParallel)Deferred[Index]={Speed,StandingWave.DisplacementMeters,uint8(WakeFoamAdd>0.04f)};
+                else
+                {
+                    ++WetVertexCount;
+                    DepthSum += DepthNorm;
+                    SpeedSum += SpeedNorm;
+                    DepthMetersSum += Sample.DepthMeters;
+                    SpeedMpsSum += Speed;
+                    MaximumAbsoluteStandingWaveM = FMath::Max(
+                        MaximumAbsoluteStandingWaveM,
+                        FMath::Abs(StandingWave.DisplacementMeters));
+                    MaximumAbsoluteHydraulicReliefM = FMath::Max(
+                        MaximumAbsoluteHydraulicReliefM,
+                        FMath::Abs(HydraulicRelief));
+                }
             }
 
             Vertices[Index].Z = SurfaceZCm;
             // Review bisect: raftsim.FlatWaterNormals 1 discards the solved vertex
             // normal so any remaining banding must come from the material.
-            if (CVarRaftSimFlatWaterNormals.GetValueOnGameThread() != 0)
+            if (bBaseFlatNormals)
             {
                 NormalOut = FVector::UpVector;
             }
@@ -5534,10 +5567,57 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 DepthNorm,
                 SpeedNorm,
                 WetVertexMask[Index] != 0
-                    ? StationEdgeCoverage(X)
+                    ? (bParallel ? ComputeStationEdgeCoverage(X+BaseUpstreamPad,
+                        GridStationN+BaseUpstreamPad+BaseDownstreamPad,
+                        ResolvedVertexSpacingMeters,CurvedGridEdgeBlendMeters) : StationEdgeCoverage(X))
                     : 0.0f);
+        };
+        if(bParallel)
+        {
+            ParallelFor(TEXT("RaftSimBaseVertices"),BaseVertexCount,256,EvaluateVertex,EParallelForFlags::Unbalanced);
+            // Original Y-major/X-minor addition order, including station sums.
+            // No floating-point atomics or tree reduction changes the result.
+            for(int32 Index=0;Index<BaseVertexCount;++Index)if(WetVertexMask[Index]!=0)
+            {
+                const int32 X=Index%GridStationN;
+                StationWetSurfaceZSum[X]+=float(Vertices[Index].Z);
+                ++StationWetSurfaceCount[X];
+                WakeFoamVertexCount+=Deferred[Index].WakeFoam;
+                ++WetVertexCount;
+                DepthSum+=VertexColors[Index].G;
+                SpeedSum+=VertexColors[Index].B;
+                DepthMetersSum+=WaterSamples[Index].DepthMeters;
+                SpeedMpsSum+=Deferred[Index].Speed;
+                MaximumAbsoluteStandingWaveM=FMath::Max(MaximumAbsoluteStandingWaveM,FMath::Abs(Deferred[Index].StandingWave));
+                MaximumAbsoluteHydraulicReliefM=FMath::Max(MaximumAbsoluteHydraulicReliefM,FMath::Abs(HydraulicReliefMeters[Index]));
+            }
         }
+        else for(int32 Index=0;Index<BaseVertexCount;++Index)EvaluateVertex(Index);
+    };
+    if(bBaseVertexAudit && GFrameCounter>=120 && GFrameCounter<184)
+    {
+        // Every mutated array and statistic, including persistent histories.
+        // Copies/restores/comparison are outside measured evaluation/reduction.
+        const auto Capture=[&](){return std::make_tuple(Vertices,Normals,VertexColors,
+            FlowVelocityMetersPerSecond,ShoreSmoothedSurfaceZCm,FroudeField,FoamSourceAudit,SourceFoam,
+            StationWetSurfaceZSum,StationWetSurfaceCount,WakeFoamVertexCount,WetVertexCount,
+            DepthSum,SpeedSum,DepthMetersSum,SpeedMpsSum,MaximumAbsoluteStandingWaveM,MaximumAbsoluteHydraulicReliefM);};
+        const auto Restore=[&](const auto& State){std::tie(Vertices,Normals,VertexColors,
+            FlowVelocityMetersPerSecond,ShoreSmoothedSurfaceZCm,FroudeField,FoamSourceAudit,SourceFoam,
+            StationWetSurfaceZSum,StationWetSurfaceCount,WakeFoamVertexCount,WetVertexCount,
+            DepthSum,SpeedSum,DepthMetersSum,SpeedMpsSum,MaximumAbsoluteStandingWaveM,MaximumAbsoluteHydraulicReliefM)=State;};
+        const auto Before=Capture();
+        static uint64 Pair=0;const bool First=(Pair++%2)!=0;
+        const double A=FPlatformTime::Seconds();RunBaseVertices(First);const double AMs=(FPlatformTime::Seconds()-A)*1000.;
+        const auto FirstState=Capture();Restore(Before);
+        const double B=FPlatformTime::Seconds();RunBaseVertices(!First);const double BMs=(FPlatformTime::Seconds()-B)*1000.;
+        const bool Exact=FirstState==Capture();
+        UE_LOG(LogTemp,Display,TEXT("BaseVertexAudit frame=%llu pair=%llu exact=%d candidate_first=%d vertices=%d wet=%d reference_ms=%.9f candidate_ms=%.9f"),
+            GFrameCounter,Pair,int32(Exact),int32(First),Vertices.Num(),WetVertexCount,First ? BMs : AMs,First ? AMs : BMs);
+        if(First==bParallelBaseVertices)Restore(FirstState);
+        if(!Exact){UE_LOG(LogTemp,Error,TEXT("BaseVertexAudit state mismatch; candidate not qualified"));return;}
     }
+    else RunBaseVertices(bParallelBaseVertices);
     LastBoulderWakeFoamVertexCount = WakeFoamVertexCount;
 
     Perf.Mark(TEXT("base_vertices"));

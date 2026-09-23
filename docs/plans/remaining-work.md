@@ -3,7 +3,25 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Current supporting review: [completed source replay and15000 s hydraulic audit](../reconstruction-review-2026-09-07/affine-source-pullback-and-15000-review.md).
+Latest performance investigation: [base-vertex parallel trial](../reconstruction-review-2026-09-07/base-vertices-parallel.md).
+64 actual-input pairs preserve every array/history/statistic exactly; both-order
+component means improve, with9 slower individual pairs retained. However BOTH
+ordinary candidate runs are slower overall than BOTH serial controls: candidate
+B/C24.917022/26.958607FPS and p9548.5326/45.3311ms; all four FAIL30FPS.
+Default promotion REJECTED. Final v4 restores serial in every normal scene;
+parallel is diagnostic-only. This is supporting progress, NOT playable delivery
+or visual improvement. Editor/game rebuilt.34 focused tests and10 native D3D12
+regressions pass; the initial NullRHI proxy failure is retained, not waived.
+Final serial-default launch confirms parallel=0 without overrides;24 images,
+469 decoded movie frames and2,034 sampled support contacts checked. No full
+traversal/shoreline/visual acceptance; title clipping and scene limitations remain.
+No scientific imports/source/collision/map/4950-field change; nonlinear OFF.
+Only source audit6480/session50573 remains live; old cook12672/replay14076 terminal.
+The source job is safely resumed after captures; no duplicate cook/replay.
+Cap decision, exact source qualification, realistic water/scene and performance
+remain OPEN. Do not repeat unchanged default promotion or advance to Colorado.
+
+Current supporting source review: [completed source replay and15000 s hydraulic audit](../reconstruction-review-2026-09-07/affine-source-pullback-and-15000-review.md).
 Old source14076 and cook12672 are TERMINAL, superseding all LIVE statements below.
 The original two-pole replay passes11 supported cases; unsupported2/7 retained.
 New saved-state primitive-work audit checks original equations without re-solving
