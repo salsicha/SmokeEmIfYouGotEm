@@ -18,9 +18,9 @@ One native cook is LIVE: PID36692/start2026-09-23T18:34:26.9266904Z,
 session68019, fresh15000→18000 s output. All5,382,400 native restart h/u/v
 cells match the prior final state bit-for-bit, all retained physical inputs
 are unchanged, zero added cells/water;51 focused regressions pass. New checkpoint
-local2000/15100 s passes BOTH state/exterior-bank audits: all86,720 bank cells dry,
-maximum per-step residual9.48e−9m³; outflow115.512228 versus inflow45.306955m³/s
-still unsettled. Next complete local3000/15150 s needs both audits.
+local3000/15150 s passes BOTH state/exterior-bank audits: all86,720 bank cells dry,
+maximum per-step residual9.48e−9m³; outflow115.279190 versus inflow45.306955m³/s
+still unsettled. Next complete local4000/15200 s needs both audits.
 Do not duplicate the cook or reuse historical PID12672. This is supporting
 settling work ONLY: no visible delivery, game rebuild, field promotion or
 acceptance; installed4950 fields and nonlinear OFF state remain unchanged.

@@ -61,7 +61,20 @@ Volume is2185204.713700 m³, down7072.754462 m³ from the restart. Combined
 instantaneous outlet115.512228 m³/s still exceeds inlet45.306955 m³/s.
 Retained reports: `tmp/cartesian-15100-state-v1-20260923.json` and
 `tmp/cartesian-15100-banks-v1-20260923.json`. This is not settling acceptance.
-Next complete local3000/15150 s needs both `audit_cartesian_cook_snapshot.py`
+Local3000/15150 s now also passes both audits. All5,382,400 cells remain finite;
+maximum depth3.561168726 m, speed5.020982768 m/s, maximum step conservation
+residual9.483589469e−9 m³. All86,720 artificial-bank cells remain exactly dry.
+Volume is2181676.392980 m³, down10601.075183 m³ from restart; combined outlet
+115.279190 m³/s still exceeds inlet45.306955 m³/s. Snapshot/driver volume
+disagreement is1.396983862e−9 m³. Reports:
+`tmp/cartesian-15150-state-v1-20260923.json` and
+`tmp/cartesian-15150-banks-v1-20260923.json`.
+The depth-array SHA256 is
+`b2d14fb0bf60697ef60649e40d6a0324b7ff3e67d35efd16bc3e3cb534eebada`.
+Live process identity was rechecked unchanged after the audit; CPU time advances.
+This checkpoint is a verified continuation, not a settling or playable gain.
+
+Next complete local4000/15200 s needs both `audit_cartesian_cook_snapshot.py`
 and `audit_cartesian_exterior_banks.py`, then reassess later regional storage trends. Do not launch
 a duplicate while this run is live or treat buffered progress output as a stall.
 
