@@ -3,6 +3,19 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest physics qualification: [completed source pullback and affine total energy](../reconstruction-review-2026-09-07/affine-total-energy.md).
+Source6480/session50573 is now TERMINAL exit0;11 supported original cases pass,
+unsupported2/7 remain retained. All635 protected/19 implementation entries match.
+No live scientific job/cook at the final inventory; do not reuse the stale PID6480
+profiling wrapper or duplicate its completed source audit. Earlier LIVE notes
+below are historical. New total-energy derivatives add original bed/depth-spatial
+gravity to the prescribed-boundary pressure lift, preserving explicit exterior
+work and both momentum coordinates;92 tests pass, including23 new cases.
+Supporting physics ONLY: source-wide new total-energy replay, conservative
+force/transport/time step, interacting fronts and native/playable validation
+remain open. No map/geometry/collision/4950-field change, nonlinear OFF. Last
+normal26.484402FPS/p9547.2133ms still FAILS30FPS; entire river/crew/release queue OPEN.
+
 Latest normal-launch correction: [editor Python game-startup ownership](../reconstruction-review-2026-09-07/editor-python-game-startup.md).
 Normal editor-hosted gameplay no longer runs incompatible editor-only Python
 startup by default. Editor/PIE and commandlet defaults, explicit engine overrides,

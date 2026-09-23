@@ -3,6 +3,11 @@
 Reviewed 2026-09-23. Supporting physics work, **not a visible playable update**.
 South Fork remains unfinished and ahead of Colorado, Pacuare and Futaleufu.
 
+Update17:18UTC September23: the derivative job6480/session50573 below has now
+completed exit0. All11 supported cases pass and unsupported2/7 remain retained;
+all input/implementation hashes match. See [completion and next coupling](affine-total-energy.md).
+The following live-job observations are historical; do not restart or reuse that PID.
+
 ## Completed jobs, not live process IDs
 
 The original affine momentum replay (old PID14076/session35230) has completed.
