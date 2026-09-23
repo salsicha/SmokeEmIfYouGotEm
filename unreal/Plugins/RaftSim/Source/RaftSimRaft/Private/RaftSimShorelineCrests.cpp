@@ -51,6 +51,7 @@ void FRaftSimShorelineCrests::Reset()
     IncrementalCorrectionHistory.Reset();
     MidpointExpansion.Reset();
     ParallelNormals.Reset();
+    PublicationCache.Reset();
     TargetCorrectionsCm.Reset(); RenderedCorrectionsCm.Reset();
     FineProfileCm.Reset();
 }
@@ -360,7 +361,31 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     // orders. Keep the original publisher as an independent regression control.
     static const bool bPartitionedTopology=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceCrestTopology"));
     static const bool bTopologyAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrestTopologyPublishAudit"));
-    if (bTopologyAudit && GFrameCounter>=120 && GFrameCounter<184)
+    // Exact paired inputs improve the small publication stage, but normal-start
+    // ABBA whole-frame gains are not repeatable. Do not enable by default.
+    static const bool bCachedPublication=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCachedCrestPublication"));
+    static const bool bPublicationAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrestPublicationCacheAudit"));
+    if (bPublicationAudit)
+    {
+        TArray<uint32> CandidateIndices;TArray<int32> CandidateOffsets=CellOffsets;
+        double ReferenceMs=0.,CandidateMs=0.;
+        const auto Reference=[&]() {const double Start=FPlatformTime::Seconds();
+            RaftSimCrestTopologyPublish::Partitioned(Refinement.Triangles,Refinement.TriangleOrigins,SourceCellOffsets,Indices,CellOffsets);
+            ReferenceMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        const auto Candidate=[&]() {const double Start=FPlatformTime::Seconds();
+            PublicationCache.Publish(Refinement.Triangles,Refinement.TriangleOrigins,SourceCellOffsets,CandidateIndices,CandidateOffsets);
+            CandidateMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        if((GFrameCounter/2)%2){Candidate();Reference();}else{Reference();Candidate();}
+        const bool Exact=Indices==CandidateIndices && CellOffsets==CandidateOffsets;
+        if(!Exact){UE_LOG(LogTemp,Error,TEXT("CrestPublicationCache mismatch frame=%llu"),GFrameCounter);return false;}
+        if(GFrameCounter>=120 && GFrameCounter<248)
+            UE_LOG(LogTemp,Display,TEXT("CrestPublicationCachePair frame=%llu exact=%d candidate_first=%d reused=%d indices=%d cells=%d reference_ms=%.9f candidate_ms=%.9f"),
+                GFrameCounter,int32(Exact),int32((GFrameCounter/2)%2),int32(PublicationCache.WasReused()),Indices.Num(),CellOffsets.Num(),ReferenceMs,CandidateMs);
+        if(bCachedPublication){Indices=MoveTemp(CandidateIndices);CellOffsets=MoveTemp(CandidateOffsets);}
+    }
+    else if(bCachedPublication)
+        PublicationCache.Publish(Refinement.Triangles,Refinement.TriangleOrigins,SourceCellOffsets,Indices,CellOffsets);
+    else if (bTopologyAudit && GFrameCounter>=120 && GFrameCounter<184)
     {
         TArray<uint32> CandidateIndices;
         // The caller supplies fresh indices but retains cell-offset storage.

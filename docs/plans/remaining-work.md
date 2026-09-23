@@ -3,6 +3,20 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest bounded runtime investigation: [crest ownership publication cache](../reconstruction-review-2026-09-07/crest-publication-cache.md).
+Five native D3D12 and14 parser tests pass;256 actual normal-start input pairs
+preserve every triangle index/cell offset. Component means improve in both
+orders, but ordinary900-frame ABBA gains do not repeat: candidate B is slower
+than both controls, C only slightly faster. Default promotion REJECTED; explicit
+opt-in only. Normal first-pool FPS/p95: A42.263270/32.3236ms,
+B38.504365/35.6647ms, C42.523842/31.6105ms, D42.474237/31.7511ms.
+These are NOT the earlier rapid-at8330 workload or full-river acceptance.
+No visible delivery, captured geometry/collision/4950-field change or nonlinear
+enablement. Do not repeat this unchanged candidate or the completed source
+audits. Final retained normal path exits0:24 views and464 decoded motion frames;
+smooth water/coarse canopy/crew limitations remain. No engine/cook/source job
+is left live. South Fork and the entire ordered queue remain unfinished.
+
 Latest supporting physics: [original-profile moment transport](../reconstruction-review-2026-09-07/front-moment-transport.md).
 New shared-face transport retains the required higher-depth-moment compression
 and depth-weighted spatial sources. Its explicit gravitational advection,

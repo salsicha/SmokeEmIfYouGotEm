@@ -8,6 +8,7 @@
 #include "RaftSimCrestMidpointExpansion.h"
 #include "RaftSimCrestNormals.h"
 #include "RaftSimCrestProfilePrefetch.h"
+#include "RaftSimCrestPublicationCache.h"
 
 struct FRaftSimShorelineCrestInput
 {
@@ -64,5 +65,6 @@ private:
     // Exact topology-only dependency schedule; no cached evolving attributes.
     FRaftSimCrestMidpointExpansion MidpointExpansion;
     FRaftSimCrestNormals ParallelNormals;
+    FRaftSimCrestPublicationCache PublicationCache;
     uint64 BuildCount=0;
 };
