@@ -3,6 +3,17 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest normal-play crew correction: [rigid paddle geometry](../reconstruction-review-2026-09-07/rigid-crew-paddle.md).
+Shared normal poses now retain a120cm shaft instead of telescoping between
+rest/stroke/brace/high-side. Blade height and grip distances are preserved;
+initial recovery-lift regression retained and fixed without weakening its gate.
+Editor/Game rebuilt; three native suites and40 actual component/grip samples
+pass. Normal-start motion has24 stills/467 decoded frames; scoped equipment
+correction only, not full crew fit or river acceptance. Separate ordinary
+first-pool p9532.8541ms passes the short30FPS budget, NOT sustained/full-route
+acceptance or an isolated speedup. All engine jobs terminal; original cook36692
+continues. Geometry/collision/captured data/4950 fields unchanged, nonlinear OFF.
+
 Latest bounded qualification: [water-shadow filtering](../reconstruction-review-2026-09-07/water-shadow-filter-review.md).
 Shadow-preserving process-local filtering shows no convincing raft-edge fix.
 ABBA p95 values38.0804/39.8348/33.5328/32.9872 ms: both candidates FAIL;
@@ -6954,7 +6965,9 @@ output alone do not establish physical, geographic or photographic acceptance.
   rivers, so Chilko and Zambezi still require final rendered-motion, shoreline,
   collision and performance review. The ordered four-river reconstruction
   sequence above does not silently close that broader scope.
-- **Crew realism:** helmet sizing and seat contact have scoped September 6
+- **Crew realism:** the September23 shared rigid-paddle correction is integrated and
+  tested in normal play (see above). It does not close garment/foot/reentry work.
+  Helmet sizing and seat contact retain their scoped September6
   corrections and actual-engine evidence. They are not full character acceptance:
   continuous motion/reentry, garment/vest joins, straps and foot/thwart fit still
   need review. See [helmet fit](../reports/2026-09-06-helmet-fit.md) and

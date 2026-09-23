@@ -15,6 +15,7 @@ param(
     [ValidateSet('WorldNormal', 'Roughness', 'SceneDepth')][string]$StartupBufferVisualization = '',
     [ValidateRange(0, 1)][Nullable[double]]$StartupOpticalNormalStrength = $null,
     [switch]$RecordStartupMotion,
+    [switch]$StartupPaddle,
     [switch]$StartupDisableDynamicShadows,
     [switch]$NormalScenarioStart,
     [switch]$CheckpointResetReplay
@@ -59,6 +60,9 @@ if ($null -ne $StartupOpticalNormalStrength -and -not $StartupRenderReplay) {
 }
 if ($RecordStartupMotion -and -not $StartupRenderReplay) {
     throw 'Motion recording requires StartupRenderReplay; it is not an FPS capture'
+}
+if ($StartupPaddle -and -not $StartupRenderReplay) {
+    throw 'StartupPaddle requires StartupRenderReplay; it is not an ordinary FPS capture'
 }
 if ($StartupDisableDynamicShadows -and -not $StartupRenderReplay) {
     throw 'Shadow control requires StartupRenderReplay; it is not an FPS capture'
@@ -235,6 +239,7 @@ try {
         # teleport, solver/time override, CSV shutdown or FPS acceptance.
         $start.ArgumentList.Add('-ForceRes')
         $motionOption = if ($RecordStartupMotion) { ' record' } else { '' }
+        $paddleOption = if ($StartupPaddle) { ' paddle' } else { '' }
         # Debug-view CVars are ECVF_Cheat: DeviceProfile overrides reject them.
         # Use the development console path, before scheduling any screenshots.
         # Only an explicit diagnostic request changes the ordinary lit capture.
@@ -248,7 +253,7 @@ try {
         # ShowFlag overrides are also ECVF_Cheat; a device-profile request can
         # log its intent yet be rejected. Use and verify the console response.
         $shadowCommands = if ($StartupDisableDynamicShadows) { 'ShowFlag.DynamicShadows 0,' } else { '' }
-        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}${normalCommands}${shadowCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption")
+        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}${normalCommands}${shadowCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption$paddleOption")
     } else {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.
@@ -279,6 +284,7 @@ try {
         }
     }
     $report.game_exit_code = $game.ExitCode
+    $report.startup_paddle_requested = [bool]$StartupPaddle
     if ($null -ne $SolverLanes -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
         $report.solver_lane_limit_confirmed = Test-RaftSimSolverLaneLog (Get-Content -LiteralPath $logFile -Raw) $SolverLanes $report.solver_archive_sha256
         if (-not $report.solver_lane_limit_confirmed) { throw 'Runtime solver lane limit or linked archive was not confirmed; no worker comparison evidence' }

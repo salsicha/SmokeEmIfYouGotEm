@@ -1444,6 +1444,33 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             // out of a fixed pelvis on flat water (2026-08-07 playtest).
             break;
     }
+    if (Pose.bShowPaddle)
+    {
+        // One rigid project-owned paddle, not a stretchable limb. The old
+        // independently authored endpoints shortened the shaft at rest and
+        // through recovery, then lengthened it again for high-side. Preserve
+        // the authored top position and blade-root height (including recovery
+        // clearance). Solve the horizontal reach on the constant-length sphere.
+        // Retain each hand's distance down the shaft, not its old world point
+        // or fraction of the deforming shaft; the rig and equipment then share
+        // the same solved grip points.
+        // 120 cm to the blade root plus the existing 39 cm blade tip makes
+        // an approximately 63-inch paddle. This is equipment design, not a
+        // measured river feature or a change to the propulsion interval.
+        constexpr double ShaftLengthCm = 120.0;
+        const FVector AuthoredDelta = Pose.PaddleBottomCm - Pose.PaddleTopCm;
+        const FVector AuthoredAxis = AuthoredDelta.GetSafeNormal();
+        const double LeftGripDistance = FVector::DotProduct(Pose.LeftHandCm - Pose.PaddleTopCm, AuthoredAxis);
+        const double RightGripDistance = FVector::DotProduct(Pose.RightHandCm - Pose.PaddleTopCm, AuthoredAxis);
+        const double Height = FMath::Clamp(AuthoredDelta.Z, -ShaftLengthCm, ShaftLengthCm);
+        const double HorizontalReach = FMath::Sqrt(ShaftLengthCm * ShaftLengthCm - Height * Height);
+        const FVector HorizontalAxis = FVector(AuthoredDelta.X, AuthoredDelta.Y, 0).GetSafeNormal();
+        const FVector RigidDelta = HorizontalAxis * HorizontalReach + FVector(0, 0, Height);
+        const FVector RigidAxis = RigidDelta / ShaftLengthCm;
+        Pose.PaddleBottomCm = Pose.PaddleTopCm + RigidDelta;
+        Pose.LeftHandCm = Pose.PaddleTopCm + RigidAxis * LeftGripDistance;
+        Pose.RightHandCm = Pose.PaddleTopCm + RigidAxis * RightGripDistance;
+    }
     if (UsesWaistPivotedUpperBodyArticulation(Action))
     {
         ApplyWaistPivotedUpperBodyArticulation(Pose);
