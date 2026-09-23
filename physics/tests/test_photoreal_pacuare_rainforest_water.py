@@ -1,4 +1,5 @@
 from pathlib import Path
+from raftsim.editor_source_layout import read_base_material_source
 import json
 
 
@@ -35,7 +36,7 @@ TERRAIN_AUTHORING_SOURCE = (
 
 def test_pacuare_water_is_isolated_moving_and_non_displacing():
     source = WATER_SOURCE.read_text(encoding="utf-8")
-    base = BASE_SOURCE.read_text(encoding="utf-8")
+    base = read_base_material_source(REPO_ROOT)
 
     assert "M_RaftSim_Pacuare_RainforestDefaultLitWater" in source
     assert "MSM_DefaultLit" in source

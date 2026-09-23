@@ -64,6 +64,36 @@ def read_south_fork_full_reach_source(repo_root: Path) -> str:
     )
 
 
+PHOTOREAL_MATERIAL_MEMBERS = (
+    "RaftSimEditorPhotorealMaterials.cpp",
+    "RaftSimEditorPhotorealWaterMaterials.cpp",
+    "RaftSimEditorPhotorealWaterMaterials.h",
+)
+
+BASE_MATERIAL_MEMBERS = (
+    "RaftSimEditorMaterialsBase.cpp",
+    "RaftSimEditorPhysicalSourceTerrainMaterial.cpp",
+)
+
+
+def read_base_material_source(repo_root: Path) -> str:
+    """Read only the split base/physical-source builders, not other materials."""
+    materials = repo_root / EDITOR_PRIVATE_RELATIVE_PATH / "Materials"
+    return "\n".join(
+        (materials / name).read_text(encoding="utf-8")
+        for name in BASE_MATERIAL_MEMBERS
+    )
+
+
+def read_photoreal_material_source(repo_root: Path) -> str:
+    """Read the exact command/builder set; missing members fail normally."""
+    materials = repo_root / EDITOR_PRIVATE_RELATIVE_PATH / "Materials"
+    return "\n".join(
+        (materials / name).read_text(encoding="utf-8")
+        for name in PHOTOREAL_MATERIAL_MEMBERS
+    )
+
+
 LANDSCAPE_FOLIAGE_MEMBERS = (
     "RaftSimEditorLandscapeFoliageInternal.h",
     "RaftSimEditorLandscapeFoliageAssets.cpp",

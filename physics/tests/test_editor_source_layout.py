@@ -6,6 +6,7 @@ from raftsim.editor_source_layout import (
     build_editor_source_inventory,
     read_raftsim_editor_source,
     read_south_fork_full_reach_source,
+    read_photoreal_material_source,
     render_editor_source_inventory_markdown,
 )
 
@@ -1584,11 +1585,7 @@ def test_generated_canopy_provenance_matches_three_independent_ponderosa_sources
 
 
 def test_photoreal_materials_preserve_physical_detail_scale_and_natural_water_normals():
-    source_path = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
-        "RaftSimEditorPhotorealMaterials.cpp"
-    )
-    source = source_path.read_text(encoding="utf-8")
+    source = read_photoreal_material_source(REPO_ROOT)
     source += (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
         "RaftSimEditorPhotorealTextureAssets.cpp"
@@ -1696,10 +1693,7 @@ def test_live_water_surface_avoids_double_volume_transmission():
     assert "RiverWaterConfig->LiveSurfaceSpecular" in source
     assert "CreateDynamicMaterialInstance(0, WaterMaterial)" in source
 
-    material_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
-        "RaftSimEditorPhotorealMaterials.cpp"
-    ).read_text(encoding="utf-8")
+    material_source = read_photoreal_material_source(REPO_ROOT)
     assert 'TEXT("M_RaftSim_LiveRiverSurface")' in material_source
     assert "BuildLiveRiverSurfaceMaterial()" in material_source
     assert 'TEXT("RaftSim.CreateLiveRiverSurfaceMaterial")' in material_source
@@ -1859,10 +1853,7 @@ def test_live_water_surface_avoids_double_volume_transmission():
 
 
 def test_broad_water_uses_project_owned_flow_aligned_solver_masked_foam_lace():
-    material_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
-        "RaftSimEditorPhotorealMaterials.cpp"
-    ).read_text(encoding="utf-8")
+    material_source = read_photoreal_material_source(REPO_ROOT)
     texture_asset_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
         "RaftSimEditorPhotorealTextureAssets.cpp"
@@ -1927,10 +1918,7 @@ def test_water_presentation_material_regeneration_does_not_touch_boulder_package
 
 
 def test_river_water_visual_experiments_use_an_isolated_preview_package():
-    material_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
-        "RaftSimEditorPhotorealMaterials.cpp"
-    ).read_text(encoding="utf-8")
+    material_source = read_photoreal_material_source(REPO_ROOT)
     capture_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
         "RaftSimCaptureCommand.cpp"
@@ -2143,10 +2131,7 @@ def test_full_reach_far_field_breaks_up_grid_and_repeated_tree_silhouettes():
         "including thirty-six-spray V2 broadleaf volumes"
         in canopy_source
     )
-    material_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
-        "RaftSimEditorPhotorealMaterials.cpp"
-    ).read_text(encoding="utf-8")
+    material_source = read_photoreal_material_source(REPO_ROOT)
     assert 'MaterialExpressionShadowReplace.h' in material_source
     assert 'RaftSimSuppressFlatFoliageCardShadowV1' in material_source
     assert 'ShadowSwitch->Default = OriginalOpacity;' in material_source
@@ -2220,10 +2205,7 @@ def test_full_reach_far_field_breaks_up_grid_and_repeated_tree_silhouettes():
 
 
 def test_project_owned_equipment_textiles_are_imported_and_material_bound():
-    material_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
-        "RaftSimEditorPhotorealMaterials.cpp"
-    ).read_text(encoding="utf-8")
+    material_source = read_photoreal_material_source(REPO_ROOT)
     m5_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
         "RaftSimM5ProductionQualityTest.cpp"

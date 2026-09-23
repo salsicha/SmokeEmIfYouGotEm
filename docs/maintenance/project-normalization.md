@@ -89,3 +89,15 @@ error lines. Editor/game builds, two native tests and24 layout/release tests pas
 Existing warnings remain. No source data, material, geometry or physics change;
 no blanket clean-release, packaged-play, realism or30FPS acceptance. See
 [cause, implementation and retained evidence](../reconstruction-review-2026-09-07/editor-python-game-startup.md).
+
+## September23 follow-up: material implementation boundaries
+
+The two remaining oversized material implementations are split by responsibility,
+without increasing size allowances or changing expression bodies, command
+registrations or generated assets. Current inventory and source-set/layout checks
+pass9/9. The affected consumer suites retain exactly their pre-split43 passes and
+15 failures; historical assertions were not weakened. Editor rebuild and native
+career catalog pass. Normal South Fork motion was inspected, but separate ordinary
+p9536.3412ms still fails the33.333333ms target. This closes two layout regressions,
+not visual, river or release acceptance. See the
+[material split and retained evidence](material-source-split-20260923.md).

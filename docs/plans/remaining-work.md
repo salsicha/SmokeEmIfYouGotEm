@@ -3,12 +3,24 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest supporting maintenance: [material source split](../maintenance/material-source-split-20260923.md).
+The two oversized material implementations now satisfy the unchanged layout
+limits; the current inventory and seven new explicit-source-set tests pass.
+Existing expression bodies and command registrations are preserved. Editor
+rebuild and native career catalog pass. Normal-start motion was inspected;
+separate ordinary cost is37.860673FPS/p9536.3412ms, still FAILING the33.333333ms
+budget. No visual improvement, asset regeneration, field promotion or river
+acceptance is claimed. Existing consumer failures are unchanged versus the
+pre-split source control; all reconstruction and release gates remain open.
+
 Latest hydraulic advancement: [exact continuation from15000 s](../reconstruction-review-2026-09-07/cartesian-continuation-15000.md).
-One native cook is LIVE: PID36692/start2026-09-23T18:34:26.9266900Z,
+One native cook is LIVE: PID36692/start2026-09-23T18:34:26.9266904Z,
 session68019, fresh15000→18000 s output. All5,382,400 native restart h/u/v
 cells match the prior final state bit-for-bit, all retained physical inputs
-are unchanged, zero added cells/water;51 focused regressions pass. First new
-complete checkpoint local1000/15050 s needs both state and exterior-bank audits.
+are unchanged, zero added cells/water;51 focused regressions pass. New checkpoint
+local2000/15100 s passes BOTH state/exterior-bank audits: all86,720 bank cells dry,
+maximum per-step residual9.48e−9m³; outflow115.512228 versus inflow45.306955m³/s
+still unsettled. Next complete local3000/15150 s needs both audits.
 Do not duplicate the cook or reuse historical PID12672. This is supporting
 settling work ONLY: no visible delivery, game rebuild, field promotion or
 acceptance; installed4950 fields and nonlinear OFF state remain unchanged.

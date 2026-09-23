@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from raftsim.editor_source_layout import read_base_material_source
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -73,7 +74,7 @@ def _sha256(path: Path) -> str:
 
 def test_futaleufu_water_is_native_moving_and_non_displacing() -> None:
     water = WATER_SOURCE.read_text(encoding="utf-8")
-    base = BASE_SOURCE.read_text(encoding="utf-8")
+    base = read_base_material_source(REPO_ROOT)
 
     assert "M_RaftSim_Futaleufu_TerminatorDefaultLitWater" in water
     assert "MSM_DefaultLit" in water

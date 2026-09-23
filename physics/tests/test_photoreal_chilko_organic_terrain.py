@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from raftsim.editor_source_layout import read_base_material_source
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -23,7 +24,7 @@ def _sha256(path: Path) -> str:
 
 def test_chilko_organic_material_is_default_lit_and_non_displacing() -> None:
     material_source = MATERIAL_SOURCE.read_text(encoding="utf-8")
-    base_source = BASE_SOURCE.read_text(encoding="utf-8")
+    base_source = read_base_material_source(REPO_ROOT)
 
     assert "BuildChilkoOrganicLavaCanyonBaseColor" in material_source
     assert base_source.count("BuildChilkoOrganicLavaCanyonBaseColor") == 1
@@ -38,7 +39,7 @@ def test_chilko_organic_material_is_default_lit_and_non_displacing() -> None:
 
 def test_chilko_organic_material_has_seven_incommensurate_world_scales() -> None:
     source = MATERIAL_SOURCE.read_text(encoding="utf-8")
-    base_source = BASE_SOURCE.read_text(encoding="utf-8")
+    base_source = read_base_material_source(REPO_ROOT)
 
     assert "Noise(0.00016f, 3)" in source
     assert "Noise(0.00059f, 3)" in source

@@ -1,6 +1,7 @@
 import hashlib
 import json
 from pathlib import Path
+from raftsim.editor_source_layout import read_base_material_source, read_photoreal_material_source
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -67,7 +68,7 @@ SUPERSEDING_ARTIFACT_HASHES = {
 
 
 def test_shared_foam_is_lit_multiscale_and_solver_masked() -> None:
-    source = MATERIAL_SOURCE.read_text()
+    source = read_base_material_source(ROOT)
     assert "Material->SetShadingModel(MSM_DefaultLit)" in source
     assert 'TEXT("RaftSimSolverCurrentAdvectedFoamPrimary")' in source
     assert 'TEXT("RaftSimSolverCurrentAdvectedFoamDetail")' in source
@@ -99,7 +100,7 @@ def test_shared_foam_does_not_move_solver_or_physics_authority() -> None:
 
 def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> None:
     runtime = RUNTIME_SOURCE.read_text()
-    material = UNIFIED_WATER_MATERIAL_SOURCE.read_text()
+    material = read_photoreal_material_source(ROOT)
     south_fork = SOUTH_FORK_WATER_PRESENTATION_SOURCE.read_text()
     assert "!bSingleLiveWaterSurfaceEnabled &&" in runtime
     assert "if (bSingleLiveWaterSurfaceEnabled)" in runtime

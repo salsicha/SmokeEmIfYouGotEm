@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from raftsim.editor_source_layout import read_base_material_source, read_photoreal_material_source
 
 import numpy as np
 import pytest
@@ -229,7 +230,7 @@ def test_chilko_rapid_approach_review_is_hash_locked_and_fail_closed() -> None:
 
 def test_chilko_water_is_native_moving_and_non_displacing() -> None:
     water = WATER_SOURCE.read_text(encoding="utf-8")
-    base = BASE_SOURCE.read_text(encoding="utf-8")
+    base = read_base_material_source(REPO_ROOT)
 
     assert "M_RaftSim_Chilko_LavaCanyonDefaultLitWater" in water
     assert "MSM_DefaultLit" in water
@@ -255,7 +256,7 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
     catalog = CATALOG_SOURCE.read_text(encoding="utf-8")
     geometry = GEOMETRY_SOURCE.read_text(encoding="utf-8")
     live_material = WATER_SOURCE.read_text(encoding="utf-8")
-    photoreal = PHOTOREAL_SOURCE.read_text(encoding="utf-8")
+    photoreal = read_photoreal_material_source(REPO_ROOT)
     lighting = LIGHTING_SOURCE.read_text(encoding="utf-8")
     runtime = RUNTIME_SOURCE.read_text(encoding="utf-8")
     config = CONFIG_HEADER.read_text(encoding="utf-8")

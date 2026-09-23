@@ -1,4 +1,5 @@
 from pathlib import Path
+from raftsim.editor_source_layout import read_base_material_source
 import json
 
 
@@ -22,7 +23,7 @@ MANIFEST = (
 
 def test_futaleufu_organic_material_is_default_lit_and_non_displacing():
     material_source = MATERIAL_SOURCE.read_text(encoding="utf-8")
-    base_source = BASE_SOURCE.read_text(encoding="utf-8")
+    base_source = read_base_material_source(REPO_ROOT)
 
     assert "BuildFutaleufuOrganicTemperateBaseColor" in material_source
     assert base_source.count("BuildFutaleufuOrganicTemperateBaseColor") == 1

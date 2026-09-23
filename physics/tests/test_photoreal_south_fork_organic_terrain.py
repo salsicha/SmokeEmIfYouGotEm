@@ -1,4 +1,5 @@
 from pathlib import Path
+from raftsim.editor_source_layout import read_base_material_source
 import hashlib
 import json
 
@@ -33,7 +34,7 @@ REVIEW = (
 
 def test_south_fork_organic_terrain_is_shared_and_shade_only():
     organic_source = ORGANIC_SOURCE.read_text(encoding="utf-8")
-    landscape_source = LANDSCAPE_SOURCE.read_text(encoding="utf-8")
+    landscape_source = read_base_material_source(REPO_ROOT)
     full_reach_source = FULL_REACH_SOURCE.read_text(encoding="utf-8")
 
     assert "BuildSouthForkOrganicFoothillBaseColor" in organic_source

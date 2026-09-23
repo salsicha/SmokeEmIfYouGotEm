@@ -1,4 +1,5 @@
 from pathlib import Path
+from raftsim.editor_source_layout import read_base_material_source
 from raftsim.editor_source_layout import LandscapeFoliageSourceSet, read_landscape_foliage_source
 import hashlib
 import json
@@ -30,7 +31,7 @@ VEGETATION_REVIEW = MANIFEST.with_name(
 
 def test_pacuare_organic_material_is_river_local_and_non_displacing():
     material_source = MATERIAL_SOURCE.read_text(encoding="utf-8")
-    base_source = BASE_SOURCE.read_text(encoding="utf-8")
+    base_source = read_base_material_source(REPO_ROOT)
 
     assert "BuildPacuareOrganicRainforestBaseColor" in material_source
     assert base_source.count("BuildPacuareOrganicRainforestBaseColor") == 1

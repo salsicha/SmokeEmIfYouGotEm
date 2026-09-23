@@ -30,7 +30,9 @@ regional-storage tests pass.
 
 ## Live identity and next checkpoint
 
-- PID: **36692**; start UTC: **2026-09-23T18:34:26.9266900Z**.
+- PID: **36692**; exact .NET start UTC: **2026-09-23T18:34:26.9266904Z**.
+  CIM reports microsecond precision (`...9266900Z`); use the .NET value above
+  with the profiling helper's exact retained-handle identity guard.
 - Tool session: **68019**. Check the complete process identity before treating
   this PID as live or pausing it for engine profiling.
 - Executable: `tmp/solver-worker-limit-v1-20260917/raftsim_cartesian_cook.exe`.
@@ -45,9 +47,22 @@ every 1,000 steps (50 model seconds). The target is 18000 s, not a prediction
 of settling time. Native frame zero is complete; observed progress reaches
 local230 / 15011.4999999218 s with maximum per-step conservation residual
 8.7392675318653801e−9 m³. The first new complete checkpoint is local
-**1000 / 15050 s**. Run
-both `audit_cartesian_cook_snapshot.py` and `audit_cartesian_exterior_banks.py`
-on that checkpoint, then reassess later regional storage trends. Do not launch
+**1000 / 15050 s**, now independently audited: all5,382,400 cells are finite,
+maximum depth3.579930135 m, speed5.034237693 m/s, maximum step conservation
+residual9.483589469e−9 m³. All86,720 artificial-bank cells remain exactly dry.
+Volume falls3540.635963 m³ in50 s; instantaneous combined outlet117.517386 m³/s
+still exceeds inlet45.306955 m³/s. This is not settled. Retained reports:
+`tmp/cartesian-15050-state-v1-20260923.json` and
+`tmp/cartesian-15050-banks-v1-20260923.json`.
+The next checkpoint, local2000/15100 s, also passes both audits: maximum
+depth3.570577408 m, speed5.027625187 m/s, maximum step conservation residual
+9.483589469e−9 m³. All86,720 artificial-bank cells remain exactly dry.
+Volume is2185204.713700 m³, down7072.754462 m³ from the restart. Combined
+instantaneous outlet115.512228 m³/s still exceeds inlet45.306955 m³/s.
+Retained reports: `tmp/cartesian-15100-state-v1-20260923.json` and
+`tmp/cartesian-15100-banks-v1-20260923.json`. This is not settling acceptance.
+Next complete local3000/15150 s needs both `audit_cartesian_cook_snapshot.py`
+and `audit_cartesian_exterior_banks.py`, then reassess later regional storage trends. Do not launch
 a duplicate while this run is live or treat buffered progress output as a stall.
 
 ## Unchanged acceptance limits

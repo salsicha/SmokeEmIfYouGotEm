@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from raftsim.editor_source_layout import read_base_material_source
 from raftsim.editor_source_layout import LandscapeFoliageSourceSet, read_landscape_foliage_source
 
 
@@ -50,7 +51,7 @@ def _sha256(path: Path) -> str:
 
 def test_hance_organic_terrain_is_multiscale_and_non_displacing() -> None:
     terrain = TERRAIN_SOURCE.read_text(encoding="utf-8")
-    base = BASE_SOURCE.read_text(encoding="utf-8")
+    base = read_base_material_source(REPO_ROOT)
 
     assert "BuildColoradoOrganicHanceBaseColor" in terrain
     for scale in ("0.00014f", "0.00053f", "0.00230f", "0.00680f"):
@@ -71,7 +72,7 @@ def test_hance_organic_terrain_is_multiscale_and_non_displacing() -> None:
 
 def test_hance_water_is_native_moving_and_samples_cooked_color_once() -> None:
     water = WATER_SOURCE.read_text(encoding="utf-8")
-    base = BASE_SOURCE.read_text(encoding="utf-8")
+    base = read_base_material_source(REPO_ROOT)
 
     assert "M_RaftSim_Colorado_HanceDefaultLitWater" in water
     assert "MSM_DefaultLit" in water
