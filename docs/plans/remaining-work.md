@@ -3,6 +3,18 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest supporting physics: [original-profile moment transport](../reconstruction-review-2026-09-07/front-moment-transport.md).
+New shared-face transport retains the required higher-depth-moment compression
+and depth-weighted spatial sources. Its explicit gravitational advection,
+compression and bed work match the original time derivatives.75 tests pass,
+including26 new checks; two fixture failures remain documented. Original-source
+audit19480/session14602 is TERMINAL exit0:11 supported cases pass, unsupported2/7
+retained, all641 protected/16 implementation hashes match. Do not duplicate it
+or the completed9552/6480 audits. This supplies a missing transport component,
+NOT a coupled dispersive force/time step, full-river coverage or playable change.
+Native nonlinear mode stays OFF; geometry/collision/installed4950 fields unchanged.
+The last normal26.484402FPS/p9547.2133ms still fails30FPS. Entire queue remains open.
+
 Latest completed supporting increment: [original-source total-energy qualification](../reconstruction-review-2026-09-07/affine-total-energy-source.md).
 The total-energy gravity helper now also supports a no-pressure-solve source
 audit using the completed hash-qualified kinetic pullback. Independent original
