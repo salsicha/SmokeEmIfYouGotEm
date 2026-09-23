@@ -3,6 +3,26 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest bounded playable-performance integration: [reusable MUSCL stage storage](../reconstruction-review-2026-09-07/solver-stage-storage.md).
+Six native tests and eight alternating-order retained-input comparisons pass;
+all saved fields match byte-for-byte, with component median reductions of
+35.24% and 36.15%. These are NOT game-FPS gains. The normal solver archive is
+rebuilt; editor and Game builds are now TERMINAL exit0 in session54658.
+All five Cartesian D3D12 tests pass. One-shot runner session25650/PID3856 is
+TERMINAL exit1 from expecting four successes instead of five; its failed receipt
+is preserved. The extra passing test is the signed-XY streaming actor check,
+and all four required tests also pass. Do not rerun the completed build/tests.
+Normal cost/motion captures completed separately through the guarded helper,
+confirming the rebuilt archive on the normal scenario path. Baseline p95 values
+36.8774/35.3842 ms become35.1858/33.4524 ms in two post-change runs; ALL still fail
+33.333333 ms. Short before/after observations do not isolate all run variation
+or establish sustained/rapid/full-route performance.24 views and465 decoded
+motion frames are retained; inspected views show progress and changing water,
+but smooth water/coarse canopy/crew limitations remain. Default runtime reuse
+is integrated; no new visible detail, geometry, collision, captured evidence,
+installed4950-field change or nonlinear activation is claimed. All build/test/
+capture jobs are terminal; the original cook remains live. Full queue stays open.
+
 Latest supporting maintenance: [material source split](../maintenance/material-source-split-20260923.md).
 The two oversized material implementations now satisfy the unchanged layout
 limits; the current inventory and seven new explicit-source-set tests pass.
@@ -18,9 +38,9 @@ One native cook is LIVE: PID36692/start2026-09-23T18:34:26.9266904Z,
 session68019, fresh15000→18000 s output. All5,382,400 native restart h/u/v
 cells match the prior final state bit-for-bit, all retained physical inputs
 are unchanged, zero added cells/water;51 focused regressions pass. New checkpoint
-local3000/15150 s passes BOTH state/exterior-bank audits: all86,720 bank cells dry,
-maximum per-step residual9.48e−9m³; outflow115.279190 versus inflow45.306955m³/s
-still unsettled. Next complete local4000/15200 s needs both audits.
+local6000/15300 s passes BOTH state/exterior-bank audits: all86,720 bank cells dry,
+maximum per-step residual9.48e−9m³; outflow115.981630 versus inflow45.306955m³/s
+still unsettled. Next complete local7000/15350 s needs both audits.
 Do not duplicate the cook or reuse historical PID12672. This is supporting
 settling work ONLY: no visible delivery, game rebuild, field promotion or
 acceptance; installed4950 fields and nonlinear OFF state remain unchanged.

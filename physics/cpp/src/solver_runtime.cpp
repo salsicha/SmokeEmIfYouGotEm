@@ -1,4 +1,5 @@
 #include "solver_internal.hpp"
+#include "solver_stage_scratch.hpp"
 #include "solver_profile.hpp"
 #include "solver_row_executor.hpp"
 #include "solver_grid_view.hpp"
@@ -302,7 +303,9 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     // Each immutable RK stage revisits the same primitives for slopes and
     // opposite faces. Materialize them once; do not cache across stages or
     // replace_state(), where depths and wet/dry transitions may have changed.
-    std::vector<solver_detail::MusclFaceState> primitives(ny * nx);
+    solver_detail::SolverStageScratchLease stage_storage;
+    stage_storage.get().prepare(ny * nx);
+    auto& primitives = stage_storage.get().primitives;
     const bool parallel_rows = nx * ny >= 16384 && boundary_fluxes == nullptr && face_fluxes == nullptr;
     solver_row_ranges(ny, parallel_rows, [&](std::size_t first_row, std::size_t end_row) {
     for (std::size_t row = first_row; row < end_row; ++row) {
@@ -353,7 +356,7 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
         return solver_detail::MusclFaceState{q.h, cell_bed(row, col) + q.h, q.hu / depth, q.hv / depth};
     };
 
-    std::vector<solver_detail::MusclHalfSlopes> slopes(ny * nx);
+    auto& slopes = stage_storage.get().slopes;
     solver_row_ranges(ny, parallel_rows, [&](std::size_t first_row, std::size_t end_row) {
     for (std::size_t row = first_row; row < end_row; ++row) {
         for (std::size_t col = 0; col < nx; ++col) {

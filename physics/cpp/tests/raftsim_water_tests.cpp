@@ -4,6 +4,8 @@
 #include "../src/solver_row_executor.hpp"
 #include "../src/solver_grid_view.hpp"
 #include "../src/solver_wave_speed.hpp"
+#include "../src/solver_stage_scratch.hpp"
+#include <future>
 
 #include <algorithm>
 #include <cmath>
@@ -52,6 +54,53 @@ void assert_validated_grid_views() {
     rejected(std::numeric_limits<std::size_t>::max(),2);
     field.values().pop_back(); rejected(7,11);
     field.values().resize(78); rejected(7,11);
+}
+
+void assert_stage_scratch_ownership() {
+    using namespace raftsim::solver_detail;
+    SolverStageScratch* retained = nullptr;
+    const MusclFaceState* allocation = nullptr;
+    {
+        SolverStageScratchLease outer;
+        auto& storage = outer.get();
+        retained = &storage;
+        storage.prepare(17000);
+        allocation = storage.primitives.data();
+        storage.primitives[13] = {1., 2., 3., 4.};
+        for (auto& slope : storage.slopes) slope = {1., 2., 3., 4., 5., 6.};
+        {
+            SolverStageScratchLease inner;
+            expect(&inner.get() != retained, "nested stage aliases active storage");
+            inner.get().prepare(25000);
+            inner.get().primitives[13] = {7., 8., 9., 10.};
+        }
+        expect(storage.primitives.data() == allocation && storage.primitives[13].v == 4.,
+            "nested stage invalidated outer arrays");
+        auto worker = std::async(std::launch::async, [retained] {
+            SolverStageScratchLease other;
+            other.get().prepare(31);
+            return &other.get() != retained;
+        });
+        expect(worker.get(), "different caller threads share scratch");
+        for (std::size_t size : {7u, 0u, 17000u}) {
+            storage.prepare(size);
+            expect(storage.primitives.size() == size && storage.slopes.size() == size,
+                "reused stage has wrong active size");
+            if (size) expect(storage.primitives.data() == allocation, "same-capacity stage reallocated");
+            for (const auto& s : storage.slopes)
+                expect(s.x_eta == 0. && s.x_u == 0. && s.x_v == 0. &&
+                       s.y_eta == 0. && s.y_u == 0. && s.y_v == 0.,
+                       "stale dry-cell or dry-neighbor slope survived prepare");
+        }
+    }
+    struct FixtureException {};
+    try {
+        SolverStageScratchLease failing;
+        expect(&failing.get() == retained, "completed stage did not release retained storage");
+        throw FixtureException{};
+    } catch (const FixtureException&) {}
+    SolverStageScratchLease recovered;
+    expect(&recovered.get() == retained, "exception stranded scratch lease");
 }
 
 void assert_scenario_loads(const raftsim::Scenario& scenario) {
@@ -659,6 +708,7 @@ int main(int argc, char** argv) {
         }
         raftsim::Scenario scenario = raftsim::load_scenario_package(argv[1]);
         assert_validated_grid_views();
+        assert_stage_scratch_ownership();
         assert_solver_row_barrier_and_failure_recovery();
         assert_scenario_loads(scenario);
         assert_boundary_flux_diagnostic(scenario);

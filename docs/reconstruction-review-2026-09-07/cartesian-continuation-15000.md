@@ -74,9 +74,58 @@ The depth-array SHA256 is
 Live process identity was rechecked unchanged after the audit; CPU time advances.
 This checkpoint is a verified continuation, not a settling or playable gain.
 
-Next complete local4000/15200 s needs both `audit_cartesian_cook_snapshot.py`
+Local4000/15200 s also passes both audits (reports
+`tmp/cartesian-15200-state-v1-20260923.json` and
+`tmp/cartesian-15200-banks-v1-20260923.json`). The subsequent completed
+local5000/15250 s checkpoint passes both independent audits: all5,382,400
+cells remain finite, maximum depth3.542773217 m and speed5.007881615 m/s.
+All86,720 artificial-bank cells remain exactly dry; maximum per-step residual
+is9.483589469e−9 m³. Volume is2174648.258995 m³, down17629.209168 m³
+from restart. Combined instantaneous outlet112.689760 m³/s still exceeds
+inlet45.306955 m³/s, so this is NOT settling acceptance. Reports:
+`tmp/cartesian-15250-state-v1-20260923.json` and
+`tmp/cartesian-15250-banks-v1-20260923.json`. Depth-array SHA256:
+`ad3ef622c95e3776b0bbcf7b9a58656447677017b89cdf31c331baad79ab2c6f`.
+The original cook36692 remains live; it does not use the separate solver-stage
+storage optimization currently being integrated into the normal game build.
+No duplicate cook was launched and no fields were promoted.
+
+Local6000/15300 s subsequently passes both audits. All5,382,400 cells are finite;
+maximum depth3.533532067 m, speed4.997859218 m/s, maximum per-step residual
+9.483589469e−9 m³. All86,720 artificial-bank cells remain exactly dry.
+Volume2171149.212900 m³ is21128.255262 m³ below restart, with snapshot/driver
+volume disagreement9.313225746e−10 m³. Combined outlet115.981630 m³/s exceeds
+inlet45.306955 m³/s: still unsettled, with no monotonic-outlet claim. Reports:
+`tmp/cartesian-15300-state-v1-20260923.json` and
+`tmp/cartesian-15300-banks-v1-20260923.json`. Depth-array SHA256:
+`530bc9de310610e156ab388a0343e09ae2d62e78f64986e0f12e9555264364c4`.
+
+Next complete local7000/15350 s needs both `audit_cartesian_cook_snapshot.py`
 and `audit_cartesian_exterior_banks.py`, then reassess later regional storage trends. Do not launch
 a duplicate while this run is live or treat buffered progress output as a stall.
+
+## Regional storage through15300 s
+
+The unchanged read-only regional audit now compares restart,15150 s and15300 s.
+All5,382,400 cells are partitioned using the same nearest-route-sample station
+bands as the retained15000 s review; input scenarios, beds, route and complete
+snapshot identities are checked. These are storage rates, NOT section discharges.
+
+| Model-time interval | Station0–9 km | Station9–26 km | Station26 km–end | Domain |
+| --- | ---: | ---: | ---: | ---: |
+|15000–15150 s|−0.00538|−43.52063|−27.14782|−70.67383 m³/s|
+|15150–15300 s|−0.00487|−41.86152|−28.31481|−70.18120 m³/s|
+|15000–15300 s|−0.00512|−42.69108|−27.73132|−70.42752 m³/s|
+
+Regional sums match integrated exterior volume to within2.73e−11 m³.
+Middle-reach loss eases while downstream loss grows over these two150 s
+intervals. This extends the earlier distributed-transient observation; it
+does not establish the cause, validate bathymetry/outlet stage or predict a
+settling time. Continue the existing unmodified cook; do not tune the outlet
+to force instantaneous balance or promote these states into gameplay.
+Report: `tmp/cartesian-storage-regions-15300-v1-20260923.json`, SHA256
+`8c52a34613af2095205da13111cbc27fc595ed802a6959d3470489d0529c1474`.
+The audit is terminal exit0; no additional cook was launched.
 
 ## Unchanged acceptance limits
 
