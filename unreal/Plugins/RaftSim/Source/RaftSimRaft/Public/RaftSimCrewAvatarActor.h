@@ -343,6 +343,9 @@ private:
     bool bFootPlacementBound = false;
     FVector BoundFootLocalCm[2] = {FVector::ZeroVector, FVector::ZeroVector};
     TWeakObjectPtr<AActor> FootPlacementRaft;
+    uint64 CachedFootSupportRevision = 0;
+    double CachedFootSupportZ[2] = {0,0};
+    FTransform CachedFootSupportToRaft;
     void BuildVisual();
     void RebuildSafetyGearMeshes();
     void RebuildPaddleMeshes();

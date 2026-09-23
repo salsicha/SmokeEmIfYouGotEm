@@ -535,6 +535,7 @@ void ARaftSimRaftActor::BuildRaftVisual()
         FVector(0.0f, 0.0f, -TubeRadiusM * kCmPerM));
     const TArray<FLinearColor> NoColors;
     ProductionRaftRestSections.Reset();
+    ++CrewSupportGeometryRevision;
     ProductionRaftDeformedSections.Reset();
     ProductionRaftDeformationCache.Reset();
     LastRenderedFlexVisualSegments.Reset();
@@ -757,6 +758,7 @@ void ARaftSimRaftActor::UpdateFlexibleRaftVisual()
     }
     const TArray<FLinearColor> NoColors;
     const TArray<FVector2D> NoUVs;
+    ++CrewSupportGeometryRevision;
     for (int32 SectionIndex = 0; SectionIndex < Sections->Num(); ++SectionIndex)
     {
         TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_UploadProceduralMeshSection);
@@ -946,7 +948,9 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     // the parity-pinned centre.
     const float GuideSide =
         CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0 ? -1.0f : 1.0f;
-    FVector SeatCm(-175.0f, GuideSide * 62.0f, 30.0f);
+    // Sit forward of the raised stern tip so the guide's unchanged leg
+    // lengths can reach the real interior floor, not hover above a tube.
+    FVector SeatCm(-155.0f, GuideSide * 62.0f, 30.0f);
     if (PassengerId != TEXT("guide"))
     {
         FString Id = PassengerId.ToString();
@@ -996,6 +1000,20 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     Avatar->SetActorRelativeLocation(SeatCm);
     Avatar->SetActorRelativeRotation(FRotator::ZeroRotator);
     Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
+    // Foot fitting moves thigh-weighted glute vertices. Reconcile the actual
+    // body contact without changing the existing one-centimetre compression.
+    if (bRenderedContact)
+    {
+        for (int32 Iteration = 0; Iteration < 8; ++Iteration)
+        {
+            const float Clearance = GetCrewSeatContactClearanceCm(Avatar);
+            if (!FMath::IsFinite(Clearance) || FMath::Abs(Clearance) > 10.0f ||
+                FMath::Abs(Clearance+1.0f) < 0.01f) break;
+            SeatCm.Z += -1.0f-Clearance;
+            Avatar->SetActorRelativeLocation(SeatCm);
+            Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
+        }
+    }
 }
 
 void ARaftSimRaftActor::InitializeCrewSeatingForValidation()

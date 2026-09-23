@@ -3,7 +3,19 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest crew geometry evidence: [actual sole/floor contact](../reconstruction-review-2026-09-07/crew-foot-contact.md).
+Current crew fitting work: [shared feet/body solve](../reconstruction-review-2026-09-07/crew-foot-fit.md).
+Rest/stroke/brace tread contact is corrected in the normal scene; editor/Game
+builds and four native suites pass, with actual normal-start motion inspected.
+This is NOT accepted delivery yet: separate v8 cost regressed to p9550.1671ms;
+revision-keyed support reuse lowers the next observed p95 to40.5902ms, still
+FAILING the33.333333ms target. v9 editor/Game builds, four native suites and
+seat/rebuild invalidation tests pass; all5,760 rest/forward/brace tread samples
+have support with per-boot minimum gap0.109–0.730cm. Full high-side contact fails.
+Do not repeat the rejected every-frame full-mesh scan or the floating tube
+fallback. High-side fitting is excluded and remains open. Installed4950 fields,
+captured sources and nonlinear OFF are unchanged; sole cook36692 continues.
+
+Baseline crew geometry evidence: [actual sole/floor contact](../reconstruction-review-2026-09-07/crew-foot-contact.md).
 All50 actual boot/pose measurements are retained: paddler soles penetrate the
 rendered floor by roughly5–11cm while guide soles have a4–8cm gap. Several
 sole samples cross the floor edge (tube/thwart support is not yet measured).

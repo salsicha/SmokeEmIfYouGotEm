@@ -2233,6 +2233,8 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
     bool bInGuide)
 {
     VariantIndex = FMath::Abs(InVariantIndex) % 4;
+    bFootPlacementBound = false;
+    bHasRenderedPose = false;
     SeatSide = InSeatSide < 0 ? -1 : 1;
     bGuide = bInGuide;
     AnimationPhaseOffset =
@@ -3754,7 +3756,7 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
             // breaking the shin's silhouette.
             const FVector ToeForward =
                 FRotator(
-                    0.0f, (Pose.bFeetPlanted ? 0.0f : Pose.TorsoRotation.Yaw) + SplayYawDegrees, 0.0f)
+                    0.0f, Pose.bFeetPlanted ? 0.0f : Pose.TorsoRotation.Yaw + SplayYawDegrees, 0.0f)
                     .RotateVector(FVector::ForwardVector);
             const FRotator BootRotation =
                 FRotationMatrix::MakeFromXZ(ToeForward, FVector::UpVector)

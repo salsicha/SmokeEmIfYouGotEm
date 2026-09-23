@@ -1,5 +1,8 @@
 # Actual crew sole/floor measurement — 2026-09-23
 
+Historical baseline, retained unchanged below. The implementation and subsequent
+failed/passing trials are recorded in [shared crew foot fitting](crew-foot-fit.md).
+
 **Contact is not accepted. No playable fit change was installed.** This is a
 new native geometry measurement that rules out a global foot-height offset;
 it is not a crew-motion, normal-launch, collision or performance acceptance.

@@ -96,6 +96,7 @@ void ARaftSimRaftActor::UpdateSharedHullVisual()
         SetActorTickEnabled(false);return;
     }
     const TArray<FLinearColor> NoColors;const TArray<FVector2D> NoUVs;
+    ++CrewSupportGeometryRevision;
     for(int32 S=0;S<ProductionRaftDeformedSections.Num();++S)
     {
         const auto& Section=ProductionRaftDeformedSections[S];

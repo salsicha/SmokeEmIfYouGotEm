@@ -56,9 +56,14 @@ def main():
     triangles = [[points[indices[i+j]] for j in range(3)] for i in range(0, len(indices), 3)]
     if not triangles:
         raise RuntimeError('Missing actual floor section')
-    report = dict(schema='raftsim.crew_foot_contact.v1', floor_section=1,
+    tube_points, tube_indices, _, _, _ = unreal.ProceduralMeshLibrary.get_section_from_procedural_mesh(visual, 0)
+    tube_points = [xyz(unreal.MathLibrary.transform_location(visual.get_world_transform(), p)) for p in tube_points]
+    solids = triangles + [[tube_points[tube_indices[i+j]] for j in range(3)] for i in range(0, len(tube_indices), 3)]
+    report = dict(schema='raftsim.crew_foot_contact.v2', floor_section=1,
+                  solid_sections=[0, 1], solid_triangles=len(solids),
                   floor_triangles=len(triangles), poses=[], images=[],
                   assets_saved=False, visual_accepted=False, motion_accepted=False)
+    source_vertices = {}
     for action in ('SEATED_IDLE', 'FORWARD_STROKE', 'BRACE', 'HIGH_SIDE_PORT', 'HIGH_SIDE_STARBOARD'):
         for host in crew:
             host.set_avatar_action(getattr(unreal.RaftSimCrewAvatarAction, action), 1.0)
@@ -68,21 +73,46 @@ def main():
                 raise RuntimeError('Missing production boots')
             for boot in boots:
                 mesh = boot.get_editor_property('static_mesh')
-                vertices = []
-                for section in range(mesh.get_num_sections(0)):
-                    vertices.extend(unreal.ProceduralMeshLibrary.get_section_from_static_mesh(mesh, 0, section)[0])
+                if mesh.get_path_name() not in source_vertices:
+                    vertices = []
+                    for section in range(mesh.get_num_sections(0)):
+                        vertices.extend(unreal.ProceduralMeshLibrary.get_section_from_static_mesh(mesh, 0, section)[0])
+                    source_vertices[mesh.get_path_name()] = vertices
+                vertices = source_vertices[mesh.get_path_name()]
                 sole_z = min(v.z for v in vertices)
                 # Retain all vertices in the lowest 1 mm of the actual tread.
                 sole = [xyz(unreal.MathLibrary.transform_location(boot.get_world_transform(), p))
                         for p in vertices if p.z <= sole_z+0.1]
                 sole = list({tuple(p) for p in sole})
-                samples = [dict(sole_cm=p, floor_z_cm=top_at(p, triangles)) for p in sole]
+                low_x, high_x = min(p[0] for p in sole), max(p[0] for p in sole)
+                low_y, high_y = min(p[1] for p in sole), max(p[1] for p in sole)
+                nearby_solids = [t for t in solids if not (
+                    max(p[0] for p in t) < low_x-1.e-6 or min(p[0] for p in t) > high_x+1.e-6 or
+                    max(p[1] for p in t) < low_y-1.e-6 or min(p[1] for p in t) > high_y+1.e-6)]
+                samples = [dict(sole_cm=p, floor_z_cm=top_at(p, triangles),
+                                solid_z_cm=top_at(p, nearby_solids)) for p in sole]
                 clearances = [p['sole_cm'][2]-p['floor_z_cm'] for p in samples if p['floor_z_cm'] is not None]
+                solid_clearances = [p['sole_cm'][2]-p['solid_z_cm'] for p in samples if p['solid_z_cm'] is not None]
                 if not clearances or not all(math.isfinite(v) for v in clearances):
                     raise RuntimeError('No finite floor support samples')
+                if not solid_clearances or not all(math.isfinite(v) for v in solid_clearances):
+                    raise RuntimeError('No finite solid support samples')
+                body = host.get_production_visual_actor().get_component_by_class(unreal.PoseableMeshComponent)
+                body_foot = body.get_bone_location_by_name(
+                    'foot_l' if boot.get_name() == 'ProductionLeftBoot' else 'foot_r', unreal.BoneSpaces.WORLD_SPACE)
+                # Reflected structs may alias the live property. Never mutate
+                # a component while measuring its independently solved target.
+                foot_target = unreal.Vector(*xyz(boot.get_editor_property('relative_location')))
+                foot_target.z -= sole_z * (host.get_body_proportion_scale().z-boot.get_editor_property('relative_scale3d').z)
+                foot_target = unreal.MathLibrary.transform_location(host.get_actor_transform(), foot_target)
                 report['poses'].append(dict(action=action, crew=host.get_name(), boot=boot.get_name(),
                     mesh=mesh.get_path_name(), seat_cm=xyz(host.get_actor_location()),
+                    seat_contact_clearance_cm=raft.get_crew_seat_contact_clearance_cm(host),
+                    body_foot_world_cm=xyz(body_foot), boot_target_world_cm=xyz(foot_target),
+                    body_boot_target_error_cm=math.dist(xyz(body_foot), xyz(foot_target)),
                     minimum_clearance_cm=min(clearances), maximum_clearance_cm=max(clearances),
+                    minimum_solid_clearance_cm=min(solid_clearances), maximum_solid_clearance_cm=max(solid_clearances),
+                    unsupported_solid_samples=sum(p['solid_z_cm'] is None for p in samples),
                     unsupported_samples=sum(p['floor_z_cm'] is None for p in samples), samples=samples))
     for host in crew:
         host.set_avatar_action(unreal.RaftSimCrewAvatarAction.SEATED_IDLE, 1.0)
