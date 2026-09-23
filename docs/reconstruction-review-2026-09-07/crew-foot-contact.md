@@ -17,7 +17,7 @@ its XY location, selecting the highest intersection, not a nearby vertex.
 There are192 unique samples per boot and9,600 posed samples across five
 actions. Values below zero indicate penetration into the rendered floor.
 
-| Pose at phase0 | Minimum clearance | Maximum clearance | Samples outside floor projection |
+| Pose at each identity's initial action phase | Minimum clearance | Maximum clearance | Samples outside floor projection |
 | --- | ---: | ---: | ---: |
 | Idle | −10.8574 cm | +7.6801 cm |129/1920|
 | Forward stroke | −11.1955 cm | +7.8702 cm |190/1920|
@@ -53,7 +53,7 @@ the actual sole shape and adjacent tubes/thwarts, and propagate the same fitted
 foot/knee targets to the host equipment and CC0 body. Do not move only the boot
 or compensate by breaking the independently measured glute contact. Verify
 the full stroke/brace/high-side sequences, raft transforms/deformation and
-normal-game motion/cost after implementation; phase0 samples alone cannot
+normal-game motion/cost after implementation; initial-action samples alone cannot
 qualify planted feet throughout animation.
 
 ## Reproduction and retained limits

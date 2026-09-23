@@ -68,6 +68,9 @@ class RAFTSIMRAFT_API ARaftSimRaftActor : public AActor
     GENERATED_BODY()
 
 public:
+    /** Exact triangle samples of current uploaded floor and tube/thwart sections, in raft local cm. */
+    bool SampleRenderedCrewSupport(const TArray<FVector>& PointsCm,
+        TArray<double>& FloorZCm, TArray<double>& SolidZCm) const;
     ARaftSimRaftActor();
 
     virtual void BeginPlay() override;

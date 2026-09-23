@@ -795,7 +795,13 @@ void ARaftSimCC0CrewVisualActor::ApplyCrewPose_Implementation(
     const float SafePhase = FMath::IsFinite(NormalizedPhase)
         ? FMath::Frac(NormalizedPhase * FMath::Clamp(Intensity, 0.15f, 2.0f))
         : 0.0f;
-    ApplyBodyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(Action, SafePhase, SeatSide));
+    FRaftSimCrewAvatarPose Pose;
+    const ARaftSimCrewAvatarActor* Host = Cast<ARaftSimCrewAvatarActor>(GetParentActor());
+    if (!Host || !Host->TryGetRenderedPose(Action, NormalizedPhase, Pose))
+    {
+        Pose = URaftSimCrewAvatarPoseLibrary::EvaluatePose(Action, SafePhase, SeatSide);
+    }
+    ApplyBodyPose(Pose);
 }
 
 FVector ARaftSimCC0CrewVisualActor::ToMeshSpace(const FVector& PointCm) const

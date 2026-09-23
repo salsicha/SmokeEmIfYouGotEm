@@ -3512,12 +3512,16 @@ void ARaftSimCrewAvatarActor::SetAnatomicalThigh(
             FMath::Max(Delta.ContainsNaN() ? RadiusCm : Delta.Size() * 0.5f, RadiusCm)));
 }
 
-void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
+void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPose)
 {
     if (!bVisualBuilt)
     {
         return;
     }
+    FRaftSimCrewAvatarPose Pose = AuthoredPose;
+    FitFeetToRenderedRaft(Pose);
+    LastRenderedPose = Pose;
+    bHasRenderedPose = true;
     const FVector HipCenter = (Pose.LeftHipCm + Pose.RightHipCm) * 0.5f;
     const FQuat TorsoRotation = Pose.TorsoRotation.Quaternion();
     const FVector Profile = GetBodyProportionScale();
@@ -3750,7 +3754,7 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
             // breaking the shin's silhouette.
             const FVector ToeForward =
                 FRotator(
-                    0.0f, Pose.TorsoRotation.Yaw + SplayYawDegrees, 0.0f)
+                    0.0f, (Pose.bFeetPlanted ? 0.0f : Pose.TorsoRotation.Yaw) + SplayYawDegrees, 0.0f)
                     .RotateVector(FVector::ForwardVector);
             const FRotator BootRotation =
                 FRotationMatrix::MakeFromXZ(ToeForward, FVector::UpVector)

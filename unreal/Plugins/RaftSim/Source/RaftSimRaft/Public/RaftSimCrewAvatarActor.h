@@ -82,6 +82,7 @@ struct FRaftSimCrewAvatarPose
     FVector PaddleTopCm = FVector::ZeroVector;
     FVector PaddleBottomCm = FVector::ZeroVector;
     bool bShowPaddle = true;
+    bool bFeetPlanted = false;
 };
 
 UCLASS()
@@ -130,6 +131,9 @@ public:
 
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaSeconds) override;
+
+    /** The equipment and owned CC0 body consume the same fitted pose. */
+    bool TryGetRenderedPose(ERaftSimCrewAvatarAction Action, float Phase, FRaftSimCrewAvatarPose& OutPose) const;
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Animation")
     void SetAvatarAction(ERaftSimCrewAvatarAction NewAction, float Intensity = 1.0f);
@@ -333,6 +337,12 @@ public:
     void SetProductionBodyOnlyShadowMode(bool bEnabled);
 
 private:
+    void FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose);
+    FRaftSimCrewAvatarPose LastRenderedPose;
+    bool bHasRenderedPose = false;
+    bool bFootPlacementBound = false;
+    FVector BoundFootLocalCm[2] = {FVector::ZeroVector, FVector::ZeroVector};
+    TWeakObjectPtr<AActor> FootPlacementRaft;
     void BuildVisual();
     void RebuildSafetyGearMeshes();
     void RebuildPaddleMeshes();
