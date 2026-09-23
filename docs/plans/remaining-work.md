@@ -3,6 +3,21 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest delivered CPU optimization: [referenced crest-source storage](../reconstruction-review-2026-09-07/compact-crest-source.md).
+Normal South Fork now discards only unreferenced CPU crest-input storage after
+shoreline clipping; every drawn triangle/attribute and physical grid remains.
+128 actual-input pairs match exactly; component means improve in both orders.
+Both ordinary900-frame candidates improve mean frame time against both controls,
+but p95 is mixed and all four FAIL30FPS. Final default short run31.918329FPS /
+p9542.2645ms also FAILS. No sustained FPS or realism acceptance claimed.
+Editor/game rebuilt;9 final D3D12 native and28 focused Python tests pass.
+Default normal start confirmed without opt-in;24 images,467 decoded movie frames,
+2,034 support contacts within0.0002cm and8,645 source transport anchors checked.
+Visible geometry remains unchanged; no new visual detail/full traversal claimed.
+Other maps retain reference storage; prior base-vertex parallel default remains OFF.
+Sole source6480 resumes/advances with no complete report; no duplicate cook,
+source/collision/4950-field change or nonlinear enablement. Entire queue OPEN.
+
 Latest visible delivery: [normal-start briefing fit](../reconstruction-review-2026-09-07/transition-fit.md).
 The full South Fork briefing and rescue-control line now remain inside the
 screen in the rebuilt normal game. Viewport-bounded layout preserves wording

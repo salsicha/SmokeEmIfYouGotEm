@@ -9134,11 +9134,14 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
         {
             const auto& Drawn=CartesianShorelineMesh->GetWaterVertices();
             double MaxTransportError=0.,MaxBulkError=0.,MaxReturn=0.;
-            int32 WetCount=0,ReturnCount=0;
-            if (Drawn.Num()>=N) for (int32 I=0;I<N;++I)
+            int32 WetCount=0,ReturnCount=0,AuditedSourceCount=0;
+            for (int32 Anchor=0;Anchor<CartesianShorelineMesh->GetCrestSourceVertexCount();++Anchor)
             {
-                MaxTransportError=FMath::Max(MaxTransportError,(Drawn[I].UV3-FoamTransportVelocityMetersPerSecond[I]).Size());
-                MaxBulkError=FMath::Max(MaxBulkError,(Drawn[I].UV1-Flow[I]).Size());
+                const int32 I=CartesianShorelineMesh->GetCrestSourceOriginalIndex(Anchor);
+                if (I>=N) continue; // Clipped bank nodes are not original grid anchors.
+                ++AuditedSourceCount;
+                MaxTransportError=FMath::Max(MaxTransportError,(Drawn[Anchor].UV3-FoamTransportVelocityMetersPerSecond[I]).Size());
+                MaxBulkError=FMath::Max(MaxBulkError,(Drawn[Anchor].UV1-Flow[I]).Size());
                 if (CartesianShoreWet[I])
                 {
                     ++WetCount;
@@ -9152,7 +9155,9 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             auto Report=MakeShared<FJsonObject>();
             Report->SetStringField(TEXT("scope"),TEXT("Actual submitted Cartesian source UV3 versus exact CPU foam backtrace velocity; UV1 bulk flow unchanged. Roller/eddy contributions are presentation-only, not measured fluid momentum or visual acceptance."));
             Report->SetNumberField(TEXT("source_vertices"),N);
-            Report->SetBoolField(TEXT("complete_source_prefix"),Drawn.Num()>=N);
+            Report->SetBoolField(TEXT("complete_source_prefix"),!CartesianShorelineMesh->HasCompactCrestSource() && AuditedSourceCount==N);
+            Report->SetNumberField(TEXT("audited_source_anchors"),AuditedSourceCount);
+            Report->SetBoolField(TEXT("source_anchors_index_compacted"),CartesianShorelineMesh->HasCompactCrestSource());
             Report->SetNumberField(TEXT("wet_vertices"),WetCount);
             Report->SetNumberField(TEXT("transport_differs_from_published_bulk_vertices"),ReturnCount);
             Report->SetNumberField(TEXT("maximum_difference_from_published_bulk_mps"),MaxReturn);
@@ -9175,9 +9180,14 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             const auto& Target=Fine.GetTargetCorrectionsCm();
             const auto& Rendered=Fine.GetRenderedCorrectionsCm();
             double MaxTargetErrorCm=0.,MaxCorrectionTrackingCm=0.,MaxSourceChangeCm=0.;
-            int32 SampleCount=0;
-            for (int32 I=0; I<N; ++I)
-                MaxSourceChangeCm=FMath::Max(MaxSourceChangeCm,FVector::Distance(Positions[I],MeshVertices[I].Position));
+            int32 SampleCount=0,AuditedSourceCount=0;
+            for (int32 Anchor=0;Anchor<CartesianShorelineMesh->GetCrestSourceVertexCount();++Anchor)
+            {
+                const int32 I=CartesianShorelineMesh->GetCrestSourceOriginalIndex(Anchor);
+                if (I>=N) continue;
+                ++AuditedSourceCount;
+                MaxSourceChangeCm=FMath::Max(MaxSourceChangeCm,FVector::Distance(Positions[I],MeshVertices[Anchor].Position));
+            }
             for (int32 Y=0; Y<GridLateralN-1; ++Y) for (int32 X=0; X<GridStationN-1; ++X)
             {
                 const int32 A=Y*GridStationN+X,Cell=Y*(GridStationN-1)+X;
@@ -9212,6 +9222,8 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             Report->SetNumberField(TEXT("maximum_target_crest_error_cm"),MaxTargetErrorCm);
             Report->SetNumberField(TEXT("maximum_fine_correction_tracking_cm"),MaxCorrectionTrackingCm);
             Report->SetNumberField(TEXT("maximum_source_vertex_change_cm"),MaxSourceChangeCm);
+            Report->SetNumberField(TEXT("audited_source_anchors"),AuditedSourceCount);
+            Report->SetBoolField(TEXT("source_anchors_index_compacted"),CartesianShorelineMesh->HasCompactCrestSource());
             Report->SetNumberField(TEXT("refinement_build_count"),Fine.GetBuildCount());
             FString Json; FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
             const bool Saved=FFileHelper::SaveStringToFile(Json,*(CrestAuditPath+TEXT(".cartesian-mesh.json")));

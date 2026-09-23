@@ -5,6 +5,7 @@
 #include "ProceduralMeshComponent.h"
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimShorelineCrests.h"
+#include "RaftSimReferencedWaterVertices.h"
 #include "RaftSimShorelineMeshComponent.generated.h"
 
 // One non-colliding water section. Unlike a procedural mesh section, its index
@@ -30,6 +31,12 @@ public:
     const FRaftSimShorelineCrests& GetCrestRefinement() const { return CrestRefinement; }
     void PrefetchCrestProfile(const FRaftSimShorelineCrestInput& Input) { CrestRefinement.PrefetchProfile(Input); }
     int32 GetActiveVertexCount() const { return ActiveVertexCount; }
+    // Source anchors precede new crest midpoints, but may be index-compacted.
+    // Diagnostics must not confuse compact anchor IDs with hydraulic grid IDs.
+    int32 GetCrestSourceVertexCount() const { return CrestSourceVertexCount; }
+    int32 GetCrestSourceOriginalIndex(int32 Anchor) const
+    { return bCompactCrestSource ? ReferencedCrestSource.Sources[Anchor] : Anchor; }
+    bool HasCompactCrestSource() const { return bCompactCrestSource; }
     virtual int32 GetNumMaterials() const override { return 1; }
     virtual FPrimitiveSceneProxy* CreateSceneProxy() override;
     virtual FBoxSphereBounds CalcBounds(const FTransform& Transform) const override;
@@ -44,7 +51,15 @@ private:
     TArray<uint32> ClippedIndices;
     TArray<int32> ClippedCellOffsets;
     FRaftSimShorelineCrests CrestRefinement;
+    FRaftSimReferencedWaterVertices ReferencedCrestSource;
+    // Separate evolving reference/candidate history only for explicit audits.
+    FRaftSimShorelineCrests AuditCrestRefinement;
+    TArray<FProcMeshVertex> AuditCrestVertices;
+    TArray<uint32> AuditCrestIndices;
+    TArray<int32> AuditCrestOffsets;
     int32 ActiveVertexCount=0;
+    int32 CrestSourceVertexCount=0;
+    bool bCompactCrestSource=false;
     RaftSimWaterShoreline::FTopologyCache TopologyCache;
     bool bPendingIndexUpdate = true;
     TArray<uint32> RenderVertexSources;

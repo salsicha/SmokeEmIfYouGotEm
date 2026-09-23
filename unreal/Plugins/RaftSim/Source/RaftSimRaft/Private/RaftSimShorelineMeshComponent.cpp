@@ -383,6 +383,9 @@ bool URaftSimShorelineMeshComponent::SetWaterMesh(TArray<FProcMeshVertex>&& Vert
     WaterIndexCapacity = IndexCapacity;
     TopologyCache.Reset();
     CrestRefinement.Reset();
+    AuditCrestRefinement.Reset();
+    CrestSourceVertexCount=WaterVertices.Num();
+    bCompactCrestSource=false;
     CellOffsets.Reset();
     bPendingIndexUpdate=true;
     WaterBounds = NewBounds.ExpandBy(500.0); // Conservative bounds for bounded material crests, not extra water.
@@ -428,8 +431,60 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
             { Coarse[E.Node]=Coarse[E.WetVertex]; Shore[E.Node]=Shore[E.WetVertex]; }
         }
         TArray<uint32> NewIndices;
-        if (!CrestRefinement.Update(BaseVertices,BaseIndices,BaseOffsets,Coarse,Shore,*Crests,
-            WaterVertices,NewIndices,CellOffsets)) return false;
+        static const bool ForceCompactSource=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCompactCrestSource"));
+        static const bool ReferenceSource=FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceCrestSource"));
+        // Exact actual-input pairs and ordinary mean frame costs qualify this
+        // representation only for South Fork. Other maps retain their source.
+        const bool CompactSource=!ReferenceSource && (ForceCompactSource ||
+            (GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"))));
+        static const bool AuditSource=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCompactCrestSourceAudit"));
+        if(!BeforeVertices)UE_LOG(LogTemp,Display,TEXT("Crest source publication: compact=%d reference_override=%d"),int32(CompactSource),int32(ReferenceSource));
+        const auto UpdateCrests=[&](bool Compact,FRaftSimShorelineCrests& State,
+            TArray<FProcMeshVertex>& Out,TArray<uint32>& OutIndices,TArray<int32>& Offsets)
+        {
+            if(Compact)
+            {
+                if(!ReferencedCrestSource.Update(BaseVertices,BaseIndices,Coarse,Shore))return false;
+                return State.Update(ReferencedCrestSource.Vertices,ReferencedCrestSource.Indices,
+                    BaseOffsets,ReferencedCrestSource.Coarse,ReferencedCrestSource.Shore,*Crests,
+                    Out,OutIndices,Offsets);
+            }
+            return State.Update(BaseVertices,BaseIndices,BaseOffsets,Coarse,Shore,*Crests,
+                Out,OutIndices,Offsets);
+        };
+        if(AuditSource)
+        {
+            double Times[2]={};bool Valid=true;
+            const auto Run=[&](bool Compact)
+            {
+                const bool Selected=Compact==CompactSource;
+                const double Begin=FPlatformTime::Seconds();
+                Valid &= UpdateCrests(Compact,Selected ? CrestRefinement : AuditCrestRefinement,
+                    Selected ? WaterVertices : AuditCrestVertices,
+                    Selected ? NewIndices : AuditCrestIndices,Selected ? CellOffsets : AuditCrestOffsets);
+                Times[int32(Compact)]=(FPlatformTime::Seconds()-Begin)*1000.;
+            };
+            // Both evolving histories see every publication, from startup.
+            const bool CandidateFirst=(GFrameCounter/2)%2!=0;
+            Run(CandidateFirst);Run(!CandidateFirst);
+            bool Exact=Valid && NewIndices.Num()==AuditCrestIndices.Num() && CellOffsets==AuditCrestOffsets;
+            for(int32 I=0;Exact && I<NewIndices.Num();++I)
+                Exact=FRaftSimCrestMidpointExpansion::EqualAttributes(
+                    WaterVertices[NewIndices[I]],AuditCrestVertices[AuditCrestIndices[I]]);
+            const auto& A=CrestRefinement.GetRenderedCorrectionsCm();
+            const auto& B=AuditCrestRefinement.GetRenderedCorrectionsCm();
+            for(int32 I=0;Exact && I<NewIndices.Num();++I)Exact=A[NewIndices[I]]==B[AuditCrestIndices[I]];
+            const auto& TA=CrestRefinement.GetTargetCorrectionsCm();
+            const auto& TB=AuditCrestRefinement.GetTargetCorrectionsCm();
+            for(int32 I=0;Exact && I<NewIndices.Num();++I)Exact=TA[NewIndices[I]]==TB[AuditCrestIndices[I]];
+            if(!Exact){UE_LOG(LogTemp,Error,TEXT("CompactCrestSource mismatch frame=%llu"),GFrameCounter);return false;}
+            if(GFrameCounter>=120 && GFrameCounter<184)
+                UE_LOG(LogTemp,Display,TEXT("CompactCrestSourcePair frame=%llu exact=%d candidate_first=%d source=%d compact=%d indices=%d reference_ms=%.9f candidate_ms=%.9f"),
+                    GFrameCounter,int32(Exact),int32(CandidateFirst),BaseVertices.Num(),ReferencedCrestSource.Vertices.Num(),NewIndices.Num(),Times[0],Times[1]);
+        }
+        else if(!UpdateCrests(CompactSource,CrestRefinement,WaterVertices,NewIndices,CellOffsets))return false;
+        bCompactCrestSource=CompactSource;
+        CrestSourceVertexCount=CompactSource ? ReferencedCrestSource.Vertices.Num() : BaseVertices.Num();
         bTopologyRebuilt|=WaterIndices!=NewIndices;
         WaterIndices=MoveTemp(NewIndices);
         ActiveVertexCount=WaterVertices.Num();
@@ -439,7 +494,12 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
         WaterVertices.SetNum(Capacity);
         for (int32 I=ActiveVertexCount; I<Capacity; ++I) WaterVertices[I]=BaseVertices[0];
     }
-    else ActiveVertexCount=WaterVertices.Num();
+    else
+    {
+        ActiveVertexCount=WaterVertices.Num();
+        CrestSourceVertexCount=WaterVertices.Num();
+        bCompactCrestSource=false;
+    }
     WaterIndexCapacity=FMath::Max3(BeforeCapacity,(Nx-1)*(Ny-1)*12,
         FMath::DivideAndRoundUp(WaterIndices.Num(),12)*12);
     // Every referenced shore node lies within the XY hull of its two source
