@@ -9,7 +9,7 @@ bool FRaftSimIndexedBreakingProfileTest::RunTest(const FString&)
     using FSite=URaftSimWaterRuntimeAdapter::FSupportBreakingSite;
     FRandomStream Random(842619);
     int64 Compared=0;
-    for (int32 Case=0;Case<10;++Case)
+    for (int32 Case=0;Case<12;++Case)
     {
         TArray<FSite> Sites;
         for (int32 I=0;I<24 && Case!=8;++I)
@@ -28,7 +28,11 @@ bool FRaftSimIndexedBreakingProfileTest::RunTest(const FString&)
         if(Case==6)Sites[7].RiverCoordinatesMeters.X=1.e9; // Bounded-index fallback.
         if(Case==7)Algo::Reverse(Sites);
         if(Case==9)Sites[7].RiverCoordinatesMeters=FVector2D(20000.,20000.); // Sparse rectangle fallback.
+        if(Case==10)Sites[7].PhysicalCrestHeightMeters=0.f; // Foam remains active on a resolved crest.
+        if(Case==11)for(auto& S:Sites)S.PhysicalCrestHeightMeters=0.f;
         FRaftSimIndexedBreakingProfile Index(Sites,.35f,.7f);
+        auto Prepared=Index;Prepared.PreparePhysicalConstants();
+        const auto PreparedCopy=Prepared;
         const FRaftSimIndexedBreakingProfile Copy=Index; // No pointer lifetime dependency.
         TestEqual(TEXT("unsupported profiles use original full scan"),Index.IsIndexed(),Case!=4 && Case!=5 && Case!=6);
         TestEqual(TEXT("bounded dense coverage"),Index.DenseTileCount()>0,Case!=4 && Case!=5 && Case!=6 && Case!=8 && Case!=9);
@@ -37,6 +41,11 @@ bool FRaftSimIndexedBreakingProfileTest::RunTest(const FString&)
             float FullFoam=-1.f,IndexedFoam=-1.f;
             const float Full=URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(P,Sites,.35f,.7f,&FullFoam);
             const float Fast=Index.Sample(P,&IndexedFoam);
+            float PreparedFoam=-1.f;
+            const float PreparedHeight=Prepared.SamplePrepared(P,&PreparedFoam);
+            if(Full!=PreparedHeight || FullFoam!=PreparedFoam || Prepared.SamplePrepared(P)!=Index.Sample(P) ||
+                PreparedCopy.SamplePrepared(P)!=Prepared.SamplePrepared(P))
+            {AddError(TEXT("Prepared physical constants changed height, foam or copy ownership"));return false;}
             float HashedFoam=-1.f;
             const float Hashed=Index.Sample(P,&HashedFoam,false);
             if (Fast!=Hashed || IndexedFoam!=HashedFoam || Copy.Sample(P)!=Index.Sample(P))

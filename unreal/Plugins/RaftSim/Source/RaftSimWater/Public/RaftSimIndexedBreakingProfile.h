@@ -2,6 +2,7 @@
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterFlowFrame.h"
 #include "RaftSimPhysicalBreakingSample.h"
+#include "RaftSimPreparedPhysicalBreakingSample.h"
 
 // Immutable broad phase for the SAME continuous crest function. No height
 // interpolation, quantization, profile-history reuse or site-order changes.
@@ -19,6 +20,10 @@ class TRaftSimIndexedBreakingProfile
     // A bounded rectangular table avoids hashing every refinement sample.
     // Own the copied subsets: normal copy/move cannot leave dangling pointers.
     TArray<TArray<FSite>> DenseTiles;
+    using FPreparedSite=RaftSimPreparedPhysicalBreakingSample::FSite;
+    TMap<FIntPoint,TArray<FPreparedSite>> PreparedTiles;
+    TArray<TArray<FPreparedSite>> PreparedDenseTiles;
+    bool bPrepared=false;
     FIntPoint DenseOrigin=FIntPoint::ZeroValue,DenseSize=FIntPoint::ZeroValue;
     float Lift,Spacing,GlobalCap=0;
     bool bIndexed=false;
@@ -79,6 +84,35 @@ public:
     bool IsIndexed() const { return bIndexed; }
     int32 TileCount() const { return Tiles.Num(); }
     int32 DenseTileCount() const { return DenseTiles.Num(); }
+    // Explicit trial preparation. Ordinary indexes allocate no prepared tables.
+    void PreparePhysicalConstants()
+    {
+        if(bPrepared || !bIndexed)return;
+        const auto Prepare=[](const TArray<FSite>& In,TArray<FPreparedSite>& Out)
+        {Out.Reserve(In.Num());for(const auto& S:In)Out.Emplace(S);};
+        if(!DenseTiles.IsEmpty())
+        {
+            PreparedDenseTiles.SetNum(DenseTiles.Num());
+            for(int32 I=0;I<DenseTiles.Num();++I)Prepare(DenseTiles[I],PreparedDenseTiles[I]);
+        }
+        else for(const auto& Entry:Tiles)Prepare(Entry.Value,PreparedTiles.Add(Entry.Key));
+        bPrepared=true;
+    }
+    float SamplePrepared(const FVector2D& P,float* Foam=nullptr) const
+    {
+        FIntPoint Key;
+        if(!bPrepared || !Tile(P,Key))return Sample(P,Foam);
+        const TArray<FPreparedSite>* Found=nullptr;
+        if(!PreparedDenseTiles.IsEmpty())
+        {
+            const int32 X=Key.X-DenseOrigin.X,Y=Key.Y-DenseOrigin.Y;
+            if(X>=0 && Y>=0 && X<DenseSize.X && Y<DenseSize.Y)Found=&PreparedDenseTiles[Y*DenseSize.X+X];
+        }
+        else Found=PreparedTiles.Find(Key);
+        const TConstArrayView<FPreparedSite> Local=Found ? TConstArrayView<FPreparedSite>(*Found) : TConstArrayView<FPreparedSite>();
+        return Foam ? RaftSimPreparedPhysicalBreakingSample::Evaluate<true>(P,Local,GlobalCap,Foam)
+                    : RaftSimPreparedPhysicalBreakingSample::Evaluate<false>(P,Local,GlobalCap,nullptr);
+    }
     float Sample(const FVector2D& P,float* Foam=nullptr,bool bDense=true) const
     { return SampleWithEmptyTileSkip(P,Foam,bDense,false); }
     float SamplePhysicalInline(const FVector2D& P,float* Foam=nullptr) const

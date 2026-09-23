@@ -6135,6 +6135,32 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
         }
 #endif
+        // Trial differs from the rejected inline evaluator: site-constant
+        // arithmetic is performed once per immutable profile, not per query.
+#if !UE_BUILD_SHIPPING
+        static const bool bPreparedPhysical=FParse::Param(FCommandLine::Get(),TEXT("RaftSimPreparedPhysicalCrests"));
+        static const bool bPreparedPhysicalAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimPreparedPhysicalCrestAudit"));
+        if((bPreparedPhysical || bPreparedPhysicalAudit) && !bFullCrestScan && !bFineIndex && !bFineAudit &&
+            !bInlinePhysical && !bInlineAudit && GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")))
+        {
+            IndexedProfile->PreparePhysicalConstants();
+            const auto Audit=bPreparedPhysicalAudit ? MakeShared<FRaftSimInlineCrestAudit,ESPMode::ThreadSafe>(TEXT("PREPARED_CREST_EPOCH"))
+                : TSharedPtr<FRaftSimInlineCrestAudit,ESPMode::ThreadSafe>();
+            CartesianCrestInput.HeightAtWorldXYCm=[IndexedProfile,Audit,Scale,Sign](const FVector2D& P)
+            {
+                const FVector2D Field(P.X*.01,P.Y*.01*Sign);
+                const float Result=IndexedProfile->SamplePrepared(Field)*Scale*100.f;
+                if(Audit)Audit->Compare(IndexedProfile->Sample(Field)*Scale*100.f,Result);
+                return Result;
+            };
+            static bool bLoggedPreparedPhysical=false;
+            if(!bLoggedPreparedPhysical)
+            {
+                UE_LOG(LogTemp,Display,TEXT("Prepared physical crest candidate active: audit=%d; original divisions, exponentials, site order and support retained"),int32(bPreparedPhysicalAudit));
+                bLoggedPreparedPhysical=true;
+            }
+        }
+#endif
         static const bool bEmptyTileAudit=[]{FString P;return FParse::Value(FCommandLine::Get(),TEXT("RaftSimCrestEmptyTileAudit="),P);}();
         if(bEmptyTileAudit)for(int32 Kind=0;Kind<2;++Kind)
             CartesianCrestInput.EmptyTileComparisonHeight[Kind]=[IndexedProfile,Scale,Sign,Kind](const FVector2D& P)

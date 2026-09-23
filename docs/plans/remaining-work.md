@@ -3,6 +3,21 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest bounded qualification: [prepared physical crest constants](../reconstruction-review-2026-09-07/prepared-physical-crests.md).
+199,806 native comparisons and23,098,795 actual-game queries match exactly,
+but same-binary900-frame ABBA gains are NOT repeatable: candidate B improves
+mean over A, while C is slightly slower than D; both candidate p95 values worsen
+against their adjacent controls. All four FAIL30FPS p95. Default promotion is
+REJECTED; explicit non-shipping opt-in only. Do not repeat this unchanged trial.
+Supporting qualification, NOT a new visible delivery or normal-play FPS gain.
+Editor/game rebuilt;3 native and25 focused tests pass. Final normal-start
+editor-hosted D3D12 -game confirms candidate OFF/compact storage ON;24 captures,
+467 decoded frames,2,034 support points and8,645 transport anchors checked.
+Standalone target rebuilt, NOT packaged traversal acceptance. Water/crew/canopy
+limitations remain. Sole source6480 resumes and advances with no completed
+report; no duplicate cook, protected-source/geometry/collision/4950-field change,
+nonlinear OFF. South Fork and the entire ordered reconstruction queue stay OPEN.
+
 Latest delivered CPU optimization: [referenced crest-source storage](../reconstruction-review-2026-09-07/compact-crest-source.md).
 Normal South Fork now discards only unreferenced CPU crest-input storage after
 shoreline clipping; every drawn triangle/attribute and physical grid remains.
