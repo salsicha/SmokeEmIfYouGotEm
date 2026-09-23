@@ -124,9 +124,22 @@ inflow45.306955 m³/s: NOT settled. Reports are
 [filtering follow-through receipt](water-shadow-filter-review.json).
 The same original cook is the sole live engine/cook job; no fields promoted.
 
-Next complete local12000/15600 s needs both `audit_cartesian_cook_snapshot.py`
-and `audit_cartesian_exterior_banks.py`, then reassess later regional storage trends. Do not launch
-a duplicate while this run is live or treat buffered progress output as a stall.
+Local12000/15600,13000/15650 and14000/15700 s now pass both independent
+audits. All5,382,400 cells remain finite and all86,720 artificial-bank cells
+remain exactly dry. At15700 s maximum depth is3.459829193 m and maximum
+speed4.956530141 m/s. Volume2143575.428078 m³ is48702.040084 m³ below restart;
+maximum per-step conservation residual remains9.483589469e−9 m³.
+Combined instantaneous outlet111.894383 m³/s exceeds inlet45.306955 m³/s.
+This does NOT establish settling. Reports:
+`tmp/cartesian-{15600,15650,15700}-{state,banks}-v1-20260923.json`.
+Latest depth SHA256:
+`fda368b043167d53d62de0ede0e7056de328a2c24ddcdf5a180e043499ccb05e`.
+The six audit invocations completed successfully; no engine job, duplicate cook,
+source mutation or field promotion was performed.
+
+Next complete local15000/15750 s needs both `audit_cartesian_cook_snapshot.py`
+and `audit_cartesian_exterior_banks.py`. Do not launch a duplicate while this
+run is live or treat buffered progress output as a stall.
 
 ## Regional storage through15300 s
 
@@ -150,6 +163,31 @@ to force instantaneous balance or promote these states into gameplay.
 Report: `tmp/cartesian-storage-regions-15300-v1-20260923.json`, SHA256
 `8c52a34613af2095205da13111cbc27fc595ed802a6959d3470489d0529c1474`.
 The audit is terminal exit0; no additional cook was launched.
+
+## Regional storage through15700 s
+
+A new read-only report extends the same partition and hash checks to completed
+local6000/15300,10000/15500 and14000/15700 s snapshots. These are equal200 s
+intervals, distinct from the earlier150 s intervals. Storage rates are not
+cross-section discharges or measured river observations.
+
+| Model-time interval | Station0–9 km | Station9–26 km | Station26 km–end | Domain |
+| --- | ---: | ---: | ---: | ---: |
+|15300–15500 s|−0.00437|−39.96950|−29.48141|−69.45528 m³/s|
+|15500–15700 s|−0.00356|−37.85834|−30.55175|−68.41364 m³/s|
+|15300–15700 s|−0.00396|−38.91392|−30.01658|−68.93446 m³/s|
+
+Regional sums agree with integrated exterior volume to within2.73e−10 m³.
+Middle-reach storage loss eases while downstream loss grows; distributed
+drainage remains substantial. The upper-region aggregate alone does not
+qualify individual rapid stages, local velocities, terrain alignment or a
+partial field promotion. Do not extrapolate an equilibrium time from these
+intervals or tune outlet stage to force balance.
+
+Report: `tmp/cartesian-storage-regions-15700-v1-20260923.json`, SHA256
+`2f4f8ccac62eb8d5bcc4db0c63913d983286c29324a03ffe3c7d97326564c64e`.
+Session26678 is terminal exit0. This is supporting hydraulic qualification,
+not visible delivery; the same cook continues with unchanged inputs.
 
 ## Unchanged acceptance limits
 

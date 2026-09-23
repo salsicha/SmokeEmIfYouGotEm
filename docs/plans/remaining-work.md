@@ -3,6 +3,15 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest crew geometry evidence: [actual sole/floor contact](../reconstruction-review-2026-09-07/crew-foot-contact.md).
+All50 actual boot/pose measurements are retained: paddler soles penetrate the
+rendered floor by roughly5–11cm while guide soles have a4–8cm gap. Several
+sole samples cross the floor edge (tube/thwart support is not yet measured).
+This rules out a global height offset. Next fit seat-specific feet/knees jointly
+for body and equipment, preserving glute contact; then verify motion and cost.
+Four projection tests pass, engine session52725 terminal exit0. This is diagnosis,
+NOT a playable correction or crew/river acceptance. No game or field change.
+
 Latest normal-play crew correction: [rigid paddle geometry](../reconstruction-review-2026-09-07/rigid-crew-paddle.md).
 Shared normal poses now retain a120cm shaft instead of telescoping between
 rest/stroke/brace/high-side. Blade height and grip distances are preserved;
@@ -75,8 +84,13 @@ are unchanged, zero added cells/water;51 focused regressions pass. New checkpoin
 local7000/15350,8000/15400 and9000/15450 s pass BOTH state/exterior-bank audits:
 all86,720 bank cells dry, maximum per-step residual9.48e−9m³; latest outflow
 113.721042 versus inflow45.306955m³/s still unsettled. Subsequent local10000/15500
-and11000/15550 s now pass BOTH audits too; latest outflow112.947736 versus
-inflow45.306955m³/s remains unsettled. Next local12000/15600 s needs both audits.
+and11000/15550 s pass BOTH audits too. New local12000/15600,13000/15650 and
+14000/15700 s also pass BOTH audits: latest outflow111.894383 versus
+inflow45.306955m³/s remains unsettled. Regional storage through15700 s still
+shows distributed middle/downstream loss, not just an outlet-cell transient;
+the later200 s interval loses68.413644m³/s overall. This is supporting evidence,
+NOT new playable delivery or settling acceptance. Next local15000/15750 s needs
+both audits when complete; the15300→15500→15700 regional audit is terminal.
 Do not duplicate the cook or reuse historical PID12672. This is supporting
 settling work ONLY: no visible delivery, game rebuild, field promotion or
 acceptance; installed4950 fields and nonlinear OFF state remain unchanged.
