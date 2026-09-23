@@ -3,15 +3,23 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest bounded visual investigation: [raft-edge shadow discrimination](../reconstruction-review-2026-09-07/raft-edge-shadow-review.md).
+Latest bounded qualification: [water-shadow filtering](../reconstruction-review-2026-09-07/water-shadow-filter-review.md).
+Shadow-preserving process-local filtering shows no convincing raft-edge fix.
+ABBA p95 values38.0804/39.8348/33.5328/32.9872 ms: both candidates FAIL;
+default promotion rejected. All five captures and session75358 terminal exit0;
+13 parser regressions pass. Normal rendering/geometry/collision/4950 fields
+unchanged, nonlinear OFF. Do not repeat this unchanged trial. This is supporting
+qualification, not visible delivery or river acceptance; sole cook36692 continues.
+
+Earlier bounded visual investigation: [raft-edge shadow discrimination](../reconstruction-review-2026-09-07/raft-edge-shadow-review.md).
 Four actual camera/carrier/terrain rays show fully wet water present at the
 reviewed raft-edge patches. A confirmed process-local shadow-off control removes
 the patches; the initial rejected ECVF_Cheat attempt is retained as invalid.
 The helper now verifies shadow controls and forbids their use as FPS captures;
 22 Python regressions and new/existing PowerShell guard suites pass. Normal
 shadows remain enabled, with NO geometry/material/field promotion or visual/FPS
-acceptance. Next qualify shadow-preserving water filtering, not hole-filling or
-source edits. All captures terminal; original cook36692 continues unchanged.
+acceptance. Shadow-preserving filtering is now qualified above without promotion;
+do not fill geometry or edit sources to hide these patches. All captures terminal.
 
 Latest bounded playable-performance integration: [reusable MUSCL stage storage](../reconstruction-review-2026-09-07/solver-stage-storage.md).
 Its [retained rapid follow-through](../reconstruction-review-2026-09-07/solver-stage-rapid-review.md)
@@ -55,8 +63,9 @@ cells match the prior final state bit-for-bit, all retained physical inputs
 are unchanged, zero added cells/water;51 focused regressions pass. New checkpoint
 local7000/15350,8000/15400 and9000/15450 s pass BOTH state/exterior-bank audits:
 all86,720 bank cells dry, maximum per-step residual9.48e−9m³; latest outflow
-113.721042 versus inflow45.306955m³/s still unsettled. Next complete
-local10000/15500 s needs both audits.
+113.721042 versus inflow45.306955m³/s still unsettled. Subsequent local10000/15500
+and11000/15550 s now pass BOTH audits too; latest outflow112.947736 versus
+inflow45.306955m³/s remains unsettled. Next local12000/15600 s needs both audits.
 Do not duplicate the cook or reuse historical PID12672. This is supporting
 settling work ONLY: no visible delivery, game rebuild, field promotion or
 acceptance; installed4950 fields and nonlinear OFF state remain unchanged.

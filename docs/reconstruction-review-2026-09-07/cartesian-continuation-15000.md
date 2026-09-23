@@ -111,7 +111,20 @@ Latest depth SHA256:
 `91395922ee38a462bd0604f629e15a945028e39e0e2d13242c2911b322bf6ebd`.
 The same original cook remains live without a duplicate or input change.
 
-Next complete local10000/15500 s needs both `audit_cartesian_cook_snapshot.py`
+Local10000/15500 and11000/15550 s now pass both audits. All5,382,400 cells
+are finite and all86,720 artificial-bank cells remain exactly dry. Latest
+maximum depth3.487468730 m, speed4.970119220 m/s, volume2153817.610698 m³
+(−38459.857464 m³ from restart), maximum per-step residual9.483589469e−9 m³.
+Combined outflow117.241668 at15500 s and112.947736 m³/s at15550 s still exceeds
+inflow45.306955 m³/s: NOT settled. Reports are
+`tmp/cartesian-15500-state-v1-20260923.json`,
+`tmp/cartesian-15500-banks-v1-20260923.json`,
+`tmp/cartesian-15550-state-v1-20260923.json` and
+`tmp/cartesian-15550-banks-v1-20260923.json`, bound in the
+[filtering follow-through receipt](water-shadow-filter-review.json).
+The same original cook is the sole live engine/cook job; no fields promoted.
+
+Next complete local12000/15600 s needs both `audit_cartesian_cook_snapshot.py`
 and `audit_cartesian_exterior_banks.py`, then reassess later regional storage trends. Do not launch
 a duplicate while this run is live or treat buffered progress output as a stall.
 
