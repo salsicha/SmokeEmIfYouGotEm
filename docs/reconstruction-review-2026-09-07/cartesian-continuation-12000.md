@@ -2,6 +2,11 @@
 
 Reviewed 2026-09-19 UTC. Supporting hydraulic work only; no playable promotion.
 
+Update2026-09-23: the continuation described below is now terminal at15000 s.
+Both final audits pass, but the reach remains unsettled and downstream storage
+is now falling. See [final state and regional accounting](affine-source-pullback-and-15000-review.md).
+Do not reuse PID12672 in profiling or restart its already completed cook.
+
 The preceding 9000→12000 s cook (PID 13584) is terminal: its process is absent,
 its native `completed.json` records completion, and local frame 60000 is complete.
 An OS exit-code receipt was not recovered; native completion and independently

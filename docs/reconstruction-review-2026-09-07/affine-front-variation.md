@@ -2,6 +2,11 @@
 
 2026-09-19 UTC. Supporting physics only; no visible gameplay change.
 
+Update2026-09-23: both jobs described as live below are now terminal. The original
+momentum replay passed11 supported cases; final15000 s hydraulic state/banks pass
+but are not settled. See the [current saved-state source qualification](affine-source-pullback-and-15000-review.md)
+for the new single live derivative audit. The remainder is the historical review.
+
 `AffineFrontPressureVariation` now differentiates the same prescribed-boundary
 two-pole energy with respect to original owner depth moments, bed slopes,
 directed face columns, physical/canonical momentum and each active exterior

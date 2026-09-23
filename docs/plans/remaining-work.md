@@ -1,7 +1,20 @@
 # Remaining requested work
 
-Last reviewed 2026-09-19 UTC. This index does not convert diagnostic passes into
+Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
+
+Current supporting review: [completed source replay and15000 s hydraulic audit](../reconstruction-review-2026-09-07/affine-source-pullback-and-15000-review.md).
+Old source14076 and cook12672 are TERMINAL, superseding all LIVE statements below.
+The original two-pole replay passes11 supported cases; unsupported2/7 retained.
+New saved-state primitive-work audit checks original equations without re-solving
+momentum unknowns;83 focused tests pass. Sole source qualification6480/session50573
+has case0 PASS, case1 running; no complete derivative report yet. Do not duplicate.
+Both final15000 s state/bank audits pass, but115.020881out versus45.306955in m3/s
+is NOT settled. New all-cell regional accounting shows downstream storage now
+falling too, not accumulating as in the earlier interval. No further cook launched.
+No playable/build/map/collision/source/4950/FPS change; nonlinear OFF. This is
+supporting qualification only. Legacy storage/face mismatch, source-cap decision,
+normal-play realism/performance and the full ordered queue remain OPEN.
 
 Latest normal-play CPU improvement: [parallel mapped crest history](../reconstruction-review-2026-09-07/crest-history-parallel.md).
 Original coordinate map and duplicate ownership are retained; mapped reads and
