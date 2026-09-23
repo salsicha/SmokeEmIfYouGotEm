@@ -3,6 +3,16 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest visible delivery: [normal-start briefing fit](../reconstruction-review-2026-09-07/transition-fit.md).
+The full South Fork briefing and rescue-control line now remain inside the
+screen in the rebuilt normal game. Viewport-bounded layout preserves wording
+and fade;20 viewport/UI-scale math cases and2 catalog/migration tests pass.
+Actual normal-start movie fully decoded467frames;1/3/6/11s views checked.
+This fixes the observed default720p clipping, NOT broader scene/water realism.
+Separate ordinary capture25.504336FPS/p9547.7349ms still FAILS30FPS. Source6480
+remains live/resumed, no complete derivative report; no duplicate cook/source,
+geometry/collision/4950-field change. Entire river/crew/performance queue OPEN.
+
 Latest performance investigation: [base-vertex parallel trial](../reconstruction-review-2026-09-07/base-vertices-parallel.md).
 64 actual-input pairs preserve every array/history/statistic exactly; both-order
 component means improve, with9 slower individual pairs retained. However BOTH

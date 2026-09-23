@@ -4,6 +4,10 @@
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/TextBlock.h"
+#include "Components/ScaleBox.h"
+#include "Components/ScaleBoxSlot.h"
+#include "Components/SizeBox.h"
+#include "RaftSimTransitionLayout.h"
 #include "EngineUtils.h"
 #include "RaftSimRunManager.h"
 #include "RaftSimPresentationDirector.h"
@@ -65,14 +69,34 @@ void URaftSimRunHudWidget::BuildWidgetTree()
     RescueText = AddText(WidgetTree, Canvas, FVector2D(40.0f, 580.0f), 19);
     SubtitleText = AddText(WidgetTree, Canvas, FVector2D(40.0f, 640.0f), 24);
     OverlayText = AddText(WidgetTree, Canvas, FVector2D(330.0f, 225.0f), 26);
-    TransitionText = AddText(WidgetTree, Canvas, FVector2D(150.0f, 760.0f), 32);
+    TransitionBounds = WidgetTree->ConstructWidget<UScaleBox>(UScaleBox::StaticClass());
+    TransitionBounds->SetStretch(EStretch::ScaleToFit);
+    TransitionBounds->SetStretchDirection(EStretchDirection::DownOnly);
+    UCanvasPanelSlot* TransitionSlot = Canvas->AddChildToCanvas(TransitionBounds);
+    TransitionSlot->SetAnchors(FAnchors(0.0f, 1.0f));
+    TransitionSlot->SetAlignment(FVector2D(0.0f, 1.0f));
+    TransitionSlot->SetPosition(FVector2D(40.0f, -40.0f));
+    TransitionSlot->SetSize(FVector2D(780.0f, 400.0f));
+    TransitionWrap = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
+    TransitionWrap->SetWidthOverride(780.0f);
+    UScaleBoxSlot* FitSlot = CastChecked<UScaleBoxSlot>(TransitionBounds->AddChild(TransitionWrap));
+    FitSlot->SetHorizontalAlignment(HAlign_Left);
+    FitSlot->SetVerticalAlignment(VAlign_Bottom);
+    TransitionText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+    FSlateFontInfo TransitionFont = TransitionText->GetFont();
+    TransitionFont.Size = 32;
+    TransitionText->SetFont(TransitionFont);
+    // Fixed wrap width produces a stable desired height; ScaleBox fits the
+    // entire text only when necessary, without truncation or scroll controls.
+    TransitionText->SetAutoWrapText(false);
+    TransitionText->SetWrapTextAt(780.0f);
+    TransitionWrap->AddChild(TransitionText);
     // Explicit regions avoid the auto-size/auto-wrap feedback loop that can
     // collapse dynamic UMG text to a word-wide column on portrait displays.
     SetTextRegion(TrainingText, FVector2D(260.0f, 400.0f), 260.0f);
     SetTextRegion(RescueText, FVector2D(940.0f, 80.0f), 940.0f);
     SetTextRegion(SubtitleText, FVector2D(940.0f, 120.0f), 940.0f);
     SetTextRegion(OverlayText, FVector2D(680.0f, 440.0f), 680.0f);
-    SetTextRegion(TransitionText, FVector2D(780.0f, 240.0f), 780.0f);
     SubtitleText->SetText(FText::GetEmpty());
     OverlayText->SetText(FText::GetEmpty());
     TransitionText->SetText(FText::GetEmpty());
@@ -102,7 +126,9 @@ void URaftSimRunHudWidget::NativeConstruct()
             const auto& Settings = Save->GetSave()->Settings;
             if (UWidget* RootWidget = WidgetTree ? WidgetTree->RootWidget : nullptr)
             {
-                RootWidget->SetRenderScale(FVector2D(Settings.UiScale));
+                AppliedUiScale = FMath::Clamp(Settings.UiScale, 0.75f, 1.5f);
+                RootWidget->SetRenderTransformPivot(FVector2D(0.5f, 0.5f));
+                RootWidget->SetRenderScale(FVector2D(AppliedUiScale));
             }
             const FLinearColor Cue = Settings.ColorCueMode == ERaftSimColorCueMode::Monochrome
                 ? FLinearColor::White
@@ -186,6 +212,19 @@ void URaftSimRunHudWidget::ShowOverlay(ERaftSimHudOverlay Overlay)
 void URaftSimRunHudWidget::NativeTick(const FGeometry& Geometry, float DeltaSeconds)
 {
     Super::NativeTick(Geometry, DeltaSeconds);
+
+    const FVector2D Viewport = Geometry.GetLocalSize();
+    if (TransitionBounds && Viewport.X > 0.0 && Viewport.Y > 0.0 &&
+        !Viewport.Equals(LastTransitionViewport))
+    {
+        const auto Region = RaftSimTransitionLayout::Resolve(Viewport, AppliedUiScale);
+        UCanvasPanelSlot* TransitionSlot = CastChecked<UCanvasPanelSlot>(TransitionBounds->Slot);
+        TransitionSlot->SetPosition(Region.Position);
+        TransitionSlot->SetSize(Region.Size);
+        TransitionWrap->SetWidthOverride(Region.Size.X);
+        TransitionText->SetWrapTextAt(Region.Size.X);
+        LastTransitionViewport = Viewport;
+    }
 
     if (RunManager == nullptr)
     {

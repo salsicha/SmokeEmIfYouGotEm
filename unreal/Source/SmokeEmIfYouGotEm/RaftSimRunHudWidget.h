@@ -6,6 +6,8 @@
 #include "RaftSimRunHudWidget.generated.h"
 
 class UTextBlock;
+class UScaleBox;
+class USizeBox;
 class ARaftSimRunManager;
 class ARaftSimTrainingDirector;
 class ARaftSimPresentationDirector;
@@ -80,6 +82,15 @@ protected:
 
     UPROPERTY()
     TObjectPtr<UTextBlock> TransitionText;
+
+    UPROPERTY()
+    TObjectPtr<UScaleBox> TransitionBounds;
+
+    UPROPERTY()
+    TObjectPtr<USizeBox> TransitionWrap;
+
+    FVector2D LastTransitionViewport = FVector2D::ZeroVector;
+    float AppliedUiScale = 1.0f;
 
     UPROPERTY()
     TObjectPtr<ARaftSimRunManager> RunManager;
