@@ -4065,6 +4065,28 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     {
         LogWaterRenderStateEvent(GetWorld(), TEXT("grid_recentre"));
     }
+    // Coverage depends on the station and this refresh's recentered grid,
+    // not on the lateral vertex. Recompute every refresh; never reuse across
+    // a changed window, corridor or spacing. Retain the original path for
+    // same-binary cost and actual-state equality controls.
+    static const bool bReferenceStationCoverage=FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceStationCoverage"));
+    static const bool bAuditStationCoverage=FParse::Param(FCommandLine::Get(),TEXT("RaftSimStationCoverageAudit"));
+    TArray<float> RefreshStationCoverage;
+    if(!bReferenceStationCoverage || bAuditStationCoverage)
+    {
+        RefreshStationCoverage.SetNumUninitialized(GridStationN);
+        for(int32 X=0;X<GridStationN;++X)RefreshStationCoverage[X]=StationEdgeCoverage(X);
+    }
+    int32 StationCoverageQueries=0,StationCoverageDifferences=0;
+    const auto RefreshCoverage=[&](int32 X)
+    {
+        if(bAuditStationCoverage)
+        {
+            ++StationCoverageQueries;
+            StationCoverageDifferences+=RefreshStationCoverage[X]!=StationEdgeCoverage(X);
+        }
+        return bReferenceStationCoverage ? StationEdgeCoverage(X) : RefreshStationCoverage[X];
+    };
     FBox2D LiveCropBounds(ForceInit);
     const bool bHasLiveCropBounds = bCartesianFlow && WaterAdapter->GetLiveWaterFieldBoundsM(LiveCropBounds);
     const auto CropAuthorityFor = [this, bCartesianFlow, bHasLiveCropBounds, LiveCropBounds](int32 Index)
@@ -5569,7 +5591,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 WetVertexMask[Index] != 0
                     ? (bParallel ? ComputeStationEdgeCoverage(X+BaseUpstreamPad,
                         GridStationN+BaseUpstreamPad+BaseDownstreamPad,
-                        ResolvedVertexSpacingMeters,CurvedGridEdgeBlendMeters) : StationEdgeCoverage(X))
+                        ResolvedVertexSpacingMeters,CurvedGridEdgeBlendMeters) : RefreshCoverage(X))
                     : 0.0f);
         };
         if(bParallel)
@@ -5699,8 +5721,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
 
             const int32 UpstreamStationIndex = UpstreamIndex%GridStationN;
             const int32 UpstreamLateralIndex = UpstreamIndex/GridStationN;
-            const float UpstreamStationCoverage = StationEdgeCoverage(UpstreamStationIndex);
-            const float LocalStationCoverage = StationEdgeCoverage(X);
+            const float UpstreamStationCoverage = RefreshCoverage(UpstreamStationIndex);
+            const float LocalStationCoverage = RefreshCoverage(X);
             const float UpstreamLateralCoverage = ComputeLateralWetCoverage(
                 UpstreamLateralIndex,
                 MinimumWetLateralIndex[UpstreamStationIndex],
@@ -7073,7 +7095,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         X, RiverCoordinatesM[X].X, WetCount,
                         WetVertexMask[CentreY * GridStationN + X] != 0 ? 1 : 0,
                         MinimumWetLateralIndex[X], MaximumWetLateralIndex[X],
-                        StationEdgeCoverage(X), StationReferenceSurfaceZ[X]);
+                        RefreshCoverage(X), StationReferenceSurfaceZ[X]);
                 };
                 UE_LOG(LogTemp, Display,
                     TEXT("RaftSim lattice edge probe: grid_start_m=%.1f grid_end_m=%.1f corridor=[%.1f,%.1f] rows=%d lateral=%d spacing=%.2f at_start=%d at_end=%d"),
@@ -7103,7 +7125,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
             else
             {
-                const float StationCoverage = StationEdgeCoverage(X);
+                const float StationCoverage = RefreshCoverage(X);
                 const float LateralCoverage = ComputePresentationBankCoverage(
                     RiverCoordinatesM[Index].X,
                     Y,
@@ -7576,7 +7598,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 CartesianShoreBedM[I] = WaterSamples[I].BedHeightMeters;
                 CartesianShoreWet[I] = CartesianShoreAvailable[I] && ConnectedWetMask[I] &&
                     !VisualFilmCullMask[I] && VolumeCoreWetMask[I] && WaterSamples[I].DepthMeters>1.e-4f &&
-                    StationEdgeCoverage(I%GridStationN)>=kLiveVolumeCoreMinimumStationCoverage;
+                    RefreshCoverage(I%GridStationN)>=kLiveVolumeCoreMinimumStationCoverage;
             }
         }
 
@@ -7644,8 +7666,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     const int32 I2 = I0 + GridStationN;
                     const int32 I3 = I2 + 1;
                     const float MinimumCellStationCoverage = FMath::Min(
-                        StationEdgeCoverage(X),
-                        StationEdgeCoverage(X + 1));
+                        RefreshCoverage(X),
+                        RefreshCoverage(X + 1));
                     if (MinimumCellStationCoverage <
                         kLiveVolumeCoreMinimumStationCoverage)
                     {
@@ -8589,6 +8611,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             WaterSamples[Index].DepthMeters >= 0.10f ? 1 : 0;
     }
     Perf.Mark(TEXT("foam_overlay_finish"));
+    if(bAuditStationCoverage)
+    {
+        UE_LOG(LogTemp,Display,TEXT("StationCoverageAudit frame=%llu stations=%d queries=%d differences=%d recentered=%d center=%.9g north=%.9g"),
+            static_cast<unsigned long long>(GFrameCounter),GridStationN,StationCoverageQueries,
+            StationCoverageDifferences,int32(bGridRecentredThisRefresh),CurvedGridCenterStationM,CartesianGridCenterNorthM);
+        ensureAlwaysMsgf(StationCoverageDifferences==0,TEXT("Within-refresh station coverage changed"));
+    }
     // Current immutable profile, next interpolation's known sample positions.
     // The component's experimental opt-in owns copies and never waits here.
     if(bCartesianFlow && CartesianShorelineMesh)

@@ -3,6 +3,18 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest normal-path performance improvement: [refresh-local station coverage](../reconstruction-review-2026-09-07/station-coverage-reuse.md).
+The original edge calculation is reused per station within each refresh, never
+across a recenter. All4,348,737 actual uses match exactly;15 native shoreline/
+interpolation suites and five audit-parser tests pass. Normal-start motion is
+fully decoded and inspected. Isolated900-frame ABBA controls give original
+p9540.8828/40.7823ms versus reuse40.5465/40.4197ms: a modest measured improvement,
+but ALL still FAIL33.333333ms. The exact reuse is retained in normal play; no
+new visible geometry/detail or river acceptance is claimed. Editor and Game
+builds are terminal success; playable captures use the normal scenario in an
+editor-hosted game, not packaged-release acceptance. Captured sources, collision,
+4950 fields and nonlinear OFF unchanged; original cook36692 continues.
+
 Current crew fitting work: [shared feet/body solve](../reconstruction-review-2026-09-07/crew-foot-fit.md).
 Rest/stroke/brace tread contact is corrected in the normal scene; editor/Game
 builds and four native suites pass, with actual normal-start motion inspected.
@@ -14,6 +26,17 @@ have support with per-boot minimum gap0.109–0.730cm. Full high-side contact fa
 Do not repeat the rejected every-frame full-mesh scan or the floating tube
 fallback. High-side fitting is excluded and remains open. Installed4950 fields,
 captured sources and nonlinear OFF are unchanged; sole cook36692 continues.
+
+New measured attribution: the instrumented normal-start900-frame capture
+`south-fork-foot-scopes-v1-20260923` rules out ongoing foot-support scanning as
+the warmed-window bottleneck. Scope rows59–839 contain7,810 cache hits, zero
+support queries and zero seat/geometry misses; total foot-fit mean0.033889ms,
+p950.0425ms. Overall elapsed rows60–840 remain FAILING at p9540.9277ms.
+This is supporting diagnosis, not a new visible improvement or river acceptance.
+Do not optimize or relax the foot-contact cache on the previous unmeasured
+assumption.315 of332 over-budget intervals are associated with water refresh;
+next isolate that work without lowering geometry/physics quality. See the
+new attribution section in the shared feet/body review above.
 
 Baseline crew geometry evidence: [actual sole/floor contact](../reconstruction-review-2026-09-07/crew-foot-contact.md).
 All50 actual boot/pose measurements are retained: paddler soles penetrate the

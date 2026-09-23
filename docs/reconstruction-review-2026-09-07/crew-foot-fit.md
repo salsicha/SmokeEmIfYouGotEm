@@ -125,6 +125,54 @@ override, the unchanged solver archive and successful cook resumption.
 All editor/Game/native/tread/motion/cost/decode jobs are terminal. Original
 cook36692 remains the sole live cook. No river/release gate is closed.
 
+## Measured attribution after v9 — September23
+
+Added enabled CSV timing scopes for `FitFeet` and `SupportQuery`, plus explicit
+cache-hit, geometry-miss, seat-miss and support-query counters in the existing
+normal runtime. No contact geometry, cache policy, simulation, source data or
+solver enablement changed. The editor instrumentation build succeeds in62.55s
+(`tmp/crew-foot-cost-scopes-editor-v1-20260923.log`). This is not a new Game build
+or visible delivery; the previous rebuilt Game and motion evidence remain v9.
+The instrumented build also passes all four native crew suites (4 succeeded,
+0 failed/not-run/in-process), terminal engine exit0, retained at
+`tmp/crew-foot-scopes-native-v1-20260923/index.json`. Original cook36692 remains
+live afterward. The existing unrelated uninitialized-variable build warning is
+not resolved by this change.
+
+Fresh ordinary normal-start capture `south-fork-foot-scopes-v1-20260923` is
+terminal exit0,900 rows,1280×720 D3D12,4 solver lanes, no replay/paddle injection.
+The guarded helper suspended and resumed exact original cook36692 successfully;
+no competing engine/build/decode was active during measurement. The receipt
+confirms default FrameTime mode, so elapsed rows60–840 correspond to scope
+rows59–839. The existing strict CSV parser verifies the completed capture.
+
+Across those781 scope rows, `RaftSimCrewContact/GameThread/FitFeet` has mean
+0.0338886044ms, p950.0425ms and max0.0843ms. Every row records10 cache hits:
+7,810 total. Explicit support-query, geometry-miss and seat-miss counters are
+all zero, as is support-query timing. These counters—not zero timing alone—
+establish that no support scan ran in this warmed interval. They do not certify
+deforming hulls or startup search cost. `SupportQuery` is nested within `FitFeet`
+when called there; do not add their inclusive times.
+
+Elapsed-frame mean31.3756918ms/p9540.9277ms still FAILS33.333333ms. The prior
+proposal to optimize changing-geometry support scans is therefore not supported
+for this run; preserve the qualified foot fit and its invalidation rules.
+Phase-aligned water-workload grouping identifies315 of332 over-budget intervals
+in323 refresh-positive rows (mean38.00193ms, p9542.201ms). The other17 occur in
+326 crest-selection-positive/non-refresh rows;132 rows with neither positive
+timing contain no over-budget intervals. These are associations, not isolated
+causal attribution. Next isolate refresh work, not a speculative foot-cache
+rewrite or lower-quality simulation. No unchanged baseline rerun is needed.
+
+Receipts: `unreal/Saved/RaftSimValidation/south-fork-foot-scopes-v1-20260923-process.json`,
+`tmp/crew-foot-scopes-frame-v1-20260923.json`; source CSV
+`unreal/Saved/Profiling/CSV/south-fork-foot-scopes-v1-20260923.csv`, SHA256
+`f599069f8fede59a1383a151af69538fc7b93f7a67cb7669d288ae74e27f846b`.
+Crew columns are present in its initial header; counter values are counts, not
+milliseconds. Statistics above use those exact inclusive scope rows, separately
+from the existing water/frame report. High-side contact, full-route water and
+all acceptance gates below remain open; Colorado/Pacuare/Futaleufu stay queued.
+
 ## Remaining gates
 
 Independent full-tread support, guide and high-side contact, within-action motion,

@@ -3,10 +3,15 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "ProceduralMeshComponent.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+
+CSV_DEFINE_CATEGORY(RaftSimCrewContact,true);
 
 bool ARaftSimRaftActor::SampleRenderedCrewSupport(const TArray<FVector>& Points,
     TArray<double>& Floor, TArray<double>& Solid) const
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimCrewContact,SupportQuery);
+    CSV_CUSTOM_STAT(RaftSimCrewContact,SupportQueries,1,ECsvCustomStatOp::Accumulate);
     if (!RaftVisual || Points.IsEmpty()) return false;
     Floor.Init(-DBL_MAX, Points.Num());
     Solid.Init(-DBL_MAX, Points.Num());
@@ -56,6 +61,7 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
     // High-side crosses curved tubes and still needs a separate contact solve;
     // retain its authored stance, as for airborne/rescue/reentry trajectories.
     if (CurrentAction > ERaftSimCrewAvatarAction::Brace || !HasProductionRiverBoots()) return;
+    CSV_SCOPED_TIMING_STAT(RaftSimCrewContact,FitFeet);
     ARaftSimRaftActor* Raft = Cast<ARaftSimRaftActor>(GetAttachParentActor());
     if (!Raft) { bFootPlacementBound = false; FootPlacementRaft.Reset(); return; }
     if (FootPlacementRaft.Get() != Raft) { bFootPlacementBound = false; FootPlacementRaft = Raft; }
@@ -109,10 +115,16 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
         if (GeometryRevision != 0 && CachedFootSupportRevision == GeometryRevision &&
             ToRaft.Equals(CachedFootSupportToRaft,1.e-6))
         {
+            CSV_CUSTOM_STAT(RaftSimCrewContact,CacheHits,1,ECsvCustomStatOp::Accumulate);
             SupportZ[0] = CachedFootSupportZ[0]; SupportZ[1] = CachedFootSupportZ[1];
             bFound = true;
         }
-        else bFound = Sample(0,Feet[0],SupportZ[0],false) && Sample(1,Feet[1],SupportZ[1],false);
+        else
+        {
+            CSV_CUSTOM_STAT(RaftSimCrewContact,GeometryMisses,int32(CachedFootSupportRevision != GeometryRevision),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimCrewContact,SeatMisses,int32(!ToRaft.Equals(CachedFootSupportToRaft,1.e-6)),ECsvCustomStatOp::Accumulate);
+            bFound = Sample(0,Feet[0],SupportZ[0],false) && Sample(1,Feet[1],SupportZ[1],false);
+        }
     }
     else
     {
