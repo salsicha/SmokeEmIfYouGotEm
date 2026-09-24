@@ -3,6 +3,18 @@
 Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September24 bounded crew follow-through: exact5cm triangle bins and conservative
+horizontal-reach pruning reduce observed cold foot-fit cost137→41ms. A2cm local
+stance repair reduces the live bow recovery7,262→20 queries and36.58→3.65ms,
+retaining the same logged foot positions and all900 attempted/solved pose counts.
+Editor/Game builds and5 native suites pass, including7,582 exact probes×3states.
+Normal-start motion is fully decoded/inspected; upper-body and visibility limits
+remain. Overall p9542.0345ms still FAILS33.333333ms, and cold command cost remains
+too high. This is an opt-in candidate improvement, NOT normal-play promotion or
+river acceptance. Next prepare/reuse grounded stances before command time, then
+verify both-direction transitions and whole-body fit. Details and preserved
+receipts are in [high-side contact](../reconstruction-review-2026-09-07/crew-high-side-contact.md).
+
 Latest bounded crew trial: [high-side contact](../reconstruction-review-2026-09-07/crew-high-side-contact.md).
 The rigid paired v2 search fails bow/guide contact. Exported actual geometry
 identifies feasible staggered stances; v3 now solves all50 audited boot poses

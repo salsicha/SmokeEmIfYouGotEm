@@ -219,3 +219,67 @@ recovery movie or packaged-game run is claimed; the live recovery evidence is
 the isolated normal-start input/CSV run above. All engine/build/capture jobs
 are terminal. Captured sources, installed4950 fields and nonlinear OFF remain
 unchanged, and original cook36692 continues without duplication.
+
+## Exact search pruning and local recovery — September24 UTC
+
+The candidate triangle index now uses5cm bins instead of20cm; these bins only
+select original triangles, never resample or simplify the support surface.
+Tube searches reject horizontally unreachable candidates before querying
+support: full3D reach cannot be smaller than its horizontal projection. The
+unchanged full3D reach,15-point support,4cm span,foot ordering/height and boot
+separation gates still decide acceptance. No new geometry or pose is authored.
+
+The first normal-start900-frame command capture
+`south-fork-high-side-prune-cost-v1-20260924` retains all solved poses and the
+previous logged foot positions. Full-capture maximum foot-fit time39.9954ms
+is lower than the prior136.8212ms observation, but still not hitch-free. The
+subsequent live invalidation costs36.5786ms/7,262 support queries. Its overall
+elapsed p9543.3062ms FAILS; report `tmp/crew-high-side-prune-frame-v1-20260924.json`,
+CSV SHA256 `234aee8f1d84cb318470e450cded9b79fe48f2c0fedd9d507bd86122c7a9ece4`.
+Editor build78.42s and all5 native suites pass; the exact index test now checks
+7,582 points×3 lifecycle states, including additional signed5cm bin boundaries.
+
+The final change first repairs an invalidated tube stance within2cm of each
+prior foot. Only if that fails does it run the complete authored-origin search.
+Both passes use identical support,reach and pair gates; nothing accepts stale
+heights. Final Editor build16.03s succeeds. Final native report
+`tmp/crew-support-local-repair-native-v1-20260924/index.json`:5 succeeded,
+0 failed/not-run/in-process,6.015921s; session35282 terminal0. The later source
+edit only indents this loop; no expression or control-flow change.
+
+Final input-only capture `south-fork-high-side-local-repair-cost-v1-20260924`
+is terminal0 (session6668), normal FullReach/full_descent start,1280×720 D3D12,
+4 solver lanes, confirmed high-side input and exact cook suspend/resume0.
+All900 rows have equal attempted/solved counts. The live bow repair now uses
+20 queries and3.6468ms, with one explicit `LocalStanceRepairs` event; its logged
+feet are the same (-32,-11,38.023)/(2,-7,40.795)cm as the prior full recovery.
+Cold command fit still takes40.7643ms with10,194 queries;3,557 additional queries
+are rejected as horizontally unreachable. This is NOT a hitch-free command.
+Warmed scope rows59–839:7,810 attempted/solved/cache hits; zero queries,
+geometry/seat misses or further searches; FitFeet mean0.0357712ms/p950.0454ms,
+max0.0702ms. Overall elapsed rows60–840 mean32.6758234ms/p9542.0345ms,
+max51.0535ms still FAIL33.333333ms. These sequential observations do not isolate
+overall FPS gains; nested contact timings must not be added to frame timings.
+Report: `tmp/crew-high-side-local-repair-frame-v1-20260924.json`.
+CSV SHA256 `11e2f37281420fd612d78d62b43f1077e70b8f2b78f959949a1fb900b3eb296e`.
+
+Separate normal-start motion capture
+`south-fork-high-side-local-repair-motion-v1-20260924` completes24 stills with
+confirmed high-side input and cook suspend/resume0 (session21352 terminal0).
+Movie `unreal/Saved/VideoCaptures/RaftSim_20260923-171009.mp4`, SHA256
+`d30f0e8d2ab3ce5f8a8dacc74eac403427ca94a6271c11c0385748dde52b8d68`, fully decodes
+467 frames over15.533333s,35 exact adjacent duplicates. Unmodified3s/9s views
+show0.12→0.13km progression, changing water and held high-side posture. Soles
+remain mostly occluded; awkward upper-body pose, smooth water and coarse canopy
+remain visible. This is not a fresh full-tread, direction-flip, transition or
+limb/hull-collision qualification. Decoder report:
+`tmp/crew-support-local-repair-motion-v1-20260924/report.json`.
+
+Final Game build32.44s succeeds (session46091 terminal0), log
+`tmp/crew-support-local-repair-game-v1-20260924.log`. Captures are editor-hosted
+normal gameplay, not packaged-release acceptance. This increment improves the
+opt-in contact candidate only; normal high-side promotion remains withheld.
+Next remove the remaining cold command search with geometry-aware stance
+preparation/reuse, then qualify both-direction transitions and whole-body fit.
+No captured data,collision,hull,physical mass,4950 fields or nonlinear-OFF
+state changes. South Fork and the full ordered queue remain unfinished.

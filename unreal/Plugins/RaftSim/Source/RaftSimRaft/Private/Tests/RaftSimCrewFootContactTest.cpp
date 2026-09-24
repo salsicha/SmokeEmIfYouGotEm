@@ -46,6 +46,9 @@ bool FRaftSimCrewSupportIndexTest::RunTest(const FString&)
     for(int32 I=0;I<Section->ProcVertexBuffer.Num();I+=37)
         Points.Add(Mesh->GetRelativeTransform().TransformPosition(FVector(Section->ProcVertexBuffer[I].Position)));
     for(double Epsilon:{-1.e-7,0.,1.e-7})Points.Add(FVector(80.+Epsilon,20.-Epsilon,0));
+    // Include positive/negative fine-bin edges that are not old 20cm edges.
+    for(double Edge:{-85.,-5.,5.,85.})for(double Epsilon:{-1.e-7,0.,1.e-7})
+        Points.Add(FVector(Edge+Epsilon,5.-Epsilon,0));
     const FVector Original=Mesh->GetRelativeLocation();
     for(int32 State=0;State<3;++State)
     {

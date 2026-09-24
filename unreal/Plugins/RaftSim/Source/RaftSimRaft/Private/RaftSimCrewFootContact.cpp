@@ -23,7 +23,9 @@ bool ARaftSimRaftActor::SampleRenderedCrewSupport(const TArray<FVector>& Points,
     static const bool bIndexedReview=FParse::Param(FCommandLine::Get(),TEXT("RaftSimReviewHighSideContact"));
     if(bIndexedReview && !bForceReference)
     {
-        const auto Bin=[](const FVector& P){return FIntPoint(FMath::FloorToInt(P.X/20.),FMath::FloorToInt(P.Y/20.));};
+        // Smaller bins reduce candidate triangle tests, not mesh resolution.
+        // Every overlapping original triangle is still indexed and evaluated.
+        const auto Bin=[](const FVector& P){return FIntPoint(FMath::FloorToInt(P.X/5.),FMath::FloorToInt(P.Y/5.));};
         if(CrewSupportIndexRevision!=CrewSupportGeometryRevision || !CrewSupportIndexTransform.Equals(ToActor,1.e-6))
         {
             CrewSupportTriangles.Reset();CrewSupportBins.Reset();
@@ -117,8 +119,8 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
 {
     // Airborne/rescue/reentry trajectories retain their authored motion.
     if (CurrentAction > ERaftSimCrewAvatarAction::HighSideStarboard || !HasProductionRiverBoots()) return;
-    // The tube-stance candidate still fails bow/guide full-contact qualification.
-    // Keep the existing ordinary seated fit; never ship the failed trial by default.
+    // Static tube contact passes; command cost and whole-body transitions remain
+    // unqualified. Preserve the ordinary seated fit until those gates pass.
     static const bool bReviewHighSideContact = FParse::Param(FCommandLine::Get(),TEXT("RaftSimReviewHighSideContact"));
     if (CurrentAction > ERaftSimCrewAvatarAction::Brace && !bReviewHighSideContact) return;
     CSV_SCOPED_TIMING_STAT(RaftSimCrewContact,FitFeet);
@@ -178,6 +180,7 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
             return FMath::IsFinite(Z) && (!bHighSide || Z-MinimumZ<=4.0);
         };
     bool bFound = false;
+    bool bRepairTubeStance = false;
     double SupportZ[2] = {0,0};
     const uint64 GeometryRevision = Raft->GetCrewSupportGeometryRevision();
     if (bFootPlacementBound)
@@ -204,6 +207,7 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
             // A failed old footprint must seek a new supported stance instead
             // of falling back to authored penetrating feet on every frame.
             bFootPlacementBound=false;
+            bRepairTubeStance=bStepOntoTube;
             Feet[0]=Idle.LeftFootCm;Feet[1]=Idle.RightFootCm;
             Feet[0].Y+=2.;Feet[1].Y-=2.;
             if(bStepOntoTube){Feet[0].Y=-7.;Feet[1].Y=7.;}
@@ -222,47 +226,70 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
         const FVector Knees[2] = {Idle.LeftKneeCm,Idle.RightKneeCm};
         const FVector RestFeet[2] = {Idle.LeftFootCm,Idle.RightFootCm};
         const FVector Authored[2] = {Feet[0],Feet[1]};
+        double Upper[2],Lower[2],MaximumReachSquared[2];
         FBox FootBounds[2];
         for(int32 Foot=0;Foot<2;++Foot)
         {
+            Upper[Foot]=FVector::Distance(RestHips[Foot],Knees[Foot]);
+            Lower[Foot]=FVector::Distance(Knees[Foot],RestFeet[Foot]);
+            MaximumReachSquared[Foot]=FMath::Square(Upper[Foot]+Lower[Foot]-1.0);
             const FBox Source=Boots[Foot]->GetStaticMesh()->GetBoundingBox();
             FootBounds[Foot]=FBox(Source.Min*Boots[Foot]->GetRelativeScale3D(),Source.Max*Boots[Foot]->GetRelativeScale3D());
         }
-        for(int32 Step=0;Step<=64 && !bFound;++Step)
+        // Hull deformation usually invalidates a footprint by millimetres.
+        // First seek a nearby reachable pair (within 2cm per axis). Failure
+        // still runs the complete authored-origin search, with identical gates.
+        for(int32 Pass=bRepairTubeStance ? 0 : 1;Pass<=1 && !bFound;++Pass)
         {
-            const double Along=((Step+1)/2)*2*(Step%2 ? 1 : -1);
-            for(int32 Shift=0;Shift<=96;++Shift)
+            Candidates[0].Reset();Candidates[1].Reset();
+            const bool bLocalRepair=Pass==0;
+            for(int32 Step=0;Step<=(bLocalRepair ? 2 : 64) && !bFound;++Step)
             {
-                const double Lateral=((Shift+1)/2)*(Shift%2 ? -1 : 1);
-                for(int32 Foot=0;Foot<2;++Foot)
+                const double Along=((Step+1)/2)*2*(Step%2 ? 1 : -1);
+                for(int32 Shift=0;Shift<=(bLocalRepair ? 4 : 96);++Shift)
                 {
-                    FVector Candidate=Authored[Foot]+FVector(Along,Inboard*Lateral,0);
-                    double Z=0;
-                    if(!Sample(Foot,Candidate,Z,false))continue;
-                    const FVector P=ToRaft.TransformPosition(Candidate);
-                    Candidate.Z=ToRaft.InverseTransformPosition(FVector(P.X,P.Y,Z)).Z
-                        -Boots[Foot]->GetStaticMesh()->GetBoundingBox().Min.Z*ProfileZ+0.1;
-                    const double Upper=FVector::Distance(RestHips[Foot],Knees[Foot]);
-                    const double Lower=FVector::Distance(Knees[Foot],RestFeet[Foot]);
-                    const double Reach=FVector::Distance(Hips[Foot],Candidate);
-                    if(Reach>=Upper+Lower-1.0 || Reach<=FMath::Abs(Upper-Lower)+1.0)continue;
-                    Candidates[Foot].Add({Candidate,Z,Along*Along+Lateral*Lateral});
+                    const double Lateral=((Shift+1)/2)*(Shift%2 ? -1 : 1);
+                    for(int32 Foot=0;Foot<2;++Foot)
+                    {
+                        FVector Candidate=(bLocalRepair ? BoundFootLocalCm[Foot] : Authored[Foot])+
+                            FVector(Along,Inboard*Lateral,0);
+                        // Whatever the sampled support height, the full leg reach
+                        // cannot be shorter than its horizontal projection. This
+                        // rejects only candidates the unchanged 3D gate must reject.
+                        const double HorizontalSquared=FMath::Square(Candidate.X-Hips[Foot].X)+
+                            FMath::Square(Candidate.Y-Hips[Foot].Y);
+                        if(HorizontalSquared>MaximumReachSquared[Foot]+1.e-8)
+                        {
+                            CSV_CUSTOM_STAT(RaftSimCrewContact,UnreachableQueriesAvoided,1,ECsvCustomStatOp::Accumulate);
+                            continue;
+                        }
+                        double Z=0;
+                        if(!Sample(Foot,Candidate,Z,false))continue;
+                        const FVector P=ToRaft.TransformPosition(Candidate);
+                        Candidate.Z=ToRaft.InverseTransformPosition(FVector(P.X,P.Y,Z)).Z
+                            -Boots[Foot]->GetStaticMesh()->GetBoundingBox().Min.Z*ProfileZ+0.1;
+                        const double Reach=FVector::Distance(Hips[Foot],Candidate);
+                        if(Reach>=Upper[Foot]+Lower[Foot]-1.0 || Reach<=FMath::Abs(Upper[Foot]-Lower[Foot])+1.0)continue;
+                        Candidates[Foot].Add({Candidate,Z,Along*Along+Lateral*Lateral});
+                    }
+                }
+                double BestCost=DBL_MAX;
+                for(const FCandidate& Left:Candidates[0])for(const FCandidate& Right:Candidates[1])
+                {
+                    if(Right.Foot.Y-Left.Foot.Y<4.0 || FMath::Abs(Right.Foot.Z-Left.Foot.Z)>10.0)continue;
+                    const bool bSeparate=
+                        Left.Foot.X+FootBounds[0].Max.X+1.0<=Right.Foot.X+FootBounds[1].Min.X ||
+                        Right.Foot.X+FootBounds[1].Max.X+1.0<=Left.Foot.X+FootBounds[0].Min.X ||
+                        Left.Foot.Y+FootBounds[0].Max.Y+1.0<=Right.Foot.Y+FootBounds[1].Min.Y;
+                    const double Cost=Left.Cost+Right.Cost;
+                    if(!bSeparate || Cost>=BestCost)continue;
+                    BestCost=Cost; bFound=true;
+                    Feet[0]=Left.Foot; Feet[1]=Right.Foot;
+                    SupportZ[0]=Left.Support; SupportZ[1]=Right.Support;
                 }
             }
-            double BestCost=DBL_MAX;
-            for(const FCandidate& Left:Candidates[0])for(const FCandidate& Right:Candidates[1])
-            {
-                if(Right.Foot.Y-Left.Foot.Y<4.0 || FMath::Abs(Right.Foot.Z-Left.Foot.Z)>10.0)continue;
-                const bool bSeparate=
-                    Left.Foot.X+FootBounds[0].Max.X+1.0<=Right.Foot.X+FootBounds[1].Min.X ||
-                    Right.Foot.X+FootBounds[1].Max.X+1.0<=Left.Foot.X+FootBounds[0].Min.X ||
-                    Left.Foot.Y+FootBounds[0].Max.Y+1.0<=Right.Foot.Y+FootBounds[1].Min.Y;
-                const double Cost=Left.Cost+Right.Cost;
-                if(!bSeparate || Cost>=BestCost)continue;
-                BestCost=Cost; bFound=true;
-                Feet[0]=Left.Foot; Feet[1]=Right.Foot;
-                SupportZ[0]=Left.Support; SupportZ[1]=Right.Support;
-            }
+            if(bLocalRepair && bFound)
+                CSV_CUSTOM_STAT(RaftSimCrewContact,LocalStanceRepairs,1,ECsvCustomStatOp::Accumulate);
         }
     }
     else if (!bFootPlacementBound)

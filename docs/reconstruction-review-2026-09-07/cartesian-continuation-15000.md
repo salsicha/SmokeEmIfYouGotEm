@@ -206,6 +206,25 @@ no duplicate cook, input adjustment, source relabeling or field promotion.
 
 ## Unchanged acceptance limits
 
+### Heartbeat qualification at16400 s
+
+The newly completed local28000/16400 s checkpoint passes both read-only audits
+in a terminal exit0 invocation. All5,382,400 h/u/v cells are finite; maximum
+depth3.337946646m, speed4.893295846m/s and per-step residual9.483589469e-9m³.
+All86,720 artificial-bank cells remain exactly dry. Snapshot volume agrees
+exactly with the driver:2097839.068451m³, down94438.399712m³ from restart.
+Combined outlet108.317588m³/s still exceeds inlet45.306955m³/s: NOT settled.
+
+Fresh reports: `tmp/cartesian-16400-state-heartbeat-20260923.json` and
+`tmp/cartesian-16400-banks-heartbeat-20260923.json`. Depth SHA256:
+`d23f62f1490980fe1b3eb865a726d01d84f4eee477fc3090dca1be240ca6139a`.
+Intervening checkpoints are not implicitly qualified. Live-work checks found
+the existing project task active and the original cook36692 as the sole
+engine/cook process. No competing editor/build/cook or runtime edit was started.
+This is new checkpoint qualification only, not a delivered playable change;
+normal-scene motion, collision, shoreline, surface and performance acceptance
+remain open. Continue playable work without promoting this unsettled state.
+
 Captured data, normal playable geometry/collision and installed 4950 s fields
 remain unchanged. Native nonlinear mode remains OFF. This run delivers no
 new visible detail, rebuilt game, motion, collision or performance acceptance.
