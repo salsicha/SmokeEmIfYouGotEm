@@ -225,6 +225,42 @@ This is new checkpoint qualification only, not a delivered playable change;
 normal-scene motion, collision, shoreline, surface and performance acceptance
 remain open. Continue playable work without promoting this unsettled state.
 
+### Heartbeat qualification at16550 s
+
+The new complete local31000/16550 s state passes both independent read-only
+audits (terminal exit0). All5,382,400 h/u/v cells are finite; maximum depth
+3.312954579m and speed4.882631273m/s. All86,720 artificial-bank cells remain
+exactly dry. Volume2088551.941968m³ is103725.526194m³ below restart; driver
+agreement is within1.40e-9m³ and maximum per-step residual9.483589469e-9m³.
+Instantaneous outlet108.915050m³/s versus inlet45.306955m³/s remains unsettled.
+Fresh reports are `tmp/cartesian-16550-state-heartbeat-20260923.json` and
+`tmp/cartesian-16550-banks-heartbeat-20260923.json`; depth SHA256:
+`9d398f87dfd401e0ddbdeb45681c3e3b4006bd49dff04448a39fb8db889303ea`.
+
+A new regional audit compares16150,16350 and16550 s using the same unchanged
+nearest-route-sample partition, input hashes and integrated-boundary checks.
+It completes exit0 (session9145). These are storage rates, not section fluxes:
+
+| Model-time interval | Station0–9 km | Station9–26 km | Station26 km–end | Domain |
+| --- | ---: | ---: | ---: | ---: |
+|16150–16350 s|−0.00185|−31.44165|−32.37702|−63.82052 m³/s|
+|16350–16550 s|−0.00140|−29.59531|−32.53938|−62.13610 m³/s|
+
+Regional sums close against integrated exterior volume within3.57e-10m³.
+Middle-reach loss eases, but lower-reach loss still increases slightly and
+domain drainage remains substantial. This does not qualify local rapid
+stages or justify partial promotion, outlet tuning or a settling-time forecast.
+Report: `tmp/cartesian-storage-regions-16550-heartbeat-20260923.json`, SHA256
+`9ff9e06caf4e68530defcaa0bd57830929b92120bcbadb20ccb04d5343d66796`.
+
+The identified original cook36692 remains the only engine/cook process; no
+duplicate was launched. The active task in the inventory is this calling task,
+not evidence of another worker. This increment qualifies new completed data,
+not an unchanged failed trial. It delivers no playable or build change. The
+next checkpoint selected for qualification must be newer than16550 s and have
+its complete marker; intervening states are not implicitly passed. Continue
+normal-play improvements independently without installing unsettled fields.
+
 Captured data, normal playable geometry/collision and installed 4950 s fields
 remain unchanged. Native nonlinear mode remains OFF. This run delivers no
 new visible detail, rebuilt game, motion, collision or performance acceptance.

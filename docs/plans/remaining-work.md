@@ -3,6 +3,23 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest normal-play crew correction: [shared commands and weight shifts](../reconstruction-review-2026-09-07/crew-command-weight.md).
+High-side/get-down now address all attached crew's physical seat ids, not only
+the guide. The dedicated response key uses the same visible/physical update,
+guide-stroke overrides agree, rest clears shifts, and a called side persists
+across hull roll reversal until a new order. The initial render/physics id
+mismatch failed the new native gate and is preserved; corrected default and
+contact-review suites each pass6/fail0. Editor/Game builds are terminal success.
+Normal-start motion is fully decoded and inspected. Separate900-frame costs:
+high-side p9534.7539ms FAIL; ordinary no-command p9531.4449ms short first-pool
+PASS only, not rapid/full-route acceptance or an isolated speedup. Existing
+high-side body geometry, physical/visual seat placement and overboard occupancy
+still need reconciliation. NRS's dated qualitative reference calls for cross-
+raft body transfer, not merely tube-standing; do not promote the opt-in contact
+pose on numeric support alone. No terrain/4950-field/source/nonlinear change.
+South Fork and the full ordered queue remain unfinished; original cook36692
+continues alone. See the linked receipt for retained failures and limits.
+
 Latest crew increment: [prepared grounded stances](../reconstruction-review-2026-09-07/crew-prepared-stances.md).
 Three independent stance bindings are prepared without publishing poses, then
 revalidated per geometry/seat on use. Review/default native suites pass5 each.
@@ -165,8 +182,14 @@ and11000/15550 s pass BOTH audits too. New local12000/15600,13000/15650 and
 inflow45.306955m³/s remains unsettled. Regional storage through15700 s still
 shows distributed middle/downstream loss, not just an outlet-cell transient;
 the later200 s interval loses68.413644m³/s overall. This is supporting evidence,
-NOT new playable delivery or settling acceptance. Next local15000/15750 s needs
-both audits when complete; the15300→15500→15700 regional audit is terminal.
+NOT new playable delivery or settling acceptance. Later heartbeat qualification
+now reaches complete local31000/16550 s: BOTH state/bank audits pass, all86,720
+bank cells remain dry, but outlet108.915050 versus inlet45.306955m³/s remains
+unsettled. The16150→16350→16550 s regional audit is terminal exit0: latest200 s
+storage rate is−62.13610m³/s, with distributed middle/lower-reach drainage.
+See the continuation receipt for hashes and limits. Next selected checkpoint
+must be newer than16550 s and complete; skipped states are not implicitly passed.
+This is supporting qualification only, not a normal-play delivery or rebuild.
 Do not duplicate the cook or reuse historical PID12672. This is supporting
 settling work ONLY: no visible delivery, game rebuild, field promotion or
 acceptance; installed4950 fields and nonlinear OFF state remain unchanged.

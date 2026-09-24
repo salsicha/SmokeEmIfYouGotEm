@@ -66,6 +66,7 @@ UCLASS()
 class RAFTSIMRAFT_API ARaftSimRaftActor : public AActor
 {
     GENERATED_BODY()
+    friend class FRaftSimCrewCommandWeightTest;
 
 public:
     /** Exact triangle samples of current uploaded floor and tube/thwart sections, in raft local cm. */
@@ -519,6 +520,9 @@ private:
 
     UPROPERTY()
     ERaftSimCrewCommand PendingCrewCommand = ERaftSimCrewCommand::Rest;
+
+    // Hold a called side across hull oscillations; only a new order reselects it.
+    int32 CrewHighSideDirection = -1;
 
     UPROPERTY()
     TArray<TObjectPtr<ARaftSimCrewAvatarActor>> CrewAvatars;

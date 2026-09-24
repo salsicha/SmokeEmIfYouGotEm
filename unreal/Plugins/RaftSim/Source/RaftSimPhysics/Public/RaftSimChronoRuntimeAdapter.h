@@ -211,6 +211,7 @@ UCLASS(BlueprintType)
 class RAFTSIMPHYSICS_API URaftSimChronoRuntimeAdapter : public UObject
 {
     GENERATED_BODY()
+    friend class FRaftSimCrewCommandWeightTest;
 
 public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Chrono")

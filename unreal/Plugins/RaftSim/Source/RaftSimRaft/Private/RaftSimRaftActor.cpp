@@ -1142,6 +1142,10 @@ void ARaftSimRaftActor::IssueCrewCommand(ERaftSimCrewCommand Command)
         // Reaffirming the current order cancels a different pending call.
         PendingCrewCommand = Command;
         CrewReactionRemaining = 0.0f;
+        if (Command == ERaftSimCrewCommand::HighSide)
+        {
+            CrewHighSideDirection = GetActorRotation().Roll >= 0.0f ? -1 : 1;
+        }
     }
     else if (Command != PendingCrewCommand || CrewReactionRemaining <= 0.0f)
     {
@@ -1170,6 +1174,10 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
             ActiveCrewCommand = PendingCrewCommand;
             if (ActiveCrewCommand != PreviousCommand)
             {
+                if (ActiveCrewCommand == ERaftSimCrewCommand::HighSide)
+                {
+                    CrewHighSideDirection = GetActorRotation().Roll >= 0.0f ? -1 : 1;
+                }
                 // Start physics and presentation at the same catch. Propulsion
                 // advances from this normalized phase only while blades are
                 // visibly planted mid-stroke.
@@ -1178,25 +1186,6 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
             }
         }
     }
-
-    // High-side / get-down couple to the D2 flexible crew actions (weight shift).
-    TArray<FRaftSimFlexCrewAction> Actions;
-    if (ActiveCrewCommand == ERaftSimCrewCommand::HighSide)
-    {
-        FRaftSimFlexCrewAction Action;
-        Action.SeatId = TEXT("guide");
-        Action.HighSideDirection = (GetActorRotation().Roll >= 0.0f) ? -1 : 1;
-        Action.bBrace = true;
-        Actions.Add(Action);
-    }
-    else if (ActiveCrewCommand == ERaftSimCrewCommand::GetDown)
-    {
-        FRaftSimFlexCrewAction Action;
-        Action.SeatId = TEXT("guide");
-        Action.LeanOffset = FVector(0.0f, 0.0f, -0.15f);
-        Actions.Add(Action);
-    }
-    RaftAdapter->SetFlexibleCrewActions(Actions);
 
     ERaftSimCrewAvatarAction AvatarAction = ERaftSimCrewAvatarAction::SeatedIdle;
     switch (ActiveCrewCommand)
@@ -1222,7 +1211,7 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
             AvatarAction = ERaftSimCrewAvatarAction::Brace;
             break;
         case ERaftSimCrewCommand::HighSide:
-            AvatarAction = GetActorRotation().Roll >= 0.0f
+            AvatarAction = CrewHighSideDirection < 0
                 ? ERaftSimCrewAvatarAction::HighSidePort
                 : ERaftSimCrewAvatarAction::HighSideStarboard;
             break;
@@ -1255,6 +1244,7 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
         }
     }
     GuideStrokeActionSeconds = FMath::Max(GuideStrokeActionSeconds - DeltaSeconds, 0.0f);
+    TArray<FRaftSimFlexCrewAction> Actions;
     for (int32 Index = 0; Index < CrewAvatars.Num(); ++Index)
     {
         ARaftSimCrewAvatarActor* Avatar = CrewAvatars[Index];
@@ -1283,11 +1273,40 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
                 ? ERaftSimCrewAvatarAction::BackStroke
                 : ERaftSimCrewAvatarAction::ForwardStroke;
         }
-        Avatar->SetAvatarAction(
+        const ERaftSimCrewAvatarAction ResolvedAction =
             bGuideAvatar && GuideStrokeActionSeconds > 0.0f
                 ? GuideStrokeAction
-                : ThisAvatarAction);
+                : ThisAvatarAction;
+        Avatar->SetAvatarAction(ResolvedAction);
+
+        // D2 actions are per seat, not a broadcast from the guide. Use the
+        // same resolved action as presentation, including the guide's own
+        // stroke override; detached swimmers never enter this loop body.
+        const bool bHighSide = ResolvedAction == ERaftSimCrewAvatarAction::HighSidePort ||
+            ResolvedAction == ERaftSimCrewAvatarAction::HighSideStarboard;
+        if (bHighSide || ResolvedAction == ERaftSimCrewAvatarAction::Brace)
+        {
+            if (Actions.IsEmpty()) Actions.Reserve(CrewAvatars.Num());
+            FRaftSimFlexCrewAction Action;
+            // Render/rescue ids are paddler_1..N; BuildDefaultCrewSeats uses
+            // passenger_0..N-1. Keep the physical contract, not the display id.
+            Action.SeatId = bGuideAvatar ? TEXT("guide")
+                : FString::Printf(TEXT("passenger_%d"), Index);
+            if (bHighSide)
+            {
+                Action.HighSideDirection =
+                    ResolvedAction == ERaftSimCrewAvatarAction::HighSidePort ? -1 : 1;
+                Action.bBrace = true;
+            }
+            else
+            {
+                Action.LeanOffset = FVector(0.0f, 0.0f, -0.15f);
+            }
+            Actions.Add(Action);
+        }
     }
+    // Publish empty as well, so rest/strokes clear all prior weight shifts.
+    RaftAdapter->SetFlexibleCrewActions(Actions);
 
     // Advance the same 0..1 cadence used by the visible stroke. The total
     // per-stroke impulse is sliced only across the planted mid-stroke window;
@@ -2644,15 +2663,20 @@ void ARaftSimRaftActor::RequestReflip()
 
 void ARaftSimRaftActor::HandleHighSideResponse(int32 Direction)
 {
-    if (RaftAdapter == nullptr || Direction == 0)
+    if (RaftAdapter == nullptr || Direction == 0 || RaftMode != ERaftSimRaftMode::Upright)
     {
         return;
     }
-    FRaftSimFlexCrewAction Action;
-    Action.SeatId = TEXT("guide");
-    Action.HighSideDirection = FMath::Clamp(Direction, -1, 1);
-    Action.bBrace = true;
-    RaftAdapter->SetFlexibleCrewActions({Action});
+    // The dedicated response key is immediate (unlike a delayed crew call),
+    // but must still update the same visible and physical participants and
+    // persist as an order instead of being erased by the next ordinary tick.
+    IssueCrewCommand(ERaftSimCrewCommand::HighSide);
+    ActiveCrewCommand = PendingCrewCommand = ERaftSimCrewCommand::HighSide;
+    CrewReactionRemaining = 0.0f;
+    CrewHighSideDirection = FMath::Clamp(Direction, -1, 1);
+    CrewStrokePhase = 0.0f;
+    LastCrewStrokeImpulsePhase = -1.0f;
+    UpdateCrew(0.0f);
     ++HighSideResponseCount;
 }
 
