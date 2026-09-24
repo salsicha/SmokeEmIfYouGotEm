@@ -2598,6 +2598,7 @@ void apply_constriction_upstream_interior_velocity_relaxation(
 std::string json_escape(const std::string& value);
 
 void write_frame_csv(const Scenario& scenario, const Frame& frame, const fs::path& path);
+void write_frame_csv_stream(const Scenario& scenario, const Frame& frame, std::ostream& out, const fs::path& path);
 
 void write_probe_csv(const Scenario& scenario, const std::vector<Frame>& frames, const Probe& probe, const fs::path& path);
 

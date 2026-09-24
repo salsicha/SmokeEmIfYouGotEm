@@ -643,6 +643,49 @@ void assert_emergent_step_uses_hydrostatic_flux() {
         "submerged step pressure correction mismatch");
 }
 
+void assert_frame_export_rejects_write_failure(const raftsim::Scenario& scenario) {
+    class FailingBuffer : public std::streambuf {
+    public:
+        explicit FailingBuffer(bool fail_flush) : flush_only(fail_flush) {}
+        bool flush_only;
+        std::string captured;
+        const std::string& str() const { return captured; }
+        std::streamsize remaining = 128;
+        std::streamsize xsputn(const char* data, std::streamsize count) override {
+            const auto accepted = flush_only ? count : std::min(count, remaining);
+            if (!flush_only) remaining -= accepted;
+            captured.append(data, static_cast<std::size_t>(accepted));
+            return accepted;
+        }
+        int_type overflow(int_type value) override {
+            if (traits_type::eq_int_type(value, traits_type::eof())) return traits_type::not_eof(value);
+            if (!flush_only && remaining == 0) return traits_type::eof();
+            if (!flush_only) --remaining;
+            captured.push_back(traits_type::to_char_type(value));
+            return value;
+        }
+        int sync() override { return flush_only ? -1 : 0; }
+    };
+    raftsim::ReducedShallowWaterSolver solver(scenario);
+    const auto frame = solver.make_frame();
+    std::ostringstream valid;
+    raftsim::solver_detail::write_frame_csv_stream(scenario, frame, valid, "valid.csv");
+    expect(valid.str().size() > 128, "export failure fixture is too small");
+    for (bool fail_flush : {false, true}) {
+        FailingBuffer buffer(fail_flush);
+        std::ostream out(&buffer);
+        bool rejected = false;
+        try {
+            raftsim::solver_detail::write_frame_csv_stream(scenario, frame, out, "injected.csv");
+        } catch (const std::runtime_error& error) {
+            rejected = std::string(error.what()).find("injected.csv") != std::string::npos;
+        }
+        expect(rejected, "partial/flush-failed frame export must throw with its path");
+        if (fail_flush) expect(buffer.str() == valid.str(), "flush failure changed serialization");
+        else expect(buffer.str().size() < valid.str().size(), "mid-write failure was not injected");
+    }
+}
+
 void assert_output_can_be_written(const raftsim::Scenario& scenario, const std::string& output_dir) {
     raftsim::SolverConfig config;
     raftsim::ReducedShallowWaterSolver solver(scenario, config);
@@ -709,6 +752,7 @@ int main(int argc, char** argv) {
         raftsim::Scenario scenario = raftsim::load_scenario_package(argv[1]);
         assert_validated_grid_views();
         assert_stage_scratch_ownership();
+        assert_frame_export_rejects_write_failure(scenario);
         assert_solver_row_barrier_and_failure_recovery();
         assert_scenario_loads(scenario);
         assert_boundary_flux_diagnostic(scenario);

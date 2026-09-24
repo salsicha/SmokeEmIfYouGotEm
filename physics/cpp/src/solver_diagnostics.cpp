@@ -13,11 +13,7 @@ std::string json_escape(const std::string& value) {
     return escaped;
 }
 
-void write_frame_csv(const Scenario& scenario, const Frame& frame, const fs::path& path) {
-    std::ofstream out(path);
-    if (!out) {
-        throw std::runtime_error("Could not write frame CSV: " + path.string());
-    }
+void write_frame_csv_stream(const Scenario& scenario, const Frame& frame, std::ostream& out, const fs::path& path) {
     out << "row,col,x,y,h,eta,u,v,hu,hv,wet,normal_x,normal_y,normal_z,froude\n";
     out << std::setprecision(17);
     for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
@@ -32,6 +28,22 @@ void write_frame_csv(const Scenario& scenario, const Frame& frame, const fs::pat
                 << frame.derived.normal_x(row, col) << ',' << frame.derived.normal_y(row, col) << ','
                 << frame.derived.normal_z(row, col) << ',' << frame.derived.froude(row, col) << '\n';
         }
+    }
+    out.flush();
+    if (!out) {
+        throw std::runtime_error("Could not finish frame CSV: " + path.string());
+    }
+}
+
+void write_frame_csv(const Scenario& scenario, const Frame& frame, const fs::path& path) {
+    std::ofstream out(path);
+    if (!out) {
+        throw std::runtime_error("Could not write frame CSV: " + path.string());
+    }
+    write_frame_csv_stream(scenario, frame, out, path);
+    out.close();
+    if (!out) {
+        throw std::runtime_error("Could not close frame CSV: " + path.string());
     }
 }
 
