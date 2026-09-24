@@ -212,3 +212,39 @@ Game rebuild succeeds in75.95s (`tmp/terrain-range-game-v2-20260924.log`), and
 `physics/tests/test_runtime_data_bundle.py` passes38 tests in3.61s. This proves
 build/dependency consistency, not freshly packaged execution. Full temporal
 terrain review and corrected-destination/full-route performance remain next.
+
+## Distant-section cost and motion follow-through
+
+The runner now accepts an explicit `ReviewStationM`, records it in the process
+receipt using invariant numeric formatting, and rejects combining it with
+`NormalScenarioStart`. Default rapid review remains8330m. This avoids disguising
+a25427.6352m review start as normal traversal. The new executable guard and
+existing motion/checkpoint runner regressions pass18 tests in10.72s.
+
+`south-fork-terrain-destination-cost-v1-20260924` starts explicitly at25427.6352m
+with the saved map and no range override.900 captured frames, rows60–840, confirmed
+FrameTime mode/offset1: mean21.919346ms, p9533.3562ms, maximum47.3816ms.
+This FAILS33.333333ms; do not round it down or transfer the first-pool pass.
+CSV SHA256 `3474a7d9a2cd919568bef803c4cb7a245a3167cc92dd9665a861ee826f672b40`;
+report `tmp/terrain-destination-frame-v1-20260924.json`. GPU p958.95ms versus
+game-thread p95 approximately33.37ms points toward game-thread work, not proof
+that terrain rendering is the performance cause. Water timing groups associate
+the over-budget frames with positive refresh timing; nested scopes are not sums.
+
+Separate `south-fork-terrain-destination-motion-v1-20260924` uses the same explicit
+station and actual playable camera. Video `unreal/Saved/VideoCaptures/RaftSim_20260923-204344.mp4`,
+SHA256 `3641216df97d5aa1f3ad3168726458229c39e8e7ab63ef2ca5d53e9ce958716c`,
+fully decodes467 frames through15.533333s with31 exact adjacent duplicates.
+Decoder receipt/original sampled frames: `tmp/terrain-destination-motion-decoded-v1-20260924/`.
+Inspected3s/6s/11s frames show advancing river station/water and a continuous
+bank, but camera faces the bank and angular foreground geometry crosses the
+view. At the early capture, logged camera yaw179.78deg differs from raft
+yaw85.00deg. This is NOT the downstream checkpoint view used to diagnose the
+floating ridge patches, so this clip does not establish their temporal stability.
+Do not claim all-frame visual inspection merely because decoding succeeded.
+
+Next investigate explicit-start camera/foreground alignment, then capture the
+correct downstream view over time; pursue the measured water/game-thread cost
+without weakening the failed gate. No further scene/source change in this
+follow-through. Both engine runs exit0 and resume sole cook36692. River acceptance,
+full-route traversal and the ordered queue remain open.

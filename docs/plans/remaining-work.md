@@ -15,6 +15,11 @@ Normal-start900-frame p9532.8845ms passes the short33.333333ms gate; mean24.0253
 maximum51.246ms. Full-route/corrected-destination cost, temporal scenery stability,
 packaged execution and broader river acceptance remain open. Historical failed
 controls and the diagnosis below are retained, not the current next action.
+Destination follow-through explicitly starts at25.4276352km:900-frame
+p9533.3562ms FAILS33.333333ms, despite the first-pool pass. Fully decoded motion
+shows a bank-facing camera with angular foreground geometry, not the downstream
+ridge view; temporal acceptance remains unproven. Next correct/verify start-camera
+alignment and investigate measured game-thread water cost. See the same receipt.
 
 Destination terrain diagnosis: [rendering controls](../reconstruction-review-2026-09-07/checkpoint-terrain-fragments.md)
 retain the floating ridge patches in both HLOD-off and confirmed Nanite-off

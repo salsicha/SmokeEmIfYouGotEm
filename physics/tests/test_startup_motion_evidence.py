@@ -58,3 +58,11 @@ def test_recording_cannot_be_used_as_normal_fps_capture():
         '-Label', 'south-fork-test-invalid-motion', '-CookProcessId', '1', '-CookStartUtc', 'invalid',
         '-RecordStartupMotion'], capture_output=True, text=True)
     assert result.returncode != 0 and 'Motion recording requires StartupRenderReplay' in result.stderr
+
+
+def test_explicit_review_station_cannot_claim_normal_start():
+    result = subprocess.run([PWSH, '-NoProfile', '-File', str(ROOT/'unreal/Scripts/profile_south_fork_current_map.ps1'),
+        '-Label', 'south-fork-test-invalid-station', '-NormalScenarioStart',
+        '-ReviewStationM', '25427.6352'], capture_output=True, text=True)
+    assert result.returncode != 0
+    assert 'An explicit review station is not a normal scenario start' in result.stderr

@@ -22,9 +22,13 @@ param(
     [switch]$ProfileCrewOverboard,
     [switch]$StartupDisableDynamicShadows,
     [switch]$NormalScenarioStart,
+    [ValidateRange(0, 1000000)][Nullable[double]]$ReviewStationM = $null,
     [switch]$CheckpointResetReplay
 )
 $ErrorActionPreference = 'Stop'
+if ($NormalScenarioStart -and $null -ne $ReviewStationM) {
+    throw 'An explicit review station is not a normal scenario start'
+}
 function Test-RaftSimShadowControlLog([string]$LogText) {
     $values = [regex]::Matches($LogText, '(?im)^.*\bShowFlag\.DynamicShadows\s*=\s*"([^"]+)"[^\r\n]*\r?$')
     return ($values.Count -gt 0 -and @($values | Where-Object { $_.Groups[1].Value -cne '0' }).Count -eq 0 -and
@@ -202,6 +206,7 @@ $report.startup_shadow_control_confirmed = $null
 $report.startup_optical_normal_strength = $StartupOpticalNormalStrength
 $report.startup_buffer_commands_confirmed = $null
 $report.checkpoint_reset_replay = [bool]$CheckpointResetReplay
+$report.review_station_m = if ($NormalScenarioStart) { $null } elseif ($null -ne $ReviewStationM) { $ReviewStationM } else { 8330.0 }
 $report.solver_lane_limit_requested = $SolverLanes
 $report.solver_lane_limit_confirmed = $null
 if ($null -ne $SolverLanes) {
@@ -233,7 +238,10 @@ try {
         '-NoSplash', '-NoSound', '-ResX=1280', '-ResY=720', '-Windowed', '-RaftSimEphemeralProfile',
         '-RaftSimScenario=south_fork_full_descent', '-csvCompression=0',
         "-abslog=$logFile")) { $start.ArgumentList.Add($argument) }
-    if (-not $NormalScenarioStart) { $start.ArgumentList.Add('-RaftSimWaterReviewStation=8330') }
+    if (-not $NormalScenarioStart) {
+        $station = ([double]$report.review_station_m).ToString('R', [Globalization.CultureInfo]::InvariantCulture)
+        $start.ArgumentList.Add("-RaftSimWaterReviewStation=$station")
+    }
     if ($NativePerformanceGate) {
         # The director owns completion. No screenshot auto-exit may truncate
         # its warmup/soak. This short development run is not release acceptance.
