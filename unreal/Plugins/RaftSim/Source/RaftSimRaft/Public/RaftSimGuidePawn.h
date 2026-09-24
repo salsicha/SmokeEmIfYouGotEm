@@ -349,6 +349,8 @@ protected:
 
     bool bChaseCameraAllowed = false;
     FRaftSimSeatedHeading SeatedHeading;
+    double InitialSeatedPawnYaw = 0.;
+    bool bInitialSeatedHeadingPending = true;
     FVector PreviousRaftVelocityMps = FVector::ZeroVector;
     float IntroCameraRemaining = 0.0f;
     float IntroCameraDuration = 4.0f;

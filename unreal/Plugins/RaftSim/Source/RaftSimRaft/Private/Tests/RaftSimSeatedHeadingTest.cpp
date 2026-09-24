@@ -27,6 +27,14 @@ bool FRaftSimSeatedHeadingTest::RunTest(const FString&)
     TestEqual(TEXT("new seated turn resumes"), Heading.Advance(-25., true), 5.);
     TestEqual(TEXT("invalid pose resets the observation"), Heading.Advance(std::numeric_limits<double>::quiet_NaN(), true), 0.);
     TestEqual(TEXT("finite recovery does not replay invalid state"), Heading.Advance(60., true), 0.);
+    FRaftSimSeatedHeading Initial;
+    Initial.Advance(180.,true); // Pawn yaw immediately before initial attachment.
+    const double InitialLook=187.; // Retain seven degrees of user look.
+    TestEqual(TEXT("initial spawn-to-seat rotation preserves user offset"),
+        FMath::UnwindDegrees(InitialLook+Initial.Advance(85.,true)),92.);
+    TestEqual(TEXT("initial rotation is not replayed on next tick"),Initial.Advance(85.,true),0.);
+    Initial.Advance(20.,false);
+    TestEqual(TEXT("later chase return does not reuse initial attachment"),Initial.Advance(40.,true),0.);
     return true;
 }
 #endif

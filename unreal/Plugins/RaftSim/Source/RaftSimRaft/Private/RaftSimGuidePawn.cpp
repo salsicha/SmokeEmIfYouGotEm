@@ -296,6 +296,14 @@ void ARaftSimGuidePawn::UpdateSeatedHeading()
     static const bool bWorldLocked = FParse::Param(FCommandLine::Get(), TEXT("RaftSimWorldLockedGuideYaw"));
     bCarryHeading = bCarryHeading && !bWorldLocked;
 #endif
+    if(bCarryHeading && bInitialSeatedHeadingPending)
+    {
+        // Possession can occur after BeginPlay/attachment. Carry the initial
+        // spawn-to-seat rotation once, when this is actually the player's view;
+        // keep any mouse offset already accumulated on the spawn heading.
+        SeatedHeading.Advance(InitialSeatedPawnYaw,true);
+        bInitialSeatedHeadingPending=false;
+    }
     const double Delta = SeatedHeading.Advance(AttachedRaft ? AttachedRaft->GetActorRotation().Yaw : 0., bCarryHeading);
     if (bCarryHeading && Delta != 0.)
     {
@@ -727,6 +735,7 @@ void ARaftSimGuidePawn::UpdateComfortCamera(float DeltaSeconds)
 void ARaftSimGuidePawn::BeginPlay()
 {
     Super::BeginPlay();
+    InitialSeatedPawnYaw=GetActorRotation().Yaw;
     // Do not construct a second paddle. The posed guide avatar already owns
     // the hand-held paddle in both camera modes.
 

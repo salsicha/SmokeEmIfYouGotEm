@@ -3,6 +3,15 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Normal-play camera correction: [initial seated heading](../reconstruction-review-2026-09-07/initial-seated-heading.md)
+carries the missed spawn-to-seat rotation once while preserving user look and
+later chase/swim gates. Actual distant-start camera/raft yaw now agree within
+0.02deg at inspected capture points; decoded3s/6s/11s views show downstream crew,
+no previous foreground obstruction and the repaired ridge gaps closed. Editor/Game
+builds and2 native suites pass; M7.CameraWeather retains2 exposure-setting assertion
+failures. No all-suite, full-route or performance acceptance. Next measure the
+corrected view and check normal-start/reentry behavior; investigate exposure failure.
+
 Normal-scene terrain delivery: [checkpoint terrain correction](../reconstruction-review-2026-09-07/checkpoint-terrain-fragments.md)
 identifies the active hash-set MainPartition's256m loading range, not the unused
 spatial-hash INI grid. Raising only the saved South Fork partition to2km restores
