@@ -1,5 +1,33 @@
 # South Fork exact continuation from 15000 seconds
 
+## New completed checkpoint:17050s (September24)
+
+The original PID36692 and its exact command line were reverified live; no
+replacement cook was started. Complete local41000 passes independent full-state
+and artificial-bank audits. All5,382,400 h/u/v cells are finite; maximum depth
+3.235469244m, speed4.839610583m/s. All86,720 artificial-bank cells are exactly
+dry. Volume2059073.896726m³ agrees with the driver within1.40e-9m³; maximum
+per-step residual remains9.483589469e-9m³. Depth SHA256:
+`d200db8bd241f37826abd408764596dcd631ea07aa93e9b9de29e4b8728e6e47`.
+Reports: `tmp/cartesian-17050-state-v1-20260924.json` and
+`tmp/cartesian-17050-banks-v1-20260924.json` (both commands terminal exit0).
+
+Outflow98.958538m³/s versus inlet45.306955m³/s remains **unsettled**.
+From16900 to17050s, storage changes at−57.314332m³/s: upper0–9km
+−0.001412, middle9–26km−25.050767, lower26km–end−32.262153m³/s.
+Total loss8597.149844m³ closes against integrated exterior flux within
+1.27e-11m³. These remain storage partitions, not cross-section fluxes;
+distributed drainage does not authorize outlet tuning, a settling forecast,
+local equilibrium claims or partial promotion. Regional report:
+`tmp/cartesian-storage-regions-17050-v1-20260924.json`.
+
+Next selected complete snapshot must be newer than17050s; skipped snapshots
+are not implicitly audited. Installed4950s fields, captured geometry and
+nonlinear OFF remain unchanged. This is new-state qualification only, not
+visible delivery, collision/motion validation or river acceptance. The source-
+cap interpretation decision remains pending; independent playable work and
+the full ordered reconstruction/crew/regression/release scope remain open.
+
 ## New completed checkpoint:16900s (September24)
 
 Original cook36692 was verified live with its original creation time; no new

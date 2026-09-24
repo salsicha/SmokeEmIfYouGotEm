@@ -29,12 +29,12 @@ This is supporting qualification, not a new visual delivery, normal-start
 traversal, reconstructed start-clearance proof or sustained river acceptance.
 See the bounds receipt above. Prior rapid failure remains historical evidence.
 
-New hydraulic qualification reaches complete local38000/16900s in the original
+New hydraulic qualification reaches complete local41000/17050s in the original
 cook36692. Both state/dry-bank audits pass; all86,720 bank cells remain dry.
-Outlet103.142577 versus inlet45.306955m³/s remains unsettled. Latest150s storage
-loss is−58.728003m³/s, distributed across middle/lower reach; integrated closure
-is1.22e−10m³. See [continuation receipt](../reconstruction-review-2026-09-07/cartesian-continuation-15000.md).
-Next selected complete snapshot must be newer than16900s. This is supporting
+Outlet98.958538 versus inlet45.306955m³/s remains unsettled. Latest150s storage
+loss is−57.314332m³/s, distributed across middle/lower reach; integrated closure
+is1.27e−11m³. See [continuation receipt](../reconstruction-review-2026-09-07/cartesian-continuation-15000.md).
+Next selected complete snapshot must be newer than17050s. This is supporting
 qualification only: no installed-field promotion or playable/river acceptance.
 
 Latest normal-play correction: [shared horizontal crew anchors](../reconstruction-review-2026-09-07/crew-seat-anchors.md).
