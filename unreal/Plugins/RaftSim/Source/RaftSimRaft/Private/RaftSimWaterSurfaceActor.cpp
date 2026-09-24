@@ -31,6 +31,7 @@
 #include "RaftSimPlayableCrestMesh.h"
 #include "RaftSimCarrierShapeAudit.h"
 #include "Async/ParallelFor.h"
+#include "RaftSimRefreshScratch.h"
 #include "ProfilingDebugging/CsvProfiler.h"
 
 #include "CollisionQueryParams.h"
@@ -4065,6 +4066,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     {
         LogWaterRenderStateEvent(GetWorld(), TEXT("grid_recentre"));
     }
+    Perf.Mark(TEXT("source_clock_recenter"));
+    // The following timing marks split the former broad source_samples stage.
+    // They are opt-in diagnostics only; no refresh work or cadence is skipped.
     // Coverage depends on the station and this refresh's recentered grid,
     // not on the lateral vertex. Recompute every refresh; never reuse across
     // a changed window, corridor or spacing. Retain the original path for
@@ -4096,28 +4100,24 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         const int32 X = Index % GridStationN;
         return StationSolverCropAuthority.IsValidIndex(X) ? StationSolverCropAuthority[X] : 1.f;
     };
-    TArray<uint8> WetVertexMask;
-    WetVertexMask.Init(0, Vertices.Num());
-    TArray<uint8> LiveSolverWetVertexMask;
-    LiveSolverWetVertexMask.Init(0, Vertices.Num());
+    static const bool bRetainRefreshScratch=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRetainRefreshScratch"));
+    FRaftSimRefreshScratch LocalScratch;
+    if(bRetainRefreshScratch && !RefreshScratch) RefreshScratch=MakeShared<FRaftSimRefreshScratch>();
+    FRaftSimRefreshScratch& Scratch=bRetainRefreshScratch ? *RefreshScratch : LocalScratch;
+    Scratch.Reset(Vertices.Num());
+    auto& WetVertexMask=Scratch.Wet;
+    auto& LiveSolverWetVertexMask=Scratch.LiveWet;
     // Which vertices the live solver actually answered for this refresh
     // (wet OR dry), and the feathered presence contribution of baseline-only
     // shoreline water inside the crop's authority handover band.
-    TArray<uint8> SolverSampledVertexMask;
-    SolverSampledVertexMask.Init(0, Vertices.Num());
-    TArray<float> FeatheredBaselineWet;
-    FeatheredBaselineWet.SetNumZeroed(Vertices.Num());
-    TArray<FRaftSimWaterSample> WaterSamples;
-    WaterSamples.SetNum(Vertices.Num());
+    auto& SolverSampledVertexMask=Scratch.Sampled;
+    auto& FeatheredBaselineWet=Scratch.Feather;
+    auto& WaterSamples=Scratch.Samples;
     if (bCartesianFlow) CartesianShoreAvailable.Init(0, Vertices.Num());
-    TArray<float> PresentationSurfaceHeightMeters;
-    PresentationSurfaceHeightMeters.Init(0.0f, Vertices.Num());
-    TArray<float> HydraulicReliefMeters;
-    HydraulicReliefMeters.Init(0.0f, Vertices.Num());
-    TArray<float> FroudeField;
-    FroudeField.Init(0.0f, Vertices.Num());
-    TArray<float> SourceFoam;
-    SourceFoam.Init(0.0f, Vertices.Num());
+    auto& PresentationSurfaceHeightMeters=Scratch.Heights;
+    auto& HydraulicReliefMeters=Scratch.Relief;
+    auto& FroudeField=Scratch.Froude;
+    auto& SourceFoam=Scratch.Foam;
 
     // Legacy non-Cartesian reviews retain their separate clock. The normal
     // Cartesian field uses only the committed-water duration prepared above.
@@ -4135,11 +4135,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // handover disagreement set — request rendered-terrain probes so the
     // visual-submersion keep below can cover whole shallow shelves, not just
     // the outer bank rings.
-    TArray<uint8> BaselineKeepProbeWanted;
-    BaselineKeepProbeWanted.Init(0, Vertices.Num());
+    auto& BaselineKeepProbeWanted=Scratch.ProbeWanted;
     const FTransform BaselineKeepTransform =
             SurfaceMesh ? SurfaceMesh->GetComponentTransform()
                         : GetActorTransform();
+    Perf.Mark(TEXT("source_buffers_coverage"));
     // Two independent actual-state captures preserve every field/mask and
     // improve both timing orders. Qualify other scenes separately; retain
     // same-binary original lookup for performance and regression controls.
@@ -4324,6 +4324,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     static const bool bSeparateSource=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSeparateSourceHandover"));
     const bool bFusedSource=bConcurrentSource && bSingleLiveWaterSurfaceEnabled && !bSeparateSource &&
         GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
+    Perf.Mark(TEXT("source_dispatch_setup"));
     if (!bFusedSource) SampleLiveVertices(bConcurrentSource);
 
     // Recompute the crop's per-station wet/dry authority for the next
@@ -4444,6 +4445,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             BlendSourceVertex(I,&Cached);
         },EParallelForFlags::Unbalanced);
     };
+    Perf.Mark(TEXT("source_authority"));
     if (bFusedSource)
     {
         SampleCombinedVertices();

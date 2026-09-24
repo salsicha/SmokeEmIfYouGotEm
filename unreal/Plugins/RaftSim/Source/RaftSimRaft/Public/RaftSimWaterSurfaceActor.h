@@ -19,6 +19,7 @@ class UMaterialParameterCollection;
 class UTextureRenderTarget2D;
 class FRaftSimWaterTextureHistory;
 class FRaftSimGroundSourceRegistry;
+struct FRaftSimRefreshScratch;
 class ARaftSimRaftActor;
 class URaftSimWaterRuntimeAdapter;
 class URaftSimStatefulDetailComponent;
@@ -715,6 +716,8 @@ private:
     void UpdateSurfaceCarrierMesh(bool bCreate,const TArray<FLinearColor>& Colors);
     void UploadMacroSurface(const TArray<FLinearColor>& Colors,bool bResetHistory);
     void ReleaseMacroHistory();
+
+    TSharedPtr<FRaftSimRefreshScratch> RefreshScratch;
 
     UPROPERTY()
     TObjectPtr<URaftSimWaterRuntimeAdapter> WaterAdapter;

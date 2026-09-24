@@ -3,6 +3,18 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Refresh follow-through now separates buffer/coverage setup (1.79ms mean) from
+fused sampling (2.83ms). An opt-in retained-scratch candidate builds and passes
+native reset and actual50,625-sample source equivalence checks. Same-build
+normal-start control/candidate p9542.0352/38.3631ms BOTH FAIL. Default is unchanged;
+one control-first pair is not causal acceptance. Reverse-order follow-through
+rejects promotion: retained p9542.1934ms versus default40.1793ms, both failing.
+Keep the candidate diagnostic-only; do not repeat the unchanged experiment.
+Next localize foam/core preparation cost without skipping interpolation or
+reducing geometry/refresh cadence.
+See the [receipt](../reconstruction-review-2026-09-07/refresh-cost-followthrough.md).
+This is supporting diagnostic work, not a delivered scene improvement.
+
 [Refresh-cost follow-through](../reconstruction-review-2026-09-07/refresh-cost-followthrough.md)
 localizes the latest timing failure:362of363 aligned refresh-only frames exceed
 budget. A new normal-start stage probe measures18.51ms mean refresh, led by
