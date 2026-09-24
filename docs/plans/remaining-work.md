@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+[Refresh-cost follow-through](../reconstruction-review-2026-09-07/refresh-cost-followthrough.md)
+localizes the latest timing failure:362of363 aligned refresh-only frames exceed
+budget. A new normal-start stage probe measures18.51ms mean refresh, led by
+source sampling/setup4.76ms and foam/core preparation3.78ms. No quality or
+cadence reduction was made. Next separate source setup from fused sampling;
+do not repeat rejected base-vertex parallelism or skip interpolation. This is
+diagnostic progress only; the measured performance failure remains open.
+
 Rescue pulling now stops outside the rendered hull with current posed-body
 clearance and follows the raft while ready to board. Reentry uses actual
 triangle distance with unchanged1.35m/readiness gates. Three native suites
