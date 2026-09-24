@@ -1,5 +1,32 @@
 # South Fork exact continuation from 15000 seconds
 
+## Heartbeat qualification:17700s
+
+The new complete local54000 snapshot passes independent state and exterior-bank
+audits (both terminal exit0). All5,382,400 h/u/v cells are finite; maximum
+depth3.235472386m and speed4.798247619m/s. All86,720 artificial-bank cells
+remain exactly dry. Volume2024370.880631m³ agrees with the driver within
+6.99e-10m³; maximum per-step conservation residual remains9.483589469e-9m³.
+Outlet94.588697m³/s still exceeds inlet45.306955m³/s: NOT settled.
+
+Reports: `tmp/cartesian-17700-state-heartbeat-20260923.json` and
+`tmp/cartesian-17700-banks-heartbeat-20260923.json`. Depth SHA256:
+`b24285d8e05e760f68cacd80373b343b31c736b7cbcef903c4ad8c3bff1f476c`.
+Regional audit17400–17700s also completes exit0: domain storage decreases
+15495.149712m³, or51.650499m³/s, with integrated-exterior closure error
+5.19e-10m³. This is storage accounting, not calibrated section flux or a
+settling-time forecast. Report:
+`tmp/cartesian-storage-regions-17700-heartbeat-20260923.json`, SHA256
+`98341182c007a2f80d14862f41644cada6b374eece01a2a9ce688377e9d2ccf8`.
+
+Existing cook36692 was live; no new cook, build, or runtime override was started.
+Process command-line inventory was permission-denied, so this check does not
+establish absence of every competing process. Installed fields and normal
+playable scene remain unchanged. This is supporting qualification only, not
+visible delivery or river acceptance. Next selected snapshot must be newer
+than17700s and complete; skipped checkpoints are not implicitly qualified.
+The normal-play swim obstruction and measured performance failure remain open.
+
 ## Heartbeat qualification:17400s
 
 The original cook36692 remains live and is the sole engine/cook process. New

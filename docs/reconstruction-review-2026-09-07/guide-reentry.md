@@ -1,5 +1,37 @@
 # Actual guide swim/reentry drill — unfinished
 
+## Swimming torso-axis correction — obstruction still open
+
+The swimming pose formerly used88deg yaw, leaving the torso and worn PFD's
+local long axis vertical despite horizontal authored hip/shoulder landmarks.
+Normal pose evaluation now uses−88deg pitch: local+Z points toward swimming
+shoulders along+X. No mesh is hidden, no rescue gate is changed, and ejection
+placement is not yet corrected. A native regression checks hip/shoulder-axis
+alignment, horizontal orientation, head direction and periodicity over101
+phases on both sides. SwimmingTorsoAlignment, RigidPaddleAcrossActions and
+OccupancyControlsLoadsAndIntegratedMass all pass with0warnings/0failures in
+`tmp/swim-torso-native-v1-20260924/index.json`. Editor build succeeds in52.53s;
+standalone Game build succeeds in67.18s. No new timing capture was performed;
+the outstanding measured frame-budget failure is not superseded by these builds.
+
+Actual normal-start drill `south-fork-swim-torso-reentry-v1-20260924` exits0,
+without timeout; original cook guard, suspension and resume succeed. Throw-line
+request succeeds at2.510660m;6s reentry is rejected;10s succeeds and11s confirms
+seated attachment and no guide swimmer. Video:
+`unreal/Saved/VideoCaptures/RaftSim_20260923-221800.mp4`, SHA256
+`ee999c58128754af371010931cfa03f4cdb2916dcc9eec876134c577cb38285a`.
+Full decode yields465frames through15.466667s,13adjacent duplicates. Inspected
+3s/6s/11s originals show changed clothing orientation but continued near-field
+raft/clothing obstruction during swimming;11s restores the seated view. HUD
+still shows1swimmer at11s despite native state0, another unresolved discrepancy.
+Decoder artifacts: `tmp/swim-torso-reentry-decoded-v1-20260924/`.
+
+This corrects a normal animation transform, not whole-body fit, swimming
+visibility, hull clearance, motion continuity or performance acceptance. Next
+resolve actual rendered-hull ejection/pull-target clearance and avatar/camera
+orientation ownership. Shared indexed hull collision remains diagnostic-only;
+do not enable it or hide geometry to mask this failure.
+
 ## Posed swimming eye and successful state transition — visual failure retained
 
 The normal guide tick now resolves swimmer detachment/reboarding before eye

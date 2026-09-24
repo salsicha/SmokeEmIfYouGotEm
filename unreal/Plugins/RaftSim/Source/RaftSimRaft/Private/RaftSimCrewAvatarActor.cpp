@@ -1403,7 +1403,9 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             break;
         case ERaftSimCrewAvatarAction::Swimming:
             Pose.TorsoCenterCm = FVector(0.0f, 0.0f, 12.0f + 2.0f * Wave);
-            Pose.TorsoRotation = FRotator(0.0f, 88.0f, 0.0f);
+            // Local +Z runs from waist to neck. Pitch it toward the authored
+            // +X swimming shoulders; yaw leaves the torso/PFD standing upright.
+            Pose.TorsoRotation = FRotator(-88.0f, 0.0f, 0.0f);
             Pose.HeadCenterCm = FVector(28.0f, 0.0f, 18.0f + 2.0f * Wave);
             Pose.LeftShoulderCm = FVector(10.0f, -14.0f, 13.0f);
             Pose.RightShoulderCm = FVector(10.0f, 14.0f, 13.0f);

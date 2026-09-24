@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Normal swimming pose now pitches the torso/PFD toward the authored shoulders
+instead of yawing an upright torso. Three native suites pass; actual normal-start
+throw-line/reentry still completes, but inspected swimming frames remain
+obstructed by raft/clothing. See the [guide receipt](../reconstruction-review-2026-09-07/guide-reentry.md).
+Hull-relative ejection/pull clearance, avatar/camera orientation, HUD count and
+full visual/performance acceptance remain open; no geometry-hiding workaround.
+
 [Guide swim/reentry drill](../reconstruction-review-2026-09-07/guide-reentry.md)
 now reaches actual detached swimming in normal South Fork play. ReachGrab fails
 at3.0m (HUD rescue_out_of_range), so reentry remains untested. Recorded3s/11s
