@@ -6,6 +6,7 @@
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimShorelineCrests.h"
 #include "RaftSimReferencedWaterVertices.h"
+#include "RaftSimShorelineCrestWeights.h"
 #include "RaftSimShorelineMeshComponent.generated.h"
 
 // One non-colliding water section. Unlike a procedural mesh section, its index
@@ -52,6 +53,7 @@ private:
     TArray<int32> ClippedCellOffsets;
     FRaftSimShorelineCrests CrestRefinement;
     FRaftSimReferencedWaterVertices ReferencedCrestSource;
+    FRaftSimShorelineCrestWeights CrestWeights;
     // Separate evolving reference/candidate history only for explicit audits.
     FRaftSimShorelineCrests AuditCrestRefinement;
     TArray<FProcMeshVertex> AuditCrestVertices;

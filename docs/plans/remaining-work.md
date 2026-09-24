@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Normal shoreline publication now retains crest-weight scratch allocations while
+rewriting every float exactly. [Storage qualification](../reconstruction-review-2026-09-07/crest-weight-storage.md)
+records Editor/Game builds and4 native suites passing, plus actual downstream
+900-frame p9533.0047ms (short-run PASS, not causal or sustained acceptance).
+Actual motion fully decodes; inspected3s/6s/11s retain the aligned crew view and
+closed ridge gaps. No visual-realism acceptance; repeated/full-route performance,
+normal-start/reentry on this build and reconstruction remain open.
+
 Normal-play camera correction: [initial seated heading](../reconstruction-review-2026-09-07/initial-seated-heading.md)
 carries the missed spawn-to-seat rotation once while preserving user look and
 later chase/swim gates. Actual distant-start camera/raft yaw now agree within

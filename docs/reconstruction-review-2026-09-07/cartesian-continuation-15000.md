@@ -1,5 +1,36 @@
 # South Fork exact continuation from 15000 seconds
 
+## Heartbeat qualification:17400s
+
+The original cook36692 remains live and is the sole engine/cook process. New
+complete local48000 passes independent full-state and exterior-bank audits
+(both commands terminal exit0). All5,382,400 h/u/v cells are finite; maximum
+depth3.235466947m and speed4.798234239m/s. All86,720 artificial-bank cells remain
+exactly dry. Volume2039866.030342m³ agrees with the driver within2.57e-9m³;
+maximum per-step conservation residual remains9.483589469e-9m³. Depth SHA256:
+`4f118250575892124024d7da2d45e2f66ed32f071321658f6e46074e2b2e76ff`.
+Reports: `tmp/cartesian-17400-state-heartbeat-20260923.json` and
+`tmp/cartesian-17400-banks-heartbeat-20260923.json`.
+
+Outflow96.340859m³/s still exceeds inlet45.306955m³/s: **not settled**.
+The new17050–17400s regional audit completes exit0. Domain storage changes at
+−54.879618m³/s: upper0–9km−0.001227, middle9–26km−23.049556, and lower26km–end
+−31.828836m³/s. Total loss19207.866383m³ closes against integrated exterior
+volume within6.01e-10m³. These are storage partitions, not section fluxes or
+proof of local rapid equilibrium. No outlet tuning or partial promotion.
+Report: `tmp/cartesian-storage-regions-17400-heartbeat-20260923.json`, SHA256
+`c85d39a18ce51edcd971128143874702d53781650355effbccd76b8d023a1d9e`.
+
+This bounded increment qualifies newly completed data, not an unchanged trial.
+No duplicate cook or production edit was started. Installed4950s fields and
+nonlinear OFF remain unchanged; no playable improvement or river acceptance
+is claimed. Next selected complete snapshot must be newer than17400s; skipped
+states are not implicitly qualified. Playable performance work remains open:
+the corrected distant-camera p9533.7009ms still fails the33.333333ms gate.
+Code inspection confirms topology validation and source-prefix copying already
+have optimized controls; do not repeat them as new work. Further shoreline
+optimization must retain exact moving crossings, wet/dry topology and crests.
+
 ## New completed checkpoint:17050s (September24)
 
 The original PID36692 and its exact command line were reverified live; no

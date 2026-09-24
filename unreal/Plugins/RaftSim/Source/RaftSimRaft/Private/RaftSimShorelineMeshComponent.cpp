@@ -422,14 +422,12 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
     }
     if (Crests)
     {
-        TArray<float> Coarse,Shore;
+        auto& Coarse=CrestWeights.Coarse;
+        auto& Shore=CrestWeights.Shore;
         {
             CSV_SCOPED_TIMING_STAT(RaftSimShoreline,CrestInput);
-            Coarse.Init(0,BaseVertices.Num()); Shore.Init(0,BaseVertices.Num());
-            for (int32 I=0; I<Nx*Ny; ++I)
-            { Coarse[I]=Crests->SourceCrestCm[I]; Shore[I]=Crests->SourceShoreWeight[I]; }
-            for (const auto& E:TopologyCache.GetEdges())
-            { Coarse[E.Node]=Coarse[E.WetVertex]; Shore[E.Node]=Shore[E.WetVertex]; }
+            CrestWeights.Update(BaseVertices.Num(),Crests->SourceCrestCm,
+                Crests->SourceShoreWeight,TopologyCache.GetEdges());
         }
         TArray<uint32> NewIndices;
         static const bool ForceCompactSource=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCompactCrestSource"));
