@@ -7,6 +7,7 @@
 #include "RaftSimCrewAvatarActor.h"
 #include "RaftSimRaftActor.h"
 #include "UObject/Script.h"
+#include "ProceduralMeshComponent.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrewOccupancyTest,
@@ -72,6 +73,21 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
     TestTrue(TEXT("ejection releases seat tilt for the authored horizontal swim"),
         FMath::Abs(SwimmingAvatar->GetActorRotation().Pitch) < .001f &&
         FMath::Abs(SwimmingAvatar->GetActorRotation().Roll) < .001f);
+    const FBox HullBox = Raft->RaftVisual->CalcBounds(Raft->RaftVisual->GetComponentTransform()).GetBox();
+    int32 CheckedParts = 0;
+    TInlineComponentArray<UPrimitiveComponent*> Parts(SwimmingAvatar);
+    for (const UPrimitiveComponent* Part : Parts)
+    {
+        if (!Part || !Part->IsRegistered() || !Part->IsVisible()) continue;
+        const FBox PartBox = Part->CalcBounds(Part->GetComponentTransform()).GetBox();
+        if (!PartBox.IsValid) continue;
+        ++CheckedParts;
+        // The first ejection is world +X. Check every visible component,
+        // independently of the production aggregate-box projection.
+        TestTrue(TEXT("whole posed swimmer starts beyond the rendered hull, including feet"),
+            PartBox.Min.X >= HullBox.Max.X + 4.99);
+    }
+    TestTrue(TEXT("clearance test covers actual visible body components"), CheckedParts > 0);
     TestTrue(TEXT("occupancy change preserves body velocity"),
         Adapter->GetKinematicState().LinearVelocityMetersPerSecond == Before.LinearVelocityMetersPerSecond);
     TestFalse(TEXT("ejected seat loses stale action immediately"), Adapter->FlexActions.ContainsByPredicate(

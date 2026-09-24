@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Initial ejection now separates the visible posed swimmer from rendered hull
+bounds. Two native suites pass; actual normal-start3s frame shows a clear
+exterior stern view. Pulling still intersects tubes at6s because its target is
+fixed0.9m from raft center. Next correct hull-relative pull geometry and audit
+distance semantics without weakening rescue gates. Full motion/collision and
+performance remain unaccepted; see the [guide receipt](../reconstruction-review-2026-09-07/guide-reentry.md).
+
 Ejection now preserves avatar world heading instead of resetting to+X while
 the guide camera faces the opposite way. Three native suites pass; actual
 normal-start3s/6s/9s/11s frames remove the guide-vest obstruction but retain

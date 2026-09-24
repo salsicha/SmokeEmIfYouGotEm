@@ -2121,6 +2121,36 @@ void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide)
                 Swimmer.SwimmerWorldPositionMeters * kCmPerM,
                 FVector::OneVector));
             Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Swimming);
+            // Establish separation using the actually published hull and
+            // posed visible swimmer, not a fixed radius inside a long hull.
+            // Project conservative world boxes onto the ejection direction;
+            // positive separation on one axis excludes initial intersection.
+            // This event-only query does not scan meshes in the frame loop.
+            if (RaftVisual && RaftVisual->GetNumSections() > 0)
+            {
+                const FVector Away(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+                const FVector AbsAway = Away.GetAbs();
+                const FBox HullBounds = RaftVisual->CalcBounds(RaftVisual->GetComponentTransform()).GetBox();
+                FBox BodyBounds(ForceInit);
+                TInlineComponentArray<UPrimitiveComponent*> BodyParts(Avatar);
+                for (const UPrimitiveComponent* Part : BodyParts)
+                {
+                    if (Part && Part->IsRegistered() && Part->IsVisible())
+                        BodyBounds += Part->CalcBounds(Part->GetComponentTransform()).GetBox();
+                }
+                if (HullBounds.IsValid && BodyBounds.IsValid)
+                {
+                    const double HullSupport = FVector::DotProduct(HullBounds.GetCenter(), Away) +
+                        FVector::DotProduct(HullBounds.GetExtent(), AbsAway);
+                    const double BodyNear = FVector::DotProduct(BodyBounds.GetCenter(), Away) -
+                        FVector::DotProduct(BodyBounds.GetExtent(), AbsAway);
+                    // Five centimetres is an explicit numerical clearance,
+                    // not inferred hull size or a reduced collision envelope.
+                    const double ShiftCm = FMath::Max(0.0, HullSupport + 5.0 - BodyNear);
+                    Swimmers.Last().SwimmerWorldPositionMeters += Away * (ShiftCm / kCmPerM);
+                    Avatar->SetActorLocation(Swimmers.Last().SwimmerWorldPositionMeters * kCmPerM);
+                }
+            }
         }
     }
     RefreshCrewSeatOccupancy();

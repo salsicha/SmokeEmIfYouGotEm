@@ -1,5 +1,35 @@
 # Actual guide swim/reentry drill — unfinished
 
+## Initial rendered-body/hull separation
+
+Initial ejection now projects the current rendered hull bounds and visible,
+posed swimmer component bounds onto the ejection direction, moving the whole
+body outside with5cm explicit clearance. These are conservative world boxes,
+not a reconstructed collision hull or a continuous collision solver. The
+event-only query does not scan mesh vertices every frame. The fixed circle is
+only the starting candidate; no rescue distance/readiness gate is changed.
+Native occupancy checks every visible component against the tilted/rotated
+raft's rendered bounds, including feet. Occupancy and swimming pose suites
+pass2success/0warnings/0failures in `tmp/swim-clearance-native-v1-20260924/index.json`.
+Editor build with regression succeeds in16.94s; standalone Game build succeeds
+in37.95s. No fresh frame-cost capture supersedes the existing measured failure.
+
+Normal-start drill `south-fork-swim-clearance-reentry-v1-20260924` exits0 with
+no timeout and successful original-cook suspension/resume. Throw-line succeeds
+at3.737883m;6s reentry remains rejected;10s succeeds;11s is seated/attached with
+0current swimmers. Video `unreal/Saved/VideoCaptures/RaftSim_20260923-223206.mp4`,
+SHA256 `be61ef51653470234e58f3332f33d40bfdbda7cd446cf915d8c991000471624e`,
+fully decodes464frames through15.433333s,15adjacent duplicates. Inspected
+3s/6s/11s originals:3s now shows an exterior water-level stern view rather than
+tube intersection;6s pulling still intersects the raft;11s restores seating.
+Artifacts: `tmp/swim-clearance-reentry-decoded-v1-20260924/`.
+
+This is a visible initial-ejection improvement only. Drift collision, wet
+surface height, exact per-side/whole-cycle clearance and rescue pulling remain
+unfinished. Next replace the fixed0.9m center-relative pull target with a
+rendered-hull-relative target and audit all associated distance semantics;
+do not enlarge1.35m reseat limits simply to pass. No performance acceptance.
+
 ## Preserve swimmer world heading on ejection
 
 Ejection formerly replaced every avatar's rotation with identity while the
