@@ -134,9 +134,10 @@ def test_hance_capture_and_live_profiles_are_river_local() -> None:
     assert "bColoradoHancePresentation ? 0.74f : 0.70f" in geometry
 
 
-def test_hance_live_smoothing_is_render_only_and_plane_preserving() -> None:
+def test_hance_live_smoothing_uses_shared_render_and_support_kernel() -> None:
     config = WATER_CONFIG_HEADER.read_text(encoding="utf-8")
     runtime = LIVE_SURFACE_SOURCE.read_text(encoding="utf-8")
+    adapter = (RUNTIME_ROOT / "RaftSimWater/Private/RaftSimWaterRuntimeAdapter.cpp").read_text(encoding="utf-8")
 
     for token in (
         "bEnableLivePresentationSurfaceSmoothing",
@@ -149,10 +150,16 @@ def test_hance_live_smoothing_is_render_only_and_plane_preserving() -> None:
     ):
         assert token in config
     assert "ComputePresentationSmoothedSurfaceHeightMeters" in runtime
-    assert "CenterSurfaceHeightMeters * 0.44f" in runtime
-    assert "* 0.14f" in runtime
-    assert "RawPresentationSurfaceHeightMeters" in runtime
-    assert "WaterSamples remains the authority for gameplay" in runtime
+    # The old render-only contract predates shared raft support. Keep this
+    # wiring check separate from native numeric tests and historical captures.
+    wrapper = runtime.split("float ARaftSimWaterSurfaceActor::ComputePresentationSmoothedSurfaceHeightMeters(", 1)[1].split("float ARaftSimWaterSurfaceActor::ComputeRaftHullSurfaceExclusion(", 1)[0]
+    assert "return URaftSimWaterRuntimeAdapter::" in wrapper
+    assert "ComputeCoupledSmoothedSurfaceHeightMeters(" in wrapper
+    assert "WaterAdapter->ConfigureRaftSupportSurface(" in runtime
+    assert "CenterSurfaceHeightMeters * 0.44f" in adapter
+    assert "* 0.14f" in adapter
+    assert "OutHeightM = ComputeCoupledSmoothedSurfaceHeightMeters(" in adapter
+    assert "RaftSupportSurfaceSmoothingStrength);" in adapter
     assert "PresentationSurfaceHeightMeters[Index]" in runtime
 
 

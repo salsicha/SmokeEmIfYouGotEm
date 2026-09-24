@@ -1,7 +1,41 @@
 #include "RaftSimWaterSmoothing.h"
+#include "RaftSimWaterSurfaceActor.h"
 #include "Misc/AutomationTest.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCoupledWaterSmoothingKernelTest,
+    "RaftSim.M4.CoupledWaterSmoothingKernel",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimCoupledWaterSmoothingKernelTest::RunTest(const FString&)
+{
+    for(float Center:{-12.f,0.f,220.f}) for(float Along:{-.75f,0.f,1.25f})
+    for(float Across:{-.5f,0.f,.875f}) for(float Strength:{-1.f,0.f,.4f,.998f,1.f,2.f})
+    {
+        const float Support=URaftSimWaterRuntimeAdapter::ComputeCoupledSmoothedSurfaceHeightMeters(
+            Center,Center-Along,Center+Along,Center-Across,Center+Across,Strength);
+        const float Render=ARaftSimWaterSurfaceActor::ComputePresentationSmoothedSurfaceHeightMeters(
+            Center,Center-Along,Center+Along,Center-Across,Center+Across,Strength);
+        TestTrue(TEXT("affine river grade is preserved by both kernels"),FMath::IsNearlyEqual(Support,Center,1.e-4f));
+        TestEqual(TEXT("render wrapper and support kernel agree exactly"),Render,Support);
+    }
+    // Independent impulse expectations pin both kernels, not a copy of their
+    // implementation: ordinary weights .44/.14, directional .25/.25/.125.
+    const float OrdinaryWeights[]={.44f,.14f,.14f,.14f,.14f};
+    const float DirectionalWeights[]={.25f,.25f,.25f,.125f,.125f};
+    for(int32 I=0;I<5;++I) for(float Strength:{0.f,.4f,.998f,1.f})
+    {
+        float H[]={0,0,0,0,0};H[I]=1.f;
+        const float Expected=Strength==1.f ? DirectionalWeights[I] :
+            (I==0 ? 1.f-Strength : 0.f)+Strength*OrdinaryWeights[I];
+        const float Actual=URaftSimWaterRuntimeAdapter::ComputeCoupledSmoothedSurfaceHeightMeters(
+            H[0],H[1],H[2],H[3],H[4],Strength);
+        TestTrue(TEXT("impulse weights retain documented spatial response"),FMath::IsNearlyEqual(Actual,Expected,1.e-6f));
+        TestEqual(TEXT("non-planar render/support response is identical"),
+            ARaftSimWaterSurfaceActor::ComputePresentationSmoothedSurfaceHeightMeters(H[0],H[1],H[2],H[3],H[4],Strength),Actual);
+    }
+    return !HasAnyErrors();
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimWaterSmoothingElisionTest,
     "RaftSim.M4.NativeMeanSmoothingElision",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)

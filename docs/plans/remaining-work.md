@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Shared-water regression: [coupled smoothing contract](../maintenance/coupled-smoothing-contract-20260924.md)
+replaces an obsolete render-only assertion with shared render/support wiring and
+native analytic plane/impulse checks. Editor build and2 native suites pass;
+affected Python module8 passes/2 retained historical-hash failures. No hashes,
+scene parameters or acceptance gates were rebased. Test-only work does not
+advance Colorado ahead of South Fork or deliver new playable water.
+
 Regression correction: [full-route coverage input validation](../maintenance/detail-coverage-input-20260924.md)
 now rejects empty/malformed routes instead of allowing a zero-query pass, checks
 footprint construction and total query count, and resolves the C4701 warning.
