@@ -157,11 +157,45 @@ larger cross-permission timing difference to this optimization. No30FPS claim.
 Separate direct-map visual run (NOT frontend navigation) exited0 and captured
 12images at0.5s intervals after10s. Actual staged screenshots002and011 were
 inspected: crew/raft/terrain render, water patterns and viewpoint change;
-surface remains smooth and shows pixelated/speckled foam. Not convincing
+surface remains smooth and shows pixelated/speckled water patterns. Their
+appearance alone does not identify foam rather than optical contributions. Not convincing
 crest/froth realism, full shoreline stability or full collision validation.
 Images: staged Saved/Screenshots/breaking-gate-staged-20260924_000..011.png.
 Log:tmp/breaking-gate-staged-render-20260924.log. No further work was live when
 the checks completed. South Fork and the complete ordered queue remain open.
+
+## Staged rapid motion follow-through — September 24
+
+Bounded direct-map review now exercises this same staged executable at8330m,
+not just the normal starting reach. Executable SHA256 remains
+`6194fed46b8dbf4a37c9948112cdc54052ed96dbc792ded7bfc1f8cc3bc04ddd`.
+No replacement geometry, source field, material, solver mode or optimization
+override was supplied. This explicit review start is NOT normal-menu traversal;
+the normal-menu performance evidence above remains the applicable measurement.
+
+Reproduction: `tmp/review-staged-troublemaker-20260924.py`; engine exit0,
+eight requested stills, complete recording decode322frames through10.7s,
+one exact adjacent duplicate. Recorded rate is not game FPS. Movie SHA256:
+`80bd404ba4aea9128a3f7258b00fc96639aa09c5894774b52f0f123679858b78`.
+Decode report: `tmp/staged-troublemaker-decoded-20260924/report.json`.
+Log: `tmp/staged-troublemaker-motion-20260924.log`.
+
+Inspected original stills000/007 and decoded3s/9s frames: broad blurred white
+coverage and smooth faces remain, with a large angular rock close ahead of the
+raft. The raft turns and moves past this view; no whole-water disappearance is
+visible in these inspected frames. These are not full shoreline/contact checks.
+The first four stills localize a brief near-stall: station8343.554→8343.151m
+while raft yaw14.517→54.901degrees; final still8349.758m/yaw124.599degrees.
+Wet support telemetry persists, but this does not distinguish physically valid
+rock deflection from inaccurate collision or flow. Do not flatten the rock,
+alter collision or change steering solely to remove this observed interaction.
+Next geometry/contact work should compare this localized interaction with the
+existing shared render/collision source and evidence uncertainty.
+
+This is additional staged validation of the already-delivered increment, NOT
+new rendered reconstruction or acceptance. No new cook/build was started;
+South Fork remains first unfinished. Avoid repeating this unchanged capture
+or the already-rejected foam-only/normal/reflection trials as progress.
 
 ## Actual-input parity and normal staged delivery
 
