@@ -458,6 +458,8 @@ private:
     void DriftSwimmers(float DeltaSeconds);
     void TryReseatSwimmers();
     void UpdateRescueInteraction(float DeltaSeconds);
+    bool GetSwimmerTubeTarget(FName PassengerId, const FVector& SwimmerM, FVector& TargetM) const;
+    double GetRenderedHullDistanceM(const FVector& WorldM) const;
     void UpdateRescueLineVisual();
     void SpawnSwimmers(int32 Count, bool bIncludeGuide);
     void RefreshCrewSeatOccupancy();

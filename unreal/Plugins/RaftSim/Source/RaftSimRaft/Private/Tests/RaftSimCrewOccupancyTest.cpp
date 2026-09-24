@@ -88,6 +88,26 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             PartBox.Min.X >= HullBox.Max.X + 4.99);
     }
     TestTrue(TEXT("clearance test covers actual visible body components"), CheckedParts > 0);
+    FVector TubeTarget;
+    const FVector StartM = Raft->Swimmers[0].SwimmerWorldPositionMeters;
+    TestTrue(TEXT("published hull supplies a pulling target"),
+        Raft->GetSwimmerTubeTarget(TEXT("paddler_1"), StartM, TubeTarget));
+    TestTrue(TEXT("pull target preserves water elevation"), FMath::IsNearlyEqual(TubeTarget.Z, StartM.Z, 1.e-6));
+    const auto* HullSection = Raft->RaftVisual->GetProcMeshSection(0);
+    if (!TestNotNull(TEXT("rendered hull section"), HullSection)) return false;
+    const FVector SurfaceM = Raft->RaftVisual->GetComponentTransform().TransformPosition(
+        HullSection->ProcVertexBuffer[0].Position) / 100.0;
+    TestTrue(TEXT("exact published surface has zero hull distance"), Raft->GetRenderedHullDistanceM(SurfaceM) < .0001);
+    const auto SavedInteraction = Raft->RescueInteraction;
+    Raft->RescueInteraction.TargetPassengerId = TEXT("paddler_1");
+    Raft->RescueInteraction.Phase = ERaftSimRescueInteractionPhase::ReadyForReentry;
+    Raft->Swimmers[0].SwimmerWorldPositionMeters = SurfaceM + FVector(100,0,0);
+    TestFalse(TEXT("ready state cannot board from far outside the actual hull"), Raft->RequestSelectedReentry());
+    TestEqual(TEXT("far reentry keeps both swimmers"), Raft->GetSwimmerCount(), 2);
+    TestEqual(TEXT("physical distance failure asks for tube contact"),
+        Raft->RescueInteraction.FeedbackCode, FName(TEXT("rescue_bring_to_tube")));
+    Raft->Swimmers[0].SwimmerWorldPositionMeters = StartM;
+    Raft->RescueInteraction = SavedInteraction;
     TestTrue(TEXT("occupancy change preserves body velocity"),
         Adapter->GetKinematicState().LinearVelocityMetersPerSecond == Before.LinearVelocityMetersPerSecond);
     TestFalse(TEXT("ejected seat loses stale action immediately"), Adapter->FlexActions.ContainsByPredicate(

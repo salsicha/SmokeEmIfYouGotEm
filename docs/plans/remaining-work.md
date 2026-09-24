@@ -3,6 +3,18 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Rescue pulling now stops outside the rendered hull with current posed-body
+clearance and follows the raft while ready to board. Reentry uses actual
+triangle distance with unchanged1.35m/readiness gates. Three native suites
+pass; actual normal-start3s/6s/9s views stay outside the stern tube and11s
+restores seating. Whole-cycle/all-side collision, wet height, boarding animation,
+automatic recovery path and measured cost remain unaccepted. See the
+[guide receipt](../reconstruction-review-2026-09-07/guide-reentry.md).
+Standalone Game also rebuilds. Fresh900-frame ordinary normal-start p9542.3028ms
+FAILS33.333333ms (mean34.250937ms). It contains no active rescue and cannot
+isolate pull-query cost; retain the failure and investigate timing before any
+performance acceptance. Full queued reconstruction remains unfinished.
+
 Initial ejection now separates the visible posed swimmer from rendered hull
 bounds. Two native suites pass; actual normal-start3s frame shows a clear
 exterior stern view. Pulling still intersects tubes at6s because its target is

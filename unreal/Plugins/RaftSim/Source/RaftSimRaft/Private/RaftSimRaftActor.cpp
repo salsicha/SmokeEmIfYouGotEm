@@ -2342,6 +2342,55 @@ bool ARaftSimRaftActor::BeginRescue(ERaftSimRescueMethod Method)
         RescueInteraction.Phase == ERaftSimRescueInteractionPhase::Pulling;
 }
 
+bool ARaftSimRaftActor::GetSwimmerTubeTarget(FName PassengerId, const FVector& SwimmerM, FVector& TargetM) const
+{
+    const auto* Avatar = FindAvatar(PassengerId);
+    if (!Avatar || !RaftVisual || RaftVisual->GetNumSections() == 0) return false;
+    FVector Away = (SwimmerM - GetActorLocation() / kCmPerM).GetSafeNormal2D();
+    if (Away.IsNearlyZero()) Away = GetActorRightVector().GetSafeNormal2D();
+    const FVector AbsAway = Away.GetAbs();
+    const FBox HullBox = RaftVisual->CalcBounds(RaftVisual->GetComponentTransform()).GetBox();
+    FBox BodyBox(ForceInit);
+    TInlineComponentArray<UPrimitiveComponent*> Parts(Avatar);
+    for (const UPrimitiveComponent* Part : Parts)
+        if (Part && Part->IsRegistered() && Part->IsVisible())
+            BodyBox += Part->CalcBounds(Part->GetComponentTransform()).GetBox();
+    if (!HullBox.IsValid || !BodyBox.IsValid) return false;
+    const double HullSupport = FVector::DotProduct(HullBox.GetCenter(), Away) +
+        FVector::DotProduct(HullBox.GetExtent(), AbsAway);
+    const double BodyNearOffset = FVector::DotProduct(BodyBox.GetCenter() - Avatar->GetActorLocation(), Away) -
+        FVector::DotProduct(BodyBox.GetExtent(), AbsAway);
+    // Preserve lateral position and water elevation; only move along the
+    // outward axis to the conservative visible-hull contact plane.
+    TargetM = SwimmerM + Away * ((HullSupport + 5.0 - BodyNearOffset) / kCmPerM -
+        FVector::DotProduct(SwimmerM, Away));
+    return IsFiniteVector(TargetM);
+}
+
+double ARaftSimRaftActor::GetRenderedHullDistanceM(const FVector& WorldM) const
+{
+    // Event-only exact triangle distance. Do not use bounding-box distance to
+    // authorize reentry at an empty corner of the conservative pull envelope.
+    if (!RaftVisual || !IsFiniteVector(WorldM)) return TNumericLimits<double>::Max();
+    const FVector P = WorldM * kCmPerM;
+    const FTransform Transform = RaftVisual->GetComponentTransform();
+    double BestSquared = TNumericLimits<double>::Max();
+    for (int32 S = 0; S < RaftVisual->GetNumSections(); ++S)
+    {
+        const FProcMeshSection* Section = RaftVisual->GetProcMeshSection(S);
+        if (!Section || !Section->bSectionVisible) continue;
+        for (int32 I = 0; I + 2 < Section->ProcIndexBuffer.Num(); I += 3)
+        {
+            const FVector A = Transform.TransformPosition(Section->ProcVertexBuffer[Section->ProcIndexBuffer[I]].Position);
+            const FVector B = Transform.TransformPosition(Section->ProcVertexBuffer[Section->ProcIndexBuffer[I+1]].Position);
+            const FVector C = Transform.TransformPosition(Section->ProcVertexBuffer[Section->ProcIndexBuffer[I+2]].Position);
+            if (FVector::CrossProduct(B-A, C-A).SizeSquared() <= UE_DOUBLE_SMALL_NUMBER) continue;
+            BestSquared = FMath::Min(BestSquared, FVector::DistSquared(P, FMath::ClosestPointOnTriangleToPoint(P,A,B,C)));
+        }
+    }
+    return FMath::Sqrt(BestSquared) / kCmPerM;
+}
+
 void ARaftSimRaftActor::UpdateRescueInteraction(float DeltaSeconds)
 {
     const int32 TargetIndex = FindSwimmerIndex(RescueInteraction.TargetPassengerId);
@@ -2355,7 +2404,8 @@ void ARaftSimRaftActor::UpdateRescueInteraction(float DeltaSeconds)
         return;
     }
     if (RescueInteraction.Phase != ERaftSimRescueInteractionPhase::LineInFlight &&
-        RescueInteraction.Phase != ERaftSimRescueInteractionPhase::Pulling)
+        RescueInteraction.Phase != ERaftSimRescueInteractionPhase::Pulling &&
+        RescueInteraction.Phase != ERaftSimRescueInteractionPhase::ReadyForReentry)
     {
         return;
     }
@@ -2373,15 +2423,15 @@ void ARaftSimRaftActor::UpdateRescueInteraction(float DeltaSeconds)
     if (RescueInteraction.Phase == ERaftSimRescueInteractionPhase::Pulling ||
         RescueInteraction.Phase == ERaftSimRescueInteractionPhase::ReadyForReentry)
     {
-        const FVector RaftM = GetActorLocation() / kCmPerM;
-        FVector Away = (Swimmer.SwimmerWorldPositionMeters - RaftM).GetSafeNormal2D();
-        if (Away.IsNearlyZero())
-        {
-            Away = FVector::RightVector;
-        }
-        const FVector TubeTarget = RaftM + Away * 0.9f;
+        if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmer.PassengerId))
+            Avatar->SetAvatarAction(RescueInteraction.Phase == ERaftSimRescueInteractionPhase::ReadyForReentry
+                ? ERaftSimCrewAvatarAction::Reentry : ERaftSimCrewAvatarAction::Swimming);
+        FVector TubeTarget;
+        if (!GetSwimmerTubeTarget(Swimmer.PassengerId, Swimmer.SwimmerWorldPositionMeters, TubeTarget)) return;
         const float PullAlpha = 1.0f - FMath::Exp(-DeltaSeconds * 1.6f);
-        Swimmer.SwimmerWorldPositionMeters = FMath::Lerp(
+        const FVector Away = (TubeTarget - GetActorLocation() / kCmPerM).GetSafeNormal2D();
+        const bool bAlreadyInsideEnvelope = FVector::DotProduct(Swimmer.SwimmerWorldPositionMeters - TubeTarget, Away) < 0.0;
+        Swimmer.SwimmerWorldPositionMeters = bAlreadyInsideEnvelope ? TubeTarget : FMath::Lerp(
             Swimmer.SwimmerWorldPositionMeters, TubeTarget, PullAlpha);
         Swimmer.PullInProgress = RescueInteraction.PullProgress;
         Swimmer.RescueMethod = RescueInteraction.Method;
@@ -2393,6 +2443,8 @@ void ARaftSimRaftActor::UpdateRescueInteraction(float DeltaSeconds)
                 Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Reentry);
             }
         }
+        if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmer.PassengerId))
+            Avatar->SetActorLocation(Swimmer.SwimmerWorldPositionMeters * kCmPerM);
     }
 }
 
@@ -2403,9 +2455,9 @@ bool ARaftSimRaftActor::RequestSelectedReentry()
     {
         return false;
     }
-    const float DistanceM = FVector::Distance(
-        Swimmers[TargetIndex].SwimmerWorldPositionMeters,
-        GetActorLocation() / kCmPerM);
+    // "Bring to tube" measures the actual rendered hull, not the raft center.
+    // The library's unchanged1.35m distance and readiness gates still apply.
+    const float DistanceM = GetRenderedHullDistanceM(Swimmers[TargetIndex].SwimmerWorldPositionMeters);
     RescueInteraction = URaftSimSwimmerRescueLibrary::CompleteReseat(
         RescueInteraction, DistanceM);
     if (RescueInteraction.Phase != ERaftSimRescueInteractionPhase::Completed)

@@ -1,5 +1,54 @@
 # Actual guide swim/reentry drill — unfinished
 
+## Hull-relative pulling and actual-surface reentry distance
+
+Pulling now stops at the rendered hull's conservative support plane with the
+current visible posed body outside by5cm, rather than0.9m from raft center.
+The target preserves swimmer elevation and follows the moving raft through
+ReadyForReentry. Any drift into the envelope is projected outward; this is a
+kinematic rescue constraint, not a physical collision solver. Pose changes
+are applied before bounds queries and position is published to the avatar in
+the same update. No geometry is hidden and nonlinear/shared-hull modes stay off.
+
+RequestSelectedReentry now measures shortest distance from swimmer origin to
+actual published visible hull triangles in world coordinates. This event-only
+query prevents empty bounding-box corners authorizing boarding. The library's
+1.35m limit and readiness gate are unchanged; distance means distance to the
+raft surface, not its center. Tests check an actual hull vertex's zero distance
+and explicitly reject a ReadyForReentry swimmer100m away while retaining both
+swimmers and rescue_bring_to_tube feedback. Missing geometry fails closed.
+The automatic recovering/capsize rescue path remains a separate legacy path
+to audit; this does not qualify every rescue/collision mode.
+
+Editor build with regressions succeeds47.97s (initial dependent rebuild291.97s,
+two retained C4305 damping warnings). Occupancy, SwimmingTorsoAlignment and
+M5.RuntimeRescueLoop all pass:2clean,1with the retained r.MotionVectorSimulation
+render-thread warning,0failures. Report `tmp/swim-pull-native-v1-20260924/index.json`.
+
+Actual normal-start `south-fork-swim-pull-reentry-v1-20260924` exits0 without
+timeout; original cook36692 suspension/resume succeed. Throw-line succeeds
+at3.493323m;6s reentry is rejected;10s succeeds;11s confirms seated attachment
+and0current swimmers. Video `unreal/Saved/VideoCaptures/RaftSim_20260923-224459.mp4`,
+SHA256 `f03c3eb60d9a1822c4b4d2fc0b3ca30690b2d235d5e7d9726c6aa01543c40c0d`,
+fully decodes463frames through15.4s with13adjacent duplicates. Inspected
+3s/6s/9s/11s frames keep the view outside the stern tube during pulling and
+restore seating; prior6s tube-interior view is absent. Decoder artifacts:
+`tmp/swim-pull-reentry-decoded-v1-20260924/`.
+
+This is a bounded visible rescue improvement, not whole-cycle/all-side collision,
+wet surface-height, boarding-animation or performance acceptance. Full source
+reconstruction, water realism and queued rivers remain unfinished.
+
+Standalone Game rebuild succeeds185.55s. Fresh900-frame ordinary normal-start
+timing (samples60–840, confirmed nonlegacy FrameTime, scope offset1) fails:
+mean34.250937ms, p9542.3028ms, maximum48.1943ms against33.333333ms. Engine exits0,
+no timeout, original cook guard/resume succeed. CSV SHA256
+`bee77a7374b19a6c0a2221b9eea004d3d426290ab6204731206839345554af83`;
+audit `tmp/swim-pull-normal-frame-v1-20260924.json`. This no-active-rescue run
+does not isolate the cost of new pull queries or establish a causal regression;
+it does establish that this sample cannot pass the normal-play budget. Active
+pull/reentry-event cost and repeatability remain to be measured separately.
+
 ## Initial rendered-body/hull separation
 
 Initial ejection now projects the current rendered hull bounds and visible,
