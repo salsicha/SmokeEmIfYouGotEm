@@ -1,5 +1,45 @@
 # Actual guide swim/reentry drill — unfinished
 
+## Swimmer surface-datum review — September24, NOT promoted
+
+Drift previously integrates velocity without sampling the resulting position's
+surface height; horizontal pulling likewise preserves the previous Z. New
+`-RaftSimSwimmerSurfaceReview` tests attachment to the existing runtime water
+sample at ejection, after drift and after pulling. Wet finite samples replace
+only root Z; dry/missing/invalid samples preserve it. Authored pose offsets,
+rescue gates and physics fields are unchanged. This is not a swimmer buoyancy
+or dry-ground locomotion model. The flag is OFF by default.
+
+Initial candidate Editor build173.28s succeeds with two existing D6 damping
+double-to-float warnings. Four native suites succeed (3clean,1with retained
+r.MotionVectorSimulation render-thread warning): SwimmerSurfaceDatum,
+SwimmingTorsoAlignment, OccupancyControlsLoadsAndIntegratedMass and
+M5.RuntimeRescueLoop. Report `tmp/swimmer-surface-native-v1-20260924/index.json`.
+
+Actual normal-start candidate replay `south-fork-swimmer-surface-v1-20260924`
+exits0 without timeout. This capture predates the review gate: attachment was
+active without the later Review flag. Seven audit records across frames30,
+60,90,120 match swimmer root and wet sampled surface exactly (60.349609375m
+down to60.333343506m). Six-second reentry rejects,10s accepts,11s is seated/
+attached with no active guide swimmer. No rescue gate was weakened.
+
+Video `unreal/Saved/VideoCaptures/RaftSim_20260923-235611.mp4`, SHA256
+`f8773d62c78515cbb76a4d677a21a96588fcf2c3bad3e5beb26c98fa557348f3`:
+467decoded frames,15.533333s,20exact adjacent duplicates. Stills/report:
+`tmp/swimmer-surface-decoded-v1-20260924/`. Inspected3s/6s show the nearby
+stern underside obstructing much of the swimming view;11s restores seating.
+This is NOT accepted visual behavior. Do not hide it with an arbitrary Z offset.
+The raft drift log at frame144 reports support_delta_cm=0 and rendered floor
+freeboard16.1cm, so these images do NOT establish a solver/render datum error.
+Next qualify actual hull/swimmer/camera contact and intended immersion together.
+
+The candidate was gated off after visual inspection. Gated-default Editor
+rebuild succeeds14.68s; the subsequent source change is comment-only.
+Gated-default standalone Game rebuild also succeeds95.05s. This is compilation,
+not a packaged-executable launch or performance measurement. Neither
+sample equality nor native tests establish rendered water agreement, motion,
+collision or measured cost. No new normal-play surface attachment is delivered.
+
 ## Cumulative swim-event HUD correction — September24
 
 The normal status line now calls GetSwimCount "swim events", not "swimmers".

@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Swimmer-height review now samples the current wet water datum at spawn/drift/
+pulling and passes4native suites plus actual sample equality/reentry. Actual
+3s/6s views remain obstructed by the stern underside, so the change is gated
+OFF behind RaftSimSwimmerSurfaceReview, not delivered as a visual fix. Existing
+raft telemetry reports support/solver agreement; do not infer a datum error
+from the view alone. Next qualify hull/swimmer/camera contact and immersion.
+See the [review receipt](../reconstruction-review-2026-09-07/guide-reentry.md).
+
 Normal HUD now labels GetSwimCount as cumulative "swim events", not current
 "swimmers". Actual normal-start throw-line/reentry replay completes at10s;
 inspected11s seated view displays the corrected historical count. This is a

@@ -1,6 +1,7 @@
 ﻿#include "RaftSimRaftActor.h"
 
 #include "Components/SceneComponent.h"
+#include "RaftSimSwimmerSurface.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Components/LightComponent.h"
@@ -2153,6 +2154,12 @@ void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide)
             }
         }
     }
+    for(int32 I=PreviousSwimmerCount;I<Swimmers.Num();++I)
+    {
+        AttachSwimmerToWaterSurface(Swimmers[I]);
+        if(auto* Avatar=FindAvatar(Swimmers[I].PassengerId))
+            Avatar->SetActorLocation(Swimmers[I].SwimmerWorldPositionMeters*kCmPerM);
+    }
     RefreshCrewSeatOccupancy();
     if (Swimmers.Num() == PreviousSwimmerCount) return;
     RescueInteraction = FRaftSimRescueInteractionState{};
@@ -2181,6 +2188,27 @@ void ARaftSimRaftActor::RefreshCrewSeatOccupancy()
     }
 }
 
+void ARaftSimRaftActor::AttachSwimmerToWaterSurface(FRaftSimSwimmerRescueFrame& Swimmer) const
+{
+    // Actual replay leaves the near-hull swimming view unaccepted. It does not
+    // establish a solver/render datum error; qualify hull/camera contact first.
+    static const bool Review=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSwimmerSurfaceReview"));
+    if(!Review) return;
+    if(!Bridge) return;
+    const auto* Water=Bridge->GetWaterRuntime();
+    if(!Water) return;
+    FRaftSimWaterSample Sample;
+    if(Water->SampleWaterAtWorldPosition(Swimmer.SwimmerWorldPositionMeters*kCmPerM,Sample))
+    {
+        const bool Attached=RaftSimAttachSwimmerToSurface(Swimmer.SwimmerWorldPositionMeters,Sample);
+        static const bool Audit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSwimmerSurfaceAudit"));
+        if(Audit && GFrameCounter%30==0)
+            UE_LOG(LogTemp,Display,TEXT("SwimmerSurfaceAudit passenger=%s frame=%llu attached=%d wet=%d root_m=%.9f surface_m=%.9f"),
+                *Swimmer.PassengerId.ToString(),GFrameCounter,Attached,Sample.bWet,
+                Swimmer.SwimmerWorldPositionMeters.Z,double(Sample.SurfaceHeightMeters));
+    }
+}
+
 void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
 {
     for (int32 Index = 0; Index < Swimmers.Num(); ++Index)
@@ -2197,6 +2225,7 @@ void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
                     : CheckpointTransform.GetLocation()) / kCmPerM;
             Swimmers[Index].SwimmerDriftVelocityMetersPerSecond = FVector::ZeroVector;
         }
+        AttachSwimmerToWaterSurface(Swimmers[Index]);
         if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmers[Index].PassengerId))
         {
             Avatar->SetActorLocation(Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
@@ -2443,6 +2472,7 @@ void ARaftSimRaftActor::UpdateRescueInteraction(float DeltaSeconds)
                 Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Reentry);
             }
         }
+        AttachSwimmerToWaterSurface(Swimmer);
         if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmer.PassengerId))
             Avatar->SetActorLocation(Swimmer.SwimmerWorldPositionMeters * kCmPerM);
     }

@@ -456,6 +456,7 @@ private:
     void UpdateCapsizeTransition(float DeltaSeconds);
     void EnterCapsize();
     void DriftSwimmers(float DeltaSeconds);
+    void AttachSwimmerToWaterSurface(FRaftSimSwimmerRescueFrame& Swimmer) const;
     void TryReseatSwimmers();
     void UpdateRescueInteraction(float DeltaSeconds);
     bool GetSwimmerTubeTarget(FName PassengerId, const FVector& SwimmerM, FVector& TargetM) const;
