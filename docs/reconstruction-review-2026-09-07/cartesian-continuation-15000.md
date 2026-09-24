@@ -386,3 +386,34 @@ rapid-workload performance failure or whole-river validation. The rock-cap
 interpretation decision remains pending; no unsupported source relabeling or
 rejected canopy retuning was performed. South Fork remains unfinished, ahead
 of Colorado, Pacuare and Futaleufu.
+
+## Terminal18000 s qualification — September24
+
+Authoritative process inspection no longer finds cook36692, and its output
+has `completed.json` plus complete frame060000 and terminal progress record.
+This continuation is finished, not a live wait. No replacement cook launched.
+Terminal marker explicitly retains settling_accepted=false and
+normal_map_integrated=false.
+
+Independent state and exterior-bank audits pass at local60000/model18000 s:
+5,382,400 finite h/u/v cells, maximum depth3.235472549m,
+maximum speed4.798231087m/s, all86,720 artificial-bank cells exactly dry.
+Volume2009775.873273m³ agrees exactly with the driver; maximum per-step
+conservation residual9.483589469e-9m³. Depth SHA256:
+`c3f8c2501e85b7ce88ea0ffeff897978426350d5e4c627e34667022ef404ba89`.
+Reports: `tmp/cartesian-18000-state-v1-20260924.json` and
+`tmp/cartesian-18000-banks-v1-20260924.json`.
+
+Final outlet91.182009m³/s still exceeds inlet45.306955m³/s. Regional audit
+17700–18000 s measures14595.007358m³ loss, or48.650025m³/s net drainage,
+closing against integrated boundary volume within2.55e-10m³. Loss remains
+concentrated in the middle/lower reach (approximately18.47/30.18m³/s).
+Report `tmp/cartesian-storage-regions-18000-v1-20260924.json`, SHA256
+`204679e056e1778cb33f0a51d597d606edb5e8fc805dbb671e976d2043857e93`.
+These partitions are storage regions, not section discharge measurements.
+
+Numerical validity is not equilibrium, captured-stage agreement or playable
+acceptance. Do not promote this state, tune an outlet to force balance or
+forecast a settling date. Installed4950 s fields and nonlinear-off default
+stay unchanged. Further cooking requires an evidence-based next experiment;
+normal-play performance and visual work can proceed with no cook workload.

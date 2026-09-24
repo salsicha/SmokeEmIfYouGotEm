@@ -7027,6 +7027,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     bFoamUsesCommittedClock=bCartesianFlow;
     FoamSum = FoamAdvectionSum;
     MaximumFoam = FoamAdvectionMax;
+    Perf.Mark(TEXT("foam_transport_history"));
 
     // Keep fully transparent dry geometry coplanar with the local river
     // surface. At a shoreline the alpha-interpolated boundary triangles now
@@ -7142,6 +7143,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
     }
 
+    Perf.Mark(TEXT("core_reference_surface"));
     // Build the transmitting optical body only from quads whose four corners
     // are wet, then clip its moving-window ends with the station feather.
     // Topology changes only when the moving window recentres or a wet/dry
@@ -7549,6 +7551,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 }
             }
         }
+        Perf.Mark(TEXT("core_masks_film"));
         // Slow rates: wake lapping and window handoffs churn the bank wet
         // edge at cell granularity; the envelope averages those transients
         // while genuine water-level changes still track within a couple of
@@ -7604,6 +7607,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
         }
 
+        Perf.Mark(TEXT("core_presence"));
         // One immutable index list, the terminal form of a long render
         // lesson: a recreated mesh section is a new render proxy, and its
         // first frame renders with no temporal history and cold shading
@@ -8128,6 +8132,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
         }
         } // Legacy column reach/collapse. Cartesian dry regions are clipped in 2D.
+        Perf.Mark(TEXT("core_topology_banks"));
 #if !UE_BUILD_SHIPPING
         const float ShoreProbeStation = CVarRaftSimShorelineProbeStation.GetValueOnGameThread();
         if (ShoreProbeStation >= 0.0f && GetWorld() && GetWorld()->GetTimeSeconds() >= 8.0f &&

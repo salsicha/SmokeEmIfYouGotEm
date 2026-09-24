@@ -145,3 +145,31 @@ Next localize the broad foam/core preparation region (previously4.06ms mean),
 including temporary packed attributes and target preparation, without skipping
 interpolation, changing geometry, reducing refresh cadence or enabling the
 broken nonlinear solver. Source split instrumentation remains available.
+
+## Foam/core stage split — September24
+
+Added opt-in timing marks only; water arithmetic, geometry, clocks and default
+allocation mode are unchanged. Editor rebuild succeeds45.60s. Actual
+normal-start `south-fork-foam-core-split-v1-20260924` exits0 without timeout,
+four solver lanes confirmed,300 frames. The original cook is now authoritatively
+terminal, so this run declares NoCookWorkload rather than a false suspension.
+CSV SHA256 `688947b867e0555ce688515c23b8d939c5c82d3173cc9aca3b132d6abb20b0bd`;
+log SHA256 `03006f05fffda2285e30085ea5984d409a6286a305ddaa4eb60ca1a0909aa809`.
+
+All90 refresh entries at engine frames60–240 inclusive (not CSV row indices):
+
+| Split region | Mean ms | p95 ms |
+| --- | ---: | ---: |
+| Foam transport and history |1.01|1.27|
+| Reference surface/dry geometry |0.47|0.62|
+| Core masks and film preparation |1.30|1.70|
+| Core presence |0.85|1.03|
+| Topology and bank preparation |0.11|0.14|
+| Remaining core publication/target preparation |0.64|0.84|
+
+Total refresh mean20.55ms/p9523.05ms includes all other stages. This logging
+run is NOT an uninstrumented performance gate or direct comparison with earlier
+timings. The broad previous4ms region is not a4ms duplicate upload. Next inspect
+core mask/film preparation and presence loops for exact redundant work; do not
+skip interpolation, dry-bank decisions or use allocation retention as a proven
+win. No actual visual change or motion/collision acceptance is claimed.

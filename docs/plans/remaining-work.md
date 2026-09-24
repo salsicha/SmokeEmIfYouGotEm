@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+The sole15000–18000 s hydraulic continuation is now terminal, not waiting.
+Independent terminal-state/bank audits pass, but final300 s net drainage is
+48.650025m³/s: NOT settled or eligible for installation. No successor cook
+launched; use no-cook profiling only after live-process checks. Installed fields
+and nonlinear-off default remain unchanged. See the
+[terminal receipt](../reconstruction-review-2026-09-07/cartesian-continuation-15000.md).
+
 Refresh follow-through now separates buffer/coverage setup (1.79ms mean) from
 fused sampling (2.83ms). An opt-in retained-scratch candidate builds and passes
 native reset and actual50,625-sample source equivalence checks. Same-build
@@ -12,6 +19,11 @@ rejects promotion: retained p9542.1934ms versus default40.1793ms, both failing.
 Keep the candidate diagnostic-only; do not repeat the unchanged experiment.
 Next localize foam/core preparation cost without skipping interpolation or
 reducing geometry/refresh cadence.
+Follow-through: built opt-in stage split measures core masks/film1.30ms mean,
+foam transport/history1.01ms, presence0.85ms, remaining publication0.64ms.
+Next inspect mask/film and presence preparation for exact redundant work;
+the broad region is not a duplicate upload. Actual normal-start probe exits0;
+this diagnostic is not visual delivery or performance acceptance.
 See the [receipt](../reconstruction-review-2026-09-07/refresh-cost-followthrough.md).
 This is supporting diagnostic work, not a delivered scene improvement.
 
