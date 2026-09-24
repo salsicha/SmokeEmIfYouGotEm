@@ -273,6 +273,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
     void ForceCrewOverboardForTesting(int32 Count);
 
+    /** Explicit guide-only drill; uses the same swimmer/occupancy path as capsize. */
+    void ForceGuideOverboardForTesting() { SpawnSwimmers(1, true); }
+
     /**
      * Timed high-side response: shift crew weight to the given side (+1 = starboard,
      * -1 = port) to counter an incoming roll. Feeds the D2 crew action into the

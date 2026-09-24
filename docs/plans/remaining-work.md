@@ -3,6 +3,12 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+[Guide swim/reentry drill](../reconstruction-review-2026-09-07/guide-reentry.md)
+now reaches actual detached swimming in normal South Fork play. ReachGrab fails
+at3.0m (HUD rescue_out_of_range), so reentry remains untested. Recorded3s/11s
+views expose a swimming-camera intersection with raft/crew geometry. Investigate
+that visible failure and use valid rescue inputs; do not weaken the gates.
+
 [Selective-normal experiment](../reconstruction-review-2026-09-07/selective-crest-normals.md)
 preserved151 actual-input attribute comparisons but did not improve measured
 cost (p9534.0391ms FAIL). It remains diagnostic-only; restored-default

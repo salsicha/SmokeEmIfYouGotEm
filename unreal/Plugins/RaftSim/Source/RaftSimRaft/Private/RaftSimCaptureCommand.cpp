@@ -38,6 +38,7 @@
 #include "NiagaraComponent.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimGuidePawn.h"
 #include "RaftSimRockObstacleActor.h"
 #include "RaftSimCameraPresentation.h"
 #include "RaftSimRunCoordinateProvider.h"
@@ -764,6 +765,46 @@ static void ScheduleCrewOverboardReview(UWorld* World)
     }
 }
 
+static void ScheduleGuideReentryReview(UWorld* World)
+{
+    const TWeakObjectPtr<UWorld> WeakWorld(World);
+    for(float Seconds:{1.f,2.f,3.f,4.f,6.f,8.f,10.f,11.f})
+    {
+        FTimerHandle Handle;
+        World->GetTimerManager().SetTimer(Handle,FTimerDelegate::CreateLambda([WeakWorld,Seconds]()
+        {
+            UWorld* Current=WeakWorld.Get();
+            auto* Raft=FindRaft(Current);
+            auto* Player=Current ? Current->GetFirstPlayerController() : nullptr;
+            auto* Guide=Player ? Cast<ARaftSimGuidePawn>(Player->GetPawn()) : nullptr;
+            if(!Raft || !Guide)
+            {UE_LOG(LogTemp,Error,TEXT("GUIDE_REENTRY missing raft or possessed guide"));return;}
+            if(Seconds==1.f)Raft->ForceGuideOverboardForTesting();
+            if(Seconds==3.f)
+            {
+                FVector Swimmer;
+                if(Raft->GetSwimmerWorldPosition(TEXT("guide"),Swimmer))
+                {
+                    const FVector Origin=Raft->GetActorLocation()+Raft->GetActorForwardVector()*45.f+FVector(0,0,65);
+                    Raft->AimRescue(Swimmer-Origin);
+                    const bool Began=Raft->BeginRescue(ERaftSimRescueMethod::ReachGrab);
+                    UE_LOG(LogTemp,Display,TEXT("GUIDE_REENTRY reach_requested result=%d"),int32(Began));
+                }
+            }
+            if(Seconds==6.f || Seconds==10.f)
+            {
+                const bool Reentered=Raft->RequestSelectedReentry();
+                UE_LOG(LogTemp,Display,TEXT("GUIDE_REENTRY reentry_requested seconds=%.0f result=%d"),Seconds,int32(Reentered));
+            }
+            UE_LOG(LogTemp,Display,TEXT("GUIDE_REENTRY sample seconds=%.0f swimming=%d mobility=%d attached=%d rescue_phase=%d target=%s completed=%d control_yaw=%.6f pawn_yaw=%.6f raft_yaw=%.6f"),
+                Seconds,int32(Raft->IsPassengerSwimming(TEXT("guide"))),int32(Guide->GetMobilityMode()),
+                int32(Guide->GetAttachParentActor()==Raft),int32(Raft->GetRescueInteractionState().Phase),
+                *Raft->GetRescueInteractionState().TargetPassengerId.ToString(),Raft->GetCompletedRescueCount(),
+                Player->GetControlRotation().Yaw,Guide->GetActorRotation().Yaw,Raft->GetActorRotation().Yaw);
+        }),Seconds,false);
+    }
+}
+
 static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
 {
     if (World == nullptr)
@@ -838,9 +879,11 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     }
 
     TWeakObjectPtr<UWorld> WeakWorld(World);
-    if(int32(bPaddle) + int32(bHighSide) + int32(bOverboard) > 1)
+    const bool bGuideReentry=FParse::Param(FCommandLine::Get(),TEXT("RaftSimGuideReentryReview"));
+    if(int32(bPaddle) + int32(bHighSide) + int32(bOverboard) + int32(bGuideReentry) > 1)
     { UE_LOG(LogTemp,Error,TEXT("CaptureSeries: crew inputs conflict; no capture started"));return; }
     if (bOverboard) ScheduleCrewOverboardReview(World);
+    if (bGuideReentry) ScheduleGuideReentryReview(World);
     if (bPaddle || bHighSide)
     {
         // Same paddle-in as CaptureRaft so a burst can happen mid-rapid.
