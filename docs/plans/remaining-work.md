@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Regression correction: [full-route coverage input validation](../maintenance/detail-coverage-input-20260924.md)
+now rejects empty/malformed routes instead of allowing a zero-query pass, checks
+footprint construction and total query count, and resolves the C4701 warning.
+Editor build and4 native suites pass; actual route coverage checks52,689
+footprints with0 missing. Metadata coverage is not physical traversal or scene
+acceptance; no new playable geometry/water delivery is claimed by this change.
+
 Latest normal-play performance increment: [exact water source bounds](../reconstruction-review-2026-09-07/water-source-bounds.md).
 Measured bounds/notification cost led to an exact parallel reduction, with no
 geometry, padding or cadence changes. All64 actual-input pairs match; native
@@ -13,6 +20,14 @@ in the short first-pool run. Motion is decoded/inspected. This does NOT prove
 sustained rapid/full-route performance, new visual detail or river acceptance.
 Initial engine HTTP/DDC startup crash is preserved, followed by a passing fresh
 native run. Other maps retain their prior default. Full ordered scope stays open.
+
+Rapid follow-through of that same default: explicit8.33km review start records
+900 frames, mean24.175561ms/p9532.4097ms (short gate PASS, maximum64.2516ms).
+Separate motion is fully decoded and3s/6s/11s images inspected; boat/water move,
+but close angular rocks, smooth/broad-white water and crew limitations remain.
+This is supporting qualification, not a new visual delivery, normal-start
+traversal, reconstructed start-clearance proof or sustained river acceptance.
+See the bounds receipt above. Prior rapid failure remains historical evidence.
 
 New hydraulic qualification reaches complete local38000/16900s in the original
 cook36692. Both state/dry-bank audits pass; all86,720 bank cells remain dry.

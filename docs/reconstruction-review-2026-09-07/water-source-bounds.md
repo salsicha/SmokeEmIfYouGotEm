@@ -86,3 +86,42 @@ pose limitations remain. Encoded video rate is not the performance measurement.
 Captured sources, installed4950s fields, physical geometry/collision and native
 nonlinear OFF remain unchanged. Original cook36692 continues alone. South Fork
 is unfinished; Colorado, Pacuare and Futaleufu must not be advanced prematurely.
+
+## Rapid follow-through — retained 8.33 km workload
+
+The enabled default was also exercised at the explicit8330m review start in
+FullReach/full_descent, with installed4950s fields and4 solver lanes. This is
+not a normal-start traversal and does not qualify the unpromoted source-union
+geometry, whose start-clearance conflict remains open. No optimization flag was
+supplied; the runtime confirms `WaterBoundsMode parallel=1 serial_override=0`.
+
+Separate900-frame cost capture, samples60–840 inclusive, confirmed scope offset1:
+mean frame24.175561ms, p9532.4097ms, maximum64.2516ms. The short p95 gate passes
+33.333333ms; individual frames still exceed budget. Bounds/notify mean0.373069ms,
+p950.6897ms; inclusive SetMesh mean5.647905ms. Historical rapid p9535.4787ms in
+[the stage-storage review](solver-stage-rapid-review.md) remains a retained
+failure, not an isolated A/B speedup measurement for this change.
+
+Cost audit: `tmp/water-bounds-rapid-frame-v1-20260924.json`; source CSV SHA256
+`bc4f79ef481bf6e180e5e213b28ab0bacc27ee2ce2ab9051617b7ea17417278b`.
+Process receipts under `unreal/Saved/RaftSimValidation/`:
+`south-fork-water-bounds-rapid-{cost,motion}-v1-20260924-process.json`.
+Both engine exits0, no timeout, guarded cook suspend/resume statuses0. Cook CPU
+delta before resumption is0.125s for cost and0s for motion; not asserted zero
+for both. Original cook36692 remains the only live cook after these captures.
+
+Separate motion: `unreal/Saved/VideoCaptures/RaftSim_20260923-192752.mp4`, SHA256
+`228a0a27c9a22bf54da98e6b0636c52438f77ef0d1a9204bb0a4000f729ed49f`.
+Full decode468 frames through15.566667s,23 adjacent exact duplicates; report
+`tmp/water-bounds-rapid-motion-v1-20260924/report.json`. Original3s/6s/11s frames
+inspected: river8.33→8.35km, changing raft orientation and water, zero displayed
+incidents/swimmers. No whole-water disappearance in those views. Large angular
+rocks remain extremely close to the raft; broad white/smooth water, repeated
+canopy and rigid crew poses remain visible. Images do not establish safe hull
+clearance, collision consistency, shoreline stability or convincing breaking
+water. Encoded frame rate is not the measured game rate.
+
+This extends qualification of an already delivered default optimization, not
+new rendered reconstruction. Sustained/full-route and packaged performance,
+matched reconstructed geometry/flow/contact, and South Fork acceptance remain
+open. No new cook, terrain promotion, source download or solver-mode change.

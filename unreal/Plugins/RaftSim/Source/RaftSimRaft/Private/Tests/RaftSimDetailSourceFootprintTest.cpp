@@ -15,6 +15,60 @@
 #include "Serialization/JsonSerializer.h"
 
 #if WITH_AUTOMATION_TESTS
+namespace
+{
+bool ReadCoverageRoute(const TSharedPtr<FJsonObject>& Route,TArray<TArray<double>>& Points,FString& Error)
+{
+    Points.Reset();
+    const TArray<TSharedPtr<FJsonValue>>* Values=nullptr;
+    if(!Route.IsValid() || !Route->TryGetArrayField(TEXT("points"),Values) || Values->Num()<2)
+    { Error=TEXT("Coverage route requires at least two points");return false; }
+    double PreviousStation=-TNumericLimits<double>::Max();
+    for(const auto& Value:*Values)
+    {
+        const TArray<TSharedPtr<FJsonValue>>* Row=nullptr;
+        if(!Value.IsValid() || !Value->TryGetArray(Row) || Row->Num()<5)
+        { Error=TEXT("Coverage route point requires station, XY and normal XY");return false; }
+        TArray<double> Point;
+        for(int32 Column=0;Column<5;++Column)
+        {
+            double Number=0.;
+            if(!(*Row)[Column].IsValid() || (*Row)[Column]->Type!=EJson::Number ||
+                !(*Row)[Column]->TryGetNumber(Number) || !FMath::IsFinite(Number))
+            { Error=TEXT("Coverage route contains a non-finite or non-numeric coordinate");return false; }
+            Point.Add(Number);
+        }
+        if(Point[0]<=PreviousStation || FMath::Abs(Point[3]*Point[3]+Point[4]*Point[4]-1.)>1.e-4)
+        { Error=TEXT("Coverage route requires increasing stations and unit side normals");return false; }
+        PreviousStation=Point[0];Points.Add(MoveTemp(Point));
+    }
+    return true;
+}
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimDetailCoverageRouteInputTest,
+    "RaftSim.M3.DetailCoverageRouteInput",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FRaftSimDetailCoverageRouteInputTest::RunTest(const FString&)
+{
+    for(const TCHAR* Text:{TEXT("{}"),TEXT("{\"points\":[]}"),
+        TEXT("{\"points\":[[0,0,0,1,0]]}"),
+        TEXT("{\"points\":[[0,0,0,1,0],[1,0]]}"),
+        TEXT("{\"points\":[[0,0,0,1,0],[1,\"bad\",0,1,0]]}"),
+        TEXT("{\"points\":[[0,0,0,1,0],[0,1,0,1,0]]}"),
+        TEXT("{\"points\":[[0,0,0,1,0],[1,1,0,0,0]]}")})
+    {
+        TSharedPtr<FJsonObject> Root;TArray<TArray<double>> Points;FString Error;
+        FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Text),Root);
+        TestFalse(TEXT("malformed or vacuous route rejected"),ReadCoverageRoute(Root,Points,Error));
+        TestFalse(TEXT("rejection explains missing evidence"),Error.IsEmpty());
+    }
+    TSharedPtr<FJsonObject> Root;TArray<TArray<double>> Points;FString Error;
+    FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(TEXT("{\"points\":[[0,2,3,1,0],[1,4,5,0,1]]}")),Root);
+    TestTrue(TEXT("valid route accepted"),ReadCoverageRoute(Root,Points,Error));
+    TestEqual(TEXT("all route rows retained"),Points.Num(),2);
+    return !HasAnyErrors();
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimDetailSourceFootprintTest,
     "RaftSim.M3.DetailSourceFootprint",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FRaftSimDetailSourceFootprintTest::RunTest(const FString&)
@@ -91,24 +145,27 @@ bool FRaftSimDetailFullRouteCoverageTest::RunTest(const FString&)
     const auto Root=Read(Streaming);
     const auto Route=Read(TEXT("physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach/playable_route/coordinate_map.json"));
     FRaftSimCartesianWaterRegions Regions;FString Error;
-    if(!Route.IsValid() || !Regions.Load(Root,Error))return false;
+    TArray<TArray<double>> Points;
+    if(!ReadCoverageRoute(Route,Points,Error) || !Regions.Load(Root,Error))
+    { AddError(Error);return false; }
     int32 Queries=0,Missing=0;
     for(double Side:{-12.,0.,12.})
     {
-        FVector2f Current;bool bFirst=true;FString Active;
-        for(const auto& Value:Route->GetArrayField(TEXT("points")))
+        FVector2f Current(0,0);bool bFirst=true;FString Active;
+        for(const auto& P:Points)
         {
-            const auto& P=Value->AsArray();
-            const FVector2D Position(P[1]->AsNumber()+Side*P[3]->AsNumber(),P[2]->AsNumber()+Side*P[4]->AsNumber());
+            const FVector2D Position(P[1]+Side*P[3],P[2]+Side*P[4]);
             FVector2f Next(float(FMath::RoundToDouble(Position.X*2.)*.5-32.),float(-FMath::RoundToDouble(-Position.Y*2.)*.5-32.));
             if(bFirst){Current=Next;bFirst=false;}
             if(FMath::Max(FMath::Abs(Position.X-(Current.X+32.)),FMath::Abs(Position.Y-(Current.Y+32.)))<8.)Next=Current;
-            FBox2D Required;FRaftSimDetailSourceFootprint::Required(Current,Next,67,Required);
+            FBox2D Required;
+            if(!FRaftSimDetailSourceFootprint::Required(Current,Next,67,Required))
+            { AddError(TEXT("Route sample cannot form a valid detail footprint"));return false; }
             FVector2D Center;
             const auto* Region=Regions.Select(Position,Active,&Center,&Required);
             if(!Region)
             {
-                if(Missing<8)AddInfo(FString::Printf(TEXT("Missing full detail crop at route station %.6f side %.1f field=(%.6f,%.6f)"),P[0]->AsNumber(),Side,Position.X,Position.Y));
+                if(Missing<8)AddInfo(FString::Printf(TEXT("Missing full detail crop at route station %.6f side %.1f field=(%.6f,%.6f)"),P[0],Side,Position.X,Position.Y));
                 ++Missing;
             }
             else
@@ -120,6 +177,7 @@ bool FRaftSimDetailFullRouteCoverageTest::RunTest(const FString&)
             Current=Next;++Queries;
         }
     }
+    TestEqual(TEXT("every route point checked at all three side offsets"),Queries,Points.Num()*3);
     TestEqual(TEXT("all actual route/side detail and closing footprints have complete source crops"),Missing,0);
     AddInfo(FString::Printf(TEXT("Full-route source selection: %d detail/closing footprints, %d missing. No physics steps or visual/traversal acceptance."),Queries,Missing));
     return !HasAnyErrors();
