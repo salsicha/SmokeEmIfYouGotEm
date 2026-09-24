@@ -11,6 +11,13 @@ no previous foreground obstruction and the repaired ridge gaps closed. Editor/Ga
 builds and2 native suites pass; M7.CameraWeather retains2 exposure-setting assertion
 failures. No all-suite, full-route or performance acceptance. Next measure the
 corrected view and check normal-start/reentry behavior; investigate exposure failure.
+Follow-through: ordinary-start motion is decoded and3s/9s/11s inspected; seated
+view remains aligned. Corrected distant view p9533.7009ms FAILS the unchanged
+33.333333ms gate. Exposure failures traced to pre-Aug27 expectations; updated
+independent documented values plus detail/kernel checks pass all3 native suites
+(one suite has an engine warning), without changing production exposure. Next
+target measured shoreline topology/source-packing cost; reentry and full-route
+acceptance remain open. Prior failures are retained as historical evidence.
 
 Normal-scene terrain delivery: [checkpoint terrain correction](../reconstruction-review-2026-09-07/checkpoint-terrain-fragments.md)
 identifies the active hash-set MainPartition's256m loading range, not the unused

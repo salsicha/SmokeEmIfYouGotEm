@@ -190,17 +190,25 @@ bool FRaftSimM7AssertCameraWeather::Update()
                     FMath::IsNearlyEqual(Settings.AutoExposureBias, 1.25f, 0.001f));
             Test->TestTrue(
                 FString::Printf(TEXT("%s compresses highlights and recovers faces"), Label),
+                // Independent values from the Aug27 anti-flicker contract in
+                // docs/water-visual-feature-plan.md, not pre-fix exposure.
                 Settings.bOverride_LocalExposureMethod &&
                     Settings.LocalExposureMethod == ELocalExposureMethod::Bilateral &&
                     Settings.bOverride_LocalExposureHighlightContrastScale &&
                     FMath::IsNearlyEqual(
-                        Settings.LocalExposureHighlightContrastScale, 0.78f, 0.001f) &&
+                        Settings.LocalExposureHighlightContrastScale, 0.86f, 0.001f) &&
                     Settings.bOverride_LocalExposureShadowContrastScale &&
                     FMath::IsNearlyEqual(
-                        Settings.LocalExposureShadowContrastScale, 0.72f, 0.001f) &&
+                        Settings.LocalExposureShadowContrastScale, 0.76f, 0.001f) &&
                     Settings.bOverride_LocalExposureBlurredLuminanceBlend &&
                     FMath::IsNearlyEqual(
-                        Settings.LocalExposureBlurredLuminanceBlend, 0.50f, 0.001f));
+                        Settings.LocalExposureBlurredLuminanceBlend, 0.70f, 0.001f));
+            Test->TestTrue(
+                FString::Printf(TEXT("%s retains anti-flicker detail and luminance support"), Label),
+                Settings.bOverride_LocalExposureDetailStrength &&
+                    FMath::IsNearlyEqual(Settings.LocalExposureDetailStrength, 0.75f, 0.001f) &&
+                Settings.bOverride_LocalExposureBlurredLuminanceKernelSizePercent &&
+                    FMath::IsNearlyEqual(Settings.LocalExposureBlurredLuminanceKernelSizePercent, 65.0f, 0.001f));
         };
         HasProductionExposure(TEXT("guide camera"), Guide->GetGuideCamera());
         HasProductionExposure(TEXT("chase camera"), Guide->GetChaseCamera());
