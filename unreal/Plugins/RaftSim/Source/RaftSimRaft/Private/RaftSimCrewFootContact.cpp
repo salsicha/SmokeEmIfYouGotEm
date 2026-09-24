@@ -6,6 +6,7 @@
 #include "ProfilingDebugging/CsvProfiler.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "HAL/PlatformTime.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrewContact,true);
 
@@ -115,24 +116,50 @@ bool ARaftSimCrewAvatarActor::TryGetRenderedPose(ERaftSimCrewAvatarAction Action
     return true;
 }
 
-void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose)
+bool ARaftSimCrewAvatarActor::PrepareRenderedFootPlacements()
+{
+    if (!FParse::Param(FCommandLine::Get(),TEXT("RaftSimReviewHighSideContact")) ||
+        !bVisualBuilt || !HasProductionRiverBoots() || !GetAttachParentActor()) return false;
+    CSV_SCOPED_TIMING_STAT(RaftSimCrewContact,PrepareStances);
+    const double Started=FPlatformTime::Seconds();
+    bool bAllSolved=true;
+    for (const auto Action : {ERaftSimCrewAvatarAction::SeatedIdle,
+        ERaftSimCrewAvatarAction::HighSidePort,ERaftSimCrewAvatarAction::HighSideStarboard})
+    {
+        auto Pose=URaftSimCrewAvatarPoseLibrary::EvaluatePose(Action,0,SeatSide);
+        FitFeetToRenderedRaft(Pose,Action);
+        bAllSolved &= Pose.bFeetPlanted;
+    }
+    UE_LOG(LogTemp,Display,TEXT("CREW_FOOT_PREPARE actor=%s solved=%d ms=%.4f"),
+        *GetName(),bAllSolved,1000.*(FPlatformTime::Seconds()-Started));
+    return bAllSolved;
+}
+
+void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose, ERaftSimCrewAvatarAction Action)
 {
     // Airborne/rescue/reentry trajectories retain their authored motion.
-    if (CurrentAction > ERaftSimCrewAvatarAction::HighSideStarboard || !HasProductionRiverBoots()) return;
+    if (Action > ERaftSimCrewAvatarAction::HighSideStarboard || !HasProductionRiverBoots()) return;
     // Static tube contact passes; command cost and whole-body transitions remain
     // unqualified. Preserve the ordinary seated fit until those gates pass.
     static const bool bReviewHighSideContact = FParse::Param(FCommandLine::Get(),TEXT("RaftSimReviewHighSideContact"));
-    if (CurrentAction > ERaftSimCrewAvatarAction::Brace && !bReviewHighSideContact) return;
+    if (Action > ERaftSimCrewAvatarAction::Brace && !bReviewHighSideContact) return;
     CSV_SCOPED_TIMING_STAT(RaftSimCrewContact,FitFeet);
     CSV_CUSTOM_STAT(RaftSimCrewContact,AttemptedPoses,1,ECsvCustomStatOp::Accumulate);
+    // Emit a real zero when no full search occurs; an absent CSV column is
+    // unavailable evidence, not a measured zero.
+    CSV_CUSTOM_STAT(RaftSimCrewContact,FullTubeSearches,0,ECsvCustomStatOp::Accumulate);
     ARaftSimRaftActor* Raft = Cast<ARaftSimRaftActor>(GetAttachParentActor());
-    if (!Raft) { bFootPlacementBound = false; FootPlacementRaft.Reset(); return; }
-    if (FootPlacementRaft.Get() != Raft) { bFootPlacementBound = false; FootPlacementRaft = Raft; }
-    const bool bHighSide=CurrentAction==ERaftSimCrewAvatarAction::HighSidePort ||
-        CurrentAction==ERaftSimCrewAvatarAction::HighSideStarboard;
-    const int32 PlacementMode=bHighSide ? int32(CurrentAction) : 0;
-    if(BoundFootPlacementMode!=PlacementMode)bFootPlacementBound=false;
-    const int32 HighSideSign=CurrentAction==ERaftSimCrewAvatarAction::HighSidePort ? -1 : 1;
+    if (!Raft || FootPlacementRaft.Get() != Raft)
+    {
+        for (auto& Entry : GroundedFootPlacements) Entry = FGroundedFootPlacement{};
+        FootPlacementRaft = Raft;
+        if (!Raft) return;
+    }
+    const bool bHighSide=Action==ERaftSimCrewAvatarAction::HighSidePort ||
+        Action==ERaftSimCrewAvatarAction::HighSideStarboard;
+    const int32 PlacementMode=!bHighSide ? 0 : (Action==ERaftSimCrewAvatarAction::HighSidePort ? 1 : 2);
+    FGroundedFootPlacement& Placement=GroundedFootPlacements[PlacementMode];
+    const int32 HighSideSign=Action==ERaftSimCrewAvatarAction::HighSidePort ? -1 : 1;
     const bool bStepOntoTube=bHighSide && HighSideSign==SeatSide;
     const FTransform ToRaft = GetActorTransform().GetRelativeTransform(Raft->GetActorTransform());
     const auto Idle = URaftSimCrewAvatarPoseLibrary::EvaluatePose(ERaftSimCrewAvatarAction::SeatedIdle, 0, SeatSide);
@@ -183,22 +210,22 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
     bool bRepairTubeStance = false;
     double SupportZ[2] = {0,0};
     const uint64 GeometryRevision = Raft->GetCrewSupportGeometryRevision();
-    if (bFootPlacementBound)
+    if (Placement.bBound)
     {
         // Supported seated actions retain the paired stance throughout motion.
-        Feet[0] = BoundFootLocalCm[0];
-        Feet[1] = BoundFootLocalCm[1];
-        if (GeometryRevision != 0 && CachedFootSupportRevision == GeometryRevision &&
-            ToRaft.Equals(CachedFootSupportToRaft,1.e-6))
+        Feet[0] = Placement.Feet[0];
+        Feet[1] = Placement.Feet[1];
+        if (GeometryRevision != 0 && Placement.SupportRevision == GeometryRevision &&
+            ToRaft.Equals(Placement.SupportToRaft,1.e-6))
         {
             CSV_CUSTOM_STAT(RaftSimCrewContact,CacheHits,1,ECsvCustomStatOp::Accumulate);
-            SupportZ[0] = CachedFootSupportZ[0]; SupportZ[1] = CachedFootSupportZ[1];
+            SupportZ[0] = Placement.SupportZ[0]; SupportZ[1] = Placement.SupportZ[1];
             bFound = true;
         }
         else
         {
-            CSV_CUSTOM_STAT(RaftSimCrewContact,GeometryMisses,int32(CachedFootSupportRevision != GeometryRevision),ECsvCustomStatOp::Accumulate);
-            CSV_CUSTOM_STAT(RaftSimCrewContact,SeatMisses,int32(!ToRaft.Equals(CachedFootSupportToRaft,1.e-6)),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimCrewContact,GeometryMisses,int32(Placement.SupportRevision != GeometryRevision),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimCrewContact,SeatMisses,int32(!ToRaft.Equals(Placement.SupportToRaft,1.e-6)),ECsvCustomStatOp::Accumulate);
             bFound = Sample(0,Feet[0],SupportZ[0],false) && Sample(1,Feet[1],SupportZ[1],false);
         }
         if(!bFound && bHighSide)
@@ -206,7 +233,7 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
             // The live hull can change after an initially valid placement.
             // A failed old footprint must seek a new supported stance instead
             // of falling back to authored penetrating feet on every frame.
-            bFootPlacementBound=false;
+            Placement.bBound=false;
             bRepairTubeStance=bStepOntoTube;
             Feet[0]=Idle.LeftFootCm;Feet[1]=Idle.RightFootCm;
             Feet[0].Y+=2.;Feet[1].Y-=2.;
@@ -214,7 +241,7 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
             CSV_CUSTOM_STAT(RaftSimCrewContact,InvalidatedStanceSearches,1,ECsvCustomStatOp::Accumulate);
         }
     }
-    if (!bFootPlacementBound && bStepOntoTube)
+    if (!Placement.bBound && bStepOntoTube)
     {
         // Curved bow/stern tubes do not admit a rigid side-by-side rectangle.
         // Search each foot, then pair only reachable, non-overlapping stances.
@@ -243,6 +270,7 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
         {
             Candidates[0].Reset();Candidates[1].Reset();
             const bool bLocalRepair=Pass==0;
+            if(!bLocalRepair)CSV_CUSTOM_STAT(RaftSimCrewContact,FullTubeSearches,1,ECsvCustomStatOp::Accumulate);
             for(int32 Step=0;Step<=(bLocalRepair ? 2 : 64) && !bFound;++Step)
             {
                 const double Along=((Step+1)/2)*2*(Step%2 ? 1 : -1);
@@ -251,7 +279,7 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
                     const double Lateral=((Shift+1)/2)*(Shift%2 ? -1 : 1);
                     for(int32 Foot=0;Foot<2;++Foot)
                     {
-                        FVector Candidate=(bLocalRepair ? BoundFootLocalCm[Foot] : Authored[Foot])+
+                        FVector Candidate=(bLocalRepair ? Placement.Feet[Foot] : Authored[Foot])+
                             FVector(Along,Inboard*Lateral,0);
                         // Whatever the sampled support height, the full leg reach
                         // cannot be shorter than its horizontal projection. This
@@ -292,7 +320,7 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
                 CSV_CUSTOM_STAT(RaftSimCrewContact,LocalStanceRepairs,1,ECsvCustomStatOp::Accumulate);
         }
     }
-    else if (!bFootPlacementBound)
+    else if (!Placement.bBound)
     {
         const FVector Authored[2] = {Feet[0],Feet[1]};
         for (int32 Step = 0; Step <= (bGuide ? 32 : 16) && !bFound; ++Step)
@@ -338,9 +366,9 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
     // Reuse only the same uploaded shape and the same relative seat. Every
     // production/review geometry upload invalidates this; moving the raft in
     // world space alone does not change its local support surface.
-    CachedFootSupportRevision = GeometryRevision;
-    CachedFootSupportToRaft = ToRaft;
-    CachedFootSupportZ[0] = SupportZ[0]; CachedFootSupportZ[1] = SupportZ[1];
+    Placement.SupportRevision = GeometryRevision;
+    Placement.SupportToRaft = ToRaft;
+    Placement.SupportZ[0] = SupportZ[0]; Placement.SupportZ[1] = SupportZ[1];
     for (int32 Foot = 0; Foot < 2; ++Foot)
     {
         const FBox Source = Boots[Foot]->GetStaticMesh()->GetBoundingBox();
@@ -366,10 +394,9 @@ void ARaftSimCrewAvatarActor::FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose
     FVector LeftKnee = Pose.LeftKneeCm, RightKnee = Pose.RightKneeCm;
     if (!FitLeg(Pose.LeftHipCm,Idle.LeftHipCm,Idle.LeftKneeCm,Idle.LeftFootCm,Feet[0],LeftKnee) ||
         !FitLeg(Pose.RightHipCm,Idle.RightHipCm,Idle.RightKneeCm,Idle.RightFootCm,Feet[1],RightKnee)) return;
-    if (!bFootPlacementBound)
+    if (!Placement.bBound)
     {
-        BoundFootLocalCm[0] = Feet[0]; BoundFootLocalCm[1] = Feet[1]; bFootPlacementBound = true;
-        BoundFootPlacementMode=PlacementMode;
+        Placement.Feet[0] = Feet[0]; Placement.Feet[1] = Feet[1]; Placement.bBound = true;
         UE_LOG(LogTemp,Display,TEXT("CREW_FOOT_BIND actor=%s left=%s right=%s"),
             *GetName(),*Feet[0].ToString(),*Feet[1].ToString());
     }

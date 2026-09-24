@@ -1,6 +1,9 @@
 # High-side foot-contact trial — September 23
 
 Status: **rejected for normal play**, not crew or South Fork acceptance.
+Latest follow-through: [prepared grounded stances](crew-prepared-stances.md)
+removes measured full searches from the short command capture, while retaining
+setup cost and the unresolved whole-body/transition/performance gates.
 Update: the subsequent staggered v3 resolves the scoped sole-support failures
 below, but remains opt-in pending normal command motion, transition and cost.
 The ordinary rest/stroke/brace fit remains enabled. The unqualified high-side

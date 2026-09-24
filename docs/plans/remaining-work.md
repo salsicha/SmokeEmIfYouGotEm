@@ -1,7 +1,22 @@
 # Remaining requested work
 
-Last reviewed 2026-09-23 UTC. This index does not convert diagnostic passes into
+Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
+
+Latest crew increment: [prepared grounded stances](../reconstruction-review-2026-09-07/crew-prepared-stances.md).
+Three independent stance bindings are prepared without publishing poses, then
+revalidated per geometry/seat on use. Review/default native suites pass5 each.
+Final900-frame normal-start capture explicitly records0 full tube searches,
+9,000 solved/attempted poses and maximum foot-fit3.52ms; setup preparation costs
+105.92ms across five crew and is recorded separately. All9,600 static tread
+samples have support/no penetration. Engine motion is fully decoded/inspected.
+Overall p9543.4028ms still FAILS33.333333ms. High-side remains opt-in pending
+whole-body transitions, foot trajectories and limb/hull clearance; this is not
+a new normal-play visual delivery or river acceptance. Earlier cold-search
+observations below remain historical evidence, not the next unchanged trial.
+Editor and Game builds are terminal success. A separate unflagged ordinary
+900-frame run retains all solved poses/no preparation; overall p9543.6425ms
+still fails. No cook duplication or installed-field/nonlinear-mode change.
 
 September24 bounded crew follow-through: exact5cm triangle bins and conservative
 horizontal-reach pruning reduce observed cold foot-fit cost137→41ms. A2cm local

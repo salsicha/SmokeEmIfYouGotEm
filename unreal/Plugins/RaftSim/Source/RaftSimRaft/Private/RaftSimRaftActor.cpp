@@ -1014,6 +1014,9 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
             Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
         }
     }
+    // Complete seat reconciliation before preparing alternate grounded stances.
+    // Preparation never publishes an alternate action or moves rendered parts.
+    Avatar->PrepareRenderedFootPlacements();
 }
 
 void ARaftSimRaftActor::InitializeCrewSeatingForValidation()

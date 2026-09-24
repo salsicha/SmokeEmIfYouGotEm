@@ -340,17 +340,25 @@ public:
     /** Keep one posed production-body caster instead of duplicate character layers. */
     void SetProductionBodyOnlyShadowMode(bool bEnabled);
 
+    /** Solve grounded review stances after seating, without publishing poses. */
+    bool PrepareRenderedFootPlacements();
+
 private:
-    void FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose);
+    void FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose, ERaftSimCrewAvatarAction Action);
     FRaftSimCrewAvatarPose LastRenderedPose;
     bool bHasRenderedPose = false;
-    bool bFootPlacementBound = false;
-    int32 BoundFootPlacementMode = INDEX_NONE;
-    FVector BoundFootLocalCm[2] = {FVector::ZeroVector, FVector::ZeroVector};
+    struct FGroundedFootPlacement
+    {
+        bool bBound = false;
+        FVector Feet[2] = {FVector::ZeroVector, FVector::ZeroVector};
+        uint64 SupportRevision = 0;
+        double SupportZ[2] = {0,0};
+        FTransform SupportToRaft;
+    };
+    // Idle/stroke/brace, high-side port, high-side starboard. Each entry must
+    // independently revalidate against the current uploaded shape and seat.
+    FGroundedFootPlacement GroundedFootPlacements[3];
     TWeakObjectPtr<AActor> FootPlacementRaft;
-    uint64 CachedFootSupportRevision = 0;
-    double CachedFootSupportZ[2] = {0,0};
-    FTransform CachedFootSupportToRaft;
     void BuildVisual();
     void RebuildSafetyGearMeshes();
     void RebuildPaddleMeshes();

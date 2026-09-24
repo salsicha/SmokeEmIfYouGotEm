@@ -106,6 +106,18 @@ bool FRaftSimCrewFootContactTest::RunTest(const FString&)
             if (Component->GetName() == TEXT("ProductionLeftBoot") || Component->GetName() == TEXT("ProductionRightBoot"))
                 Boots.Add(Component);
         if (!TestEqual(TEXT("both actual boots"), Boots.Num(), 2)) continue;
+        const bool bReview=FParse::Param(FCommandLine::Get(),TEXT("RaftSimReviewHighSideContact"));
+        const auto ActionBeforePreparation=Host->GetAvatarAction();
+        TArray<FTransform> BeforePreparation;
+        for(auto* Boot:Boots)BeforePreparation.Add(Boot->GetRelativeTransform());
+        const FTransform BodyBeforePreparation=Body->GetBoneTransformByName(TEXT("pelvis"),EBoneSpaces::WorldSpace);
+        TestEqual(TEXT("all grounded stances prepared only in review mode"),Host->PrepareRenderedFootPlacements(),bReview);
+        TestEqual(TEXT("preparation never changes action"),Host->GetAvatarAction(),ActionBeforePreparation);
+        TestTrue(TEXT("preparation never dispatches an alternate body pose"),
+            BodyBeforePreparation.Equals(Body->GetBoneTransformByName(TEXT("pelvis"),EBoneSpaces::WorldSpace),1.e-6));
+        for(int32 Foot=0;Foot<Boots.Num();++Foot)
+            TestTrue(TEXT("preparation never moves rendered boots"),Boots[Foot]->GetRelativeTransform().Equals(BeforePreparation[Foot],1.e-6));
+        TArray<FTransform> RecordedStances[3];
         for (int32 Action = 0; Action <= static_cast<int32>(ERaftSimCrewAvatarAction::HighSideStarboard); ++Action)
         {
             // Non-unit intensity also checks that the body no longer evaluates
@@ -120,6 +132,8 @@ bool FRaftSimCrewFootContactTest::RunTest(const FString&)
                 Host->HasPlantedRenderedFeet(),bContactExpected);
             TArray<FTransform> Planted;
             for (auto* Boot : Boots) Planted.Add(Boot->GetRelativeTransform());
+            if(Action==0 || Action>=int32(ERaftSimCrewAvatarAction::HighSidePort))
+                RecordedStances[Action==0 ? 0 : (Action==int32(ERaftSimCrewAvatarAction::HighSidePort) ? 1 : 2)]=Planted;
             for (int32 Step = 0; Step < 8; ++Step)
             {
                 Host->Tick(0.1f);
@@ -143,6 +157,19 @@ bool FRaftSimCrewFootContactTest::RunTest(const FString&)
                         Boot->GetRelativeTransform().Equals(Planted[Foot],0.01));
                 }
                 ++Samples;
+            }
+        }
+        if(bReview)
+        {
+            for(const int32 Mode:{2,1,0,1,2,0})
+            {
+                const auto Action=Mode==0 ? ERaftSimCrewAvatarAction::SeatedIdle :
+                    (Mode==1 ? ERaftSimCrewAvatarAction::HighSidePort : ERaftSimCrewAvatarAction::HighSideStarboard);
+                Host->SetAvatarAction(Action);
+                TestTrue(TEXT("repeated direction switches retain solved support"),Host->HasPlantedRenderedFeet());
+                for(int32 Foot=0;Foot<Boots.Num();++Foot)
+                    TestTrue(TEXT("each direction retains its own supported stance"),
+                        Boots[Foot]->GetRelativeTransform().Equals(RecordedStances[Mode][Foot],0.01));
             }
         }
         Host->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);

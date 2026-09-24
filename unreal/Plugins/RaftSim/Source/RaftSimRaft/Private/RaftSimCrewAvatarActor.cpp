@@ -2233,7 +2233,8 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
     bool bInGuide)
 {
     VariantIndex = FMath::Abs(InVariantIndex) % 4;
-    bFootPlacementBound = false;
+    for (auto& Placement : GroundedFootPlacements) Placement = FGroundedFootPlacement{};
+    FootPlacementRaft.Reset();
     bHasRenderedPose = false;
     SeatSide = InSeatSide < 0 ? -1 : 1;
     bGuide = bInGuide;
@@ -3521,7 +3522,7 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
         return;
     }
     FRaftSimCrewAvatarPose Pose = AuthoredPose;
-    FitFeetToRenderedRaft(Pose);
+    FitFeetToRenderedRaft(Pose, CurrentAction);
     LastRenderedPose = Pose;
     bHasRenderedPose = true;
     const FVector HipCenter = (Pose.LeftHipCm + Pose.RightHipCm) * 0.5f;
