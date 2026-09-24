@@ -417,3 +417,39 @@ acceptance. Do not promote this state, tune an outlet to force balance or
 forecast a settling date. Installed4950 s fields and nonlinear-off default
 stay unchanged. Further cooking requires an evidence-based next experiment;
 normal-play performance and visual work can proceed with no cook workload.
+
+## Terminal tile-flux localization — September24
+
+New read-only `physics/scripts/audit_cartesian_tile_flux.py` reconstructs the
+completed17700s/18000s snapshots through the existing native coupled inspector.
+It hashes every manifest-declared package input, checks all snapshot hashes
+before/after, checks unchanged state/time, checks cook boundary probes and
+volume, and accounts for each internal shared face once. It takes zero steps;
+no restart package, replacement cook, boundary change or playable update.
+
+Report: `tmp/cartesian-tile-flux-18000-v1-20260924.json`, SHA256
+`4d026213e9ce40070b09a79d9874aae7b37c099482f6f1d39d53efca8097b503`.
+The report binds the executable and input/snapshot hashes. Native inspector:
+`tmp/solver-lto-v1-20260917/raftsim_cartesian_inspect.exe`.
+Reproduce with the audit script, the existing cook directory, steps54000/60000,
+`--solver` pointing to that executable and a fresh `--report` path.
+
+All841tiles inspected. All1138shared face pairs cancel exactly at BOTH endpoints;
+maximum and summed shared-face residual are0m3/s. Exterior instantaneous net
+inflow is-49.281742086m3/s at17700s and-45.875054480m3/s at18000s.
+Interval storage rate is-48.650024527m3/s; integrated exterior/storage closure
+residual is-2.05546e-10m3. Instantaneous endpoints are not interval averages.
+
+Drainage is diffuse, not dominated by one leaking tile:324tiles lose more than
+0.01m3/s, none gain more than0.01m3/s, and the top10losses total4.769682923m3/s
+(9.80% of net drainage). Largest loss is tile148/core_0148 at0.577434455m3/s,
+with instantaneous net inflow-0.591249798/-0.583464536m3/s. Next are tiles142,
+42,182,72; all per-tile grids, four face fluxes and rates are retained in report.
+These are80x80m tile control volumes, NOT geographic river cross-sections.
+
+Five focused tests pass: east/west cancellation, north/south cancellation,
+retained seam mismatch, duplicate/off-lattice rejection and nonfinite rejection.
+No geographic/hydraulic/performance acceptance follows. This narrows the next
+investigation to distributed stage/bed/outlet evidence rather than inventing
+a seam repair; it does not establish the outlet stage or inferred bed is correct.
+Installed4950sfields and nonlinear-off default remain untouched.
