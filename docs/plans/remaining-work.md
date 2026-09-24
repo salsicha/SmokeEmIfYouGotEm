@@ -3,6 +3,12 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Destination terrain diagnosis: [rendering controls](../reconstruction-review-2026-09-07/checkpoint-terrain-fragments.md)
+retain the floating ridge patches in both HLOD-off and confirmed Nanite-off
+checkpoint images. Neither toggle is a fix; defaults/assets stay unchanged.
+Next identify the visible mesh/component owners and inspect connectivity,
+transforms, bounds and residency. Wet-contact replay passes do not accept scenery.
+
 Runtime correction: [water scenario reset isolation](../reconstruction-review-2026-09-07/water-scenario-reset.md)
 clears old physical/presentation fields when an adapter is reconfigured, instead
 of retaining them across coordinate reset. Editor/Game builds and2 native suites
