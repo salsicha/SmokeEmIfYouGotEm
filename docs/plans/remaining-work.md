@@ -8,6 +8,12 @@ now reaches actual detached swimming in normal South Fork play. ReachGrab fails
 at3.0m (HUD rescue_out_of_range), so reentry remains untested. Recorded3s/11s
 views expose a swimming-camera intersection with raft/crew geometry. Investigate
 that visible failure and use valid rescue inputs; do not weaken the gates.
+Follow-through: normal camera now follows the posed head after swim/reboard
+transitions; Editor/Game builds and3 native suites pass (one retained engine
+warning). Throw-line drill actually completes reentry and restores the seated
+view, but swimming images remain obstructed. Fixed1.5m world-axis ejection
+positions can be inside the4.3m hull footprint; next verify and correct these
+against shared hull geometry. This is not swim-visual or collision acceptance.
 
 [Selective-normal experiment](../reconstruction-review-2026-09-07/selective-crest-normals.md)
 preserved151 actual-input attribute comparisons but did not improve measured

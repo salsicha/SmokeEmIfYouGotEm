@@ -221,6 +221,9 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
 void ARaftSimGuidePawn::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+    // Resolve detachment/reboarding before positioning the eye. Otherwise the
+    // old seat-local eye offset survives a swimmer move for the whole swim.
+    UpdateSwimmingAndRescueAim();
     // Seat the view on the guide avatar's actual posed head each frame. The
     // constructor offset was a fixed estimate that landed inside the chest
     // (2026-08-09 playtest: "all that can be seen is the inside of the life
@@ -228,8 +231,7 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
     if (ARaftSimRaftActor* RaftForView = ResolveRaft())
     {
         FVector HeadWorldCm;
-        if (MobilityMode == ERaftSimGuideMobilityMode::InRaft &&
-            RaftForView->GetGuideHeadWorldLocationCm(HeadWorldCm))
+        if (RaftForView->GetGuideHeadWorldLocationCm(HeadWorldCm))
         {
             GuideSeatAnchor->SetWorldLocation(
                 HeadWorldCm + GetActorForwardVector() * 9.0f +
@@ -239,7 +241,6 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
     UpdateSeatedHeading();
     UpdateComfortCamera(DeltaSeconds);
     UpdateChaseCamera();
-    UpdateSwimmingAndRescueAim();
     // The seated guide avatar owns the sole visible paddle; the former
     // camera-attached view model duplicated it and floated ahead of the guide.
     // With the view seated in the guide avatar's own eye socket, its head
@@ -256,11 +257,12 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
         const APlayerController* ViewingController = Cast<APlayerController>(GetController());
         const bool bViewedThroughOwnCamera =
             ViewingController == nullptr || ViewingController->GetViewTarget() == this;
-        const bool bFirstPersonSeat =
+        const bool bFirstPersonView =
             bViewedThroughOwnCamera &&
-            !CameraRuntimeState.bChaseCameraActive &&
+            !CameraRuntimeState.bChaseCameraActive;
+        const bool bFirstPersonSeat = bFirstPersonView &&
             MobilityMode == ERaftSimGuideMobilityMode::InRaft;
-        Raft->SetGuideFirstPersonView(bFirstPersonSeat);
+        Raft->SetGuideFirstPersonView(bFirstPersonView);
         // Over-the-shoulder glance: a seated human turns their head, not
         // their torso, so a strongly rearward view must not fill with the
         // inside of the guide's own arms and vest. Hide the avatar's body

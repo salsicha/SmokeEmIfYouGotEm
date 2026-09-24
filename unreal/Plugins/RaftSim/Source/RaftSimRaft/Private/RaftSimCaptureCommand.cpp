@@ -787,8 +787,11 @@ static void ScheduleGuideReentryReview(UWorld* World)
                 {
                     const FVector Origin=Raft->GetActorLocation()+Raft->GetActorForwardVector()*45.f+FVector(0,0,65);
                     Raft->AimRescue(Swimmer-Origin);
-                    const bool Began=Raft->BeginRescue(ERaftSimRescueMethod::ReachGrab);
-                    UE_LOG(LogTemp,Display,TEXT("GUIDE_REENTRY reach_requested result=%d"),int32(Began));
+                    const bool ThrowLine=FParse::Param(FCommandLine::Get(),TEXT("RaftSimGuideReentryThrowLine"));
+                    const bool Began=Raft->BeginRescue(ThrowLine ? ERaftSimRescueMethod::ThrowLine : ERaftSimRescueMethod::ReachGrab);
+                    UE_LOG(LogTemp,Display,TEXT("GUIDE_REENTRY rescue_requested throw_line=%d result=%d feedback=%s distance_m=%.6f"),
+                        int32(ThrowLine),int32(Began),*Raft->GetRescueInteractionState().FeedbackCode.ToString(),
+                        Raft->GetRescueInteractionState().DistanceMeters);
                 }
             }
             if(Seconds==6.f || Seconds==10.f)

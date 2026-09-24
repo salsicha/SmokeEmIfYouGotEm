@@ -1,5 +1,45 @@
 # Actual guide swim/reentry drill — unfinished
 
+## Posed swimming eye and successful state transition — visual failure retained
+
+The normal guide tick now resolves swimmer detachment/reboarding before eye
+placement, follows the actual posed guide head in swimming as well as seating,
+and keeps its own head hidden while its first-person camera is active. Chase
+and external views retain their visibility gates. Editor/Game builds succeed
+in51.07s/185.21s. This corrects stale seated-local camera placement but is NOT
+a complete swim-view fix.
+
+The drill has an explicit `-RaftSimGuideReentryThrowLine` option. Fresh normal
+scene/start run `south-fork-swimming-eye-reentry-v1-20260924` uses the existing
+throw-line range/aim/readiness gates: request succeeds at2.741082m, progresses
+LineInFlight→Pulling, rejects premature6s reentry, then accepts10s reentry.
+At11s the guide is no longer a swimmer, mobility is InRaft, attached to the
+raft, completed rescue count1. The timer's immediate10s sample precedes the
+next pawn tick; it correctly still shows detached mobility. Control yaw is
+stable−179.993865deg while swimming, then−179.954884 at11s versus raft−178.876988.
+The retained≈1.08deg look offset is not reset to the spawn heading. No manual
+swimmer deletion, readiness bypass or teleport was used. Engine exit0, no
+timeout, exact original-cook guard/resume succeeded.
+
+Video `unreal/Saved/VideoCaptures/RaftSim_20260923-220229.mp4`, SHA256
+`94338e4fc84fe3bf5932b14b6e19fb9505bce5155887110cc739553ade9839fb`, fully decodes
+465frames through15.466667s with15 adjacent duplicates. Original3s/6s/9s/11s
+frames inspected: swimming views remain obstructed by close-up vest/raft
+geometry;11s restores the seated view. State-transition success does NOT accept
+swimming visuals, animation, collision, all-frame continuity or performance.
+Artifacts: `tmp/swimming-eye-reentry-decoded-v1-20260924/`.
+
+Source inspection identifies the next concrete geometry issue: SpawnSwimmers
+uses a world-axis1.5m circle regardless of hull dimensions; default footprint
+length4.3m has half-length2.15m. Bow/stern ejection can lie within the footprint.
+Verify actual hull-relative clearances and correct ejection positions using the
+shared hull geometry. Do not mask the problem by hiding the raft/other crew or
+loosening rescue gates. No body-hiding workaround was added. Native occupancy,
+seated-heading and CameraWeather suites pass (2clean success,1success with the
+retained r.MotionVectorSimulation render-thread warning,0failures), report
+`tmp/swimming-eye-native-v1-20260924/index.json`. The full queued reconstruction
+remains unfinished.
+
 The previous overboard capture excluded the guide. A new explicit
 `-RaftSimGuideReentryReview` capture-only option exercises the guide swimmer
 through the existing SpawnSwimmers/occupancy path. It schedules guide ejection
