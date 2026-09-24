@@ -3,6 +3,7 @@
 #include "RaftSimRunCoordinateProvider.h"
 #include "RaftSimCartesianHydraulicRelief.h"
 #include "RaftSimBreakingTileAudit.h"
+#include "RaftSimBreakingCandidateGate.h"
 #include "RaftSimWetEdgeAudit.h"
 #include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimTerrainProbeSources.h"
@@ -5665,11 +5666,43 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     const bool bAuditBreakingHeight = !bLoggedBreakingHeightAudit && GetWorld() &&
         GetWorld()->GetTimeSeconds() >= 10.0f &&
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimBreakingHeightAudit"));
+    // Exact native/actual-input decisions and both timing orders qualify the
+    // normal South Fork path. Other rivers retain their existing path.
+    static const bool bForceEarlyBreakingGate=FParse::Param(FCommandLine::Get(),TEXT("RaftSimEarlyBreakingGate"));
+    static const bool bReferenceBreakingGate=FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceBreakingGate"));
+    const bool bEarlyBreakingGate=!bReferenceBreakingGate && (bForceEarlyBreakingGate ||
+        (bCartesianFlow && GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"))));
+#if !UE_BUILD_SHIPPING
+    static const bool bGateAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimBreakingGateAudit"));
+    static int32 GateAuditCalls=0;
+    if(bGateAudit && GateAuditCalls<64 && GetWorld() && GetWorld()->GetTimeSeconds()>=10.f)
+    {
+        int32 Compared=0,Skipped=0,Admitted=0,Different=0;
+        for(int32 Y=0;Y<GridLateralN;++Y)
+        for(int32 X=bCartesianFlow?0:PresentationAnalysisStride;X<GridStationN;++X)
+        {
+            const int32 I=Y*GridStationN+X;
+            const FVector2D D=FlowDirectionFor(WaterSamples[I]);
+            const int32 U=bCartesianFlow?RaftSimWaterFlowFrame::OffsetIndex(I,GridStationN,GridLateralN,D,-PresentationAnalysisStride):I-PresentationAnalysisStride;
+            const bool Original=U!=INDEX_NONE && LiveSolverWetVertexMask[I]!=0 && LiveSolverWetVertexMask[U]!=0 && !(FroudeField[I]>.94f);
+            const bool Reject=RaftSimBreakingCandidateGate::RejectCurrent(LiveSolverWetVertexMask[I],FroudeField[I]);
+            const bool Candidate=!Reject && U!=INDEX_NONE && LiveSolverWetVertexMask[U]!=0;
+            ++Compared;Skipped+=Reject;Admitted+=Original;Different+=Original!=Candidate;
+        }
+        UE_LOG(LogTemp,Display,TEXT("BreakingGatePair call=%d frame=%llu compared=%d skipped=%d admitted=%d different=%d"),
+            ++GateAuditCalls,GFrameCounter,Compared,Skipped,Admitted,Different);
+        if(Different){UE_LOG(LogTemp,Error,TEXT("Breaking gate changed an actual-input survivor"));return;}
+    }
+#endif
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
         for (int32 X = bCartesianFlow ? 0 : PresentationAnalysisStride; X < GridStationN; ++X)
         {
             const int32 Index = Y * GridStationN + X;
+            // Skip only cells rejected below already. Never move upstream
+            // reads ahead of their bounds guard or change survivor ordering.
+            if (bEarlyBreakingGate && RaftSimBreakingCandidateGate::RejectCurrent(
+                LiveSolverWetVertexMask[Index],FroudeField[Index])) continue;
             const FVector2D DownstreamDirection = FlowDirectionFor(WaterSamples[Index]);
             const int32 ImmediateUpstreamIndex = bCartesianFlow
                 ? RaftSimWaterFlowFrame::OffsetIndex(Index,GridStationN,GridLateralN,
