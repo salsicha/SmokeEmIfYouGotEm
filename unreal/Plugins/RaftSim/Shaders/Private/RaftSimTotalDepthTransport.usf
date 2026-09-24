@@ -1,4 +1,5 @@
 #include "/Engine/Public/Platform.ush"
+#include "RaftSimFinite.ush"
 #include "RaftSimPortableFloat.ush"
 #include "RaftSimExactHydrostatic.ush"
 // Intermediate buffers are UAVs only in their producer dispatch. Subsequent
@@ -365,7 +366,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
 #endif
 #if RAFTSIM_TRANSPORT_PHASE == 0
     float4 s=State[i];float bed=Bed[i];
-    bool bad=!RaftSimPortableValidState(s) || !isfinite(bed);
+    bool bad=!RaftSimPortableValidState(s) || !RaftSimIsFinite(bed);
     bool wet=(asuint(s.x)&0x7fffffffu)!=0;
     float2 u=wet?float2(RaftSimPortableDivide(s.y,s.x),RaftSimPortableDivide(s.z,s.x)):0;
     if(bad)InterlockedAdd(Diagnostics[0],1);
@@ -373,7 +374,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
     for(uint j=i;j<2*(GridSize.x+GridSize.y);j+=count)
     {
         float4 e=ExteriorState[j];
-        if(!RaftSimPortableValidState(e) || !isfinite(ExteriorBed[j]))InterlockedAdd(Diagnostics[0],1);
+        if(!RaftSimPortableValidState(e) || !RaftSimIsFinite(ExteriorBed[j]))InterlockedAdd(Diagnostics[0],1);
     }
 #endif
     Velocity[i]=bad?0:u;Geometry[i]=float2(s.x,bed);
@@ -396,7 +397,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
     }
     PhysicalBedSlope[i]=slope;
 #endif
-    if(any(!isfinite(slope)))InterlockedAdd(Diagnostics[0],1);
+    if(any(!RaftSimIsFinite(slope)))InterlockedAdd(Diagnostics[0],1);
 #elif RAFTSIM_TRANSPORT_PHASE == 1
     [unroll(2)]for(uint a=0;a<2;++a)
     {
@@ -411,7 +412,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
             s.y=SurfaceSlope(i,a).x;
         }
         if(a==0)RawX[i]=s;else RawY[i]=s;
-        if(any(!isfinite(s)))InterlockedAdd(Diagnostics[1],1);
+        if(any(!RaftSimIsFinite(s)))InterlockedAdd(Diagnostics[1],1);
     }
 #elif RAFTSIM_TRANSPORT_PHASE == 2
 #if RAFTSIM_TRANSPORT_UNSCALED
@@ -459,7 +460,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
         {
             float4 ledger;ExteriorFace(i,a,true,f,correction,foam[a],ledger);
             BoundaryFlux[BoundaryIndex(i,a,true)]=ledger;
-            if(any(!isfinite(ledger)))InterlockedAdd(Diagnostics[1],1);
+            if(any(!RaftSimIsFinite(ledger)))InterlockedAdd(Diagnostics[1],1);
         }
         else
 #endif
@@ -470,12 +471,12 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
             float4 lf,ledger;float2 lc;float foamLow;
             ExteriorFace(i,a,false,lf,lc,foamLow,ledger);
             BoundaryFlux[BoundaryIndex(i,a,false)]=ledger;
-            if(any(!isfinite(lf)) || any(!isfinite(lc)) || any(!isfinite(ledger)))InterlockedAdd(Diagnostics[1],1);
+            if(any(!RaftSimIsFinite(lf)) || any(!RaftSimIsFinite(lc)) || any(!RaftSimIsFinite(ledger)))InterlockedAdd(Diagnostics[1],1);
         }
 #endif
         if(wet && !high && GridSize[a]>1)mask|=1u<<a;
         if(a==0){FluxX[i]=f;CorrectionX[i]=correction;}else{FluxY[i]=f;CorrectionY[i]=correction;}
-        if(any(!isfinite(f)) || any(!isfinite(correction)) || !isfinite(foam[a]))InterlockedAdd(Diagnostics[1],1);
+        if(any(!RaftSimIsFinite(f)) || any(!RaftSimIsFinite(correction)) || !RaftSimIsFinite(foam[a]))InterlockedAdd(Diagnostics[1],1);
     }
     Pairs[i]=mask;FoamFlux[i]=foam;
 #elif RAFTSIM_TRANSPORT_PHASE == 4
@@ -505,7 +506,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
             result[a+1]=RaftSimPortableSub(result[a+1],source);
             peak[a]=max(pos.w,neg.w);
         }
-        if(any(!isfinite(result)) || any(!isfinite(peak)) || !isfinite(foamRate))InterlockedAdd(Diagnostics[1],1);
+        if(any(!RaftSimIsFinite(result)) || any(!RaftSimIsFinite(peak)) || !RaftSimIsFinite(foamRate))InterlockedAdd(Diagnostics[1],1);
         HydroRate[i]=float4(result,foamRate);
     }
     peak=ReduceMax(peak,lane);if(lane==0)Partial[group.x]=peak;

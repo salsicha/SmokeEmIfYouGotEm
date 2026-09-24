@@ -587,6 +587,25 @@ bool ARaftSimContentLockDirector::RunRapidMatrixRegression(FString& OutReportJso
                 TSharedRef<FJsonObject> Case = MakeShared<FJsonObject>();
                 Case->SetStringField(TEXT("rapid"), RapidName);
                 Case->SetStringField(TEXT("flow_band"), BandId);
+                // Preserve the gate below while exposing which observation failed.
+                // A false budget verdict can be inherited from failed stability;
+                // it does not by itself prove that the measured step was slow.
+                Case->SetBoolField(TEXT("steps_and_final_stats_available"), bStepped);
+                Case->SetBoolField(TEXT("seed_has_nonfinite"), Seeded.bHasNonFinite);
+                Case->SetBoolField(TEXT("final_has_nonfinite"), Stepped.bHasNonFinite);
+                const auto RecordObservation = [&Case](const TCHAR* Name, float Value)
+                {
+                    if (FMath::IsFinite(Value)) Case->SetNumberField(Name, Value);
+                    else Case->SetField(Name, MakeShared<FJsonValueNull>());
+                };
+                RecordObservation(TEXT("seed_mask_wet_fraction"), Seeded.SeedWetFraction);
+                RecordObservation(TEXT("initial_wet_fraction"), Seeded.WetFraction);
+                RecordObservation(TEXT("final_wet_fraction"), Stepped.WetFraction);
+                RecordObservation(TEXT("initial_water_volume_m3"), Seeded.TotalWaterVolumeM3);
+                RecordObservation(TEXT("final_water_volume_m3"), Stepped.TotalWaterVolumeM3);
+                RecordObservation(TEXT("sim_time_seconds"), Stepped.SimTimeSeconds);
+                Case->SetBoolField(TEXT("measured_average_within_budget"),
+                    Stepped.AverageSolverStepMilliseconds <= SolverBudgetMilliseconds);
                 Case->SetBoolField(TEXT("hash_verified_fields_loaded"), bConfigured);
                 Case->SetBoolField(TEXT("feature_envelopes_passed"), bEnvelopePassed);
                 Case->SetBoolField(TEXT("finite_and_mass_stable"), bStable);

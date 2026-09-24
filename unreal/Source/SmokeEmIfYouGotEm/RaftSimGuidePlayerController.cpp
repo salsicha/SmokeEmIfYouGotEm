@@ -9,6 +9,10 @@
 #include "HighResScreenshot.h"
 #include "InputCoreTypes.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+#include "TimerManager.h"
 #include "RaftSimGuidePawn.h"
 #include "RaftSimPresentationDirector.h"
 #include "RaftSimRaftActor.h"
@@ -75,6 +79,35 @@ T* FindActor(UWorld* World)
 void ARaftSimGuidePlayerController::BeginPlay()
 {
     Super::BeginPlay();
+
+#if !UE_BUILD_SHIPPING
+    // Capture gameplay after frontend travel without including boot-only CSV
+    // registrations. An explicit bounded capture avoids depending on the
+    // engine's optional start-on-event support. Neither path changes play.
+    int32 PostTravelCsvFrames = 0;
+    FParse::Value(FCommandLine::Get(), TEXT("RaftSimPostTravelCsvFrames="), PostTravelCsvFrames);
+    const bool bPostTravelCapture = PostTravelCsvFrames > 0 && PostTravelCsvFrames <= 18000;
+    if (IsLocalController() && (bPostTravelCapture ||
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimPostTravelCsvEvent"))))
+    {
+        FTimerHandle ProfileReadyTimer;
+        GetWorldTimerManager().SetTimer(ProfileReadyTimer,
+            FTimerDelegate::CreateWeakLambda(this, [this, bPostTravelCapture, PostTravelCsvFrames]()
+            {
+                UE_LOG(LogTemp, Display, TEXT("RaftSim post-travel CSV event: world=%s world_s=%.3f"),
+                    *GetWorld()->GetPathName(), GetWorld()->GetTimeSeconds());
+                CSV_EVENT_GLOBAL(TEXT("RaftSimPostTravelReady"));
+#if CSV_PROFILER
+                if (bPostTravelCapture && !FCsvProfiler::IsCapturing())
+                {
+                    UE_LOG(LogTemp, Display, TEXT("RaftSim post-travel CSV capture: frames=%d"),
+                        PostTravelCsvFrames);
+                    FCsvProfiler::Get()->BeginCapture(PostTravelCsvFrames);
+                }
+#endif
+            }), 5.0f, false);
+    }
+#endif
 
     // In embedded PIE, Slate can retain the mouse move while a keyboard
     // command is held before the game viewport produces MouseX/MouseY. Listen

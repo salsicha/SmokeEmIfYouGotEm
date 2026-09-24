@@ -39,6 +39,7 @@ public class RaftSimEditor : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new[]
         {
+            "AssetTools",
             "Landscape",
             "LandscapeEditor",
             "LevelEditor",

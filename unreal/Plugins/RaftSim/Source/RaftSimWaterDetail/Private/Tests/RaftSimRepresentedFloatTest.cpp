@@ -41,7 +41,7 @@ bool FRepresentedFloatTest::RunTest(const FString&)
     const uint32 Operation=Header[1]-1;const bool bFace=Operation==4 || Operation==8;
     const uint32 Stride=bFace?96:Operation==0?16:20;
     const uint32 InputVectors=bFace?4:1,ExpectedComponents=bFace?8:1,OutputComponents=bFace?8:4;
-    if(Header[0]!=0x52534650 || Header[1]<1 || Header[1]>10 || Header[2]<32 || Header[2]>65536 || Bytes.Num()!=12+Stride*Header[2])
+    if(Header[0]!=0x52534650 || Header[1]<1 || Header[1]>11 || Header[2]<32 || Header[2]>65536 || Bytes.Num()!=12+Stride*Header[2])
     {AddError(TEXT("Invalid bounded arithmetic fixture"));return false;}
     TArray<FVector4f> Input;Input.SetNumUninitialized(Header[2]*InputVectors);TArray<uint32> ExpectedBits;ExpectedBits.SetNumUninitialized(Header[2]*ExpectedComponents);
     for(uint32 I=0;I<Header[2];++I)

@@ -1,0 +1,10 @@
+#ifndef RAFTSIM_FINITE
+#define RAFTSIM_FINITE
+// IEEE-754 classification without floating arithmetic: retains subnormals and
+// rejects both infinities and every NaN payload. UE 5.8's Vulkan compiler can
+// fail internally on multiple vector isfinite calls in the same shader.
+bool RaftSimIsFinite(float x) { return (asuint(x) & 0x7f800000u) != 0x7f800000u; }
+bool2 RaftSimIsFinite(float2 x) { return (asuint(x) & 0x7f800000u) != 0x7f800000u; }
+bool3 RaftSimIsFinite(float3 x) { return (asuint(x) & 0x7f800000u) != 0x7f800000u; }
+bool4 RaftSimIsFinite(float4 x) { return (asuint(x) & 0x7f800000u) != 0x7f800000u; }
+#endif

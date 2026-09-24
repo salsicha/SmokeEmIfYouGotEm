@@ -3,6 +3,574 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest playable performance increment: South Fork's breaking detector now
+rejects already-ineligible current cells before computing flow direction.
+Native86,688cases and64actual-input refreshes (3.24million decisions) preserve
+survivors exactly. Both Editor ABBA orders improve mean frame cost by~1.06ms.
+Rebuilt staged Game verified through normal menu startup and separate rendered
+motion captures; source/cooked geometry and hydraulic fields unchanged. The
+staged same-binary default/reference pair is36.561/43.552ms versus37.233/44.344ms
+mean/p95; both still FAIL33.333333ms. An earlier restricted-execution88.031ms
+p95 failure is retained, not attributed to the optimization. See
+[qualification and limits](../reconstruction-review-2026-09-07/refresh-localization-followup.md).
+Storage recovered losslessly by compressing183terminal diagnostic arrays:
+all hashes unchanged, no deletions. Do not repeat completed early-gate timing
+as a substitute for the still-open geometry, visual water and performance work.
+
+New source coverage check: official Folsom2005 bathymetry archive acquired and
+queried, but no soundings cover the current outlet; source easting bound ends
+475.541m short of its expanded query. All47intersecting historical contours
+are above the present water boundary. Do not extrapolate a replacement bed or
+apply the report's2.34ft offset again to NAVD88 GIS heights. Reuse verification
+remains open. See folsom-outlet-source-coverage review. No new cook or playable
+changes; pursue local evidence and normal-scene work, not this archive as an
+outlet bathymetry fix.
+
+Latest hydraulic localization: zero-step native inspection of all841tiles at
+17700/18000s finds all1138shared face pairs exactly cancelling at both endpoints.
+Drainage is distributed:324tiles lose over0.01m3/s; the top10lose4.769683m3/s
+of the48.650025m3/s interval loss. No tile gains over0.01m3/s. This rules out
+an instantaneous tile-seam mass mismatch at these checkpoints, not a wrong
+boundary stage or inferred bed. See cartesian-continuation-15000 terminal
+tile-flux section. Five audit tests pass; no new cook or playable changes.
+Next investigate distributed stage/bed/outlet evidence, not seam repair or
+another unchanged long cook. South Fork remains unfinished and first in queue.
+
+Newest bounded performance result: parallel ordered crest emission rejected.
+Two native tests pass and 64 actual-input pairs preserve exact topology with
+faster refinement (about 2.44..2.52ms -> 1.86..1.90ms), but normal-launch ABBA
+whole-frame results do not repeat the benefit. Control-a/candidate-a/candidate-b/
+control-b mean/p95: 32.6014/41.8021, 35.6396/45.0277, 34.6379/42.8120,
+35.2038/42.4520ms; all FAIL 33.333333ms. Candidate code/flags/test removed;
+reports retained in crest-parallel-emission review. No staged game or source
+geometry changes. Do not repeat this unchanged emission experiment.
+Baseline restoration editor build is terminal SUCCESS (145.63s); no live
+emission experiment or candidate code remains.
+
+Latest playable code delivery: normal staged executable now repairs legacy
+null steering/recording mappings in the pawn-private context and preserves
+surviving input priority during both stale-entry and raw-look cleanup. Stronger
+native isolation/order/teardown test passes 1/1 with no warnings/failures after
+retaining and fixing its initial ordering failure. Final normal Boot/menu-handler
+to FullReach run: 900 post-travel frames, exit 0, wet raft motion telemetry,
+no blank-action warnings. Strict frame audit mean 34.352297ms/p95 41.6848ms
+still FAILS 33.333333ms. See runtime-input-context-isolation review for installed
+binary/backups/log hashes. No new visual water or geometry acceptance; physical
+input dispatch and repeated actual respawn/travel remain outstanding.
+
+Latest geometry evidence: acquired locked2022-07-21 USGS four-band NAIP window
+(120x80 at0.6m), full source-footprint and valid-data checks. New infrared context
+strengthens vegetation interpretation on the western cap but all8diagnosed
+source-face hit disks at3m registration uncertainty contain mixed NDVI values.
+No original-return relabeling, speculative cap removal, cook or playable change.
+Four focused tests pass. See troublemaker-spectral-context review; do not repeat
+the earlier local-outlier fit or treat natural-colour/NDVI as per-point proof.
+
+Newest bounded result: exact fine-profile slot caching is NOT promoted and
+removed after mixed whole-frame ABBA results. Native D3D12 tests2/2pass and
+64paired live inputs exact with lower sample-stage cost, but mean/p95(ms)
+control-a30.3089/40.9239, candidate-a34.7995/42.9898,
+candidate-b29.6602/39.7146, control-b32.2533/41.4223. All fail33.333333ms;
+no repeatable whole-frame benefit. See fine-profile-cache-rejected review.
+No staged game/captured geometry/physics changes; do not repeat this candidate.
+Restoration editor build is TERMINAL SUCCESS143.09s; no experiment remains live.
+
+Latest supporting progress: bounded post-travel CSV capture now works through
+default Boot/menu-handler/FullReach, without direct-map startup or weakening
+the strict CSV parser. Game build23.95s; separately named review executable
+completed900frames and exited0. Audit rows60..840: mean75.4246ms,
+p9583.9472ms, FAIL33.333333ms. SurfaceTick44.56ms, solver16.13ms;
+nested publish18.27ms/crest13.28ms must not be added together. Not a matched
+comparison with earlier captures, so no causal regression claim. No visible
+geometry/water improvement or river acceptance this run; installed normal
+executable unchanged. See packaged-default-menu-launch review for reproduction.
+Next substantive work remains water/geometry and its CPU cost, not another
+unchanged boot-spanning CSV failure. Colorado remains queued.
+
+Newest playable delivery: input lifecycle fix installed at the normal staged
+v7executable path after preserving/hash-checking the previous executable as
+`SmokeEmIfYouGotEm-pre-input-lifecycle.exe`. Game build49.56s; extended native
+subsystem teardown test passes1/1with0warnings/failures. Actual installed
+default-boot/menu-handler->FullReach run completes1800frames, ordinary in-play
+GC at~60s, subsequent raft drift and exit0. Prior GC fatal does not recur.
+See runtime-input-context-isolation review for binary/log hashes and limits.
+This is incremental code delivery, not a fresh cook/release package or full
+river acceptance. Older statements that the staged executable lacks this fix
+are superseded. Continue South Fork water/geometry/performance work; preserve
+remaining real respawn/input-dispatch and full-release validation requirements.
+
+Latest input repair follow-through: private mapping context is removed on
+EndPlay using its remembered registration subsystem (works after unpossession).
+Editor build68.72s and native PawnContextIsolation pass (1success,0warnings,
+0failures). Two real pawn contexts remain separate, source mappings unchanged,
+rescue/mouse/steer/record bindings retained, and paddle rebind preserves the
+negative key and other pawn. Next exercise subsystem teardown/respawn, rebuild
+Game and integrate into the normal stage; current review Game binary predates
+EndPlay cleanup. See runtime-input-context-isolation review for scope/evidence.
+
+Newest delivered code/test: [runtime input context isolation](../reconstruction-review-2026-09-07/runtime-input-context-isolation.md).
+Pawn now duplicates its configured IMC after component initialization instead
+of mutating the cooked root-set asset. Game build passed73.04s; separately
+named packaged review executable completes normal-menu->FullReach with forced
+GC every frame,181verified GC-assumption checks,180frames,exit0. Original
+v7executable preserved. Next validate mapping isolation/control coverage,
+private-context EndPlay cleanup, respawn/travel and ordinary sustained play
+before integrating the rebuilt executable into the normal stage. This fixes
+the identified ownership path but is not full input/river/release acceptance.
+
+CRITICAL newest evidence: longer normal-menu travel run hit a packaged GC fatal
+at frame697:6objects violate Disregard-for-GC assumptions. Cooked
+`IMC_RaftSimDefault` references pawn-owned runtime steer/recording actions and
+runtime negate modifiers. `RaftSimGuidePawn.cpp` loads and MUTATES the shared
+cooked context in its constructor (UnmapKey/MapKey); this is the concrete next
+fix: isolate runtime mappings from the cooked asset, preserve existing bindings,
+then validate forced GC, respawn/travel and sustained packaged play. Do not
+disable GC verification or remove controls. Log `tmp/staged-post-travel-event-20260924.log`.
+The crashed review process8940was explicitly stopped after preserving its log;
+session61929is terminal GameExit=-1. No completed performance capture.
+
+Opt-in `RaftSimPostTravelCsvEvent` was added to the gameplay controller (5s
+world timer, weak callback, local-only, non-Shipping). Game build passed99.18s.
+Separately named `SmokeEmIfYouGotEm-PostTravelReview.exe` beside the preserved
+v7executable uses unchanged cooked content; SHA256
+`dc930ed0fbc7f93bbdc8ef424d2ed5d768f6b0ba9e363be7ce192157956163f7`.
+Default Boot->menu handler->FullReach confirmed; event logged world_s5.029 at
+frame41, but CSV start was NOT confirmed before the later GC crash. Event-based
+profiling remains unverified. Original staged executable was not overwritten.
+
+Menu CSV failure localized:4duplicate FMsgLogfCount columns and2duplicate
+NumInstanceTransformUpdates columns (the latter has two installed-engine
+declarations). Disabling logging alone is insufficient. Preserve strict parser
+behavior (13tests pass unchanged); do not repeat boot-spanning capture or
+rewrite raw evidence. Next verify/use a post-travel CSV event trigger while
+retaining the normal menu launch. The existing rejected CSV remains rejected.
+
+Latest launch-path evidence: [packaged default menu](../reconstruction-review-2026-09-07/packaged-default-menu-launch.md)
+boots without map/scenario overrides, renders7run buttons, and its existing
+StartScenario review hook travels to FullReach and runs900frames (exit0).
+Physical UI input remains unverified because the computer-use runtime failed
+initialization. Strict CSV audit rejects the travel capture's headers; no new
+performance pass is claimed. Separate v7p9544.1487ms still fails. No code or
+package changed in this launch-path check; South Fork remains unfinished.
+
+Latest decision: single-lookup insertion is REJECTED and removed.64identical
+live-input pairs are geometrically exact but slower in both execution orders
+(assembly1.8829/2.0443ms vs reference1.8237/1.8245ms). All four affected raft
+files match their pre-candidate source; staged v7 never contained this candidate.
+Removal editor rebuild is TERMINAL SUCCESS139.34s, log
+`tmp/single-lookup-crest-removal-build-20260924.log`.
+Preserve reports; do not repeat this experiment.
+The earlier opt-in/next-comparison statements below are historical.
+
+Newest bounded implementation: [single-lookup crest insertion candidate](../reconstruction-review-2026-09-07/crest-single-insertion-candidate.md).
+Editor build and2native suites pass; remains opt-in. Actual candidate/control
+900frame first pair does not demonstrate benefit: p9544.9857/41.0350ms, both
+FAIL. No default promotion or new Game package. Next use identical actual-input
+assembly pairs before any further whole-frame trials; remove the candidate if
+that localized comparison shows no benefit. All processes in this trial are
+terminal. South Fork and the full ordered queue remain unfinished.
+
+Latest verification: v7 normal-start render and separate no-capture900frame
+cost run are TERMINAL exit0. Twelve rendered frames show moving crew/raft/water;
+inspected002/011 do not establish convincing crest/froth or full-route geometry
+acceptance. Packaged warmed frame mean35.621072ms, p9544.1487ms still FAILS
+33.333333ms. Evidence: `tmp/staged-v7-normal-start-frame-audit-20260924.json`;
+details in the deferred-sample-normals review. Direct scenario launch is not
+main-menu verification. No later river is eligible yet; no new cook was started.
+Earlier live/running v7 statements below are superseded by these terminal results.
+Follow-on packaged300frame stage capture also exited0: of181warmed crest updates,
+80reevaluate changed XY despite unchanged source indices. Those average9.3985ms
+crest work, including2.4138ms refinement assembly;101reuse updates average1.6708ms.
+Exact selection-mask caching already exists. Next inspect changed-mask ordered
+edge/triangle assembly, not stale-coordinate caching or more midpoint scheduling.
+See the deferred-sample-normals review for evidence and scope limitations.
+
+Latest bounded follow-up (2026-09-24): no live cook/game was present at entry.
+Water follow-through: [deferred sample normals](../reconstruction-review-2026-09-07/deferred-sample-normals.md)
+removes central-normal work overwritten by wet/dry reconstruction in both live
+and shared-atlas samplers. Editor build17.90s and5native suites pass. Actual
+normal-start ABBA shows active sampling2.9268->2.6722ms and2.7598->2.6222ms;
+reverse frame mean is essentially unchanged/slightly worse. All4p95results
+39.6572..45.3488ms still FAIL33.333333ms. No visual/FPS acceptance claimed.
+Game build is LIVE session95464, log `tmp/deferred-sample-normal-game-build-20260924.log`;
+v6stagedgame remains unchanged. Next finish that build and stage/verify the
+normal playable update; do not repeat rejected thread/scratch trials.
+Follow-through: Game build95464is TERMINAL SUCCESS42.27s; code-only UAT staging
+is now started at `tmp/standalone-stage-deferred-normal-v7-20260924`. It uses
+the existing cooked content and does NOT include the uncooked MetaHuman repair.
+V7staging56526is now TERMINAL SUCCESS (UAT157.68s). Actual staged60-case
+regression is being run to `tmp/staged-v7-packaged-regression-20260924.json`;
+no staged visual or performance acceptance yet. Preserve the completed stage.
+V7regression is terminal:57/60pass; all60stable, same3Troublemaker timing
+failures10.9558/11.1186/13.1526ms. Actual normal-start render capture is now
+running with log `tmp/staged-v7-normal-start-render-20260924.log`.
+Roster recovery audit: all5expected optimized MetaHuman Blueprint files are
+absent on this host, as is the installed engine's MetaHumanCharacter/Content/Optional
+Core Data directory. Searching the project for the named baked texture and
+Blueprint files did not locate originals. The historical v6 roster review records
+5characters/84files each, but that report does not prove their presence here.
+Current crew selection explicitly requires all5MetaHuman Blueprints before
+activating that adapter, otherwise retaining the existing CC0 path. Thus the
+80missing textures are part of an absent generated roster, not isolated files
+that can safely be replaced with generic installed textures. Requested the
+original roster folder/backup location asynchronously; do not repeatedly rerun
+this unchanged missing-source check or regenerate identities without resolving
+the source/Creator-service prerequisites. Preserve the public repository's
+cooked-only MetaHuman policy; do not force-add these generated binary assets.
+This limits roster recovery, not all goal work: South Fork's water geometry,
+rendered motion, shoreline/collision and30FPS gates remain open and actionable.
+Restoration follow-through: editor session22775 is TERMINAL SUCCESS (1109.43s).
+Native restoration session77705 exited0 and saved all59missing common packages;
+hash audit confirms163pre-existing character/material assets and59installed
+sources unchanged. Evidence: `unreal/Saved/RaftSimValidation/face-material-restoration-20260924.json`.
+Fresh engine audit session47253 exited1 (intentional failed assertion), report
+`unreal/Saved/RaftSimValidation/face-material-restored-closure-20260924.json`.
+The base material and3generic LOD instances now have complete dependency
+closures; all14roots load and have zero MetaHumanCharacter-plugin references.
+However the10character-specific instances still reference80unique absent
+generated textures (16per character across LODs). Do not substitute unrelated
+faces or call this a complete crew repair. Locate the original generated roster
+sources next. No post-restoration shader cook/package/render result exists yet.
+The59new assets are under the existing generated-MetaHumans gitignore rule;
+release reproducibility/versioning must be addressed before claiming delivery.
+Epic's current licensing page, checked2026-09-24, places MetaHuman under the
+standard Unreal Engine license: https://www.metahuman.com/license . This records
+the governing source, not a determination of this project's revenue, seat,
+royalty or source-distribution obligations. No new terms were accepted.
+Earlier live-build/restoration-not-run statements below are historical.
+Follow-on implementation: added an explicit editor-only
+`RaftSim.RestoreMissingFaceDependencies <audit-json>` maintenance command. It
+checks the fixed source/destination hierarchy, refuses existing destination
+files or loaded packages, rechecks source dependency closure through the native
+registry, and uses Unreal AdvancedCopyPackages to remap the complete copied set.
+No runtime scene automatically invokes it. Editor build is LIVE session22775,
+log `tmp/face-dependency-restore-build-20260924.log`; adding AssetTools caused
+a147-action editor rebuild. Preserve the live build; do not duplicate it.
+The restoration has NOT been run and no new content assets exist yet.
+Prepared `tmp/restore_face_dependencies_20260924.py` verifies audited source
+hashes, snapshots existing character/material asset hashes, invokes the guarded
+copy, and records preservation. Then run the separate fresh-process
+`tmp/verify_restored_face_dependencies_20260924.py` for all14cropped-material
+roots. Neither script's pass would establish shader or rendered acceptance.
+Read-only native material audits identify49missing project dependencies beneath
+the dynamically loaded cropped MetaHuman face hierarchy. Do NOT exclude these
+assets based on the absence of saved map references: crew C++ loads them by path.
+All49exact relative source assets exist and are registered in the installed
+MetaHumanCharacter plugin (11,710,220bytes; per-file SHA256 recorded). Their
+recursive source closure has zero unregistered dependencies and10additional
+plugin texture dependencies, all10also absent at their mapped project paths.
+Thus restoring only the original49would leave the remapped closure incomplete;
+the repair must include these10textures as well.
+Evidence: `unreal/Saved/RaftSimValidation/face-material-source-closure-20260924.json`,
+script `tmp/audit_face_material_sources_20260924.py`; native session24417 exited0.
+The sandboxed predecessor was stopped after Zen cache initialization failed;
+the successful run used normal local-cache access. No asset was copied, replaced,
+excluded or saved, and no cook was started. Next use a reference-remapping copy
+with explicit destination collision checks, then fresh dependency/compile/cook
+and face-facing rendered validation. Raw filesystem copying or independently
+duplicating functions could retain editor-plugin references. Installed-source
+provenance is recorded, not a new redistribution-license determination.
+This is supporting diagnosis only: South Fork remains first and unaccepted;
+the measured v6 performance and the3Troublemaker timing failures below remain.
+
+Current packaging state: retry session55631 is TERMINAL FAILED, not a live
+wait. It reached2055/2055packages and completed11343shader jobs, then failed
+with411errors/1956warnings; cook exit1 after1961.23s, UAT exit25 after32m49s.
+The retained terminal cook log is
+`C:/Users/salsi/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.8/Cook-2026.09.24-04.18.36.txt`.
+Errors include Niagara unknown parameters and a handled Niagara static-switch
+ensure (`StaticSwitchNode->bSetByPin`). No staged playable build resulted.
+Read-only saved-reference audit is now running in session77508 using
+`tmp/audit_liquid_review_dependencies_20260924.py`, log
+`tmp/liquid-review-dependency-audit-20260924.log`; no asset/config changes yet.
+Earlier live-cook observations below are historical. Do not poll or restart
+session55631, and do not infer scene acceptance from completed package counts.
+
+Follow-through: saved-reference audit session77508 exited0. Report
+`unreal/Saved/RaftSimValidation/liquid-review-dependencies-20260924T111957748074Z.json`
+finds zero LiquidBodyReview paths from all9configured playable maps; all10
+review packages have no saved referencers. Source references are Editor-only.
+Added a precise NeverCook exclusion for this folder, preserving its assets,
+normal Water AlwaysCook, every playable map and all configured shader targets.
+No solver/plugin was enabled. Project-layout tests:8passed; diff-check passed.
+Full build/cook/stage retry is LIVE in session98413, destination
+`tmp/standalone-stage-review-scope-v4-20260924`. Preserve this run. Packaging
+scope correction is not scene, physical, performance or standalone acceptance.
+Retry4 build passed in28.91s; cook PID36620 is live, log
+`C:/Program Files/Epic Games/UE_5.8/Engine/Programs/AutomationTool/Saved/Cook-2026.09.24-04.22.37.txt`.
+No error lines at the initial137/1206package checkpoint, but material warnings
+remain: M_RaftSim_MetaHuman_FaceCroppedV2 and8face material instances fail to
+compile with missing material functions and would use the default material.
+Investigate saved bindings/dependencies after the cook, even if UAT succeeds;
+do not exclude production crew assets or call this a visually qualified build.
+Retry4 session98413 is now TERMINAL SUCCESS, UAT exit0 after303.46s
+(stage117.40s). Staged output is in the above destination's Windows folder.
+Actual staged runtime audit passed2405files/917948199bytes with no source
+fallback: `tmp/staged-v4-runtime-copy-audit-20260924.json`. The first Python
+attempt reported FileNotFound on a long coordinate-map path; the file existed
+in the copy manifest and on disk, and the extended-length Windows path audit
+passed. This was verifier path handling, not a missing staged payload.
+MetaHuman warnings remain unresolved. A bounded staged-game NullRHI packaged
+regression is being launched; it cannot qualify visuals or frame performance.
+Staged-game packaged regression now produced a terminal FAILED report:
+`tmp/staged-v4-packaged-regression-20260924.json` (adjacent engine log).
+It confirms running_from_packaged_build=true,60cases across20rapids,0passed.
+First case shows hash-verified fields and deterministic replay true but
+finite_and_mass_stable=false; overall max average solver26.899242ms versus
+the existing1.6ms regression budget. Inspect all case predicates and native
+implementation before changing anything; do not weaken the budget or turn
+on an unaccepted solver. The PowerShell invocation returned0, illustrating
+why the actual report, not shell exit alone, controls acceptance. Standalone
+launch/report generation is now evidenced, but packaged regression fails and
+rendered normal launch, motion, crew materials and30FPS validation remain open.
+Follow-through: report inspection shows57/60cases fail the combined stability
+predicate, while all60load verified fields and replay deterministically. The
+budget flag also depends on stability, so false does not alone establish a
+timing overrun. Added underlying seed/final wet fractions, water volumes,
+nonfinite flags, stepping availability, simulation time and independent timing
+verdict to the packaged report without changing existing acceptance predicates.
+Game build passed53.99s (`tmp/packaged-regression-observations-build-20260924.log`).
+Fresh staging of this binary is being started at
+`tmp/standalone-stage-observations-v5-20260924` using the unchanged completed
+cook; no solver behavior or normal scene was altered by this telemetry change.
+Fresh stage session18921 completed successfully (UAT0,142.51s). Detailed
+staged regression `tmp/staged-v5-packaged-regression-20260924.json` again fails
+0/60, but now isolates the predicates: all60stepped successfully, remained
+finite, loaded verified fields and replayed deterministically. The57non-
+Troublemaker cases meet measured average timing but exceed wet-fraction drift;
+Troublemaker's3bands pass stability yet take20.046/26.470/28.871ms average,
+above the unchanged1.6ms budget. Chili Bar low grows from0.358793wet fraction
+to0.548326 in0.2simulated seconds, volume18579.213to18565.383m3. Treat this as
+shoreline/spreading investigation plus a separate high-resolution cost issue,
+not nonfinite blowup or a universal timing failure. No predicate was weakened.
+Isolated native replay now identifies the forced first-order runtime handoff
+as the Chili Bar low shoreline failure. Built a scratch CLI against the same
+`physics/cpp/build-ue/raftsim_water.lib`, seeded exact cooked arrays with runtime
+datum,0.041float Manning and12xfloat(1/60)steps. Report/logs/frames:
+`tmp/shoreline-order-replay-20260924`, generator
+`tmp/replay_shoreline_order_20260924.py`. Order1 reproduces the packaged result
+exactly:1163/2121wet cells (0.5483262612), versus761/2121initial
+(0.3587930222). Changing only spatial order to2 retains761wet cells; both runs
+are finite, with volume drift0.000744419/0.000733787 respectively. This is
+actual solver execution, not source-text inference, but only one band. Next
+expand replay coverage and restore cook/runtime numerical consistency without
+weakening the wet-area or timing gates. Normal runtime remains unchanged yet.
+Follow-through: expanded native replay completed all60bands and both orders
+(`tmp/shoreline-order-matrix-20260924/report.json`, session11522exit0).
+Order1 passes3/60wet-drift checks, order2passes60/60; both remain finite in60/60.
+Manifest CFL/dry/flux/roughness-scale settings match the isolated replay for
+all20rapids. Replaced the forced first-order handoff with the cook's explicit
+validated spatial_order (1 or2); missing/invalid metadata fails closed. No
+wet-area or performance predicate changed. Game rebuild is LIVE session23022,
+log `tmp/runtime-spatial-order-build-20260924.log`. Need staged regression and
+normal rendered verification; Troublemaker cost remains unresolved and may
+increase with the corrected scheme. The nonlinear review solver stays off.
+Packaged follow-through: Game build session23022passed51.46s; fresh stage
+session2163passed131.96s at `tmp/standalone-stage-spatial-order-v6-20260924`.
+Actual staged regression `tmp/staged-v6-packaged-regression-20260924.json`
+now passes57/60 (previous0/60). All60pass finite/wet-area stability, verified
+data loading and deterministic replay. Only Troublemaker's3timing gates fail:
+8.406275/8.796350/12.674342ms average versus unchanged1.6ms. Do not claim full
+regression acceptance or compare these short diagnostic timings to desktop
+frame pacing. Normal rendered launch/motion/materials and30FPS remain open.
+Staged v6 normal-start GPU capture completed (session96884exit0): direct
+FullReach launch, south_fork_full_descent scenario, no review-station/solver
+override, ordinary gameplay camera,1280x720offscreen.24PNGs are under the
+stage's `Windows/SmokeEmIfYouGotEm/Saved/Screenshots/staged-v6-normal-start-20260924_*`;
+video `Saved/VideoCaptures/RaftSim_20260924-044806.mp4` has118sourceframes over
+18.518s and may repeat encoded frames (not FPS acceptance). Viewed frames006
+and023: crew/raft/terrain/water render, with changed water texture and scenery;
+camera remains bank-facing, water still lacks demonstrated cresting/froth.
+Log stations120.193to128.655m confirm movement but do not prove collision or
+full surface continuity. Menu navigation is NOT verified by a direct map launch.
+A separate900frame no-screenshot CSV cost run is being started on this stage.
+That staged cost run completed (session97014exit0); audit
+`tmp/staged-v6-normal-start-frame-audit-20260924.json`, CSV SHA
+`92c9e59a1f5f` prefix. Warmed rows60..840(781samples) show mean36.150620ms,
+p9543.6402ms,27.662043elapsed FPS: FAIL unchanged33.333333ms/30FPS target.
+Game thread mean35.043647ms/p9543.0913ms; render thread mean15.784454ms,
+GPU mean11.912063ms (overlapping timings, do not sum). This is measured
+packaged1280x720offscreen gameplay cost, not editor-game or video cadence;
+nonoffscreen release validation and broader traversal still required.
+
+Earlier packaging result: session32016 is TERMINAL FAILED, not a live wait.
+Cook PID9388 exited3 after8253.07s; UAT exited25 after2h18m44s.
+The configured Vulkan SM6 cook hit a bindless-descriptor compiler assertion
+in FRaftSimTemporalBoundaryCS permutation1 (SpirVShaderCompiler.inl:764,
+"Bindless shaders should only have uniform buffers"). Saved inputs remain in
+`unreal/Saved/ShaderDebugInfo/VULKAN_SM6/Global/FRaftSimTemporalBoundaryCS/1`.
+No staged package or playable acceptance resulted. Next isolate this exact
+saved compiler input before another full cook; retain all configured targets
+and physical validation predicates. Earlier live-cook observations below are
+historical and must not cause further polling of the terminal session.
+Isolated replay now reproduces the assertion with the original debug source
+and eliminates it by splitting the two comma-separated SRV declarations into
+eight individual declarations. Scratch report:
+`tmp/temporal-bindless-isolation-20260924/report.json` (original worker error,
+29171-byte output; split variant no worker error,33852-byte output; both process
+exit codes0, so process exit alone is insufficient). Original debug inputs are
+unchanged. The declaration-only production correction is applied; all arithmetic,
+physical predicates and diagnostics remain unchanged. Native GPU qualification
+and a subsequent full cook are still required; no package acceptance is claimed.
+Vulkan SM6 native qualification is now running in session41946, editor PID26160:
+`RaftSim.WaterDetail.TemporalBoundaryGPU`, actual Vulkan (not NullRHI), with
+report target `tmp/temporal-bindless-vulkan-sm6-20260924` and adjacent `.log`.
+Startup reached ShaderTypesReady; no test report or terminal result yet.
+The suite covers both stages, exact endpoints, invalid observations and retry
+rollback. Preserve this live test rather than starting a competing engine run.
+Follow-through: session41946 is TERMINAL FAILED during global shader startup,
+before any regression ran (no index.json). TotalDepthInterval permutation0 has
+the same bindless assertion. Its isolated original/split replay reproduces and
+removes the error respectively (40401/48678 output bytes), recorded in
+`tmp/totaldepthinterval-bindless-isolation-v2-20260924/report.json`.
+The two remaining comma-separated StructuredBuffer declarations in the plugin
+were in this shader; both are now separated without changing computation.
+Native qualification must be relaunched with a fresh report after this fix.
+The fresh two-suite Vulkan SM6 run is live in session3660, editor PID10600,
+report `tmp/bindless-both-vulkan-sm6-v2-20260924` (adjacent `.log`). It includes
+TemporalBoundaryGPU and TotalDepthIntervalGPU. Startup passed the prior global
+shader failure point and is compiling missing editor materials; no regression
+result yet. Do not duplicate this engine run or treat startup as test acceptance.
+Follow-through: session3660 is TERMINAL PASS, exit0; report confirms2clean
+successes,0warnings,0failures. Actual RHI is Vulkan with VULKAN_SM6, not NullRHI.
+Both TemporalBoundaryGPU and TotalDepthIntervalGPU completed. This qualifies
+their native GPU regressions after the declaration corrections, not the scene
+or package. Next check the default D3D12 path and retry the full configured cook.
+D3D12 follow-through is also TERMINAL PASS: session29082,2clean tests,0warnings,
+0failures, report `tmp/bindless-both-d3d12-v2-20260924/index.json`.
+The full configured Win64 Development build/cook/stage retry is now live in
+session55631, destination `tmp/standalone-stage-bindless-v3-20260924`. Build
+succeeded/up-to-date in5.72s. Cook log is
+`C:/Program Files/Epic Games/UE_5.8/Engine/Programs/AutomationTool/Saved/Cook-2026.09.24-03.45.55.txt`.
+All configured targets retained; no duplicate archive. Free disk before launch
+was30.16GB. Preserve this cook; no staged execution or scene acceptance yet.
+The retry has now emitted Global shader-library statistics for all four
+configured formats (PCD3D_SM5/SM6 and Vulkan SM5/SM6) and entered content cook.
+Latest observed count101/1219packages; cook PID34632 remains live. This clears
+the previous global-compiler stop but is not terminal package success.
+Content cook advanced to129packages, then reported Niagara unknown-parameter
+type errors in `VFX/Water/LiquidBodyReview/NS_SouthForkLiquidTerrainReview`
+(Grid3D FLIP Attribute and Rendering Method parameters), alongside missing-enum
+pin warnings in the review systems. Session55631 remains live; capture its
+terminal result before modifying cook inputs. These errors require investigation,
+not suppression or an assumption that the staged build is valid.
+Read-only tracing identifies a likely packaging-scope mismatch: DefaultGame.ini
+always-cooks all `/Game/RaftSim/VFX/Water`, including LiquidBodyReview, whereas
+the liquid-terrain review launcher explicitly requires process-local
+`-EnablePlugins=NiagaraFluids` and checks its rendering-method enum. The normal
+uproject does not name that plugin. Before choosing exclusion versus dependency
+repair, verify actual saved playable-scene references; source-only references
+are insufficient. Do not enable an unaccepted review solver in normal play.
+Cook remains live and has reached239/1219packages; no inputs changed.
+Later observation: PID34632 remains live at1867/2055packages (dependency
+discovery can expand the total). Prepared and Python-syntax-checked the
+read-only `tmp/audit_liquid_review_dependencies_20260924.py` for use after
+this cook exits. It inventories saved review-package referencers and traces
+all configured MapsToCook dependency paths through the AssetRegistry, including
+soft/management references. It has NOT run in Unreal yet; no absence of saved
+references is established, and dynamic C++/config loads need separate review.
+No cook inputs or gameplay defaults were changed during this wait.
+
+Standalone launch preflight on September24 exposes a delivery gap: the rebuilt
+Development Game executable did not produce the requested engine log or honor
+`-ExecCmds=quit` within a bounded45-second NullRHI startup. The exact probe
+PID6124 was no longer present at cleanup after its timeout; no terminal exit
+code was captured. This is a failed startup qualification,
+not a measured render/performance failure; its underlying cause is not yet known.
+No active engine/hydraulic cook was found before testing. Saved/Cooked/Windows
+file listing contains only ue.projectstore and Metadata/CookedSettings.txt;
+this does not establish absence of cooked data because UE uses the Zen store.
+No staged or packaged build was found at normal project output locations. Editor-game
+captures and successful Game compilation therefore do not establish a working
+standalone delivery. Next use the supported cook/stage workflow and qualify the
+staged executable; do not repeat this unchanged raw-executable probe. Free disk
+was approximately25GB before packaging, so check staging/archive capacity first.
+No scene change, package completion or South Fork acceptance is claimed.
+
+Follow-through: the supported UAT BuildCookRun is now TERMINAL FAILED (September24,
+started around00:22 local). Editor/Game build succeeded in53.86s. Content cook
+PID29636 finished with exit3 after1053.45s; UAT reported exit25 after18m30s.
+Tool session8270 is terminal; do not poll it as a live cook. Intended output
+target is `tmp/standalone-stage-20260924`; flags are Win64 Development,
+`-build -cook -stage -pak -package`, without a duplicate archive. Cook log
+is retained by UAT at
+`C:/Users/salsi/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.8/Cook-2026.09.24-00.41.09.txt`.
+VULKAN_SM5 global shader compilation failed with9Internal Error results:
+TotalDepthFrame permutations0/3, NonlinearPressure0/7, TotalDepthTransport6/18/30,
+BreakingFront0 and NonlinearAcceleration1. No staging or playable package exists
+from this run. One isolated TotalDepthFrame0 replay with ShaderCompileWorker
+reproduces the failure immediately (handled ensure in VulkanShaderCompiler.cpp
+line383); process exit0 is NOT shader success. Saved DebugCompile inputs and
+the fresh DebugCompile-repro-20260924.out are preserved under ShaderDebugInfo.
+The generated CompileDXC.bat references a dxc.exe absent from the engine install;
+use the actual worker replay, not that missing executable. Next isolate the
+shader/compiler failure before any new full cook; do not remove the configured
+Vulkan target or weaken finite-state guards merely to pass packaging.
+The normal full cook regenerates derived Zen cook outputs; source assets and
+captured data are unchanged. Last free-space check was30.89GB. Packaging and
+actual staged Game launch remain pending, not accepted.
+
+Shader isolation follow-through (scratch only): TotalDepthFrame0's finite-only
+guard and its complete state guard separately compile without the worker ensure;
+restoring the second Surface finite-check reproduces it. Explicit branch hints
+and unconditional atomic updates do not fix it. Two simple resource reads do
+compile. Replacing only the Surface finite predicate with
+`any((asuint(Surface[i]) & 0x7f800000u) == 0x7f800000u)` eliminates the ensure
+and yields2038bytes of worker output versus392bytes for the failed original.
+This preserves IEEE754 NaN/infinity rejection and retains every other predicate,
+but is not yet a production change or a qualified shader/physics fix. Inputs
+and per-variant outputs are in `tmp/vulkan-frame-isolation-20260924`; original
+saved compiler inputs remain intact. Next verify finite-classification equivalence,
+qualify all9failed permutations, then run native GPU checks and the full cook.
+The copied SDK dxc frontend with the installed engine compiler DLL reports no
+SPIR-V codegen support; that path is not equivalent to Unreal's worker pipeline.
+
+Follow-through: all9preserved failing permutations now replay without the worker
+ensure in scratch with scalar/vector exponent classification. Report:
+`tmp/vulkan-finite-nine-20260924/report.json` (100014host classification samples;
+compiler replay is not GPU acceptance). The five affected production shaders
+now include RaftSimFinite.ush and retain every predicate/counter/gate. Editor
+rebuild succeeded in77.09s. An added arithmetic-fixture operation exercises all
+four overloads against65536independent FP32 records; its repeatable generator is
+`physics/scripts/make_finite_classification_fixture.py`. Actual D3D12 test is
+TERMINAL PASS:65536records, zero classification/input-bit errors,1clean test.
+Report directory `tmp/finite-gpu-d3d12-20260924`; fixture SHA256
+`8df8e5b0743dd1826f3e79e53f75110c98caf9fc2617d8685524b74d9c2abe86`.
+Five affected D3D12 solver suites also pass cleanly: BreakingFront,
+NonlinearAcceleration, NonlinearPressure, TotalDepthFrame and TotalDepthTransport.
+Their report is `tmp/finite-solver-regressions-d3d12-20260924/index.json`.
+Actual Vulkan SM5 six-test follow-through is TERMINAL PASS (session3753):
+4clean tests and2with HTTP generate_204 timeout warnings,0failed. Log confirms
+VULKAN_SM5 on NVIDIA RTX3060Laptop;65536classification records have zero
+classification/input-bit errors. Report:
+`tmp/finite-solver-regressions-vulkan-20260924/index.json`.
+A new full configured Win64 Development UAT cook/stage is launched after these
+results (tool session32016), targeting `tmp/standalone-stage-finite-v2-20260924`. Do not duplicate
+it. Editor/Game rebuild passed in68.25s; cook PID9388 and shader workers were
+confirmed live. Current cook log is
+`C:/Program Files/Epic Games/UE_5.8/Engine/Programs/AutomationTool/Saved/Cook-2026.09.24-01.11.47.txt`
+(UAT relocates it to its roaming log directory on exit).
+The same cook later completed PCD3D_SM5 TotalDepthTransport permutation16
+after1264.052s. A subsequent900.06s worker-state warning lists pending batches
+Transport9/4, Transport15/3, and TotalDepthFrame0/Transport21. Three child
+ShaderCompileWorker processes remain live and accumulate CPU time; this warning
+is not a terminal cook failure. Preserve session32016 rather than launching a
+duplicate or treating an observation timeout as completion.
+Later observation: Transport9/4 and15/3 returned, followed by Transport21
+at6914.163s. Session32016 is still running with no terminal UAT result and
+no staged output directory yet. This is compiler progress, not package success;
+preserve the ongoing cook and wait for its terminal result before staged tests.
+The current UBT output copy at `unreal/Binaries/Win64/RaftSimRuntimeData`
+passes the existing hash/size/dependency-closure verifier:2405files,
+917948199bytes, no external-source fallback. Report:
+`tmp/finite-v2-ubt-runtime-copy-audit-20260924.json`.
+This is the Game build's data copy, NOT the pending UAT staged package;
+packaged execution and physical acceptance remain explicitly false.
+Packaging, staged launch and ordinary visual/performance validation remain
+pending; successful native fixtures are not scene or release acceptance.
+No nonlinear solver was enabled and no physical/visual/performance acceptance
+is claimed by this compiler correction.
+
 Normal drift now enforces the existing posed-body/hull exclusion envelope;
 previously current could carry swimmers back into the hull before pulling.
 Three native suites pass; corrected normal and surface-review replays show

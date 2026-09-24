@@ -90,6 +90,28 @@ bool FRaftSimWaterDryRockSamplingTest::RunTest(const FString&)
         RaftSimWetSurfaceInterpolation::ResolveMixed(FlatBed,Film,Available,.3,.4,0.,1.,1.,H,Eta,Normal));
     TestTrue(TEXT("bypass leaves all output channels unchanged"),H==7. && Eta==8. && Normal==FVector(1.,2.,3.));
 
+    // Deferring the central-difference normal is valid only if every branch
+    // that returns true completely replaces it, including entirely dry cells.
+    for (int32 Mask=0; Mask<16; ++Mask)
+    {
+        double Corners[4];
+        for (int32 I=0; I<4; ++I) Corners[I]=(Mask & (1<<I)) ? .2+.13*I : 0.;
+        for (double X : {0.,.37,1.}) for (double Y : {0.,.61,1.})
+        {
+            double D1=9.,E1=10.,D2=D1,E2=E1;
+            FVector N1(1.,2.,3.),N2(-4.,5.,-6.);
+            const bool Mixed1=RaftSimWetSurfaceInterpolation::ResolveMixed(
+                FlatBed,Corners,Available,X,Y,0.,1.,1.,D1,E1,N1);
+            const bool Mixed2=RaftSimWetSurfaceInterpolation::ResolveMixed(
+                FlatBed,Corners,Available,X,Y,0.,1.,1.,D2,E2,N2);
+            TestEqual(TEXT("mixed decision independent of incoming normal"),Mixed1,Mixed2);
+            if (Mixed1)
+                TestTrue(TEXT("mixed/dry outputs completely replace incoming normal"),D1==D2 && E1==E2 && N1==N2);
+            else
+                TestTrue(TEXT("all-wet branch requires the original central normal"),Mask==15 && N1==FVector(1.,2.,3.) && N2==FVector(-4.,5.,-6.));
+        }
+    }
+
     // Independent numerical derivative of the same nonuniform mixed surface.
     const double UnevenBed[4]={0.,2.,.1,.2},MixedDepth[4]={1.,0.,1.3,0.};
     const auto Evaluate=[&](double X,double Y,FVector& OutNormal)

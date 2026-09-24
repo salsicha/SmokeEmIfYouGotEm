@@ -1,0 +1,87 @@
+# Troublemaker cap: independent infrared context
+
+September24,2026. New source interpretation evidence, not a river delivery.
+No captured XYZ, point class, cap topology, collision, hydraulic bed, water field
+or normal-play asset changed. South Fork remains first and unfinished.
+
+## Acquisition and limits
+
+The current [USGS NAIP service](https://imagery.nationalmap.gov/arcgis/rest/services/USGSNAIPImagery/ImageServer?f=pjson)
+supports four-band imagery and describes downloadable NAIP orthoimagery as
+public domain. Exact spatial query returns only the already known
+`m_3812009_se_10_060_20220721` raster for this area, acquired2022-07-21,
+0.6m, USDA-FSA-APFO, CNIR, NAD83/UTM10N. No closer-to-2019 acquisition was
+found in this service; this is not a claim that other archives contain none.
+
+Unlike the previous natural-colour export, this bounded intake acquires all
+four bands (red/green/blue/NIR) with `None` rendering rule and nearest-neighbour
+resampling, locked to OBJECTID21979.72x48m window,120x80 pixels,0.6m output,
+EPSG32610. The returned catalog polygon covers the entire requested rectangle;
+TIFF bounds/CRS/count/shape and every band's valid-data mask are checked.
+Provider JSON, exact URLs, hashes and original TIFF bytes are preserved.
+The image is a resampled digital-number export, not calibrated reflectance.
+3m existing registration uncertainty and2019/2022 date difference remain.
+
+Acquisition: `physics/scripts/fetch_troublemaker_spectral_window.py`;
+raw receipt: `tmp/troublemaker-spectral-source-20260924/manifest.json`.
+Analysis: `physics/scripts/audit_troublemaker_spectral_context.py`;
+report/figure: `tmp/troublemaker-spectral-context-20260924/`.
+Small raw TIFF, provider responses, manifests, report and inspected figure are
+also preserved with hash-verified copies in
+[durable evidence](troublemaker-spectral-context/). Raw TIFF SHA256
+`ec03a339263036147c7b8f11ea2d47c3f381c74a555b25efb80eea479e5eed61`;
+analysis report SHA256
+`4f0fe30a30a80f32d328b4219dfa920aee027ffad8f27497d733167c5cc3fc31`.
+Four unit tests pass: unsigned arithmetic, invalid denominators/data, zero
+radius and inclusion of pixel squares intersecting the uncertainty disk.
+Initial plotting failed because sandbox access hid the existing matplotlib
+package; the same analysis succeeded with read access to those dependencies.
+
+## Result tied to actual diagnosed faces
+
+The source cap hash and previously verified native/source camera rays are
+checked before sampling. All8diagnosed faces are retained. At each hit, report
+the nominal digital-number NDVI and every pixel intersecting the full3m disk;
+do not pick the nearest favourable pixel or infer surveyed vegetation borders.
+
+| Source triangle | Nominal NDVI | 3m disk min | 3m disk median | 3m disk max |
+| --- | ---: | ---: | ---: | ---: |
+|2342|0.3854|-0.0464|0.3575|0.4927|
+|2432|0.1966|-0.5200|0.0370|0.4927|
+|1137|0.1965|-0.0947|0.1214|0.4927|
+|2581|0.1266|-0.1597|-0.0151|0.4927|
+|6225|-0.0431|-0.5200|-0.0435|0.3846|
+|6217|0.1014|-0.5200|0.0653|0.4836|
+|6222|0.1966|-0.5200|0.0286|0.4927|
+|6315|-0.0681|-0.3766|-0.0681|0.1585|
+
+Inspected original-band plot shows strong NIR response on the western/northern
+extension, contrasting with the eastern pale core. This strengthens the
+vegetation hypothesis from natural colour, but all8target disks contain mixed
+values across zero. It does NOT establish which2019return is vegetation,
+bare rock under vegetation, shadow, water, or another surface. No NDVI threshold
+was tuned into an automatic selection or permission to delete/flatten faces.
+The prior rejected local-outlier fitting remains rejected.
+
+## Other reference access
+
+Browser runtime failed before opening a page with `failed to write kernel
+assets ... (os error3)`. No browser input or new video-frame observation.
+[Garden Betty's primary trip account](https://gardenbetty.com/troublemaker-on-the-american-river/)
+reports end-of-June1600cfs and its2013comment chronology; linked images could
+not be fetched. These do not establish exact capture dates or calibration.
+[Dreamflows' photo page](https://www.dreamflows.com/American/troublemaker.wavewheel.lg.php)
+explicitly identifies Gunsight Rock and credits Chris Shackleton, copyright2006,
+all rights reserved. The photo itself also could not be fetched. No image
+download, shipping license, visual identification or point registration is
+inferred from these text pages.
+
+## Next reconstruction decision
+
+The western extension cannot honestly remain treated as semantically certified
+rock merely because its XYZ reproduces unclassified returns. Conversely this
+spectral result cannot justify cutting it away. A coherent interpreted envelope
+needs fixed-landmark boat/bank-height constraints with registration/occlusion
+uncertainty, then the same shape must drive collision, bed and fresh flow before
+normal-play integration. No new cook was launched from unchanged ambiguity.
+Other water/crew/regression work remains actionable; this is not a global block.

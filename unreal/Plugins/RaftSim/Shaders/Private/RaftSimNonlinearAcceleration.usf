@@ -1,4 +1,5 @@
 #include "/Engine/Public/Platform.ush"
+#include "RaftSimFinite.ush"
 #include "RaftSimPressureMath.ush"
 int2 GridSize;
 float CellMeters;
@@ -95,10 +96,10 @@ void MainCS(uint3 id:SV_DispatchThreadID)
 {
     uint i=id.x;if(i>=GridSize.x*GridSize.y)return;
     int2 p=Point(i);float2 g=Geometry[i];uint mask=Pairs[i];
-    bool invalid=any(!isfinite(g)) || RaftSimPressureNegative(g.x) || (mask&~3u)!=0 || any(!isfinite(RightHandSide[i]));
-    if(UsePhysicalBedSlope!=0)invalid=invalid || any(!isfinite(PhysicalBedSlope[i]));
+    bool invalid=any(!RaftSimIsFinite(g)) || RaftSimPressureNegative(g.x) || (mask&~3u)!=0 || any(!RaftSimIsFinite(RightHandSide[i]));
+    if(UsePhysicalBedSlope!=0)invalid=invalid || any(!RaftSimIsFinite(PhysicalBedSlope[i]));
     float fraction=Fraction(i);
-    invalid=invalid || !isfinite(fraction) || fraction<0 || fraction>1;
+    invalid=invalid || !RaftSimIsFinite(fraction) || fraction<0 || fraction>1;
     [unroll(2)]for(uint axis=0;axis<2;++axis)
     {
         int2 delta=axis==0?int2(1,0):int2(0,1);
@@ -116,7 +117,7 @@ void MainCS(uint3 id:SV_DispatchThreadID)
         Coefficients(Neighbor(p,-delta),nc,ne);d[axis]+=Fraction(Index(Neighbor(p,-delta)))*ne[axis]*ne[axis];
     }
     float4 diag=1+float4(Lengths.x*d,Lengths.y*d);
-    if(any(!isfinite(c)) || any(!isfinite(e)) || any(!isfinite(diag)))InterlockedAdd(Diagnostics[0],1);
+    if(any(!RaftSimIsFinite(c)) || any(!RaftSimIsFinite(e)) || any(!RaftSimIsFinite(diag)))InterlockedAdd(Diagnostics[0],1);
     PreparedCenter[i]=c;PreparedEdges[i]=e;PreparedDiagonal[i]=diag;
 }
 #else
@@ -215,7 +216,7 @@ void MainCS(uint lane:SV_GroupIndex)
             Alpha=0;
             [unroll]for(uint k=0;k<2;++k)if(Active[k]!=0)
             {
-                if(!isfinite(denominator[k]) || denominator[k]<=0){Diagnostics[1]|=1u<<k;Active[k]=0;}
+                if(!RaftSimIsFinite(denominator[k]) || denominator[k]<=0){Diagnostics[1]|=1u<<k;Active[k]=0;}
                 else {Alpha[k]=Rz[k]/denominator[k];Diagnostics[k+2]=iteration+1;}
             }
         }
@@ -240,7 +241,7 @@ void MainCS(uint lane:SV_GroupIndex)
             Beta=0;
             [unroll]for(uint k=0;k<2;++k)if(Active[k]!=0)
             {
-                if(!isfinite(sums[k]) || !isfinite(sums[k+2])){Diagnostics[1]|=1u<<k;Active[k]=0;}
+                if(!RaftSimIsFinite(sums[k]) || !RaftSimIsFinite(sums[k+2])){Diagnostics[1]|=1u<<k;Active[k]=0;}
                 else if(sums[k]==0)Active[k]=0;
                 else Beta[k]=RaftSimPortableScale(sums[k]/Rz[k],RatioExponent[k]);
             }
@@ -325,7 +326,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
         float2 active=Control[3].xy,alpha=0,rz=Control[1].xy;
         [unroll]for(uint k=0;k<2;++k)if(active[k]!=0)
         {
-            if(!isfinite(sums[k]) || sums[k]<=0){Diagnostics[1]|=1u<<k;active[k]=0;}
+            if(!RaftSimIsFinite(sums[k]) || sums[k]<=0){Diagnostics[1]|=1u<<k;active[k]=0;}
             else {alpha[k]=rz[k]/sums[k];Diagnostics[k+2]=Iteration+1;}
         }
         Control[2]=float4(alpha,0,0);Control[3]=float4(active,0,0);
@@ -357,7 +358,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
         float2 active=Control[3].xy,beta=0;float4 old=Control[1];
         [unroll]for(uint k=0;k<2;++k)if(active[k]!=0)
         {
-            if(!isfinite(sums[k]) || !isfinite(sums[k+2])){Diagnostics[1]|=1u<<k;active[k]=0;}
+            if(!RaftSimIsFinite(sums[k]) || !RaftSimIsFinite(sums[k+2])){Diagnostics[1]|=1u<<k;active[k]=0;}
             else if(sums[k]==0)active[k]=0;
             else beta[k]=RaftSimPortableScale(sums[k]/old[k],ratio[k]);
         }
@@ -383,7 +384,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
         Active=uint2(Control[3].xy);Alpha=0;float4 old=Control[1];
         [unroll]for(uint k=0;k<2;++k)if(Active[k]!=0)
         {
-            if(!isfinite(sums[k]) || sums[k]<=0)
+            if(!RaftSimIsFinite(sums[k]) || sums[k]<=0)
             { if(group.x==0)Diagnostics[1]|=1u<<k;Active[k]=0; }
             else
             { Alpha[k]=old[k]/sums[k];if(group.x==0)Diagnostics[k+2]=Iteration+1; }
@@ -414,7 +415,7 @@ void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_Gro
         Active=uint2(NextControl[1].xy);Beta=0;float4 old=NextControl[0];
         [unroll]for(uint k=0;k<2;++k)if(Active[k]!=0)
         {
-            if(!isfinite(sums[k]) || !isfinite(sums[k+2]))
+            if(!RaftSimIsFinite(sums[k]) || !RaftSimIsFinite(sums[k+2]))
             { if(group.x==0)Diagnostics[1]|=1u<<k;Active[k]=0; }
             else if(sums[k]==0)Active[k]=0;
             else Beta[k]=RaftSimPortableScale(sums[k]/old[k],ratio[k]);

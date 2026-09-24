@@ -1,4 +1,5 @@
 #include "/Engine/Public/Platform.ush"
+#include "RaftSimFinite.ush"
 #if RAFTSIM_ARITHMETIC_PORTABLE
 #include "RaftSimPortableFloat.ush"
 #include "RaftSimExactHydrostatic.ush"
@@ -16,6 +17,17 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     if(id.x>=Count)return;
     float4 v=Input[id.x];
 #if RAFTSIM_ARITHMETIC_PORTABLE
+    if(RK2==10)
+    {
+        bool4 f=RaftSimIsFinite(v);
+        uint mask=uint(f.x)|(uint(f.y)<<1)|(uint(f.z)<<2)|(uint(f.w)<<3);
+        // Exercise scalar and shorter-vector overloads against the same oracle.
+        bool2 f2=RaftSimIsFinite(v.xy);bool3 f3=RaftSimIsFinite(v.xyz);
+        mask|=uint(RaftSimIsFinite(v.x))<<4;
+        mask|=(uint(f2.x)|(uint(f2.y)<<1))<<5;
+        mask|=(uint(f3.x)|(uint(f3.y)<<1)|(uint(f3.z)<<2))<<7;
+        Output[id.x]=uint4(mask,asuint(v.x),0,0);return;
+    }
     if(RK2==9)
     {
         // Keep the original wide accumulator as an independent control after

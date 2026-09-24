@@ -1,4 +1,5 @@
 #include "/Engine/Public/Platform.ush"
+#include "RaftSimFinite.ush"
 #include "RaftSimPortableFloat.ush"
 #include "RaftSimExactHydrostatic.ush"
 int2 GridSize;
@@ -106,7 +107,7 @@ void Front(uint first,int axis)
     float logFroude=DepthLog2(hp)-DepthLog2(ht)+.5*log2(1+RaftSimPortableDivide(ht,hp))-.5;
     if(!(rateTrigger || maximum/CellMeters>=.5773502691896258) || logFroude<=.3785116232537298)return;
     float radius=RaftSimPortableDivide(RaftSimPortableMul(3.75,RaftSimPortableSub(hp,ht)),CellMeters);
-    if(!isfinite(radius)){InterlockedOr(Diagnostics[0],4u);return;}
+    if(!RaftSimIsFinite(radius)){InterlockedOr(Diagnostics[0],4u);return;}
     float center=(axis==0 ? steepest%GridSize.x:steepest/GridSize.x)+1;
     uint edge=axis==0 ? (first/GridSize.x)*GridSize.x+GridSize.x-1:
         (GridSize.y-1)*GridSize.x+first%GridSize.x;
@@ -144,13 +145,13 @@ void MainCS(uint3 id:SV_DispatchThreadID)
 #if RAFTSIM_BREAKING_PHASE==0
     Coverage[i]=0;
     float2 jumps=float2(ComputeJump(i,0),ComputeJump(i,1));SurfaceJumps[i]=jumps;
-    bool bad=!all(isfinite(Geometry[i])) || RepresentedSign(Geometry[i].x)<0 || !all(isfinite(HydroRate[i])) || (Pairs[i]&~3u)!=0;
+    bool bad=!all(RaftSimIsFinite(Geometry[i])) || RepresentedSign(Geometry[i].x)<0 || !all(RaftSimIsFinite(HydroRate[i])) || (Pairs[i]&~3u)!=0;
     for(int axis=0;axis<2;++axis)if(Linked(i,axis))
     {
         uint j=Neighbor(i,axis,1);
         int position=axis==0?i%GridSize.x:i/GridSize.x;
         bad=bad || GridSize[axis]==1 || (!Periodic && position==GridSize[axis]-1) ||
-            !RaftSimPositiveDepth(Geometry[i].x) || !RaftSimPositiveDepth(Geometry[j].x) || !isfinite(jumps[axis]);
+            !RaftSimPositiveDepth(Geometry[i].x) || !RaftSimPositiveDepth(Geometry[j].x) || !RaftSimIsFinite(jumps[axis]);
     }
     if(bad)InterlockedOr(Diagnostics[0],1u);
 #elif RAFTSIM_BREAKING_PHASE==1

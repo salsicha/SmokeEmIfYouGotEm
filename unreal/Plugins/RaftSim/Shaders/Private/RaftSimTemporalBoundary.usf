@@ -2,8 +2,16 @@
 uint Count;
 float2 FirstTime;
 float Duration;
-StructuredBuffer<float4> FirstState,SecondState,Progress,TrialInfo;
-StructuredBuffer<float> FirstBed,SecondBed,FirstVelocity,SecondVelocity;
+// One resource per declaration lets the Vulkan SM6 bindless parser rewrite
+// every SRV; comma-separated declarations leave ordinary descriptors behind.
+StructuredBuffer<float4> FirstState;
+StructuredBuffer<float4> SecondState;
+StructuredBuffer<float4> Progress;
+StructuredBuffer<float4> TrialInfo;
+StructuredBuffer<float> FirstBed;
+StructuredBuffer<float> SecondBed;
+StructuredBuffer<float> FirstVelocity;
+StructuredBuffer<float> SecondVelocity;
 RWStructuredBuffer<float4> State;
 RWStructuredBuffer<float> Bed;
 RWStructuredBuffer<float2> FaceTrace;

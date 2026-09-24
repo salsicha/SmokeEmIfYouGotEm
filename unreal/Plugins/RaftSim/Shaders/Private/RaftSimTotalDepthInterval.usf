@@ -4,9 +4,12 @@ float2 FirstTime;
 float Duration;
 uint BoundaryMode;
 StructuredBuffer<float4> PreviousProgress;
-StructuredBuffer<uint> PreviousSummary,PreviousDiagnostics;
+// Declare resources separately for Vulkan SM6 bindless rewriting.
+StructuredBuffer<uint> PreviousSummary;
+StructuredBuffer<uint> PreviousDiagnostics;
 RWStructuredBuffer<float4> NextProgress;
-RWStructuredBuffer<uint> NextSummary,NextDiagnostics;
+RWStructuredBuffer<uint> NextSummary;
+RWStructuredBuffer<uint> NextDiagnostics;
 [numthreads(1,1,1)]
 void MainCS(uint3 id:SV_DispatchThreadID)
 {

@@ -14,13 +14,13 @@ struct SolverStageScratch {
     std::vector<MusclHalfSlopes> slopes;
     bool leased = false;
 
-    void prepare(std::size_t cells) {
+    void prepare(std::size_t cells, bool reset_slopes = true) {
         // Every primitive member is assigned by the reconstruction loop.
         primitives.resize(cells);
         // Dry cells and dry-neighbor directions skip slope assignment. Reset
         // ALL six slopes, including reused wet-to-dry cells, before any read.
         slopes.resize(cells);
-        std::fill(slopes.begin(), slopes.end(), MusclHalfSlopes{});
+        if (reset_slopes) std::fill(slopes.begin(), slopes.end(), MusclHalfSlopes{});
     }
 };
 

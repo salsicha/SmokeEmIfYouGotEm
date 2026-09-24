@@ -304,7 +304,13 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     // opposite faces. Materialize them once; do not cache across stages or
     // replace_state(), where depths and wet/dry transitions may have changed.
     solver_detail::SolverStageScratchLease stage_storage;
+#if defined(RAFTSIM_INLINE_SLOPE_RESET) && RAFTSIM_INLINE_SLOPE_RESET
+    // Candidate scheduling only: each reconstruction worker resets its own
+    // six slopes before any dry-cell early exit or wet-neighbor assignment.
+    stage_storage.get().prepare(ny * nx, false);
+#else
     stage_storage.get().prepare(ny * nx);
+#endif
     auto& primitives = stage_storage.get().primitives;
     const bool parallel_rows = nx * ny >= 16384 && boundary_fluxes == nullptr && face_fluxes == nullptr;
     solver_row_ranges(ny, parallel_rows, [&](std::size_t first_row, std::size_t end_row) {
@@ -360,6 +366,9 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     solver_row_ranges(ny, parallel_rows, [&](std::size_t first_row, std::size_t end_row) {
     for (std::size_t row = first_row; row < end_row; ++row) {
         for (std::size_t col = 0; col < nx; ++col) {
+#if defined(RAFTSIM_INLINE_SLOPE_RESET) && RAFTSIM_INLINE_SLOPE_RESET
+            slopes[idx(scenario_, row, col)] = solver_detail::MusclHalfSlopes{};
+#endif
             solver_detail::MusclFaceState center = cell_primitive(row, col);
             if (center.h <= config_.dry_tolerance) {
                 continue;

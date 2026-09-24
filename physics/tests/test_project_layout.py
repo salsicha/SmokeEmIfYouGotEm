@@ -46,6 +46,13 @@ class ProjectLayoutTests(unittest.TestCase):
         shipping={item['map'] for item in CATALOG['shipping']}
         self.assertTrue(all(item['map'] not in shipping for item in CATALOG['development']))
 
+    def test_review_water_is_excluded_without_removing_playable_vfx(self):
+        config=(ROOT/'unreal/Config/DefaultGame.ini').read_text()
+        self.assertIn('+DirectoriesToNeverCook=(Path="/Game/RaftSim/VFX/Water/LiquidBodyReview")',config)
+        self.assertIn('+DirectoriesToAlwaysCook=(Path="/Game/RaftSim/VFX/Water")',config)
+        self.assertNotIn('+DirectoriesToNeverCook=(Path="/Game/RaftSim/VFX/Water")',config)
+        self.assertTrue(any((ROOT/'unreal/Content/RaftSim/VFX/Water/LiquidBodyReview').glob('*.uasset')))
+
     def test_live_map_tests_cover_current_six_rivers(self):
         source=(PLUGIN/'RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp').read_text()
         block=source.split('const TCHAR* GRiverMapPaths[] = {',1)[1].split('};',1)[0]

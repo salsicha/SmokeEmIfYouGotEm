@@ -1,4 +1,5 @@
 #include "/Engine/Public/Platform.ush"
+#include "RaftSimFinite.ush"
 int2 GridSize;
 float2 OriginMeters;
 float CellMeters;
@@ -20,12 +21,12 @@ void MainCS(uint3 id:SV_DispatchThreadID)
 #if RAFTSIM_FRAME_PHASE == 0
     if(any(p>=GridSize))return;
     float4 s=State[i];
-    if(any(!isfinite(s)) || s.x<0 || s.w<0 || (s.x==0 && any(s.yz!=0)) ||
-        (s.x>0 && any(!isfinite(s.yz/s.x))))InterlockedAdd(Diagnostics[0],1);
-    if(any(!isfinite(Surface[i])))InterlockedAdd(Diagnostics[2],1);
+    if(any(!RaftSimIsFinite(s)) || s.x<0 || s.w<0 || (s.x==0 && any(s.yz!=0)) ||
+        (s.x>0 && any(!RaftSimIsFinite(s.yz/s.x))))InterlockedAdd(Diagnostics[0],1);
+    if(any(!RaftSimIsFinite(Surface[i])))InterlockedAdd(Diagnostics[2],1);
 #if RAFTSIM_FRAME_BOUNDARY
     for(uint j=i;j<2*(GridSize.x+GridSize.y);j+=GridSize.x*GridSize.y)
-        if(any(!isfinite(BoundaryVolume[j])))InterlockedAdd(Diagnostics[0],1);
+        if(any(!RaftSimIsFinite(BoundaryVolume[j])))InterlockedAdd(Diagnostics[0],1);
 #endif
 #elif RAFTSIM_FRAME_PHASE == 1
     if(any(p!=0))return;
@@ -33,7 +34,7 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     // No progress from a rejected/pending interval can become a completed frame.
     float4 clock=Progress[0];uint bits=0;
     if(Summary[2]!=1 || Summary[1]>Summary[0] || clock.z!=0)bits|=1u;
-    if(any(!isfinite(clock)))bits|=2u;
+    if(any(!RaftSimIsFinite(clock)))bits|=2u;
     if((TrialDiagnostics[0]|TrialDiagnostics[1]|TrialDiagnostics[2])!=0)bits|=4u;
     if(Summary[3]!=RAFTSIM_FRAME_BOUNDARY)bits|=8u;
     Diagnostics[3]=bits;

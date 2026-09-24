@@ -1,4 +1,5 @@
 #include "/Engine/Public/Platform.ush"
+#include "RaftSimFinite.ush"
 #include "RaftSimPressureMath.ush"
 int2 GridSize;
 float CellMeters;
@@ -108,8 +109,8 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     uint i=id.x;if(i>=GridSize.x*GridSize.y)return;
 #if RAFTSIM_PRESSURE_PHASE == 0
     float4 state=State[i];float2 g=Geometry[i];float f=NonbreakingFraction[i];
-    bool invalid=any(!isfinite(state)) || any(!isfinite(g)) || any(!isfinite(HydroRate[i])) ||
-        any(!isfinite(PhysicalBedSlope[i])) || !isfinite(f) || f<0 || f>1 ||
+    bool invalid=any(!RaftSimIsFinite(state)) || any(!RaftSimIsFinite(g)) || any(!RaftSimIsFinite(HydroRate[i])) ||
+        any(!RaftSimIsFinite(PhysicalBedSlope[i])) || !RaftSimIsFinite(f) || f<0 || f>1 ||
         !RaftSimPortableValidState(state) || RaftSimPressureNegative(g.x) ||
         (asuint(state.x)!=asuint(g.x) && ((asuint(state.x)|asuint(g.x))&0x7fffffffu)!=0) || (Pairs[i]&~3u)!=0;
     [unroll(2)]for(int a=0;a<2;++a)if((Pairs[i]&(1u<<a))!=0)
@@ -119,11 +120,11 @@ void MainCS(uint3 id:SV_DispatchThreadID)
             !RaftSimPressureWet(g.x) || !RaftSimPressureWet(Geometry[Neighbor(i,a,1)].x);
     }
     float2 u=RaftSimPressureWet(g.x)?RaftSimPressureDivide(state.yz,g.x):0;
-    invalid=invalid || any(!isfinite(u));
+    invalid=invalid || any(!RaftSimIsFinite(u));
     if(invalid){InterlockedAdd(Diagnostics[0],1);Velocity[i]=0;}else Velocity[i]=u;
 #if RAFTSIM_PRESSURE_BOUNDARY
     for(uint j=i;j<2*(GridSize.x+GridSize.y);j+=GridSize.x*GridSize.y)
-        if(any(!isfinite(BoundaryVelocity[j])))InterlockedAdd(Diagnostics[0],1);
+        if(any(!RaftSimIsFinite(BoundaryVelocity[j])))InterlockedAdd(Diagnostics[0],1);
 #endif
 #else
     if(Diagnostics[0]!=0 || Diagnostics[1]!=0)
@@ -159,7 +160,7 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     div+=BoundarySource(i).x;
 #endif
     float4 result=float4(advective,div,dot(u,PhysicalBedSlope[i]));Terms[i]=result;
-    if(any(!isfinite(result)))InterlockedAdd(Diagnostics[1],1);
+    if(any(!RaftSimIsFinite(result)))InterlockedAdd(Diagnostics[1],1);
 #elif RAFTSIM_PRESSURE_PHASE == 2
     float4 t=Terms[i];float2 u=Velocity[i];float divAdv=0,divRate=0;
     [unroll(2)]for(int a=0;a<2;++a)
@@ -193,12 +194,12 @@ void MainCS(uint3 id:SV_DispatchThreadID)
         RaftSimPortableMul(1.5,RaftSimPortableMul(h,q)),RaftSimPortableMul(3,curvature)));
     float4 forcing=float4(RaftSimPressureMul(float2(p,b),Lengths.x),RaftSimPressureMul(float2(p,b),Lengths.y));
     Base[i]=base;Forcing[i]=forcing;
-    if(any(!isfinite(base)) || any(!isfinite(forcing)))InterlockedAdd(Diagnostics[1],1);
+    if(any(!RaftSimIsFinite(base)) || any(!RaftSimIsFinite(forcing)))InterlockedAdd(Diagnostics[1],1);
 #elif RAFTSIM_PRESSURE_PHASE == 3
     float2 c;float4 e;Coefficients(i,c,e);float w=dot(c,Base[i]);
     [unroll(2)]for(int a=0;a<2;++a)w+=e[a]*Base[Neighbor(i,a,1)][a]+e[a+2]*Base[Neighbor(i,a,-1)][a];
     float2 result=float2(w,dot(Slope(i),Base[i]));BaseW[i]=result;
-    if(any(!isfinite(result)))InterlockedAdd(Diagnostics[1],1);
+    if(any(!RaftSimIsFinite(result)))InterlockedAdd(Diagnostics[1],1);
 #elif RAFTSIM_PRESSURE_PHASE == 4
     float2 c;float4 e;Coefficients(i,c,e);
     float f=NonbreakingFraction[i],h=Geometry[i].x;float2 b=Slope(i);
@@ -219,7 +220,7 @@ void MainCS(uint3 id:SV_DispatchThreadID)
             RaftSimPressureAdd(GradPressure(i,2,true),RaftSimPressureMul(PhysicalBedSlope[i],Forcing[i].w)),root));
     }
     RightHandSide[i]=rhs;
-    if(any(!isfinite(rhs)))InterlockedAdd(Diagnostics[1],1);
+    if(any(!RaftSimIsFinite(rhs)))InterlockedAdd(Diagnostics[1],1);
 #elif RAFTSIM_PRESSURE_PHASE == 5
     if(SolverDiagnostics[0]!=0 || SolverDiagnostics[1]!=0){Pressure[i]=0;return;}
     float h=Geometry[i].x,root=RaftSimPortableSqrt(h),f=NonbreakingFraction[i];
@@ -231,14 +232,14 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     float2 bottomTerm=RaftSimPressureAdd(RaftSimPressureMul(w,-1.5),RaftSimPressureMul(bb,.75));
     float2 bottom=RaftSimPressureAdd(Forcing[i].yw,float2(RaftSimPortableMul(scaled.x,bottomTerm.x),RaftSimPortableMul(scaled.y,bottomTerm.y)));
     float4 result=float4(p.x,bottom.x,p.y,bottom.y);Pressure[i]=result;
-    if(any(!isfinite(result)))InterlockedAdd(Diagnostics[1],1);
+    if(any(!RaftSimIsFinite(result)))InterlockedAdd(Diagnostics[1],1);
 #elif RAFTSIM_PRESSURE_PHASE == 6
     if(SolverDiagnostics[0]!=0 || SolverDiagnostics[1]!=0){Force[i]=0;return;}
     float2 b=PhysicalBedSlope[i];float4 p=Pressure[i];
     float2 result=RaftSimPressureAdd(RaftSimPressureMul(RaftSimPressureAdd(GradPressure(i,0,false),RaftSimPressureMul(b,p.y)),-PoleWeights.x),
         RaftSimPressureMul(RaftSimPressureAdd(GradPressure(i,2,false),RaftSimPressureMul(b,p.w)),-PoleWeights.y));
     Force[i]=result;
-    if(any(!isfinite(result)))InterlockedAdd(Diagnostics[1],1);
+    if(any(!RaftSimIsFinite(result)))InterlockedAdd(Diagnostics[1],1);
 #endif
 #endif
 }

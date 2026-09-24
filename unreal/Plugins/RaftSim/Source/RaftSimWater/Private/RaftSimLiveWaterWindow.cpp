@@ -6,6 +6,8 @@
 
 #include "Dom/JsonObject.h"
 #include "Misc/FileHelper.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Misc/Paths.h"
 #include "Misc/ScopeLock.h"
 #include "Serialization/JsonReader.h"
@@ -16,6 +18,13 @@
 
 namespace
 {
+bool UseEagerSampleNormals()
+{
+    // Same-binary reference for equality/performance qualification only.
+    static const bool Eager = FParse::Param(FCommandLine::Get(), TEXT("RaftSimEagerSampleNormals"));
+    return Eager;
+}
+
 // Clamp gameplay ticks so a hitch cannot explode the CFL substep count.
 constexpr float kMaxStepSeconds = 0.1f;
 
@@ -387,6 +396,10 @@ struct FSharedCartesianAtlas
         Result.SurfaceHeightM = float(BedValue + Depth + Datum);
         Result.VelocityMps = FVector2D(float(VelX), float(VelY));
         Result.bWet = Depth > 1.e-4; // Same presentation wet threshold as the live sampler.
+        // Mixed/dry reconstruction supplies its own normal. Defer the extra
+        // neighbour lookups and normalization unless that normal is needed.
+        const auto CentralNormal = [&]()
+        {
         const int32 Center = Index(X, Y);
         const auto Surface = [this](int32 I) { return Bed.Float64[I] + H.Float64[I]; };
         const int32 L = Index(X-1, Y), R = Index(X+1, Y);
@@ -399,7 +412,10 @@ struct FSharedCartesianAtlas
             if (Before != INDEX_NONE) return (Surface(Center)-Surface(Before))/Spacing;
             return 0.;
         };
-        Result.SurfaceNormal = FVector(float(-Gradient(L,R)), float(-Gradient(D,Up)), 1.f).GetSafeNormal();
+        return FVector(float(-Gradient(L,R)), float(-Gradient(D,Up)), 1.f).GetSafeNormal();
+        };
+        const bool EagerNormal=UseEagerSampleNormals();
+        if (EagerNormal) Result.SurfaceNormal=CentralNormal();
         double ReconstructedSurface=BedValue+Depth;
         if (RaftSimWetSurfaceInterpolation::ResolveMixed(CornerBed,CornerDepth,Available,
             Fx,Fy,BedValue,Spacing,Spacing,Depth,ReconstructedSurface,Result.SurfaceNormal))
@@ -407,6 +423,7 @@ struct FSharedCartesianAtlas
             Result.DepthM=float(Depth); Result.SurfaceHeightM=float(ReconstructedSurface+Datum);
             Result.bWet=Depth>1.e-4;
         }
+        else if (!EagerNormal) Result.SurfaceNormal=CentralNormal();
         return Result;
     }
 };
@@ -1101,13 +1118,18 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     raftsim::SolverConfig Config;
     Config.solver_mode = TCHAR_TO_UTF8(*(*Solver)->GetStringField(TEXT("solver_mode")));
     Config.flux_scheme = TCHAR_TO_UTF8(*(*Solver)->GetStringField(TEXT("flux_scheme")));
-    // The cooked 0.5 m state already contains the rapid's high-resolution
-    // ledges, holes, and wave train. Reconstructing every interface twice on
-    // the game thread costs ~51 ms per 160 x 80 m step at Troublemaker and
-    // does not add visible geometry. First-order runtime evolution preserves
-    // the same cells and conservative FV authority at less than half that
-    // cost; offline cooking remains second-order.
-    Config.spatial_order = 1;
+    // Continue with the cook's reconstruction order. Downgrading MUSCL seeds
+    // to first order diffuses their shoreline immediately (57/60 rapid bands
+    // exceeded the wet-area gate after only 0.2 seconds). Cost must be solved
+    // without silently changing the numerical model at the runtime handoff.
+    double CookedSpatialOrder = 0.0;
+    if (!(*Solver)->TryGetNumberField(TEXT("spatial_order"), CookedSpatialOrder) ||
+        (CookedSpatialOrder != 1.0 && CookedSpatialOrder != 2.0))
+    {
+        OutError = TEXT("Cooked river window requires explicit spatial_order 1 or 2");
+        return nullptr;
+    }
+    Config.spatial_order = static_cast<int>(CookedSpatialOrder);
     Config.cfl = (*Solver)->GetNumberField(TEXT("cfl"));
     Config.dry_tolerance = (*Solver)->GetNumberField(TEXT("dry_tolerance"));
     Config.roughness_scale = (*Solver)->GetNumberField(TEXT("roughness_scale"));
@@ -1483,7 +1505,10 @@ FRaftSimLiveWaterSampleResult FRaftSimLiveWaterWindow::Sample(
     Result.VelocityMps = FVector2D(
         static_cast<float>(Bilinear(State.u)), static_cast<float>(Bilinear(State.v)));
 
-    // Surface normal from central differences of the free surface.
+    // The mixed/dry branch below replaces this normal completely. Keep the
+    // same central-difference arithmetic, but evaluate only for its consumers.
+    const auto CentralNormal = [&]()
+    {
     const auto SurfaceAt = [&](std::size_t R, std::size_t C) -> double
     { return Scenario.bed(R, C) + FMath::Max(State.h(R, C), 0.0); };
     const std::size_t CL = Col > 0 ? Col - 1 : Col;
@@ -1494,8 +1519,10 @@ FRaftSimLiveWaterSampleResult FRaftSimLiveWaterWindow::Sample(
                         (CellXM * static_cast<double>(CR - CL == 0 ? 1 : CR - CL));
     const double DzDy = (SurfaceAt(RU, Col) - SurfaceAt(RD, Col)) /
                         (CellYM * static_cast<double>(RU - RD == 0 ? 1 : RU - RD));
-    Result.SurfaceNormal =
-        FVector(static_cast<float>(-DzDx), static_cast<float>(-DzDy), 1.0f).GetSafeNormal();
+    return FVector(static_cast<float>(-DzDx), static_cast<float>(-DzDy), 1.0f).GetSafeNormal();
+    };
+    const bool EagerNormal=UseEagerSampleNormals();
+    if (EagerNormal) Result.SurfaceNormal=CentralNormal();
     const double CornerBed[4]={Scenario.bed(Row,Col),Scenario.bed(Row,Col+1),
         Scenario.bed(Row+1,Col),Scenario.bed(Row+1,Col+1)};
     const double CornerDepth[4]={State.h(Row,Col),State.h(Row,Col+1),
@@ -1508,6 +1535,7 @@ FRaftSimLiveWaterSampleResult FRaftSimLiveWaterWindow::Sample(
         Result.DepthM=float(SampleDepth); Result.SurfaceHeightM=float(Surface+ElevationDatumM);
         Result.bWet=SampleDepth>1.e-4;
     }
+    else if (!EagerNormal) Result.SurfaceNormal=CentralNormal();
     return Result;
 }
 
