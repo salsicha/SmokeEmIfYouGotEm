@@ -88,6 +88,18 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             PartBox.Min.X >= HullBox.Max.X + 4.99);
     }
     TestTrue(TEXT("clearance test covers actual visible body components"), CheckedParts > 0);
+    const double DriftZ=Raft->Swimmers[0].SwimmerWorldPositionMeters.Z;
+    Raft->Swimmers[0].SwimmerWorldPositionMeters=Raft->GetActorLocation()/100.+FVector(.2,0,0);
+    Raft->Swimmers[0].SwimmerWorldPositionMeters.Z=DriftZ;
+    Raft->DriftSwimmers(0.f);
+    TestEqual(TEXT("hull separation does not lift a swimmer"),Raft->Swimmers[0].SwimmerWorldPositionMeters.Z,DriftZ);
+    for(const auto* Part:Parts)
+        if(Part && Part->IsRegistered() && Part->IsVisible())
+            TestTrue(TEXT("drift restores every visible part beyond the hull"),
+                Part->CalcBounds(Part->GetComponentTransform()).GetBox().Min.X>=HullBox.Max.X+4.99);
+    const FVector Separated=Raft->Swimmers[0].SwimmerWorldPositionMeters;
+    Raft->DriftSwimmers(0.f);
+    TestTrue(TEXT("repeated zero-step contact does not creep"),Raft->Swimmers[0].SwimmerWorldPositionMeters.Equals(Separated,1.e-6));
     FVector TubeTarget;
     const FVector StartM = Raft->Swimmers[0].SwimmerWorldPositionMeters;
     TestTrue(TEXT("published hull supplies a pulling target"),

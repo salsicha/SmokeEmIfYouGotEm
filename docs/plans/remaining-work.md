@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Normal drift now enforces the existing posed-body/hull exclusion envelope;
+previously current could carry swimmers back into the hull before pulling.
+Three native suites pass; corrected normal and surface-review replays show
+positive exterior camera clearance at2–8s sample points and complete reentry.
+This is scoped contact improvement, not full swimming/water acceptance.
+Detached-swimmer900-frame p9540.0317ms still FAILS33.333333ms. Sampled-height
+attachment remains review-only. See [contact receipt](../reconstruction-review-2026-09-07/guide-reentry.md).
+
 Swimmer-height review now samples the current wet water datum at spawn/drift/
 pulling and passes4native suites plus actual sample equality/reentry. Actual
 3s/6s views remain obstructed by the stern underside, so the change is gated

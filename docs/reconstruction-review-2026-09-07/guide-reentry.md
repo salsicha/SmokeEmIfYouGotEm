@@ -1,5 +1,62 @@
 # Actual guide swim/reentry drill — unfinished
 
+## Drift contact and camera-clearance follow-through — September24
+
+An opt-in `RaftSimSwimHullCameraAudit` in the existing guide replay samples
+38,344 visible hull triangles: nearest camera distance, double-sided forward
+ray hit, and clearance beyond the conservative outward hull-box support plane.
+Positive plane clearance proves exterior separation on that axis; negative
+clearance alone does NOT prove interior penetration. These timer samples use
+the player-camera manager's current view, not a synchronized per-pixel GPU
+readback. The1s sample occurs at ejection before camera convergence and is not
+classified as a settled swimming view. Probe build succeeds44.51s.
+
+Surface-attached pre-fix replay `south-fork-swim-camera-audit-v1-20260924`
+measures only4.787cm nearest clearance at3s (support−2.796cm), versus32.917cm
+at6s after pulling. Drift lacked the hull envelope used at ejection/pulling.
+The normal drift path now projects inward-moving posed bodies outward onto
+that same support plane, preserving Z and never pulling exterior swimmers in.
+It does not hide geometry, lift the camera or weaken reentry gates. This is
+conservative body/hull exclusion, not general continuous collision detection.
+
+Editor build39.54s; three native suites pass (2clean,1retained engine warning),
+including every visible body component outside hull after forced drift contact,
+unchanged height and no zero-step creep. Report:
+`tmp/swim-drift-contact-native-v1-20260924/index.json`.
+
+Corrected surface review has positive camera-plane clearance at2/3/4/6/8s
+(61.34/40.19/29.65/30.64/26.56cm);3s nearest distance46.14cm. Normal-default
+replay without surface attachment also stays exterior at those samples
+(58.41/29.76/20.49/22.44/24.34cm). Both reject6s boarding, accept10s and restore
+seated/attached/no-swimmer state at11s. The remaining large nearby stern view
+is exterior occlusion at these samples, not proof of clipping or a datum error.
+Inspected review3s and default3s/11s show exterior stern and restored seating.
+Full immersion, all-side/continuous contact and boarding animation remain open;
+sampled-height attachment remains review-only, disabled by default.
+
+Original videos (all decode completely):
+
+| Replay | Video suffix | SHA256 | Frames / last seconds / duplicates |
+| --- | --- | --- | --- |
+| Pre-fix review |20260924-000405|34fda05b04904a4a436641a826673ecde00d0ecafc8be67456f445b82a93b1ea|468 /15.566667 /27|
+| Corrected review |20260924-000811|5fb6c6d753ec4eaa354e5c622a00fec73490fcfb330cdcba491678023e1614c0|467 /15.533333 /23|
+| Corrected default |20260924-000909|764deba7f320fb6d4c2b8cfcb2bf1ffe007e99b3ee9ba6b9cfff99193edf703f|468 /15.566667 /25|
+
+Paths are `unreal/Saved/VideoCaptures/RaftSim_<suffix>.mp4`; decoder receipts
+are `tmp/swim-camera-audit-decoded-v1-20260924/` and
+`tmp/swim-drift-contact-{review,normal}-decoded-v1-20260924/`.
+Encoded30FPS is not measured game FPS. All engine runs exit0 without timeout.
+
+Uninstrumented900-frame default `south-fork-swim-drift-contact-cost-v1-20260924`
+issues one passenger overboard, confirmed swimming at3s/9s. With four solver
+lanes/no cook, confirmed nonlegacy offset1 and781rows60–840, mean29.642233ms,
+p9540.0317ms, max54.2053ms: FAIL33.333333ms. CSV SHA256
+`b08e72bad1d7a8d082cb5e5c3deaf7402dfdfea4af4f776f657825a0b88292d0`;
+report `tmp/swim-drift-contact-frame-v1-20260924.json`. This measures a real
+swimmer workload, not isolated query cost or a before/after causal effect.
+Standalone Game rebuild succeeds50.45s. Captured runs use rebuilt Editor game
+mode, so this does not additionally claim packaged-executable launch coverage.
+
 ## Swimmer surface-datum review — September24, NOT promoted
 
 Drift previously integrates velocity without sampling the resulting position's

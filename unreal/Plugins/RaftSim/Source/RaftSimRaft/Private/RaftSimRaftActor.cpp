@@ -2225,6 +2225,18 @@ void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
                     : CheckpointTransform.GetLocation()) / kCmPerM;
             Swimmers[Index].SwimmerDriftVelocityMetersPerSecond = FVector::ZeroVector;
         }
+        // Drift can carry a swimmer back into the hull before a rescue starts.
+        // Reuse the same conservative posed-body support plane as pulling;
+        // do not pull exterior swimmers inward or alter the water elevation.
+        if(auto* Avatar=FindAvatar(Swimmers[Index].PassengerId))
+            Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Swimming);
+        FVector HullTarget;
+        if(GetSwimmerTubeTarget(Swimmers[Index].PassengerId,Swimmers[Index].SwimmerWorldPositionMeters,HullTarget))
+        {
+            const FVector Away=(HullTarget-GetActorLocation()/kCmPerM).GetSafeNormal2D();
+            if(FVector::DotProduct(Swimmers[Index].SwimmerWorldPositionMeters-HullTarget,Away)<0.)
+                Swimmers[Index].SwimmerWorldPositionMeters=HullTarget;
+        }
         AttachSwimmerToWaterSurface(Swimmers[Index]);
         if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmers[Index].PassengerId))
         {

@@ -765,6 +765,54 @@ static void ScheduleCrewOverboardReview(UWorld* World)
     }
 }
 
+static void AuditSwimHullCamera(ARaftSimRaftActor* Raft,APlayerController* Player,float Seconds)
+{
+    if(!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSwimHullCameraAudit")) || !Player->PlayerCameraManager) return;
+    FVector Swimmer;
+    if(!Raft->GetSwimmerWorldPosition(TEXT("guide"),Swimmer)) return;
+    UProceduralMeshComponent* Hull=nullptr;
+    TInlineComponentArray<UProceduralMeshComponent*> Meshes(Raft);
+    for(auto* Mesh:Meshes)if(Mesh && Mesh->GetFName()==TEXT("RaftVisual")){Hull=Mesh;break;}
+    if(!Hull){UE_LOG(LogTemp,Error,TEXT("SwimHullCameraAudit missing rendered hull"));return;}
+    const FVector Camera=Player->PlayerCameraManager->GetCameraLocation();
+    const FVector Direction=Player->PlayerCameraManager->GetCameraRotation().Vector();
+    const FVector Away=(Swimmer-Raft->GetActorLocation()).GetSafeNormal2D();
+    const FTransform Transform=Hull->GetComponentTransform();
+    const FBox Box=Hull->CalcBounds(Transform).GetBox();
+    const double Clearance=FVector::DotProduct(Camera-Box.GetCenter(),Away)-FVector::DotProduct(Box.GetExtent(),Away.GetAbs());
+    double Nearest=MAX_dbl,RayHit=MAX_dbl;
+    int32 Triangles=0;
+    for(int32 S=0;S<Hull->GetNumSections();++S)
+    {
+        const auto* Section=Hull->GetProcMeshSection(S);
+        if(!Section || !Section->bSectionVisible)continue;
+        for(int32 I=0;I+2<Section->ProcIndexBuffer.Num();I+=3)
+        {
+            const FVector A=Transform.TransformPosition(Section->ProcVertexBuffer[Section->ProcIndexBuffer[I]].Position);
+            const FVector B=Transform.TransformPosition(Section->ProcVertexBuffer[Section->ProcIndexBuffer[I+1]].Position);
+            const FVector C=Transform.TransformPosition(Section->ProcVertexBuffer[Section->ProcIndexBuffer[I+2]].Position);
+            const FVector E1=B-A,E2=C-A;
+            if(FVector::CrossProduct(E1,E2).SizeSquared()<1.e-12)continue;
+            ++Triangles;
+            Nearest=FMath::Min(Nearest,FVector::Distance(Camera,FMath::ClosestPointOnTriangleToPoint(Camera,A,B,C)));
+            // Double-sided Moller-Trumbore ray, rendered triangles only.
+            const FVector P=FVector::CrossProduct(Direction,E2);
+            const double Det=FVector::DotProduct(E1,P);
+            if(FMath::Abs(Det)<1.e-10)continue;
+            const FVector T=Camera-A;
+            const double U=FVector::DotProduct(T,P)/Det;
+            if(U<0 || U>1)continue;
+            const FVector Q=FVector::CrossProduct(T,E1);
+            const double V=FVector::DotProduct(Direction,Q)/Det;
+            if(V<0 || U+V>1)continue;
+            const double Hit=FVector::DotProduct(E2,Q)/Det;
+            if(Hit>=0)RayHit=FMath::Min(RayHit,Hit);
+        }
+    }
+    UE_LOG(LogTemp,Display,TEXT("SwimHullCameraAudit seconds=%.0f triangles=%d support_clearance_cm=%.6f nearest_cm=%.6f forward_hit_cm=%.6f camera_z_cm=%.6f swimmer_z_cm=%.6f hull_min_z_cm=%.6f hull_max_z_cm=%.6f"),
+        Seconds,Triangles,Clearance,Nearest==MAX_dbl?-1.:Nearest,RayHit==MAX_dbl?-1.:RayHit,Camera.Z,Swimmer.Z,Box.Min.Z,Box.Max.Z);
+}
+
 static void ScheduleGuideReentryReview(UWorld* World)
 {
     const TWeakObjectPtr<UWorld> WeakWorld(World);
@@ -799,6 +847,7 @@ static void ScheduleGuideReentryReview(UWorld* World)
                 const bool Reentered=Raft->RequestSelectedReentry();
                 UE_LOG(LogTemp,Display,TEXT("GUIDE_REENTRY reentry_requested seconds=%.0f result=%d"),Seconds,int32(Reentered));
             }
+            AuditSwimHullCamera(Raft,Player,Seconds);
             UE_LOG(LogTemp,Display,TEXT("GUIDE_REENTRY sample seconds=%.0f swimming=%d mobility=%d attached=%d rescue_phase=%d target=%s completed=%d control_yaw=%.6f pawn_yaw=%.6f raft_yaw=%.6f"),
                 Seconds,int32(Raft->IsPassengerSwimming(TEXT("guide"))),int32(Guide->GetMobilityMode()),
                 int32(Guide->GetAttachParentActor()==Raft),int32(Raft->GetRescueInteractionState().Phase),
