@@ -173,3 +173,36 @@ timings. The broad previous4ms region is not a4ms duplicate upload. Next inspect
 core mask/film preparation and presence loops for exact redundant work; do not
 skip interpolation, dry-bank decisions or use allocation retention as a proven
 win. No actual visual change or motion/collision acceptance is claimed.
+
+## Vertex-local presence preparation candidate — September24
+
+`-RaftSimParallelCorePresence` tests a fused parallel pass for presence and
+Cartesian wet/depth/bed outputs. Each vertex writes only its own outputs;
+terrain probes and their serial ordering remain untouched. Default retains the
+original two serial passes. Station-coverage audit mode remains serial because
+its diagnostic counters are shared. Editor builds successfully71.55s.
+
+Actual normal-start `south-fork-core-presence-audit-v1-20260924` compares both
+schedules from the same saved pre-update presence on59 refreshes in engine
+frames120–240. All50,625-vertex comparisons are exact for presence, wetness,
+depth and bed; production outputs are restored after comparison. Log SHA256:
+`528588c510432caebbdc24363fc1da2c71b58eaf9026ed879282d8b76391fc14`.
+This is scoped preparation equality, not full visual/collision acceptance.
+
+Separate900-frame no-audit runs, same normal start, four solver lanes,
+NoCookWorkload after confirmed cook termination, nonlegacy offset1,
+samples60–840 inclusive781rows:
+
+| Mode, execution order | Mean frame ms | p95 ms | Maximum ms |
+| --- | ---: | ---: | ---: |
+| Serial control v1 |36.887218|44.7021|66.0685|
+| Parallel candidate v1 |33.447001|41.9950|51.5570|
+
+CSV control SHA256 `ef1d8d0a961bc29efd995174d68a2d8550f016f8670f8b349d52527de4de0049`;
+candidate `f086a0ecf33ca19a9b82ee75f25d0ad55aa0158a6f88df7a288e8c2fe3e70153`.
+Reports: `tmp/core-presence-{control,candidate}-frame-v1-20260924.json`.
+All three engine runs exit0 without timeout. Both timings FAIL33.333333ms.
+Do not promote on this one control-first pair; prior scratch testing demonstrated
+the danger of that inference. Next reverse the pair and validate downstream/
+recenter inputs if it holds. The candidate remains opt-in, Game rebuild and
+motion/shoreline acceptance remain outstanding, and South Fork is unfinished.

@@ -7560,7 +7560,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             -2.2f * FMath::Max(RefreshIntervalSeconds, 0.0f));
         const float PresenceReleaseBlend = 1.0f - FMath::Exp(
             -1.4f * FMath::Max(RefreshIntervalSeconds, 0.0f));
-        for (int32 Index = 0; Index < Vertices.Num(); ++Index)
+        static const bool bParallelCorePresence=FParse::Param(FCommandLine::Get(),TEXT("RaftSimParallelCorePresence"));
+        static const bool bAuditCorePresence=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCorePresenceAudit"));
+        const bool AuditPresence=bAuditCorePresence && bCartesianFlow && GFrameCounter>=120 && GFrameCounter<=240;
+        const TArray<float> PreviousPresence=AuditPresence ? LiveVolumeCoreWetPresence : TArray<float>();
+        const auto UpdatePresenceVertex=[&](int32 Index)
         {
             // Solver-wet cells present fully; baseline shoreline water
             // presents through the crop-authority feather so ownership
@@ -7590,21 +7594,49 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 Presence = 0.0f;
             }
             LiveVolumeCoreWetPresence[Index] = Presence;
-        }
+        };
 
         if (bCartesianFlow)
         {
             CartesianShoreWet.SetNumUninitialized(Vertices.Num());
             CartesianShoreDepthM.SetNumUninitialized(Vertices.Num());
             CartesianShoreBedM.SetNumUninitialized(Vertices.Num());
-            for (int32 I=0; I<Vertices.Num(); ++I)
+        }
+        const auto UpdateShoreVertex=[&](int32 I)
             {
                 CartesianShoreDepthM[I] = WaterSamples[I].DepthMeters;
                 CartesianShoreBedM[I] = WaterSamples[I].BedHeightMeters;
                 CartesianShoreWet[I] = CartesianShoreAvailable[I] && ConnectedWetMask[I] &&
                     !VisualFilmCullMask[I] && VolumeCoreWetMask[I] && WaterSamples[I].DepthMeters>1.e-4f &&
                     RefreshCoverage(I%GridStationN)>=kLiveVolumeCoreMinimumStationCoverage;
+        };
+        // Presence and shore outputs are vertex-local. Keep the original two
+        // serial passes as default/reference until whole-game cost is qualified.
+        // Coverage's optional audit increments counters, so it remains serial.
+        const auto PreparePresence=[&](bool Parallel)
+        {
+            if(Parallel && bCartesianFlow && !bAuditStationCoverage)
+                ParallelFor(Vertices.Num(),[&](int32 I){UpdatePresenceVertex(I);UpdateShoreVertex(I);},EParallelForFlags::Unbalanced);
+            else
+            {
+                for(int32 I=0;I<Vertices.Num();++I)UpdatePresenceVertex(I);
+                if(bCartesianFlow)for(int32 I=0;I<Vertices.Num();++I)UpdateShoreVertex(I);
             }
+        };
+        PreparePresence(bParallelCorePresence);
+        if(AuditPresence)
+        {
+            const auto SavedPresence=LiveVolumeCoreWetPresence;
+            const auto SavedWet=CartesianShoreWet;
+            const auto SavedDepth=CartesianShoreDepthM, SavedBed=CartesianShoreBedM;
+            LiveVolumeCoreWetPresence=PreviousPresence;
+            PreparePresence(!bParallelCorePresence);
+            const bool Exact=SavedPresence==LiveVolumeCoreWetPresence && SavedWet==CartesianShoreWet &&
+                SavedDepth==CartesianShoreDepthM && SavedBed==CartesianShoreBedM;
+            UE_LOG(LogTemp,Display,TEXT("CorePresenceAudit frame=%llu vertices=%d exact=%d"),GFrameCounter,Vertices.Num(),Exact);
+            ensureAlwaysMsgf(Exact,TEXT("Core presence preparation differs from reference"));
+            LiveVolumeCoreWetPresence=SavedPresence;
+            CartesianShoreWet=SavedWet; CartesianShoreDepthM=SavedDepth; CartesianShoreBedM=SavedBed;
         }
 
         Perf.Mark(TEXT("core_presence"));

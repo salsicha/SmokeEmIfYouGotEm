@@ -24,6 +24,11 @@ foam transport/history1.01ms, presence0.85ms, remaining publication0.64ms.
 Next inspect mask/film and presence preparation for exact redundant work;
 the broad region is not a duplicate upload. Actual normal-start probe exits0;
 this diagnostic is not visual delivery or performance acceptance.
+Presence follow-through adds an opt-in fused parallel vertex-local pass;
+59 actual50,625-vertex comparisons match exactly. Same-build control/candidate
+p9544.7021/41.9950ms both fail. Default remains serial; reverse-order evidence
+and downstream/recenter checks are required before any promotion. No scene
+acceptance or Game rebuild is claimed for this candidate.
 See the [receipt](../reconstruction-review-2026-09-07/refresh-cost-followthrough.md).
 This is supporting diagnostic work, not a delivered scene improvement.
 
