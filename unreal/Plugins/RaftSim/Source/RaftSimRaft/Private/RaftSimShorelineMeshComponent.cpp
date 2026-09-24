@@ -1,4 +1,5 @@
 #include "RaftSimShorelineMeshComponent.h"
+#include "RaftSimWaterSourceBounds.h"
 #include "DynamicMeshBuilder.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialRenderProxy.h"
@@ -444,7 +445,10 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
         {
             if(Compact)
             {
-                if(!ReferencedCrestSource.Update(BaseVertices,BaseIndices,Coarse,Shore))return false;
+                {
+                    CSV_SCOPED_TIMING_STAT(RaftSimShoreline,CrestSourceGather);
+                    if(!ReferencedCrestSource.Update(BaseVertices,BaseIndices,Coarse,Shore))return false;
+                }
                 return State.Update(ReferencedCrestSource.Vertices,ReferencedCrestSource.Indices,
                     BaseOffsets,ReferencedCrestSource.Coarse,ReferencedCrestSource.Shore,*Crests,
                     Out,OutIndices,Offsets);
@@ -483,6 +487,8 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
                     GFrameCounter,int32(Exact),int32(CandidateFirst),BaseVertices.Num(),ReferencedCrestSource.Vertices.Num(),NewIndices.Num(),Times[0],Times[1]);
         }
         else if(!UpdateCrests(CompactSource,CrestRefinement,WaterVertices,NewIndices,CellOffsets))return false;
+        {
+        CSV_SCOPED_TIMING_STAT(RaftSimShoreline,OutputStorage);
         bCompactCrestSource=CompactSource;
         CrestSourceVertexCount=CompactSource ? ReferencedCrestSource.Vertices.Num() : BaseVertices.Num();
         bTopologyRebuilt|=WaterIndices!=NewIndices;
@@ -493,6 +499,7 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
             ? Align(ActiveVertexCount+ActiveVertexCount/8,4096) : BeforeVertices;
         WaterVertices.SetNum(Capacity);
         for (int32 I=ActiveVertexCount; I<Capacity; ++I) WaterVertices[I]=BaseVertices[0];
+        }
     }
     else
     {
@@ -500,12 +507,43 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
         CrestSourceVertexCount=WaterVertices.Num();
         bCompactCrestSource=false;
     }
+    CSV_SCOPED_TIMING_STAT(RaftSimShoreline,BoundsAndNotify);
     WaterIndexCapacity=FMath::Max3(BeforeCapacity,(Nx-1)*(Ny-1)*12,
         FMath::DivideAndRoundUp(WaterIndices.Num(),12)*12);
     // Every referenced shore node lies within the XY hull of its two source
     // points and at its wet source's Z. Reserve nodes never contribute bounds.
+    const TConstArrayView<FProcMeshVertex> BoundsSource(BaseVertices.GetData(),Nx*Ny);
+    static const bool bForceParallelBounds=FParse::Param(FCommandLine::Get(),TEXT("RaftSimParallelWaterBounds"));
+    static const bool bSerialBounds=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialWaterBounds"));
+    // Exact native/live pairs and both orders of whole-frame controls qualify
+    // the South Fork normal scene. Other scenes retain the original default.
+    const bool bParallelBounds=!bSerialBounds && (bForceParallelBounds ||
+        (GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"))));
+    if (!BeforeVertices) UE_LOG(LogTemp,Display,TEXT("WaterBoundsMode parallel=%d serial_override=%d"),
+        int32(bParallelBounds),int32(bSerialBounds));
+    static const bool bBoundsAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimWaterBoundsAudit"));
     FBox SourceBounds(ForceInit);
-    for (int32 I=0; I<Nx*Ny; ++I) SourceBounds+=BaseVertices[I].Position;
+    if (bBoundsAudit && GFrameCounter>=120 && GFrameCounter<184)
+    {
+        FBox Results[2]; double Times[2];
+        const bool CandidateFirst=(GFrameCounter/2)%2!=0;
+        for (int32 Order=0; Order<2; ++Order)
+        {
+            const int32 Kind=(Order+int32(CandidateFirst))%2;
+            const double Start=FPlatformTime::Seconds();
+            Results[Kind]=Kind ? RaftSimWaterSourceBounds::Parallel(BoundsSource)
+                : RaftSimWaterSourceBounds::Reference(BoundsSource);
+            Times[Kind]=(FPlatformTime::Seconds()-Start)*1000.;
+        }
+        const bool Exact=Results[0].IsValid==Results[1].IsValid &&
+            Results[0].Min==Results[1].Min && Results[0].Max==Results[1].Max;
+        UE_LOG(LogTemp,Display,TEXT("WaterBoundsPair frame=%llu exact=%d candidate_first=%d vertices=%d reference_ms=%.9f candidate_ms=%.9f"),
+            GFrameCounter,int32(Exact),int32(CandidateFirst),BoundsSource.Num(),Times[0],Times[1]);
+        if (!Exact) { UE_LOG(LogTemp,Error,TEXT("Water source bounds mismatch")); return false; }
+        SourceBounds=Results[int32(bParallelBounds)];
+    }
+    else SourceBounds=bParallelBounds ? RaftSimWaterSourceBounds::Parallel(BoundsSource)
+        : RaftSimWaterSourceBounds::Reference(BoundsSource);
     WaterBounds=SourceBounds.ExpandBy(500.0);
     bPendingIndexUpdate|=bTopologyRebuilt;
     UpdateBounds();

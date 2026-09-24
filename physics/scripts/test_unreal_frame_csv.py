@@ -57,6 +57,8 @@ class UnrealFrameCsvTest(unittest.TestCase):
         self.assertNotIn(RELIEF_SCOPES[0], summarize(legacy, 0, 0))
         self.assertNotIn("RaftSimCrests/GameThread/Normals", summarize(legacy, 0, 0))
         self.assertNotIn("RaftSimShoreline/GameThread/RenderPacket", summarize(legacy, 0, 0))
+        for name in ('CrestSourceGather', 'OutputStorage', 'BoundsAndNotify'):
+            self.assertNotIn(f'RaftSimShoreline/GameThread/{name}', summarize(legacy, 0, 0))
 
     def test_render_packet_timing_is_optional_and_not_added_to_frame_time(self):
         name = "RaftSimShoreline/GameThread/RenderPacket"

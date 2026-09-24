@@ -14,7 +14,10 @@ WATER_SCOPES = ("RaftSimSurface/GameThread/Tick", "RaftSimSurface/GameThread/Ref
                 "RaftSimCrests/GameThread/Selection", "RaftSimSolver/GameThread/StepWater")
 PUBLISH_SCOPES = ("RaftSimSurface/GameThread/PackSource", "RaftSimShoreline/GameThread/SetMesh",
                   "RaftSimShoreline/GameThread/Topology", "RaftSimShoreline/GameThread/CrestInput",
-                  "RaftSimCrests/GameThread/Normals", "RaftSimShoreline/GameThread/RenderPacket")
+                  "RaftSimCrests/GameThread/Normals", "RaftSimShoreline/GameThread/RenderPacket",
+                  "RaftSimShoreline/GameThread/CrestSourceGather",
+                  "RaftSimShoreline/GameThread/OutputStorage",
+                  "RaftSimShoreline/GameThread/BoundsAndNotify")
 SMOOTHING_SCOPES = ("RaftSimSurface/GameThread/OpticalFilter",)
 # Optional in historical captures; absence must not be reported as zero cost.
 BREAKING_SCOPES = ("RaftSimSurface/GameThread/BreakingVertices",)
@@ -190,7 +193,8 @@ def main():
               "and can also contain CartesianPublish when creating, recentering or hard-publishing the carrier; "
               "on the combined source path SourceSamples includes sampling and handover, while SourceHandover measures only its completed guard; "
               "CartesianPublish contains packing/SetMesh; "
-              "SetMesh contains topology/crest input/crest update, which contains selection and normals). "
+              "SetMesh contains topology/crest input/source gather/output storage/bounds and notification/crest update, "
+              "which contains selection and normals). "
               "RenderPacket is separate deferred render-data preparation, not a child of SetMesh. "
               "Do not sum nested or thread times. Present zero scope "
               "rows record zero time (not proof of no call); absent columns are unavailable. "

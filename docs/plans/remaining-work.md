@@ -3,6 +3,17 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest normal-play performance increment: [exact water source bounds](../reconstruction-review-2026-09-07/water-source-bounds.md).
+Measured bounds/notification cost led to an exact parallel reduction, with no
+geometry, padding or cadence changes. All64 actual-input pairs match; native
+bounds/referenced-water suites pass3 and audit/parser tests pass17. ABBA p95:
+references35.1387/31.8753ms, candidates31.0480/31.0448ms; both orders favor the
+candidate. Rebuilt normal default confirms the enabled path and p9530.8299ms
+in the short first-pool run. Motion is decoded/inspected. This does NOT prove
+sustained rapid/full-route performance, new visual detail or river acceptance.
+Initial engine HTTP/DDC startup crash is preserved, followed by a passing fresh
+native run. Other maps retain their prior default. Full ordered scope stays open.
+
 New hydraulic qualification reaches complete local38000/16900s in the original
 cook36692. Both state/dry-bank audits pass; all86,720 bank cells remain dry.
 Outlet103.142577 versus inlet45.306955m³/s remains unsettled. Latest150s storage
