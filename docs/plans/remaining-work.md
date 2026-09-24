@@ -10,6 +10,11 @@ records Editor/Game builds and4 native suites passing, plus actual downstream
 Actual motion fully decodes; inspected3s/6s/11s retain the aligned crew view and
 closed ridge gaps. No visual-realism acceptance; repeated/full-route performance,
 normal-start/reentry on this build and reconstruction remain open.
+Ordinary-start follow-through on the same build now records p9533.9212ms FAIL;
+the downstream pass is not consistent-performance acceptance. Normal motion
+fully decodes and3s/9s/11s views were inspected; guide reentry remains untested.
+Measured CrestInput is only0.06ms mean; focus next on3.46ms mean/7.42ms p95
+crest update without reducing geometry. See the same storage receipt.
 
 Normal-play camera correction: [initial seated heading](../reconstruction-review-2026-09-07/initial-seated-heading.md)
 carries the missed spawn-to-seat rotation once while preserving user look and
