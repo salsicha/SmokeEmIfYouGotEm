@@ -5,6 +5,8 @@
 #include "Misc/ScopeExit.h"
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimCrewAvatarActor.h"
+#include "RaftSimCrewSeatLayout.h"
+#include "HAL/IConsoleManager.h"
 #include "RaftSimRaftActor.h"
 #include "UObject/Script.h"
 
@@ -39,7 +41,39 @@ bool FRaftSimCrewCommandWeightTest::RunTest(const FString&)
     Flex.PassengerCount = Raft->PaddlerCount;
     Flex.GuideMassKg = 85.0;
     Flex.PassengerMassKg = 75.0;
-    const auto Seats = RaftSimFlex::BuildDefaultCrewSeats(Flex);
+    const bool bLeftGuide = IConsoleManager::Get().FindConsoleVariable(
+        TEXT("raftsim.GuideLeftHanded"))->GetInt() != 0;
+    const auto Seats = RaftSimCrewSeatLayout::BuildNormalSeats(Flex, bLeftGuide);
+    const auto ReferenceSeats = RaftSimFlex::BuildDefaultCrewSeats(Flex);
+    TestTrue(TEXT("reference guide remains centred for independent D6 fixtures"),
+        ReferenceSeats[0].LocalPosition.Y == 0.);
+    for (int32 Index = 0; Index < Seats.Num(); ++Index)
+    {
+        const FName Id = Index == 0 ? FName(TEXT("guide"))
+            : FName(*FString::Printf(TEXT("paddler_%d"), Index));
+        const auto* Avatar = Raft->FindAvatar(Id);
+        if (!TestNotNull(TEXT("normal anchor has rendered avatar"), Avatar)) continue;
+        const FVector RenderM = Raft->GetActorTransform().InverseTransformPosition(
+            Avatar->GetActorLocation()) * .01;
+        TestTrue(TEXT("physical anchor X matches actual attached avatar"),
+            FMath::IsNearlyEqual(Seats[Index].LocalPosition.X, RenderM.X, 1.e-6));
+        TestTrue(TEXT("physical anchor Y matches actual attached avatar"),
+            FMath::IsNearlyEqual(Seats[Index].LocalPosition.Y, RenderM.Y, 1.e-6));
+        TestEqual(TEXT("vertical load remains explicitly inferred"),
+            Seats[Index].LocalPosition.Z, ReferenceSeats[Index].LocalPosition.Z);
+    }
+    const auto Left = RaftSimCrewSeatLayout::BuildNormalSeats(Flex, true);
+    const auto Right = RaftSimCrewSeatLayout::BuildNormalSeats(Flex, false);
+    TestTrue(TEXT("handed guide load mirrors across the raft"),
+        Left[0].LocalPosition.Equals(FVector(-1.55, -.62, .15), 1.e-6) &&
+        Right[0].LocalPosition.Equals(FVector(-1.55, .62, .15), 1.e-6));
+    const auto LeftWeight = RaftSimFlex::EvaluateCrewWeightDistribution(Flex.TotalMassKg(),
+        FVector(0, 0, -9.81), Left, {}, Flex.LengthM, Flex.WidthM);
+    const auto RightWeight = RaftSimFlex::EvaluateCrewWeightDistribution(Flex.TotalMassKg(),
+        FVector(0, 0, -9.81), Right, {}, Flex.LengthM, Flex.WidthM);
+    TestTrue(TEXT("mirrored guide changes actual weight moment, not just a label"),
+        FMath::IsNearlyEqual(LeftWeight.RollMomentNm, -RightWeight.RollMomentNm, 1.e-6) &&
+        FMath::Abs(LeftWeight.RollMomentNm) > 100.);
     Adapter->ConfigureFlexibleRaftModel(Flex, Seats);
     const int32 CrewCount = Raft->CrewAvatars.Num();
     TestEqual(TEXT("fixture has four paddlers and guide"), CrewCount, 5);

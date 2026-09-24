@@ -3,6 +3,16 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest normal-play correction: [shared horizontal crew anchors](../reconstruction-review-2026-09-07/crew-seat-anchors.md).
+Physical passenger rows/guide handedness now match actual rendered horizontal
+seat positions; independent reference fixtures remain unchanged. Editor/Game
+builds and11 native crew/flexible tests pass. Normal-start high-side motion is
+decoded/inspected, but body motion/COM realism is still provisional. Ordinary
+900-frame p9534.7217ms FAILS33.333333ms; prior short passes are not full-route
+acceptance or proof this workload meets budget. No source/terrain/field change.
+Vertical mass geometry, articulated inertia, transitions and river acceptance
+remain open. Original cook continues alone; the ordered queue is unchanged.
+
 Latest normal-play correction: [crew occupancy and loads](../reconstruction-review-2026-09-07/crew-occupancy-native.md).
 Ejected crew no longer retain integrated raft mass; reflip leaves swimmer seats
 unoccupied until reseating. Hull buoyancy capacity is preserved. Repeated events

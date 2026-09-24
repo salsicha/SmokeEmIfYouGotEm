@@ -17,6 +17,7 @@
 #include "RaftSimRockObstacleActor.h"
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimFlexibleRaftModel.h"
+#include "RaftSimCrewSeatLayout.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimCartesianWaterRegions.h"
@@ -32,8 +33,8 @@
 // a right-handed guide sits the right tube, a lefty the left ("if they are
 // right handed they sit on the right side of the boat", player report
 // 2026-08-31; the old seat was a centred coxswain perch no paddle guide
-// uses). Presentation-side only: the physics seat mass stays at the Python
-// reference's centre-stern position so D6 parity is untouched.
+// uses). Normal physical loads share the authored horizontal anchors;
+// independent Python/D6 reference fixtures keep their reference layout.
 static TAutoConsoleVariable<int32> CVarRaftSimGuideLeftHanded(
     TEXT("raftsim.GuideLeftHanded"), 0,
     TEXT("0 = right-handed guide (sits the right stern quarter, paddles on ")
@@ -380,7 +381,8 @@ void ARaftSimRaftActor::BeginPlay()
     FlexParameters.PassengerMassKg = kPassengerMassKg;
     FlexParameters.PassengerCount = PaddlerCount;
     Adapter->ConfigureFlexibleRaftModel(
-        FlexParameters, RaftSimFlex::BuildDefaultCrewSeats(FlexParameters), 18000.0,
+        FlexParameters, RaftSimCrewSeatLayout::BuildNormalSeats(FlexParameters,
+            CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0), 18000.0,
         /*bBodyMassIncludesAllSeats=*/true);
 
     // Seed the adapter in the local water frame. Starting a floating raft at
@@ -944,22 +946,17 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     // Both the raft component's offset and the posed body's underside
     // matter. Seat the visible mesh on the rendered tube, not the old
     // placeholder pelvis or a fixed actor-height guess.
-    // The guide perches on a stern-quarter tube on their dominant side,
-    // same lateral as the paddler seats; only the physics mass stays at
-    // the parity-pinned centre.
-    const float GuideSide =
-        CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0 ? -1.0f : 1.0f;
+    // The guide and passengers share horizontal anchors with physical loads.
+    const bool bLeftHandedGuide = CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0;
     // Sit forward of the raised stern tip so the guide's unchanged leg
     // lengths can reach the real interior floor, not hover above a tube.
-    FVector SeatCm(-155.0f, GuideSide * 62.0f, 30.0f);
+    FVector SeatCm = RaftSimCrewSeatLayout::AnchorCm(0, true, bLeftHandedGuide);
     if (PassengerId != TEXT("guide"))
     {
         FString Id = PassengerId.ToString();
         Id.RemoveFromStart(TEXT("paddler_"));
         const int32 Index = FMath::Max(FCString::Atoi(*Id) - 1, 0);
-        const float Side = (Index % 2 == 0) ? -1.0f : 1.0f;
-        const float BowM = 1.15f - (Index / 2) * 1.05f;
-        SeatCm = FVector(BowM * kCmPerM, Side * 62.0f, 22.0f);
+        SeatCm = RaftSimCrewSeatLayout::AnchorCm(Index, false, bLeftHandedGuide);
     }
     bool bTubeFound = false;
     const float TubeTopZCm = ComputeSeatTubeTopZCm(SeatCm, bTubeFound);
