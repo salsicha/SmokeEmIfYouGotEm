@@ -30,6 +30,10 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         World->DestroyActor(Raft);
     };
     Raft->InitializeCrewSeatingForValidation();
+    Raft->SetActorRotation(FRotator(12.f, -137.f, 21.f));
+    const auto* FirstAvatar = Raft->FindAvatar(TEXT("paddler_1"));
+    if (!TestNotNull(TEXT("first seated avatar"), FirstAvatar)) return false;
+    const float EjectionYaw = FirstAvatar->GetActorRotation().Yaw;
     auto* Adapter = NewObject<URaftSimChronoRuntimeAdapter>(Raft);
     Raft->RaftAdapter = Adapter;
     FRaftSimFlexParameters Flex;
@@ -62,6 +66,12 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
     const auto Before = Adapter->GetKinematicState();
     Raft->ForceCrewOverboardForTesting(2);
     TestEqual(TEXT("two swimmers"), Raft->GetSwimmerCount(), 2);
+    const auto* SwimmingAvatar = Raft->FindAvatar(TEXT("paddler_1"));
+    TestTrue(TEXT("ejection preserves world heading instead of resetting to world +X"),
+        FMath::Abs(FMath::FindDeltaAngleDegrees(SwimmingAvatar->GetActorRotation().Yaw, EjectionYaw)) < .001f);
+    TestTrue(TEXT("ejection releases seat tilt for the authored horizontal swim"),
+        FMath::Abs(SwimmingAvatar->GetActorRotation().Pitch) < .001f &&
+        FMath::Abs(SwimmingAvatar->GetActorRotation().Roll) < .001f);
     TestTrue(TEXT("occupancy change preserves body velocity"),
         Adapter->GetKinematicState().LinearVelocityMetersPerSecond == Before.LinearVelocityMetersPerSecond);
     TestFalse(TEXT("ejected seat loses stale action immediately"), Adapter->FlexActions.ContainsByPredicate(

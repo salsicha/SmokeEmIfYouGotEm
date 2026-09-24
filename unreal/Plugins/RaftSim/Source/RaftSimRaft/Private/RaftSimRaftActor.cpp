@@ -2111,9 +2111,13 @@ void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide)
 
         if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmer.PassengerId))
         {
-            Avatar->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+            // Ejection must not turn the swimmer toward world +X while the
+            // detached guide camera retains its world heading. Keep heading,
+            // but release seated/capsize roll and pitch for the authored swim.
+            const FQuat SwimHeading = FRotator(0.0f, Avatar->GetActorRotation().Yaw, 0.0f).Quaternion();
+            Avatar->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
             Avatar->SetActorTransform(FTransform(
-                FQuat::Identity,
+                SwimHeading,
                 Swimmer.SwimmerWorldPositionMeters * kCmPerM,
                 FVector::OneVector));
             Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Swimming);

@@ -1,5 +1,38 @@
 # Actual guide swim/reentry drill — unfinished
 
+## Preserve swimmer world heading on ejection
+
+Ejection formerly replaced every avatar's rotation with identity while the
+guide pawn/camera retained its world heading. In the normal-start drill these
+directions differed by approximately180deg, placing the camera looking back
+through the swimmer. SpawnSwimmers now retains the avatar's world yaw and
+releases seated pitch/roll before applying the horizontal swimming pose. This
+does not change rescue gates, hide geometry or enable shared-hull diagnostics.
+The occupancy regression now ejects an avatar from a tilted,−137deg raft and
+checks preserved yaw and released tilt. Occupancy, SwimmingTorsoAlignment and
+SeatedHeading pass:3success,0warnings,0failures in
+`tmp/swim-heading-native-v1-20260924/index.json`. Editor build73.55s and
+standalone Game build94.69s succeed. No new frame-cost claim; the outstanding
+measured frame-budget failure remains open.
+
+Normal-start `south-fork-swim-heading-reentry-v1-20260924` exits0 without
+timeout; original cook36692 suspension/resume both succeed. Throw-line succeeds
+at2.545447m,6s reentry is rejected,10s succeeds,11s confirms seated attachment
+and0current swimmers. Video `unreal/Saved/VideoCaptures/RaftSim_20260923-222446.mp4`,
+SHA256 `a5a28e16b565aee76b9d00d6efc80802d6f527152c9586ceaec83bcea01e34d2`,
+fully decodes465frames through15.466667s with11adjacent duplicates. Inspected
+3s/6s/9s/11s originals no longer show the guide's vest filling the view, but
+the camera still lies at/inside raft tubes during swimming/pulling. Reentry
+restores the seated view. Artifacts: `tmp/swim-heading-reentry-decoded-v1-20260924/`.
+This is partial visible correction, NOT swimming/collision/performance acceptance.
+Next fix hull-relative ejection and pull-target clearance, not another camera mask.
+
+HUD follow-through: RunHudWidget prints RunManager.GetSwimCount(), whose value
+increments once per new batch of swimmers and does not decrease on rescue.
+The11s value1 is therefore cumulative swim incidents, not stale current rescue
+state. Its label "swimmers" is misleading and remains to be corrected; no
+rescue-state reset is justified by that display.
+
 ## Swimming torso-axis correction — obstruction still open
 
 The swimming pose formerly used88deg yaw, leaving the torso and worn PFD's

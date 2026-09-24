@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Ejection now preserves avatar world heading instead of resetting to+X while
+the guide camera faces the opposite way. Three native suites pass; actual
+normal-start3s/6s/9s/11s frames remove the guide-vest obstruction but retain
+raft-tube intersection during swimming/pulling. Existing rescue gates still
+complete reentry. Next fix hull-relative ejection/pull placement. HUD's1 is a
+cumulative incident counter with a misleading label, not stale rescue state.
+See the [guide receipt](../reconstruction-review-2026-09-07/guide-reentry.md).
+
 Normal swimming pose now pitches the torso/PFD toward the authored shoulders
 instead of yawing an upright torso. Three native suites pass; actual normal-start
 throw-line/reentry still completes, but inspected swimming frames remain
