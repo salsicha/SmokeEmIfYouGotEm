@@ -22,7 +22,8 @@ SMOOTHING_SCOPES = ("RaftSimSurface/GameThread/OpticalFilter",)
 # Optional in historical captures; absence must not be reported as zero cost.
 BREAKING_SCOPES = ("RaftSimSurface/GameThread/BreakingVertices",)
 FOAM_SCOPES = ("RaftSimSurface/GameThread/FoamTransport",)
-GROUND_SCOPES = ("RaftSimGround/GameThread/Sample",)
+GROUND_SCOPES = ("RaftSimGround/GameThread/Sample", "RaftSimGround/GameThread/SurfaceSweep",
+                 "RaftSimHull/GameThread/Prepare", "RaftSimHull/GameThread/Render")
 RELIEF_SCOPES = ("RaftSimSurface/GameThread/HydraulicRelief",)
 METADATA = {"config", "engineversion", "deviceprofile", "rhiname", "raytracing",
             "systemresolution.resx", "systemresolution.resy", "targetframerate"}

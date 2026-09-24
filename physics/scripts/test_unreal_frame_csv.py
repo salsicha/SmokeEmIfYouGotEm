@@ -7,6 +7,23 @@ FOOTER = HEADER + "[HasHeaderRowAtEnd],1\n"
 
 
 class UnrealFrameCsvTest(unittest.TestCase):
+    def test_full_hull_scopes_are_optional_and_do_not_replace_frame_budget(self):
+        for name in GROUND_SCOPES[1:]:
+            with self.subTest(scope=name):
+                header = HEADER.rstrip() + ',' + name + '\n'
+                capture = header + '200,190,4,2,70,80\n200,190,4,2,70,0\n' + header + '[HasHeaderRowAtEnd],1\n'
+                samples, _ = parse_capture(io.StringIO(capture))
+                result = summarize(samples, 0, 1)
+                self.assertEqual(result[name]['mean_ms'], 40)
+                self.assertEqual(result[name]['positive_sample_count'], 1)
+                self.assertEqual(result['elapsed_frame_fps'], 5)
+                self.assertFalse(result['frame_p95_within_target_budget'])
+                legacy, _ = parse_capture(io.StringIO(HEADER + '20,18,4,2,5\n' + FOOTER))
+                self.assertNotIn(name, summarize(legacy, 0, 0))
+                for invalid in ('nan', 'inf', '-1'):
+                    with self.assertRaises(ValueError):
+                        parse_capture(io.StringIO(capture.replace(',80\n', ',' + invalid + '\n')))
+
     def test_append_only_engine_series_preserve_original_metric_positions(self):
         # Exact append-only layout emitted by Unreal's continuous CSV writer.
         final = HEADER.rstrip() + ',Exclusive/GameThread/EventWait/Effects\n'
