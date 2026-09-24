@@ -143,3 +143,72 @@ a range experiment or changing normal residency. Source export manifests do
 contain `coarse_2560_2816` and `coarse_2560_2688`; runtime absence alone does not
 prove that either was placed in the saved map. This remains diagnosis, not a
 playable fix or river acceptance.
+
+## Saved-map correction
+
+`audit_south_fork_checkpoint_terrain.py` loads the nine exact saved actors without
+saving. All are present, spatially loaded, not editor-only, visible and not hidden,
+with expected meshes/transforms and default runtime-grid assignment. Map and
+selected actor-package hashes are unchanged. Its report is
+`south-fork-checkpoint-saved-terrain-v1-20260924.json`, SHA256
+`8e9c861518715513e94f136bde2cb5200d2ceb621993002b3dda7dd5314b5225`.
+
+The runtime observer now records the actual hash class and reflected partition
+configuration. `south-fork-checkpoint-terrain-hash-v1-20260924` proves the map
+uses `WorldPartitionRuntimeHashSet` with `MainPartition`, not the spatial-hash
+grid configured in DefaultEngine.ini. Report SHA256
+`bda1306a12318fd12d9c8142ab8eec2f91ca0f7cf1f3281b0aabef5fbbbfb513`.
+Editor build37.59s succeeds. This explains the prior wrong-hash control's lack
+of effect; do not repeat it as a test of this map's active loading range.
+
+Correctly targeted control `south-fork-checkpoint-mainpartition-range-v1-20260924`
+uses `wp.Runtime.OverrideRuntimeLoadingRange -grid=MainPartition -range=200000`.
+All nine meshes now have loaded matches. Inspected phase1-3 shows continuous
+terrain at both former floating-patch gaps. Report SHA256
+`8be14c98e1ac26bab6f2990ab8ef4852921f64fe7fcd486cc65c47d70a54f3e6`.
+The attempted `south-fork-mainpartition-range-cost-v1-20260924` cost run contains
+two separate ExecCmds arguments; it is NOT accepted as verified candidate cost.
+
+`fix_south_fork_terrain_loading_range.py` applies the same range to the saved
+South Fork MainPartition only. It gates on the exact inspected map hash,
+partition identity and old range, backs up the map before editing, and saves no
+source meshes, captured data, actor transforms, hydraulic fields or other maps.
+Actual saved range was25600cm, now200000cm. The initial two script attempts
+failed protected/snake-case property reads before backup/mutation; their logs
+`south-fork-terrain-range-normal-v1`/`v2-20260924.log` are retained. Exact reflected
+property names succeed in `v3`. Mutation receipt:
+`south-fork-terrain-range-normal-v1-20260924.json`.
+
+- Old map SHA256: `c6bda5ff5f680d22b291eb30a6c902488acd909bb7f2b6177fa7103cdd40399f`.
+- Saved map SHA256: `27a67b3d6de5ba88b38d43ec527cc90acd2524f8d646278fc013c433ced0376f`.
+- Recoverable backup: `unreal/Saved/RaftSimValidation/south-fork-terrain-range-before-v1-20260924.zip`, SHA256 `171486d37da2819ff26018c09d4deb3ddacd8f758fd15deed2b70d5e004f5d3f`.
+
+Fresh normal-default replay `south-fork-terrain-range-normal-checkpoint-v1-20260924`
+has NO loading-range override. It passes checkpoint wet contact/detail advance,
+exits0 without timeout, and its inspected phase1-3 shows both former gaps closed.
+Report SHA256 `3341741eb5b52d57143f3f4793733ffb6b80d909b000cff9bc26befec1f632c2`.
+This is an incremental normal-scene terrain fix, not full-route geometry,
+shoreline, water realism, motion, sustained performance or river acceptance.
+All guarded replays resume the original cook36692; no new cook is started.
+
+Normal-default900-frame cost capture `south-fork-terrain-range-normal-cost-v1-20260924`
+has no extra startup commands; FrameTime mode is confirmed, scope offset1.
+Rows60–840: mean24.025367ms, p9532.8845ms, maximum51.246ms: short first-pool gate
+PASS against33.333333ms, not full-route or corrected-destination performance.
+CSV SHA256 `553cdc8b3540dcd8c050bdd6d8cd2d02e43d6732e30aa704913c094abca1747b`;
+audit `tmp/terrain-range-normal-frame-v1-20260924.json`.
+
+Game build initially fails closed on the expected stale map hash in the runtime
+bundle (`tmp/terrain-range-game-v1-20260924.log`). A fresh read-only native reload,
+`audit_south_fork_terrain_range_bindings.py`, verifies saved MainPartition range,
+unchanged water/route actor bytes and entrypoints. Binding report
+`tmp/terrain-range-saved-bindings-v1-20260924.json` has SHA256
+`8f0a1bb9cfbdd8a3a2206851fc4b9f53cc31877c76db612feb7f504ddad7d925`.
+`rebind_saved_map` verifies all2405 payload files and complete unchanged actor
+inventory before updating only the map and native-binding hashes in the bundle.
+This is a required map-only packaging dependency update, not rebasing historical
+visual evidence or blessing different hydraulics.
+Game rebuild succeeds in75.95s (`tmp/terrain-range-game-v2-20260924.log`), and
+`physics/tests/test_runtime_data_bundle.py` passes38 tests in3.61s. This proves
+build/dependency consistency, not freshly packaged execution. Full temporal
+terrain review and corrected-destination/full-route performance remain next.

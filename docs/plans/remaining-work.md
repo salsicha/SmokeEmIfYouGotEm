@@ -3,6 +3,19 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Normal-scene terrain delivery: [checkpoint terrain correction](../reconstruction-review-2026-09-07/checkpoint-terrain-fragments.md)
+identifies the active hash-set MainPartition's256m loading range, not the unused
+spatial-hash INI grid. Raising only the saved South Fork partition to2km restores
+all seven absent complementary meshes and closes the inspected floating gaps in
+a fresh normal-default checkpoint replay (no range override). Exact previous map
+is backed up; source geometry, water/route actors and installed flow remain unchanged.
+Editor/Game builds pass; independently verified map-only bundle rebind retains all
+2405 payloads, and38 bundle regressions pass. No historical acceptance hash is rebased.
+Normal-start900-frame p9532.8845ms passes the short33.333333ms gate; mean24.025367ms,
+maximum51.246ms. Full-route/corrected-destination cost, temporal scenery stability,
+packaged execution and broader river acceptance remain open. Historical failed
+controls and the diagnosis below are retained, not the current next action.
+
 Destination terrain diagnosis: [rendering controls](../reconstruction-review-2026-09-07/checkpoint-terrain-fragments.md)
 retain the floating ridge patches in both HLOD-off and confirmed Nanite-off
 checkpoint images. Neither toggle is a fix; defaults/assets stay unchanged.

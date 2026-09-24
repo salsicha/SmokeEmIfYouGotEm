@@ -10,6 +10,9 @@
 #include "Engine/GameInstance.h"
 #include "EngineUtils.h"
 #include "WorldPartition/WorldPartitionSubsystem.h"
+#include "WorldPartition/WorldPartition.h"
+#include "WorldPartition/WorldPartitionRuntimeHash.h"
+#include "UObject/UnrealType.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "Misc/FileHelper.h"
@@ -195,6 +198,21 @@ struct FProbe
                     Residency.Add(MakeShared<FJsonValueObject>(Entry));
                 }
                 Row->SetArrayField(TEXT("terrain_complementary_residency"),Residency);
+                if(auto* Partition=World->GetWorldPartition())
+                {
+                    auto* Hash=Partition->RuntimeHash.Get();
+                    Row->SetStringField(TEXT("runtime_hash_class"),Hash ? Hash->GetClass()->GetPathName() : TEXT("None"));
+                    Row->SetBoolField(TEXT("partition_streaming_enabled"),Partition->bEnableStreaming);
+                    if(Hash)for(const FName PropertyName:{FName(TEXT("Grids")),FName(TEXT("RuntimePartitions"))})
+                    {
+                        if(auto* Property=FindFProperty<FProperty>(Hash->GetClass(),PropertyName))
+                        {
+                            FString Value;
+                            Property->ExportTextItem_Direct(Value,Property->ContainerPtrToValuePtr<void>(Hash),nullptr,Hash,PPF_None);
+                            Row->SetStringField(PropertyName.ToString(),Value);
+                        }
+                    }
+                }
             }
             Events.Add(MakeShared<FJsonValueObject>(Row));
         }
