@@ -1,5 +1,36 @@
 # South Fork exact continuation from 15000 seconds
 
+## New completed checkpoint:16900s (September24)
+
+Original cook36692 was verified live with its original creation time; no new
+cook was launched. Complete local38000/16900s passes both independent snapshot
+and exterior-bank audits. All5,382,400 h/u/v cells are finite; maximum depth
+3.256262318m, maximum speed4.851050237m/s. All86,720 artificial-bank cells remain
+exactly dry. Volume2067671.046570m³ differs from the native driver by only
+−1.629815e−9m³; maximum per-step conservation residual remains9.483589469e−9m³.
+Depth SHA256 `c49fc9c4206311d9ae0c17d824f99f4cfdb2fa7d226e7a8382120c54168c1719`.
+Reports: `tmp/cartesian-16900-state-v1-20260924.json` and
+`tmp/cartesian-16900-banks-v1-20260924.json`.
+
+Instantaneous outlet103.142577m³/s still exceeds inlet45.306955m³/s: **not
+settled**, not eligible for promotion. New regional comparisons use the same
+unchanged route partition, physical inputs and integrated conservation checks:
+
+| Model-time interval | Station0–9km | Station9–26km | Station26km–end | Domain |
+| --- | ---: | ---: | ---: | ---: |
+|16550–16750s|−0.001218|−27.812563|−32.544693|−60.358475m³/s|
+|16750–16900s|−0.001305|−26.308281|−32.418417|−58.728003m³/s|
+
+These are storage-change rates, not numerical cross-section fluxes. Integrated
+exterior closure errors are−8.00e−11 and1.22e−10m³. The middle/lower reach still
+drains; tiny upper-reach net storage alone does not prove local equilibrium or
+justify partial field promotion. Report:
+`tmp/cartesian-storage-regions-16900-v1-20260924.json`. Skipped checkpoints are
+not implicitly state/bank-audited. Next selected complete snapshot must be newer
+than16900s. No settling-time forecast, bathymetry/outlet calibration acceptance,
+new playable geometry, build, motion or performance acceptance follows here.
+Normal installed4950s fields and nonlinear OFF remain unchanged.
+
 Reviewed 2026-09-23 UTC. Supporting hydraulic work only; no playable promotion.
 
 The preceding 12000–15000 s cook is terminal. Its final state and dry-bank

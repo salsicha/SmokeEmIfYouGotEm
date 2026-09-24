@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+New hydraulic qualification reaches complete local38000/16900s in the original
+cook36692. Both state/dry-bank audits pass; all86,720 bank cells remain dry.
+Outlet103.142577 versus inlet45.306955m³/s remains unsettled. Latest150s storage
+loss is−58.728003m³/s, distributed across middle/lower reach; integrated closure
+is1.22e−10m³. See [continuation receipt](../reconstruction-review-2026-09-07/cartesian-continuation-15000.md).
+Next selected complete snapshot must be newer than16900s. This is supporting
+qualification only: no installed-field promotion or playable/river acceptance.
+
 Latest normal-play correction: [shared horizontal crew anchors](../reconstruction-review-2026-09-07/crew-seat-anchors.md).
 Physical passenger rows/guide handedness now match actual rendered horizontal
 seat positions; independent reference fixtures remain unchanged. Editor/Game
