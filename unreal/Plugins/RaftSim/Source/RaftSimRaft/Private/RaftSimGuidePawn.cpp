@@ -47,6 +47,18 @@ bool HasNegateModifier(const FEnhancedActionKeyMapping& Mapping)
     }
     return false;
 }
+
+void UnmapKeyPreservingOrder(UInputMappingContext* Context, const UInputAction* Action, const FKey& Key)
+{
+    const auto Matches = [Action,&Key](const FEnhancedActionKeyMapping& Mapping)
+        { return Mapping.Action == Action && Mapping.Key == Key; };
+    if (!Context->GetMappings().ContainsByPredicate(Matches)) return;
+    const auto Preserved = Context->GetMappings().FilterByPredicate(
+        [&Matches](const FEnhancedActionKeyMapping& Mapping) { return !Matches(Mapping); });
+    while (Context->GetMappings().ContainsByPredicate(Matches)) Context->UnmapKey(Action,Key);
+    // UE's UnmapKey uses RemoveAtSwap. Preserve surviving priority and modifiers.
+    for (int32 I=0; I<Preserved.Num(); ++I) Context->GetMapping(I)=Preserved[I];
+}
 }
 
 ARaftSimGuidePawn::ARaftSimGuidePawn()
@@ -73,15 +85,32 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     ReseatCrewAction = LoadGeneratedInputAsset<UInputAction>(
         TEXT("/Game/RaftSim/Input/IA_ReseatCrew.IA_ReseatCrew"));
 
+    GuideSteerAction = CreateDefaultSubobject<UInputAction>(TEXT("IA_GuideSteerRuntime"));
+    GuideSteerAction->ValueType = EInputActionValueType::Axis1D;
+    ToggleRecordingAction = CreateDefaultSubobject<UInputAction>(TEXT("IA_ToggleRecordingRuntime"));
+    ToggleRecordingAction->ValueType = EInputActionValueType::Boolean;
+    InitializeGuideComponents();
+}
+
+void ARaftSimGuidePawn::PostInitializeComponents()
+{
+    Super::PostInitializeComponents();
+    // Never add pawn-owned actions/modifiers to a cooked asset in the root
+    // set. Duplicate the complete context (including profile overrides and
+    // instanced modifiers) only after this pawn's subobjects are initialized.
+    if (!DefaultMappingContext || !GetWorld() || !GetWorld()->IsGameWorld()) return;
+    DefaultMappingContext = DuplicateObject<UInputMappingContext>(DefaultMappingContext, this);
+    DefaultMappingContext->SetFlags(RF_Transient);
+
     // The cooked IMC predates independent raw mouse look. Remove its mouse
     // mapping at runtime so held paddle-axis keys cannot starve IA_Look and
     // so the controller's raw MouseX/MouseY sampling never double-applies.
     // The gamepad right stick stays mapped to IA_Look below.
     if (DefaultMappingContext && LookAction)
     {
-        DefaultMappingContext->UnmapKey(LookAction, EKeys::Mouse2D);
-        DefaultMappingContext->UnmapKey(LookAction, EKeys::MouseX);
-        DefaultMappingContext->UnmapKey(LookAction, EKeys::MouseY);
+        UnmapKeyPreservingOrder(DefaultMappingContext, LookAction, EKeys::Mouse2D);
+        UnmapKeyPreservingOrder(DefaultMappingContext, LookAction, EKeys::MouseX);
+        UnmapKeyPreservingOrder(DefaultMappingContext, LookAction, EKeys::MouseY);
     }
 
     // Shipping fallback: bind the already-cooked rescue actions even when an
@@ -93,6 +122,11 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
         {
             return;
         }
+        // Older cooked contexts can contain serialized null references to
+        // the former pawn-owned actions. Repair only a key whose replacement
+        // action is available; never mutate the source asset or remove a
+        // valid binding that shares the key.
+        UnmapKeyPreservingOrder(DefaultMappingContext, nullptr, Key);
         for (const FEnhancedActionKeyMapping& Existing : DefaultMappingContext->GetMappings())
         {
             if (Existing.Action == Action && Existing.Key == Key)
@@ -118,19 +152,18 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     // The guide's own stern draw/pry rides the mouse buttons: RMB = pry
     // right, LMB = draw left (gamepad: left trigger = draw left; the right
     // trigger belongs to the throw line). Runtime-transient action mapped
-    // into the loaded IMC exactly like the rescue fallback above —
+    // into the pawn-private IMC exactly like the rescue fallback above —
     // GActionSpecs mirrors the Milestone 23 input contract, so no new
     // generated asset.
-    GuideSteerAction = CreateDefaultSubobject<UInputAction>(TEXT("IA_GuideSteerRuntime"));
-    GuideSteerAction->ValueType = EInputActionValueType::Axis1D;
     MapRescueKey(GuideSteerAction, EKeys::RightMouseButton);
     MapRescueKey(GuideSteerAction, EKeys::LeftMouseButton, /*bNegate=*/true);
     MapRescueKey(GuideSteerAction, EKeys::Gamepad_LeftTrigger, /*bNegate=*/true);
     // F9 toggles the debug screen recorder (clips in Saved/VideoCaptures).
-    ToggleRecordingAction = CreateDefaultSubobject<UInputAction>(
-        TEXT("IA_ToggleRecordingRuntime"));
-    ToggleRecordingAction->ValueType = EInputActionValueType::Boolean;
     MapRescueKey(ToggleRecordingAction, EKeys::F9);
+}
+
+void ARaftSimGuidePawn::InitializeGuideComponents()
+{
     for (const TCHAR* CommandPath : {
              TEXT("/Game/RaftSim/Input/IA_GuideCommandForwardPaddle.IA_GuideCommandForwardPaddle"),
              TEXT("/Game/RaftSim/Input/IA_GuideCommandBackPaddle.IA_GuideCommandBackPaddle"),
@@ -734,6 +767,16 @@ void ARaftSimGuidePawn::UpdateComfortCamera(float DeltaSeconds)
         : 0.0f;
 }
 
+void ARaftSimGuidePawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = RegisteredInputSubsystem.Get())
+    {
+        if (DefaultMappingContext) InputSubsystem->RemoveMappingContext(DefaultMappingContext);
+    }
+    RegisteredInputSubsystem.Reset();
+    Super::EndPlay(EndPlayReason);
+}
+
 void ARaftSimGuidePawn::BeginPlay()
 {
     Super::BeginPlay();
@@ -750,6 +793,7 @@ void ARaftSimGuidePawn::BeginPlay()
             if (DefaultMappingContext != nullptr)
             {
                 InputSubsystem->AddMappingContext(DefaultMappingContext, 0);
+                RegisteredInputSubsystem = InputSubsystem;
             }
         }
     }

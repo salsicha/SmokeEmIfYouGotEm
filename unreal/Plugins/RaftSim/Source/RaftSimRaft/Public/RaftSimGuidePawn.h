@@ -11,6 +11,7 @@ class ARaftSimRaftActor;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
+class UEnhancedInputLocalPlayerSubsystem;
 class USceneComponent;
 struct FInputActionValue;
 
@@ -116,10 +117,13 @@ class RAFTSIMRAFT_API ARaftSimGuidePawn : public APawn
 
 public:
     ARaftSimGuidePawn();
+    friend class FRaftSimInputContextIsolationTest;
 
     virtual void Tick(float DeltaSeconds) override;
     virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& OutResult) override;
     virtual void BeginPlay() override;
+    virtual void PostInitializeComponents() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|GuideCamera")
@@ -209,6 +213,7 @@ protected:
 
     void HandlePaddleStroke(const FInputActionValue& Value);
     void HandleTurnStroke(const FInputActionValue& Value);
+    void InitializeGuideComponents();
     void HandleGuideSteer(const FInputActionValue& Value);
     void HandleLook(const FInputActionValue& Value);
     void HandleHighSide(const FInputActionValue& Value);
@@ -223,6 +228,8 @@ protected:
     /** Mapping context and actions are generated assets under /Game/RaftSim/Input. */
     UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
     TObjectPtr<UInputMappingContext> DefaultMappingContext;
+    // Remember the registration owner even after unpossession.
+    TWeakObjectPtr<UEnhancedInputLocalPlayerSubsystem> RegisteredInputSubsystem;
 
     UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
     TObjectPtr<UInputAction> PaddleStrokeAction;
