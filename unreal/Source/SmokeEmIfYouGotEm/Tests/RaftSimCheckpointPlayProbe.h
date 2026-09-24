@@ -17,6 +17,9 @@
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
 #include "UnrealClient.h"
+#include "GameFramework/PlayerController.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/StaticMesh.h"
 
 namespace RaftSimCheckpointPlayProbe
 {
@@ -112,6 +115,52 @@ struct FProbe
             Row->SetNumberField(TEXT("detail_seconds"),LastClock);
             Row->SetStringField(TEXT("raft_world_cm"),Position.ToString());
             Row->SetNumberField(TEXT("origin_x_m"),Registration.X);Row->SetNumberField(TEXT("origin_y_m"),Registration.Y);
+            if(Phase==1 && FParse::Param(FCommandLine::Get(),TEXT("RaftSimCheckpointTerrainRays")))
+            {
+                // Read-only owner probes, not rendered-pixel or collision acceptance.
+                // Normalized positions cover the retained detached patches and
+                // adjacent ridge at1280x720; preserve misses rather than invent owners.
+                TArray<TSharedPtr<FJsonValue>> Rays;
+                auto* PC=World->GetFirstPlayerController();int32 Width=0,Height=0;
+                if(PC)PC->GetViewportSize(Width,Height);
+                for(const FVector2D Pixel:{FVector2D(600,207),FVector2D(620,210),FVector2D(900,268),
+                    FVector2D(890,275),FVector2D(840,270),FVector2D(600,240),FVector2D(900,305)})
+                {
+                    auto Ray=MakeShared<FJsonObject>();FVector Origin,Direction;
+                    Ray->SetNumberField(TEXT("reference_pixel_x"),Pixel.X);
+                    Ray->SetNumberField(TEXT("reference_pixel_y"),Pixel.Y);
+                    const bool Projected=PC && Width>0 && Height>0 && PC->DeprojectScreenPositionToWorld(
+                        Pixel.X*Width/1280.,Pixel.Y*Height/720.,Origin,Direction);
+                    Ray->SetBoolField(TEXT("deprojected"),Projected);
+                    if(Projected)
+                    {
+                        Ray->SetStringField(TEXT("origin_cm"),Origin.ToString());
+                        Ray->SetStringField(TEXT("direction"),Direction.ToString());
+                        FCollisionQueryParams Params(SCENE_QUERY_STAT(CheckpointTerrainOwner),true);
+                        FHitResult Hit;
+                        const bool HitTerrain=World->LineTraceSingleByChannel(Hit,Origin,
+                            Origin+Direction*5000000.,ECC_Visibility,Params);
+                        Ray->SetBoolField(TEXT("collision_hit"),HitTerrain);
+                        if(HitTerrain)
+                        {
+                            Ray->SetStringField(TEXT("actor"),GetPathNameSafe(Hit.GetActor()));
+                            Ray->SetStringField(TEXT("component"),GetPathNameSafe(Hit.GetComponent()));
+                            Ray->SetStringField(TEXT("impact_cm"),Hit.ImpactPoint.ToString());
+                            Ray->SetNumberField(TEXT("distance_cm"),Hit.Distance);
+                            Ray->SetNumberField(TEXT("item"),Hit.Item);
+                            if(auto* Mesh=Cast<UStaticMeshComponent>(Hit.GetComponent()))
+                            {
+                                Ray->SetStringField(TEXT("mesh"),GetPathNameSafe(Mesh->GetStaticMesh()));
+                                Ray->SetStringField(TEXT("transform"),Mesh->GetComponentTransform().ToHumanReadableString());
+                                Ray->SetStringField(TEXT("bounds_origin_cm"),Mesh->Bounds.Origin.ToString());
+                                Ray->SetStringField(TEXT("bounds_extent_cm"),Mesh->Bounds.BoxExtent.ToString());
+                            }
+                        }
+                    }
+                    Rays.Add(MakeShared<FJsonValueObject>(Ray));
+                }
+                Row->SetArrayField(TEXT("terrain_owner_collision_rays"),Rays);
+            }
             Events.Add(MakeShared<FJsonValueObject>(Row));
         }
         if(Now-PhaseStart<10. || FreshFrames<100 || LastClock-FirstClock<3. || Captures<4)return;

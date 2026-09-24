@@ -8,6 +8,10 @@ retain the floating ridge patches in both HLOD-off and confirmed Nanite-off
 checkpoint images. Neither toggle is a fix; defaults/assets stay unchanged.
 Next identify the visible mesh/component owners and inspect connectivity,
 transforms, bounds and residency. Wet-contact replay passes do not accept scenery.
+Owner-ray follow-through now identifies context1024_2560_2560 at the four patch
+rays, coarse_2432_2816 below, and two gap misses. Context exports contain only
+supplemental quads: next distinguish missing source coverage from unloaded
+complementary original terrain. No source geometry or normal setting was changed.
 
 Runtime correction: [water scenario reset isolation](../reconstruction-review-2026-09-07/water-scenario-reset.md)
 clears old physical/presentation fields when an adapter is reconfigured, instead
