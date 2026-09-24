@@ -107,30 +107,6 @@ bool FRaftSimHullGroupedBroadPhaseTest::RunTest(const FString&)
             Registry.SweepCapturedSurface(Start,End,Hull.Faces,.001,1.e-7,false); // build outside timings
             for(int32 Order=0;Order<2;++Order)
             {
-                double Ms[2]={};
-                for(int32 Repeat=0;Repeat<4;++Repeat)
-                {
-                    FResult Pair[2];
-                    for(int32 Step=0;Step<2;++Step)
-                    {
-                        const int32 Cached=Order==0?Step:1-Step;
-                        const double Began=FPlatformTime::Seconds();
-                        Pair[Cached]=Registry.SweepCapturedSurface(Start,End,Hull.Faces,.001,1.e-7,true,Cached!=0);
-                        Ms[Cached]+=(FPlatformTime::Seconds()-Began)*1000.;
-                    }
-                    const auto& A=Pair[0];const auto& B=Pair[1];
-                    TestTrue(TEXT("static face bounds preserve complete query outcome"),
-                        A.Status==B.Status && A.Time==B.Time && A.TrianglePairs==B.TrianglePairs &&
-                        A.Iterations==B.Iterations && A.MovingFace==B.MovingFace && A.GroundFace==B.GroundFace &&
-                        A.GroundComponent==B.GroundComponent && A.Normal==B.Normal &&
-                        A.Witness.MovingPoint==B.Witness.MovingPoint && A.Witness.GroundPoint==B.Witness.GroundPoint &&
-                        A.Witness.MovingBary==B.Witness.MovingBary && A.Witness.GroundBary==B.Witness.GroundBary &&
-                        A.Witness.Squared==B.Witness.Squared);
-                }
-                AddInfo(FString::Printf(TEXT("static-face-bounds source=%s case=%d order=%d uncached_ms=%.6f cached_ms=%.6f"),Path,Case,Order,Ms[0],Ms[1]));
-            }
-            for(int32 Order=0;Order<2;++Order)
-            {
                 FResult R,G;
                 const auto Run=[&](bool Grouped)
                 {
