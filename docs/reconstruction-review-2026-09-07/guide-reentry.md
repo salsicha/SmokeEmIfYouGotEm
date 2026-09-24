@@ -1,5 +1,29 @@
 # Actual guide swim/reentry drill — unfinished
 
+## Cumulative swim-event HUD correction — September24
+
+The normal status line now calls GetSwimCount "swim events", not "swimmers".
+RunManager increments this historical counter for a fresh overboard batch;
+reentry does not decrement it. Scoring, rescue gates and active swimmer state
+are unchanged. This resolves the misleading historical1 after successful
+reentry, not a stale-rescue-state defect.
+
+Editor build succeeds79.27s; standalone Game build succeeds113.61s. Actual
+normal-start replay `south-fork-swim-event-hud-v1-20260924` runs rebuilt Editor
+in game mode, exits0 without timeout, no cook workload. Throw-line drill
+reenters at10s;11s telemetry confirms swimming0/mobility0/attached1/completed1.
+Inspected11s frame shows the seated view and corrected "1 swim events" label.
+This is not proof of launching the packaged standalone executable.
+
+Original video `unreal/Saved/VideoCaptures/RaftSim_20260923-234331.mp4`, SHA256
+`cfb87c103e35789a4aaf3dfa0e683a3fbe5a153eb9a97733aaab5f2e77c9b95d`.
+Full decode:468frames,15.566667s,22exact adjacent duplicates,1280x720;
+report/stills `tmp/swim-event-hud-decoded-v1-20260924/`. Full decoding is not
+all-frame visual inspection, and encoded30FPS is not measured game FPS.
+Water realism, continuous swim/boarding animation, collision and performance
+remain unaccepted. Retained-scratch and parallel-presence candidates remain
+opt-in following inconsistent whole-frame comparisons.
+
 ## Hull-relative pulling and actual-surface reentry distance
 
 Pulling now stops at the rendered hull's conservative support plane with the

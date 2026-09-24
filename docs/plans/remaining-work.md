@@ -3,6 +3,12 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Normal HUD now labels GetSwimCount as cumulative "swim events", not current
+"swimmers". Actual normal-start throw-line/reentry replay completes at10s;
+inspected11s seated view displays the corrected historical count. This is a
+narrow playable UI correction, not water, boarding-animation or performance
+acceptance. See [guide receipt](../reconstruction-review-2026-09-07/guide-reentry.md).
+
 The sole15000–18000 s hydraulic continuation is now terminal, not waiting.
 Independent terminal-state/bank audits pass, but final300 s net drainage is
 48.650025m³/s: NOT settled or eligible for installation. No successor cook
@@ -29,6 +35,9 @@ Presence follow-through adds an opt-in fused parallel vertex-local pass;
 p9544.7021/41.9950ms both fail. Default remains serial; reverse-order evidence
 and downstream/recenter checks are required before any promotion. No scene
 acceptance or Game rebuild is claimed for this candidate.
+Reverse-order result rejects presence promotion: candidate p9540.9524ms versus
+serial40.2939ms, both failing. Do not repeat the unchanged candidate; serial
+remains default. Whole-frame order sensitivity does not prove scheduling gains.
 See the [receipt](../reconstruction-review-2026-09-07/refresh-cost-followthrough.md).
 This is supporting diagnostic work, not a delivered scene improvement.
 

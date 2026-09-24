@@ -259,7 +259,7 @@ void URaftSimRunHudWidget::NativeTick(const FGeometry& Geometry, float DeltaSeco
         }
         const int32 ElapsedSeconds = FMath::Max(0, FMath::FloorToInt(RunManager->GetRunTimeSeconds()));
         StatusText->SetText(FText::FromString(FString::Printf(
-            TEXT("%s  •  %02d:%02d  •  %d incidents  •  %d swimmers  •  river km %.2f"),
+            TEXT("%s  •  %02d:%02d  •  %d incidents  •  %d swim events  •  river km %.2f"),
             StateName, ElapsedSeconds / 60, ElapsedSeconds % 60,
             RunManager->GetSafetyIncidentCount(), RunManager->GetSwimCount(),
             RunManager->GetCurrentStationM() / 1000.0f)));

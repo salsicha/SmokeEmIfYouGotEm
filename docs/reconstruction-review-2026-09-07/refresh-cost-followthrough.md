@@ -206,3 +206,22 @@ Do not promote on this one control-first pair; prior scratch testing demonstrate
 the danger of that inference. Next reverse the pair and validate downstream/
 recenter inputs if it holds. The candidate remains opt-in, Game rebuild and
 motion/shoreline acceptance remain outstanding, and South Fork is unfinished.
+
+## Presence reverse-order check — promotion rejected
+
+Same build, candidate-first then control, normal-start900 frames, no cook,
+four solver lanes, confirmed nonlegacy offset1 and781rows60–840:
+
+| Mode | Mean frame ms | p95 ms | Maximum ms |
+| --- | ---: | ---: | ---: |
+| Parallel candidate v2 |31.263367|40.9524|46.7880|
+| Serial control v2 |30.060455|40.2939|48.6874|
+
+CSV candidate SHA256 `eda0498f32d212d54bd0509d9b44cc50aa793899285e683fc8e9f395dfa4fdbf`;
+control `7bf8bc556faf8c7b38a8959d8e65ce221bd2de320605f696c336f2a4443fdc63`.
+Reports: `tmp/core-presence-{candidate,control}-frame-v2-20260924.json`.
+Both engine runs exit0 without timeout. Both fail33.333333ms and the reversed
+pair no longer favors the candidate's mean/p95. Do not promote or repeat this
+unchanged experiment as a proven improvement. Default remains serial. Any
+future scheduling work needs more localized cost evidence, not extrapolation
+from whole-frame order-sensitive pairs. Equality remains a scoped pass only.
