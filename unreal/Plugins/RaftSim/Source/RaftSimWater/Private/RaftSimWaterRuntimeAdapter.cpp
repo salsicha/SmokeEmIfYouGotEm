@@ -26,6 +26,24 @@ CSV_DEFINE_CATEGORY(RaftSimSolver,true);
 void URaftSimWaterRuntimeAdapter::Configure(const FRaftSimWaterRuntimeConfig& InConfig)
 {
     Config = InConfig;
+    // A new scenario resets the coordinate frame below. Never retain physical
+    // or presentation data expressed in the previous frame across that reset.
+#if RAFTSIM_HAS_LIVE_SOLVER
+    LiveWindow.Reset();
+    LastFixedWindowExtentM = FVector2D::ZeroVector;
+#endif
+    ReportManifestState = FRaftSimWaterReportManifestState();
+    CartesianWaterBoundsM = FBox2D(ForceInit);
+    RaftSupportBreakingSites.Reset();
+    RaftSupportBoulderFootprints.Reset();
+    RaftSupportBreakingCrestLiftMeters = 0.0f;
+    RaftSupportBreakingStationSpacingMeters = 1.0f;
+    RaftSupportBandField.Reset();
+    PresentationBaselineField.Reset();
+    PresentationWaveClockSeconds = -1.0f;
+    bRaftSupportLocalFluidEnabled = false;
+    RaftSupportLocalFluidStrength = 0.0f;
+    RaftSupportLocalFluidAdvectionMeters = FVector2D::ZeroVector;
     CaptureState = FRaftSimWaterDeterministicCaptureState();
     CaptureState.CapturePath = Config.DeterministicCapturePath;
     CaptureState.bEnabled = Config.bEnableDeterministicCapture;

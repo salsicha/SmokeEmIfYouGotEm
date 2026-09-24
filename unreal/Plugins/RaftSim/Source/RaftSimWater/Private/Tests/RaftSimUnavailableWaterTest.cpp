@@ -48,6 +48,26 @@ bool FRaftSimUnavailableWaterTest::RunTest(const FString&)
     TestTrue(TEXT("explicit valid reload recovers from fault"),
         Water->ConfigureDevTankWindow(FVector2D(0,0),10,10,1,5,2));
     TestTrue(TEXT("recovered tank samples"),Water->SampleWaterAtWorldPosition(FVector(200,300,0),Sample));
+    TArray<URaftSimWaterRuntimeAdapter::FSupportBoulderFootprint> Footprints;
+    Footprints.AddDefaulted();
+    Water->ConfigureRaftSupportBoulderFootprints(Footprints);
+    TestEqual(TEXT("first scenario has a boulder footprint"),Water->GetRaftSupportBoulderFootprintCount(),1);
+    Water->ConfigureRaftSupportSurface(true,1.f,1.f,1.f);
+    Water->ConfigureRaftSupportLocalFluid(true,1.f,FVector2D(32,15));
+    Water->SetPresentationWaveClockSeconds(91.f);
+    Config.ScenarioPackagePath=TEXT("second-unavailable-water-test");
+    Water->Configure(Config);
+    TestFalse(TEXT("new scenario releases previous physical window"),Water->HasLiveWindow());
+    TestEqual(TEXT("new scenario clears boulder coordinates"),Water->GetRaftSupportBoulderFootprintCount(),0);
+    TestFalse(TEXT("new scenario does not inherit support configuration"),Water->IsRaftSupportSurfaceEnabled());
+    TestFalse(TEXT("old manifest state does not leak into new scenario"),Water->GetReportManifestState().bLoaded);
+    CheckMissing();
+    if(!TestTrue(TEXT("second scenario loads distinct physical data"),
+        Water->ConfigureDevTankWindow(FVector2D(0,0),10,10,1,8,3)))return false;
+    TestTrue(TEXT("second scenario samples its own field"),Water->SampleWaterAtWorldPosition(FVector(200,300,0),Sample));
+    TestEqual(TEXT("second scenario has new stage"),Sample.SurfaceHeightMeters,8.f);
+    TestEqual(TEXT("second scenario has new bed"),Sample.BedHeightMeters,5.f);
+    TestEqual(TEXT("second scenario has new depth"),Sample.DepthMeters,3.f);
 #endif
     return !HasAnyErrors();
 }

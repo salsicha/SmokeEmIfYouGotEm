@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Runtime correction: [water scenario reset isolation](../reconstruction-review-2026-09-07/water-scenario-reset.md)
+clears old physical/presentation fields when an adapter is reconfigured, instead
+of retaining them across coordinate reset. Editor/Game builds and2 native suites
+pass. Normal-map distant checkpoint/return retain wet contact and moving detail,
+but inspected destination images show floating terrain fragments: visual FAIL.
+Investigate actual destination terrain/streaming next; native replay success is
+not geometry acceptance. No new frame-performance or river-completion claim.
+
 Runtime correction: [unavailable-water sampling](../reconstruction-review-2026-09-07/unavailable-water.md)
 no longer fabricates a one-metre wet sheet for missing non-Cartesian fields and
 rejects faulted adapters. Explicit tanks and valid river windows remain supported.
