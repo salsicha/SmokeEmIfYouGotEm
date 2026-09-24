@@ -67,6 +67,7 @@ class RAFTSIMRAFT_API ARaftSimRaftActor : public AActor
 {
     GENERATED_BODY()
     friend class FRaftSimCrewCommandWeightTest;
+    friend class FRaftSimCrewOccupancyTest;
 
 public:
     /** Exact triangle samples of current uploaded floor and tube/thwart sections, in raft local cm. */
@@ -456,6 +457,7 @@ private:
     void UpdateRescueInteraction(float DeltaSeconds);
     void UpdateRescueLineVisual();
     void SpawnSwimmers(int32 Count, bool bIncludeGuide);
+    void RefreshCrewSeatOccupancy();
     void RemoveSwimmerAt(int32 Index);
     int32 FindSwimmerIndex(FName PassengerId) const;
     ARaftSimCrewAvatarActor* FindAvatar(FName PassengerId) const;

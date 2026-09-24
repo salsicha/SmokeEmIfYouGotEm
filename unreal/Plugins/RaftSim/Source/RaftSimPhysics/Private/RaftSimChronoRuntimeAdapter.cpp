@@ -76,10 +76,25 @@ void URaftSimChronoRuntimeAdapter::SetKinematicState(const FRaftSimRaftKinematic
 void URaftSimChronoRuntimeAdapter::ConfigureFlexibleRaftModel(
     const FRaftSimFlexParameters& InParameters,
     const TArray<FRaftSimFlexCrewSeat>& InSeats,
-    double NominalPressurePa)
+    double NominalPressurePa,
+    bool bBodyMassIncludesAllSeats)
 {
     FlexParameters = InParameters;
     FlexSeats = InSeats;
+    bBodyMassIncludesFlexibleCrew = bBodyMassIncludesAllSeats;
+    bFlexibleCrewMassContractValid = true;
+    NominalFlexibleCrewMassKg = 0.0;
+    for (const FRaftSimFlexCrewSeat& Seat : FlexSeats)
+    {
+        NominalFlexibleCrewMassKg += Seat.OccupantMassKg;
+        if (bBodyMassIncludesAllSeats)
+            bFlexibleCrewMassContractValid &= FMath::IsFinite(Seat.OccupantMassKg) && Seat.OccupantMassKg >= 0.0;
+    }
+    if (bBodyMassIncludesAllSeats)
+        bFlexibleCrewMassContractValid &= FMath::IsFinite(RaftConfig.MassKg) &&
+            FMath::IsFinite(NominalFlexibleCrewMassKg) && RaftConfig.MassKg > NominalFlexibleCrewMassKg;
+    if (!bFlexibleCrewMassContractValid)
+        UE_LOG(LogTemp, Error, TEXT("Invalid combined crew mass contract: body must include all seats and positive dry mass"));
     FlexCapsizedSeats = FlexSeats;
     for (FRaftSimFlexCrewSeat& Seat : FlexCapsizedSeats)
     {
@@ -103,6 +118,19 @@ void URaftSimChronoRuntimeAdapter::ConfigureFlexibleRaftModel(
 void URaftSimChronoRuntimeAdapter::SetFlexibleCrewActions(const TArray<FRaftSimFlexCrewAction>& InActions)
 {
     FlexActions = InActions;
+}
+
+bool URaftSimChronoRuntimeAdapter::SetFlexibleCrewSeatOccupied(const FString& SeatId, bool bOccupied)
+{
+    FRaftSimFlexCrewSeat* Seat = FlexSeats.FindByPredicate(
+        [&SeatId](const FRaftSimFlexCrewSeat& Candidate) { return Candidate.SeatId == SeatId; });
+    if (!Seat) return false;
+    Seat->bOccupied = bOccupied;
+    if (!bOccupied)
+    {
+        FlexActions.RemoveAll([&SeatId](const FRaftSimFlexCrewAction& Action) { return Action.SeatId == SeatId; });
+    }
+    return true;
 }
 
 void URaftSimChronoRuntimeAdapter::SetFlexibleUniformWater(
@@ -188,6 +216,7 @@ bool URaftSimChronoRuntimeAdapter::SetHullGeometryProvider(
 
 bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
 {
+    if (!bFlexibleCrewMassContractValid) return false;
     // Build the rigid state in meters from the UE-centimeter kinematic state.
     FRaftSimFlexRigidState State;
     State.Position = KinematicState.WorldTransform.GetTranslation() * 0.01;
@@ -403,11 +432,18 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         }
     }
 
-    const double MassKg = FMath::Max(static_cast<double>(RaftConfig.MassKg), 1.0e-3);
+    const double NominalMassKg = FMath::Max(static_cast<double>(RaftConfig.MassKg), 1.0e-3);
+    const double MassKg = bBodyMassIncludesFlexibleCrew
+        ? FMath::Max(NominalMassKg - NominalFlexibleCrewMassKg +
+            SeatSolve.CrewTelemetry.TotalCrewMassKg, 1.0e-3)
+        : NominalMassKg;
+    // Preserve the existing shape-based inertia approximation as occupancy
+    // changes. This is not a per-limb/parallel-axis center-of-mass solve.
+    const double InertiaScale = MassKg / NominalMassKg;
     const FVector Inertia(
-        FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.X), 1.0e-3),
-        FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.Y), 1.0e-3),
-        FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.Z), 1.0e-3));
+        FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.X) * InertiaScale, 1.0e-3),
+        FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.Y) * InertiaScale, 1.0e-3),
+        FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.Z) * InertiaScale, 1.0e-3));
 
     // Buoyancy support stage (ported from the P1 actor integrator): gravity,
     // multi-point tube buoyancy against the live water surface, blended
@@ -421,7 +457,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         const double WeightN = MassKg * kSupportGravityMps2;
         ForceN.Z += -WeightN;
         const double PerPointBuoyancyN =
-            WeightN * static_cast<double>(RaftConfig.BuoyancyWeightMultiple) /
+            // Occupants leaving do not remove inflated hull volume/capacity.
+            NominalMassKg * kSupportGravityMps2 * static_cast<double>(RaftConfig.BuoyancyWeightMultiple) /
             static_cast<double>(TubeSamplePointsM.Num()) *
             FMath::Lerp(0.48, 1.0, static_cast<double>(FlexPressureFraction)) *
             FMath::Lerp(0.80, 1.0, static_cast<double>(FlexFabricIntegrity));
@@ -870,6 +907,10 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     if(HullGeometryProvider && !bInvalidState)HullGeometryCommit();
 
     LastFlexStepTelemetry.bEvaluated = true;
+    LastFlexStepTelemetry.OccupiedCrewMassKg = SeatSolve.CrewTelemetry.TotalCrewMassKg;
+    LastFlexStepTelemetry.IntegratedMassKg = MassKg;
+    LastFlexStepTelemetry.IntegratedInertiaKgM2 = Inertia;
+    LastFlexStepTelemetry.BuoyancyReferenceMassKg = NominalMassKg;
     LastFlexStepTelemetry.MaxFreeboardLossM = SeatSolve.TubeSolve.MaxFreeboardLossM;
     LastFlexStepTelemetry.PortTotalFreeboardLossM = SeatSolve.PortTotalFreeboardLossM;
     LastFlexStepTelemetry.StarboardTotalFreeboardLossM = SeatSolve.StarboardTotalFreeboardLossM;

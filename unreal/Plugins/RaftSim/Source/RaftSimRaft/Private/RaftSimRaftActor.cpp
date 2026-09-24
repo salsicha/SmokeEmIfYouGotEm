@@ -380,7 +380,8 @@ void ARaftSimRaftActor::BeginPlay()
     FlexParameters.PassengerMassKg = kPassengerMassKg;
     FlexParameters.PassengerCount = PaddlerCount;
     Adapter->ConfigureFlexibleRaftModel(
-        FlexParameters, RaftSimFlex::BuildDefaultCrewSeats(FlexParameters));
+        FlexParameters, RaftSimFlex::BuildDefaultCrewSeats(FlexParameters), 18000.0,
+        /*bBodyMassIncludesAllSeats=*/true);
 
     // Seed the adapter in the local water frame. Starting a floating raft at
     // zero world velocity while the material immediately advects at the live
@@ -2086,10 +2087,11 @@ void ARaftSimRaftActor::EnterCapsize()
 
 void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide)
 {
-    Swimmers.Reset();
-    RescueInteraction = FRaftSimRescueInteractionState{};
-    SelectedSwimmerIndex = INDEX_NONE;
     const int32 Available = FMath::Clamp(Count, 0, PaddlerCount + (bIncludeGuide ? 1 : 0));
+    if (Available == 0) return;
+    // Keep existing swimmers (including their positions and rescue clocks)
+    // when another ejection or capsize adds crew; never orphan their seats.
+    const int32 PreviousSwimmerCount = Swimmers.Num();
     const FVector RaftWorldCm = IsFiniteVector(GetActorLocation())
         ? GetActorLocation()
         : CheckpointTransform.GetLocation();
@@ -2101,6 +2103,7 @@ void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide)
         Swimmer.PassengerId = bIncludeGuide && Index == 0
             ? FName(TEXT("guide"))
             : FName(*FString::Printf(TEXT("paddler_%d"), Index + (bIncludeGuide ? 0 : 1)));
+        if (FindSwimmerIndex(Swimmer.PassengerId) != INDEX_NONE) continue;
         const float Angle = (2.0f * PI * Index) / FMath::Max(1, Available);
         Swimmer.SwimmerWorldPositionMeters =
             RaftM + FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f) * 1.5f;
@@ -2119,6 +2122,10 @@ void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide)
             Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Swimming);
         }
     }
+    RefreshCrewSeatOccupancy();
+    if (Swimmers.Num() == PreviousSwimmerCount) return;
+    RescueInteraction = FRaftSimRescueInteractionState{};
+    SelectedSwimmerIndex = INDEX_NONE;
     if (!Swimmers.IsEmpty())
     {
         SelectedSwimmerIndex = 0;
@@ -2128,6 +2135,18 @@ void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide)
             Swimmers[0].SwimmerWorldPositionMeters,
             GetActorLocation() / kCmPerM);
         RescueInteraction.FeedbackCode = TEXT("rescue_target_selected");
+    }
+}
+
+void ARaftSimRaftActor::RefreshCrewSeatOccupancy()
+{
+    if (!RaftAdapter) return;
+    RaftAdapter->SetFlexibleCrewSeatOccupied(TEXT("guide"), FindSwimmerIndex(TEXT("guide")) == INDEX_NONE);
+    for (int32 Index = 0; Index < PaddlerCount; ++Index)
+    {
+        const FName PassengerId(*FString::Printf(TEXT("paddler_%d"), Index + 1));
+        RaftAdapter->SetFlexibleCrewSeatOccupied(FString::Printf(TEXT("passenger_%d"), Index),
+            FindSwimmerIndex(PassengerId) == INDEX_NONE);
     }
 }
 
@@ -2379,6 +2398,7 @@ void ARaftSimRaftActor::RemoveSwimmerAt(int32 Index)
         AttachAvatarToSeat(Avatar, PassengerId);
     }
     Swimmers.RemoveAt(Index);
+    RefreshCrewSeatOccupancy();
     if (Swimmers.IsEmpty())
     {
         SelectedSwimmerIndex = INDEX_NONE;
@@ -2461,6 +2481,7 @@ bool ARaftSimRaftActor::TryRestoreCheckpoint(const FTransform& Destination)
     SelectedSwimmerIndex = INDEX_NONE;
     RescueFailureResetRemaining = -1.0f;
     RaftMode = ERaftSimRaftMode::Upright;
+    RefreshCrewSeatOccupancy();
     FlipRiskLatchSeconds = 0.0f;
     CapsizeTransitionRemainingSeconds = 0.0f;
     SetActorTransform(CheckpointTransform);

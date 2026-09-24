@@ -42,6 +42,7 @@
 #include "RaftSimCameraPresentation.h"
 #include "RaftSimRunCoordinateProvider.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
+#include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "RaftSimWaterVfxActor.h"
@@ -726,6 +727,43 @@ bool FRaftSimCarrierCaptureIndexTest::RunTest(const FString&)
 }
 #endif
 
+// Input-only drill on the current playable raft; never changes water, time or
+// camera. Samples come from completed physics steps, not intended input values.
+static void ScheduleCrewOverboardReview(UWorld* World)
+{
+    if (!World) return;
+    const TWeakObjectPtr<UWorld> WeakWorld(World);
+    FTimerHandle EjectHandle;
+    World->GetTimerManager().SetTimer(EjectHandle, FTimerDelegate::CreateLambda([WeakWorld]()
+    {
+        if (auto* Raft = FindRaft(WeakWorld.Get()))
+        {
+            Raft->ForceCrewOverboardForTesting(1);
+            UE_LOG(LogTemp, Display, TEXT("CrewOverboard input issued: one passenger"));
+        }
+    }), 1.f, false);
+    for (float Seconds : {3.f, 9.f})
+    {
+        FTimerHandle SampleHandle;
+        World->GetTimerManager().SetTimer(SampleHandle, FTimerDelegate::CreateLambda([WeakWorld, Seconds]()
+        {
+            UWorld* Current = WeakWorld.Get();
+            auto* Raft = FindRaft(Current);
+            UGameInstance* GI = Current ? Current->GetGameInstance() : nullptr;
+            auto* Bridge = GI ? GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
+            auto* Adapter = Bridge ? Bridge->GetRaftRuntime() : nullptr;
+            if (!Raft || !Adapter || !Adapter->GetLastFlexibleStepTelemetry().bEvaluated)
+            {
+                UE_LOG(LogTemp, Error, TEXT("CrewOverboard missing completed physics sample"));
+                return;
+            }
+            const auto& T = Adapter->GetLastFlexibleStepTelemetry();
+            UE_LOG(LogTemp, Display, TEXT("CREW_OCCUPANCY_SAMPLE seconds=%.0f swimmers=%d crew_kg=%.3f integrated_kg=%.3f buoyancy_reference_kg=%.3f"),
+                Seconds, Raft->GetSwimmerCount(), T.OccupiedCrewMassKg, T.IntegratedMassKg, T.BuoyancyReferenceMassKg);
+        }), Seconds, false);
+    }
+}
+
 static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
 {
     if (World == nullptr)
@@ -767,6 +805,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     }
     bool bPaddle = false;
     bool bHighSide = false;
+    bool bOverboard = false;
     float TargetStationM = -1.0f;
     float TargetLateralM = 0.0f;
     float FocusStationM = -1.0f;
@@ -777,6 +816,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     {
         bPaddle |= Arg.Equals(TEXT("paddle"), ESearchCase::IgnoreCase);
         bHighSide |= Arg.Equals(TEXT("highside"), ESearchCase::IgnoreCase);
+        bOverboard |= Arg.Equals(TEXT("overboard"), ESearchCase::IgnoreCase);
         bRecord |= Arg.Equals(TEXT("record"), ESearchCase::IgnoreCase);
         bLegacyHydraulicFrame |= Arg.Equals(TEXT("legacy_hydraulic_frame"), ESearchCase::IgnoreCase);
         if (Arg.StartsWith(TEXT("station="), ESearchCase::IgnoreCase))
@@ -798,8 +838,9 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     }
 
     TWeakObjectPtr<UWorld> WeakWorld(World);
-    if(bPaddle && bHighSide)
-    { UE_LOG(LogTemp,Error,TEXT("CaptureSeries: paddle and highside commands conflict; no capture started"));return; }
+    if(int32(bPaddle) + int32(bHighSide) + int32(bOverboard) > 1)
+    { UE_LOG(LogTemp,Error,TEXT("CaptureSeries: crew inputs conflict; no capture started"));return; }
+    if (bOverboard) ScheduleCrewOverboardReview(World);
     if (bPaddle || bHighSide)
     {
         // Same paddle-in as CaptureRaft so a burst can happen mid-rapid.
@@ -1204,6 +1245,12 @@ static FAutoConsoleCommandWithWorldAndArgs GProfileHighSideCommand(
         }),1.f,false);
     }));
 
+static FAutoConsoleCommandWithWorldAndArgs GProfileCrewOverboardCommand(
+    TEXT("RaftSim.ProfileCrewOverboard"),
+    TEXT("Issue one overboard drill after one second; CSV owns observation and shutdown."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateLambda([](const TArray<FString>&, UWorld* World)
+    { ScheduleCrewOverboardReview(World); }));
+
 static FAutoConsoleCommandWithWorldAndArgs GCaptureSeriesCommand(
     TEXT("RaftSim.CaptureSeries"),
     TEXT("After a start delay, take a numbered burst of screenshots at a "
@@ -1211,7 +1258,7 @@ static FAutoConsoleCommandWithWorldAndArgs GCaptureSeriesCommand(
          "<startSeconds> <count> <intervalSeconds> [label] "
          "[x y z pitch yaw|shore_left|shore_right|breaking_water|"
          "breaking_water_side|breaking_water_opposite|river_station|"
-         "river_station_side|river_station_downstream] [paddle|highside] "
+         "river_station_side|river_station_downstream] [paddle|highside|overboard] "
          "[focusstation=<m>] [focuslateral=<m>] [record] "
          "[legacy_hydraulic_frame (shore comparison only, NOT downstream)] "
          "[station=<m>] [lateral=<m>] (station walks the raft there in "

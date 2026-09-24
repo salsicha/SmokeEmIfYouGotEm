@@ -3,6 +3,18 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest normal-play correction: [crew occupancy and loads](../reconstruction-review-2026-09-07/crew-occupancy-native.md).
+Ejected crew no longer retain integrated raft mass; reflip leaves swimmer seats
+unoccupied until reseating. Hull buoyancy capacity is preserved. Repeated events
+retain the swimmer roster/rescue clocks. Editor/Game builds succeed, seven native
+crew tests pass, and production rescue/reentry passes with one retained engine
+render-thread warning. Normal-start motion is decoded/inspected and completed
+physics telemetry confirms310kg crew/530kg body with one swimmer,605kg buoyancy
+reference. Separate900-frame overboard/ordinary p95s31.0470/31.3873ms pass the
+short first-pool gate only. Swimmer visibility, articulated mass/seat geometry,
+high-side transitions, full-route performance and river acceptance remain open.
+No captured-source/terrain/installed-field/nonlinear change; sole cook continues.
+
 Latest normal-play crew correction: [shared commands and weight shifts](../reconstruction-review-2026-09-07/crew-command-weight.md).
 High-side/get-down now address all attached crew's physical seat ids, not only
 the guide. The dedicated response key uses the same visible/physical update,

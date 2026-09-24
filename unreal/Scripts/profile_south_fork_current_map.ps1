@@ -18,6 +18,8 @@ param(
     [switch]$StartupPaddle,
     [switch]$StartupHighSide,
     [switch]$ProfileHighSide,
+    [switch]$StartupCrewOverboard,
+    [switch]$ProfileCrewOverboard,
     [switch]$StartupDisableDynamicShadows,
     [switch]$NormalScenarioStart,
     [switch]$CheckpointResetReplay
@@ -70,6 +72,12 @@ if ($StartupHighSide -and -not $StartupRenderReplay) {
     throw 'StartupHighSide requires StartupRenderReplay; it is not an ordinary FPS capture'
 }
 if ($StartupHighSide -and $StartupPaddle) { throw 'Choose one startup crew command' }
+if ($StartupCrewOverboard -and (-not $StartupRenderReplay -or $StartupPaddle -or $StartupHighSide)) {
+    throw 'StartupCrewOverboard requires render replay without other crew input'
+}
+if ($ProfileCrewOverboard -and ($NativePerformanceGate -or $DetailStreamingReplay -or $StartupRenderReplay -or $CheckpointResetReplay -or $ProfileHighSide -or $StartupHighSide -or $StartupPaddle -or $StartupCrewOverboard)) {
+    throw 'ProfileCrewOverboard requires an ordinary CSV run without other input'
+}
 if ($ProfileHighSide -and ($NativePerformanceGate -or $DetailStreamingReplay -or $StartupRenderReplay -or $CheckpointResetReplay -or $StartupHighSide -or $StartupPaddle)) {
     throw 'ProfileHighSide requires an ordinary CSV run without replay, recording or other input'
 }
@@ -250,6 +258,7 @@ try {
         $motionOption = if ($RecordStartupMotion) { ' record' } else { '' }
         $paddleOption = if ($StartupPaddle) { ' paddle' } else { '' }
         $highSideOption = if ($StartupHighSide) { ' highside' } else { '' }
+        $overboardOption = if ($StartupCrewOverboard) { ' overboard' } else { '' }
         # Debug-view CVars are ECVF_Cheat: DeviceProfile overrides reject them.
         # Use the development console path, before scheduling any screenshots.
         # Only an explicit diagnostic request changes the ordinary lit capture.
@@ -263,7 +272,7 @@ try {
         # ShowFlag overrides are also ECVF_Cheat; a device-profile request can
         # log its intent yet be rejected. Use and verify the console response.
         $shadowCommands = if ($StartupDisableDynamicShadows) { 'ShowFlag.DynamicShadows 0,' } else { '' }
-        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}${normalCommands}${shadowCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption$paddleOption$highSideOption")
+        $start.ArgumentList.Add("-ExecCmds=${bufferCommands}${normalCommands}${shadowCommands}RaftSim.CaptureSeries 0.1 24 0.5 $Label$motionOption$paddleOption$highSideOption$overboardOption")
     } else {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.
@@ -271,7 +280,7 @@ try {
         # Match the engine default explicitly and retain runtime confirmation.
         # Its elapsed interval belongs to the preceding logical frame, not
         # the water scopes on the same CSV row. No frame limit is changed.
-        $profileCrewCommands = if ($ProfileHighSide) { 'RaftSim.ProfileHighSide,' } else { '' }
+        $profileCrewCommands = if ($ProfileHighSide) { 'RaftSim.ProfileHighSide,' } elseif ($ProfileCrewOverboard) { 'RaftSim.ProfileCrewOverboard,' } else { '' }
         $profileCommands = "-ExecCmds=${profileCrewCommands}csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames"
         $start.ArgumentList.Add($profileCommands)
     }
@@ -298,6 +307,11 @@ try {
     $report.startup_paddle_requested = [bool]$StartupPaddle
     $report.startup_high_side_requested = [bool]$StartupHighSide
     $report.profile_high_side_requested = [bool]$ProfileHighSide
+    $report.crew_overboard_requested = [bool]($ProfileCrewOverboard -or $StartupCrewOverboard)
+    if ($report.crew_overboard_requested) {
+        $report.crew_overboard_confirmed = (Get-Content -LiteralPath $logFile -Raw).Contains('CrewOverboard input issued: one passenger')
+        if (-not $report.crew_overboard_confirmed) { throw 'Crew overboard input was not confirmed' }
+    }
     if ($ProfileHighSide) {
         $report.profile_high_side_confirmed = (Get-Content -LiteralPath $logFile -Raw).Contains('ProfileHighSide input issued: HighSide')
         if (-not $report.profile_high_side_confirmed) { throw 'Requested profiled high-side command was not issued' }

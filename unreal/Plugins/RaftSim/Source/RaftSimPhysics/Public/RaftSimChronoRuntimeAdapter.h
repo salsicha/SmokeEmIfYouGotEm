@@ -165,6 +165,10 @@ struct FRaftSimRaftKinematicState
 struct FRaftSimFlexStepTelemetry
 {
     bool bEvaluated = false;
+    double OccupiedCrewMassKg = 0.0;
+    double IntegratedMassKg = 0.0;
+    FVector IntegratedInertiaKgM2 = FVector::ZeroVector;
+    double BuoyancyReferenceMassKg = 0.0;
     double MaxFreeboardLossM = 0.0;
     double PortTotalFreeboardLossM = 0.0;
     double StarboardTotalFreeboardLossM = 0.0;
@@ -212,6 +216,7 @@ class RAFTSIMPHYSICS_API URaftSimChronoRuntimeAdapter : public UObject
 {
     GENERATED_BODY()
     friend class FRaftSimCrewCommandWeightTest;
+    friend class FRaftSimCrewOccupancyTest;
 
 public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Chrono")
@@ -304,10 +309,17 @@ public:
 
     // Stand up the quasi-static flexible model behind the adapter. Seats may be
     // empty (no crew loads). The tube layout is rebuilt from the parameters.
+    // Production's body includes ALL configured seat masses; occupancy then
+    // subtracts absent occupants from integration, not hull buoyancy capacity.
+    // Independent reference fixtures retain their separately specified body.
     void ConfigureFlexibleRaftModel(
         const FRaftSimFlexParameters& InParameters,
         const TArray<FRaftSimFlexCrewSeat>& InSeats,
-        double NominalPressurePa = 18000.0);
+        double NominalPressurePa = 18000.0,
+        bool bBodyMassIncludesAllSeats = false);
+
+    /** Physical ids (guide/passenger_0..N). Does not rebuild hull or reset motion. */
+    bool SetFlexibleCrewSeatOccupied(const FString& SeatId, bool bOccupied);
 
     void SetFlexibleCrewActions(const TArray<FRaftSimFlexCrewAction>& InActions);
 
@@ -405,6 +417,10 @@ private:
     FRaftSimFlexParameters FlexParameters;
     TArray<FRaftSimFlexTubeSegment> FlexLayout;
     TArray<FRaftSimFlexCrewSeat> FlexSeats;
+    // Opted in by production's combined body, not independent reference fixtures.
+    bool bBodyMassIncludesFlexibleCrew = false;
+    bool bFlexibleCrewMassContractValid = true;
+    double NominalFlexibleCrewMassKg = 0.0;
     TArray<FRaftSimFlexCrewSeat> FlexCapsizedSeats;
     TArray<FRaftSimFlexCrewAction> FlexActions;
     TArray<FRaftSimFlexRockObstacle> FlexObstacles;
