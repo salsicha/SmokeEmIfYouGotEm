@@ -647,7 +647,8 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
     FRaftSimWaterSample& OutSample
 ) const
 {
-    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized)
+    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized ||
+        Status == ERaftSimWaterRuntimeStatus::Faulted)
     {
         return false;
     }
@@ -697,14 +698,10 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
         return false;
     }
 #endif
-    if (bCartesianWaterCoordinates) return false;
-    OutSample.SurfaceHeightMeters = WorldPosition.Z;
-    OutSample.BedHeightMeters = WorldPosition.Z - 1.0f;
-    OutSample.DepthMeters = 1.0f;
-    OutSample.VelocityMetersPerSecond = FVector::ZeroVector;
-    OutSample.SurfaceNormal = FVector::UpVector;
-    OutSample.bWet = true;
-    return true;
+    // Binding a scenario is not evidence of a water field. In particular do
+    // not fabricate a wet sheet at the probe height when loading has failed.
+    // Explicit development tanks use the same valid LiveWindow path above.
+    return false;
 }
 void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportSurface(
     bool bEnabled,
@@ -1658,7 +1655,8 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterFieldAtRiverCoordinates(
     FRaftSimWaterSample& OutSample
 ) const
 {
-    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized)
+    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized ||
+        Status == ERaftSimWaterRuntimeStatus::Faulted)
     {
         return false;
     }
@@ -1683,16 +1681,7 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterFieldAtRiverCoordinates(
     }
 #endif
 
-    if (bCartesianWaterCoordinates) return false;
-    OutSample.WorldPosition = FVector(
-        StationLateralM.X * 100.0f, StationLateralM.Y * 100.0f, 0.0f);
-    OutSample.SurfaceHeightMeters = 0.0f;
-    OutSample.BedHeightMeters = -1.0f;
-    OutSample.DepthMeters = 1.0f;
-    OutSample.VelocityMetersPerSecond = FVector::ZeroVector;
-    OutSample.SurfaceNormal = FVector::UpVector;
-    OutSample.bWet = true;
-    return true;
+    return false;
 }
 
 bool URaftSimWaterRuntimeAdapter::GetLiveWaterFieldBoundsM(FBox2D& OutBounds) const

@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Runtime correction: [unavailable-water sampling](../reconstruction-review-2026-09-07/unavailable-water.md)
+no longer fabricates a one-metre wet sheet for missing non-Cartesian fields and
+rejects faulted adapters. Explicit tanks and valid river windows remain supported.
+Editor/Game builds and2 native suites pass. Normal-start motion is decoded and
+inspected; separate900-frame p9531.3109ms passes the short first-pool gate only.
+This is failure-path correctness, not new reconstructed geometry/froth, full-
+route performance or river acceptance. Original cook and installed fields stay.
+
 Shared-water regression: [coupled smoothing contract](../maintenance/coupled-smoothing-contract-20260924.md)
 replaces an obsolete render-only assertion with shared render/support wiring and
 native analytic plane/impulse checks. Editor build and2 native suites pass;
