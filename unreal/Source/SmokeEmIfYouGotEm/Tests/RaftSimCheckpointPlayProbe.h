@@ -160,6 +160,41 @@ struct FProbe
                     Rays.Add(MakeShared<FJsonValueObject>(Ray));
                 }
                 Row->SetArrayField(TEXT("terrain_owner_collision_rays"),Rays);
+                // Enumerate loaded actors only: an empty list is absence from
+                // this world, not proof that a package/partition descriptor is missing.
+                TArray<TSharedPtr<FJsonValue>> Residency;
+                const TArray<FString> Names={TEXT("SM_SouthFork_context1024_2560_2560"),
+                    TEXT("SM_SouthFork_coarse_2432_2816"),TEXT("SM_SouthFork_coarse_2560_2816"),
+                    TEXT("SM_SouthFork_coarse_2560_2688"),TEXT("SM_SouthFork_coarse_2688_2688"),
+                    TEXT("SM_SouthFork_coarse_2688_2560"),TEXT("SM_SouthFork_coarse_2816_2560"),
+                    TEXT("SM_SouthFork_coarse_2816_2432"),TEXT("SM_SouthFork_coarse_2560_2432")};
+                for(const FString& Name:Names)
+                {
+                    auto Entry=MakeShared<FJsonObject>();Entry->SetStringField(TEXT("mesh_name"),Name);
+                    TArray<TSharedPtr<FJsonValue>> Components;
+                    for(TActorIterator<AActor> It(World);It;++It)
+                    {
+                        TArray<UStaticMeshComponent*> Meshes;It->GetComponents(Meshes);
+                        for(auto* Mesh:Meshes)
+                        {
+                            if(!Mesh->GetStaticMesh() || Mesh->GetStaticMesh()->GetName()!=Name)continue;
+                            auto State=MakeShared<FJsonObject>();
+                            State->SetStringField(TEXT("component"),Mesh->GetPathName());
+                            State->SetBoolField(TEXT("registered"),Mesh->IsRegistered());
+                            State->SetBoolField(TEXT("visible"),Mesh->IsVisible());
+                            State->SetBoolField(TEXT("actor_hidden"),It->IsHidden());
+                            State->SetBoolField(TEXT("render_state_created"),Mesh->IsRenderStateCreated());
+                            State->SetBoolField(TEXT("recently_rendered"),Mesh->WasRecentlyRendered(1.f));
+                            State->SetStringField(TEXT("transform"),Mesh->GetComponentTransform().ToHumanReadableString());
+                            State->SetStringField(TEXT("bounds_origin_cm"),Mesh->Bounds.Origin.ToString());
+                            State->SetStringField(TEXT("bounds_extent_cm"),Mesh->Bounds.BoxExtent.ToString());
+                            Components.Add(MakeShared<FJsonValueObject>(State));
+                        }
+                    }
+                    Entry->SetArrayField(TEXT("loaded_components"),Components);
+                    Residency.Add(MakeShared<FJsonValueObject>(Entry));
+                }
+                Row->SetArrayField(TEXT("terrain_complementary_residency"),Residency);
             }
             Events.Add(MakeShared<FJsonValueObject>(Row));
         }

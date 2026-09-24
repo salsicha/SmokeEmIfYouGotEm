@@ -74,3 +74,72 @@ Source connectivity, matching original coverage and actor residency still need
 qualification; no precise cause or terrain fix is claimed yet. Cook36692 remains
 the sole live job. No standalone Game rebuild or performance claim for this
 opt-in observer-only addition; normal gameplay behavior is unchanged.
+
+## Source-topology follow-through
+
+Read-only NumPy inspection of the identified context NPZ and both topology
+archives narrows the next residency check. The extension topology SHA256 is
+`2a7535dea7d53ac82bf3234193423b16770a4cbd8e0bbba637e81dfdfa2855ef`.
+Mapping each triangle's source-grid indices through the10006-column grid gives
+exactly4483 unique quads, each with two triangles; all belong to the supplemental
+mask. This equals the supplemental-mask count in the tile's512×512-quad footprint.
+The export therefore does not omit any supplemental quad in that footprint.
+
+Of262144 footprint quads,79068 belong to the combined terrain mask:4483
+supplemental and74585 original. The other183076 are outside that mask. These
+counts describe source coverage, not visible pixel holes or runtime residency.
+Across the four cardinal edges of every exported quad,16853 neighbours are
+supplemental,511 original, and568 uncovered. All511 original neighbours match
+the retained original topology after applying the extension's71-column offset.
+The complementary original mesh names and shared-edge counts are:
+
+- `coarse_2432_2816`:1
+- `coarse_2560_2816`:94
+- `coarse_2560_2688`:98
+- `coarse_2688_2688`:86
+- `coarse_2688_2560`:96
+- `coarse_2816_2560`:51
+- `coarse_2816_2432`:57
+- `coarse_2560_2432`:28
+
+Next inspect these exact eight components' runtime residency/visibility and
+project the combined source coverage into the checkpoint camera. In particular,
+the ridge-below ray already hits the first mesh, so absence of *all* original
+terrain is not a supported explanation. This does not yet distinguish legitimate
+outer coverage boundaries from missing complementary visible terrain. Do not
+fill the uncovered footprint with invented source heights. No engine rerun,
+asset change, new frame-cost measurement or playable improvement is claimed by
+this bounded source check. Sole cook36692 remains live; no duplicate was started.
+
+## Actual runtime residency and range control
+
+The same opt-in observer now enumerates loaded static-mesh components for the
+nine identified mesh names, retaining empty matches explicitly. It records
+registration, visibility, actor-hidden state, render-state creation, recent
+rendering, transforms and bounds. Empty matches prove only absence from the
+current runtime world, not missing saved actors or packages. Editor build
+`tmp/checkpoint-terrain-residency-editor-v1-20260924.log` succeeds in34.25s.
+
+Normal-default replay `south-fork-checkpoint-terrain-residency-v1-20260924`
+finds only the context mesh and `coarse_2432_2816` loaded in all four destination
+captures; both are registered, visible, not actor-hidden, have render state and
+were recently rendered. The other seven complementary meshes have zero loaded
+matches throughout. Inspected phase1-3 still shows both floating patches.
+Report SHA256 `87aa888809d7e0bb7f6cd0fb87ecd784f0cbb1272f633ce1bdbbadf552880342`.
+
+An ephemeral control, `south-fork-checkpoint-terrain-range-v1-20260924`, requests
+`wp.Runtime.OverrideRuntimeSpatialHashLoadingRange -grid=0 -range=200000`.
+Installed engine source defines the command and the launch/log records it,
+but the observer does not yet export actual hash type/grid/range. The command
+must therefore NOT be represented as a verified2km active loading radius.
+The final capture has the same loaded/absent meshes and visible fragments.
+Report SHA256 `4090e17324585c2c70ca3827346729c1c6633546cb462151522a32c7f9ca5fda`.
+
+Both runs pass checkpoint wet-contact/detail progression, exit0 without timeout,
+and guard/resume cook36692 successfully. No saved map/configuration or terrain
+geometry changes; no new FPS measurement. Next inspect actual runtime hash/grid
+configuration and saved descriptors for the seven absent actors before repeating
+a range experiment or changing normal residency. Source export manifests do
+contain `coarse_2560_2816` and `coarse_2560_2688`; runtime absence alone does not
+prove that either was placed in the saved map. This remains diagnosis, not a
+playable fix or river acceptance.

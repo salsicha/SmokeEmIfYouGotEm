@@ -12,6 +12,17 @@ Owner-ray follow-through now identifies context1024_2560_2560 at the four patch
 rays, coarse_2432_2816 below, and two gap misses. Context exports contain only
 supplemental quads: next distinguish missing source coverage from unloaded
 complementary original terrain. No source geometry or normal setting was changed.
+Source-topology follow-through finds all4483 supplemental quads exported exactly
+twice as triangles and511 shared edges matching retained original coverage.
+The receipt lists eight exact complementary coarse meshes for the next runtime
+residency check. Uncovered outer footprint is not permission to invent terrain;
+this is supporting diagnosis only, not a visible fix or river acceptance.
+Actual destination residency now shows seven of those eight coarse meshes absent
+through all four captures; context and ridge-below mesh remain rendered. A
+temporary spatial-hash range command changes neither residency nor fragments;
+its effective grid/range was not established. Next inspect saved descriptors and
+actual runtime hash/grid settings before another range experiment. Both native
+checkpoint runs pass wet contact, not visual acceptance; no defaults changed.
 
 Runtime correction: [water scenario reset isolation](../reconstruction-review-2026-09-07/water-scenario-reset.md)
 clears old physical/presentation fields when an adapter is reconfigured, instead
