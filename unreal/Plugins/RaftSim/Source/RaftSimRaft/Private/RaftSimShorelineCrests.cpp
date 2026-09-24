@@ -415,13 +415,16 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     // call orders including rebuild costs. Retain the original control path.
     static const bool bParallelNormals=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialCrestNormals"));
     static const bool bNormalsAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrestNormalsAudit"));
+    // Exact native/live inputs, but ordinary-start frame cost did not improve.
+    // Retain the candidate only for explicit experiments.
+    static const bool bSelectiveNormals=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSelectiveCrestNormals"));
     if(bNormalsAudit && GFrameCounter>=100 && GFrameCounter<=250)
     {
         TArray<FProcMeshVertex> Candidate=Vertices;
         double SerialMs=0.,ParallelMs=0.;bool Valid=true;
         const uint64 Builds=ParallelNormals.Builds;
         const auto Serial=[&](){const double Start=FPlatformTime::Seconds();FRaftSimCrestNormals::Reference(Vertices,Indices,Source.Num());SerialMs=(FPlatformTime::Seconds()-Start)*1000.;};
-        const auto Parallel=[&](){const double Start=FPlatformTime::Seconds();Valid=ParallelNormals.Apply(Candidate,Indices,Source.Num());ParallelMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        const auto Parallel=[&](){const double Start=FPlatformTime::Seconds();Valid=ParallelNormals.Apply(Candidate,Indices,Source.Num(),bSelectiveNormals);ParallelMs=(FPlatformTime::Seconds()-Start)*1000.;};
         if(GFrameCounter%2){Parallel();Serial();}else{Serial();Parallel();}
         for(int32 I=0;Valid && I<Vertices.Num();++I)Valid=FRaftSimCrestMidpointExpansion::EqualAttributes(Vertices[I],Candidate[I]);
         if(!Valid){UE_LOG(LogTemp,Error,TEXT("CrestNormalsAudit mismatch frame=%llu"),GFrameCounter);return false;}
@@ -430,7 +433,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         if(bParallelNormals)Vertices=MoveTemp(Candidate);
     }
     else if(bParallelNormals)
-    {if(!ParallelNormals.Apply(Vertices,Indices,Source.Num()))return false;}
+    {if(!ParallelNormals.Apply(Vertices,Indices,Source.Num(),bSelectiveNormals))return false;}
     else FRaftSimCrestNormals::Reference(Vertices,Indices,Source.Num());
     }
     if (bTiming)

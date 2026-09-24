@@ -11,12 +11,15 @@ class FRaftSimCrestNormals
     TArray<int32> Offsets,Faces;
     TArray<uint8> Touched;
     TArray<FVector> FaceNormals;
+    TArray<int32> ActiveFaces,ActiveVertices;
     int32 CachedSourceCount=INDEX_NONE,CachedVertexCount=INDEX_NONE;
+    bool CachedSelective=false;
 public:
     uint64 Builds=0,Reuses=0;
     void Reset()
     {
         CachedIndices.Reset();Offsets.Reset();Faces.Reset();Touched.Reset();FaceNormals.Reset();
+        ActiveFaces.Reset();ActiveVertices.Reset();
         CachedSourceCount=CachedVertexCount=INDEX_NONE;
     }
     static void Reference(TArray<FProcMeshVertex>& Vertices,const TArray<uint32>& Indices,int32 SourceCount)
@@ -37,10 +40,11 @@ public:
             T=(T-V.Normal*FVector::DotProduct(T,V.Normal)).GetSafeNormal();
         }
     }
-    bool Apply(TArray<FProcMeshVertex>& Vertices,const TArray<uint32>& Indices,int32 SourceCount)
+    bool Apply(TArray<FProcMeshVertex>& Vertices,const TArray<uint32>& Indices,int32 SourceCount,
+        bool Selective=false)
     {
         if(Indices.Num()%3 || SourceCount<0 || SourceCount>Vertices.Num())return false;
-        const bool Same=CachedVertexCount==Vertices.Num() && CachedSourceCount==SourceCount && CachedIndices==Indices;
+        const bool Same=CachedVertexCount==Vertices.Num() && CachedSourceCount==SourceCount && CachedIndices==Indices && CachedSelective==Selective;
         if(!Same)
         {
             for(uint32 I:Indices)if(I>=uint32(Vertices.Num()))return false;
@@ -58,18 +62,31 @@ public:
                     if(Fine)Touched[I]=1;
                 }
             }
+            ActiveVertices.Reset();ActiveFaces.Reset();
+            if(Selective)
+            {
+            for(int32 I=0;I<Touched.Num();++I)if(Touched[I])ActiveVertices.Add(I);
+            // A coarse face adjacent to a touched source vertex contributes
+            // to its original-order sum too. Do not select only fine faces.
+            for(int32 T=0;T<Indices.Num()/3;++T)
+                if(Touched[Indices[3*T]] || Touched[Indices[3*T+1]] || Touched[Indices[3*T+2]])
+                    ActiveFaces.Add(T);
+            }
+            CachedSelective=Selective;
             CachedIndices=Indices;CachedSourceCount=SourceCount;CachedVertexCount=Vertices.Num();++Builds;
         }
         else ++Reuses;
         FaceNormals.SetNumUninitialized(Indices.Num()/3,EAllowShrinking::No);
-        ParallelFor(FaceNormals.Num(),[&](int32 T)
+        ParallelFor(Selective ? ActiveFaces.Num() : FaceNormals.Num(),[&](int32 Task)
         {
+            const int32 T=Selective ? ActiveFaces[Task] : Task;
             const int32 A=Indices[3*T],B=Indices[3*T+1],C=Indices[3*T+2];
             FaceNormals[T]=FVector::CrossProduct(Vertices[C].Position-Vertices[A].Position,
                 Vertices[B].Position-Vertices[A].Position);
         });
-        ParallelFor(Vertices.Num(),[&](int32 I)
+        ParallelFor(Selective ? ActiveVertices.Num() : Vertices.Num(),[&](int32 Task)
         {
+            const int32 I=Selective ? ActiveVertices[Task] : Task;
             if(!Touched[I])return;
             FVector Sum=FVector::ZeroVector;
             for(int32 J=Offsets[I];J<Offsets[I+1];++J)Sum+=FaceNormals[Faces[J]];

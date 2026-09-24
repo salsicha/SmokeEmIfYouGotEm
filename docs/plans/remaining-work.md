@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+[Selective-normal experiment](../reconstruction-review-2026-09-07/selective-crest-normals.md)
+preserved151 actual-input attribute comparisons but did not improve measured
+cost (p9534.0391ms FAIL). It remains diagnostic-only; restored-default
+Editor/Game builds and3 native suites pass. Fresh ordinary launch still fails
+at p9533.7393ms. No scene or performance acceptance; do not repeat the unchanged
+experiment. Guide reentry, realistic water and broader reconstruction remain open.
+
 Normal shoreline publication now retains crest-weight scratch allocations while
 rewriting every float exactly. [Storage qualification](../reconstruction-review-2026-09-07/crest-weight-storage.md)
 records Editor/Game builds and4 native suites passing, plus actual downstream
