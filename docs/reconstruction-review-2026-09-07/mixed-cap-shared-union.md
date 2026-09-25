@@ -280,3 +280,29 @@ delivery, measured normals, photographic acceptance, settled flow or FPS proof.
 91shading/preview/staging regression tests pass. Further smoothing alone is not
 the next geometry solution; retain the source-supported cap and address the
 remaining shape evidence, hydraulic settling and measured whole-frame cost.
+
+## Recorded candidate motion inspected
+
+Decoded the already-completed crease45 PIE recording, without another scene
+launch: `unreal/Saved/VideoCaptures/RaftSim_20260925-013802.mp4`, SHA256
+`0de97403339fb5f8cf2202c839e422685841888237575972f819a5067925e05b`.
+Existing decoder `tmp/decode-constriction-motion-20260918.py` completed exit0:
+627frames, strictly increasing timestamps0..20.866667s,2742x1222,4exact adjacent
+duplicates. Receipt: `independent-lidar-followup/mixed-cap-crease45-motion.json`.
+Engine log reports292source frames over20.915s; codec repetition/compression
+means neither decoded count nor exact-duplicate count establishes game FPS or
+the number of independently rendered frames.
+
+Inspected decoded3s/11s/20s frames together. Raft moves downstream out of view;
+foam patterns evolve with no whole-water disappearance in these samples.
+Broad bright foam patches and jagged rock silhouette remain. These sampled
+frames do not prove every-frame shoreline continuity, sustained wetting,
+collision robustness, photographic fidelity or crew animation acceptance.
+Engine capture metadata advances station8358.575→8385.765→8413.941m at world
+12.823→22.427→32.437s. Logged wet support persists with zero reported ground
+penetration at the sampled telemetry times; no continuous collision claim.
+
+This closes the uninspected-recording gap for the candidate, not the visual or
+performance gate. No normal launch changes, new cook or source edits. Next
+visible work must address source-supported shape and local froth structure,
+not another identical playback or another smoothing-only trial.
