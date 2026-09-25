@@ -18,5 +18,11 @@ def test_exact_historical_bytes_and_checkout_policy(relative):
     review=json.loads((ROOT/'docs/environment-captures/south_fork_full_reach/m9_south_fork_organic_foothill_terrain_v1_review.json').read_text())
     expected=next(a['sha256'] for a in review['hash_locked_artifacts'] if a['path']==relative)
     assert hashlib.sha256((ROOT/relative).read_bytes()).hexdigest()==expected
-    policy=subprocess.check_output(['git','check-attr','eol','--',relative],cwd=ROOT,text=True)
-    assert policy.strip()==relative+': eol: lf'
+    if relative.endswith('.json'):
+        policy=subprocess.check_output(['git','check-attr','filter','text','--',relative],cwd=ROOT,text=True)
+        assert relative+': filter: lfs' in policy
+        assert relative+': text: unset' in policy
+    else:
+        policy=subprocess.check_output(['git','check-attr','eol','text','--',relative],cwd=ROOT,text=True)
+        assert relative+': eol: lf' in policy
+        assert relative+': text: set' in policy
