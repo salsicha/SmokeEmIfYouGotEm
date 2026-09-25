@@ -1,5 +1,11 @@
 # Remaining requested work
 
+Latest September25 palm-support correction remains review-only. Worst body
+envelope deficit drops15.218cm->12.470cm, but the failing ring finger moves to
+frame342, near the seat handoff. Raw tube winding=1 and nearest surface11.079cm
+support an inside-tube concern. Finish the hand orientation/wrist/finger handoff
+to the actual seated paddle grip before promotion; no gates were relaxed.
+
 September25 calf-span candidate confirms an endpoint mismatch:45.9866cm source
 versus34.3657cm control span,11.6209cm endpoint error, reduced to0.000000245cm
 by review-only longitudinal fitting. Expanded clearance still FAILS, now at a

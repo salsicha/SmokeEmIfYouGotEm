@@ -398,3 +398,38 @@ Final cached-switch build11.59s succeeded. No-opt-in native regression
 `tmp/crew-calf-fit-default-20260925/index.json` passes1success/0failures/0not-run,
 engine exit0. Its measured fit=0 leaves the same11.620898031cm endpoint error
 before/after, confirming the experimental fitting is not enabled in normal play.
+
+### Palm target versus wrist pivot; remaining final handoff failure
+
+Native `tmp/crew-boarding-finger-contact-20260925/index.json` reproduces the
+15.218cm deficit. At its worst ring-finger point the exact rendered-surface
+distance is2.824726254cm and raw section0 solid-angle winding is1.000000000.
+These are consistent with an interior point, not merely a harmless finger below
+the vertical top envelope. Winding is diagnostic only: closure/orientation and
+continuous collision are not certified. It is measured at the failing frame,
+not against a later pose. This test-only query does not run in normal gameplay.
+
+Reentry previously placed the imported wrist pivot at the authored palm target
+and retained reference orientation. The disabled prototype now publishes a
+smooth palm-support blend. Its CC0 hand transform offsets the wrist using the
+same source knuckle anchor convention as paddle grips and aligns fingers inward,
+palms down, with mirrored handedness. The blend rises through reach, stays full
+through leg-over, and fades during settling; ordinary poses keep blend0.
+
+Builds36.65s (contact diagnostic) and119.33s (palm candidate) succeeded.
+`tmp/crew-boarding-palm-support-20260925/index.json`, with calf fitting and strict
+timed boarding, still fails exactly the body-envelope assertion, engine exit255.
+Across583728 supported body samples the maximum is12.470056895cm atframe342,
+vertex8153,100% `ring_03_l`; raft-local(148.105,-57.637,18.568)cm,
+avatar-local(33.108,4.360,24.492)cm. Surface distance11.079095918cm, tube winding1.
+
+The remaining worst point is now near completion, where the prototype fades
+toward non-paddle reference hand orientation while its destination hand targets
+come from a seated paddle pose. Next repair the full wrist/orientation/finger
+handoff to that actual destination, with continuity and surface checks. Do not
+claim the supported interval fully clear from only the changed global maximum.
+No new visual acceptance, default promotion, packaged build or performance claim.
+
+No-opt-in native regression `tmp/crew-palm-support-default-20260925/index.json`
+passes1success/0failures/0not-run, engine exit0. Strict prototype failure remains
+recorded and neither review option is enabled by default.

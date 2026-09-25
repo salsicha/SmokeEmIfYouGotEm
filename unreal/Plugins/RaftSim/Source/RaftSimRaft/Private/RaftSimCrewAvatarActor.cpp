@@ -3621,6 +3621,9 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
         Pose.TorsoRotation = FQuat::Slerp(From.TorsoRotation.Quaternion(),
             To.TorsoRotation.Quaternion(), Blend).Rotator();
         Pose.bShowPaddle = false;
+        const float PalmT = BoardingPoseAlpha <= BoardingReachFraction ? BoardingPoseAlpha / BoardingReachFraction :
+            (BoardingPoseAlpha <= BoardingLegOverFraction ? 1.f : (1.f-BoardingPoseAlpha)/(1.f-BoardingLegOverFraction));
+        Pose.BoardingPalmSupportBlend = FMath::Clamp(PalmT*PalmT*(3.f-2.f*PalmT), 0.f, 1.f);
         Pose.bFeetPlanted = false;
     }
     FitFeetToRenderedRaft(Pose, CurrentAction);

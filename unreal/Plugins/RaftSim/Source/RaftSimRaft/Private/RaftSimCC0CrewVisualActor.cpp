@@ -1083,10 +1083,11 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // bone is a wrist pivot. Offset each wrist by its own hash-locked reference
     // palm vector so the visible knuckle plane, not the wrist, meets the
     // side-correct paddle handle.
-    const FVector LeftWristCm = Pose.bShowPaddle
+    const bool bPalmTarget = Pose.bShowPaddle || Pose.BoardingPalmSupportBlend > 0.f;
+    const FVector LeftWristCm = bPalmTarget
         ? ResolvePaddleGripWristCm(true, Pose, Pose.LeftHandCm)
         : Pose.LeftHandCm;
-    const FVector RightWristCm = Pose.bShowPaddle
+    const FVector RightWristCm = bPalmTarget
         ? ResolvePaddleGripWristCm(false, Pose, Pose.RightHandCm)
         : Pose.RightHandCm;
     FVector LeftElbow =
@@ -1115,7 +1116,7 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         LeftShoulderCm);
     SetSegmentBone(TEXT("upperarm_l"), TEXT("lowerarm_l"), LeftShoulderCm, LeftElbow);
     SetSegmentBone(TEXT("lowerarm_l"), TEXT("hand_l"), LeftElbow, LeftWristCm);
-    if (Pose.bShowPaddle)
+    if (bPalmTarget)
     {
         SetPaddleGripHandTransform(true, Pose, LeftWristCm);
     }
@@ -1130,7 +1131,7 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         RightShoulderCm);
     SetSegmentBone(TEXT("upperarm_r"), TEXT("lowerarm_r"), RightShoulderCm, RightElbow);
     SetSegmentBone(TEXT("lowerarm_r"), TEXT("hand_r"), RightElbow, RightWristCm);
-    if (Pose.bShowPaddle)
+    if (bPalmTarget)
     {
         SetPaddleGripHandTransform(false, Pose, RightWristCm);
     }
@@ -1291,7 +1292,8 @@ FVector ARaftSimCC0CrewVisualActor::ResolvePaddleGripWristCm(
     const FQuat TargetHandRotation = ResolvePaddleGripHandRotation(bLeft, Pose);
     const FQuat HandDelta =
         (TargetHandRotation * ReferenceHand->GetRotation().Inverse()).GetNormalized();
-    return DesiredGripCm - HandDelta.RotateVector(ReferencePalmOffsetCm);
+    const float PalmWeight = Pose.bShowPaddle ? 1.f : Pose.BoardingPalmSupportBlend;
+    return DesiredGripCm - HandDelta.RotateVector(ReferencePalmOffsetCm) * PalmWeight;
 }
 
 FQuat ARaftSimCC0CrewVisualActor::ResolvePaddleGripHandRotation(
@@ -1327,6 +1329,17 @@ FQuat ARaftSimCC0CrewVisualActor::ResolvePaddleGripHandRotation(
         (bLeft ? FVector::CrossProduct(ReferenceWidth, ReferenceForward)
                : FVector::CrossProduct(ReferenceForward, ReferenceWidth))
             .GetSafeNormal();
+    if (!Pose.bShowPaddle && Pose.BoardingPalmSupportBlend > 0.f)
+    {
+        // Boarding frame faces into the raft. Fingers point inward (+X),
+        // palm faces the upper tube (-Z); mirrored knuckle widths preserve
+        // anatomical handedness. Blend both wrist offset and orientation.
+        const FQuat ReferenceBasis = FRotationMatrix::MakeFromXZ(ReferenceWidth, ReferenceNormal).ToQuat();
+        const FQuat SupportBasis = FRotationMatrix::MakeFromXZ(
+            bLeft ? FVector::RightVector : -FVector::RightVector, -FVector::UpVector).ToQuat();
+        const FQuat SupportRotation = (SupportBasis * ReferenceBasis.Inverse() * ReferenceHand->GetRotation()).GetNormalized();
+        return FQuat::Slerp(ReferenceHand->GetRotation(), SupportRotation, Pose.BoardingPalmSupportBlend).GetNormalized();
+    }
     const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
     // The knuckle line mirrors too: on a shared shaft axis the left hand's
     // index-to-pinky direction runs opposite the right's, otherwise the

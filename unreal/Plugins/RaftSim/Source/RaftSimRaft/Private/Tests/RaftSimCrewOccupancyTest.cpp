@@ -316,6 +316,7 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         FVector WorstBodyPoint = FVector::ZeroVector;
         FVector WorstBodyHostPoint = FVector::ZeroVector;
         int32 WorstBodyVertex = -1;
+        double WorstBodySurfaceDistanceCm = 0., WorstBodyTubeWinding = 0.;
         FVector WorstBootPoint = FVector::ZeroVector;
         FString WorstBootName;
         const bool bStrictTransfer = FParse::Param(FCommandLine::Get(), TEXT("RaftSimRequireBoardingTransferClearance"));
@@ -417,6 +418,26 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
                                 WorstBodyVertex = V;
                                 WorstBodyHostPoint = BoardingAvatar->GetActorTransform().InverseTransformPosition(
                                     Raft->GetActorTransform().TransformPosition(Points[V]));
+                                const FVector WorldPoint = Raft->GetActorTransform().TransformPosition(Points[V]);
+                                WorstBodySurfaceDistanceCm = 100. * Raft->GetRenderedHullDistanceM(WorldPoint / 100.);
+                                // Raw solid-angle winding of the published tube section.
+                                // Diagnostic only: not acceptance without closed/oriented mesh validation.
+                                double Angle = 0.;
+                                const auto* Tube = Raft->RaftVisual ? Raft->RaftVisual->GetProcMeshSection(0) : nullptr;
+                                if (TestNotNull(TEXT("contact diagnostic has published tube section"), Tube))
+                                {
+                                    const FTransform TubeWorld = Raft->RaftVisual->GetComponentTransform();
+                                    for (int32 I = 0; I + 2 < Tube->ProcIndexBuffer.Num(); I += 3)
+                                    {
+                                        const FVector A = TubeWorld.TransformPosition(Tube->ProcVertexBuffer[Tube->ProcIndexBuffer[I]].Position) - WorldPoint;
+                                        const FVector B = TubeWorld.TransformPosition(Tube->ProcVertexBuffer[Tube->ProcIndexBuffer[I+1]].Position) - WorldPoint;
+                                        const FVector C = TubeWorld.TransformPosition(Tube->ProcVertexBuffer[Tube->ProcIndexBuffer[I+2]].Position) - WorldPoint;
+                                        const double LA = A.Size(), LB = B.Size(), LC = C.Size();
+                                        Angle += 2. * FMath::Atan2(FVector::DotProduct(A,FVector::CrossProduct(B,C)),
+                                            LA*LB*LC + FVector::DotProduct(A,B)*LC + FVector::DotProduct(B,C)*LA + FVector::DotProduct(C,A)*LB);
+                                    }
+                                }
+                                WorstBodyTubeWinding = Angle / (4. * UE_DOUBLE_PI);
                             }
                         }
                 }
@@ -475,6 +496,8 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         TestTrue(TEXT("pull stage is sampled"), bCapturedPull && PullSamples > 0);
         TestTrue(TEXT("transfer boot audit has supported vertex samples"), BootClearanceSamples > 0);
         TestTrue(TEXT("transfer body audit has supported vertex samples"), BodyClearanceSamples > 0);
+        AddInfo(FString::Printf(TEXT("BOARDING_BODY_CONTACT surface_distance_cm=%.9f tube_winding=%.9f"),
+            WorstBodySurfaceDistanceCm, WorstBodyTubeWinding));
         if (WorstBodyVertex >= 0)
         {
             const auto* Visual = BoardingAvatar->GetProductionVisualActor();

@@ -82,6 +82,7 @@ struct FRaftSimCrewAvatarPose
     FVector PaddleTopCm = FVector::ZeroVector;
     FVector PaddleBottomCm = FVector::ZeroVector;
     bool bShowPaddle = true;
+    float BoardingPalmSupportBlend = 0.f;
     bool bFeetPlanted = false;
 };
 
