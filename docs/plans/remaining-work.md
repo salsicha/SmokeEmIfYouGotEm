@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC normalization: three immutable South Fork text artifacts had
+CRLF-only hash drift. Exact LF bytes were verified against existing review
+hashes before restoration; exact-path Git attributes prevent recurrence. Three
+raw-byte/policy checks pass; combined suite7passed/1failed retains real historical
+content mismatch. No expected hashes or acceptance gates changed. See
+[exact-byte recovery](../maintenance/frozen-evidence-line-endings-20260925.md).
+
 September25UTC key events now pass through actual pawn bindings into raft crew
 commands in the native fixture: forward/backward queue and activate after real
 crew update; cooldown, release and removed-key behavior pass. Native1success/
