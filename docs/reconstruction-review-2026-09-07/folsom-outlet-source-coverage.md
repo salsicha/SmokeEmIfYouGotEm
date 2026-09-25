@@ -98,3 +98,37 @@ establish a measured reservoir stage, or justify raising stage to force balance.
 Next distinguish this local startup effect from evolved boundary response using
 the existing native flux inspector and an explicitly labeled sensitivity test;
 do not repeat the unchanged full-duration cook. Normal playable fields untouched.
+
+## Native fixed-state stage sensitivity
+
+The diagnostic inspector now accepts explicit `--outlet-stage-offset-m=VALUE`,
+finite and bounded to+/-0.5m. Only staged outflow boundary values change in
+memory; h/u/v/time remain exactly unchanged before/after inspection. Output
+explicitly reports sensitivity mode, offset and affected-boundary count. Default
+behavior is unchanged; no production solver or input file is modified.
+25native integration tests pass, including zero-offset equivalence, signed
+wet-boundary response, unchanged files and invalid-offset rejection.
+Initial build lacked the MSVC include environment; rebuilding with vcvars64
+succeeded. No engine or cook was run.
+
+`audit_outlet_flux_sensitivity.py` hashes all declared package inputs and frame
+arrays, verifies the unchanged baseline against the cook's recorded exterior
+fluxes, and rechecks hashes after three zero-step inspections. Both trials alter
+exactly two staged outflow boundaries in memory. Results (positive outflow):
+
+| Saved state | -1cm stage | unchanged | +1cm stage |
+|---|---:|---:|---:|
+| Mixed-cap50s |30.112183|27.973981|25.913151m3/s|
+| Previous-cap18000s |93.038926|91.182009|89.238076m3/s|
+
+Centered instantaneous derivatives are-209.951599 and-190.042512m2/s.
+These are fixed-state responses, NOT evolved predictions or a calibrated stage.
+The states use different caps and times: do not attribute their difference to
+the cap. Even +1cm leaves the old terminal outflow far above45.306955m3/s inflow;
+this small perturbation does not resolve the drainage. Do not extrapolate the
+derivative into a stage selected to force balance. Local source-stage variation
+and actual downstream evidence still need separation from inferred-bed effects.
+
+Reports: `independent-lidar-followup/mixed-outlet-flux-sensitivity-50s.json`
+and `outlet-flux-sensitivity-18000s.json`. Both source/checkpoint sets unchanged;
+all processes terminal. No playable delivery or acceptance follows.

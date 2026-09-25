@@ -37,11 +37,29 @@ int main(int argc,char** argv) {
         const auto v=raftsim::load_npy_f64((frame/"v.npy").string());
         const auto& packages=manifest.at("packages").as_array();
         require(!packages.empty(),"Empty cook");
+        double stage_offset=0.;bool sensitivity=false;int offset_argument=-1;
+        const std::string prefix="--outlet-stage-offset-m=";
+        for(int i=3;i<argc;++i) {
+            const std::string argument=argv[i];
+            if(argument.rfind(prefix,0)!=0)continue;
+            require(!sensitivity,"Duplicate stage offset");
+            std::size_t used=0;const auto raw=argument.substr(prefix.size());
+            stage_offset=std::stod(raw,&used);
+            require(used==raw.size() && std::isfinite(stage_offset) && std::abs(stage_offset)<=.5,
+                "Sensitivity offset must be finite and within half a metre");
+            sensitivity=true;offset_argument=i;
+        }
+        std::size_t altered_boundaries=0;
         std::vector<raftsim::Scenario> scenarios;
         for(std::size_t i=0;i<packages.size();++i) {
             const fs::path name=packages[i].as_string();
             require(name==name.filename() && name!="." && name!="..","Simple package name required");
             auto scenario=raftsim::load_scenario_package((input.parent_path()/name).string());
+            if(sensitivity)for(auto& boundary:scenario.boundaries) {
+                if(boundary.kind=="outflow" && boundary.has_stage) {
+                    boundary.stage+=stage_offset;++altered_boundaries;
+                }
+            }
             const auto& g=scenario.grid;
             for(const auto* field:{&h,&u,&v})
                 require(field->nx()==g.nx && field->ny()==packages.size()*g.ny,"Unexpected checkpoint dimensions");
@@ -58,11 +76,14 @@ int main(int argc,char** argv) {
         }
         std::set<std::size_t> selected;
         for(int i=3;i<argc;++i) {
+            if(i==offset_argument)continue;
             std::size_t consumed=0;const std::string raw=argv[i];
             require(!raw.empty() && raw[0]!='-',"Nonnegative tile index required");
             const auto index=std::stoull(raw,&consumed);
             require(consumed==raw.size() && index<packages.size() && selected.insert(index).second,"Invalid/duplicate tile index");
         }
+        require(!selected.empty(),"Tile selection required");
+        require(!sensitivity || altered_boundaries>0,"No staged outflow boundary for sensitivity");
         raftsim::SolverConfig config;
         config.solver_mode="finite_volume";config.boundary_mode="scenario";config.flux_scheme="hll";
         config.spatial_order=2;config.cfl=.2;config.feature_strength_scale=0.;config.bed_slope_source_scale=1.;
@@ -80,6 +101,9 @@ int main(int argc,char** argv) {
         require(std::abs(domain.total_volume()-complete.at("volume_m3").as_number())<1.e-6,"Checkpoint volume differs from completion record");
         std::ostringstream out;out<<std::setprecision(17);
         out<<"{\"schema\":\"raftsim.cartesian_instantaneous_flux.v1\",\"time_seconds\":"<<time
+            <<",\"boundary_sensitivity\":"<<(sensitivity?"true":"false")
+            <<",\"outlet_stage_offset_m\":"<<stage_offset
+            <<",\"altered_in_memory_boundaries\":"<<altered_boundaries
             <<",\"solver_steps_run\":0,\"state_unchanged\":true,\"tiles\":[";
         bool first=true;double volume=0.,net=0.;
         for(std::size_t i:selected) {

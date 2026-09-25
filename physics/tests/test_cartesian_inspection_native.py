@@ -104,6 +104,32 @@ def test_native_rejects_invalid_selection(solver, cook, indices):
     assert not result.stdout
 
 
+def test_explicit_outlet_sensitivity_preserves_state_and_files(solver, cook):
+    path=cook[0].parent/'core_0000/scenario.json'
+    scenario=json.loads(path.read_text())
+    scenario['boundaries'][0]=dict(edge='west',kind='outflow',stage=.6)
+    path.write_text(json.dumps(scenario))
+    before={p:inspection.sha(p) for p in cook[1].parent.rglob('*') if p.is_file()}
+    reports=[]
+    for offset in (None,0.,-.01,.01):
+        args=[0] if offset is None else [0,f'--outlet-stage-offset-m={offset}']
+        result=run(solver,cook,*args)
+        assert result.returncode==0,result.stderr
+        reports.append(json.loads(result.stdout))
+    flux=[r['tiles'][0]['inward_flux_m3s'][0] for r in reports]
+    assert flux[0]==flux[1] and flux[2]<flux[0]<flux[3]
+    assert not reports[0]['boundary_sensitivity']
+    for r in reports[1:]:
+        assert r['boundary_sensitivity'] and r['altered_in_memory_boundaries']==1
+        assert r['solver_steps_run']==0 and r['state_unchanged']
+    assert before=={p:inspection.sha(p) for p in cook[1].parent.rglob('*') if p.is_file()}
+
+
+@pytest.mark.parametrize('offset',['nan','inf','.501','-.501','0junk'])
+def test_invalid_sensitivity_offset_rejected(solver,cook,offset):
+    assert run(solver,cook,0,'--outlet-stage-offset-m='+offset).returncode!=0
+
+
 @pytest.mark.parametrize('field,value', [('h',-1.), ('h',11.), ('u',21.), ('v',float('nan'))])
 def test_native_rejects_invalid_checkpoint_state(solver, cook, field, value):
     path = cook[1] / 'frame_000005' / f'{field}.npy'
