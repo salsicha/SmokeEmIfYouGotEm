@@ -101,3 +101,36 @@ career catalog pass. Normal South Fork motion was inspected, but separate ordina
 p9536.3412ms still fails the33.333333ms target. This closes two layout regressions,
 not visual, river or release acceptance. See the
 [material split and retained evidence](material-source-split-20260923.md).
+
+## September25 follow-up: foam transport output guard
+
+The shared-foam source test now follows the actual output-reference transport
+path: the shared evolution kernel writes both the density and red color channel,
+and the caller binds that color output to the rendered vertex-color array.
+The obsolete direct-assignment assertion was not a runtime failure. No runtime,
+material, physics, captured data or historical review hashes were changed.
+The suite now reports2 passed/4 failed (previously1/5); the remaining topology,
+publication and historical hash gates remain unresolved and intact.
+Headless engine test `RaftSim.Water.FoamCommittedEvolution` passes1/1, exit0,
+with report `tmp/foam-wiring-native-20260925/index.json`. It covers generation,
+release, held state and remapping, not rendered motion or performance.
+This is supporting regression maintenance, not a playable improvement or river
+acceptance. South Fork remains first in the reconstruction queue.
+
+The subsequent shoreline pass verified moving-bank and exact-cache behavior
+plus the existing persistent-proxy test (3/3, engine exit0). That proxy test
+previously exercised only externally supplied triangles. It now additionally
+uses the production `SetClippedWaterMesh` entry point for32 updates covering all
+16 wet/dry masks twice, moving bank intersections and grid translation. Actual
+RHI proxy identity remains unchanged, indices match fresh construction, and
+every published triangle corner matches its reference. The rebuilt extended
+test passes1/1, exit0, in `tmp/shoreline-clipped-proxy-20260925/index.json`.
+Editor build succeeded in59.11s. Fine-crest refinement, shaded scene motion and
+whole-frame performance are explicitly outside this fixture's scope.
+
+The old atomic-CreateMeshSection comment assertion is replaced with current
+clipped-submission and capacity-only proxy-invalidation wiring guards. The
+shared-foam suite is now3 passed/3 failed; the remaining source smoothing,
+wet-mask and frozen-review hash failures are unchanged. No production water
+behavior or historical digest was changed. These are regression-maintenance
+results, not visible playable improvements or release acceptance.

@@ -626,6 +626,38 @@ bool FRaftSimShorelinePersistentProxyTest::RunTest(const FString&)
     TArray<uint32> Invalid={0,2,99};
     TestFalse(TEXT("out-of-range update rejected"),Mesh->SetWaterMesh(Grid(2,2),MoveTemp(Invalid),12));
     TestEqual(TEXT("rejection preserves last valid data"),Mesh->GetWaterIndices().Num(),6);
+    // Exercise the production clipping entry point too, not only externally
+    // supplied triangles. Fine-crest refinement is a separate contract.
+    TArray<uint8> Wet,Available; Wet.Init(1,4); Available.Init(1,4);
+    TArray<float> Depth,Bed; Depth.Init(1.f,4); Bed.Init(0.f,4);
+    if (!TestTrue(TEXT("initial clipped water accepted"),Mesh->SetClippedWaterMesh(
+        2,2,Grid(2,2),Wet,Available,Depth,Bed))) return false;
+    World->SendAllEndOfFrameUpdates(); FlushRenderingCommands();
+    auto* ClippedProxy=Mesh->GetSceneProxy();
+    if (!TestNotNull(TEXT("clipped path has actual RHI proxy"),ClippedProxy)) return false;
+    for (int32 Step=0;Step<32;++Step)
+    {
+        auto Source=Grid(2,2);
+        for (int32 I=0;I<4;++I)
+        {
+            Wet[I]=bool((Step%16)&(1<<I));
+            Depth[I]=Wet[I] ? .25f+Step*.03f : 0.f;
+            Bed[I]=Wet[I] ? 0.f : 2.f;
+            Source[I].Position+=FVector(Step*2.,0.,Depth[I]);
+        }
+        auto ReferenceSource=Source;
+        TArray<FProcMeshVertex> ReferenceVertices; TArray<uint32> ReferenceIndices;
+        if (!RaftSimWaterShoreline::Build(2,2,MoveTemp(ReferenceSource),Wet,Available,
+            Depth,Bed,ReferenceVertices,ReferenceIndices)) return false;
+        if (!TestTrue(TEXT("clipped membership and recenter accepted"),Mesh->SetClippedWaterMesh(
+            2,2,MoveTemp(Source),Wet,Available,Depth,Bed))) return false;
+        World->SendAllEndOfFrameUpdates(); FlushRenderingCommands();
+        TestTrue(TEXT("clipped topology changes retain actual proxy"),Mesh->GetSceneProxy()==ClippedProxy);
+        TestTrue(TEXT("clipped publication retains no stale dry triangles"),Mesh->GetWaterIndices()==ReferenceIndices);
+        for (uint32 I:ReferenceIndices)
+            TestEqual(TEXT("published clipped corner matches fresh geometry"),
+                Mesh->GetWaterVertices()[I].Position,ReferenceVertices[I].Position);
+    }
     return true;
 }
 

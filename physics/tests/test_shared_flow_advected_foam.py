@@ -89,7 +89,13 @@ def test_shared_foam_is_lit_multiscale_and_solver_masked() -> None:
 def test_shared_foam_does_not_move_solver_or_physics_authority() -> None:
     runtime = RUNTIME_SOURCE.read_text()
     assert "SourceFoam[Index]" in runtime
-    assert "VertexColors[Index].R = FinalFoam" in runtime
+    # Transport writes through output references; verify both the shared
+    # evolution kernel and its binding to the rendered vertex-color array.
+    compact = "".join(runtime.split())
+    assert "FinalFoam=RaftSimFoamEvolution::Resolve(Advected,SourceFoam[Index],FoamAttackBlend,TongueFoamSuppression[Index],ShoreDisplacementWeight[Index],bHoldFoam)" in compact
+    assert "OutputFoam[Index]=FinalFoam;" in compact
+    assert "OutputColors[Index].R=FinalFoam;" in compact
+    assert "AdvectFoam(NewFoamField,FoamTransportVelocityMetersPerSecond,VertexColors,bCartesianFlow&&bParallelFoamTransport);" in compact
     assert "FocusedFoam * VertexColors[Index].A" in runtime
     assert "SmoothRapidFoamCoverage(" in runtime
     assert "FoamCoverage >= 0.01f" in runtime
@@ -214,7 +220,13 @@ def test_travel_keeps_shoreline_visibility_and_sampling_stable() -> None:
     assert "HandleLevelAddedToWorld" in streaming
     assert "ApplyStaticFlowBandVisibilityToActor(Actor)" in streaming
     assert "FWorldDelegates::LevelAddedToWorld.Remove" in streaming
-    assert "CreateMeshSection replaces an existing section atomically" in runtime
+    # Cartesian submission keeps its proxy when buffer capacity is unchanged.
+    # Native ShorelinePersistentProxy covers the actual clipped RHI path.
+    shoreline = (RUNTIME_SOURCE.parent / "RaftSimShorelineMeshComponent.cpp").read_text()
+    assert "CartesianShorelineMesh->SetClippedWaterMesh(" in runtime
+    assert "bPendingIndexUpdate|=bTopologyRebuilt;" in shoreline
+    assert "if (BeforeVertices!=WaterVertices.Num() || BeforeCapacity!=WaterIndexCapacity) MarkRenderStateDirty();" in shoreline
+    assert "else MarkRenderDynamicDataDirty();" in shoreline
     assert (
         "LiveVolumeCoreMesh->ClearMeshSection(0);\n"
         "                LiveVolumeCoreMesh->CreateMeshSection" not in runtime
