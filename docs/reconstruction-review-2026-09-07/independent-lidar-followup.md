@@ -214,6 +214,35 @@ candidate `mixed-retained-camera-candidate-v5-20260925_000.png` and parent
 address the remaining source classification/connectivity and inferred side-wall
 geometry, rather than treating this small patch or crease shading as completion.
 
+### Independent lower support at the four diagnosed walls — September 25
+
+The wall closure is an inferred vertical extrusion, not a measured rock face.
+A complete hash-checked scan of21,084,597independent LAZ points finds ground-
+classified observations within1.5m horizontal radius of every diagnosed wall
+hit, where the retained2019archive has no class2points at that radius.
+Counts for faces6225/6217/6222/6315 are8/8/12/2 (neighborhoods overlap; these
+are not unique totals). Their heights relative to220mNAVD88 span respectively
+7.24–7.96,7.09–7.39,6.78–7.23,7.02–7.06m. All source points and flags are retained
+in [the support record](independent-lidar-followup/diagnosed-wall-support.json).
+
+The additional [connectivity record](independent-lidar-followup/diagnosed-wall-support-connectivity.json)
+checks each non-withheld class2point against the exact mixed-cap roof. Two
+observations for face6225 (LAZ1398163,6055843) and five for6222 (1402214,6053500,
+11271228,15885478,18546316) have both new edges<=1m, positive triangle area and
+zero roof overlap within1e-9m2. Faces6217 and6315 have no passing direct extension.
+These checks establish possible local connections, NOT the correct outline,
+measured flank, manifold combined patch, classification certainty or acceptance.
+
+Next construct and review a bounded source-exact extension for6225/6222 using
+explicit2021dataset/index ownership, with no moved original roof points and no
+relaxed edge limit. Verify combined topology/overlap and the remaining outer
+closure before export. Do not choose an observation merely because it makes
+the lowest/smoothest shape. Survey epoch, GEOID12B/GEOID18 and the declared2m
+horizontal transform accuracy remain uncertainty; no fitted offset was applied.
+The first scanner attempt failed on LAS bit-field scalar conversion before
+writing output; NumPy conversion corrected it. Both completed scans exited0;
+no geometry, fields, engine scene or playable executable changed in this pass.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid

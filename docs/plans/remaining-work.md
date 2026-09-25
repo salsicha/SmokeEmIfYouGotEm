@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC wall-support advance: independent2021ground-classified returns
+provide two direct non-overlapping <=1m extension options at diagnosed wall6225
+and five at6222. Other two walls lack a passing direct connection. Full cloud
+scan and source hashes verified; no geometry changed. Next build a provenance-
+preserving bounded patch and validate combined topology, not a cosmetic bevel.
+See independent-lidar-followup's lower-support section and connectivity record.
+
 September25UTC native follow-through: identical-matrix actual PIE parent/candidate
 captures confirm seven diagnosed rock hits unchanged and the eighth7.8114m farther
 behind its removed foreground face. Images still show spikes and vertical walls;
