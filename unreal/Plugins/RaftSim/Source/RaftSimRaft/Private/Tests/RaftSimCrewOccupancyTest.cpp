@@ -136,7 +136,32 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
     TestEqual(TEXT("duplicate event preserves active rescue phase"),
         Raft->RescueInteraction.Phase, ERaftSimRescueInteractionPhase::Pulling);
     Step(235.);
-    Raft->RemoveSwimmerAt(Raft->FindSwimmerIndex(TEXT("paddler_1")));
+    // Exercise the public successful boarding branch, not just its removal helper.
+    // Capture discontinuity separately: occupancy correctness is not animation acceptance.
+    const int32 BoardingIndex = Raft->FindSwimmerIndex(TEXT("paddler_1"));
+    TestTrue(TEXT("boarding target remains present"), Raft->Swimmers.IsValidIndex(BoardingIndex));
+    if (!Raft->Swimmers.IsValidIndex(BoardingIndex)) return false;
+    auto* BoardingAvatar = Raft->FindAvatar(TEXT("paddler_1"));
+    if (!TestNotNull(TEXT("boarding keeps the existing avatar"), BoardingAvatar)) return false;
+    BoardingAvatar->SetAvatarAction(ERaftSimCrewAvatarAction::Reentry);
+    TestTrue(TEXT("current reentry pose supplies current tube target"),
+        Raft->GetSwimmerTubeTarget(TEXT("paddler_1"), Raft->Swimmers[BoardingIndex].SwimmerWorldPositionMeters, TubeTarget));
+    Raft->Swimmers[BoardingIndex].SwimmerWorldPositionMeters = TubeTarget;
+    BoardingAvatar->SetActorLocation(TubeTarget * 100.);
+    AddInfo(FString::Printf(TEXT("REENTRY_TARGET hull_distance_m=%.9f"), Raft->GetRenderedHullDistanceM(TubeTarget)));
+    const FVector BeforeBoarding = BoardingAvatar->GetActorLocation();
+    const int32 PreviousRescues = Raft->GetCompletedRescueCount();
+    Raft->RescueInteraction.TargetPassengerId = TEXT("paddler_1");
+    Raft->RescueInteraction.Phase = ERaftSimRescueInteractionPhase::ReadyForReentry;
+    TestTrue(TEXT("ready swimmer at rendered tube boards through public request"), Raft->RequestSelectedReentry());
+    TestTrue(TEXT("boarding preserves avatar identity"), Raft->FindAvatar(TEXT("paddler_1")) == BoardingAvatar);
+    TestEqual(TEXT("successful public boarding counts exactly one rescue"), Raft->GetCompletedRescueCount(), PreviousRescues + 1);
+    TestFalse(TEXT("boarded passenger leaves swimming state"), Raft->IsPassengerSwimming(TEXT("paddler_1")));
+    TestTrue(TEXT("boarded visual remains finite"), BoardingAvatar->HasFiniteVisualTransforms());
+    AddInfo(FString::Printf(TEXT("REENTRY_DISCONTINUITY elapsed_s=0 root_jump_cm=%.9f"),
+        FVector::Distance(BeforeBoarding, BoardingAvatar->GetActorLocation())));
+    TestFalse(TEXT("repeat boarding cannot rescue the already boarded passenger"), Raft->RequestSelectedReentry());
+    TestEqual(TEXT("repeat boarding does not increment rescue count"), Raft->GetCompletedRescueCount(), PreviousRescues + 1);
     TestEqual(TEXT("one swimmer remains after single reseat"), Raft->GetSwimmerCount(), 1);
     Step(310.);
     Raft->RaftMode = ERaftSimRaftMode::Capsized;

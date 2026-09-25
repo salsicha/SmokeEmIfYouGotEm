@@ -95,3 +95,9 @@ the unchanged receipt SHA256 was rechecked, including exactly four cases for
 each of the five distinct CC0 mesh identities. Every attached/restored error
 is0cm and every injected displacement is5cm. Large PNG review sets remain
 local and are not added to this source checkpoint. No push or release acceptance.
+
+September25 public reentry follow-up measures a392.38cm zero-time root jump in
+the actual rotated-raft fixture, despite passing readiness/distance and mass
+checks. This identifies an independent animation defect, not a garment repair.
+See [public reentry measurement](crew-public-reentry-discontinuity.md) for the
+retained failed setup, successful current-state fixture and required next repair.
