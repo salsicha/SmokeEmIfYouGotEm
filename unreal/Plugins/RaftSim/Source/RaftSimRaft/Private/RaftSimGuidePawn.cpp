@@ -645,7 +645,7 @@ bool ARaftSimGuidePawn::ApplyRuntimeKeyBinding(FName ActionId, FKey NewKey)
     }
     for (const FKey& OldKey : KeyboardKeys)
     {
-        DefaultMappingContext->UnmapKey(Target, OldKey);
+        UnmapKeyPreservingOrder(DefaultMappingContext, Target, OldKey);
     }
     DefaultMappingContext->MapKey(Target, NewKey);
     return true;

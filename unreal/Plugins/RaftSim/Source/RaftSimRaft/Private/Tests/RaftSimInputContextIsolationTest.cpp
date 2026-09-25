@@ -57,6 +57,29 @@ bool FRaftSimInputContextIsolationTest::RunTest(const FString&)
     TestTrue(TEXT("source asset unchanged by construction and rebind"),Asset->GetMappings()==Before);
     TestTrue(TEXT("new positive paddle key present"),Pawns[0]->HasPaddleStrokeKeyBinding(EKeys::J,false));
     TestTrue(TEXT("negative paddle key retained"),Pawns[0]->HasPaddleStrokeKeyBinding(EKeys::S,true));
+    // Rebinding must not swap unrelated mappings across priority positions.
+    auto* RebindMarker=NewObject<UInputAction>(Contexts[0]);
+    Contexts[0]->MapKey(RebindMarker,EKeys::F10);
+    Contexts[0]->MapKey(RebindMarker,EKeys::F11);
+    for(const FKey& NextKey : {EKeys::K,EKeys::L,EKeys::J})
+    {
+        const auto Previous=Contexts[0]->GetMappings();
+        const auto Retained=Previous.FilterByPredicate([](const FEnhancedActionKeyMapping& M)
+        {
+            // Only the positive keyboard paddle mapping is replaced.
+            if(!M.Action || !M.Action->GetName().Contains(TEXT("PaddleStroke")) || M.Key.IsGamepadKey())return true;
+            return M.Key==EKeys::S;
+        });
+        TestTrue(TEXT("repeated rebind succeeds"),Pawns[0]->ApplyRuntimeKeyBinding(TEXT("PaddleStroke"),NextKey));
+        const auto& After=Contexts[0]->GetMappings();
+        TestEqual(TEXT("one replacement mapping appended"),After.Num(),Retained.Num()+1);
+        for(int32 I=0;I<Retained.Num() && I<After.Num();++I)
+            TestTrue(TEXT("surviving mapping record and priority exact"),After[I]==Retained[I]);
+        TestTrue(TEXT("new positive key dispatched by mapping"),Pawns[0]->HasPaddleStrokeKeyBinding(NextKey,false));
+        TestTrue(TEXT("negative key retained after repeated rebind"),Pawns[0]->HasPaddleStrokeKeyBinding(EKeys::S,true));
+    }
+    TestTrue(TEXT("other pawn unchanged after repeated rebinds"),Contexts[1]->GetMappings()==SecondBefore);
+    TestTrue(TEXT("source unchanged after repeated rebinds"),Asset->GetMappings()==Before);
     // Reproduce the stale cooked entries without editing the actual asset.
     auto* Legacy=DuplicateObject<UInputMappingContext>(Asset,GetTransientPackage());
     const FKey LegacyKeys[]={EKeys::RightMouseButton,EKeys::LeftMouseButton,EKeys::Gamepad_LeftTrigger,EKeys::F9};

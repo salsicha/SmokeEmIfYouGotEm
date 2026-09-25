@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC: runtime key rebinding now preserves surviving mapping records
+and priority order. Repeated-rebind native regression passes; Editor/Game rebuilt
+and normal v7 staged executable updated with verified backup. Normal Boot/menu
+South Fork launch completes 300 CSV frames with wet raft motion and orderly
+shutdown. This is a playable input repair, not river/visual/performance acceptance;
+physical input dispatch and repeated real respawn/travel remain open. See
+[input repair evidence](../reconstruction-review-2026-09-07/runtime-input-context-isolation.md).
+
 September25UTC: fixed valid route starts failing in the final metre when their
 heading query exceeded the route. Production transform now uses an in-range
 backward chord, still pointing downstream. Editor build and three native route

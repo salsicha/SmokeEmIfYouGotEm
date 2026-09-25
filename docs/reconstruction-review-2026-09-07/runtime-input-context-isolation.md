@@ -1,5 +1,40 @@
 # Runtime input context ownership repair
 
+## Runtime rebind ordering follow-through — September 25
+
+The runtime key-rebind path still called UE's swap-removing `UnmapKey` directly.
+It now uses the same order-preserving removal helper as startup cleanup. Native
+coverage rebinds PaddleStroke K -> L -> J and checks every surviving full mapping
+record and position, negative S binding, other pawn context and source asset.
+This checks mapping presence/order, not physical hardware dispatch (despite the
+fixture's overly broad "dispatched by mapping" assertion label).
+
+Editor build succeeded (82.04s); Game build succeeded (52.76s). Native
+`RaftSim.Input.PawnContextIsolation`: 1 success, 0 warnings, 0 failures.
+Report `tmp/runtime-rebind-order-native-20260925/index.json`, SHA256
+`779b3b6a55855c238a6bd4611e05c8fb3166604d9d7358c931d0f91958625def`.
+
+Normal v7 staged executable now has SHA256
+`5246445253bdca36b1076643235ab21639d5b6ba719cfb585d51e4d4e3d1ad85`.
+Previous executable was preserved and verified as
+`SmokeEmIfYouGotEm-pre-runtime-rebind-order-20260925.exe`, SHA256
+`f83b3dfb780191526a4c92d615fe9b44471c423635291e60bfe542ba0d60905d`.
+No cooked content, geometry or hydraulic field changed.
+
+Normal Boot/menu StartScenario -> FullReach, without direct-map/scenario override,
+completed 300 post-travel CSV frames. World-10s telemetry reports wet raft drift
+at 1.368m/s and zero ground points/penetration. Full log has no `Error:`, fatal,
+blank-action or null-action matches; shutdown closes the engine and object
+subsystem. The process is absent. Engine requested status 0, but the OS process
+exit code was not captured; shell return from launching the GUI is not that code.
+Log `tmp/runtime-rebind-order-normal-stage-20260925.log`, SHA256
+`8984b82dac67f06d295d5b1e2d300b2c2f1fe2cdd700aee133b1c12db0213b72`.
+
+This delivers a normal-play code repair, not a visible river reconstruction or
+performance improvement. Physical input dispatch, repeated real respawn/travel,
+visual water/geometry and the 30FPS acceptance gate remain open. No duplicate
+cook or engine validation process remains running.
+
 2026-09-24. Fix implemented and packaged GC stress checked; full input/travel
 regression and release installation remain open.
 
