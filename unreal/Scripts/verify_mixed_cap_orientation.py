@@ -21,7 +21,8 @@ def main():
     assert export['source_cap_sha256']==config['source_cap_sha256']
     native=json.loads(unreal.RaftSimGroundSourceLibrary.audit_collision_source(mesh))
     assert native['collision_source_sha256']==config['reversed_provider_sha256'] and native['flip_normals'] is True
-    assert native['triangle_count']==len(config['probes'])==6428
+    assert native['triangle_count']==len(config['probes'])==export['triangle_count']
+    assert sorted(row['face'] for row in config['probes'])==list(range(export['triangle_count']))
     api=unreal.get_editor_subsystem(unreal.EditorActorSubsystem);ignored=api.get_all_level_actors()
     actor=api.spawn_actor_from_class(unreal.StaticMeshActor,unreal.Vector(0,0,0))
     actor.set_actor_location(unreal.Vector(0,0,0),False,True)

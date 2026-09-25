@@ -3,6 +3,12 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC constrained cap now has matching audited geometry (841cores,
+5,382,400cells) and exact FBX export. Actual transient Unreal all6,492face
+collision/winding check passes, engine exit0. Two fingerprint regressions pass.
+No full-map/rendered/water acceptance or playable installation; remaining shape
+defects persist. See independent-lidar-followup shared/native-face section.
+
 September25UTC constrained-boundary variant recovers28source-exact exterior
 triangles, preserving the roof. Two diagnosed rays now hit roof, two still hit
 vertical closures; one roof face remains83.8degrees. Unmodified shared loader

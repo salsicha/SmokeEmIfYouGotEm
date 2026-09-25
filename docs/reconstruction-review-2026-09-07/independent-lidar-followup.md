@@ -333,6 +333,37 @@ normal-play installation or engine acceptance occurred here. Two remaining
 walls and the steep face still need evidence-based work; do not mix this mesh
 with old flow fields in normal play or mark the river complete.
 
+### Shared geometry and actual native-face collision — September 25
+
+Prepared `tmp/troublemaker-constrained-wall-union-20260925/` from the normal
+4900to5400input with `--replace-union`, preserving its explicit bed revision.
+The audit checks841cores/5,382,400cells, changes871cells across four cores, and
+passes source-field, captured-mask/stage and exact roof-sampling checks. These
+are geometry cells, not a new flow solve or settled-water result. The exporter
+required this matching shared-union audit; no authorization gate was bypassed.
+[Geometry audit](independent-lidar-followup/constrained-wall-geometry-audit.json).
+
+Blender exported3,246vertices/6,492faces without decimation, with the existing
+45degree authored crease shading. FBX SHA256
+89dca1378bb978bcec60e89c1705ec9e4b0f6073a1b4f965a0688c3dbfc2e433.
+Transient Unreal import and every-face outward traces pass:2,994roof,
+2,994internal bottom and504inferred wall faces. Maximum error0.000282954cm,
+minimum normal dot0.9999999993. Native directed-source SHA256
+485dbd25980740b050f45fe11da3d7338e24aadcfda47c0148f03ab05e890b67.
+Engine exit0; no saved assets or levels. Full-map union collision is NOT verified.
+[Native report](independent-lidar-followup/constrained-wall-native-collision.json).
+
+The face-count check now uses the exact export count instead of the old6428
+constant and additionally requires every face index exactly once. Two fingerprint
+regressions verify cyclic/face-order invariance and sensitivity to winding/XYZ;
+the earlier native baseline hash also reproduces before generating these probes.
+Import tangent-basis warnings remain, as in the earlier export; not a clean
+release-log claim. This scoped collision pass does not establish rendered shape,
+shoreline, motion, flow consistency or performance. No playable content changed.
+Next normal-map union and matched-camera review can use the new export plus
+its matching geometry, while the two walls/steep face remain unresolved. No
+unchanged long cook or old-field production promotion is justified by this pass.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid
