@@ -246,3 +246,32 @@ local; ordinary boarding and cooked river assets are unchanged.
 No-opt-in native regression `tmp/crew-boarding-pull-default-20260925/index.json`
 also passes1success/0warnings/0failures/0not-run, engine exit0. This remains an
 editor-native regression, not normal-menu motion/cost or packaged acceptance.
+
+### Rendered-boot transfer clearance: failing gate
+
+The next native audit reads every LOD0 vertex from both visible production boot
+components, transformed into raft-local coordinates after actual pose publication.
+It samples every6updates during the post-pull transfer and queries the reference
+uploaded tube/floor upper envelope at each vertex XY. Unavailable CPU vertex data
+or empty samples fail the test rather than counting as clearance. This is a
+conservative top-envelope deficit, NOT signed solid containment, continuous
+collision detection, all-body clearance or a frame-performance measurement.
+
+Run with both `-RaftSimTimedReentryReview` and
+`-RaftSimRequireBoardingTransferClearance`. The strict option rejects sampled
+deficit>2cm; this authored diagnostic tolerance is not river acceptance. Supplying
+the strict flag alone fails closed rather than silently testing default boarding.
+
+`tmp/crew-boarding-boot-clearance-20260925/index.json` reports0success/1failure/
+0warnings/0not-run, engine exit1: exactly the transfer upper-envelope assertion.
+Across350662supported vertex samples, the maximum deficit is42.393345562cm at
+frame252, `ProductionLeftBoot`, raft-local point(-48.180,73.440,-16.059)cm.
+This quantifies the previously observed hull-crossing transfer. Keep the gate
+failing until a genuinely leg-clearing path passes it; do not relabel unsigned
+hand proximity or occupancy success as collision acceptance.
+
+The first test build failed on `auto*` deduction from Unreal's object pointer;
+explicit `const UStaticMesh*` corrected it. Builds12.69s and12.62s then succeeded,
+the latter adding a CPU-buffer availability guard. No runtime animation changed
+in this audit. Next resolve leg-over-tube support before root travel to the seat;
+the42cm deficit is too large to treat as a sole-offset adjustment.

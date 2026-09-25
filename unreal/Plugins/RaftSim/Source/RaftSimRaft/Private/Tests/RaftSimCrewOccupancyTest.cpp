@@ -15,6 +15,9 @@
 #include "Serialization/BufferArchive.h"
 #include "HAL/FileManager.h"
 #include "RenderingThread.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/StaticMesh.h"
+#include "StaticMeshResources.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrewOccupancyTest,
@@ -23,6 +26,12 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrewOccupancyTest,
 
 bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
 {
+    if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimRequireBoardingTransferClearance")) &&
+        !FParse::Param(FCommandLine::Get(), TEXT("RaftSimTimedReentryReview")))
+    {
+        AddError(TEXT("Strict boarding clearance requires RaftSimTimedReentryReview; no default-path substitute"));
+        return false;
+    }
     FEditorScriptExecutionGuard ScriptGuard;
     UWorld* World = nullptr;
     for (const FWorldContext& Context : GEngine->GetWorldContexts())
@@ -288,6 +297,16 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         double MaxPullHandGapCm = 0., MaxPullLegSpanErrorCm = 0.;
         int32 PullSamples = 0;
         bool bCapturedPull = false;
+        TArray<UStaticMeshComponent*> TransferBoots;
+        TInlineComponentArray<UStaticMeshComponent*> StaticParts(BoardingAvatar);
+        for (auto* Part : StaticParts)
+            if (Part && Part->IsVisible() && (Part->GetFName() == TEXT("ProductionLeftBoot") ||
+                Part->GetFName() == TEXT("ProductionRightBoot"))) TransferBoots.Add(Part);
+        TestEqual(TEXT("transfer audit observes both production boots"), TransferBoots.Num(), 2);
+        double MaximumBootTopEnvelopeDeficitCm = 0.;
+        int32 BootClearanceSamples = 0, WorstBootFrame = -1;
+        FVector WorstBootPoint = FVector::ZeroVector;
+        FString WorstBootName;
         Raft->UpdateRescueInteraction(-1.f);
         TestTrue(TEXT("negative time cannot move boarding root"), BoardingAvatar->GetActorLocation().Equals(PreviousPosition, .01));
         while (!Raft->BoardingPassenger.IsNone() && Frames < 720)
@@ -307,6 +326,40 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
                 TestEqual(TEXT("count changes only on completion"), Raft->GetCompletedRescueCount(), PreviousRescues);
             }
             ++Frames;
+            if (!Raft->BoardingPassenger.IsNone() && Frames % 6 == 0 &&
+                Raft->BoardingElapsed > Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingPullFraction)
+            {
+                for (auto* Boot : TransferBoots)
+                {
+                    const UStaticMesh* Mesh = Boot->GetStaticMesh();
+                    const auto* RenderData = Mesh ? Mesh->GetRenderData() : nullptr;
+                    if (!TestTrue(TEXT("boot clearance has actual LOD0 render vertices"),
+                        RenderData && RenderData->LODResources.Num() > 0)) continue;
+                    const auto& Positions = RenderData->LODResources[0].VertexBuffers.PositionVertexBuffer;
+                    if (!TestTrue(TEXT("boot CPU vertex buffer is available and nonempty"),
+                        Positions.GetVertexData() != nullptr && Positions.GetNumVertices() > 0)) continue;
+                    TArray<FVector> Points;
+                    const FTransform ToRaft = Boot->GetComponentTransform().GetRelativeTransform(Raft->GetActorTransform());
+                    for (uint32 V = 0; V < Positions.GetNumVertices(); ++V)
+                        Points.Add(ToRaft.TransformPosition(FVector(Positions.VertexPosition(V))));
+                    TArray<double> Floor, Solid;
+                    // Conservative upper-envelope clearance, not signed solid
+                    // containment. Outside-footprint points have no support.
+                    Raft->SampleRenderedCrewSupport(Points, Floor, Solid, true);
+                    if (!TestEqual(TEXT("boot support query covers every render vertex"), Solid.Num(), Points.Num())) continue;
+                    for (int32 V = 0; V < Points.Num(); ++V)
+                    {
+                        if (Solid[V] == -DBL_MAX) continue;
+                        ++BootClearanceSamples;
+                        const double Deficit = Solid[V] - Points[V].Z;
+                        if (Deficit > MaximumBootTopEnvelopeDeficitCm)
+                        {
+                            MaximumBootTopEnvelopeDeficitCm = Deficit;
+                            WorstBootFrame = Frames; WorstBootPoint = Points[V]; WorstBootName = Boot->GetName();
+                        }
+                    }
+                }
+            }
             if (!Raft->BoardingPassenger.IsNone()) RecordHandSupport(Frames);
             if (!Raft->BoardingPassenger.IsNone() &&
                 Raft->BoardingElapsed > Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingReachFraction &&
@@ -357,6 +410,12 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         TestTrue(TEXT("no large per-frame root teleport"), MaxStepCm < 10.);
         TestTrue(TEXT("reach stage is sampled"), bCapturedReach);
         TestTrue(TEXT("pull stage is sampled"), bCapturedPull && PullSamples > 0);
+        TestTrue(TEXT("transfer boot audit has supported vertex samples"), BootClearanceSamples > 0);
+        AddInfo(FString::Printf(TEXT("BOARDING_TRANSFER_BOOT samples=%d max_top_envelope_deficit_cm=%.9f frame=%d boot=%s point_local_cm=%s"),
+            BootClearanceSamples, MaximumBootTopEnvelopeDeficitCm, WorstBootFrame, *WorstBootName, *WorstBootPoint.ToString()));
+        if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimRequireBoardingTransferClearance")))
+            TestTrue(TEXT("transfer boot vertices remain above rendered upper envelope within 2cm"),
+                MaximumBootTopEnvelopeDeficitCm <= 2.);
         TestTrue(TEXT("pull retains both hand controls at tube"), MaxPullHandGapCm < 5.);
         TestTrue(TEXT("pull preserves thigh and shin control spans"), MaxPullLegSpanErrorCm < .01);
         AddInfo(FString::Printf(TEXT("BOARDING_PULL_SUPPORT samples=%d max_both_gap_cm=%.9f max_leg_span_error_cm=%.9f"),

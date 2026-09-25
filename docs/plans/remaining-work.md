@@ -1,5 +1,11 @@
 # Remaining requested work
 
+Latest boarding clearance gate now samples actual production boot vertices during
+the final transfer. It fails at42.393cm below the rendered upper envelope (left
+boot,frame252), confirming the unresolved hull-crossing path. This is a sampled
+conservative clearance check, not continuous/all-body collision acceptance.
+Resolve leg-over support before seat travel; do not promote the prototype.
+
 Latest follow-through adds a default-off intermediate posture: hand targets stay
 at the tube while the body shifts and the legs fold outboard without shortening
 their control spans. Native86sample checks pass; engine frames180/206 show legs
