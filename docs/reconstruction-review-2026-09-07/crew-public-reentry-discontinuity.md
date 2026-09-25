@@ -218,3 +218,31 @@ a new normal-menu motion/performance run or standalone/package validation.
 The accumulated default-off prototype is being checkpointed in Git; local
 captures and unrelated work are excluded. It must remain disabled until the
 remaining supported transfer and collision/animation gates are satisfied.
+
+### Intermediate hand-anchored posture
+
+The next default-off candidate holds the reach root from35to60percent of the
+transition and leaves both hand controls at the same targets. An authored torso
+shift puts its center5cm inboard and20cm above the hand midpoint; head, shoulders
+and hips receive the same shift. Legs fold outboard using normalized direction
+interpolation, preserving the existing thigh/shin target spans rather than
+shortening them with endpoint interpolation. These are authored posture rules,
+not measured biomechanics, anatomical validation or a force-supported solve.
+
+Editor rebuild85.96s succeeds. D3D12 receipt
+`tmp/crew-boarding-pull-20260925/index.json` reports1success/0warnings/0failures/
+0not-run, engine exit0. Across86pull samples the maximum of both hand distances
+is2.540161718cm and maximum leg-span change rounds to0.000000000cm. The full
+prototype takes343updates; maximum sampled root step3.414265516cm.
+
+Actual engine frames180and206 in `tmp/crew-boarding-pull-views-20260925` show
+legs hanging outside during the intermediate posture, unlike the prior direct
+seat transfer. These dark single-view captures do not establish skin clearance
+or physical contact forces. Frame270still shows the subsequent transfer passing
+through the raft. Do not promote this candidate: inward support transfer and a
+leg-clearing traversal to the assigned seat are still missing. Captures remain
+local; ordinary boarding and cooked river assets are unchanged.
+
+No-opt-in native regression `tmp/crew-boarding-pull-default-20260925/index.json`
+also passes1success/0warnings/0failures/0not-run, engine exit0. This remains an
+editor-native regression, not normal-menu motion/cost or packaged acceptance.

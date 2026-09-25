@@ -1,5 +1,12 @@
 # Remaining requested work
 
+Latest follow-through adds a default-off intermediate posture: hand targets stay
+at the tube while the body shifts and the legs fold outboard without shortening
+their control spans. Native86sample checks pass; engine frames180/206 show legs
+outside during that stage. Frame270still exposes penetration during the later
+seat transfer. Inward support transfer and leg-clearing traversal remain open;
+no normal-play promotion or river acceptance.
+
 Latest September25 boarding prototype integrates a tube-aligned reach pose and
 removes the airborne sine lift. Actual engine frame120 reaches the side tube;
 frames180/240 expose hull penetration in the subsequent seat-transfer placeholder.

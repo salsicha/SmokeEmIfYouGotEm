@@ -3554,10 +3554,15 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
     {
         Pose = BoardingStartPose;
         const bool bApproaching = BoardingPoseAlpha <= BoardingReachFraction;
-        const auto& From = bBoardingHasReach && !bApproaching ? BoardingReachPose : BoardingStartPose;
-        const auto& To = bBoardingHasReach && bApproaching ? BoardingReachPose : BoardingEndPose;
-        const float StageT = bBoardingHasReach ? (bApproaching ? BoardingPoseAlpha / BoardingReachFraction :
-            (BoardingPoseAlpha - BoardingReachFraction) / (1.f - BoardingReachFraction)) : BoardingPoseAlpha;
+        const bool bPulling = BoardingPoseAlpha <= BoardingPullFraction;
+        const auto& From = !bBoardingHasReach || bApproaching ? BoardingStartPose :
+            (bPulling ? BoardingReachPose : BoardingPullPose);
+        const auto& To = !bBoardingHasReach ? BoardingEndPose :
+            (bApproaching ? BoardingReachPose : (bPulling ? BoardingPullPose : BoardingEndPose));
+        const float StageT = !bBoardingHasReach ? BoardingPoseAlpha : (bApproaching ?
+            BoardingPoseAlpha / BoardingReachFraction : (bPulling ?
+            (BoardingPoseAlpha-BoardingReachFraction)/(BoardingPullFraction-BoardingReachFraction) :
+            (BoardingPoseAlpha-BoardingPullFraction)/(1.f-BoardingPullFraction)));
         const float Blend = StageT * StageT * (3.f - 2.f * StageT);
         FVector FRaftSimCrewAvatarPose::* const Points[] = {
             &FRaftSimCrewAvatarPose::TorsoCenterCm, &FRaftSimCrewAvatarPose::HeadCenterCm,
@@ -3569,6 +3574,23 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
             &FRaftSimCrewAvatarPose::PaddleTopCm, &FRaftSimCrewAvatarPose::PaddleBottomCm};
         for (auto Point : Points)
             Pose.*Point = FMath::Lerp(From.*Point, To.*Point, Blend);
+        if (bBoardingHasReach && !bApproaching && bPulling)
+        {
+            // Blend leg directions, not endpoints: endpoint lerp shortens the
+            // skin-driving joint spans while folding the legs out of the tube.
+            const auto Leg = [Blend](const FVector& Hip, const FVector& AH, const FVector& AK, const FVector& AF,
+                const FVector& BH, const FVector& BK, const FVector& BF, FVector& Knee, FVector& Foot)
+            {
+                const FVector Thigh = FMath::Lerp((AK-AH).GetSafeNormal(), (BK-BH).GetSafeNormal(), Blend).GetSafeNormal();
+                const FVector Shin = FMath::Lerp((AF-AK).GetSafeNormal(), (BF-BK).GetSafeNormal(), Blend).GetSafeNormal();
+                Knee = Hip + Thigh * FMath::Lerp(FVector::Distance(AH,AK), FVector::Distance(BH,BK), double(Blend));
+                Foot = Knee + Shin * FMath::Lerp(FVector::Distance(AK,AF), FVector::Distance(BK,BF), double(Blend));
+            };
+            Leg(Pose.LeftHipCm,From.LeftHipCm,From.LeftKneeCm,From.LeftFootCm,
+                To.LeftHipCm,To.LeftKneeCm,To.LeftFootCm,Pose.LeftKneeCm,Pose.LeftFootCm);
+            Leg(Pose.RightHipCm,From.RightHipCm,From.RightKneeCm,From.RightFootCm,
+                To.RightHipCm,To.RightKneeCm,To.RightFootCm,Pose.RightKneeCm,Pose.RightFootCm);
+        }
         Pose.TorsoRotation = FQuat::Slerp(From.TorsoRotation.Quaternion(),
             To.TorsoRotation.Quaternion(), Blend).Rotator();
         Pose.bShowPaddle = false;

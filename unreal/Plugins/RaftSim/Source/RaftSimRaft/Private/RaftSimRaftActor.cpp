@@ -2579,10 +2579,13 @@ void ARaftSimRaftActor::UpdateTimedBoarding(float DeltaSeconds)
     const float T = BoardingElapsed / BoardingDuration;
     const float ReachFraction = ARaftSimCrewAvatarActor::BoardingReachFraction;
     const bool bApproaching = T <= ReachFraction;
-    const float StageT = bApproaching ? T / ReachFraction : (T-ReachFraction) / (1.f-ReachFraction);
+    const float PullFraction = ARaftSimCrewAvatarActor::BoardingPullFraction;
+    const bool bPulling = T <= PullFraction;
+    const float StageT = bApproaching ? T / ReachFraction :
+        (bPulling ? 0.f : (T-PullFraction) / (1.f-PullFraction));
     const float Ease = StageT*StageT*(3.f-2.f*StageT);
     const FTransform& From = bApproaching ? BoardingStartLocal : BoardingReachLocal;
-    const FTransform& To = bApproaching ? BoardingReachLocal : BoardingSeatLocal;
+    const FTransform& To = bApproaching || bPulling ? BoardingReachLocal : BoardingSeatLocal;
     // The reach stage replaces the unsupported sine lift. The subsequent seat
     // transfer is still a review placeholder, NOT a qualified pull-over path.
     const FTransform Local(FQuat::Slerp(From.GetRotation(), To.GetRotation(), Ease),
@@ -2640,6 +2643,26 @@ bool ARaftSimRaftActor::RequestSelectedReentry()
         auto ReachPose = StartPose;
         ReachPose.LeftHandCm = BoardingReachLocal.InverseTransformPosition(LeftSupport);
         ReachPose.RightHandCm = BoardingReachLocal.InverseTransformPosition(RightSupport);
+        auto PullPose = ReachPose;
+        const FVector ReachHands = (ReachPose.LeftHandCm+ReachPose.RightHandCm)*.5;
+        // Authored intermediate posture: torso just inboard of the hands,
+        // legs still outboard. This is not a measured or force-solved climb.
+        const FVector TorsoShift(ReachHands.X+5.-ReachPose.TorsoCenterCm.X, 0.,
+            ReachHands.Z+20.-ReachPose.TorsoCenterCm.Z);
+        PullPose.TorsoCenterCm += TorsoShift;
+        PullPose.HeadCenterCm += TorsoShift;
+        PullPose.LeftShoulderCm += TorsoShift; PullPose.RightShoulderCm += TorsoShift;
+        PullPose.LeftHipCm += TorsoShift; PullPose.RightHipCm += TorsoShift;
+        const auto OutsideLeg = [](const FVector& OldHip, const FVector& OldKnee, const FVector& OldFoot,
+            const FVector& Hip, FVector& Knee, FVector& Foot)
+        {
+            Knee = Hip + FVector(-.6,0.,-.8) * FVector::Distance(OldHip,OldKnee);
+            Foot = Knee + FVector(-.4,0.,-FMath::Sqrt(.84)) * FVector::Distance(OldKnee,OldFoot);
+        };
+        OutsideLeg(ReachPose.LeftHipCm,ReachPose.LeftKneeCm,ReachPose.LeftFootCm,
+            PullPose.LeftHipCm,PullPose.LeftKneeCm,PullPose.LeftFootCm);
+        OutsideLeg(ReachPose.RightHipCm,ReachPose.RightKneeCm,ReachPose.RightFootCm,
+            PullPose.RightHipCm,PullPose.RightKneeCm,PullPose.RightFootCm);
         // Resolve the same fitted destination used by completion, without a
         // world tick or ownership/mass transfer between preparation and restore.
         AttachAvatarToSeat(Avatar, Swimmers[TargetIndex].PassengerId);
@@ -2650,6 +2673,7 @@ bool ARaftSimRaftActor::RequestSelectedReentry()
         Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Reentry);
         Avatar->SetBoardingPose(StartPose, EndPose, 0.f);
         Avatar->SetBoardingReachPose(ReachPose);
+        Avatar->SetBoardingPullPose(PullPose);
         BoardingPassenger = Swimmers[TargetIndex].PassengerId;
         BoardingElapsed = 0.f;
         BoardingDuration = FMath::Max(4.f, float((FVector::Distance(

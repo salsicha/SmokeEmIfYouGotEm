@@ -136,9 +136,11 @@ public:
     bool TryGetRenderedPose(ERaftSimCrewAvatarAction Action, float Phase, FRaftSimCrewAvatarPose& OutPose) const;
     const FRaftSimCrewAvatarPose& GetPublishedCrewPose() const { return LastRenderedPose; }
     void SetBoardingPose(const FRaftSimCrewAvatarPose& Start, const FRaftSimCrewAvatarPose& End, float Alpha);
-    void SetBoardingReachPose(const FRaftSimCrewAvatarPose& Reach) { BoardingReachPose = Reach; bBoardingHasReach = true; }
+    void SetBoardingReachPose(const FRaftSimCrewAvatarPose& Reach) { BoardingReachPose = BoardingPullPose = Reach; bBoardingHasReach = true; }
+    void SetBoardingPullPose(const FRaftSimCrewAvatarPose& Pull) { BoardingPullPose = Pull; }
     void AdvanceBoardingPose(float Alpha);
     static constexpr float BoardingReachFraction = .35f;
+    static constexpr float BoardingPullFraction = .6f;
 
     /** Contact solve succeeded; independent tread/mesh checks remain required. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
@@ -481,7 +483,7 @@ private:
     float AnimationPhase = 0.0f;
     float AnimationPhaseOffset = 0.0f;
     float ActionIntensity = 1.0f;
-    FRaftSimCrewAvatarPose BoardingStartPose, BoardingReachPose, BoardingEndPose;
+    FRaftSimCrewAvatarPose BoardingStartPose, BoardingReachPose, BoardingPullPose, BoardingEndPose;
     bool bBoardingHasReach = false;
     float BoardingPoseAlpha = -1.f;
     float PfdPresentationWetness = 0.0f;

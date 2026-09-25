@@ -285,6 +285,9 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         int32 Frames = 0;
         bool bCapturedReach = false;
         double ReachBothHandGapCm = DBL_MAX;
+        double MaxPullHandGapCm = 0., MaxPullLegSpanErrorCm = 0.;
+        int32 PullSamples = 0;
+        bool bCapturedPull = false;
         Raft->UpdateRescueInteraction(-1.f);
         TestTrue(TEXT("negative time cannot move boarding root"), BoardingAvatar->GetActorLocation().Equals(PreviousPosition, .01));
         while (!Raft->BoardingPassenger.IsNone() && Frames < 720)
@@ -305,6 +308,29 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             }
             ++Frames;
             if (!Raft->BoardingPassenger.IsNone()) RecordHandSupport(Frames);
+            if (!Raft->BoardingPassenger.IsNone() &&
+                Raft->BoardingElapsed > Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingReachFraction &&
+                Raft->BoardingElapsed <= Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingPullFraction)
+            {
+                ++PullSamples;
+                const auto& P = BoardingAvatar->GetPublishedCrewPose();
+                const FTransform W = BoardingAvatar->GetActorTransform();
+                MaxPullHandGapCm = FMath::Max(MaxPullHandGapCm, 100. * FMath::Max(
+                    Raft->GetRenderedHullDistanceM(W.TransformPosition(P.LeftHandCm)/100.),
+                    Raft->GetRenderedHullDistanceM(W.TransformPosition(P.RightHandCm)/100.)));
+                const double Errors[] = {
+                    FMath::Abs(FVector::Distance(P.LeftHipCm,P.LeftKneeCm)-FVector::Distance(BeforeBoardingPose.LeftHipCm,BeforeBoardingPose.LeftKneeCm)),
+                    FMath::Abs(FVector::Distance(P.LeftKneeCm,P.LeftFootCm)-FVector::Distance(BeforeBoardingPose.LeftKneeCm,BeforeBoardingPose.LeftFootCm)),
+                    FMath::Abs(FVector::Distance(P.RightHipCm,P.RightKneeCm)-FVector::Distance(BeforeBoardingPose.RightHipCm,BeforeBoardingPose.RightKneeCm)),
+                    FMath::Abs(FVector::Distance(P.RightKneeCm,P.RightFootCm)-FVector::Distance(BeforeBoardingPose.RightKneeCm,BeforeBoardingPose.RightFootCm))};
+                for (double Error : Errors) MaxPullLegSpanErrorCm = FMath::Max(MaxPullLegSpanErrorCm, Error);
+            }
+            if (!bCapturedPull && !Raft->BoardingPassenger.IsNone() &&
+                Raft->BoardingElapsed >= Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingPullFraction)
+            {
+                bCapturedPull = true; SavePose(Frames);
+                AddInfo(FString::Printf(TEXT("BOARDING_PULL frame=%d"), Frames));
+            }
             if (!bCapturedReach && !Raft->BoardingPassenger.IsNone() &&
                 Raft->BoardingElapsed >= Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingReachFraction)
             {
@@ -330,6 +356,11 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         TestTrue(TEXT("timed boarding reaches completion"), Frames < 720 && Raft->BoardingPassenger.IsNone());
         TestTrue(TEXT("no large per-frame root teleport"), MaxStepCm < 10.);
         TestTrue(TEXT("reach stage is sampled"), bCapturedReach);
+        TestTrue(TEXT("pull stage is sampled"), bCapturedPull && PullSamples > 0);
+        TestTrue(TEXT("pull retains both hand controls at tube"), MaxPullHandGapCm < 5.);
+        TestTrue(TEXT("pull preserves thigh and shin control spans"), MaxPullLegSpanErrorCm < .01);
+        AddInfo(FString::Printf(TEXT("BOARDING_PULL_SUPPORT samples=%d max_both_gap_cm=%.9f max_leg_span_error_cm=%.9f"),
+            PullSamples, MaxPullHandGapCm, MaxPullLegSpanErrorCm));
         TestTrue(TEXT("both hand controls at reach boundary are within authored palm clearance"), ReachBothHandGapCm < 5.);
         AddInfo(FString::Printf(TEXT("TIMED_REENTRY frames=%d max_step_cm=%.9f"), Frames, MaxStepCm));
         AddInfo(FString::Printf(TEXT("BOARDING_HAND_SUPPORT max_nearest_gap_cm=%.9f samples_both_over_10cm=%d"),
