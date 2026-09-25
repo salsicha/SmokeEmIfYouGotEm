@@ -16,8 +16,9 @@ from verify_south_fork_rock_union_collision import package_file
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
-def main():
-    config=json.loads((ROOT/os.environ['RAFTSIM_MIXED_UNION_CONFIG']).read_text())
+def main(config=None):
+    if config is None:
+        config=json.loads((ROOT/os.environ['RAFTSIM_MIXED_UNION_CONFIG']).read_text())
     output=(ROOT/config['report']).resolve();probe_path=ROOT/config['probes']
     assert output.is_relative_to(ROOT/'tmp') and not output.exists()
     assert sha(probe_path)==config['probes_sha256']
@@ -82,6 +83,8 @@ def main():
         protected_file_count=len(protected),saved_assets=False,saved_levels=False,
         ground_replaced=False,cap_actor=cap.get_name(),cap_restored=True,playable_integrated=False),indent=2)+'\n')
     assert not failures,str(len(failures))+' full-map union failures: '+str(output)
+    return dict(owners=owners,meshes=meshes,replacement=replacement,protected=protected,
+                probes=probes,probe_path=probe_path)
 
 
 if __name__=='__main__':

@@ -76,6 +76,30 @@ def test_dependencies_are_normalized_hashed_and_bounded(tmp_path):
         Dependencies(root).add(source, deps.hashes['source.bin'])
 
 
+@pytest.mark.parametrize('changed', ['independent_source', 'parent_manifest', 'construction_receipt'])
+def test_mixed_cap_preview_binds_every_source_receipt(tmp_path, changed):
+    cap = {'schema': 'raftsim.mixed_survey_rock_cap.v1'}
+    for name in ('source_mesh', 'original_returns', 'cap'):
+        path = tmp_path / (name + '.bin')
+        path.write_bytes(name.encode())
+        cap[name + '_path'] = path.name
+        cap[name + '_sha256'] = sha(path)
+    for name in ('independent_source', 'parent_manifest', 'construction_receipt'):
+        path = tmp_path / (name + '.bin')
+        path.write_bytes(name.encode())
+        cap[name] = dict(path=path.name, sha256=sha(path))
+    deps = Dependencies(tmp_path)
+    add_cap_dependencies(deps, cap)
+    assert len(deps.hashes) == 6
+    record = cap.pop(changed)
+    with pytest.raises(ValueError, match='Missing mixed-cap dependency'):
+        add_cap_dependencies(Dependencies(tmp_path), cap)
+    cap[changed] = record
+    (tmp_path / record['path']).write_bytes(b'changed')
+    with pytest.raises(ValueError, match='Changed dependency'):
+        add_cap_dependencies(Dependencies(tmp_path), cap)
+
+
 def test_asset_path_matches_its_package(tmp_path):
     assert asset_file('/Game/Review/Rock.Rock', tmp_path) == tmp_path / 'unreal/Content/Review/Rock.uasset'
 

@@ -211,3 +211,47 @@ coverage evidence (`independent-lidar-followup/mixed-cap-runtime-coverage.json`)
 This center change still needs actual engine window/motion review. All processes
 started in this step are terminal; no active cook remains. Next run the native
 water-query expectations and actual moving/visual checks with matching cap.
+
+## Native field comparison completed; preview source retention hardened
+
+The native Unreal adapter completed all25600 matching hydraulic-cell queries
+with zero wet mismatches and no failures. Maximum bed/surface error is
+7.62939453125e-6m; depth error1.1918204823e-7m, velocity component error at most
+2.3817516670e-7m/s. Receipt:
+`independent-lidar-followup/mixed-cap-native-runtime.json`. The engine ran no
+solver steps and saved no assets or levels. This proves loading/sampling of the
+50s candidate, not hydraulic settling, moving-window behavior or visual motion.
+
+Preview dependency binding now also requires and hashes the independent LAZ,
+parent manifest and construction receipt for mixed-survey caps. Missing or
+changed records are rejected; all six dependencies of the actual candidate
+verify. Preview and mesh-staging regression suites pass80tests. This closes a
+provenance-retention gap before ephemeral play, not a playable delivery.
+
+No cook or editor remains live. Normal scene and staged game are unchanged.
+Next work remains matching-cap rendered/moving review, followed by a justified
+playable increment; do not install the unsettled50s pilot merely because these
+sampler checks pass. South Fork remains first and unfinished.
+
+## Matching-cap actual PIE review completed
+
+The unsaved normal-map preview now runs fresh full-map collision and native
+field checks before play, swaps only the existing cap actor, preserves its
+material, and verifies exact candidate/ground presence plus water configuration
+inside PIE before requesting captures. No map or asset package is saved.
+
+Initial upstream launch failed candidate-presence verification before capture;
+retain `independent-lidar-followup/mixed-cap-pie-upstream-failure.json`.
+The retry used the existing `-RaftSimWaterReviewStation=8330` override; engine
+log confirms requested/applied8330m and region0190, then moving region0193.
+Actual PIE verified one candidate, one retained ground and zero old caps.
+All three screenshots completed and the session ended, exit0,50.36s wall time;
+protected files unchanged. Receipt: `independent-lidar-followup/mixed-cap-pie-crux.json`.
+Screenshots remain at `unreal/Saved/Screenshots/mixed-cap-pie-crux-20260925_00[0-2].png`.
+First capture records raft station8353.026m, not a stationary fixture.
+
+The inspected final engine frame shows frothy water and strongly faceted rock;
+this is not photographic acceptance. No timing acceptance is inferred from
+capture wall time. This PIE session is not normal packaged startup or settled
+hydraulics, and does not prove full-reach shoreline stability or contact safety.
+Normal staged game remains unchanged; no cook/editor process remains live.

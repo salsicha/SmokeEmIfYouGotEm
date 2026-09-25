@@ -55,6 +55,12 @@ def add_cap_dependencies(deps, cap):
     selection = cap.get('reviewed_extension_selection')
     if selection is not None:
         deps.add(deps.root / selection['path'], selection['sha256'])
+    if cap.get('schema') == 'raftsim.mixed_survey_rock_cap.v1':
+        for name in ('independent_source', 'parent_manifest', 'construction_receipt'):
+            record = cap.get(name)
+            require(isinstance(record, dict) and bool(record.get('path')) and
+                    bool(record.get('sha256')), 'Missing mixed-cap dependency: ' + name)
+            deps.add(deps.root / record['path'], record['sha256'])
 
 
 def verify_audits(atlas, snapshot, banks, coverage, atlas_hash, stream_hash):
