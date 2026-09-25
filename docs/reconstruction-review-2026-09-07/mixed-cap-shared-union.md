@@ -180,3 +180,34 @@ water update, raft traversal, visual or performance acceptance.
 Cook remains original session92780/PID33552; latest inspected step800/40s.
 Next audit its terminal1000step snapshot, then export matching runtime fields
 and proceed to native water/mesh consistency and normal-play validation.
+
+## Fresh50s pilot terminal and runtime export
+
+Original cook session92780 finished exit0 at step1000/50s, wall1428.60s.
+Do not poll or restart it as if still live. Snapshot audit passes5382400cells:
+maximum depth4.277084m, speed12.166877m/s, maximum step conservation residual
+1.18348e-8m3. Artificial-bank audit finds all86720bank cells exactly dry.
+Reports are retained in `independent-lidar-followup/mixed-cap-50s-snapshot.json`
+and `mixed-cap-50s-banks.json`. This is NOT settled flow: final inlet45.306955m3/s
+versus outlet27.973981m3/s leaves substantial positive storage change. No normal
+scene promotion is justified by numerical sanity alone.
+
+Runtime export `tmp/troublemaker-mixed-normal-runtime-50s-20260925` completed
+exit0 (session59299),841atlas tiles and799packets, verifying42185039overlap bed
+cells.791unchanged packets reuse733751375bytes; eight union packets are new.
+Atlas SHA256 `3b6bdc88650c46a21f30bb17ccf0b58810cd265a3ee02ccb0c01996b2a95b8af`.
+Exact25600native query expectations are prepared at
+`tmp/troublemaker-mixed-normal-runtime-expectations-20260925.json`; not yet run
+in Unreal. They cover the same hydraulic-cell queries as the collision proof.
+
+Continuous coverage audit (session35609) finished exit0. The initial declaration
+had two unavailable cells in region0002. Existing constrained-center repair
+produced `streaming_manifest_coverage_checked.json`, SHA256
+`619f31d25c81b53fc47ab01fe865b1480c92f7f4430723ee14a5a1c3dab5867f`.
+It verifies all406823original water probes with10mminimum interior margin,
+797continuous center rectangles;3822centers move, maximum102m. No terrain or
+water sample is fabricated. Preserve both the original failure and corrected
+coverage evidence (`independent-lidar-followup/mixed-cap-runtime-coverage.json`).
+This center change still needs actual engine window/motion review. All processes
+started in this step are terminal; no active cook remains. Next run the native
+water-query expectations and actual moving/visual checks with matching cap.
