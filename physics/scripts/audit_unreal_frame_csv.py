@@ -77,7 +77,7 @@ def parse_capture(stream, require_water_scopes=False):
     return samples, metadata
 
 
-def summarize(samples, first, last, target_fps=30.0):
+def summarize(samples, first, last, target_fps=20.0):
     if not math.isfinite(target_fps) or target_fps <= 0:
         raise ValueError("target FPS must be finite and positive")
     if first < 0 or last < first or last >= len(samples):
@@ -106,7 +106,7 @@ def summarize(samples, first, last, target_fps=30.0):
     return result
 
 
-def summarize_water_workload(samples, first, last, scope_offset, target_fps=30.0):
+def summarize_water_workload(samples, first, last, scope_offset, target_fps=20.0):
     """Associate elapsed intervals with explicitly phase-selected water scopes.
 
     Default UE5.8 FrameTime is emitted near BeginFrame, after the limiter wait,
@@ -163,8 +163,8 @@ def main():
     parser.add_argument("captures", nargs="+", type=Path)
     parser.add_argument("--first-sample", type=int, default=30)
     parser.add_argument("--last-sample", type=int, default=90)
-    parser.add_argument("--target-fps", type=float, default=30.0,
-                        help="Acceptance target, independent of recorded engine metadata (default: 30)")
+    parser.add_argument("--target-fps", type=float, default=20.0,
+                        help="Acceptance target, independent of recorded engine metadata (default: 20)")
     parser.add_argument("--report", required=True, type=Path)
     parser.add_argument("--require-water-scopes", action="store_true")
     parser.add_argument("--frame-time-scope-offset", type=int, choices=(0, 1),

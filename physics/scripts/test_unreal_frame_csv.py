@@ -101,8 +101,8 @@ class UnrealFrameCsvTest(unittest.TestCase):
         self.assertEqual(stats["FrameTime"]["p95_ms_nearest_rank"], 20)
         self.assertAlmostEqual(stats["elapsed_frame_fps"], 1000 / 15)
         self.assertTrue(stats["frame_p95_within_target_budget"])
-        self.assertEqual(stats["target_fps"], 30)
-        self.assertAlmostEqual(stats["frame_budget_ms"], 1000 / 30)
+        self.assertEqual(stats["target_fps"], 20)
+        self.assertAlmostEqual(stats["frame_budget_ms"], 50)
         self.assertFalse(summarize(samples, 1, 2, 60)["frame_p95_within_target_budget"])
         self.assertEqual(metadata, {"rhiname": "D3D12"})
         self.assertEqual(stats["GameThreadTime"]["mean_ms"], 10.5)
@@ -124,8 +124,9 @@ class UnrealFrameCsvTest(unittest.TestCase):
                 summarize(samples, first, last)
 
     def test_target_budget_boundary_and_invalid_targets(self):
-        samples, _ = parse_capture(io.StringIO(HEADER + "33.333333333333336,20,10,2,12\n" + FOOTER))
+        samples, _ = parse_capture(io.StringIO(HEADER + "50,20,10,2,12\n" + FOOTER))
         self.assertTrue(summarize(samples, 0, 0)["frame_p95_within_target_budget"])
+        self.assertFalse(summarize(samples, 0, 0, 30)["frame_p95_within_target_budget"])
         samples[0]["FrameTime"] += .001
         self.assertFalse(summarize(samples, 0, 0)["frame_p95_within_target_budget"])
         for target in (0, -30, float("nan"), float("inf")):
@@ -139,7 +140,7 @@ class WaterWorkloadPhaseTest(unittest.TestCase):
         # in the next row. Deliberately anti-correlated same-row timings.
         return [dict(FrameTime=t, GameThreadTime=9., RenderThreadTime=5., RHIThreadTime=2., GPUTime=4.,
                      **{WATER_SCOPES[1]: r, WATER_SCOPES[6]: s})
-                for t, r, s in ((10., 20., 5.), (50., 0., 0.), (10., 20., 5.), (50., 0., 0.))]
+                for t, r, s in ((10., 20., 5.), (60., 0., 0.), (10., 20., 5.), (60., 0., 0.))]
 
     def test_explicit_phase_changes_association_not_gate_or_elapsed_samples(self):
         samples = self.samples()
@@ -148,7 +149,7 @@ class WaterWorkloadPhaseTest(unittest.TestCase):
         legacy = summarize_water_workload(samples, 1, 3, 0)
         self.assertEqual(shifted['groups'][3]['frame_time_sample_indices'], [1, 3])
         self.assertEqual(shifted['groups'][3]['water_scope_sample_indices'], [0, 2])
-        self.assertEqual(shifted['groups'][3]['mean_frame_ms'], 50.)
+        self.assertEqual(shifted['groups'][3]['mean_frame_ms'], 60.)
         self.assertEqual(shifted['groups'][3]['scope_mean_ms'][WATER_SCOPES[1]], 20.)
         self.assertEqual(legacy['groups'][3]['frame_time_sample_indices'], [2])
         self.assertEqual(legacy['groups'][3]['mean_frame_ms'], 10.)
@@ -165,10 +166,10 @@ class WaterWorkloadPhaseTest(unittest.TestCase):
     def test_nearest_rank_budget_boundary_and_empty_groups(self):
         samples = self.samples()
         for row in samples:
-            row['FrameTime'] = 1000/30
+            row['FrameTime'] = 1000/20
         result = summarize_water_workload(samples, 1, 3, 1)
         self.assertTrue(result['frame_p95_within_target_budget'])
-        self.assertEqual(result['groups'][3]['p95_frame_ms_nearest_rank'], 1000/30)
+        self.assertEqual(result['groups'][3]['p95_frame_ms_nearest_rank'], 1000/20)
         self.assertEqual(sum(g['frames_over_budget'] for g in result['groups']), 0)
 
     def test_missing_predecessor_and_invalid_offset_are_not_silently_trimmed(self):

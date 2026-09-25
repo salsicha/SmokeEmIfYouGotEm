@@ -1,5 +1,19 @@
 # Remaining requested work
 
+Current desktop performance goal (user revision, September 25, 2026): **20 FPS**,
+50 ms p95 frame budget and 100 ms two-frame hitch threshold. This supersedes
+the 30/60 FPS targets in historical entries and referenced plans. Existing
+measurements and reports remain unchanged; this is not new performance evidence
+or river acceptance. Visual quality, physics rates and solver budgets are unchanged.
+
+September25 20FPS follow-through: editor and standalone targets rebuilt;
+the stale review-station regression is repaired and all nine profiling check
+groups pass. Fresh normal Boot/menu South Fork capture exits0:1200frames,
+p95=32.0096ms against50ms, zero frames over100ms, sampled raft motion present.
+This is a bounded performance pass, not a runtime optimization or visual/river
+acceptance. No packaged restage or geometry/field change. See
+[target follow-through](../reconstruction-review-2026-09-07/desktop-20fps-followthrough-20260925.md).
+
 September25 current rebuilt normal Boot/menu South Fork follow-through exits0
 and records actual raft motion, but frame p95=37.5728ms FAILS33.333ms (mean26.991ms).
 No experimental flags, direct-map launch or recook. This is fresh default-path
@@ -5102,22 +5116,21 @@ Full-river cook84534 is terminal exit0 at6000s: both state/artificial-bank
 audits pass, settling false. No cook is running; do not reuse old PID32144.
 Earlier entries below preserve the sequence of evidence, not current status.
 
-## Current performance target — user revision, September 12
+## Current performance target — user revision, September 25
 
-The user explicitly changed the desktop target from 60 to **30 FPS**.
-Use a 33.333 ms p95 frame budget; the two-frame hitch threshold is 66.667 ms.
-This supersedes 60 FPS requirements in earlier entries and referenced plans.
+The user explicitly changed the desktop target from 30 to **20 FPS**.
+Use a 50 ms p95 frame budget; the two-frame hitch threshold is 100 ms.
+This supersedes 30/60 FPS requirements in earlier entries and referenced plans.
 Preserve old measurements and reports as history, not current target authority.
 Keep resolution/quality, physics timestep, contact/geometry tolerances, source
 provenance, solver/memory budgets and visual requirements unchanged. Do not cap
 frame rate or reduce simulation frequency just to meet the target. The separate
 future VR comfort profile remains90FPS and is not this desktop target.
 
-CSV audit v2 defaults to30FPS, records the target and budget, and accepts an
-explicit `--target-fps` for historical comparisons. Eight parser/budget tests pass
-(reconfirmed September13 in0.15s); native desktop target is also30FPS.
+CSV audit v2 defaults to20FPS, records the target and budget, and accepts an
+explicit `--target-fps` for historical comparisons; native desktop target is also20FPS.
 The legacy `physics/config/runtime_budgets.json` desktop render target and its
-documentation now also say30Hz; ten focused runtime/CSV budget tests pass.
+documentation now also say20Hz. Existing historical reports retain their original targets.
 
 September13 consistent hydrostatic polynomial correction:
 [actual GPU rounding defect and regression](../reconstruction-review-2026-09-07/normal-river-hydrostatic-polynomials.md).

@@ -162,7 +162,7 @@ if ($profileAssignment.Count -ne 1) { throw 'Expected one production CSV command
 $buildProfile=[scriptblock]::Create($profileAssignment[0].Extent.Text+'; $profileCommands')
 $Label='south-fork-test-profile-length'
 foreach ($ProfileFrames in @(300,1200,2400)) {
-    if ((& $buildProfile) -cne "-ExecCmds=csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames") { throw 'CSV duration or explicit timing mode changed unrelated commands' }
+    if ((& $buildProfile) -cne "-ExecCmds=csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 20,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames") { throw 'CSV duration or explicit timing mode changed unrelated commands' }
 }
 $profileParam=@($ast.ParamBlock.Parameters | Where-Object {$_.Name.VariablePath.UserPath -eq 'ProfileFrames'})
 if ($profileParam.Count -ne 1 -or $profileParam[0].DefaultValue.Extent.Text -ne '300') { throw 'Default profiling duration changed' }
@@ -181,16 +181,49 @@ foreach ($taskOverride in @(
 }
 $stationGuard=@($ast.FindAll({param($node)
     $node -is [Management.Automation.Language.IfStatementAst] -and
-    $node.Extent.Text -eq "if (-not `$NormalScenarioStart) { `$start.ArgumentList.Add('-RaftSimWaterReviewStation=8330') }"
+    $node.Clauses.Count -eq 1 -and
+    $node.Clauses[0].Item1.Extent.Text -eq '-not $NormalScenarioStart' -and
+    $node.Clauses[0].Item2.Extent.Text.Contains('RaftSimWaterReviewStation=')
 },$true))
 if ($stationGuard.Count -ne 1) { throw 'Expected an explicit default-only review station' }
+$stationAssignment=@($ast.FindAll({param($node)
+    $node -is [Management.Automation.Language.AssignmentStatementAst] -and
+    $node.Left.Extent.Text -eq '$report.review_station_m'
+},$true))
+if ($stationAssignment.Count -ne 1) { throw 'Expected one recorded review station selection' }
+$selectStation=[scriptblock]::Create($stationAssignment[0].Extent.Text)
 $buildStation=[scriptblock]::Create($stationGuard[0].Extent.Text)
-foreach ($NormalScenarioStart in @($false,$true)) {
-    $start=[Diagnostics.ProcessStartInfo]::new()
-    & $buildStation
-    if ($NormalScenarioStart -and $start.ArgumentList.Count) { throw 'Normal start gained a review station' }
-    if (-not $NormalScenarioStart -and ($start.ArgumentList.Count -ne 1 -or $start.ArgumentList[0] -cne '-RaftSimWaterReviewStation=8330')) {
-        throw 'Default diagnostic station changed'
+$originalCulture=[cultureinfo]::CurrentCulture
+try {
+    foreach ($culture in @('en-US','fr-FR')) {
+        [cultureinfo]::CurrentCulture=[cultureinfo]::GetCultureInfo($culture)
+        foreach ($case in @(
+            @{Normal=$true; Station=$null; Expected=$null; Argument=$null},
+            @{Normal=$false; Station=$null; Expected=8330.0; Argument='-RaftSimWaterReviewStation=8330'},
+            @{Normal=$false; Station=0.0; Expected=0.0; Argument='-RaftSimWaterReviewStation=0'},
+            @{Normal=$false; Station=1234.125; Expected=1234.125; Argument='-RaftSimWaterReviewStation=1234.125'}
+        )) {
+            $NormalScenarioStart=$case.Normal
+            $ReviewStationM=$case.Station
+            $report=[ordered]@{}
+            & $selectStation
+            if ($report.review_station_m -ne $case.Expected) { throw 'Recorded station differs from requested/default station' }
+            $start=[Diagnostics.ProcessStartInfo]::new()
+            & $buildStation
+            if ($NormalScenarioStart -and $start.ArgumentList.Count) { throw 'Normal start gained a review station' }
+            if (-not $NormalScenarioStart -and ($start.ArgumentList.Count -ne 1 -or $start.ArgumentList[0] -cne $case.Argument)) {
+                throw 'Launched station differs from recorded selection or is locale-dependent'
+            }
+        }
     }
+} finally {
+    [cultureinfo]::CurrentCulture=$originalCulture
 }
-'PASS: ordinary put-in capture has no station override; existing diagnostic default preserved'
+$rejected=$false
+try { & $source -Label 'south-fork-test-normal-explicit-station-conflict' -CookProcessId 0 -CookStartUtc 'invalid' -NormalScenarioStart -ReviewStationM 0 }
+catch {
+    if ($_.Exception.Message -ne 'An explicit review station is not a normal scenario start') { throw }
+    $rejected=$true
+}
+if (-not $rejected) { throw 'Normal scenario start accepted an explicit station parameter' }
+'PASS: ordinary put-in has no station override; default/custom station and invariant-culture recording agree'

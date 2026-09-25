@@ -2,8 +2,8 @@
 
 Requested 2026-09-06. Work in progress; no geographic or hydraulic acceptance yet.
 
-Performance target revised by the user on2026-09-12: desktop30FPS,33.333ms
-p95 frame budget. Earlier60FPS assessments below are historical. See the
+Performance target revised by the user on2026-09-25: desktop20FPS,50ms
+p95 frame budget. Earlier60FPS and30FPS assessments below are historical. See the
 current target and unchanged quality/physics requirements in[remaining work](remaining-work.md).
 
 Reconstruct Chili Bar to Salmon Falls as accurately as available captured data

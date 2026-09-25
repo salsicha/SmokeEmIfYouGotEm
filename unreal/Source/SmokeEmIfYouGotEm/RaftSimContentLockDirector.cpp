@@ -46,9 +46,9 @@ constexpr const TCHAR* FullReachTransitFields = TEXT(
     "full_hydraulics/full_reach_transit_seed");
 constexpr const TCHAR* ReleaseVersion = TEXT("1.0.0-rc1");
 constexpr float SolverBudgetMilliseconds = 1.6f;
-// User revised the desktop target to 30 FPS on September 12, 2026.
+// User revised the desktop target to 20 FPS on September 25, 2026.
 // Keep the hitch criterion at two target frames; physics step rates are separate.
-constexpr float TargetFrameRate = 30.0f;
+constexpr float TargetFrameRate = 20.0f;
 constexpr float FrameBudgetMilliseconds = 1000.0f / TargetFrameRate;
 constexpr float HitchBudgetMilliseconds = 2.0f * FrameBudgetMilliseconds;
 constexpr float MemoryBudgetMegabytes = 8192.0f;

@@ -20,11 +20,11 @@ def test_runtime_budget_profiles_are_complete_and_positive():
         assert profile["water_solver_ms"] + profile["raft_coupling_ms"] <= profile["total_physics_ms"]
 
 
-def test_desktop_targets_30_fps_without_reducing_physics_tick_rate():
+def test_desktop_targets_20_fps_without_reducing_physics_tick_rate():
     budget_path = Path(__file__).resolve().parents[1] / "config" / "runtime_budgets.json"
     profiles = json.loads(budget_path.read_text(encoding="utf-8"))["profiles"]
 
-    assert profiles["desktop"]["render_target_hz"] == 30
+    assert profiles["desktop"]["render_target_hz"] == 20
     assert profiles["desktop"]["physics_tick_hz"] == 120
     assert profiles["vr"]["render_target_hz"] == 90
     assert profiles["handheld"]["render_target_hz"] == 60

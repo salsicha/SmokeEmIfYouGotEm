@@ -289,7 +289,7 @@ try {
         # Its elapsed interval belongs to the preceding logical frame, not
         # the water scopes on the same CSV row. No frame limit is changed.
         $profileCrewCommands = if ($ProfileHighSide) { 'RaftSim.ProfileHighSide,' } elseif ($ProfileCrewOverboard) { 'RaftSim.ProfileCrewOverboard,' } else { '' }
-        $profileCommands = "-ExecCmds=${profileCrewCommands}csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 30,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames"
+        $profileCommands = "-ExecCmds=${profileCrewCommands}csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 20,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames"
         $start.ArgumentList.Add($profileCommands)
     }
     if ($ExtraGameArgument) { $start.ArgumentList.Add($ExtraGameArgument) }

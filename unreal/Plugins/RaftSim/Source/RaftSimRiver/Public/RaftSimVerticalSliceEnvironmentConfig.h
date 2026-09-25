@@ -61,7 +61,7 @@ struct FRaftSimEnvironmentQualityBudget
     FName TargetPlatform;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment")
-    int32 TargetFrameRate = 30;
+    int32 TargetFrameRate = 20;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment")
     float MaxVisibleFoliageInstances = 0.0f;
