@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC: unused-contact-shape elision rejected after exact128native
+pairs and3passing tests but mixed normal-launch ABBA whole-frame results.
+All four p95 values fail33.333333ms; candidate code/switch/test removed.
+See [result](../reconstruction-review-2026-09-07/unused-contact-shape-rejected.md).
+Do not repeat this unchanged experiment. Baseline restoration build succeeded
+(exit0,167.78s); no experiment remains live.
+
 Latest playable performance increment: South Fork's breaking detector now
 rejects already-ineligible current cells before computing flow direction.
 Native86,688cases and64actual-input refreshes (3.24million decisions) preserve
