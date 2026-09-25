@@ -259,6 +259,17 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         const auto SavePose = [&](int32 Frame)
         {
             if (!Capture) return;
+            if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimBoardingHandCapture")))
+            {
+                const auto& HandPose = BoardingAvatar->GetPublishedCrewPose();
+                const FTransform HostTransform = BoardingAvatar->GetActorTransform();
+                const FVector Aim = HostTransform.TransformPosition((HandPose.LeftHandCm+HandPose.RightHandCm)*0.5);
+                const FVector Eye = Aim + HostTransform.TransformVectorNoScale(FVector(140,-200,140));
+                Capture->SetWorldLocationAndRotation(Eye,(Aim-Eye).Rotation());
+                Capture->ShowFlags.SetLighting(true);
+                // Diagnostic world-normal view, not normal-game lighting acceptance.
+                Capture->CaptureSource = SCS_Normal;
+            }
             World->SendAllEndOfFrameUpdates(); FlushRenderingCommands();
             Capture->CaptureScene(); FlushRenderingCommands();
             FBufferArchive Bytes;
@@ -329,6 +340,28 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             PreviousLegWorld[P] = BoardingAvatar->GetActorTransform().TransformPosition(BoardingAvatar->GetPublishedCrewPose().*LegPoints[P]);
         double MaxLegPointStepCm = 0.;
         int32 WorstLegFrame = -1, WorstLegPoint = -1;
+        auto* HandVisual = Cast<ARaftSimCC0CrewVisualActor>(BoardingAvatar->GetProductionVisualActor());
+        auto* HandBody = HandVisual ? HandVisual->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
+        if (!TestNotNull(TEXT("handoff audit observes actual production bones"), HandBody)) return false;
+        TArray<FName> HandBones;
+        TArray<FTransform> PreviousHandWorld;
+        for (const TCHAR* Side : {TEXT("l"), TEXT("r")})
+        {
+            HandBones.Add(FName(*FString::Printf(TEXT("hand_%s"), Side)));
+            for (const TCHAR* Digit : {TEXT("thumb"), TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")})
+                for (int32 Segment = 1; Segment <= 3; ++Segment)
+                    HandBones.Add(FName(*FString::Printf(TEXT("%s_%02d_%s"), Digit, Segment, Side)));
+        }
+        for (FName Bone : HandBones)
+        {
+            TestTrue(TEXT("handoff bone exists"), HandBody->GetBoneIndex(Bone) != INDEX_NONE);
+            PreviousHandWorld.Add(HandBody->GetBoneTransformByName(Bone, EBoneSpaces::WorldSpace));
+        }
+        double MaxHandStepCm = 0., MaxHandAngleDegrees = 0.;
+        int32 WorstHandFrame = -1, GripHandoffSamples = 0;
+        FName WorstHandBone;
+        int32 WorstHandAngleFrame = -1;
+        FName WorstHandAngleBone;
         Raft->UpdateRescueInteraction(-1.f);
         TestTrue(TEXT("negative time cannot move boarding root"), BoardingAvatar->GetActorLocation().Equals(PreviousPosition, .01));
         while (!Raft->BoardingPassenger.IsNone() && Frames < 720)
@@ -337,6 +370,31 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             Raft->UpdateCrew(1.f/60.f);
             Raft->UpdateRescueInteraction(1.f/60.f);
             BoardingAvatar->Tick(1.f/60.f);
+            for (int32 H = 0; H < HandBones.Num(); ++H)
+            {
+                const FTransform HandWorld = HandBody->GetBoneTransformByName(HandBones[H], EBoneSpaces::WorldSpace);
+                TestFalse(TEXT("handoff bone transform is finite"), HandWorld.ContainsNaN());
+                const double HandStep = FVector::Distance(HandWorld.GetLocation(), PreviousHandWorld[H].GetLocation());
+                if (HandStep > MaxHandStepCm) { MaxHandStepCm = HandStep; WorstHandFrame = Frames+1; WorstHandBone = HandBones[H]; }
+                const double HandAngle = FMath::RadiansToDegrees(
+                    HandWorld.GetRotation().AngularDistance(PreviousHandWorld[H].GetRotation()));
+                if (HandAngle > MaxHandAngleDegrees)
+                { MaxHandAngleDegrees = HandAngle; WorstHandAngleFrame = Frames+1; WorstHandAngleBone = HandBones[H]; }
+                PreviousHandWorld[H] = HandWorld;
+            }
+            if (!Raft->BoardingPassenger.IsNone())
+            {
+                const auto& HandPose = BoardingAvatar->GetPublishedCrewPose();
+                if (Raft->BoardingElapsed > Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingLegOverFraction)
+                {
+                    ++GripHandoffSamples;
+                    TestTrue(TEXT("handoff retains full palm anchoring while changing grip"),
+                        FMath::IsNearlyEqual(HandPose.BoardingPalmSupportBlend + HandPose.BoardingPaddleGripBlend, 1.f, 1.e-5f));
+                    TestFalse(TEXT("paddle prop remains hidden during handoff"), HandPose.bShowPaddle);
+                }
+                else
+                    TestEqual(TEXT("paddle grip does not start before leg clearance"), HandPose.BoardingPaddleGripBlend, 0.f);
+            }
             for (int32 P = 0; P < 4; ++P)
             {
                 const FVector CurrentLeg = BoardingAvatar->GetActorTransform().TransformPosition(BoardingAvatar->GetPublishedCrewPose().*LegPoints[P]);
@@ -490,6 +548,12 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         TestTrue(TEXT("timed boarding reaches completion"), Frames < 720 && Raft->BoardingPassenger.IsNone());
         TestTrue(TEXT("no large per-frame root teleport"), MaxStepCm < 10.);
         TestTrue(TEXT("no foot or knee control teleport above 10cm per update"), MaxLegPointStepCm < 10.);
+        TestTrue(TEXT("grip handoff was sampled"), GripHandoffSamples > 0);
+        TestTrue(TEXT("no wrist or finger teleport above 10cm per update"), MaxHandStepCm < 10.);
+        TestTrue(TEXT("no wrist or finger rotation jump above 30 degrees per update"), MaxHandAngleDegrees <= 30.);
+        AddInfo(FString::Printf(TEXT("BOARDING_HAND_CONTINUITY samples=%d max_step_cm=%.9f frame=%d bone=%s max_angle_deg=%.9f angle_frame=%d angle_bone=%s"),
+            GripHandoffSamples, MaxHandStepCm, WorstHandFrame, *WorstHandBone.ToString(), MaxHandAngleDegrees,
+            WorstHandAngleFrame, *WorstHandAngleBone.ToString()));
         AddInfo(FString::Printf(TEXT("BOARDING_LEG_CONTINUITY max_step_cm=%.9f boot_sample_stride=%d frame=%d point=%d"),
             MaxLegPointStepCm, BootSampleStride, WorstLegFrame, WorstLegPoint));
         TestTrue(TEXT("reach stage is sampled"), bCapturedReach);

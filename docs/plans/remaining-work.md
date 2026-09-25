@@ -6,6 +6,14 @@ the 30/60 FPS targets in historical entries and referenced plans. Existing
 measurements and reports remain unchanged; this is not new performance evidence
 or river acceptance. Visual quality, physics rates and solver budgets are unchanged.
 
+September25 destination-grip boarding handoff now passes the new32-bone
+continuity audit: max5.693cm/6.608degrees per update. The strict body gate still
+fails8.277cm atframe270 on right-thumb vertex6151 (tube winding1); boots remain
+within2cm. Intermediate-grip and fixed-handle-identity hypotheses are retained
+as failed evidence. Resolve thumb support/release contact before promotion;
+both review flags remain disabled. See the destination-grip section in
+[reentry evidence](../reconstruction-review-2026-09-07/crew-public-reentry-discontinuity.md).
+
 September25 20FPS follow-through: editor and standalone targets rebuilt;
 the stale review-station regression is repaired and all nine profiling check
 groups pass. Fresh normal Boot/menu South Fork capture exits0:1200frames,

@@ -433,3 +433,58 @@ No new visual acceptance, default promotion, packaged build or performance claim
 No-opt-in native regression `tmp/crew-palm-support-default-20260925/index.json`
 passes1success/0failures/0not-run, engine exit0. Strict prototype failure remains
 recorded and neither review option is enabled by default.
+
+### Destination-grip handoff and explicit wrist/finger continuity
+
+The review-only boarding pose now publishes a separate paddle-grip blend while
+the paddle prop remains hidden. Wrist offsets keep full palm anchoring through
+the support-to-grip transfer, rather than fading back to bare reference wrists.
+The CC0 adapter blends toward the actual stored seated destination's hand basis
+and parent-local finger shape. The existing destination contact solver is reused;
+the moving wrists are restored before the finger blend is applied. Ordinary
+poses retain zero boarding blends and the existing full paddle-grip path.
+
+New native observation tracks all32 wrist/finger bones on every update, including
+completion. It requires finite transforms, position steps below10cm and rotation
+steps at most30degrees per1/60s update; these are continuity checks, not anatomical
+or collision acceptance. The body/boot2cm clearance limits remain unchanged.
+
+Retained experiments, all with timed boarding, strict clearance and calf fitting:
+
+- `tmp/crew-boarding-grip-handoff-20260925/index.json`: the first intermediate-pose
+  grip blend fails body clearance at8.825065092cm, frame270, vertex6151,
+ 100% `thumb_03_r`. Position step8.925388515cm but rotation step168.426164076degrees.
+- `tmp/crew-boarding-grip-identity-20260925/index.json`: fixing shaft/T-grip identity
+  alone is rejected and removed. Body deficit8.208083661cm, but position step
+ 15.012610516cm and rotation179.533444082degrees fail the expanded continuity gates.
+- `tmp/crew-boarding-destination-grip-20260925/index.json`: solving the stored
+  destination shape instead of continuously re-solving wrap direction against
+  intermediate paddle points passes continuity:86handoff samples, maximum
+ 5.693478932cm step atframe291 (`pinky_01_l`), maximum6.607625101degrees atframe301
+  (`index_03_r`). Strict test still fails only body-envelope clearance, exit1.
+
+Final body result:583717 supported samples, maximum8.276833862cm atframe270,
+vertex6151,100% `thumb_03_r`, raft-local(-68.422,76.005,17.728)cm. Exact surface
+distance8.224789439cm and raw tube winding1 remain consistent with an interior
+point. Boots retain1.633426454cm deficit over1956174 supported samples. Existing
+137pull samples retain2.540161718cm maximum both-hand control gap and zero leg
+span error. This does not establish that every other body region is clear.
+
+Editor builds82.00s,79.20s and77.49s succeeded. Captures are retained in
+`tmp/crew-boarding-grip-handoff-views-20260925/`,
+`tmp/crew-boarding-grip-close-20260925/` (base color), and
+`tmp/crew-boarding-destination-normal-views-20260925/` (world normals).
+The wide frame330 and close frame270 were inspected: base color is too dark,
+and the normal view makes geometry legible but other seated crew still occlude
+the failing hand. None establishes normal shading, continuous motion or clearance.
+
+Next resolve the right-thumb skin/support orientation and release path near
+frame270 with an unobstructed exact-contact view; do not hide the vertex, raise
+the tolerance or promote solely because the final handoff no longer flips.
+Both experimental flags remain default-off. No standalone/package rebuild,
+normal-play visual improvement, river geometry change or performance acceptance
+is claimed from this candidate.
+
+No-opt-in follow-up `tmp/crew-destination-grip-default-20260925/index.json`
+passes1success/0warnings/0failures/0not-run, engine exit0. This verifies the
+ordinary native occupancy regression, not rescue animation or packaged play.

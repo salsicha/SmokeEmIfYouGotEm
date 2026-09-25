@@ -1083,7 +1083,8 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // bone is a wrist pivot. Offset each wrist by its own hash-locked reference
     // palm vector so the visible knuckle plane, not the wrist, meets the
     // side-correct paddle handle.
-    const bool bPalmTarget = Pose.bShowPaddle || Pose.BoardingPalmSupportBlend > 0.f;
+    const bool bPalmTarget = Pose.bShowPaddle || Pose.BoardingPalmSupportBlend > 0.f ||
+        Pose.BoardingPaddleGripBlend > 0.f;
     const FVector LeftWristCm = bPalmTarget
         ? ResolvePaddleGripWristCm(true, Pose, Pose.LeftHandCm)
         : Pose.LeftHandCm;
@@ -1292,7 +1293,8 @@ FVector ARaftSimCC0CrewVisualActor::ResolvePaddleGripWristCm(
     const FQuat TargetHandRotation = ResolvePaddleGripHandRotation(bLeft, Pose);
     const FQuat HandDelta =
         (TargetHandRotation * ReferenceHand->GetRotation().Inverse()).GetNormalized();
-    const float PalmWeight = Pose.bShowPaddle ? 1.f : Pose.BoardingPalmSupportBlend;
+    const float PalmWeight = Pose.bShowPaddle ? 1.f :
+        FMath::Clamp(Pose.BoardingPalmSupportBlend + Pose.BoardingPaddleGripBlend, 0.f, 1.f);
     return DesiredGripCm - HandDelta.RotateVector(ReferencePalmOffsetCm) * PalmWeight;
 }
 
@@ -1338,6 +1340,17 @@ FQuat ARaftSimCC0CrewVisualActor::ResolvePaddleGripHandRotation(
         const FQuat SupportBasis = FRotationMatrix::MakeFromXZ(
             bLeft ? FVector::RightVector : -FVector::RightVector, -FVector::UpVector).ToQuat();
         const FQuat SupportRotation = (SupportBasis * ReferenceBasis.Inverse() * ReferenceHand->GetRotation()).GetNormalized();
+        if (Pose.BoardingPaddleGripBlend > 0.f)
+        {
+            // The final controls target a seated paddle grip, not reference
+            // wrists. Keep the palm offset and blend toward that same basis.
+            FRaftSimCrewAvatarPose GripPose = Pose;
+            if (const auto* Host = Cast<ARaftSimCrewAvatarActor>(GetParentActor()))
+                Host->TryGetBoardingGripDestination(GripPose);
+            GripPose.bShowPaddle = true;
+            return FQuat::Slerp(ResolvePaddleGripHandRotation(bLeft, GripPose),
+                SupportRotation, Pose.BoardingPalmSupportBlend).GetNormalized();
+        }
         return FQuat::Slerp(ReferenceHand->GetRotation(), SupportRotation, Pose.BoardingPalmSupportBlend).GetNormalized();
     }
     const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
@@ -1916,7 +1929,8 @@ void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
     {
         return;
     }
-    const float GripAlpha = Pose.bShowPaddle ? 0.32f : 0.16f;
+    const float GripWeight = Pose.bShowPaddle ? 1.f : FMath::Clamp(Pose.BoardingPaddleGripBlend, 0.f, 1.f);
+    const float GripAlpha = FMath::Lerp(0.16f, 0.32f, GripWeight);
     for (const bool bLeft : {true, false})
     {
         for (const TCHAR* Digit : CC0GripDigits)
@@ -1924,19 +1938,59 @@ void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
             ApplyFingerChain(bLeft, Digit, GripAlpha);
         }
     }
-    if (!Pose.bShowPaddle)
+    if (GripWeight <= 0.f)
     {
         return;
+    }
+    // Solve the existing seated contact pose, then blend each digit in its
+    // parent frame. Component-position lerps would shorten finger segments.
+    // Ordinary paddle poses take the unchanged full-grip path without arrays.
+    TArray<FName> BlendBones, BlendParents;
+    TArray<FTransform> OpenLocal;
+    FRaftSimCrewAvatarPose GripPose = Pose;
+    FTransform TransferHands[2];
+    if (GripWeight < 1.f)
+    {
+        for (const bool bLeft : {true, false})
+        {
+            const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+            for (const TCHAR* Digit : CC0GripDigits)
+            {
+                FName Parent(*FString::Printf(TEXT("hand_%s"), Side));
+                for (int32 Segment = 1; Segment <= 3; ++Segment)
+                {
+                    const FName Bone(*FString::Printf(TEXT("%s_%02d_%s"), Digit, Segment, Side));
+                    BlendBones.Add(Bone); BlendParents.Add(Parent);
+                    OpenLocal.Add(Body->GetBoneTransformByName(Bone, EBoneSpaces::ComponentSpace).GetRelativeTransform(
+                        Body->GetBoneTransformByName(Parent, EBoneSpaces::ComponentSpace)));
+                    Parent = Bone;
+                }
+            }
+        }
+    }
+    if (!BlendBones.IsEmpty())
+    {
+        if (const auto* Host = Cast<ARaftSimCrewAvatarActor>(GetParentActor()))
+            Host->TryGetBoardingGripDestination(GripPose);
+        GripPose.bShowPaddle = true;
+        for (const bool bLeft : {true, false})
+        {
+            const FName Hand(bLeft ? TEXT("hand_l") : TEXT("hand_r"));
+            TransferHands[bLeft ? 0 : 1] = Body->GetBoneTransformByName(Hand, EBoneSpaces::ComponentSpace);
+            const FVector Center = bLeft ? GripPose.LeftHandCm : GripPose.RightHandCm;
+            SetPaddleGripHandTransform(bLeft, GripPose, ResolvePaddleGripWristCm(bLeft, GripPose, Center));
+            for (const TCHAR* Digit : CC0GripDigits) ApplyFingerChain(bLeft, Digit, 0.32f);
+        }
     }
     Body->RefreshBoneTransforms();
     for (const bool bLeft : {true, false})
     {
         const FVector GripCenterCm =
-            bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+            bLeft ? GripPose.LeftHandCm : GripPose.RightHandCm;
         const FVector GripAxis =
-            ResolvePaddleGripAxis(Pose, GripCenterCm);
+            ResolvePaddleGripAxis(GripPose, GripCenterCm);
         const bool bUpperTGrip =
-            IsUpperTGrip(Pose, GripCenterCm);
+            IsUpperTGrip(GripPose, GripCenterCm);
         for (const TCHAR* Digit : {
                  TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")})
         {
@@ -1953,6 +2007,25 @@ void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
             GripCenterCm,
             GripAxis,
             bUpperTGrip);
+    }
+    TArray<FTransform> ClosedLocal;
+    for (int32 Index = 0; Index < BlendBones.Num(); ++Index)
+        ClosedLocal.Add(Body->GetBoneTransformByName(BlendBones[Index], EBoneSpaces::ComponentSpace).GetRelativeTransform(
+            Body->GetBoneTransformByName(BlendParents[Index], EBoneSpaces::ComponentSpace)));
+    if (!BlendBones.IsEmpty())
+    {
+        // Only the destination's hand-local finger shape is used. Restore the
+        // actual moving wrists before applying that shape; do not solve grip
+        // wrap directions against interpolated, not-yet-grasped paddle points.
+        Body->SetBoneTransformByName(TEXT("hand_l"), TransferHands[0], EBoneSpaces::ComponentSpace);
+        Body->SetBoneTransformByName(TEXT("hand_r"), TransferHands[1], EBoneSpaces::ComponentSpace);
+    }
+    for (int32 Index = 0; Index < BlendBones.Num(); ++Index)
+    {
+        FTransform Local;
+        Local.Blend(OpenLocal[Index], ClosedLocal[Index], GripWeight);
+        Body->SetBoneTransformByName(BlendBones[Index], Local *
+            Body->GetBoneTransformByName(BlendParents[Index], EBoneSpaces::ComponentSpace), EBoneSpaces::ComponentSpace);
     }
     Body->RefreshBoneTransforms();
 }

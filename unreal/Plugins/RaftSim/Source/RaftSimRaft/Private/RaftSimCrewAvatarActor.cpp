@@ -3536,6 +3536,14 @@ void ARaftSimCrewAvatarActor::SetBoardingPose(const FRaftSimCrewAvatarPose& Star
     AdvanceBoardingPose(Alpha);
 }
 
+bool ARaftSimCrewAvatarActor::TryGetBoardingGripDestination(FRaftSimCrewAvatarPose& OutPose) const
+{
+    if (CurrentAction != ERaftSimCrewAvatarAction::Reentry || BoardingPoseAlpha < 0.f ||
+        !bBoardingHasReach || !BoardingEndPose.bShowPaddle) return false;
+    OutPose = BoardingEndPose;
+    return true;
+}
+
 void ARaftSimCrewAvatarActor::AdvanceBoardingPose(float Alpha)
 {
     BoardingPoseAlpha = FMath::Clamp(Alpha, 0.f, 1.f);
@@ -3624,6 +3632,8 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
         const float PalmT = BoardingPoseAlpha <= BoardingReachFraction ? BoardingPoseAlpha / BoardingReachFraction :
             (BoardingPoseAlpha <= BoardingLegOverFraction ? 1.f : (1.f-BoardingPoseAlpha)/(1.f-BoardingLegOverFraction));
         Pose.BoardingPalmSupportBlend = FMath::Clamp(PalmT*PalmT*(3.f-2.f*PalmT), 0.f, 1.f);
+        Pose.BoardingPaddleGripBlend = bBoardingHasReach && !bLegOver && BoardingEndPose.bShowPaddle
+            ? Blend : 0.f;
         Pose.bFeetPlanted = false;
     }
     FitFeetToRenderedRaft(Pose, CurrentAction);

@@ -83,6 +83,9 @@ struct FRaftSimCrewAvatarPose
     FVector PaddleBottomCm = FVector::ZeroVector;
     bool bShowPaddle = true;
     float BoardingPalmSupportBlend = 0.f;
+    // Hidden paddle during boarding; blend the rig toward its seated grip
+    // independently of whether the paddle prop is visible.
+    float BoardingPaddleGripBlend = 0.f;
     bool bFeetPlanted = false;
 };
 
@@ -137,6 +140,7 @@ public:
     bool TryGetRenderedPose(ERaftSimCrewAvatarAction Action, float Phase, FRaftSimCrewAvatarPose& OutPose) const;
     const FRaftSimCrewAvatarPose& GetPublishedCrewPose() const { return LastRenderedPose; }
     void SetBoardingPose(const FRaftSimCrewAvatarPose& Start, const FRaftSimCrewAvatarPose& End, float Alpha);
+    bool TryGetBoardingGripDestination(FRaftSimCrewAvatarPose& OutPose) const;
     void SetBoardingReachPose(const FRaftSimCrewAvatarPose& Reach) { BoardingReachPose = BoardingPullPose = Reach; bBoardingHasReach = true; }
     void SetBoardingPullPose(const FRaftSimCrewAvatarPose& Pull) { BoardingPullPose = Pull; }
     void SetBoardingLegOverPoses(const FRaftSimCrewAvatarPose& Lift, const FRaftSimCrewAvatarPose& Over) { BoardingLiftPose = Lift; BoardingLegOverPose = Over; }
