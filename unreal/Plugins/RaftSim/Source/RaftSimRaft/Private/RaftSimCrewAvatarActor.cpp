@@ -1,4 +1,5 @@
 #include "RaftSimCrewAvatarActor.h"
+#include "RaftSimCrewBoarding.h"
 
 #include "RaftSimCC0CrewVisualActor.h"
 #include "RaftSimMannyCrewVisualActor.h"
@@ -3555,14 +3556,19 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
         Pose = BoardingStartPose;
         const bool bApproaching = BoardingPoseAlpha <= BoardingReachFraction;
         const bool bPulling = BoardingPoseAlpha <= BoardingPullFraction;
+        const bool bLifting = BoardingPoseAlpha <= BoardingLiftFraction;
+        const bool bLegOver = BoardingPoseAlpha <= BoardingLegOverFraction;
         const auto& From = !bBoardingHasReach || bApproaching ? BoardingStartPose :
-            (bPulling ? BoardingReachPose : BoardingPullPose);
+            (bPulling ? BoardingReachPose : (bLifting ? BoardingPullPose : (bLegOver ? BoardingLiftPose : BoardingLegOverPose)));
         const auto& To = !bBoardingHasReach ? BoardingEndPose :
-            (bApproaching ? BoardingReachPose : (bPulling ? BoardingPullPose : BoardingEndPose));
+            (bApproaching ? BoardingReachPose : (bPulling ? BoardingPullPose :
+                (bLifting ? BoardingLiftPose : (bLegOver ? BoardingLegOverPose : BoardingEndPose))));
         const float StageT = !bBoardingHasReach ? BoardingPoseAlpha : (bApproaching ?
             BoardingPoseAlpha / BoardingReachFraction : (bPulling ?
             (BoardingPoseAlpha-BoardingReachFraction)/(BoardingPullFraction-BoardingReachFraction) :
-            (BoardingPoseAlpha-BoardingPullFraction)/(1.f-BoardingPullFraction)));
+            (bLifting ? (BoardingPoseAlpha-BoardingPullFraction)/(BoardingLiftFraction-BoardingPullFraction) :
+                (bLegOver ? (BoardingPoseAlpha-BoardingLiftFraction)/(BoardingLegOverFraction-BoardingLiftFraction) :
+                (BoardingPoseAlpha-BoardingLegOverFraction)/(1.f-BoardingLegOverFraction)))));
         const float Blend = StageT * StageT * (3.f - 2.f * StageT);
         FVector FRaftSimCrewAvatarPose::* const Points[] = {
             &FRaftSimCrewAvatarPose::TorsoCenterCm, &FRaftSimCrewAvatarPose::HeadCenterCm,
@@ -3590,6 +3596,27 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
                 To.LeftHipCm,To.LeftKneeCm,To.LeftFootCm,Pose.LeftKneeCm,Pose.LeftFootCm);
             Leg(Pose.RightHipCm,From.RightHipCm,From.RightKneeCm,From.RightFootCm,
                 To.RightHipCm,To.RightKneeCm,To.RightFootCm,Pose.RightKneeCm,Pose.RightFootCm);
+        }
+        if (bBoardingHasReach && !bPulling && bLegOver)
+        {
+            const float PoleT = FMath::Clamp(4.f*(BoardingPoseAlpha-BoardingPullFraction)/
+                (BoardingLiftFraction-BoardingPullFraction),0.f,1.f);
+            const float PoleBlend = PoleT*PoleT*(3.f-2.f*PoleT);
+            const auto Solve = [PoleBlend](const FVector& Hip, const FVector& Foot, const FVector& OldHip,
+                const FVector& OldKnee, const FVector& OldFoot, double Side, FVector& Knee)
+            {
+                // Move the bend guide out of the sagittal swing plane while
+                // still outboard; a near-collinear guide can flip the knee.
+                const FVector Hint = FMath::Lerp(OldKnee-OldHip,
+                    FVector(0,Side*FVector::Distance(OldHip,OldKnee),0),double(PoleBlend));
+                return RaftSimCrewBoarding::SolveLeg(Hip, Foot, FVector::Distance(OldHip,OldKnee),
+                    FVector::Distance(OldKnee,OldFoot), Hint, Knee);
+            };
+            if (!ensureMsgf(Solve(Pose.LeftHipCm,Pose.LeftFootCm,BoardingPullPose.LeftHipCm,
+                BoardingPullPose.LeftKneeCm,BoardingPullPose.LeftFootCm,-1.,Pose.LeftKneeCm) &&
+                Solve(Pose.RightHipCm,Pose.RightFootCm,BoardingPullPose.RightHipCm,
+                BoardingPullPose.RightKneeCm,BoardingPullPose.RightFootCm,1.,Pose.RightKneeCm),
+                TEXT("Unreachable boarding leg-over control target"))) return;
         }
         Pose.TorsoRotation = FQuat::Slerp(From.TorsoRotation.Quaternion(),
             To.TorsoRotation.Quaternion(), Blend).Rotator();
@@ -3817,10 +3844,17 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
         // the single animation authority.
         const FVector ProductionBootScale =
             kProductionRiverBootPresentationScale * Profile;
+        float BoardingSplayWeight = 1.f;
+        if (CurrentAction == ERaftSimCrewAvatarAction::Reentry && bBoardingHasReach &&
+            BoardingEndPose.bFeetPlanted && BoardingPoseAlpha > BoardingLegOverFraction)
+        {
+            const float T = (BoardingPoseAlpha-BoardingLegOverFraction)/(1.f-BoardingLegOverFraction);
+            BoardingSplayWeight = 1.f-T*T*(3.f-2.f*T);
+        }
         const auto PlaceProductionBoot = [
             &Pose,
             &ProductionBootScale,
-            &Profile](UStaticMeshComponent* Boot,
+            &Profile, BoardingSplayWeight](UStaticMeshComponent* Boot,
                       const FVector& SolvedFootCm,
                       float SplayYawDegrees)
         {
@@ -3831,7 +3865,7 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
             // breaking the shin's silhouette.
             const FVector ToeForward =
                 FRotator(
-                    0.0f, Pose.bFeetPlanted ? 0.0f : Pose.TorsoRotation.Yaw + SplayYawDegrees, 0.0f)
+                    0.0f, Pose.bFeetPlanted ? 0.0f : (Pose.TorsoRotation.Yaw + SplayYawDegrees) * BoardingSplayWeight, 0.0f)
                     .RotateVector(FVector::ForwardVector);
             const FRotator BootRotation =
                 FRotationMatrix::MakeFromXZ(ToeForward, FVector::UpVector)

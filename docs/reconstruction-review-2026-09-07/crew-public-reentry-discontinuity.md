@@ -275,3 +275,70 @@ explicit `const UStaticMesh*` corrected it. Builds12.69s and12.62s then succeede
 the latter adding a CPU-buffer availability guard. No runtime animation changed
 in this audit. Next resolve leg-over-tube support before root travel to the seat;
 the42cm deficit is too large to treat as a sole-offset adjustment.
+
+### Leg-over candidate and dense completion-frame audit
+
+The review-only controller now holds the root at the tube through lift/leg-over
+before travelling to the seat. Two-bone knee controls preserve segment lengths;
+segment reachability is checked before mutating boarding state. Targets are
+authored (foot height25cm above hand targets), not measured human motion. A stable
+sideways bend pole is blended while feet remain outside. Boot splay fades toward
+the actual planted end orientation during settling. Ordinary boarding stays unchanged.
+
+Retained failures: `tmp/crew-boarding-legover-20260925/index.json` failed boot
+clearance at18.884cm. Correcting end boot orientation passed sparse sampling,
+but strengthened per-update tests exposed a54.298cm right-knee jump atframe247
+(`tmp/crew-boarding-legover-joint-20260925/index.json`). The stable bend-pole
+repair addresses that discontinuity without weakening either limit.
+
+Final native D3D12 run:
+`tmp/crew-boarding-legover-complete-frame-20260925/index.json` reports1success,
+0warnings/0failures/0not-run, engine exit0. Strict sampling now includes every
+post-pull update and the completion frame:1,956,174 supported boot vertices;
+maximum upper-envelope deficit1.633426454cm atframe306, unchanged2cm threshold.
+Largest knee/foot control step6.120569828cm atframe291 (left knee), under10cm.
+137 anchored samples have maximum both-hand gap2.540161718cm and zero reported
+leg-span error. The completion-frame test build succeeded in12.72s.
+
+No-opt-in follow-up `tmp/crew-boarding-legover-default-20260925/index.json` also
+reports1success/0warnings/0failures/0not-run, engine exit0. This validates the
+native occupancy regression only, not normal-menu or packaged performance.
+
+Local engine captures remain in
+`tmp/crew-boarding-legover-stable-views-20260925/`. Earlier candidate views show
+close/occluded passage through other seated crew. These checks do not establish
+whole-body or crew-to-crew clearance, continuous collision, moving/deforming
+raft behavior, other identities/sides, interruption safety, partial support loads,
+normal-menu motion/cost or packaged acceptance. No river/cooked assets changed;
+do not enable the prototype or claim a delivered playable animation improvement.
+
+### Expanded skinned-body audit rejects promotion
+
+The next audit samples CPU-skinned LOD0 body vertices without the seated-glute
+sampler's fixed spatial filter. It runs every6updates after the pull stage and
+on completion, querying the same conservative raft upper envelope. Empty CPU
+data, nonfinite points or missing production visual fail closed. Strict transfer
+validation now also requires body deficit<=2cm; the boot gate is unchanged.
+This includes skin covered by boots/equipment and does not prove signed solid
+penetration or visible intersection. No additional per-frame production work.
+
+Editor builds51.05s and14.30s succeeded. Native D3D12 results:
+`tmp/crew-boarding-body-envelope-20260925/index.json` and the attributed follow-up
+`tmp/crew-boarding-body-attribution-20260925/index.json` fail exactly the new body
+envelope assertion (0success/1failure, engine exit255; Unreal reports-1).
+Across585036 supported body samples, maximum deficit17.020253100cm occurs at
+frame300, LOD0 vertex9511, raft-local(49.677,37.969,-1.367)cm,
+avatar-local(36.758,24.891,7.902)cm. Boots retain1.633426454cm maximum deficit
+over1956174 supported samples. The passing boot-only receipt above is not a
+passing expanded-clearance receipt.
+
+Actual retained engine frame240 was inspected: the dark, oblique view occludes
+body contact and cannot establish clearance. Body foot bones intentionally use
+0.35 rest scale beneath production boots, so identify vertex9511's skin influences
+and inspect ankle/calf deformation before calling this visible penetration or
+changing the motion. Do not hide the sample or relax the gate to obtain a pass.
+Other crew, equipment, continuous collision and normal-play acceptance remain open.
+
+After expanding the audit, the no-opt-in native regression
+`tmp/crew-boarding-body-default-20260925/index.json` passes1success/0failures/
+0not-run, engine exit0. No default-path promotion or packaged rebuild occurred.

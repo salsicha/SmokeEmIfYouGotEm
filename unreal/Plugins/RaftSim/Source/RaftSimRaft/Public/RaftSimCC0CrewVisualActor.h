@@ -134,6 +134,9 @@ public:
      * Evaluated only on seating/validation, never in the animation tick. */
     TArray<FVector> GetSeatedContactPointsLocalCm() const;
 
+    /** CPU-skinned LOD0 vertices for offline/native clearance audits only. */
+    TArray<FVector> GetPosedBodyVerticesWorldCmForValidation() const;
+
     /** World-space anchor of the coherently posed head/hair island. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     FVector GetSolvedHeadWorldLocation() const;

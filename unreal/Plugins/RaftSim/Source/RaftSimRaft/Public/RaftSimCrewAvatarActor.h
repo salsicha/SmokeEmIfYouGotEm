@@ -138,9 +138,12 @@ public:
     void SetBoardingPose(const FRaftSimCrewAvatarPose& Start, const FRaftSimCrewAvatarPose& End, float Alpha);
     void SetBoardingReachPose(const FRaftSimCrewAvatarPose& Reach) { BoardingReachPose = BoardingPullPose = Reach; bBoardingHasReach = true; }
     void SetBoardingPullPose(const FRaftSimCrewAvatarPose& Pull) { BoardingPullPose = Pull; }
+    void SetBoardingLegOverPoses(const FRaftSimCrewAvatarPose& Lift, const FRaftSimCrewAvatarPose& Over) { BoardingLiftPose = Lift; BoardingLegOverPose = Over; }
     void AdvanceBoardingPose(float Alpha);
     static constexpr float BoardingReachFraction = .35f;
     static constexpr float BoardingPullFraction = .6f;
+    static constexpr float BoardingLiftFraction = .675f;
+    static constexpr float BoardingLegOverFraction = .75f;
 
     /** Contact solve succeeded; independent tread/mesh checks remain required. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
@@ -483,7 +486,7 @@ private:
     float AnimationPhase = 0.0f;
     float AnimationPhaseOffset = 0.0f;
     float ActionIntensity = 1.0f;
-    FRaftSimCrewAvatarPose BoardingStartPose, BoardingReachPose, BoardingPullPose, BoardingEndPose;
+    FRaftSimCrewAvatarPose BoardingStartPose, BoardingReachPose, BoardingPullPose, BoardingLiftPose, BoardingLegOverPose, BoardingEndPose;
     bool bBoardingHasReach = false;
     float BoardingPoseAlpha = -1.f;
     float PfdPresentationWetness = 0.0f;

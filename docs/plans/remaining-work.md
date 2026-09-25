@@ -1,6 +1,19 @@
 # Remaining requested work
 
-Latest boarding clearance gate now samples actual production boot vertices during
+Latest September25 expanded boarding audit FAILS: CPU-skinned body vertex9511
+falls17.020cm below the conservative raft top envelope atframe300 while boots
+still pass. Inspect calf/ankle skin transforms and actual visibility/solid contact
+before selecting a repair. The audit includes boot-covered body vertices and is
+not signed penetration. Keep the prototype disabled; no playable promotion.
+
+September25 follow-through: the default-off leg-over candidate now passes dense
+boot-envelope sampling including the completion frame (1,956,174 supported vertex
+samples, maximum deficit1.633cm against the unchanged2cm limit). The pole-stability
+repair reduces the worst knee/foot update from54.30cm to6.12cm. This is NOT
+whole-body/crew clearance or normal-play acceptance; keep the candidate disabled.
+See the reentry evidence for retained failures and outstanding validation.
+
+Earlier boarding clearance gate sampled actual production boot vertices during
 the final transfer. It fails at42.393cm below the rendered upper envelope (left
 boot,frame252), confirming the unresolved hull-crossing path. This is a sampled
 conservative clearance check, not continuous/all-body collision acceptance.

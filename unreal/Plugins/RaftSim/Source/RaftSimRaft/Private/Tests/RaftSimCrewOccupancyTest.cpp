@@ -5,6 +5,7 @@
 #include "Misc/ScopeExit.h"
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimCrewAvatarActor.h"
+#include "RaftSimCC0CrewVisualActor.h"
 #include "RaftSimRaftActor.h"
 #include "UObject/Script.h"
 #include "ProceduralMeshComponent.h"
@@ -305,8 +306,23 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         TestEqual(TEXT("transfer audit observes both production boots"), TransferBoots.Num(), 2);
         double MaximumBootTopEnvelopeDeficitCm = 0.;
         int32 BootClearanceSamples = 0, WorstBootFrame = -1;
+        double MaximumBodyDeficitCm = 0.;
+        int32 BodyClearanceSamples = 0, WorstBodyFrame = -1;
+        FVector WorstBodyPoint = FVector::ZeroVector;
+        FVector WorstBodyHostPoint = FVector::ZeroVector;
+        int32 WorstBodyVertex = -1;
         FVector WorstBootPoint = FVector::ZeroVector;
         FString WorstBootName;
+        const bool bStrictTransfer = FParse::Param(FCommandLine::Get(), TEXT("RaftSimRequireBoardingTransferClearance"));
+        const int32 BootSampleStride = bStrictTransfer ? 1 : 6;
+        const FVector FRaftSimCrewAvatarPose::* LegPoints[] = {
+            &FRaftSimCrewAvatarPose::LeftKneeCm, &FRaftSimCrewAvatarPose::RightKneeCm,
+            &FRaftSimCrewAvatarPose::LeftFootCm, &FRaftSimCrewAvatarPose::RightFootCm};
+        FVector PreviousLegWorld[4];
+        for (int32 P = 0; P < 4; ++P)
+            PreviousLegWorld[P] = BoardingAvatar->GetActorTransform().TransformPosition(BoardingAvatar->GetPublishedCrewPose().*LegPoints[P]);
+        double MaxLegPointStepCm = 0.;
+        int32 WorstLegFrame = -1, WorstLegPoint = -1;
         Raft->UpdateRescueInteraction(-1.f);
         TestTrue(TEXT("negative time cannot move boarding root"), BoardingAvatar->GetActorLocation().Equals(PreviousPosition, .01));
         while (!Raft->BoardingPassenger.IsNone() && Frames < 720)
@@ -315,6 +331,13 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             Raft->UpdateCrew(1.f/60.f);
             Raft->UpdateRescueInteraction(1.f/60.f);
             BoardingAvatar->Tick(1.f/60.f);
+            for (int32 P = 0; P < 4; ++P)
+            {
+                const FVector CurrentLeg = BoardingAvatar->GetActorTransform().TransformPosition(BoardingAvatar->GetPublishedCrewPose().*LegPoints[P]);
+                const double LegStep = FVector::Distance(CurrentLeg,PreviousLegWorld[P]);
+                if (LegStep > MaxLegPointStepCm) { MaxLegPointStepCm = LegStep; WorstLegFrame = Frames+1; WorstLegPoint = P; }
+                PreviousLegWorld[P] = CurrentLeg;
+            }
             const FVector Current = BoardingAvatar->GetActorLocation();
             MaxStepCm = FMath::Max(MaxStepCm, FVector::Distance(PreviousPosition, Current));
             PreviousPosition = Current;
@@ -326,8 +349,8 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
                 TestEqual(TEXT("count changes only on completion"), Raft->GetCompletedRescueCount(), PreviousRescues);
             }
             ++Frames;
-            if (!Raft->BoardingPassenger.IsNone() && Frames % 6 == 0 &&
-                Raft->BoardingElapsed > Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingPullFraction)
+            if (Frames % BootSampleStride == 0 && (Raft->BoardingPassenger.IsNone() ||
+                Raft->BoardingElapsed > Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingPullFraction))
             {
                 for (auto* Boot : TransferBoots)
                 {
@@ -361,9 +384,41 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
                 }
             }
             if (!Raft->BoardingPassenger.IsNone()) RecordHandSupport(Frames);
+            if ((Frames % 6 == 0 || Raft->BoardingPassenger.IsNone()) &&
+                (Raft->BoardingPassenger.IsNone() || Raft->BoardingElapsed >
+                    Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingPullFraction))
+            {
+                auto* Visual = Cast<ARaftSimCC0CrewVisualActor>(BoardingAvatar->GetProductionVisualActor());
+                if (TestNotNull(TEXT("body clearance observes production CC0 visual"), Visual))
+                {
+                    auto Points = Visual->GetPosedBodyVerticesWorldCmForValidation();
+                    TestTrue(TEXT("body clearance has CPU-skinned vertices"), !Points.IsEmpty());
+                    for (auto& Point : Points)
+                    {
+                        TestFalse(TEXT("skinned body clearance point is finite"), Point.ContainsNaN());
+                        Point = Raft->GetActorTransform().InverseTransformPosition(Point);
+                    }
+                    TArray<double> Floor, Solid;
+                    Raft->SampleRenderedCrewSupport(Points, Floor, Solid, true);
+                    if (TestEqual(TEXT("body support query covers skinned vertices"), Solid.Num(), Points.Num()))
+                        for (int32 V = 0; V < Points.Num(); ++V)
+                        {
+                            if (Solid[V] == -DBL_MAX) continue;
+                            ++BodyClearanceSamples;
+                            const double Deficit = Solid[V] - Points[V].Z;
+                            if (Deficit > MaximumBodyDeficitCm)
+                            {
+                                MaximumBodyDeficitCm = Deficit; WorstBodyFrame = Frames; WorstBodyPoint = Points[V];
+                                WorstBodyVertex = V;
+                                WorstBodyHostPoint = BoardingAvatar->GetActorTransform().InverseTransformPosition(
+                                    Raft->GetActorTransform().TransformPosition(Points[V]));
+                            }
+                        }
+                }
+            }
             if (!Raft->BoardingPassenger.IsNone() &&
                 Raft->BoardingElapsed > Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingReachFraction &&
-                Raft->BoardingElapsed <= Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingPullFraction)
+                Raft->BoardingElapsed <= Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingLegOverFraction)
             {
                 ++PullSamples;
                 const auto& P = BoardingAvatar->GetPublishedCrewPose();
@@ -408,9 +463,17 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         }
         TestTrue(TEXT("timed boarding reaches completion"), Frames < 720 && Raft->BoardingPassenger.IsNone());
         TestTrue(TEXT("no large per-frame root teleport"), MaxStepCm < 10.);
+        TestTrue(TEXT("no foot or knee control teleport above 10cm per update"), MaxLegPointStepCm < 10.);
+        AddInfo(FString::Printf(TEXT("BOARDING_LEG_CONTINUITY max_step_cm=%.9f boot_sample_stride=%d frame=%d point=%d"),
+            MaxLegPointStepCm, BootSampleStride, WorstLegFrame, WorstLegPoint));
         TestTrue(TEXT("reach stage is sampled"), bCapturedReach);
         TestTrue(TEXT("pull stage is sampled"), bCapturedPull && PullSamples > 0);
         TestTrue(TEXT("transfer boot audit has supported vertex samples"), BootClearanceSamples > 0);
+        TestTrue(TEXT("transfer body audit has supported vertex samples"), BodyClearanceSamples > 0);
+        AddInfo(FString::Printf(TEXT("BOARDING_TRANSFER_BODY samples=%d max_top_envelope_deficit_cm=%.9f frame=%d vertex=%d point_local_cm=%s point_host_cm=%s"),
+            BodyClearanceSamples, MaximumBodyDeficitCm, WorstBodyFrame, WorstBodyVertex, *WorstBodyPoint.ToString(), *WorstBodyHostPoint.ToString()));
+        if (bStrictTransfer)
+            TestTrue(TEXT("sampled skinned body remains above rendered raft envelope within 2cm"), MaximumBodyDeficitCm <= 2.);
         AddInfo(FString::Printf(TEXT("BOARDING_TRANSFER_BOOT samples=%d max_top_envelope_deficit_cm=%.9f frame=%d boot=%s point_local_cm=%s"),
             BootClearanceSamples, MaximumBootTopEnvelopeDeficitCm, WorstBootFrame, *WorstBootName, *WorstBootPoint.ToString()));
         if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimRequireBoardingTransferClearance")))

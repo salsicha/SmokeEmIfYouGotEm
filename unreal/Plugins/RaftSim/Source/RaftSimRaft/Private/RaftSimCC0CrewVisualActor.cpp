@@ -809,6 +809,26 @@ FVector ARaftSimCC0CrewVisualActor::ToMeshSpace(const FVector& PointCm) const
     return PointCm / BodyScale;
 }
 
+TArray<FVector> ARaftSimCC0CrewVisualActor::GetPosedBodyVerticesWorldCmForValidation() const
+{
+    TArray<FVector> Result;
+    USkeletalMesh* Mesh = Body ? Cast<USkeletalMesh>(Body->GetSkinnedAsset()) : nullptr;
+    FSkeletalMeshRenderData* Data = Mesh ? Mesh->GetResourceForRendering() : nullptr;
+    FSkinWeightVertexBuffer* Weights = Body ? Body->GetSkinWeightBuffer(0) : nullptr;
+    if (!bBodyReady || !Data || Data->LODRenderData.IsEmpty() || !Weights) return Result;
+    const FSkeletalMeshLODRenderData& LOD = Data->LODRenderData[0];
+    if (!LOD.StaticVertexBuffers.PositionVertexBuffer.GetVertexData() ||
+        !Weights->GetDataVertexBuffer()->GetWeightData()) return Result;
+    TArray<FMatrix44f> Matrices;
+    Body->CacheRefToLocalMatrices(Matrices);
+    const FTransform BodyWorld = Body->GetComponentTransform();
+    Result.Reserve(LOD.GetNumVertices());
+    for (uint32 Index = 0; Index < LOD.GetNumVertices(); ++Index)
+        Result.Add(BodyWorld.TransformPosition(FVector(USkinnedMeshComponent::GetSkinnedVertexPosition(
+            Body, Index, LOD, *Weights, Matrices))));
+    return Result;
+}
+
 TArray<FVector> ARaftSimCC0CrewVisualActor::GetSeatedContactPointsLocalCm() const
 {
     TArray<FVector> Result;

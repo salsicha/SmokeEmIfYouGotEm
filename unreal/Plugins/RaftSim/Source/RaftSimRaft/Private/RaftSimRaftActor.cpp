@@ -1,6 +1,7 @@
 ﻿#include "RaftSimRaftActor.h"
 
 #include "Components/SceneComponent.h"
+#include "RaftSimCrewBoarding.h"
 #include "RaftSimSwimmerSurface.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
@@ -2579,7 +2580,7 @@ void ARaftSimRaftActor::UpdateTimedBoarding(float DeltaSeconds)
     const float T = BoardingElapsed / BoardingDuration;
     const float ReachFraction = ARaftSimCrewAvatarActor::BoardingReachFraction;
     const bool bApproaching = T <= ReachFraction;
-    const float PullFraction = ARaftSimCrewAvatarActor::BoardingPullFraction;
+    const float PullFraction = ARaftSimCrewAvatarActor::BoardingLegOverFraction;
     const bool bPulling = T <= PullFraction;
     const float StageT = bApproaching ? T / ReachFraction :
         (bPulling ? 0.f : (T-PullFraction) / (1.f-PullFraction));
@@ -2663,6 +2664,35 @@ bool ARaftSimRaftActor::RequestSelectedReentry()
             PullPose.LeftHipCm,PullPose.LeftKneeCm,PullPose.LeftFootCm);
         OutsideLeg(ReachPose.RightHipCm,ReachPose.RightKneeCm,ReachPose.RightFootCm,
             PullPose.RightHipCm,PullPose.RightKneeCm,PullPose.RightFootCm);
+        auto LiftPose = PullPose;
+        auto LegOverPose = PullPose;
+        // Lift outside before crossing the tube. Height is an authored review
+        // target, not a clearance guarantee; strict rendered-boot audit remains.
+        const double FootZ = ReachHands.Z + 25.;
+        LiftPose.LeftFootCm.Z = LiftPose.RightFootCm.Z = FootZ;
+        LegOverPose.LeftFootCm = FVector(ReachHands.X-10., PullPose.LeftHipCm.Y, FootZ);
+        LegOverPose.RightFootCm = FVector(ReachHands.X-10., PullPose.RightHipCm.Y, FootZ);
+        const auto PrepareLeg = [](const FVector& Hip, const FVector& OldKnee, const FVector& OldFoot,
+            const FVector& LiftFoot, const FVector& OverFoot, double Side, FVector& LiftKnee, FVector& OverKnee)
+        {
+            const double Thigh = FVector::Distance(Hip,OldKnee), Shin = FVector::Distance(OldKnee,OldFoot);
+            const auto Fits = [&](const FVector& A, const FVector& B)
+            {
+                const FVector Delta=B-A;
+                const double T=Delta.IsNearlyZero() ? 0. : FMath::Clamp(FVector::DotProduct(Hip-A,Delta)/Delta.SizeSquared(),0.,1.);
+                return FVector::Distance(Hip,A+Delta*T) > FMath::Abs(Thigh-Shin)+.001 &&
+                    FMath::Max(FVector::Distance(Hip,A),FVector::Distance(Hip,B)) < Thigh+Shin-.001;
+            };
+            const FVector Hint(0,Side*Thigh,0);
+            return Fits(OldFoot,LiftFoot) && Fits(LiftFoot,OverFoot) &&
+                RaftSimCrewBoarding::SolveLeg(Hip,LiftFoot,Thigh,Shin,Hint,LiftKnee) &&
+                RaftSimCrewBoarding::SolveLeg(Hip,OverFoot,Thigh,Shin,Hint,OverKnee);
+        };
+        if (!PrepareLeg(PullPose.LeftHipCm,PullPose.LeftKneeCm,PullPose.LeftFootCm,
+            LiftPose.LeftFootCm,LegOverPose.LeftFootCm,-1.,LiftPose.LeftKneeCm,LegOverPose.LeftKneeCm) ||
+            !PrepareLeg(PullPose.RightHipCm,PullPose.RightKneeCm,PullPose.RightFootCm,
+            LiftPose.RightFootCm,LegOverPose.RightFootCm,1.,LiftPose.RightKneeCm,LegOverPose.RightKneeCm))
+        { RescueInteraction = PreviousInteraction; return false; }
         // Resolve the same fitted destination used by completion, without a
         // world tick or ownership/mass transfer between preparation and restore.
         AttachAvatarToSeat(Avatar, Swimmers[TargetIndex].PassengerId);
@@ -2674,6 +2704,7 @@ bool ARaftSimRaftActor::RequestSelectedReentry()
         Avatar->SetBoardingPose(StartPose, EndPose, 0.f);
         Avatar->SetBoardingReachPose(ReachPose);
         Avatar->SetBoardingPullPose(PullPose);
+        Avatar->SetBoardingLegOverPoses(LiftPose, LegOverPose);
         BoardingPassenger = Swimmers[TargetIndex].PassengerId;
         BoardingElapsed = 0.f;
         BoardingDuration = FMath::Max(4.f, float((FVector::Distance(
