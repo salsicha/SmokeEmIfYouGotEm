@@ -3,6 +3,20 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC actual retained-camera PIE review of the constrained cap completes
+with three captures, engine exit0 and protected files unchanged. The viewed frame
+still shows tall flat-sided blocks and triangular spikes: NOT visual acceptance.
+Geometry-only unsaved review leaves installed fields unchanged and explicitly
+excludes water validation. No promotion or new cook; fix remaining source/closure
+shape before rerunning this unchanged candidate. See retained-view receipt.
+
+September25UTC constrained cap full-map collision now passes 34,935 native
+surface/owner probes at the unchanged 0.1cm tolerance (maximum 0.031770cm).
+The transient check restores the original cap and verifies 472 protected files;
+no assets/levels saved. This supersedes the earlier missing full-map collision
+check only, not rendered, hydraulic, motion or performance acceptance. No
+playable installation. See independent-lidar-followup full-map union section.
+
 September25UTC constrained cap now has matching audited geometry (841cores,
 5,382,400cells) and exact FBX export. Actual transient Unreal all6,492face
 collision/winding check passes, engine exit0. Two fingerprint regressions pass.

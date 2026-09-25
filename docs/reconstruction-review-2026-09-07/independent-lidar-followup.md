@@ -364,6 +364,58 @@ Next normal-map union and matched-camera review can use the new export plus
 its matching geometry, while the two walls/steep face remain unresolved. No
 unchanged long cook or old-field production promotion is justified by this pass.
 
+### Full-map union collision follow-through — September 25
+
+The constrained export now passes the unchanged full-map native union gate:
+34,935 surface-position and owner checks, maximum error 0.031769855cm against
+the existing 0.1cm tolerance. Coverage includes 25,600 hydraulic-grid samples,
+4,466 revised-ground centroids, all 1,623 roof vertex records, all 2,994 roof
+centroids and 252 boundary samples. Parent-covered targets retain their source
+metadata and test the actual upper surface; they are not forced to hit the cap.
+[Native receipt](independent-lidar-followup/constrained-wall-full-map-collision.json).
+
+`prepare_constrained_wall_map_check.py` binds the candidate source manifest,
+matching audited geometry/export and native collision fingerprint. It retains
+6,744 legacy probes separately before adding source-visible vertex rays; it
+does not waive legacy failures. The combined probe SHA256 is
+75eea9245991e9c5869ecb48994d7607c31bc76bf33e2e4b8969e31905aad264.
+The three source-visible probe regressions pass.
+
+The actual FullReach map was loaded in Unreal with null RHI and the candidate
+cap swapped transiently. Engine exit0, no failures, original cap restored,
+472 protected files checked unchanged, no assets or levels saved. No other
+engine/cook process remains live. Import tangent/near-zero binormal warnings
+and the retained ground's high-triangle navigation warning remain recorded;
+this is not clean-log or rendering acceptance.
+
+This closes the earlier missing full-map collision check only. The two exposed
+vertical walls and steep face remain unresolved. No rendered capture, matching
+flow solve, shoreline/motion/performance acceptance or normal-play geometry
+delivery occurred. Next review the new candidate in the retained engine view,
+explicitly separating geometry-only diagnostics from water acceptance; do not
+pair this new mesh with the older candidate's flow in normal play.
+
+### Constrained candidate rendered review — September 25
+
+Actual FullReach PIE confirms one candidate cap, one retained ground and no old
+cap at the review station. Three 1280x720 captures complete; engine exit0,
+47.85s harness duration, protected files unchanged. The retained camera uses
+the recorded pose and 91.185degree FOV. First captured frame was visually
+inspected: tall flat-sided blocks and sharp triangular faces remain prominent.
+This candidate is not accepted or installed despite passing native collision.
+[Capture receipt](independent-lidar-followup/constrained-wall-retained-view.json).
+
+The harness now supports an explicitly geometry-only config, restricted to the
+retained candidate view. It uses the new bound geometry/collision config but
+does not modify installed water settings or invoke the old candidate's runtime
+expectations. Existing fields appear only as background; they do not match this
+mesh. No water, motion, shoreline or performance conclusion is drawn. No saved
+assets/levels or normal launch changes. The harness syntax and diff checks pass.
+
+Next work must address the remaining source selection and inferred closures,
+not repeat this unchanged export/capture or launch another long cook. The visual
+failure is broader than the small exterior-connectivity additions repaired here.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid

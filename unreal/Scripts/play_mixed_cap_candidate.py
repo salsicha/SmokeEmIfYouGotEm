@@ -22,6 +22,8 @@ REPORT=ROOT/'tmp'/(LABEL+'.json')
 RETAINED_VIEW=os.environ.get('RAFTSIM_MIXED_RETAINED_VIEW')=='1'
 PARENT_CAP=os.environ.get('RAFTSIM_MIXED_PARENT_CAP')=='1'
 assert not PARENT_CAP or RETAINED_VIEW
+GEOMETRY_CONFIG=os.environ.get('RAFTSIM_GEOMETRY_ONLY_CONFIG')
+assert not GEOMETRY_CONFIG or (RETAINED_VIEW and not PARENT_CAP)
 state={};protected={};started=time.perf_counter()
 
 
@@ -84,7 +86,12 @@ def tick(delta):
 assert not REPORT.exists()
 try:
     assert not any((ROOT/'unreal/Saved/Screenshots'/(LABEL+f'_{i:03d}.png')).exists() for i in range(3))
-    config=json.loads((ROOT/'tmp/troublemaker-mixed-installed-visible-config-20260925.json').read_text())
+    config_path=(ROOT/(GEOMETRY_CONFIG or 'tmp/troublemaker-mixed-installed-visible-config-20260925.json')).resolve()
+    assert config_path.is_relative_to(ROOT/'tmp')
+    config=json.loads(config_path.read_text())
+    state['geometry_only']=bool(GEOMETRY_CONFIG)
+    state['water_geometry_consistency_verified']=False
+    state['scene_config_sha256']=sha(config_path)
     export_override=os.environ.get('RAFTSIM_MIXED_PIE_EXPORT')
     if export_override:
         export_path=(ROOT/export_override).resolve()
@@ -95,8 +102,9 @@ try:
     config['report']='tmp/'+LABEL+'-preflight.json'
     context=verify_scene(config);protected=context['protected']
     expected=ROOT/'tmp/troublemaker-mixed-normal-runtime-expectations-20260925.json'
-    state['native_runtime']=verify_runtime(expected,context['probe_path'],context['probes'])
-    assert state['native_runtime']['field_queries_verified']
+    if not GEOMETRY_CONFIG:
+        state['native_runtime']=verify_runtime(expected,context['probe_path'],context['probes'])
+        assert state['native_runtime']['field_queries_verified']
     cap=context['owners']['cap'];mesh=context['replacement']
     mesh.set_material(0,cap.static_mesh_component.get_material(0))
     cap.modify();cap.static_mesh_component.modify()
@@ -108,11 +116,16 @@ try:
     base='tmp/troublemaker-mixed-normal-runtime-50s-20260925'
     values=dict(cooked_fields_dir=base+'/region_0190',streaming_manifest_path=base+'/streaming_manifest_coverage_checked.json',
         coordinate_map_path='physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach/hydraulic_regions_context/coordinate_map.json',
-        window_center_m=unreal.Vector2D(*state['native_runtime']['window_center_m']),window_extent_m=224.,
+        window_center_m=unreal.Vector2D(*state.get('native_runtime',{}).get('window_center_m',[0.,0.])),window_extent_m=224.,
         moving_window_station_extent_m=224.,moving_window_lateral_extent_m=224.,
         flow_band=unreal.Name('median_runnable'),recenter_hydraulic_crux=False,
         enable_moving_window_streaming=True,map_provides_terrain=True)
-    configs[0].modify()
+    if GEOMETRY_CONFIG:
+        # Retain installed fields solely as background in this unsaved shape review.
+        # They do not match the replacement geometry and cannot prove water behavior.
+        values={}
+        state['water_review_excluded_reason']='Installed fields do not match transient candidate geometry'
+    else:configs[0].modify()
     for key,value in values.items():configs[0].set_editor_property(key,value)
     state['handle']=unreal.register_slate_post_tick_callback(tick)
     unreal.get_editor_subsystem(unreal.LevelEditorSubsystem).editor_request_begin_play()
