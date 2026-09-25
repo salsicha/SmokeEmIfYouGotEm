@@ -9,6 +9,11 @@ backward chord, still pointing downstream. Editor build and three native route
 regressions pass, including real transform position/heading at boundaries.
 No packaged/rendered acceptance claimed; see
 [route-end regression](../reconstruction-review-2026-09-07/route-end-start-regression.md).
+Follow-through: rebuilt Game and updated the normal v7 staged executable with
+verified backup. Two Boot/menu runs exit0 with900frames each; normal/8330m p95
+44.2335/45.0802ms both FAIL. Applied8330m placement is confirmed. Separate
+rendered stills retain broad pale water/angular rock; no visual acceptance.
+Build and validation processes are terminal. See the same report for hashes.
 
 September25UTC: unused-contact-shape elision rejected after exact128native
 pairs and3passing tests but mixed normal-launch ABBA whole-frame results.

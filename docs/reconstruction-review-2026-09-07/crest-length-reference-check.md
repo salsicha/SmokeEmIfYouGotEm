@@ -57,3 +57,21 @@ Native follow-up:3/3successes,0test warnings/errors/not-run, engine exit0:
 `tmp/review-start-regressions-20260925/index.json`.
 These cover coordinate separation, camera frame and review bounds; the actual
 normal-menu run above separately verifies successful applied relocation.
+
+## Breaking-onset interpretation follow-up
+
+The current `smoothstep(1.28,1.7,upstream_Froude)` spilling fraction is a
+presentation closure, not a site measurement. The primary experimental abstract
+of [Ohtsu, Yasuda and Gotoh (2001)](https://www.tandfonline.com/doi/abs/10.1080/00221680109499821)
+reports dependence on inflow boundary-layer development: limiting Froude values
+range from 1.3 to 2.3 for developing inflow, versus approximately 1.7 for fully
+developed inflow in their smooth rectangular channels. Those conditions are not
+established for this natural rapid. Therefore neither this paper nor the five
+runtime sites establishes that a zero spilling fraction is a software error;
+lowering the threshold to whiten every crest would be unsupported.
+
+Next physical calibration needs registered local flow/depth, crest and approach
+geometry plus an appropriate breaking criterion, not more tessellation or a
+uniform foam multiplier. This literature check supplies no new measured South
+Fork coordinates, bathymetry, discharge or license to redistribute paper/video
+assets. It does not change the playable water or qualify its appearance.

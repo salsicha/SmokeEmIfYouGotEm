@@ -34,3 +34,45 @@ Cartesian flow-direction coupling was already fixed, and normal Cartesian
 raft support first samples the submitted carrier. The independently configured
 fallback footprint list still differs from the rendered exposure list; that
 alone does not establish a mismatch in the normal carrier-backed query.
+
+## Staged game follow-through
+
+The Game target rebuilt successfully in 282.89 s after cleanup (3060 actions,
+mostly runtime dependency copies). Log: `tmp/route-start-game-build-20260925.log`.
+The v7 staged executable was updated after a verified backup; no cooked map,
+captured geometry or hydraulic field was replaced.
+
+- New executable SHA256:
+  `f83b3dfb780191526a4c92d615fe9b44471c423635291e60bfe542ba0d60905d`.
+- Old executable SHA256:
+  `6194fed46b8dbf4a37c9948112cdc54052ed96dbc792ded7bfc1f8cc3bc04ddd`.
+- Backup beside the staged executable:
+  `SmokeEmIfYouGotEm-pre-route-start-20260925.exe`.
+- Process/deployment receipt: `tmp/route-start-staged-20260925.json`.
+
+Two sequential Boot/menu-handler launches each captured 900 post-travel frames
+and exited 0. No direct-map argument was used in these checks. Both used an
+ephemeral profile, D3D12, adapter 0, 1280x720, and nonlegacy CSV timing. Strict
+audits retain rows 60–840 and frame-scope offset 1:
+
+| Start | Mean frame ms | p95 ms | 33.333333 ms gate |
+| --- | ---: | ---: | --- |
+| Normal selected-scenario start | 36.488174 | 44.2335 | FAIL |
+| Review station 8330 m through same menu path | 33.726005 | 45.0802 | FAIL |
+
+Reports: `tmp/route-start-staged-{normal,troublemaker}-frame-20260925.json`.
+The second log confirms requested/applied station 8330.000 m, sampled=1,
+destination error 0 cm. Subsequent raft telemetry remains wet and moving.
+These are launch qualification, not a matched optimization benchmark.
+
+A separate direct-map rendered check exited 0 and produced four stills at
+one-second intervals: staged `Saved/Screenshots/route-start-render-20260925_000..003.png`.
+First and last inspected: raft/crew/terrain/water render, viewpoint and paddles
+change, but broad pale smooth water and the angular nearby rock persist. This
+is sampled motion evidence, not continuous animation or collision acceptance.
+Log: `tmp/route-start-render-20260925.log`.
+
+The verified code is now in the ordinary staged game, not only Editor. Actual
+wet placement at the river endpoint remains untested; its geometric transform
+is covered by the native test. No new water-realism, full traversal, shoreline,
+30 FPS or release acceptance is claimed. All these build/run processes ended.
