@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC boundary selection audit identifies lower same-bin captured
+witnesses at14of252cap perimeter vertices;8were excluded by the old0.3m DEM
+clearance rule, including5class2ground observations. This identifies concrete
+selection-bias candidates, not permission to replace roof points blindly. Three
+tests pass; no playable change. Next inspect local connectivity/imagery at these
+source IDs rather than repeating unchanged wall extensions or captures.
+
 September25UTC actual retained-camera PIE review of the constrained cap completes
 with three captures, engine exit0 and protected files unchanged. The viewed frame
 still shows tall flat-sided blocks and triangular spikes: NOT visual acceptance.

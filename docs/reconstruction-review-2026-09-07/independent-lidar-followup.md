@@ -416,6 +416,28 @@ Next work must address the remaining source selection and inferred closures,
 not repeat this unchanged export/capture or launch another long cook. The visual
 failure is broader than the small exterior-connectivity additions repaired here.
 
+### Boundary lower-return selection audit — September 25
+
+The constructor selects its lowest return AFTER excluding observations within
+0.3m of the flattened DEM, then closes the selected perimeter vertically. A
+bounded audit now tests this potential selection bias at all252current boundary
+vertices using the original2019archive and unchanged0.5m bins. Fourteen vertices
+have an eligible class1/2/10 source observation more than0.5m lower in the same
+bin. Eight witnesses would fail the original clearance prerequisite, including
+five ground-classified points:658439,658438,685144,688855,689621. Their vertical
+separations are approximately1.31,1.48,1.84,1.25,0.71m, respectively.
+[Exact indices and coordinates](independent-lidar-followup/boundary-lower-bin-witnesses.json).
+
+This tests a concrete selection mechanism beyond exterior extension. It does
+not establish that upper points are vegetation: oblique rock edges can produce
+multiple layers, and same-bin proximity is not point correspondence. Most
+boundary vertices have no qualifying witness under this test; this cannot solve
+the entire shape problem. Original source/mesh hashes are verified, no returns
+are discarded and no geometry is changed. Three tests cover stable source ties,
+negative-coordinate bins, vegetation/missing-residual exclusion and invalid
+bin size. Audit exits0. Next inspect these five ground-supported neighborhoods
+against local connectivity and imagery before any source selection replacement.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid
