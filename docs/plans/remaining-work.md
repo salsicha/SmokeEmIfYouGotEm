@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC constrained-boundary variant recovers28source-exact exterior
+triangles, preserving the roof. Two diagnosed rays now hit roof, two still hit
+vertical closures; one roof face remains83.8degrees. Unmodified shared loader
+verifies source coordinates/classes and closed solid;29regressions pass. Candidate
+manifest is bound but uninstalled. Next native geometry review, not acceptance or
+old-field promotion; see independent-lidar-followup preserved-boundary section.
+
 September25UTC broader wall candidate:19edge-connected source-exact triangles
 add1.192843m2, preserve the old roof and pass closed topology/eight regressions.
 One diagnosed ray changes from a90degree closure to57.66degree captured-point

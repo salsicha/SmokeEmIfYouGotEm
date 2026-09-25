@@ -300,6 +300,39 @@ still leaves exposed closures (especially6225, which had direct support), while
 retaining original roof geometry. A lower slope at one ray alone is not enough
 to justify normal-play promotion; shared geometry and engine views remain gates.
 
+### Preserved-boundary variant and shared-loader validation — September 25
+
+The `--constrained-boundary` variant uses the existing source-only cavity recovery
+to preserve every original perimeter segment before filtering exterior faces.
+It produces28edge-connected additions totaling1.665134584m2, rather than19faces.
+All original roof triangles remain coordinate-exact; one point-contact fan is
+split without moving coordinates. Closed solid:9,738two-face edges,504inferred
+wall triangles,4.55e-13m3volume identity error. This recovers usable connectivity
+lost by the unconstrained triangulation, not a new source observation.
+
+Source rays now hit roof at650,345 (83.809682degrees) and390,490 (57.658288degrees).
+The other two diagnosed walls remain90degrees. The first face is still very
+steep; these results are not photographic repair acceptance or native visibility.
+Candidate: `tmp/troublemaker-constrained-wall-extension-v1-20260925/`, cap SHA256
+7d1031602413e0dae311574f6b6d03e1542917bf2b9893a5c911875f84404d62.
+[Construction receipt](independent-lidar-followup/constrained-wall-construction.json).
+
+`validate_constrained_wall_union.py` creates an explicitly unpromoted manifest
+for the existing mixed-source schema and runs the UNMODIFIED `SourceRockUnion`
+loader. Every per-vertex source coordinate/classification, underlying source
+hash, coordinate frame and reconstructed solid is verified;17independent-source
+vertex records include duplicate fan ownership. The manifest replaces stale
+single-point metadata with explicit LAZ indices; no source classes are relabelled.
+Manifest SHA2565cbe5c2f1ea240c6596fa9f873ea72c201c74004d607df07a7f69107e0688c9c.
+[Shared-loader receipt](independent-lidar-followup/constrained-wall-shared-union.json).
+Twenty-nine source-connectivity and wall-extension regressions pass.
+
+Next native geometry export/collision/view check should use this bound manifest,
+not the earlier short-connector or unconstrained candidate. No hydraulic cook,
+normal-play installation or engine acceptance occurred here. Two remaining
+walls and the steep face still need evidence-based work; do not mix this mesh
+with old flow fields in normal play or mark the river complete.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid
