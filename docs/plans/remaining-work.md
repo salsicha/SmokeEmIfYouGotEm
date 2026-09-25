@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC five lower ground witnesses inspected against registered NAIP
+and current topology: all lie inside the roof, so they are not exterior-extension
+anchors. Direct swaps invert2/2/2/2/3faces; two exceed1m edge bounds. Baseline
+has zero inverted roof faces. Three-metre image-registration uncertainty does
+not resolve upper-point semantics. Next reviewed local cavity reconstruction,
+not direct substitutions; no geometry or playable assets changed.
+
 September25UTC boundary selection audit identifies lower same-bin captured
 witnesses at14of252cap perimeter vertices;8were excluded by the old0.3m DEM
 clearance rule, including5class2ground observations. This identifies concrete

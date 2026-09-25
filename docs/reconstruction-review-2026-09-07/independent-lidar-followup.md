@@ -438,6 +438,31 @@ negative-coordinate bins, vegetation/missing-residual exclusion and invalid
 bin size. Audit exits0. Next inspect these five ground-supported neighborhoods
 against local connectivity and imagery before any source selection replacement.
 
+### Five ground-witness image and topology review — September 25
+
+All five lower class2witnesses lie INSIDE the existing roof footprint. They are
+not candidates for another exterior extension. Hypothetical exact-XYZ vertex
+substitutions invert2,2,2,2,3incident faces respectively; witnesses685144 and
+688855 also create maximum XYedges1.136659m and1.360490m, exceeding the existing
+1m limit. The original roof has zero non-upward faces. Direct substitution is
+therefore rejected independently of whether its appearance would improve.
+[Coordinates and topology receipt](independent-lidar-followup/boundary-ground-context.json).
+
+`inspect_boundary_ground_witnesses.py` verifies retained NAIP image/registration
+hashes and produces five nearest-pixel4m contextual views in
+`tmp/boundary-ground-witness-review-20260925/context.png`. Visually inspected:
+green/dark regions surround the first three targets; the last two have mixed
+gray/green context. This does not label individual returns: the registered image
+uncertainty is3m, much larger than the0.19–0.43m upper/lower separations. No
+imagery resampling is presented as new detail. The upper points are class1,
+not certified rock or vegetation. No source coordinates/classes were changed.
+
+The next geometric hypothesis must remove/retriangulate a reviewed local cavity
+while preserving unrelated source faces and full source history. It cannot keep
+old connectivity and merely lower these vertices, nor claim that these five
+observations resolve the whole visible wall problem. Geometry, flow and normal
+play remain unchanged; this is source/topology evidence only.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid
