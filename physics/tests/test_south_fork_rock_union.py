@@ -183,6 +183,18 @@ def test_fresh_input_gate_rejects_old_depth_and_changed_boundary():
         validate_fresh_package(dict(scenario,boundaries=[]),scenario,bed,state,geometry,20)
 
 
+def test_copied_cook_input_requires_byte_identical_original(tmp_path):
+    from audit_south_fork_rock_union_input import retained_input_root
+    copied=tmp_path/'copy.json';copied.write_text('{"inputs":[]}')
+    directory=tmp_path/'input';directory.mkdir()
+    original=directory/'manifest.json';original.write_bytes(copied.read_bytes())
+    assert retained_input_root(copied)==tmp_path
+    assert retained_input_root(copied,original)==directory
+    original.write_text('{"inputs":[1]}')
+    with pytest.raises(ValueError,match='differs from retained cook copy'):
+        retained_input_root(copied,original)
+
+
 def test_runtime_packet_union_preserves_observations_and_outside_samples(source):
     from south_fork_rock_union_packets import packet_fields
     fields=dict(bed_navd88_m=np.full((321,321),22.),captured_surface_navd88_m=np.full((321,321),23.),

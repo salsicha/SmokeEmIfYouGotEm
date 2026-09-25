@@ -45,3 +45,32 @@ No cook was started and no evolved water state was transferred. Normal-launch
 motion, appearance and performance acceptance remain open, including the existing
 p95 frame-budget failure. The constriction base is a verified prior candidate;
 this report does not establish that it is the installed normal-scene bed.
+
+## Normal-baseline follow-through
+
+The saved runtime bundle `south_fork_source_matched_v2` points to the
+control-ablation 4950s runtime, whose cook input identifies
+`tmp/south-fork-control-ablation-union-geometry-v1-20260916/manifest.json`.
+Its bed revision is the control-ablation revision, not the later constriction
+candidate. Preserve this baseline for the bounded cap update. The earlier
+constriction-based fresh inputs were generated but were not cooked or installed.
+
+Normal-baseline replacement geometry:
+`tmp/troublemaker-mixed-normal-baseline-geometry-20260925/manifest.json`, SHA256
+`7805eff51f8be11b6878a194c50920ce99870bd1507e016e0ba3050b89d3021b`.
+All 841 original cores passed provenance checks. Matching runtime packets at
+`tmp/troublemaker-mixed-normal-packets-20260925/manifest.json`, SHA256
+`b3f403d95defad4d1c1e82b38f6b04be77df74897e909e7968be5ee5cb0ed54d`, pass
+independent reconstruction of all 799 regions (eight derived packets).
+
+Fresh inputs are at `tmp/troublemaker-mixed-normal-fresh-input-20260925`.
+The first audit found that the retained cook's copied input manifest has no
+adjacent scenario packages. The audit now accepts an explicitly supplied original
+manifest only if byte-identical, then still hashes every package dependency.
+The original is `tmp/control-ablation-4900to5400s-input-v1-20260917/manifest.json`.
+The rejection regression and existing shared-union tests pass (31 tests).
+
+Collision targets at `tmp/troublemaker-mixed-normal-collision-probes-20260925.json`
+were reconstructed from the same geometry: 30,066 baseline and 34,887 combined
+targets. These are targets, not native collision passes. No solver, engine import,
+normal-scene mutation or new acceptance occurred in this step.

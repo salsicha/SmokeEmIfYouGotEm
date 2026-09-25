@@ -25,7 +25,16 @@ def validate_fresh_package(scenario,prior,bed,state,geometry,datum):
         if not np.array_equal(state[key],value):raise ValueError('Inconsistent conserved initial field: '+key)
 
 
-def audit(path,report):
+def retained_input_root(manifest,original=None):
+    manifest=Path(manifest).resolve()
+    if original is None:return manifest.parent
+    original=Path(original).resolve()
+    if sha(original)!=sha(manifest):
+        raise ValueError('Original input manifest differs from retained cook copy')
+    return original.parent
+
+
+def audit(path,report,original_input_manifest=None):
     path=Path(path).resolve();report=Path(report).resolve()
     if report.exists():raise ValueError('Preserve earlier input audits')
     flow=json.loads(path.read_text())
@@ -36,19 +45,20 @@ def audit(path,report):
     geometry=json.loads(gp.read_text());bp=ROOT/geometry['retained_flow_manifest']
     if sha(bp)!=geometry['retained_flow_manifest_sha256']:raise ValueError('Changed retained flow manifest')
     base=json.loads(bp.read_text())
+    base_root=retained_input_root(bp,original_input_manifest)
     for key in ('packages','boundary_probes','dt_seconds','target_discharge_m3s'):
         if flow[key]!=base[key]:raise ValueError('Changed full-domain forcing/layout: '+key)
     if flow['packages']!=[r['name'] for r in geometry['regions']]:raise ValueError('Core order differs')
     datum=flow['vertical_datum_navd88_m'];total=0.;count=0;q=0.
     for name,record,original,core in zip(flow['packages'],flow['inputs'],base['inputs'],geometry['regions']):
         if name!=record['name'] or name!=original['name']:raise ValueError('Input identity order differs')
-        for root,item in [(path.parent,record),(bp.parent,original)]:
+        for root,item in [(path.parent,record),(base_root,original)]:
             for file,digest in item['files'].items():
                 if sha(root/name/file)!=digest:raise ValueError('Changed input dependency: '+name+'/'+file)
         cp=ROOT/core['geometry_file']
         if sha(cp)!=core['geometry_sha256']:raise ValueError('Changed physical core')
         scenario=json.loads((path.parent/name/'scenario.json').read_text())
-        prior=json.loads((bp.parent/name/'scenario.json').read_text())
+        prior=json.loads((base_root/name/'scenario.json').read_text())
         bed=np.load(path.parent/name/'bed.npy',allow_pickle=False)
         with np.load(path.parent/name/'initial_state.npz',allow_pickle=False) as state,np.load(cp,allow_pickle=False) as source:
             validate_fresh_package(scenario,prior,bed,state,source,datum)
@@ -74,4 +84,6 @@ def audit(path,report):
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('input',type=Path);parser.add_argument('--report',type=Path,required=True)
-    args=parser.parse_args();print(json.dumps(audit(args.input,args.report),indent=2),flush=True)
+    parser.add_argument('--original-input-manifest',type=Path,
+                        help='Byte-identical original when the retained manifest is a cook-output copy')
+    args=parser.parse_args();print(json.dumps(audit(args.input,args.report,args.original_input_manifest),indent=2),flush=True)
