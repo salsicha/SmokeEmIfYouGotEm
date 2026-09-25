@@ -8072,3 +8072,9 @@ output alone do not establish physical, geographic or photographic acceptance.
 
 The current pass is working on the first dependency, not claiming completion
 of this list or launching later river reconstruction prematurely.
+
+September25: an unused Cartesian legacy bank scan is removed in source and
+the rebuilt normal v7 game. Normal menu travel and wet raft motion pass; the
+packaged300-frame p9534.63ms still fails the33.333333ms target. Paired editor
+timings are order-dependent, so no reliable FPS improvement or visual acceptance
+is claimed. See [scope and measurements](../reconstruction-review-2026-09-07/cartesian-legacy-bank-scan.md).

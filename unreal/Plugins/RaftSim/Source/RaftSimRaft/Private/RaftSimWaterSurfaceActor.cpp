@@ -7694,6 +7694,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // waterline band below and the sub-cell extension later.
         TArray<int32> MinPresentY;
         TArray<int32> MaxPresentY;
+        // Cartesian publication clips in 2D; every consumer of these column
+        // bounds belongs to the legacy reach/collapse branch below. Preserve
+        // an explicit same-binary cost control without changing any geometry.
+        static const bool bLegacyCartesianBankBounds=FParse::Param(
+            FCommandLine::Get(),TEXT("RaftSimLegacyCartesianBankBounds"));
+        if (!bCartesianFlow || bLegacyCartesianBankBounds)
+        {
         MinPresentY.Init(INDEX_NONE, GridStationN);
         MaxPresentY.Init(INDEX_NONE, GridStationN);
         for (int32 Y = 0; Y < GridLateralN; ++Y)
@@ -7709,6 +7716,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     MaxPresentY[X] = Y;
                 }
             }
+        }
         }
         // Immutable full-lattice topology. Only the station-edge coverage
         // feather trims cells, and that is a pure function of X and the grid
