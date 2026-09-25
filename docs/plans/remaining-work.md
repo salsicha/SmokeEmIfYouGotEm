@@ -1,5 +1,11 @@
 # Remaining requested work
 
+September25 current rebuilt normal Boot/menu South Fork follow-through exits0
+and records actual raft motion, but frame p95=37.5728ms FAILS33.333ms (mean26.991ms).
+No experimental flags, direct-map launch or recook. This is fresh default-path
+validation after the crew rebuilds, not a playable improvement or regression
+causality claim. See [normal follow-through](../reconstruction-review-2026-09-07/south-fork-normal-followthrough-20260925.md).
+
 September25 additional Troublemaker source screening found a November2024 AW
 photo-report lead, but direct retrieval is403 and capture date/flow/licensing
 are unverified. A dated first-person rock-impact report supplies no geometric
