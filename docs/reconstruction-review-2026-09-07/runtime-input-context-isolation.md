@@ -214,3 +214,33 @@ This closes key-to-action-value evaluation, not physical OS/Slate delivery,
 EnhancedInputComponent callback execution, actual paddle forces, real repeated
 respawn/travel or visual/performance acceptance. No normal executable/assets
 were replaced. Those broader checks remain open.
+
+## Production pawn callback and crew command — September 25
+
+The fixture now installs ARaftSimGuidePawn::SetupPlayerInputComponent bindings
+on a real EnhancedInputComponent and processes it in the key-event input stack.
+A transient production raft and reduced-body adapter receive the callbacks.
+K increments the actual paddle-stroke counter and queues AllForward; S increments
+it and queues AllBackward. Advancing the production UpdateCrew by the configured
+reaction delay plus0.01s activates each expected command. A held key during the
+pawn cooldown, release, and removed J binding do not add strokes. World time is
+not simulated; the fixture resets the pawn cooldown timestamp only between
+independent forward/backward input cases. No claim about timed OS input follows.
+
+The initial test proved callback entry but incorrectly expected immediate active
+crew commands; two assertions failed because the real command has0.4s reaction
+latency. [Initial failure](input-pawn-callback-initial.json) is retained. The
+fixture now checks pending commands and runs the real crew update before the
+original active-command checks; these assertions were not removed or weakened.
+Test-only friend access follows existing raft fixtures. Production code unchanged.
+
+Corrected Editor build succeeds184.88s, retaining two existing C4305double/float
+warnings in the D6measured runner. The native fixture passes1test/0warnings/
+0failures, engine exit0: [receipt](input-pawn-callback-native.json). Initial test
+build12.37s. Logs remain under `tmp/input-pawn-callback*-20260925.log`.
+
+This closes production callback and crew-command propagation in the isolated
+engine fixture, not OS/Slate physical input, natural-world scheduling, visible
+crew motion, integrated water forces, real respawn/travel or release packaging.
+No staged executable or playable asset was replaced. River acceptance remains
+open; this regression does not establish reconstructed geometry or30FPS.

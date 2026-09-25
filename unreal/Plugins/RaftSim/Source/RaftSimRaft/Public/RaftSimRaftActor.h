@@ -67,6 +67,7 @@ class RAFTSIMRAFT_API ARaftSimRaftActor : public AActor
 {
     GENERATED_BODY()
     friend class FRaftSimCrewCommandWeightTest;
+    friend class FRaftSimInputContextIsolationTest;
     friend class FRaftSimCrewOccupancyTest;
 
 public:

@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedPlayerInput.h"
+#include "EnhancedInputComponent.h"
+#include "RaftSimRaftActor.h"
+#include "RaftSimChronoRuntimeAdapter.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "InputKeyEventArgs.h"
@@ -123,7 +126,7 @@ bool FRaftSimInputContextIsolationTest::RunTest(const FString&)
     Controller->PlayerInput=NewObject<UEnhancedPlayerInput>(Controller);
     auto* Subsystem=NewObject<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
     // Exercise engine key evaluation, not just context-array membership. This
-    // does not simulate OS/Slate delivery or the pawn's physical paddle callback.
+    // does not simulate OS/Slate delivery; production callbacks are tested below.
     FModifyContextOptions DispatchOptions;
     DispatchOptions.bForceImmediately=true;
     DispatchOptions.bIgnoreAllPressedKeysUntilRelease=false;
@@ -134,11 +137,12 @@ bool FRaftSimInputContextIsolationTest::RunTest(const FString&)
     for(const auto& Mapping:Contexts[0]->GetMappings())
         if(Mapping.Action && Mapping.Key==EKeys::J && Mapping.Action->GetName().Contains(TEXT("PaddleStroke")))Stroke=Mapping.Action;
     if(!TestNotNull(TEXT("stroke action for actual key evaluation"),Stroke))return false;
+    TArray<UInputComponent*> InputStack;
     auto Evaluate=[&](const FKey& Key,EInputEvent Event)
     {
         Input->InputKey(FInputKeyEventArgs(nullptr,FInputDeviceId::CreateFromInternalId(0),Key,Event,
             Event==IE_Released?0.f:1.f,false,FPlatformTime::Cycles64()));
-        Input->ProcessInputStack(TArray<UInputComponent*>(),1.f/60.f,false);
+        Input->ProcessInputStack(InputStack,1.f/60.f,false);
         return Input->GetActionValue(Stroke).Get<float>();
     };
     TestEqual(TEXT("rebound J evaluates positive stroke"),Evaluate(EKeys::J,IE_Pressed),1.f);
@@ -154,6 +158,44 @@ bool FRaftSimInputContextIsolationTest::RunTest(const FString&)
     TestEqual(TEXT("released K evaluates zero"),Evaluate(EKeys::K,IE_Released),0.f);
     TestEqual(TEXT("S remains negative after registered rebind"),Evaluate(EKeys::S,IE_Pressed),-1.f);
     Evaluate(EKeys::S,IE_Released);
+    // Bind the real production pawn callback and observe its raft command.
+    auto* DispatchRaft=World->SpawnActor<ARaftSimRaftActor>();
+    if(!TestNotNull(TEXT("callback target raft"),DispatchRaft))return false;
+    auto* Adapter=NewObject<URaftSimChronoRuntimeAdapter>(DispatchRaft);
+    FRaftSimRaftBodyConfig Body;
+    Body.Runtime=ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
+    Adapter->ConfigureRaftBody(Body);
+    auto* AdapterProperty=FindFProperty<FObjectPropertyBase>(ARaftSimRaftActor::StaticClass(),TEXT("RaftAdapter"));
+    if(!TestNotNull(TEXT("raft adapter property"),AdapterProperty))return false;
+    AdapterProperty->SetObjectPropertyValue_InContainer(DispatchRaft,Adapter);
+    Pawns[0]->AttachedRaft=DispatchRaft;
+    auto* BoundInput=NewObject<UEnhancedInputComponent>(Pawns[0]);
+    Pawns[0]->SetupPlayerInputComponent(BoundInput);
+    InputStack.Add(BoundInput);
+    Pawns[0]->LastStrokeTimeSeconds=-1.f;
+    const int32 BeforeDispatch=DispatchRaft->GetPaddleStrokeCount();
+    Evaluate(EKeys::K,IE_Pressed);
+    TestEqual(TEXT("rebound K invokes real paddle callback once"),DispatchRaft->GetPaddleStrokeCount(),BeforeDispatch+1);
+    TestTrue(TEXT("forward callback queues crew reaction"),DispatchRaft->PendingCrewCommand==ERaftSimCrewCommand::AllForward);
+    DispatchRaft->UpdateCrew(DispatchRaft->CrewReactionSeconds+.01f);
+    TestTrue(TEXT("callback commands forward crew stroke"),DispatchRaft->GetActiveCrewCommand()==ERaftSimCrewCommand::AllForward);
+    Evaluate(EKeys::K,IE_Repeat);
+    TestEqual(TEXT("held key respects stroke cooldown"),DispatchRaft->GetPaddleStrokeCount(),BeforeDispatch+1);
+    Evaluate(EKeys::K,IE_Released);
+    TestEqual(TEXT("release does not create a stroke"),DispatchRaft->GetPaddleStrokeCount(),BeforeDispatch+1);
+    // The isolated world does not advance time: reset only the cooldown fixture.
+    Pawns[0]->LastStrokeTimeSeconds=-1.f;
+    Evaluate(EKeys::S,IE_Pressed);
+    TestEqual(TEXT("retained S invokes real paddle callback"),DispatchRaft->GetPaddleStrokeCount(),BeforeDispatch+2);
+    TestTrue(TEXT("backward callback queues crew reaction"),DispatchRaft->PendingCrewCommand==ERaftSimCrewCommand::AllBackward);
+    DispatchRaft->UpdateCrew(DispatchRaft->CrewReactionSeconds+.01f);
+    TestTrue(TEXT("callback commands backward crew stroke"),DispatchRaft->GetActiveCrewCommand()==ERaftSimCrewCommand::AllBackward);
+    Evaluate(EKeys::S,IE_Released);
+    Pawns[0]->LastStrokeTimeSeconds=-1.f;
+    Evaluate(EKeys::J,IE_Pressed);
+    TestEqual(TEXT("removed J cannot invoke paddle callback"),DispatchRaft->GetPaddleStrokeCount(),BeforeDispatch+2);
+    Evaluate(EKeys::J,IE_Released);
+    InputStack.Reset();
     Subsystem->RemoveMappingContext(Contexts[0],DispatchOptions);
     for(int32 I=0;I<2;++I)
     {

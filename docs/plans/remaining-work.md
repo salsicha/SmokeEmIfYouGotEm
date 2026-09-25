@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC key events now pass through actual pawn bindings into raft crew
+commands in the native fixture: forward/backward queue and activate after real
+crew update; cooldown, release and removed-key behavior pass. Native1success/
+0warnings/0failures, engine exit0; Editor build184.88s. Initial fixture timing
+failure preserved and corrected without removing command assertions. No runtime
+behavior/staged asset change; physical OS input, animation and water forces remain
+open. See runtime-input-context-isolation callback follow-through.
+
 September25UTC input regression now evaluates real Enhanced Input press/release
 events: rebound J/K positive stroke, retained S negative, release zero and old J
 inactive after rebind all pass. Editor build19.24s; native1success/0warnings/
