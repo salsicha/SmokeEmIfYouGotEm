@@ -91,3 +91,43 @@ The next candidate should resolve that mixed-source contract, preserving the
 unchanged1m gate, rather than removing more unrelated boundary rock or relaxing
 the limit. The current source-exact playable cap remains installed, with its
 documented semantic uncertainty and visual shortcomings unresolved.
+
+## Separate mixed-survey construction candidate
+
+The builder's explicit `--independent-support` path now creates
+`tmp/troublemaker-mixed-support-candidate-20260925/mixed_survey_rock_cap.npz`.
+The original2019-only invocation remains rejected; its1m gate is unchanged.
+This separate interpreted candidate adds captured2021LAZ point6044173 to fill
+the identified gap, alongside the seven2019lower interior observations.
+Its original coordinates are(683786.11,4296696.03,228.37)m inEPSG6339/NAVD88
+GEOID18. The raw LAZ hash, CRS, transform, exact index and pulse fields are
+retained in [the construction receipt](independent-lidar-followup/mixed-candidate-report.json).
+No fitted ground offset is applied; the approximately8cm cross-survey vertical
+difference and declared2m absolute transform accuracy remain uncertainty.
+
+The archive uses explicit source_dataset/source_point_index/source_classification
+arrays and a source table. It deliberately omits the2019-only
+original_return_index field so old provenance consumers cannot silently treat
+the new point as an old archive index. Its receipt uses a new schema;
+the existing shared-union loader must explicitly validate this contract before
+it can consume the candidate. Do not relabel the receipt as its legacy schema.
+
+Construction passes:1.7172012538762729m2 exact patch coverage;11old faces become
+23; all2,943outside triangles retain exact coordinates and order. There are
+1,607roof vertices and2,966roof faces; global maximum edge.998534253m.
+Every retained2019position remains source-exact; the independent point retains
+its declared transformed position. The closed solid has6,428faces,9,642edges
+with exactly two incident faces each, volume2086.5066174418944m3 and volume
+identity error9.094947e-13m3. Its vertical closing walls remain inferred.
+
+Separate read-only assertions verify dataset/index ownership, absent excluded
+source IDs, unchanged outside faces and closed topology. Sampling the union
+with the retained parent terrain at36old/new patch centroids and excluded
+anchors shows changes from−1.746137m to+.006132m. Thus the change is not hidden
+under the parent terrain, but this is not a live rendered/collision check.
+Candidate SHA256:2ce993c54e489cf42a9773f5b8f34def310586f9b785c03325af0477033ae4b6.
+
+Next implement strict mixed-source validation in the shared union preparation
+path, then produce matching render/collision/bed and fresh hydraulic fields for
+bounded normal-play review. No map/installed mesh/cooked field changed, no cook
+or engine launched, and no photographic, navigation or performance acceptance.
