@@ -74,3 +74,27 @@ from unmatched historical data, extend the hydraulic domain solely to reach
 this archive, or launch an unchanged long cook. Actual local bed/stage evidence
 remains missing. This source limitation does not block normal playable water,
 geometry and performance work elsewhere in the requested South Fork scene.
+
+## September25: initial edge-stage discontinuity localized
+
+Read-only `physics/scripts/audit_outlet_initial_stage.py` checks every declared
+input hash for both downstream packages, their source geometry hashes and
+unchanged hashes after reading. It compares imposed stage with captured surface,
+initial eta and depth at every initially wet open-edge cell. No solver step,
+boundary adjustment or cook is performed. Result retained at
+`independent-lidar-followup/mixed-outlet-initial-stage.json` for the fresh mixed-cap input.
+
+The common imposed131.0414276123m NAVD88 stage equals the minimum wet source
+elevation, not every wet cell. Core0000 has45wet cells,2differing by over1cm,
+source range131.041428..131.159332m; maximum imposed-minus-initial difference
+is-0.117905m and mean-0.003930m. Core0001 has57wet cells,16differing but only3
+over1cm, source range131.041428..131.449936m; maximum negative difference
+is-0.408508m and mean-0.008266m. All102wet cells lie within captured water masks.
+Thus the largest mismatch is localized, not a uniform40cm outlet drop.
+
+This rules out exact pointwise compatibility of the constant median boundary
+with cold initial surface. It does NOT explain the later distributed drainage,
+establish a measured reservoir stage, or justify raising stage to force balance.
+Next distinguish this local startup effect from evolved boundary response using
+the existing native flux inspector and an explicitly labeled sensitivity test;
+do not repeat the unchanged full-duration cook. Normal playable fields untouched.
