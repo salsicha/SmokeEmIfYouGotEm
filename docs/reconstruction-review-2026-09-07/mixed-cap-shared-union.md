@@ -306,3 +306,23 @@ This closes the uninspected-recording gap for the candidate, not the visual or
 performance gate. No normal launch changes, new cook or source edits. Next
 visible work must address source-supported shape and local froth structure,
 not another identical playback or another smoothing-only trial.
+
+## Fixed diagnosed-face coverage of the mixed patch
+
+`audit_mixed_cap_view_targets.py` binds the retained native/source ray audit,
+original camera sidecar and both cap hashes. It matches exact directed XYZ
+triangles up to cyclic vertex order, permitting reindexing but neither position
+changes nor reversed winding. Two focused tests pass, including infinitesimal
+height-change and nonfinite rejection. Report:
+`independent-lidar-followup/mixed-cap-fixed-view-targets.json`.
+
+Seven of eight previously diagnosed cap faces remain EXACTLY unchanged.
+Old roof1137 at pixel(475,330) is absent from the new triangle set; roof2342,
+2432,2581 and all four inferred walls6225,6217,6222,6315 retain directed XYZ.
+Their new indices are2331,2421,2570,6249,6241,6246,6339 respectively.
+This explains the limited scope of the local patch; it does not prove the
+changed target is repaired or establish current visibility after occlusion.
+Do not claim the mixed patch fixes the seven retained shapes or infer success
+from its import/collision passes. Next reconstruction work must address the
+remaining supported roof interpretation and explicit wall hypothesis, with
+consistent render/collision/bed fields; another normals-only trial cannot do so.
