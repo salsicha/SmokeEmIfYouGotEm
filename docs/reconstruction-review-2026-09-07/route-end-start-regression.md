@@ -88,3 +88,14 @@ At about ten seconds, raft telemetry remains wet with no dry support points,
 raft speed 0.535 m/s and water speed 0.532 m/s. This closes the final-metre
 streaming/wet-placement check left open above, not full outlet traversal,
 surveyed bathymetry, rendered shoreline review or sustained performance.
+
+Final-metre rendered follow-up, 03:33 UTC: a separate direct-map review with
+the same staged executable and station produced four one-second-spaced stills
+and exited 0 (`tmp/route-end-shoreline-20260925.log`). Inspected original
+`route-end-shoreline-20260925_000.png` and `_003.png` in staged Saved/Screenshots:
+water, raft and three crew are present; paddle poses and water pattern change.
+No whole-surface disappearance or gross horizon/shoreline jump is visible in
+these sampled views. Distant banks remain smooth and sparsely detailed; these
+images do not establish captured bank accuracy, underwater geometry, continuous
+shoreline stability or full-route traversal. Do not repeat this unchanged short
+endpoint capture as further reconstruction progress.
