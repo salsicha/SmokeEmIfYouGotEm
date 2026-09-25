@@ -19,6 +19,10 @@ bool FRaftSimRefinementTopologyCacheTest::RunTest(const FString&)
         }
     }
     FRaftSimSurfaceRefinement Cached,Fresh,Serial;
+    // Compare the single-lookup candidate against original indexed insertion
+    // and the independent serial map across changing geometry and masks.
+    Cached.bIndexedEdges=true;Cached.bSingleLookupEdges=true;
+    Fresh.bIndexedEdges=true;
     int64 Compared=0;
     for(int32 Frame=0;Frame<20;++Frame)
     {

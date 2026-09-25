@@ -56,6 +56,7 @@ struct FRaftSimSurfaceRefinement
     bool bFlatCoordinateMemo=false; // Candidate: exact keys, unchanged profile epochs.
     bool bStrongEdgeHash=false; // Candidate until exact actual-input timing qualifies it.
     bool bIndexedEdges=false; // Shoreline enables the qualified indexed lookup.
+    bool bSingleLookupEdges=false; // Candidate; preserve the original assembly control.
     bool bRetainTopologyStorage=false; // Reuse capacity, never stale selection/profile values.
     bool bLevelLocalMemos=false; // Candidate: retain coordinate slots separately per level.
     bool bInlineSelection=false; // Candidate: typed predicate, identical evaluations.
@@ -402,7 +403,17 @@ private:
                     for (int32 E=0;E<3;++E)
                     {
                         const int32 L=Corners[E],R=Corners[(E+1)%3];const uint64 K=Key(L,R);
-                        if (!Midpoints.Contains(K))
+                        if (bSingleLookupEdges)
+                        {
+                            int32& Node=Midpoints.FindOrAdd(K,INDEX_NONE);
+                            if (Node==INDEX_NONE)
+                            {
+                                Node=Points.Num();
+                                Points.Add((Points[L]+Points[R])*0.5);
+                                MidpointParents.Add(FIntPoint(L,R));
+                            }
+                        }
+                        else if (!Midpoints.Contains(K))
                         {
                             const int32 NewIndex=Points.Num();
                             Points.Add((Points[L]+Points[R])*0.5);
