@@ -3,6 +3,15 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC local-cavity construction corrects an important interpretation:
+all five lower witnesses already exist in the current extended roof. The original
+threshold excluded them initially, not from the current candidate. Three isolated
+upper-point exclusion/retriangulation hypotheses pass exact retained-face, seam,
+<=1m edge and closed-solid gates; two fail retained seams and are rejected. Three
+tests pass. No combined candidate, source-label proof or playable installation.
+Next compare the three saved hypotheses against source evidence and visible
+shape before shared-field/native promotion. See boundary-ground-cavities receipt.
+
 September25UTC five lower ground witnesses inspected against registered NAIP
 and current topology: all lie inside the roof, so they are not exterior-extension
 anchors. Direct swaps invert2/2/2/2/3faces; two exceed1m edge bounds. Baseline

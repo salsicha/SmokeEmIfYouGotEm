@@ -463,6 +463,35 @@ old connectivity and merely lower these vertices, nor claim that these five
 observations resolve the whole visible wall problem. Geometry, flow and normal
 play remain unchanged; this is source/topology evidence only.
 
+### Exact-source local cavity hypotheses — September 25
+
+Construction established that all five ground witnesses already occur in the
+current extended cap:658439/658438/685144/688855/689621 map to roof vertices
+62/61/192/665/803. The prior clearance audit describes original selector bias,
+NOT missing points in the present roof. An initial duplicate-XY rejection caught
+this; the builder now explicitly reuses existing lower vertices. Upper raw
+observations remain preserved, and their exclusion from faces is an interpretation.
+
+Three independently constructed hypotheses pass unchanged shared-seam,1m XYedge
+and closed-solid gates:658439,658438,689621. They replace7/7/10local triangles
+with5/5/8triangles and preserve every unaffected source face exactly. Inferred
+footprint losses are0.078956/0.088442/0.105579m2. Maximum new XYedges are
+0.734715/0.806622/0.737419m. The other two hypotheses fail retained-seam coverage
+and are rejected, not patched by increasing support limits or dropping the gate.
+[Full construction receipt](independent-lidar-followup/boundary-ground-cavities.json).
+
+Candidate NPZs are isolated under `tmp/boundary-ground-cavities-v2-20260925/`,
+each bound to the original source and constrained-parent hashes. They are not
+combined or assigned a production manifest. No source XYZ or classifications
+move; unchanged unused vertex records remain for provenance. Three regressions
+cover exact local geometry/shared seams, unchanged edge rejection and reuse of
+an already present lower point. Tests and actual construction exit0.
+
+This establishes feasible local connectivity at three locations, not that the
+excluded class1points were non-rock, nor full source/visual acceptance. Next
+compare each hypothesis's shape and source evidence, keeping the two failed
+locations explicit. No export, cook, native validation or playable change yet.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid
