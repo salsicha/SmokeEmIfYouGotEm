@@ -1,5 +1,12 @@
 # Remaining requested work
 
+September25 calf-span candidate confirms an endpoint mismatch:45.9866cm source
+versus34.3657cm control span,11.6209cm endpoint error, reduced to0.000000245cm
+by review-only longitudinal fitting. Expanded clearance still FAILS, now at a
+left ring-finger vertex15.218cm below the envelope. Both boarding and calf fitting
+remain default-off; inspect actual hand/tube contact and leg skin continuity
+before promotion. This is not a delivered normal-play animation improvement.
+
 Latest September25 expanded boarding audit FAILS: CPU-skinned body vertex9511
 is91.8% right-calf weighted and8.2% right-foot weighted. The source-length calf
 transform is the next repair hypothesis: SetSegmentBone rotates/translates but

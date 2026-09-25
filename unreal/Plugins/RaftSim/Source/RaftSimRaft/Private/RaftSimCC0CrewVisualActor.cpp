@@ -5,6 +5,8 @@
 #include "Engine/SkeletalMesh.h"
 #include "HAL/IConsoleManager.h"
 #include "Materials/MaterialInterface.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Rendering/SkeletalMeshRenderData.h"
 #include "Rendering/SkinWeightVertexBuffer.h"
 
@@ -953,6 +955,31 @@ void ARaftSimCC0CrewVisualActor::SetSegmentBone(
     FTransform Target = *Reference;
     Target.SetLocation(ToMeshSpace(DesiredStartCm));
     Target.SetRotation((Swing * Twist * Reference->GetRotation()).GetNormalized());
+    if (BoneName == TEXT("calf_l") || BoneName == TEXT("calf_r"))
+    {
+        const FVector LocalAxis = Reference->GetRotation().UnrotateVector(ReferenceDirection);
+        const FVector AbsAxis = LocalAxis.GetAbs();
+        const int32 Axis = AbsAxis.X > AbsAxis.Y ? (AbsAxis.X > AbsAxis.Z ? 0 : 2) : (AbsAxis.Y > AbsAxis.Z ? 1 : 2);
+        const FVector SourceEndLocal = Reference->InverseTransformPosition(ReferenceEnd->GetLocation());
+        const double BeforeError = FVector::Distance(Target.TransformPosition(SourceEndLocal), ToMeshSpace(DesiredEndCm));
+        static const bool bFit = FParse::Param(FCommandLine::Get(), TEXT("RaftSimFitCalfSpanReview"));
+        if (bFit && AbsAxis[Axis] > .9999)
+        {
+            FVector Scale = Target.GetScale3D();
+            Scale[Axis] *= FVector::Distance(ToMeshSpace(DesiredStartCm), ToMeshSpace(DesiredEndCm)) /
+                FVector::Distance(Reference->GetLocation(), ReferenceEnd->GetLocation());
+            Target.SetScale3D(Scale);
+        }
+        static bool bLoggedCalfSpan = false;
+        if (!bLoggedCalfSpan)
+        {
+            bLoggedCalfSpan = true;
+            UE_LOG(LogTemp, Display, TEXT("CALF_SPAN_REVIEW fit=%d axis=%s source_cm=%.9f target_cm=%.9f endpoint_before_cm=%.9f endpoint_after_cm=%.9f"),
+                bFit, *LocalAxis.ToString(), FVector::Distance(Reference->GetLocation(), ReferenceEnd->GetLocation()),
+                FVector::Distance(ToMeshSpace(DesiredStartCm), ToMeshSpace(DesiredEndCm)), BeforeError,
+                FVector::Distance(Target.TransformPosition(SourceEndLocal), ToMeshSpace(DesiredEndCm)));
+        }
+    }
     Body->SetBoneTransformByName(BoneName, Target, EBoneSpaces::ComponentSpace);
 }
 

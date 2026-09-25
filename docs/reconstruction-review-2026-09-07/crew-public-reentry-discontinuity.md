@@ -365,3 +365,36 @@ Body configuration variable. Renaming the local to PosedBody fixed compilation;
 Editor build14.05s succeeded. Absolute-path patch writes temporarily failed;
 workspace-relative apply_patch succeeded with no ACL or data changes. No runtime
 animation, source assets or acceptance limits changed in this attribution step.
+
+### Calf shaft-fit experiment: endpoint repaired, clearance still failing
+
+Default-off `-RaftSimFitCalfSpanReview` scales only the source calf's dominant
+local shaft axis to the requested knee-to-ankle span, preserving transverse
+scale. It requires axis alignment>0.9999; this source reports local(0,-1,0).
+The first measured calf source span45.986578586cm exceeds the target34.365680555cm.
+The transformed source endpoint error decreases from11.620898031cm to
+0.000000245cm. This verifies the endpoint defect and candidate correction, not
+all skin deformation or all identities/poses. The flag is cached once; ordinary
+leg scale stays unchanged. Source assets and control spans are not modified.
+
+Editor build47.01s succeeded. Actual D3D12 run with timed boarding, strict
+clearance and calf fitting: `tmp/crew-boarding-calf-fit-20260925/index.json`
+fails the body-envelope gate, engine exit255 (Unreal-1). The maximum is now
+15.218177159cm atframe264, vertex8149,100% `ring_03_l` weighted; raft-local
+(-109.830,72.101,10.943)cm, avatar-local(78.107,-12.638,25.036)cm. There are
+584831 supported body samples. This does not prove all calf samples clear;
+the worst vertex changed. Fingers below an upper envelope require actual
+surface/solid contact review, not automatic relabeling as acceptable grip.
+
+Captures: `tmp/crew-boarding-calf-fit-views-20260925/`. Actual frame300 inspected;
+the oblique dark view still occludes lower-body contact. No visual acceptance.
+Next quantify calf-region skin clearance and inspect hand/tube geometry with
+adequate close views; verify ordinary seated/rowing/high-side skin continuity
+before enabling longitudinal fitting. Keep strict gates unchanged and both
+review options disabled in normal play. No normal-launch cost or packaged
+acceptance claimed from this experiment.
+
+Final cached-switch build11.59s succeeded. No-opt-in native regression
+`tmp/crew-calf-fit-default-20260925/index.json` passes1success/0failures/0not-run,
+engine exit0. Its measured fit=0 leaves the same11.620898031cm endpoint error
+before/after, confirming the experimental fitting is not enabled in normal play.
