@@ -153,7 +153,31 @@ are retained; the ground-fit offset is NOT applied. The earlier no-pulse output
 is also preserved in ignored tmp. Both analysis runs exited0; no new cook,
 geometry, collision, water field or playable acceptance.
 
-Next compare the coherent lower support layer against the cap's selected roof
+### Fixed-camera mixed-cap retrace — September 25
+
+The retained eight diagnosed cap rays have now been traced against both caps,
+holding the original ray audit's candidate ground constant. All eight baseline
+source hits reproduce (source face and world position), and source/view hashes
+match before and after the comparison. Five existing nearest-solid/reflection/
+identity tests pass. Report:
+[mixed-cap-retrace.json](independent-lidar-followup/mixed-cap-retrace.json).
+
+Seven rays have exactly zero hit displacement, including all four diagnosed
+90-degree inferred side walls. Pixel (475,330), originally cap face1137 at
+9.260605m along the ray, now first intersects cap face1146 at17.072017m:
+7.811412m farther away. Its hit slope changes65.249707 to32.461068 degrees,
+but this is a DIFFERENT surface behind the removed foreground triangle, not
+proof that the foreground rock has been correctly reconstructed. The candidate
+does not repair the other seven diagnosed targets.
+
+This is a source-space occlusion result, not GPU visibility, fresh native
+collision or normal-play acceptance. No source data, terrain or water changed.
+Next inspect a fresh engine capture at the exact retained camera with candidate
+and parent under identical settings; evaluate the revealed surface and remaining
+inferred walls against evidence. Do not treat the lower replacement slope as a
+repair gate or repeat another unchanged long cook to resolve this visual issue.
+
+Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid
 turning absent lower returns into measured rock. A global first-return filter

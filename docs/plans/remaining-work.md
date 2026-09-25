@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC source-space follow-through: retracing the eight diagnosed rock
+rays against the mixed cap leaves seven hits exactly unchanged. The eighth
+passes the removed foreground face and hits another cap surface7.811412m farther
+away; its lower slope is not a reconstruction pass. Five resolver tests pass.
+Next requires exact retained-camera engine comparison, not another unchanged
+cook. Normal playable geometry remains unchanged; see independent-lidar-followup.
+
 September25UTC: runtime key rebinding now preserves surviving mapping records
 and priority order. Repeated-rebind native regression passes; Editor/Game rebuilt
 and normal v7 staged executable updated with verified backup. Normal Boot/menu
