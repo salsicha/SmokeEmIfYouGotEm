@@ -1,5 +1,13 @@
 # Remaining requested work
 
+September25 crew reentry: production drift now preserves the selected ready
+swimmer's Reentry pose instead of resetting it to Swimming twice per frame.
+The previously failing native regression and elapsed/PFD/mass checks pass;
+Editor and standalone game targets rebuild. Normal menu launch/motion and a
+short cost check pass, but the392.38cm instantaneous boarding jump remains.
+Timed climb, continuous visual review and packaged restaging are still open.
+See [reentry evidence](../reconstruction-review-2026-09-07/crew-public-reentry-discontinuity.md).
+
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 

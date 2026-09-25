@@ -2228,8 +2228,15 @@ void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
         // Drift can carry a swimmer back into the hull before a rescue starts.
         // Reuse the same conservative posed-body support plane as pulling;
         // do not pull exterior swimmers inward or alter the water elevation.
+        // The selected ready swimmer is already posed for tube contact. Do not
+        // overwrite that pose (and reset its phase) before the rescue update
+        // restores it later in this same frame. Clearance must use that body.
+        const ERaftSimCrewAvatarAction DriftAction =
+            RescueInteraction.TargetPassengerId == Swimmers[Index].PassengerId &&
+            RescueInteraction.Phase == ERaftSimRescueInteractionPhase::ReadyForReentry
+                ? ERaftSimCrewAvatarAction::Reentry : ERaftSimCrewAvatarAction::Swimming;
         if(auto* Avatar=FindAvatar(Swimmers[Index].PassengerId))
-            Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Swimming);
+            Avatar->SetAvatarAction(DriftAction);
         FVector HullTarget;
         if(GetSwimmerTubeTarget(Swimmers[Index].PassengerId,Swimmers[Index].SwimmerWorldPositionMeters,HullTarget))
         {
@@ -2241,7 +2248,7 @@ void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
         if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmers[Index].PassengerId))
         {
             Avatar->SetActorLocation(Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
-            Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Swimming);
+            Avatar->SetAvatarAction(DriftAction);
         }
         if (Swimmers[Index].TimeInWaterSeconds > Swimmers[Index].RescueWindowSeconds &&
             Swimmers[Index].FailedRescueReason.IsNone())

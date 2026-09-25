@@ -40,3 +40,40 @@ both sides, tilted/moving raft and interruptions/checkpoint resets.
 
 No runtime behavior, saved asset, packaged executable or river acceptance changed.
 The passing occupancy regression is explicitly not reentry-animation acceptance.
+
+## Ready-pose ownership repair
+
+The next production pass found `DriftSwimmers` unconditionally applying Swimming
+before its hull-clearance query and again after positioning. The later rescue
+update restored Reentry for the selected ready passenger. This repeatedly changed
+pose ownership and reset animation phase inside each frame. Drift now selects
+Reentry only for the matching ReadyForReentry target; all other swimmers retain
+Swimming. The same selected pose is used for clearance and the final update.
+No readiness/distance limit, hull clearance, mass or completion rule changed.
+
+Before the runtime fix, the extended native test fails exactly eight ready-pose
+assertions (`tmp/crew-ready-pose-before-20260925/index.json`). Afterward the same
+test passes (`tmp/crew-ready-pose-after-20260925/index.json`). Additional checks
+pass12elapsed updates at1/60s with finite body and PFD error<0.01cm, unoccupied
+crew mass235kg while waiting, another passenger still swimming, and release to
+Swimming when the target's phase returns to Pulling. Eight zero-step cycles
+retain the ready root within0.01cm. Final D3D12 report:
+`tmp/crew-ready-pose-elapsed-20260925/index.json`,1success/0failures/0warnings/
+0not-run, exit0. Tests exercise production methods directly in an editor world,
+not human input or an inspected continuous gameplay animation.
+
+Editor builds11.03s (new failing regression),29.72s (runtime fix),11.03s
+(elapsed checks) succeed. The ordinary Boot/menu South Fork launch exits0 with
+raft speed1.367m/s,wet1,support delta0 and sampled penetration0. Separate300frame
+CSV rows30–270 give mean21.763666ms,p9530.2152ms. Nonlegacy timing is confirmed
+in `tmp/crew-ready-pose-normal-20260925.log`; report with CSV SHA256:
+`tmp/crew-ready-pose-normal-cost-20260925.json`. This no-rescue run is a launch
+regression check, not direct rescue validation or a performance improvement claim.
+
+The392.377744591cm instantaneous boarding jump still exists and is still logged.
+This fixes a competing pose owner required before a timed climb, not the climb
+itself. No cap geometry, flow field, saved map, packaged stage or remote changed.
+
+Standalone Development game target also rebuilds successfully in119.34s. Its
+binary is not yet restaged or separately packaged-play qualified. The normal
+editor-hosted game test above used the rebuilt production runtime without opt-in.

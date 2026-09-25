@@ -149,10 +149,37 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
     Raft->Swimmers[BoardingIndex].SwimmerWorldPositionMeters = TubeTarget;
     BoardingAvatar->SetActorLocation(TubeTarget * 100.);
     AddInfo(FString::Printf(TEXT("REENTRY_TARGET hull_distance_m=%.9f"), Raft->GetRenderedHullDistanceM(TubeTarget)));
-    const FVector BeforeBoarding = BoardingAvatar->GetActorLocation();
     const int32 PreviousRescues = Raft->GetCompletedRescueCount();
     Raft->RescueInteraction.TargetPassengerId = TEXT("paddler_1");
     Raft->RescueInteraction.Phase = ERaftSimRescueInteractionPhase::ReadyForReentry;
+    const FVector ReadyPosition = BoardingAvatar->GetActorLocation();
+    for (int32 Frame = 0; Frame < 8; ++Frame)
+    {
+        Raft->DriftSwimmers(0.f);
+        TestEqual(TEXT("drift preserves selected ready swimmer reentry pose"),
+            BoardingAvatar->GetAvatarAction(), ERaftSimCrewAvatarAction::Reentry);
+        TestEqual(TEXT("unselected swimmer continues swimming"),
+            Raft->FindAvatar(TEXT("paddler_2"))->GetAvatarAction(), ERaftSimCrewAvatarAction::Swimming);
+        Raft->UpdateRescueInteraction(0.f);
+        TestTrue(TEXT("zero-time ready drift/rescue cycle does not move the root"),
+            BoardingAvatar->GetActorLocation().Equals(ReadyPosition, .01));
+    }
+    for (int32 Frame = 0; Frame < 12; ++Frame)
+    {
+        Raft->DriftSwimmers(1.f / 60.f);
+        TestEqual(TEXT("elapsed drift preserves ready pose"), BoardingAvatar->GetAvatarAction(), ERaftSimCrewAvatarAction::Reentry);
+        Raft->UpdateRescueInteraction(1.f / 60.f);
+        BoardingAvatar->Tick(1.f / 60.f);
+        TestTrue(TEXT("ready body remains finite during elapsed updates"), BoardingAvatar->HasFiniteVisualTransforms());
+        TestTrue(TEXT("ready PFD follows rendered chest during elapsed updates"), BoardingAvatar->GetProductionPfdTorsoErrorCm() < .01f);
+    }
+    Step(235.); // Waiting at the tube has not silently occupied the seat.
+    Raft->RescueInteraction.Phase = ERaftSimRescueInteractionPhase::Pulling;
+    Raft->DriftSwimmers(0.f);
+    TestEqual(TEXT("leaving ready state releases reentry pose"), BoardingAvatar->GetAvatarAction(), ERaftSimCrewAvatarAction::Swimming);
+    Raft->RescueInteraction.Phase = ERaftSimRescueInteractionPhase::ReadyForReentry;
+    Raft->UpdateRescueInteraction(0.f);
+    const FVector BeforeBoarding = BoardingAvatar->GetActorLocation();
     TestTrue(TEXT("ready swimmer at rendered tube boards through public request"), Raft->RequestSelectedReentry());
     TestTrue(TEXT("boarding preserves avatar identity"), Raft->FindAvatar(TEXT("paddler_1")) == BoardingAvatar);
     TestEqual(TEXT("successful public boarding counts exactly one rescue"), Raft->GetCompletedRescueCount(), PreviousRescues + 1);
