@@ -277,7 +277,7 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     float GetProductionHelmetFitScale() const;
 
-    /** Distance between the authored PFD origin and deterministic torso solve. */
+    /** PFD attachment error against the rendered CC0 chest (legacy host anchor otherwise), not garment clearance. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     float GetProductionPfdTorsoErrorCm() const;
 

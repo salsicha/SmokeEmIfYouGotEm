@@ -1164,8 +1164,10 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // neckline: component-space scales there crush every vertex weighted
     // downstream — chest, shoulders, and arm roots collapsed while the
     // separately-placed helmets stayed put (tried and reverted,
-    // 2026-09-02). The cape is authored mesh; a real trim is a Blender
-    // pass on the CC0 wetsuit source.
+    // 2026-09-02). The source generator assigns wetsuit/skin materials to
+    // the same body surface by skin-bone weight, not a separate cloth shell.
+    // Diagnose material boundaries and posed body deformation before editing
+    // topology; trimming this region can remove anatomy rather than cloth.
     Body->RefreshBoneTransforms();
     ApplyPaddleGripPose(Pose);
     Body->RefreshBoneTransforms();

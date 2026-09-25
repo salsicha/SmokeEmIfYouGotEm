@@ -1769,6 +1769,14 @@ float ARaftSimCrewAvatarActor::GetProductionPfdTorsoErrorCm() const
     {
         return TNumericLimits<float>::Max();
     }
+    if (const auto* CC0Visual = Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor()))
+    {
+        FTransform ChestWorld;
+        if (!CC0Visual->GetSolvedChestWorldTransform(ChestWorld) || ChestWorld.ContainsNaN())
+            return TNumericLimits<float>::Max();
+        // Attachment error only: this does not measure cloth/body clearance.
+        return FVector::Distance(ProductionPfd->GetComponentLocation(), ChestWorld.GetLocation());
+    }
     const FRaftSimCrewAvatarPose Pose =
         URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             CurrentAction, AnimationPhase, SeatSide);
