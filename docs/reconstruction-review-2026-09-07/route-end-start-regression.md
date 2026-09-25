@@ -89,7 +89,7 @@ raft speed 0.535 m/s and water speed 0.532 m/s. This closes the final-metre
 streaming/wet-placement check left open above, not full outlet traversal,
 surveyed bathymetry, rendered shoreline review or sustained performance.
 
-Final-metre rendered follow-up, 03:33 UTC: a separate direct-map review with
+Final-metre rendered follow-up, 03:31 UTC: a separate direct-map review with
 the same staged executable and station produced four one-second-spaced stills
 and exited 0 (`tmp/route-end-shoreline-20260925.log`). Inspected original
 `route-end-shoreline-20260925_000.png` and `_003.png` in staged Saved/Screenshots:
