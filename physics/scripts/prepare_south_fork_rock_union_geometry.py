@@ -26,7 +26,24 @@ def union_fields(fields,center,union):
     return output,changed
 
 
-def prepare(base_flow,cap_manifest,output,terrain_revision=None):
+def retained_union(geometry,root):
+    """Rebuild the previous geometry from its own dependencies, never the new cap."""
+    if not geometry.get('terrain_union'):return None
+    root=Path(root).resolve()
+    path=(root/geometry['rock_cap_manifest']).resolve()
+    if not path.is_relative_to(root):raise ValueError('Previous cap outside project')
+    cap=json.loads(path.read_text());origin=np.asarray(cap['origin_utm_and_vertical_datum_m'])
+    revision=geometry.get('terrain_revision_manifest')
+    if revision is not None:
+        revision=(root/revision).resolve()
+        if not revision.is_relative_to(root):raise ValueError('Previous revision outside project')
+    previous=SourceRockUnion(path,root,root/cap['source_mesh_path'],origin[:2],origin[2],revision)
+    if previous.identity!=geometry['terrain_union']:
+        raise ValueError('Previous union dependencies do not match current geometry')
+    return previous
+
+
+def prepare(base_flow,cap_manifest,output,terrain_revision=None,replace_union=False):
     output=Path(output).resolve();base_flow=Path(base_flow).resolve()
     if output.exists() or not output.is_relative_to(ROOT/'tmp'):
         raise ValueError('Fresh project tmp candidate directory required')
@@ -34,18 +51,26 @@ def prepare(base_flow,cap_manifest,output,terrain_revision=None):
     if sha(geometry_path)!=flow['geometry_manifest_sha256']:
         raise ValueError('Current hydraulic geometry dependency changed')
     geometry=json.loads(geometry_path.read_text())
-    if not geometry['completed'] or (geometry.get('terrain_union') and terrain_revision is None):
+    if not geometry['completed'] or (geometry.get('terrain_union') and terrain_revision is None and not replace_union):
         raise ValueError('Completed retained geometry, without an earlier union, required')
     if [r['name'] for r in geometry['regions']]!=flow['packages']:
         raise ValueError('Physical domain and state package order differ')
     cap_manifest=Path(cap_manifest).resolve();cap=json.loads(cap_manifest.read_text())
     origin=np.asarray(cap['origin_utm_and_vertical_datum_m'])
+    previous_union=retained_union(geometry,ROOT)
+    if replace_union and previous_union is None:
+        raise ValueError('Replacement requires a verified existing union')
+    if replace_union and geometry.get('terrain_revision_manifest'):
+        retained_revision=(ROOT/geometry['terrain_revision_manifest']).resolve()
+        if terrain_revision is not None and Path(terrain_revision).resolve()!=retained_revision:
+            raise ValueError('Cap replacement must preserve the current bed revision')
+        terrain_revision=retained_revision
     union=SourceRockUnion(cap_manifest,ROOT,ROOT/cap['source_mesh_path'],origin[:2],origin[2],terrain_revision)
-    previous_union=None
-    if geometry.get('terrain_union'):
-        previous_union=SourceRockUnion(cap_manifest,ROOT,ROOT/cap['source_mesh_path'],origin[:2],origin[2])
-        if previous_union.identity!=geometry['terrain_union']:
+    if previous_union is not None:
+        if not replace_union and previous_union.identity['cap_manifest_sha256']!=sha(cap_manifest):
             raise ValueError('Revision must retain the exact current rock union')
+        if previous_union.identity['parent_geometry_sha256']!=union.identity['parent_geometry_sha256']:
+            raise ValueError('Replacement must retain the same source terrain')
     if geometry['vertical_datum_navd88_m']!=origin[2] or geometry['grid_spacing_m']!=1.:
         raise ValueError('Source union and hydraulic lattice/datum differ')
     result=copy.deepcopy(geometry);changes=[];checked=set();total=0
@@ -81,7 +106,7 @@ def prepare(base_flow,cap_manifest,output,terrain_revision=None):
     output.mkdir()
     for record in result['regions']:
         center=np.asarray(record['center_utm_m'])
-        if np.any(center+39<union.lower) or np.any(center-40>union.upper):continue
+        if (np.any(center+39<union.lower) or np.any(center-40>union.upper)) and not record.get('terrain_union'):continue
         old_path=ROOT/record.get('original_core_geometry_file',record['geometry_file'])
         expected_old_sha=record.get('original_core_geometry_sha256',record['geometry_sha256'])
         if sha(old_path)!=expected_old_sha:raise ValueError('Retained pre-union core changed')
@@ -91,7 +116,14 @@ def prepare(base_flow,cap_manifest,output,terrain_revision=None):
             if any(not np.array_equal(fields[k],old[k]) for k in FIELDS):
                 raise ValueError('Pre-union core differs from exact source packet slice')
         updated,changed=union_fields(fields,center,union)
-        if not changed.any():continue
+        if not changed.any():
+            # A smaller replacement must remove the prior cap, not leave stale
+            # raised cells or ownership outside the new footprint.
+            record.update(geometry_file=old_path.relative_to(ROOT).as_posix(),
+                          geometry_sha256=expected_old_sha,copied_without_interpolation=True)
+            for key in ('terrain_union','original_core_geometry_file','original_core_geometry_sha256'):
+                record.pop(key,None)
+            continue
         path=output/(record['name']+'.npz')
         np.savez_compressed(path,**updated)
         delta=updated['bed_navd88_m'][changed]-fields['bed_navd88_m'][changed]
@@ -120,7 +152,7 @@ def prepare(base_flow,cap_manifest,output,terrain_revision=None):
     if terrain_revision is not None:
         result.update(terrain_revision_manifest=Path(terrain_revision).resolve().relative_to(ROOT).as_posix(),
             terrain_revision=union.terrain_revision.identity,
-            notes='Explicit submerged-prior revision on the registered rapid, then the unchanged source-rock solid. All captured masks/stages, measured vertices and physical endpoints retained. Fresh solve required; no old-bed state transfer.')
+            notes='Explicit registered terrain revision, then the selected source-rock solid. Captured masks/stages and physical endpoints retained. Fresh solve required; no old-bed state transfer.')
     manifest_path=output/'manifest.json';manifest_path.write_text(json.dumps(result,indent=2)+'\n')
     audit=dict(manifest_sha256=sha(manifest_path),passed=True,checked_core_count=len(result['regions']),
         checked_original_cell_count=total,changed_cores=changes,changed_cell_count=sum(r['changed_cells'] for r in changes),
@@ -139,5 +171,7 @@ if __name__=='__main__':
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--terrain-revision',type=Path,
                         help='Explicit source-preserving registered-bed candidate; requires a fresh solve')
+    parser.add_argument('--replace-union',action='store_true',
+                        help='Verify and replace the previous cap while retaining its bed revision; fresh solve required')
     args=parser.parse_args()
-    print(json.dumps(prepare(args.base_flow,args.cap_manifest,args.output,args.terrain_revision),indent=2),flush=True)
+    print(json.dumps(prepare(args.base_flow,args.cap_manifest,args.output,args.terrain_revision,args.replace_union),indent=2),flush=True)

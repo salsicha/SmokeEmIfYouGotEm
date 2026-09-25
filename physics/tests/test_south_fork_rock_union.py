@@ -47,6 +47,56 @@ def test_union_never_fills_outside_triangle_inside_bounding_box(source):
     assert out==22 and not changed
 
 
+def test_retained_union_uses_previous_descriptor_and_rejects_stale_identity(source):
+    from prepare_south_fork_rock_union_geometry import retained_union
+    root,path,_,_=source
+    geometry=dict(rock_cap_manifest=path.name,terrain_union=load(source).identity)
+    assert retained_union(geometry,root).identity==geometry['terrain_union']
+    geometry['terrain_union']=dict(geometry['terrain_union'],cap_manifest_sha256='stale')
+    with pytest.raises(ValueError,match='Previous union dependencies'):
+        retained_union(geometry,root)
+
+
+def test_explicit_cap_replacement_reconstructs_source_fields(source,monkeypatch):
+    import prepare_south_fork_rock_union_geometry as module
+    root,path,_,manifest=source
+    monkeypatch.setattr(module,'ROOT',root)
+    (root/'tmp').mkdir()
+    fields=dict(bed_navd88_m=np.full((80,80),22.),captured_surface_navd88_m=np.full((80,80),23.),
+                captured_water_mask=np.zeros((80,80),np.uint8),terrain_owner=np.full((80,80),2,np.uint8))
+    original=root/'original.npz';np.savez_compressed(original,**fields)
+    values,_=module.union_fields(fields,[100,200],load(source))
+    core=root/'core.npz';np.savez_compressed(core,**values)
+    record=dict(name='region',center_utm_m=[100,200],geometry_file=core.name,geometry_sha256=sha(core),
+                source_geometry_file=original.name,source_geometry_sha256=sha(original),
+                source_slice_row_column=[0,0],original_core_geometry_file=original.name,
+                original_core_geometry_sha256=sha(original),terrain_union=load(source).identity)
+    geometry=dict(completed=True,regions=[record],terrain_union=load(source).identity,
+                  rock_cap_manifest=path.name,vertical_datum_navd88_m=20.,grid_spacing_m=1.,open_geometry_edges=[])
+    gp=root/'geometry.json';gp.write_text(json.dumps(geometry))
+    flow=root/'flow.json';flow.write_text(json.dumps(dict(geometry_manifest=gp.name,
+        geometry_manifest_sha256=sha(gp),packages=['region'],boundary_probes=[])))
+    candidate=root/'candidate.json';candidate.write_text(json.dumps(dict(manifest,status='replacement')))
+    output=root/'tmp/new'
+    audit=module.prepare(flow,candidate,output,replace_union=True)
+    assert audit['passed'] and not audit['hydraulic_state_solved']
+    result=json.loads((output/'manifest.json').read_text())
+    assert result['terrain_union']['cap_manifest_sha256']==sha(candidate)
+    assert result['retained_geometry_manifest_sha256']==sha(gp)
+    with np.load(root/result['regions'][0]['geometry_file']) as saved:
+        for key in module.FIELDS:assert np.array_equal(saved[key],values[key])
+    # Tampering with a current core, even with its hash updated, must fail
+    # source reconstruction before any replacement directory is created.
+    values['bed_navd88_m'][0,0]+=1
+    np.savez_compressed(core,**values);record['geometry_sha256']=sha(core)
+    gp.write_text(json.dumps(geometry))
+    f=json.loads(flow.read_text());f['geometry_manifest_sha256']=sha(gp);flow.write_text(json.dumps(f))
+    rejected=root/'tmp/rejected'
+    with pytest.raises(ValueError,match='Retained core differs'):
+        module.prepare(flow,candidate,rejected,replace_union=True)
+    assert not rejected.exists()
+
+
 def test_interpreted_selection_hash_and_sources_are_part_of_union(source):
     root,path,_,manifest=source
     manifest.update(source_naip_sha256='image',source_naip_export_sha256='registration')

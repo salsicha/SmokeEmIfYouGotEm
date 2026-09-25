@@ -23,7 +23,8 @@ class SourceRockUnion:
         root=Path(root).resolve();manifest_path=Path(manifest_path).resolve()
         self.manifest=json.loads(manifest_path.read_text())
         m=self.manifest
-        if m.get('schema')!='raftsim.original_return_rock_cap.v1':
+        mixed=m.get('schema')=='raftsim.mixed_survey_rock_cap.v1'
+        if m.get('schema')!='raftsim.original_return_rock_cap.v1' and not mixed:
             raise ValueError('Explicit original-return solid schema required')
         self.origin=np.asarray(m['origin_utm_and_vertical_datum_m'],float)
         if not np.array_equal(self.origin,np.r_[origin_utm_m,datum_m]):
@@ -52,21 +53,28 @@ class SourceRockUnion:
                     raise ValueError('Interpreted selection source/frame mismatch: '+key)
         with np.load(paths['cap'],allow_pickle=False) as data:
             self.xyz=data['vertices_m'].copy();self.faces=data['triangles'].copy()
-            ids=data['original_return_index']
+            mixed_identity=None
+            if mixed:
+                from south_fork_mixed_cap_sources import validate_mixed_sources
+                with np.load(paths['original_returns'],allow_pickle=False) as source:
+                    mixed_identity=validate_mixed_sources(data,source,m,root,self.origin)
+            ids=data['original_return_index'] if not mixed else np.empty(0,dtype=int)
             with np.load(paths['original_returns'],allow_pickle=False) as source:
                 original=np.column_stack([source[k][ids] for k in
                     ('utm_easting_m','utm_northing_m','navd88_m')])
-                if not np.array_equal(self.xyz,original-self.origin):
+                if not mixed and not np.array_equal(self.xyz,original-self.origin):
                     raise ValueError('Candidate moved an original source vertex')
-                if not np.array_equal(data['original_classification'],source['classification'][ids]):
+                if not mixed and not np.array_equal(data['original_classification'],source['classification'][ids]):
                     raise ValueError('Candidate relabelled source classification')
-                if not np.isin(data['original_classification'],[1,2,10]).all():
+                if not mixed and not np.isin(data['original_classification'],[1,2,10]).all():
                     raise ValueError('Excluded source class in rock interpretation')
             self.floor=float(m['inferred_solid']['internal_floor_m'])
             with np.load(paths['source_mesh'],allow_pickle=False) as parent:
                 if self.floor>=float(parent['z_m'].min()):
                     raise ValueError('Solid floor is not below the retained terrain')
-            vertices,faces,kinds,_=close_cap_below_retained_terrain(self.xyz,self.faces,self.floor)
+            vertices,faces,kinds,closure=close_cap_below_retained_terrain(self.xyz,self.faces,self.floor)
+            if mixed and any(m['inferred_solid'].get(k)!=v for k,v in closure.items()):
+                raise ValueError('Mixed manifest closure statistics do not match the solid')
             if not (np.array_equal(vertices,data['solid_vertices_m']) and
                     np.array_equal(faces,data['solid_triangles']) and
                     np.array_equal(kinds,data['solid_face_kind'])):
@@ -82,6 +90,8 @@ class SourceRockUnion:
             hydraulics_recooked=False,playable_integrated=False)
         if selection is not None:
             self.identity['interpreted_selection_sha256']=selection['sha256']
+        if mixed_identity is not None:
+            self.identity['independent_source']=mixed_identity
         self.terrain_revision = None
         if terrain_revision is not None:
             from south_fork_terrain_revision import load_revision
