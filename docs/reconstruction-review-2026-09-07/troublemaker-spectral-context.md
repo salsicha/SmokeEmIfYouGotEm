@@ -85,3 +85,39 @@ needs fixed-landmark boat/bank-height constraints with registration/occlusion
 uncertainty, then the same shape must drive collision, bed and fresh flow before
 normal-play integration. No new cook was launched from unchanged ambiguity.
 Other water/crew/regression work remains actionable; this is not a global block.
+
+## Browser reference access recovered — September 25
+
+The computer-use skill's browser-first guidance enabled direct visual inspection
+of three previously inaccessible references. Text-fetch cache misses persist;
+ordinary in-app-browser rendering succeeds. No images were downloaded, edited,
+packaged or treated as licensed game assets.
+
+- [Dreamflows photograph and caption](https://www.dreamflows.com/American/troublemaker.wavewheel.lg.php):
+  the caption identifies Gunsight Rock in the foreground. The visible exposed
+  part has an angular sloping face, with water passing over/around its upper
+  edge and aerated water below. The caption retains Chris Shackleton's 2006
+  copyright/all-rights-reserved notice; this is not an exact acquisition date
+  or discharge observation.
+- [Garden Betty bank overview](https://gardenbetty.com/wp-content/uploads/2013/07/2013-07-10-16.jpg):
+  several separate exposed bedrock ledges interrupt the rapid. Vegetated bank
+  and foreground rock outlines are visible, with a blurred patch near the
+  upper-right background. Displayed source is 520 by 390 pixels.
+- [Garden Betty drop sequence image](https://gardenbetty.com/wp-content/uploads/2013/07/2013-07-10-21.jpg):
+  a localized steep water face lies beside sloping/angular exposed rock at
+  image right. Displayed source is 520 by 346 pixels. Its position within the
+  [trip account](https://gardenbetty.com/troublemaker-on-the-american-river/)
+  supplies context, not a surveyed camera pose or the identity of every rock.
+
+These observations replace the earlier statement that no visual identification
+was possible through the available tools. They do NOT register any of the eight
+diagnosed cap faces to a photo. Camera intrinsics/pose, exact water level and
+2019 correspondence remain unknown. The 3 m registration uncertainty is not
+reduced by viewing a picture. The newly visible angular rock surfaces also rule
+out treating angular appearance alone as evidence for smoothing/removal.
+
+Next use distinct rock corners and ledge relationships to test candidate camera
+registration against the preserved source, retaining occlusion and date/flow
+uncertainty. Do not derive metre-scale dimensions from kayak/person pixels or
+silently substitute the photo's waterline for submerged geometry. No new cook,
+geometry/collision edit, playable improvement or acceptance is claimed here.
