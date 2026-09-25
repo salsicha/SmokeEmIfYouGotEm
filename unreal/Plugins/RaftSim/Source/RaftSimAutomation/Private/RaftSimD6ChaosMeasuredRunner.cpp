@@ -597,8 +597,8 @@ UBoxComponent* SpawnRaftProxy(
     Box->SetCollisionResponseToAllChannels(ECR_Block);
     Box->SetGenerateOverlapEvents(false);
     Box->SetNotifyRigidBodyCollision(true);
-    Box->SetLinearDamping(0.05);
-    Box->SetAngularDamping(0.05);
+    Box->SetLinearDamping(0.05f);
+    Box->SetAngularDamping(0.05f);
     Box->SetEnableGravity(Config.bEnableGravity);
     Box->BodyInstance.bUseCCD = true;
     Box->RegisterComponent();

@@ -134,3 +134,46 @@ shared-foam suite is now3 passed/3 failed; the remaining source smoothing,
 wet-mask and frozen-review hash failures are unchanged. No production water
 behavior or historical digest was changed. These are regression-maintenance
 results, not visible playable improvements or release acceptance.
+
+### September25 continuation: extracted smoothing and clipped wet-mask guards
+
+The two remaining inline-source expectations now follow their production owners:
+the shared smoothing kernel's fourth-pass hydraulic snapshot and the clipped
+Cartesian shoreline's wet/depth/coverage submission. The extracted foam evolution
+kernel retains the source-versus-advected attack condition. Guards check caller
+bindings as well as kernel logic; no runtime behavior or historical hash changes.
+
+The native `RaftSim.M4.NativeMeanSmoothingElision` test passes1/1, engine exit0,
+in `tmp/smoothing-guard-followup-20260925/index.json`. It compares optical and
+hydraulic arrays against the frozen original loop across wet holes, strides and
+strengths. The existing clipped-proxy evidence above supplies separate shoreline
+coverage; it was not rerun or counted as new visual evidence in this pass.
+
+The affected Python suite now passes5/6, with only the historical material digest
+failure remaining (`tmp/shared-foam-guards-followup-20260925.xml`). The historical
+review and superseding digests are untouched. This closes obsolete source-location
+expectations, not the historical provenance gate, rendered motion, performance or
+South Fork reconstruction. No playable assets were changed.
+
+### September25 continuation: retained D6 telemetry bytes
+
+The seven compliant replay telemetry files had CRLF-only drift. Converting each
+to LF reproduced its existing immutable sidecar SHA256 exactly before restoring
+the bytes; all seven restored files have now been independently checked against
+`physics/reports/d6/compliant/flexible_raft_d6_compliant_measured_results.json`.
+That sidecar is unchanged. No telemetry values, expected hashes or promotion
+gates were edited, and no evidence was regenerated. The origin of the line-ending
+conversion has not been established; JSON files already have LFS `-text` policy.
+
+The existing full D6 regression receipt records37 passed,0 failed in
+`tmp/d6-restored-telemetry-lf-20260925.xml`, following the earlier36 passed/1 failed
+hash check in `tmp/d6-explicit-float-20260925.xml`. The runner's two damping
+literals now use explicit `0.05f`, preserving their float values while removing
+the two conversion warnings in the affected incremental Editor build (25.50s).
+This does not establish a clean full-release build or D6 gameplay acceptance.
+
+Follow-up inspection found no running Unreal cook/build, verified all seven raw
+hashes and passed `git diff --check`. Existing captures and pending user work
+remain intact. No packaged game, playable river geometry, water field, branch,
+remote or acceptance status changed; South Fork remains the first unfinished
+river, including visible cap shape and whole-frame performance failures.

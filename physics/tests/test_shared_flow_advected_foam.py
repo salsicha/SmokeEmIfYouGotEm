@@ -134,7 +134,16 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert "PresentationWaveClockSeconds = 0.0f" in runtime
     assert "bSingleLiveWaterSurfaceEnabled ? 16 : 1" in runtime
     assert "HydraulicSourceSurfaceHeightMeters" in runtime
-    assert "PassIndex == 3" in runtime
+    # The fourth-pass hydraulic snapshot moved into the shared kernel. Native
+    # NativeMeanSmoothingElision compares it against the frozen original loop.
+    smoothing = (RUNTIME_SOURCE.parent.parent / "Public/RaftSimWaterSmoothing.h").read_text()
+    compact_runtime = "".join(runtime.split())
+    compact_smoothing = "".join(smoothing.split())
+    assert "HydraulicPassCount=bSingleLiveWaterSurfaceEnabled?4:1;" in compact_runtime
+    assert "RaftSimWaterSmoothing::Apply(PresentationSurfaceHeightMeters,WetVertexMask,GridStationN,GridLateralN,Stride,ResolvedPresentationSurfaceSmoothingStrength,OpticalPassCount,HydraulicPassCount,HydraulicSourceSurfaceHeightMeters);" in compact_runtime
+    assert "Passes=FMath::Max(OpticalPasses,HydraulicPasses);" in compact_smoothing
+    assert "if(Pass+1==HydraulicPasses)Hydraulic=Surface;" in compact_smoothing
+    assert "if(!Wet[I]||!Wet[U]||!Wet[D]||!Wet[R]||!Wet[L])continue;" in compact_smoothing
     assert "bSingleLiveWaterSurfaceEnabled ||" in runtime
     assert "bSingleLiveWaterSurfaceEnabled\n            ? 1.0f" in runtime
     assert "ResolvedPresentationStandingWaveScale = bLiveSurfaceCarrierEnabled" in runtime
@@ -143,7 +152,9 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert "ComputeCoupledRapidGradeWaveMeters" in runtime
     assert "ComputeCoupledHydraulicFeatureEnergy" in runtime
     assert "FoamAttackBlend" in runtime
-    assert "SourceFoam[Index] > Advected" in runtime
+    evolution = (RUNTIME_SOURCE.parent.parent / "Public/RaftSimFoamEvolution.h").read_text()
+    assert "Source>Advected" in evolution
+    assert "FMath::Lerp(Advected,Source,FMath::Clamp(AttackBlend,0.f,1.f)) : Advected" in evolution
     assert "RaftSimUnifiedCurrentWaterSurface" in material
     assert "RaftSimUnifiedCurrentFoamFroth" in material
     assert "RaftSimUnifiedCurrentLiveFroth" in material
@@ -205,7 +216,11 @@ def test_single_water_surface_continues_past_crop_without_changing_hydraulics() 
     assert "SamplePresentationBaselineFieldAtRiverCoordinates" in runtime
     assert "bUseCopiedBoundaryOpticalApron = false" in runtime
     assert "rectangular bank patch" in runtime
-    assert "VolumeCoreWetMask[I0] != 0" in runtime
+    # Production Cartesian water clips at the bank instead of selecting whole
+    # quads by I0. Retain the hydraulic wet/depth/coverage gates at submission.
+    compact = "".join(runtime.split())
+    assert "CartesianShoreWet[I]=CartesianShoreAvailable[I]&&ConnectedWetMask[I]&&!VisualFilmCullMask[I]&&VolumeCoreWetMask[I]&&WaterSamples[I].DepthMeters>1.e-4f&&RefreshCoverage(I%GridStationN)>=kLiveVolumeCoreMinimumStationCoverage;" in compact
+    assert "SetClippedWaterMesh(GridStationN,GridLateralN,MoveTemp(Source),CartesianShoreWet,CartesianShoreAvailable,CartesianShoreDepthM,CartesianShoreBedM," in compact
     assert "FlowVelocityMetersPerSecond," in runtime
     assert "VolumeCoreEmptyUVs" in runtime
 
