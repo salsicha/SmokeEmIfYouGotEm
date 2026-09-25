@@ -49,3 +49,33 @@ survey comparison. If returns exist, first establish stable-ground horizontal
 and vertical agreement and inspect coherent rock/vegetation structure before
 proposing any shared render/collision/bed revision. Do not select whichever
 epoch happens to make smoother rocks. South Fork remains first unfinished.
+
+## Completed transfer and first actual comparison
+
+The original transfer exited0, with exactly105,423,716 bytes. SHA256:
+`2261adeac1a3ea49cdeaaa038cbb8bba40b2c1ada7f15b0e42e98192957fd96e`.
+The audit then decoded all21,084,597 declared points and exited0. All18 queried
+2019 anchors have2021 returns within0.3m in the nominal transformed frame.
+This verifies actual point coverage, not just catalog bounds.
+
+Durable report: [anchor comparison](independent-lidar-followup/anchor-comparison.json).
+All queries retain the2m operation-accuracy caveat, the original source/witness
+hashes, and the separate geoid realizations. No same-point identity is inferred.
+
+Examples of new-minus-old height ranges within the0.3m query:
+
+| Original point | Returns | Classes | Height range m |
+| --- | ---: | --- | --- |
+|685449|5|1 only|−0.095827 to−0.035827|
+|685469|6|five1, one2|−1.937892 to+0.202108|
+|686411|3|1 only|−1.779830 to−1.739830|
+|686536|13|1 only|−0.367940 to+1.892060|
+|689127|6|1 only|−0.089721 to−0.009721|
+
+Class1 remains unclassified; class2 is source-classified ground, not certified
+rock. Several neighbourhoods retain multiple vertical layers. This is useful
+independent evidence, but neither a uniform vertical offset nor a permission
+to replace every high return by a lower one. The next concrete check is
+stable-ground cross-survey registration away from water/vegetation, followed
+by coherent local cross-sections at the divergent anchors (especially686411).
+No terrain/collision/bed edits, cook, rebuilt game or new scene acceptance.
