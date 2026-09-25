@@ -188,3 +188,29 @@ This is not a controlled performance comparison or optimization claim. No
 terrain, boulders, collision, cooked fields or water presentation changed.
 Physical input dispatch, repeated real respawn/travel, source-asset regeneration
 and final release packaging remain unverified; river acceptance stays open.
+
+## Engine key-event evaluation — September 25
+
+The fixture now feeds FInputKeyEventArgs press/release events through the actual
+UEnhancedPlayerInput::InputKey and ProcessInputStack, then checks the action's
+evaluated value. J produces+1, S produces-1 and releases produce0. After a live
+context rebind to K, J produces0, K produces+1 and S remains-1. The prior mapping
+membership assertion is relabelled accurately; it no longer says dispatched.
+
+Installed UE5.8 MapKey/UnmapKey already request subsystem rebuilds. No missing
+rebuild bug was found and no production code was changed. The isolated fixture
+flushes deferred rebuild explicitly with bForceImmediately because its world
+does not tick. It therefore does NOT test normal-frame rebuild scheduling.
+Only one pawn context is active during key evaluation; two-context teardown
+coverage continues afterward. Source-template and other-pawn isolation checks
+remain in place.
+
+Editor build succeeds in19.24s. Native PawnContextIsolation completes with
+1success,0warnings,0failures; engine exit0. Durable
+[native receipt](input-key-evaluation-native.json); execution log is
+`tmp/input-key-evaluation-native-20260925.log`. No cook or game build was run.
+
+This closes key-to-action-value evaluation, not physical OS/Slate delivery,
+EnhancedInputComponent callback execution, actual paddle forces, real repeated
+respawn/travel or visual/performance acceptance. No normal executable/assets
+were replaced. Those broader checks remain open.

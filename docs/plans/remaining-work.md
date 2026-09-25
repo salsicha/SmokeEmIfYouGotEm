@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC input regression now evaluates real Enhanced Input press/release
+events: rebound J/K positive stroke, retained S negative, release zero and old J
+inactive after rebind all pass. Editor build19.24s; native1success/0warnings/
+0failures, engine exit0. This closes engine key-value evaluation only, not
+OS/Slate delivery, pawn paddle callbacks or real respawn/travel. No gameplay
+code or staged binary change. See runtime-input-context-isolation follow-through.
+
 September25UTC the three passing local-cavity hypotheses change ZERO of the
 eight diagnosed retained-view rays (all24comparisons unchanged). Set these
 aside as repairs for this view; do not export/cook them merely because topology

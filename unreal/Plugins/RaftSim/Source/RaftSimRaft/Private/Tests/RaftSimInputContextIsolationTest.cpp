@@ -8,6 +8,7 @@
 #include "EnhancedPlayerInput.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
+#include "InputKeyEventArgs.h"
 #include "RaftSimGuidePawn.h"
 #include "UObject/UnrealType.h"
 
@@ -75,7 +76,7 @@ bool FRaftSimInputContextIsolationTest::RunTest(const FString&)
         TestEqual(TEXT("one replacement mapping appended"),After.Num(),Retained.Num()+1);
         for(int32 I=0;I<Retained.Num() && I<After.Num();++I)
             TestTrue(TEXT("surviving mapping record and priority exact"),After[I]==Retained[I]);
-        TestTrue(TEXT("new positive key dispatched by mapping"),Pawns[0]->HasPaddleStrokeKeyBinding(NextKey,false));
+        TestTrue(TEXT("new positive key present in mapping"),Pawns[0]->HasPaddleStrokeKeyBinding(NextKey,false));
         TestTrue(TEXT("negative key retained after repeated rebind"),Pawns[0]->HasPaddleStrokeKeyBinding(EKeys::S,true));
     }
     TestTrue(TEXT("other pawn unchanged after repeated rebinds"),Contexts[1]->GetMappings()==SecondBefore);
@@ -121,6 +122,39 @@ bool FRaftSimInputContextIsolationTest::RunTest(const FString&)
     Controller->Player=LocalPlayer;
     Controller->PlayerInput=NewObject<UEnhancedPlayerInput>(Controller);
     auto* Subsystem=NewObject<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+    // Exercise engine key evaluation, not just context-array membership. This
+    // does not simulate OS/Slate delivery or the pawn's physical paddle callback.
+    FModifyContextOptions DispatchOptions;
+    DispatchOptions.bForceImmediately=true;
+    DispatchOptions.bIgnoreAllPressedKeysUntilRelease=false;
+    Subsystem->AddMappingContext(Contexts[0],0,DispatchOptions);
+    Pawns[0]->RegisteredInputSubsystem=Subsystem;
+    auto* Input=CastChecked<UEnhancedPlayerInput>(Controller->PlayerInput);
+    const UInputAction* Stroke=nullptr;
+    for(const auto& Mapping:Contexts[0]->GetMappings())
+        if(Mapping.Action && Mapping.Key==EKeys::J && Mapping.Action->GetName().Contains(TEXT("PaddleStroke")))Stroke=Mapping.Action;
+    if(!TestNotNull(TEXT("stroke action for actual key evaluation"),Stroke))return false;
+    auto Evaluate=[&](const FKey& Key,EInputEvent Event)
+    {
+        Input->InputKey(FInputKeyEventArgs(nullptr,FInputDeviceId::CreateFromInternalId(0),Key,Event,
+            Event==IE_Released?0.f:1.f,false,FPlatformTime::Cycles64()));
+        Input->ProcessInputStack(TArray<UInputComponent*>(),1.f/60.f,false);
+        return Input->GetActionValue(Stroke).Get<float>();
+    };
+    TestEqual(TEXT("rebound J evaluates positive stroke"),Evaluate(EKeys::J,IE_Pressed),1.f);
+    TestEqual(TEXT("released J evaluates zero"),Evaluate(EKeys::J,IE_Released),0.f);
+    TestEqual(TEXT("retained S evaluates negative stroke"),Evaluate(EKeys::S,IE_Pressed),-1.f);
+    TestEqual(TEXT("released S evaluates zero"),Evaluate(EKeys::S,IE_Released),0.f);
+    TestTrue(TEXT("registered rebind to K succeeds"),Pawns[0]->ApplyRuntimeKeyBinding(TEXT("PaddleStroke"),EKeys::K));
+    // Flush deferred compilation explicitly in this non-ticking fixture.
+    Subsystem->RequestRebuildControlMappings(DispatchOptions);
+    TestEqual(TEXT("old J no longer evaluates stroke"),Evaluate(EKeys::J,IE_Pressed),0.f);
+    Evaluate(EKeys::J,IE_Released);
+    TestEqual(TEXT("new K evaluates positive stroke"),Evaluate(EKeys::K,IE_Pressed),1.f);
+    TestEqual(TEXT("released K evaluates zero"),Evaluate(EKeys::K,IE_Released),0.f);
+    TestEqual(TEXT("S remains negative after registered rebind"),Evaluate(EKeys::S,IE_Pressed),-1.f);
+    Evaluate(EKeys::S,IE_Released);
+    Subsystem->RemoveMappingContext(Contexts[0],DispatchOptions);
     for(int32 I=0;I<2;++I)
     {
         Subsystem->AddMappingContext(Contexts[I],0);
