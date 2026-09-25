@@ -4,9 +4,25 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from audit_troublemaker_independent_lidar import summarize_neighbours
+from audit_troublemaker_survey_alignment import fit_offset
+import numpy as np
 
 
 class IndependentSurveyTests(unittest.TestCase):
+    def test_known_offset_recovery(self):
+        gradients = np.array([(x,y) for x in [-.4,0,.4] for y in [-.3,-.1,.1,.3]])
+        offset = np.array([.2,-.15,.08])
+        residuals = gradients @ offset[:2] + offset[2]
+        actual, condition = fit_offset(gradients,residuals)
+        np.testing.assert_allclose(actual,offset,atol=1e-14)
+        self.assertTrue(np.isfinite(condition))
+
+    def test_flat_ground_cannot_register_xy(self):
+        with self.assertRaises(ValueError):
+            fit_offset(np.zeros((12,2)), np.zeros(12))
+        with self.assertRaises(ValueError):
+            fit_offset(np.zeros((2,2)), np.zeros(2))
+
     def test_empty_is_missing_not_zero_height(self):
         actual = summarize_neighbours([], 100, .3)
         self.assertEqual(actual['count'], 0)

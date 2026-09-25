@@ -79,3 +79,40 @@ to replace every high return by a lower one. The next concrete check is
 stable-ground cross-survey registration away from water/vegetation, followed
 by coherent local cross-sections at the divergent anchors (especially686411).
 No terrain/collision/bed edits, cook, rebuilt game or new scene acceptance.
+
+## Independent ground-consistency screen
+
+`audit_troublemaker_survey_alignment.py` hash-checks both sources, excludes
+withheld2021 returns, and selects class2 points outside the2019 water mask,
+more than5m from its water returns. One2019 sample per4m spatial bin supplies
+a1.5m local plane with at least12points, RMS<=.08m and slope<=1. The nearest
+2021 ground point must be within.3m and outside the same water buffer. No
+cross-epoch residual trimming is performed. These are candidate stable-ground
+controls, not independently surveyed monuments or proven unchanged terrain.
+
+The completed screen retains3,631controls from578,641old and455,114new ground
+points. Linear apparent-offset fit (east,north,vertical) is
+(-.006375,+.025416,-.079357)m; design condition5.83218. Before correction,
+residual5th/median/95th percentiles are(-.167785,-.078843,+.010063)m.
+After the diagnostic fit they are(-.089944,-.000726,+.087352)m; extremes still
+reach−.976275 and+1.003940m. No fitted transformation is applied to sources.
+
+Four spatial holdouts split controls at the median east/north coordinates;
+each fit excludes the entire held-out quadrant. Held-out median residuals are
+(.018873,−.009022,.002197,−.014888)m; fifth-to-95th intervals are respectively
+[-.055503,.128664],[-.107106,.076684],[-.082970,.085430],[-.099745,.068343]m.
+The four fitted vertical offsets range−.090617 to−.074392m. Outliers remain
+as large as−.990000 and+1.022918m and are not discarded as invalid source data.
+Six numerical tests pass, including exact synthetic offset recovery and
+rejection of flat ground that cannot constrain horizontal offsets.
+
+This makes a uniform metre-scale datum/translation explanation for anchor
+686411's1.74–1.78m local discrepancy implausible within this screened area.
+It does not establish exact rock correspondence or reduce the declared absolute
+datum accuracy. Next inspect both local point structures and vertical layers
+at686411, retaining lower and upper observations instead of fitting all anchors
+to this ground offset. No rock removal/smoothing is yet justified.
+
+[Complete ground controls and residuals](independent-lidar-followup/ground-consistency.json)
+retain every selected control for independent spatial holdout reproduction.
+All analysis processes are terminal; no gameplay or cooked fields changed.
