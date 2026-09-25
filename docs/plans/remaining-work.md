@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC broader wall candidate:19edge-connected source-exact triangles
+add1.192843m2, preserve the old roof and pass closed topology/eight regressions.
+One diagnosed ray changes from a90degree closure to57.66degree captured-point
+roof; three remain vertical. Partial geometry evidence only, not installed.
+Next constrained boundary connectivity plus shared/native validation; see
+independent-lidar-followup broader captured exterior connectivity section.
+
 September25UTC bounded wall candidate constructed with exact captured additions
 and unchanged old roof; five geometric regressions pass. NOT a repair acceptance:
 one diagnosed ray still sees83.81degree roof, another a new90degree closing wall.

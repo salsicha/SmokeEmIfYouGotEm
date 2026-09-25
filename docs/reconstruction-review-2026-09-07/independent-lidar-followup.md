@@ -272,6 +272,34 @@ length alone. Preserve the same1m edge bound and original roof; reject candidate
 whose diagnosed silhouette still terminates on an exposed artificial wall. The
 other two walls and the roof's semantic classification remain unresolved.
 
+### Broader captured exterior connectivity — September 25
+
+`build_broad_wall_extension.py` uses all16unique non-withheld exterior class2
+observations in the diagnosed neighborhoods, re-reading their exact LAZ records
+and CRS before construction. Of21non-overlapping exterior Delaunay triangles
+within the unchanged1mXY edge bound,19connect to the original roof by shared
+edges; point-only/disconnected components are rejected. Thirteen added source
+observations remain used. Added area1.192842612m2; all original roof triangle
+coordinates remain exact. One disconnected vertex fan is split into duplicated
+indices with identical XYZ/source ownership, using the existing checked splitter.
+The initial unsplit closure failed, not waived. Final closure has9,726two-face
+edges and1.36e-12m3volume identity error. Eight focused tests pass.
+
+Candidate is `tmp/troublemaker-broad-wall-extension-v1-20260925/`, cap SHA256
+03288230c9e86c54554123d5636c01a8888fb0564412cb2bd934aa67d7b6efa3.
+[Full construction and diagnosed-ray receipt](independent-lidar-followup/broad-wall-extension-construction.json).
+At pixel390,490 the source ray now hits a57.658288degree roof face between
+captured points instead of the vertical closing wall. The other three diagnosed
+wall rays still hit90degree closures. This is partial source-space improvement,
+not a full wall repair, a measured outline, native collision or visual acceptance.
+No runtime manifest, cook, export or playable scene changed. Source epoch/geoid
+and2mdeclared transform uncertainty remain; no fitted offset is applied.
+
+Next examine constrained boundary connectivity where the filtered triangulation
+still leaves exposed closures (especially6225, which had direct support), while
+retaining original roof geometry. A lower slope at one ray alone is not enough
+to justify normal-play promotion; shared geometry and engine views remain gates.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid
