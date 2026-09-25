@@ -121,3 +121,58 @@ registration against the preserved source, retaining occlusion and date/flow
 uncertainty. Do not derive metre-scale dimensions from kayak/person pixels or
 silently substitute the photo's waterline for submerged geometry. No new cook,
 geometry/collision edit, playable improvement or acceptance is claimed here.
+
+## Low-water reference lead screened — September 25 follow-up
+
+The [American Whitewater June 29, 2009 incident record](https://www.americanwhitewater.org/accident/jun-29-2009-american-s-fork-6-chili-bar/)
+links Kurt Hoge's low-water photographs through Flickr account
+`40311817@N05`. The indexed record explicitly locates that rock at the play wave
+**below Troublemaker itself**, not at a confirmed diagnosed cap-face landmark.
+The incident date and reported incident flows are not photograph acquisition
+metadata. Direct AW access returned HTTP403 and the Flickr page could not be
+retrieved in this check; no photograph, exact capture date, camera registration
+or reuse license was verified. Do not use this lead to lower or reclassify the
+unclassified 2019 cap returns. It remains a downstream reference lead only.
+
+The Garden Betty account and sequence were already visually reviewed above;
+rediscovering them is not new coverage. No duplicate source download, geometry
+edit, flow cook or playable acceptance resulted from this reference screen.
+
+## Additional high-resolution resort views inspected — September25
+
+The computer-use skill's browser-first fallback exposed three real gallery
+links that the text fetcher represented with a transparent placeholder. All
+three originals were visually inspected in the in-app browser, not downloaded:
+
+- [Bank-height view1,2000x1333](https://www.americanriverresort.com/wp-content/uploads/2021/01/troublemaker-1-of-3.jpg):
+  exposed angular ledges upstream, a building and tall conifer in the background,
+  and a sloping partly wetted rock beside the raft's drop. Raft/spray obscure
+  the central drop; this is not an unobstructed rock survey.
+- [Overhead view2,2000x1125](https://www.americanriverresort.com/wp-content/uploads/2021/01/troublemaker-2-of-3.jpg):
+  a central elongated fractured rock, a smaller adjacent rock separated by
+  water, broad fractured ledges toward image lower-right, and opposite-bank
+  ledges, vegetation and a small gravel/sand opening. Exposed outlines offer
+  candidate fixed landmarks; foam edges and the waterline do not.
+- [Bank-height view3,1936x1296](https://www.americanriverresort.com/wp-content/uploads/2021/01/troublemaker-3-of-3.jpg):
+  an upstream boulder garden and a rounded/sloping partly submerged foreground
+  rock, with substantial raft/spray occlusion and a building/conifer backdrop.
+
+The [hosting page](https://www.americanriverresort.com/adventures/whitewater-rafting-on-the-american-river/troublemaker)
+identifies Troublemaker and displays a copyright/rights-reserved footer. Its
+`2021/01` asset path is NOT verified acquisition metadata. Exact capture dates,
+discharges, camera poses/intrinsics and reuse rights remain unverified. No
+permission to package these images is inferred. The three photographs must not
+be presumed simultaneous or treated as calibrated stereo.
+
+Compared the overhead image visually with the retained registered
+`troublemaker-spectral-context/spectral-context.png`. The0.6m NAIP context and
+different water/occlusion conditions do not yet establish unique point matches
+for the diagnosed cap faces. No homography, metre-scale dimension or reduced
+registration error is claimed. Next identify at least four well-distributed
+exposed-rock correspondences and independent held-out landmarks; model relief
+and camera projection explicitly rather than fit a waterline to the cap.
+
+The [All-Outdoors aerial article](https://www.aorafting.com/blog/aerieal-videos-high-flows-on-the-south-fork/)
+labels its Troublemaker flyover26,000CFS on February7. It is a high-flow lead,
+not low-water face coverage; the video was not visually inspected this pass.
+No new geometry, collision, field cook, game asset or acceptance status changed.
