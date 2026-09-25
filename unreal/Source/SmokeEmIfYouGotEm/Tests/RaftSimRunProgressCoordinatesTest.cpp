@@ -222,6 +222,27 @@ bool FRaftSimReviewStartRangeTest::RunTest(const FString&)
         Run->GetProgressCoordinates(nullptr)->GetRiverStationRangeM(Minimum, Maximum))) return false;
     FRaftSimCareerScenarioDefinition Scenario;
     Scenario.ScenarioId = TEXT("range_test_original");
+    auto* Water = NewObject<URaftSimWaterRuntimeAdapter>(Run);
+    const auto* Progress = Run->GetProgressCoordinates(nullptr);
+    for (float Station : {Minimum, 8330.f, Maximum - .5f, Maximum})
+    {
+        FTransform Start;
+        if (!TestTrue(TEXT("actual start transform supports route boundaries"),
+            ARaftSimRunManager::BuildStationStartTransform(Progress, Water, Station, Start))) return false;
+        FVector Center, Neighbor;
+        const bool bLookBack = Station + 1.f > Maximum;
+        if (!Progress->RiverToWorldPosition(FVector2D(Station, 0.f), Progress->GetRiverVerticalDatumM(), Center) ||
+            !Progress->RiverToWorldPosition(FVector2D(Station + (bLookBack ? -1.f : 1.f), 0.f),
+                Progress->GetRiverVerticalDatumM(), Neighbor)) return false;
+        const FVector ExpectedDirection = (bLookBack ? Center - Neighbor : Neighbor - Center).GetSafeNormal2D();
+        TestTrue(TEXT("start retains downstream heading including final metre"),
+            FVector::DotProduct(Start.GetRotation().GetForwardVector(), ExpectedDirection) > .999999);
+        TestTrue(TEXT("start retains exact station XY"),
+            FVector::Dist2D(Start.GetLocation(), Center) < .001);
+    }
+    FTransform Rejected;
+    TestFalse(TEXT("outside-route start is not silently clamped"),
+        ARaftSimRunManager::BuildStationStartTransform(Progress, Water, Maximum + 1.f, Rejected));
     Scenario.StartStationM = 10.f;
     Scenario.FinishStationM = 20.f;
     for (float Station : {Minimum, 8330.f, Maximum, Minimum - 1.f, Maximum + 1.f, 48000.f})

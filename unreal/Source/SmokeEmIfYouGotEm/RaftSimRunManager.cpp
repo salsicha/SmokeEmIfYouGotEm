@@ -255,18 +255,35 @@ bool ARaftSimRunManager::SampleRiverStation(float& OutStationM, FVector* OutTang
 // start station instead of the map's put-in: the same window reseed and
 // raft move the checkpoint restore does, with a transform built from the
 // corridor (heading downstream, hull just above the local water surface).
-static bool BuildStationStartTransform(
+bool ARaftSimRunManager::BuildStationStartTransform(
     const URaftSimWaterRuntimeAdapter* Progress, URaftSimWaterRuntimeAdapter* Water,
     float StationM, FTransform& OutTransform)
 {
     FVector PointCm;
     FVector AheadCm;
+    if (!Progress || !Water || !FMath::IsFinite(StationM)) return false;
     const float DatumM = Progress->GetRiverVerticalDatumM();
-    if (!Progress->RiverToWorldPosition(FVector2D(StationM, 0.0f), DatumM, PointCm) ||
-        !Progress->RiverToWorldPosition(FVector2D(StationM + 1.0f, 0.0f), DatumM, AheadCm))
+    if (!Progress->RiverToWorldPosition(FVector2D(StationM, 0.0f), DatumM, PointCm))
     {
         return false;
     }
+    FVector Heading;
+    if (Progress->RiverToWorldPosition(FVector2D(StationM + 1.0f, 0.0f), DatumM, AheadCm))
+    {
+        Heading = AheadCm - PointCm;
+    }
+    else
+    {
+        // The final metre is a valid start too. Look back within the route
+        // and retain downstream orientation instead of querying past its end.
+        float MinimumM = 0.f, MaximumM = 0.f;
+        if (!Progress->GetRiverStationRangeM(MinimumM, MaximumM) ||
+            !Progress->RiverToWorldPosition(
+                FVector2D(FMath::Max(MinimumM, StationM - 1.f), 0.f), DatumM, AheadCm))
+            return false;
+        Heading = PointCm - AheadCm;
+    }
+    if (Heading.IsNearlyZero()) return false;
     FRaftSimWaterSample Sample;
     if (Water->SampleWaterAtWorldPosition(PointCm, Sample) && Sample.bWet)
     {
@@ -277,7 +294,7 @@ static bool BuildStationStartTransform(
         PointCm.Z += 100.0f;
     }
     OutTransform = FTransform(
-        FRotator(0.0f, (AheadCm - PointCm).Rotation().Yaw, 0.0f), PointCm);
+        FRotator(0.0f, Heading.Rotation().Yaw, 0.0f), PointCm);
     return true;
 }
 

@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC: fixed valid route starts failing in the final metre when their
+heading query exceeded the route. Production transform now uses an in-range
+backward chord, still pointing downstream. Editor build and three native route
+regressions pass, including real transform position/heading at boundaries.
+No packaged/rendered acceptance claimed; see
+[route-end regression](../reconstruction-review-2026-09-07/route-end-start-regression.md).
+
 September25UTC: unused-contact-shape elision rejected after exact128native
 pairs and3passing tests but mixed normal-launch ABBA whole-frame results.
 All four p95 values fail33.333333ms; candidate code/switch/test removed.

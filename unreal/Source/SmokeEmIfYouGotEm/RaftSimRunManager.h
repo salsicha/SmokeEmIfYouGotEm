@@ -100,6 +100,9 @@ public:
     FString ProgressCoordinateMapPath;
 
     bool ConfigureProgressCoordinateMap(const FString& Path);
+    static bool BuildStationStartTransform(
+        const URaftSimWaterRuntimeAdapter* Progress, URaftSimWaterRuntimeAdapter* Water,
+        float StationM, FTransform& OutTransform);
     static bool SeedCartesianCheckpointWater(const ARaftSimRiverWaterConfig* Config,
         URaftSimWaterRuntimeAdapter* Water, FTransform& Checkpoint);
     const URaftSimWaterRuntimeAdapter* GetProgressCoordinates(
