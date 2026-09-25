@@ -3,6 +3,13 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC bounded wall candidate constructed with exact captured additions
+and unchanged old roof; five geometric regressions pass. NOT a repair acceptance:
+one diagnosed ray still sees83.81degree roof, another a new90degree closing wall.
+No cook/promotion. The shortest-connector rule relocates the defect; next use
+broader source-supported boundary connectivity without relaxing1m edges. See
+independent-lidar-followup two-triangle extension section.
+
 September25UTC wall-support advance: independent2021ground-classified returns
 provide two direct non-overlapping <=1m extension options at diagnosed wall6225
 and five at6222. Other two walls lack a passing direct connection. Full cloud

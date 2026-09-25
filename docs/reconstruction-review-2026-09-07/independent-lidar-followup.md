@@ -243,6 +243,35 @@ The first scanner attempt failed on LAS bit-field scalar conversion before
 writing output; NumPy conversion corrected it. Both completed scans exited0;
 no geometry, fields, engine scene or playable executable changed in this pass.
 
+### Two-triangle extension constructed, not promoted — September 25
+
+`build_diagnosed_wall_extension.py` constructs a bounded candidate in
+`tmp/troublemaker-wall-extension-v1-20260925/`. It selects the eligible class2
+point minimizing maximum new XY edge (index tie-break), explicitly not the
+lowest height. Selected LAZ indices6055843 and6053500 preserve raw transformed
+coordinates and retain dataset1 ownership. They extend faces6225/6222 respectively.
+No old roof coordinates or triangles move; added area is0.1371635404m2.
+All edges stay<=1m, old-roof and patch-patch overlap are rejected, and closed
+topology has9,654two-face edges with9.09e-13m3volume identity error. Five tests
+pass, including overlap, oversized edge and degenerate extension rejection.
+Candidate SHA256:949b577303ef8b8ef2f9c25a74e3e89c0143a3e625ca519174391964c9916086.
+[Construction receipt](independent-lidar-followup/wall-extension-construction.json).
+
+The diagnosed source rays reject treating this as the wall repair: pixel650,345
+now hits the new roof triangle2966, but its slope is still83.809682degrees.
+Pixel390,490 hits a NEW inferred vertical wall6282 at90degrees. The short
+extension largely relocates the closure instead of resolving its shape. These
+are source-space ray checks, not fresh native captures or visual acceptance.
+No export, cook, engine install or playable promotion was performed for this
+candidate. Its separate manifest schema intentionally cannot masquerade as an
+accepted runtime union. Do not spend a long cook on this unchanged patch.
+
+Next evaluate a broader source-supported boundary connection using the retained
+exterior observations and intermediate points, rather than optimizing connector
+length alone. Preserve the same1m edge bound and original roof; reject candidates
+whose diagnosed silhouette still terminates on an exposed artificial wall. The
+other two walls and the roof's semantic classification remain unresolved.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid
