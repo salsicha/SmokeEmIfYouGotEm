@@ -59,3 +59,35 @@ XYZ rebased through the retained anchor UTM/NAVD88 coordinate to
 from cap triangles incident to409, and every original/new point is tested with
 Shapely intersects_xy against that union. No coordinate or class filtering was
 silently added to the retained local2021sections.
+
+## Expanded local candidate: construction rejected
+
+The union incident to source686411and686654 contains11triangles and
+1.7172012538762729m2. Its nine boundary sources are685888,685889,686118,
+686120,686122,686564,686573,686574,686578. All boundary edges remain below1m;
+the old patch maximum edge is.963041568m, entire parent cap.998534253m.
+The new footprint includes29independent returns spanning7.88–9.75m above220m,
+including upper observations; it is not a uniformly ground-classified patch.
+
+`build_troublemaker_local_support_candidate.py` attempts an explicitly
+interpreted local revision, retaining the exact boundary and every outside
+triangle. It excludes the two high anchors from the candidate only (raw data
+untouched), using original lower interior returns685883,686116,686117,686330,
+686331,686332,686333. Their source XYZ remains unchanged. A first three-point
+selection and this seven-point selection both FAIL the unchanged1m edge gate.
+The final failed triangulation contains new edges1.053634,1.083191,1.095877m.
+These are not inherited long boundaries. The error prints all offending faces.
+
+No candidate directory/archive was written: the failure occurs before output
+creation, closure, parent sampling or installation. Later checks in the builder
+have therefore NOT passed. Do not mistake the presence of a builder for valid
+geometry, or rerun it unchanged expecting success. No cook or engine launch.
+
+This local2019-only lower selection leaves an unsupported sampling gap near
+the southern interior. Actual2021 lower returns exist there, but incorporating
+them requires explicit source-epoch/index metadata and consistent horizontal/
+vertical treatment; do not relabel them2019points or insert synthetic midpoints.
+The next candidate should resolve that mixed-source contract, preserving the
+unchanged1m gate, rather than removing more unrelated boundary rock or relaxing
+the limit. The current source-exact playable cap remains installed, with its
+documented semantic uncertainty and visual shortcomings unresolved.
