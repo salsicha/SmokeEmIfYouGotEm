@@ -16,6 +16,8 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--manifest',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--verified-union',type=Path,
+        help='Completed hash-bound shared-union geometry required for mixed-survey caps')
     parser.add_argument('--crease-angle-degrees',type=float,
         help='Opt-in authored shading; retains every source vertex and face')
     args=parser.parse_args(sys.argv[sys.argv.index('--')+1:])
@@ -23,7 +25,14 @@ def main():
     cap=ROOT/source['cap_path'];out=args.output.resolve()
     if not out.is_relative_to(ROOT/'tmp') or out.exists():raise ValueError('Fresh project tmp export required')
     if hashlib.sha256(cap.read_bytes()).hexdigest()!=source['cap_sha256']:raise ValueError('Cap source changed')
-    if not source['closed_solid_geometry_verified'] or source['production_promoted']:raise ValueError('Unpromoted closed candidate required')
+    authority=None
+    if source.get('schema')=='raftsim.mixed_survey_rock_cap.v1':
+        if args.verified_union is None:raise ValueError('Mixed cap requires verified shared union')
+        from rock_cap_export_authority import verify_export_authority
+        authority=verify_export_authority(args.manifest,args.verified_union,ROOT)
+    elif not source.get('closed_solid_geometry_verified'):
+        raise ValueError('Verified closed candidate required')
+    if source['production_promoted']:raise ValueError('Unpromoted candidate required')
     with np.load(cap,allow_pickle=False) as data:
         original=data['solid_vertices_m'];faces=data['solid_triangles'];kinds=data['solid_face_kind']
         # Match the retained terrain FBX convention. Unreal import yields
@@ -64,6 +73,9 @@ def main():
         expected_unreal_bounds_cm=[(original.min(axis=0)*100).tolist(),(original.max(axis=0)*100).tolist()],
         actor_scale=[1,-1,1],all_original_roof_vertices_retained=True,decimated=False,production_promoted=False)
     if shading is not None:report['shading']=shading
+    if authority is not None:
+        report['mixed_source_authority']=authority
+        report['source_geometry_is_mixed_survey']=True
     (out/'manifest.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report),flush=True)
 

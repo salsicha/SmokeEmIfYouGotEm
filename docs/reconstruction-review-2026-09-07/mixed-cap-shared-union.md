@@ -74,3 +74,26 @@ Collision targets at `tmp/troublemaker-mixed-normal-collision-probes-20260925.js
 were reconstructed from the same geometry: 30,066 baseline and 34,887 combined
 targets. These are targets, not native collision passes. No solver, engine import,
 normal-scene mutation or new acceptance occurred in this step.
+
+## Export and fresh pilot follow-through
+
+The full fresh-input audit passed all 841 cores / 5,382,400 cells; receipt:
+`tmp/troublemaker-mixed-normal-fresh-input-audit-20260925.json`. Initial volume
+is 3022042.2917456147 m3, inflow 45.30695454719999 m3/s, no evolved-state transfer.
+
+Mixed-source Blender export now requires a hash-matching completed shared-union
+geometry and audit rather than the legacy manifest's closed-solid boolean. A
+changed-provenance rejection regression passes. Actual Blender 5.2 export:
+`tmp/troublemaker-mixed-normal-rock-export-20260925/manifest.json`, 3214 vertices,
+6428 triangles, no decimation. FBX SHA256:
+`f9ddf163fb5b91f4350f42f309be360da8ef6106e846cdbe6727cf387739304a`.
+No native import/collision or visual acceptance yet.
+
+One bounded native fresh pilot was started for 1000 steps / 50 simulated seconds,
+four workers, snapshots every 1000 steps, output:
+`tmp/troublemaker-mixed-normal-fresh-50s-20260925`.
+At this entry it is LIVE, exec session 92780, PID 33552, started September25
+00:56:10 local. Last sampled progress: step90 / 4.5s, conservation residual
+2.5170265871565789e-10 m3. Do not restart based on this note: poll the session
+or inspect the process/output for current authoritative status first. No settling,
+normal-scene installation or performance acceptance is implied.
