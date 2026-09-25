@@ -125,3 +125,26 @@ No saved scene or asset changed. Full-editor log:
 The same pilot remains live (session92780/PID33552); latest inspected on this pass
 was step350/17.5s. No second cook was started. Native import sessions70778 and
 68291 failed in commandlet mode; full-editor session43035 is terminal.
+
+## Effective collision orientation verified
+
+Full-editor session60267 completed exit0 with a passing report at
+`tmp/troublemaker-mixed-orientation-20260925.json`, copied to
+`independent-lidar-followup/mixed-cap-native-orientation.json`.
+All6428source-face centroids were traced from their independently computed
+outward side in the actual actor frame (scale1,-1,1), checking position, impact
+normal and actor ownership. No face was omitted:2966roof,2966internal-bottom,
+496inferred-wall queries. Maximum position errors were0.000283,0.000169 and
+0.000246cm respectively; minimum normal dot was0.9999999993. No failures.
+
+Local UE5.8 StaticMesh.cpp explicitly sets collision-provider bFlipNormals=true.
+Together with exact reversed directed-triangle identity and the actual traces,
+this resolves the isolated orientation discrepancy without moving vertices or
+loosening tolerances. Preserve the earlier failed source-order assumption report.
+This is NOT full-map collision, raft traversal, rendered appearance or hydraulic
+acceptance. No asset or level was saved. Next use the installed normal-scene
+ground and replace its cap transiently for full-map union checks, then paired
+runtime validation once the fresh pilot finishes.
+
+The pilot remains the original session92780/PID33552; latest inspected step520,
+26simulated seconds. Poll it rather than starting another cook.
