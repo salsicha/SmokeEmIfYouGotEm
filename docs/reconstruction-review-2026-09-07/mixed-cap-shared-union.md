@@ -97,3 +97,31 @@ At this entry it is LIVE, exec session 92780, PID 33552, started September25
 2.5170265871565789e-10 m3. Do not restart based on this note: poll the session
 or inspect the process/output for current authoritative status first. No settling,
 normal-scene installation or performance acceptance is implied.
+
+## Native import follow-through
+
+48 combined provenance, union, export-authority and directed-hash tests pass.
+Transient Unreal import was attempted with no saves. Commandlet mode cannot
+provide StaticMeshEditorSubsystem; the preserved failure receipt is
+`tmp/troublemaker-mixed-native-import-20260925.failure.json`. Use full editor
+`-ExecutePythonScript`, not `-run=pythonscript`, for this importer.
+
+Full-editor process exited0, but the actual report explicitly FAILED:
+`tmp/troublemaker-mixed-native-import-20260925.json`. Exit code is not acceptance.
+It contains all6428triangles, CPU-accessible collision LOD0, and flip_normals=true.
+The directed provider hash is
+`3745f79c8609822b440fd085b0f718f051b1cf63d798e5156df64ba355ba6e69`;
+the initial source-order expectation was
+`2e0d15fd67af14df240476824917a89a5371aa254a358ba9e91d78d3d3008839`.
+Independent recomputation exactly matches the actual provider when every source
+triangle reverses winding; unreflected and Y-reflected alternatives do not match.
+Thus this is an exact winding convention difference, not lost triangles or moved
+float32 positions. The native hash implementation deliberately does not apply
+bFlipNormals. Do not merely replace the expected hash to claim full acceptance:
+verify effective collision orientation and actual full-map traces first.
+No saved scene or asset changed. Full-editor log:
+`tmp/troublemaker-mixed-native-editor-20260925.log`.
+
+The same pilot remains live (session92780/PID33552); latest inspected on this pass
+was step350/17.5s. No second cook was started. Native import sessions70778 and
+68291 failed in commandlet mode; full-editor session43035 is terminal.
