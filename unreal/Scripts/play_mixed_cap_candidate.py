@@ -70,6 +70,13 @@ assert not REPORT.exists()
 try:
     assert not any((ROOT/'unreal/Saved/Screenshots'/(LABEL+f'_{i:03d}.png')).exists() for i in range(3))
     config=json.loads((ROOT/'tmp/troublemaker-mixed-installed-visible-config-20260925.json').read_text())
+    export_override=os.environ.get('RAFTSIM_MIXED_PIE_EXPORT')
+    if export_override:
+        export_path=(ROOT/export_override).resolve()
+        assert export_path.is_relative_to(ROOT/'tmp')
+        config['export_directory']=export_path.relative_to(ROOT).as_posix()
+    state['export_directory']=config['export_directory']
+    state['export_manifest_sha256']=sha(ROOT/config['export_directory']/'manifest.json')
     config['report']='tmp/'+LABEL+'-preflight.json'
     context=verify_scene(config);protected=context['protected']
     expected=ROOT/'tmp/troublemaker-mixed-normal-runtime-expectations-20260925.json'

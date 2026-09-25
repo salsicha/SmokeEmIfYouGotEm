@@ -255,3 +255,28 @@ this is not photographic acceptance. No timing acceptance is inferred from
 capture wall time. This PIE session is not normal packaged startup or settled
 hydraulics, and does not prove full-reach shoreline stability or contact safety.
 Normal staged game remains unchanged; no cook/editor process remains live.
+
+## Existing crease shading carried into mixed-source candidate
+
+The new mixed-source FBX had used the flat exporter default, unlike the installed
+cap's previously reviewed45degree crease shading (see landward-rock-shading).
+Fresh export `tmp/troublemaker-mixed-crease45-export-20260925` carries that same
+authored choice without moving any source vertices or triangles. Export FBX SHA
+`e41c65571d84c5bd0216ac17b93ca607f54b83916f74d1c98a63ba90c712deee`.
+All6428native directed collision triangles retain the exact previously verified
+hash; native shading vertex splits increase the provider count to4749.
+Actual normal-map union collision passes34887queries and paired native water
+passes25600queries again, before play. No solver/bed/flow change or recook.
+
+Crux PIE session19653 is terminal exit0,51.78s wall, threecaptures complete,
+472protected packages unchanged. Reports/export retained under
+`independent-lidar-followup/mixed-cap-{pie-crease45,crease45-collision,crease45-export}.json`.
+Actual images: `unreal/Saved/Screenshots/mixed-cap-pie-crease45-20260925_00[0-2].png`.
+Compared final frame at the same camera with the flat candidate: triangle-level
+lighting is reduced, while jagged silhouette and inferred flanks remain plainly
+visible. Separately evolved water states preclude pixelwise water comparison.
+This prevents a candidate shading regression; it is NOT a new normal-game
+delivery, measured normals, photographic acceptance, settled flow or FPS proof.
+91shading/preview/staging regression tests pass. Further smoothing alone is not
+the next geometry solution; retain the source-supported cap and address the
+remaining shape evidence, hydraulic settling and measured whole-frame cost.
