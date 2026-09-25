@@ -373,9 +373,18 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
             bCheckpointRestorePending = false;
             return;
         }
-        UE_LOG(LogTemp, Display,
-            TEXT("RaftSim run: no checkpoint near station %.0f m; starting the section at its start station"),
-            StartStationM);
+        if (bReviewStart)
+        {
+            UE_LOG(LogTemp, Display,
+                TEXT("RaftSim review start: constructing requested station %.3f m; saved checkpoint deliberately bypassed"),
+                StartStationM);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Display,
+                TEXT("RaftSim run: no checkpoint near station %.0f m; starting the section at its start station"),
+                StartStationM);
+        }
     }
     // A resumed section is an intentional discontinuity. Seed a fresh live
     // window at its saved station before moving the authoritative raft body;
@@ -446,6 +455,21 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
     {
         bCheckpointRestorePending = false;
         return;
+    }
+    if (bReviewStart)
+    {
+        // Report the applied raft pose, not only the requested input. This
+        // remains diagnostic: failed streaming/wetness/restore paths above
+        // must never emit a successful review-start record.
+        LastProgressSample.bValid = false;
+        float AppliedStationM = 0.f;
+        FVector AppliedPositionCm = Raft->GetActorLocation();
+        const bool bSampled = SampleRiverStation(AppliedStationM, nullptr, &AppliedPositionCm);
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim review start applied: requested_station_m=%.3f sampled=%d applied_station_m=%.3f world_cm=(%.6f,%.6f,%.6f) destination_error_cm=%.9g"),
+            StartStationM, bSampled, AppliedStationM,
+            AppliedPositionCm.X, AppliedPositionCm.Y, AppliedPositionCm.Z,
+            FVector::Distance(AppliedPositionCm, Checkpoint.GetLocation()));
     }
     CurrentStationM = StartStationM;
     FurthestStationM = StartStationM;
