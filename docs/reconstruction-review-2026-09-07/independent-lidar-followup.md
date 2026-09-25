@@ -492,6 +492,22 @@ excluded class1points were non-rock, nor full source/visual acceptance. Next
 compare each hypothesis's shape and source evidence, keeping the two failed
 locations explicit. No export, cook, native validation or playable change yet.
 
+### Local cavity relevance to the diagnosed view — September 25
+
+All three passing cavity hypotheses were retraced against the eight retained
+diagnosed camera rays, holding the earlier source-audit ground fixed and using
+the constrained cap as baseline. All24hit comparisons are unchanged. Source,
+candidate, view and construction hashes are checked before comparison.
+[Ray comparison receipt](independent-lidar-followup/boundary-cavity-view.json).
+
+These local candidates do not repair any sampled defect in this view. Set them
+aside rather than export or cook them on the strength of topology alone. Eight
+rays cannot establish whole-image equality, native visibility or that the local
+interpretation has no value elsewhere. No new native/cooked/playable state is
+claimed. Return to the actual remaining diagnosed faces and their dated-image,
+classified-return and inferred-closure evidence. Do not repeat the unchanged
+boundary-hypothesis construction as progress toward this view's acceptance.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid

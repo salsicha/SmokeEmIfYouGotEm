@@ -3,6 +3,12 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC the three passing local-cavity hypotheses change ZERO of the
+eight diagnosed retained-view rays (all24comparisons unchanged). Set these
+aside as repairs for this view; do not export/cook them merely because topology
+passes. This does not prove whole-image equality. Remaining visible-face source
+interpretation and inferred-flank shape need targeted work; no playable change.
+
 September25UTC local-cavity construction corrects an important interpretation:
 all five lower witnesses already exist in the current extended roof. The original
 threshold excluded them initially, not from the current candidate. Three isolated
