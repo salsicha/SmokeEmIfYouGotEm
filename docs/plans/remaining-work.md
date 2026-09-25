@@ -1,5 +1,11 @@
 # Remaining requested work
 
+September25 additional Troublemaker source screening found a November2024 AW
+photo-report lead, but direct retrieval is403 and capture date/flow/licensing
+are unverified. A dated first-person rock-impact report supplies no geometric
+controls. No source acquisition, cook or playable change; preserve the rejected
+cap and follow [source screen](../reconstruction-review-2026-09-07/troublemaker-additional-source-screen-20260925.md).
+
 Latest September25 palm-support correction remains review-only. Worst body
 envelope deficit drops15.218cm->12.470cm, but the failing ring finger moves to
 frame342, near the seat handoff. Raw tube winding=1 and nearest surface11.079cm
