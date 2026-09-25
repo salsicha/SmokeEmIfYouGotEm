@@ -76,3 +76,15 @@ The verified code is now in the ordinary staged game, not only Editor. Actual
 wet placement at the river endpoint remains untested; its geometric transform
 is covered by the native test. No new water-realism, full traversal, shoreline,
 30 FPS or release acceptance is claimed. All these build/run processes ended.
+
+## Final-metre wet placement verified
+
+The previously missing placement check completed in the rebuilt staged game
+through Boot/menu startup, with an ephemeral profile and review station
+33333.646 m (float/log value 33333.645 m). Engine exit 0; 120 post-travel frames.
+`tmp/route-end-wet-placement-20260925.log` confirms sampled/applied station
+33333.645 m and destination error 3.64e-12 cm after successful restoration.
+At about ten seconds, raft telemetry remains wet with no dry support points,
+raft speed 0.535 m/s and water speed 0.532 m/s. This closes the final-metre
+streaming/wet-placement check left open above, not full outlet traversal,
+surveyed bathymetry, rendered shoreline review or sustained performance.
