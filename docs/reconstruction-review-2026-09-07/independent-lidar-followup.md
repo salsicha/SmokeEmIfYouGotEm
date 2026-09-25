@@ -177,6 +177,43 @@ and parent under identical settings; evaluate the revealed surface and remaining
 inferred walls against evidence. Do not treat the lower replacement slope as a
 repair gate or repeat another unchanged long cook to resolve this visual issue.
 
+### Native retained-camera comparison — September 25
+
+Actual unsaved FullReach PIE pair completed: candidate-v5 in52.82s and parent-v1
+in82.41s, both engine exit0 and all protected files unchanged. Native camera
+matrices are exactly equal between the pair; projecting the original diagnosed
+hit points differs from the retained September18 view by at most0.040328pixels
+(fixed-camera float position precision). Both captures are1280x720. This uses
+the installed normal ground, not the earlier source-ray audit's candidate ground.
+
+Actual complex-collision rays show seven exactly unchanged world hits and a
+781.142120cm displacement at pixel475,330. This independently confirms the
+source-space occlusion result. Inspected first-frame images show a reduced local
+foreground peak but retain conspicuous triangular spikes and vertical/block-like
+walls. No boulder reconstruction or photographic acceptance is claimed.
+
+Both runs use the same candidate50s water configuration to isolate geometry;
+the parent cap plus these fields is a diagnostic mismatch, NEVER a promoted
+playable bundle. The first frames occur at world12.854427s and43.141078s because
+the parent control unnecessarily waited for the intentionally absent candidate
+actor. Therefore water, vegetation motion and foam image differences are NOT
+a controlled temporal comparison. The harness wait now checks the selected cap;
+this final wait/log-volume correction has not yet been rerun. No water/performance
+improvement is claimed. Candidate flow remains unsettled and uninstalled.
+
+Earlier attempts are retained in tmp: v1 omitted the explicit scenario and failed
+the geometry-presence gate; v2/v3 hit unavailable Python runtime spawn APIs;
+v4 captured90-degree FOV, not the retained91.185065degree view. v5 instead uses
+the existing native capture camera and player-controller FOV override; captured
+FOV is91.185068degrees. Failed attempts are not accepted captures.
+
+Durable runtime receipts and view metadata are in `independent-lidar-followup/`
+with `retained-camera-` prefixes. Full images/video remain in Unreal Saved;
+candidate `mixed-retained-camera-candidate-v5-20260925_000.png` and parent
+`mixed-retained-camera-parent-v1-20260925_000.png` were inspected. Next work must
+address the remaining source classification/connectivity and inferred side-wall
+geometry, rather than treating this small patch or crease shading as completion.
+
 Earlier next step: compare the coherent lower support layer against the cap's selected roof
 connectivity over this footprint. Any candidate must identify excluded upper
 observations as interpreted non-ground, retain them as raw source, and avoid

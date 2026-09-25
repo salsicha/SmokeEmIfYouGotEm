@@ -3,6 +3,14 @@
 Last reviewed 2026-09-24 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+September25UTC native follow-through: identical-matrix actual PIE parent/candidate
+captures confirm seven diagnosed rock hits unchanged and the eighth7.8114m farther
+behind its removed foreground face. Images still show spikes and vertical walls;
+no promotion. Capture world times differ, so no paired water/motion conclusion.
+Both engine runs exit0 and protected files remain unchanged. See native retained-
+camera comparison in independent-lidar-followup; remaining wall/source geometry
+needs work rather than accepting this local patch as the complete reconstruction.
+
 September25UTC source-space follow-through: retracing the eight diagnosed rock
 rays against the mixed cap leaves seven hits exactly unchanged. The eighth
 passes the removed foreground face and hits another cap surface7.811412m farther
