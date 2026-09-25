@@ -342,3 +342,26 @@ Other crew, equipment, continuous collision and normal-play acceptance remain op
 After expanding the audit, the no-opt-in native regression
 `tmp/crew-boarding-body-default-20260925/index.json` passes1success/0failures/
 0not-run, engine exit0. No default-path promotion or packaged rebuild occurred.
+
+### Right-calf attribution
+
+`tmp/crew-boarding-body-influences-20260925/index.json` reproduces the same body
+envelope failure, engine exit255 (Unreal-1). The vertex's actual LOD0 render-section
+bone map and skin weights identify `calf_r=60138`, `foot_r=5397` (sum65535),
+approximately91.8% calf and8.2% foot. This is not a purely collapsed foot vertex.
+The audit now retains these influence names/weights for the worst body vertex.
+
+Code inspection: SetSegmentBone preserves reference scale while rotating its
+source shaft onto the desired control direction and placing its start. Calf
+and foot heads are positioned separately. Thus a shorter knee-to-foot control
+span does not itself shorten calf-dominant skin to that span. A source-length
+calf/ankle mismatch is the next repair hypothesis, not yet a verified causal fix.
+Measure the transformed source endpoint against the ankle control and review
+skin continuity before modifying leg transforms across ordinary seated poses.
+Do not inflate boot offsets or remove calf samples to pass the clearance test.
+
+The attribution test initially failed compilation for shadowing the existing
+Body configuration variable. Renaming the local to PosedBody fixed compilation;
+Editor build14.05s succeeded. Absolute-path patch writes temporarily failed;
+workspace-relative apply_patch succeeded with no ACL or data changes. No runtime
+animation, source assets or acceptance limits changed in this attribution step.

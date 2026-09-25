@@ -1,6 +1,12 @@
 # Remaining requested work
 
 Latest September25 expanded boarding audit FAILS: CPU-skinned body vertex9511
+is91.8% right-calf weighted and8.2% right-foot weighted. The source-length calf
+transform is the next repair hypothesis: SetSegmentBone rotates/translates but
+does not fit its shaft length to the shorter control span. Verify transformed
+endpoints and skin deformation before changing the rig; do not raise the boots
+or exclude this sample. Attribution receipt is in the reentry evidence.
+The vertex
 falls17.020cm below the conservative raft top envelope atframe300 while boots
 still pass. Inspect calf/ankle skin transforms and actual visibility/solid contact
 before selecting a repair. The audit includes boot-covered body vertices and is

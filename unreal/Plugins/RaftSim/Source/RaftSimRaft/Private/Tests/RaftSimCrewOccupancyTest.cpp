@@ -19,6 +19,11 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "StaticMeshResources.h"
+#include "Components/PoseableMeshComponent.h"
+#include "Engine/SkeletalMesh.h"
+#include "Rendering/SkeletalMeshRenderData.h"
+#include "Rendering/SkeletalMeshLODRenderData.h"
+#include "Rendering/SkinWeightVertexBuffer.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrewOccupancyTest,
@@ -470,6 +475,34 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         TestTrue(TEXT("pull stage is sampled"), bCapturedPull && PullSamples > 0);
         TestTrue(TEXT("transfer boot audit has supported vertex samples"), BootClearanceSamples > 0);
         TestTrue(TEXT("transfer body audit has supported vertex samples"), BodyClearanceSamples > 0);
+        if (WorstBodyVertex >= 0)
+        {
+            const auto* Visual = BoardingAvatar->GetProductionVisualActor();
+            auto* PosedBody = Visual ? Visual->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
+            auto* Mesh = PosedBody ? Cast<USkeletalMesh>(PosedBody->GetSkinnedAsset()) : nullptr;
+            const auto* Data = Mesh ? Mesh->GetResourceForRendering() : nullptr;
+            const auto* Weights = PosedBody ? PosedBody->GetSkinWeightBuffer(0) : nullptr;
+            if (TestTrue(TEXT("failing body vertex has skin influence data"),
+                Data && !Data->LODRenderData.IsEmpty() && Weights))
+            {
+                const auto& LOD = Data->LODRenderData[0];
+                int32 Section = INDEX_NONE, SectionVertex = INDEX_NONE;
+                LOD.GetSectionFromVertexIndex(WorstBodyVertex, Section, SectionVertex);
+                if (TestTrue(TEXT("failing vertex maps to render section"), LOD.RenderSections.IsValidIndex(Section)))
+                {
+                    const auto& BoneMap = LOD.RenderSections[Section].BoneMap;
+                    for (uint32 I = 0; I < Weights->GetMaxBoneInfluences(); ++I)
+                    {
+                        const uint16 Weight = Weights->GetBoneWeight(WorstBodyVertex, I);
+                        if (!Weight) continue;
+                        const uint32 Bone = Weights->GetBoneIndex(WorstBodyVertex, I);
+                        if (TestTrue(TEXT("vertex influence maps to skeleton"), BoneMap.IsValidIndex(Bone)))
+                            AddInfo(FString::Printf(TEXT("BOARDING_BODY_INFLUENCE vertex=%d bone=%s weight_raw=%u"),
+                                WorstBodyVertex, *Mesh->GetRefSkeleton().GetBoneName(BoneMap[Bone]).ToString(), Weight));
+                    }
+                }
+            }
+        }
         AddInfo(FString::Printf(TEXT("BOARDING_TRANSFER_BODY samples=%d max_top_envelope_deficit_cm=%.9f frame=%d vertex=%d point_local_cm=%s point_host_cm=%s"),
             BodyClearanceSamples, MaximumBodyDeficitCm, WorstBodyFrame, WorstBodyVertex, *WorstBodyPoint.ToString(), *WorstBodyHostPoint.ToString()));
         if (bStrictTransfer)
