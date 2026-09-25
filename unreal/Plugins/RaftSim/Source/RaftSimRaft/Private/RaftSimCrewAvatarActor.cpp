@@ -2199,6 +2199,7 @@ void ARaftSimCrewAvatarActor::SetAvatarAction(
     ERaftSimCrewAvatarAction NewAction,
     float Intensity)
 {
+    if (NewAction != ERaftSimCrewAvatarAction::Reentry) BoardingPoseAlpha = -1.f;
     if (CurrentAction != NewAction)
     {
         CurrentAction = NewAction;
@@ -3525,6 +3526,23 @@ void ARaftSimCrewAvatarActor::SetAnatomicalThigh(
             FMath::Max(Delta.ContainsNaN() ? RadiusCm : Delta.Size() * 0.5f, RadiusCm)));
 }
 
+void ARaftSimCrewAvatarActor::SetBoardingPose(const FRaftSimCrewAvatarPose& Start,
+    const FRaftSimCrewAvatarPose& End, float Alpha)
+{
+    BoardingStartPose = Start;
+    BoardingEndPose = End;
+    bBoardingHasReach = false;
+    AdvanceBoardingPose(Alpha);
+}
+
+void ARaftSimCrewAvatarActor::AdvanceBoardingPose(float Alpha)
+{
+    BoardingPoseAlpha = FMath::Clamp(Alpha, 0.f, 1.f);
+    ApplyPose(BoardingStartPose);
+    DispatchProductionPose();
+    AlignProductionHeadgearToSolvedHead();
+}
+
 void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPose)
 {
     if (!bVisualBuilt)
@@ -3532,6 +3550,30 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
         return;
     }
     FRaftSimCrewAvatarPose Pose = AuthoredPose;
+    if (CurrentAction == ERaftSimCrewAvatarAction::Reentry && BoardingPoseAlpha >= 0.f)
+    {
+        Pose = BoardingStartPose;
+        const bool bApproaching = BoardingPoseAlpha <= BoardingReachFraction;
+        const auto& From = bBoardingHasReach && !bApproaching ? BoardingReachPose : BoardingStartPose;
+        const auto& To = bBoardingHasReach && bApproaching ? BoardingReachPose : BoardingEndPose;
+        const float StageT = bBoardingHasReach ? (bApproaching ? BoardingPoseAlpha / BoardingReachFraction :
+            (BoardingPoseAlpha - BoardingReachFraction) / (1.f - BoardingReachFraction)) : BoardingPoseAlpha;
+        const float Blend = StageT * StageT * (3.f - 2.f * StageT);
+        FVector FRaftSimCrewAvatarPose::* const Points[] = {
+            &FRaftSimCrewAvatarPose::TorsoCenterCm, &FRaftSimCrewAvatarPose::HeadCenterCm,
+            &FRaftSimCrewAvatarPose::LeftShoulderCm, &FRaftSimCrewAvatarPose::RightShoulderCm,
+            &FRaftSimCrewAvatarPose::LeftHandCm, &FRaftSimCrewAvatarPose::RightHandCm,
+            &FRaftSimCrewAvatarPose::LeftHipCm, &FRaftSimCrewAvatarPose::RightHipCm,
+            &FRaftSimCrewAvatarPose::LeftKneeCm, &FRaftSimCrewAvatarPose::RightKneeCm,
+            &FRaftSimCrewAvatarPose::LeftFootCm, &FRaftSimCrewAvatarPose::RightFootCm,
+            &FRaftSimCrewAvatarPose::PaddleTopCm, &FRaftSimCrewAvatarPose::PaddleBottomCm};
+        for (auto Point : Points)
+            Pose.*Point = FMath::Lerp(From.*Point, To.*Point, Blend);
+        Pose.TorsoRotation = FQuat::Slerp(From.TorsoRotation.Quaternion(),
+            To.TorsoRotation.Quaternion(), Blend).Rotator();
+        Pose.bShowPaddle = false;
+        Pose.bFeetPlanted = false;
+    }
     FitFeetToRenderedRaft(Pose, CurrentAction);
     LastRenderedPose = Pose;
     bHasRenderedPose = true;

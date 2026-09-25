@@ -134,6 +134,11 @@ public:
 
     /** The equipment and owned CC0 body consume the same fitted pose. */
     bool TryGetRenderedPose(ERaftSimCrewAvatarAction Action, float Phase, FRaftSimCrewAvatarPose& OutPose) const;
+    const FRaftSimCrewAvatarPose& GetPublishedCrewPose() const { return LastRenderedPose; }
+    void SetBoardingPose(const FRaftSimCrewAvatarPose& Start, const FRaftSimCrewAvatarPose& End, float Alpha);
+    void SetBoardingReachPose(const FRaftSimCrewAvatarPose& Reach) { BoardingReachPose = Reach; bBoardingHasReach = true; }
+    void AdvanceBoardingPose(float Alpha);
+    static constexpr float BoardingReachFraction = .35f;
 
     /** Contact solve succeeded; independent tread/mesh checks remain required. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
@@ -476,5 +481,8 @@ private:
     float AnimationPhase = 0.0f;
     float AnimationPhaseOffset = 0.0f;
     float ActionIntensity = 1.0f;
+    FRaftSimCrewAvatarPose BoardingStartPose, BoardingReachPose, BoardingEndPose;
+    bool bBoardingHasReach = false;
+    float BoardingPoseAlpha = -1.f;
     float PfdPresentationWetness = 0.0f;
 };

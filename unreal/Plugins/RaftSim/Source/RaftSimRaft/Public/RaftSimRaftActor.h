@@ -460,8 +460,12 @@ private:
     void AttachSwimmerToWaterSurface(FRaftSimSwimmerRescueFrame& Swimmer) const;
     void TryReseatSwimmers();
     void UpdateRescueInteraction(float DeltaSeconds);
+    void UpdateTimedBoarding(float DeltaSeconds);
+    void CancelTimedBoarding();
     bool GetSwimmerTubeTarget(FName PassengerId, const FVector& SwimmerM, FVector& TargetM) const;
     double GetRenderedHullDistanceM(const FVector& WorldM) const;
+    bool FindBoardingTubeSupports(const FVector& SwimmerWorldCm, double HandSpacingCm,
+        FVector& LeftLocalCm, FVector& RightLocalCm) const;
     void UpdateRescueLineVisual();
     void SpawnSwimmers(int32 Count, bool bIncludeGuide);
     void RefreshCrewSeatOccupancy();
@@ -499,6 +503,9 @@ private:
     FRaftSimRescueInteractionState RescueInteraction;
 
     FVector RescueAimWorldDirection = FVector::ForwardVector;
+    FName BoardingPassenger;
+    FTransform BoardingStartLocal, BoardingReachLocal, BoardingSeatLocal;
+    float BoardingElapsed = 0.f, BoardingDuration = 0.f;
     int32 SelectedSwimmerIndex = INDEX_NONE;
 
     /** Visible, sagging throw line built from project-owned procedural geometry. */

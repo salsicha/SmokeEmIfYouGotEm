@@ -1,5 +1,32 @@
 # Remaining requested work
 
+Latest September25 boarding prototype integrates a tube-aligned reach pose and
+removes the airborne sine lift. Actual engine frame120 reaches the side tube;
+frames180/240 expose hull penetration in the subsequent seat-transfer placeholder.
+Do not promote. Next implement supported torso/leg clearance and inward handhold
+transfer; reach control proximity alone is not climb acceptance. Ordinary play
+is unchanged. Details and retained captures are in the reentry evidence below.
+
+September25 timed boarding candidate: native smoothness/occupancy/PFD checks
+pass, but actual engine frame120 shows an unsupported airborne passenger.
+The review-only trajectory is rejected for promotion and remains default-off.
+Contact-anchored climb and interruption/checkpoint validation remain open;
+this is diagnostic progress, not a delivered playable animation improvement.
+See the timed candidate section in the reentry evidence linked below.
+
+Follow-through: exact visible-hull queries show both hand controls more than
+10cm from the hull in217of236 boarding samples; initial gaps exceed1m. Resolve
+reach/contact before transfer, not merely lower the arc. A reproduced cancelled
+boarding restart bug is fixed in the default-off controller; before/after native
+regressions verify cancellation ownership and unchanged mass/count. Safe return
+to water, checkpoint interruptions and the climb itself remain unqualified.
+
+Contact-stage foundation: an exact published-tube palm-support selector now
+passes native hull-distance, rigid-motion, opposite-side and zero-spacing checks.
+It is not yet driving the boarding pose; existing unsupported motion is unchanged.
+Reference-backed next step is approach/reach onto the tube, with arm-length and
+body-clearance checks before pull-over and seat transfer. No playable promotion.
+
 September25 crew reentry: production drift now preserves the selected ready
 swimmer's Reentry pose instead of resetting it to Swimming twice per frame.
 The previously failing native regression and elapsed/PFD/mass checks pass;

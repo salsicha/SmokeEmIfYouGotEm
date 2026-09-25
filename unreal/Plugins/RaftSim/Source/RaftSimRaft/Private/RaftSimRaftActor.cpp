@@ -1991,6 +1991,7 @@ void ARaftSimRaftActor::UpdateCapsizeLoop(float DeltaSeconds)
 
 void ARaftSimRaftActor::EnterCapsize()
 {
+    CancelTimedBoarding();
     const FRaftSimFlexStepTelemetry EntryTelemetry = RaftAdapter
         ? RaftAdapter->GetLastFlexibleStepTelemetry()
         : FRaftSimFlexStepTelemetry{};
@@ -2213,6 +2214,7 @@ void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
 {
     for (int32 Index = 0; Index < Swimmers.Num(); ++Index)
     {
+        if (Swimmers[Index].PassengerId == BoardingPassenger) continue;
         const FVector SwimmerCm = Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM;
         const FVector FlowMps = SampleWaterVelocityMps(SwimmerCm);
         Swimmers[Index] = URaftSimSwimmerRescueLibrary::IntegrateSwimmerDrift(
@@ -2273,6 +2275,7 @@ void ARaftSimRaftActor::TryReseatSwimmers()
     FRaftSimSwimmingSkillProfile Skill;
     for (int32 Index = Swimmers.Num() - 1; Index >= 0; --Index)
     {
+        if (Swimmers[Index].PassengerId == BoardingPassenger) continue;
         const float DistanceM =
             FVector::Dist(Swimmers[Index].SwimmerWorldPositionMeters, RaftM);
         FRaftSimRescueAttempt Attempt;
@@ -2324,6 +2327,7 @@ bool ARaftSimRaftActor::IsPassengerSwimming(FName PassengerId) const
 
 void ARaftSimRaftActor::SelectRescueTarget(float Direction)
 {
+    if (!BoardingPassenger.IsNone()) return;
     if (Swimmers.IsEmpty())
     {
         SelectedSwimmerIndex = INDEX_NONE;
@@ -2355,6 +2359,7 @@ void ARaftSimRaftActor::AimRescue(FVector WorldAimDirection)
 
 bool ARaftSimRaftActor::BeginRescue(ERaftSimRescueMethod Method)
 {
+    if (!BoardingPassenger.IsNone()) return false;
     if (!Swimmers.IsValidIndex(SelectedSwimmerIndex))
     {
         SelectRescueTarget(1.0f);
@@ -2415,6 +2420,57 @@ bool ARaftSimRaftActor::GetSwimmerTubeTarget(FName PassengerId, const FVector& S
     return IsFiniteVector(TargetM);
 }
 
+bool ARaftSimRaftActor::FindBoardingTubeSupports(const FVector& SwimmerWorldCm, double HandSpacingCm,
+    FVector& LeftLocalCm, FVector& RightLocalCm) const
+{
+    // Event-only palm-support candidates on the published outer tube (section0).
+    // No box proxy, floor/thwart fallback, or assertion that a grip exists here.
+    if (!RaftVisual || !IsFiniteVector(SwimmerWorldCm) || !FMath::IsFinite(HandSpacingCm) ||
+        HandSpacingCm <= 0. || !GetActorTransform().IsValid()) return false;
+    const FProcMeshSection* Tube = RaftVisual->GetProcMeshSection(0);
+    if (!Tube || !Tube->bSectionVisible || Tube->ProcVertexBuffer.IsEmpty()) return false;
+    const FTransform ToRaft = RaftVisual->GetComponentTransform().GetRelativeTransform(GetActorTransform());
+    FBox Bounds(ForceInit);
+    for (const auto& Vertex : Tube->ProcVertexBuffer)
+    {
+        const FVector P = ToRaft.TransformPosition(Vertex.Position);
+        if (!IsFiniteVector(P)) return false;
+        Bounds += P;
+    }
+    const FVector Swimmer = GetActorTransform().InverseTransformPosition(SwimmerWorldCm);
+    const double Side = Swimmer.Y >= Bounds.GetCenter().Y ? 1. : -1.;
+    // Prefer the side tube's middle half, rather than the higher bow/stern rocker.
+    const double CenterX = FMath::Clamp(Swimmer.X,
+        Bounds.GetCenter().X - Bounds.GetExtent().X * .5,
+        Bounds.GetCenter().X + Bounds.GetExtent().X * .5);
+    const FVector Seeds[2] = {
+        FVector(CenterX - Side * HandSpacingCm * .5, Side > 0. ? Bounds.Max.Y : Bounds.Min.Y, Bounds.Max.Z),
+        FVector(CenterX + Side * HandSpacingCm * .5, Side > 0. ? Bounds.Max.Y : Bounds.Min.Y, Bounds.Max.Z)};
+    FVector Supports[2];
+    double Best[2] = {DBL_MAX, DBL_MAX};
+    for (int32 I = 0; I + 2 < Tube->ProcIndexBuffer.Num(); I += 3)
+    {
+        const FVector A = ToRaft.TransformPosition(Tube->ProcVertexBuffer[Tube->ProcIndexBuffer[I]].Position);
+        const FVector B = ToRaft.TransformPosition(Tube->ProcVertexBuffer[Tube->ProcIndexBuffer[I+1]].Position);
+        const FVector C = ToRaft.TransformPosition(Tube->ProcVertexBuffer[Tube->ProcIndexBuffer[I+2]].Position);
+        const FVector Normal = FVector::CrossProduct(B-A, C-A).GetSafeNormal();
+        const FVector Center = (A+B+C)/3.;
+        // Upper half and upward-facing slope, independent of mesh winding.
+        if (Center.Z < Bounds.GetCenter().Z || Side * (Center.Y-Bounds.GetCenter().Y) <= 0. ||
+            FMath::Abs(Normal.Z) < .5) continue;
+        for (int32 Hand = 0; Hand < 2; ++Hand)
+        {
+            const FVector Point = FMath::ClosestPointOnTriangleToPoint(Seeds[Hand], A, B, C);
+            const double Distance = FVector::DistSquared(Point, Seeds[Hand]);
+            if (Distance < Best[Hand]) { Best[Hand] = Distance; Supports[Hand] = Point; }
+        }
+    }
+    if (Best[0] == DBL_MAX || Best[1] == DBL_MAX ||
+        FVector::Distance(Supports[0], Supports[1]) < HandSpacingCm * .5) return false;
+    LeftLocalCm = Supports[0]; RightLocalCm = Supports[1];
+    return true;
+}
+
 double ARaftSimRaftActor::GetRenderedHullDistanceM(const FVector& WorldM) const
 {
     // Event-only exact triangle distance. Do not use bounding-box distance to
@@ -2441,6 +2497,7 @@ double ARaftSimRaftActor::GetRenderedHullDistanceM(const FVector& WorldM) const
 
 void ARaftSimRaftActor::UpdateRescueInteraction(float DeltaSeconds)
 {
+    if (!BoardingPassenger.IsNone()) { UpdateTimedBoarding(DeltaSeconds); return; }
     const int32 TargetIndex = FindSwimmerIndex(RescueInteraction.TargetPassengerId);
     if (!Swimmers.IsValidIndex(TargetIndex))
     {
@@ -2497,8 +2554,55 @@ void ARaftSimRaftActor::UpdateRescueInteraction(float DeltaSeconds)
     }
 }
 
+void ARaftSimRaftActor::CancelTimedBoarding()
+{
+    if (BoardingPassenger.IsNone()) return;
+    if (auto* Avatar = FindAvatar(BoardingPassenger))
+        Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Swimming);
+    // Release the interaction owner as well as the animation owner. Otherwise
+    // the next rescue update reapplies ReadyForReentry and a request can restart
+    // the cancelled transfer without a new rescue interaction.
+    if (RescueInteraction.TargetPassengerId == BoardingPassenger)
+        RescueInteraction = FRaftSimRescueInteractionState{};
+    BoardingPassenger = NAME_None;
+    BoardingElapsed = BoardingDuration = 0.f;
+}
+
+void ARaftSimRaftActor::UpdateTimedBoarding(float DeltaSeconds)
+{
+    const int32 Index = FindSwimmerIndex(BoardingPassenger);
+    auto* Avatar = FindAvatar(BoardingPassenger);
+    if (!Swimmers.IsValidIndex(Index) || !Avatar || RaftMode == ERaftSimRaftMode::Capsized)
+    { CancelTimedBoarding(); return; }
+    if (!FMath::IsFinite(DeltaSeconds) || DeltaSeconds <= 0.f) return;
+    BoardingElapsed = FMath::Min(BoardingDuration, BoardingElapsed + FMath::Min(DeltaSeconds, .25f));
+    const float T = BoardingElapsed / BoardingDuration;
+    const float ReachFraction = ARaftSimCrewAvatarActor::BoardingReachFraction;
+    const bool bApproaching = T <= ReachFraction;
+    const float StageT = bApproaching ? T / ReachFraction : (T-ReachFraction) / (1.f-ReachFraction);
+    const float Ease = StageT*StageT*(3.f-2.f*StageT);
+    const FTransform& From = bApproaching ? BoardingStartLocal : BoardingReachLocal;
+    const FTransform& To = bApproaching ? BoardingReachLocal : BoardingSeatLocal;
+    // The reach stage replaces the unsupported sine lift. The subsequent seat
+    // transfer is still a review placeholder, NOT a qualified pull-over path.
+    const FTransform Local(FQuat::Slerp(From.GetRotation(), To.GetRotation(), Ease),
+        FMath::Lerp(From.GetLocation(), To.GetLocation(), Ease),
+        FMath::Lerp(From.GetScale3D(), To.GetScale3D(), Ease));
+    Avatar->SetActorTransform(Local * GetActorTransform());
+    Avatar->AdvanceBoardingPose(T);
+    Swimmers[Index].SwimmerWorldPositionMeters = Avatar->GetActorLocation() / kCmPerM;
+    if (T >= 1.f)
+    {
+        BoardingPassenger = NAME_None;
+        BoardingElapsed = BoardingDuration = 0.f;
+        ++CompletedRescueCount;
+        RemoveSwimmerAt(Index);
+    }
+}
+
 bool ARaftSimRaftActor::RequestSelectedReentry()
 {
+    if (!BoardingPassenger.IsNone()) return false;
     const int32 TargetIndex = FindSwimmerIndex(RescueInteraction.TargetPassengerId);
     if (!Swimmers.IsValidIndex(TargetIndex))
     {
@@ -2507,11 +2611,54 @@ bool ARaftSimRaftActor::RequestSelectedReentry()
     // "Bring to tube" measures the actual rendered hull, not the raft center.
     // The library's unchanged1.35m distance and readiness gates still apply.
     const float DistanceM = GetRenderedHullDistanceM(Swimmers[TargetIndex].SwimmerWorldPositionMeters);
-    RescueInteraction = URaftSimSwimmerRescueLibrary::CompleteReseat(
-        RescueInteraction, DistanceM);
+    const auto PreviousInteraction = RescueInteraction;
+    RescueInteraction = URaftSimSwimmerRescueLibrary::CompleteReseat(RescueInteraction, DistanceM);
     if (RescueInteraction.Phase != ERaftSimRescueInteractionPhase::Completed)
     {
         return false;
+    }
+    // Integrated review only until continuous rendered clearance is qualified.
+    if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimTimedReentryReview")))
+    {
+        auto* Avatar = FindAvatar(Swimmers[TargetIndex].PassengerId);
+        if (!Avatar) { RescueInteraction = PreviousInteraction; return false; }
+        const FTransform StartWorld = Avatar->GetActorTransform();
+        const auto StartPose = Avatar->GetPublishedCrewPose();
+        FVector LeftSupport, RightSupport;
+        if (!StartWorld.IsValid() || !FindBoardingTubeSupports(StartWorld.GetLocation(),
+            FVector::Distance(StartPose.LeftHandCm, StartPose.RightHandCm), LeftSupport, RightSupport))
+        { RescueInteraction = PreviousInteraction; return false; }
+        BoardingStartLocal = StartWorld.GetRelativeTransform(GetActorTransform());
+        const FVector Right = (RightSupport-LeftSupport).GetSafeNormal();
+        const FVector Forward = FVector::CrossProduct(Right, FVector::UpVector).GetSafeNormal();
+        const FQuat ReachRotation = FRotationMatrix::MakeFromXY(Forward, Right).ToQuat();
+        // Authored palm-center clearance, not measured skin or grip geometry.
+        LeftSupport += FVector::UpVector * 3.; RightSupport += FVector::UpVector * 3.;
+        BoardingReachLocal = FTransform(ReachRotation, FVector::ZeroVector, BoardingStartLocal.GetScale3D());
+        const FVector HandMid = (StartPose.LeftHandCm+StartPose.RightHandCm)*.5;
+        BoardingReachLocal.SetLocation((LeftSupport+RightSupport)*.5 - BoardingReachLocal.TransformVector(HandMid));
+        auto ReachPose = StartPose;
+        ReachPose.LeftHandCm = BoardingReachLocal.InverseTransformPosition(LeftSupport);
+        ReachPose.RightHandCm = BoardingReachLocal.InverseTransformPosition(RightSupport);
+        // Resolve the same fitted destination used by completion, without a
+        // world tick or ownership/mass transfer between preparation and restore.
+        AttachAvatarToSeat(Avatar, Swimmers[TargetIndex].PassengerId);
+        BoardingSeatLocal = Avatar->GetActorTransform().GetRelativeTransform(GetActorTransform());
+        const auto EndPose = Avatar->GetPublishedCrewPose();
+        Avatar->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+        Avatar->SetActorTransform(StartWorld);
+        Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Reentry);
+        Avatar->SetBoardingPose(StartPose, EndPose, 0.f);
+        Avatar->SetBoardingReachPose(ReachPose);
+        BoardingPassenger = Swimmers[TargetIndex].PassengerId;
+        BoardingElapsed = 0.f;
+        BoardingDuration = FMath::Max(4.f, float((FVector::Distance(
+            BoardingStartLocal.GetLocation(), BoardingReachLocal.GetLocation()) + FVector::Distance(
+            BoardingReachLocal.GetLocation(), BoardingSeatLocal.GetLocation())) / 80.));
+        RescueInteraction = PreviousInteraction;
+        RescueInteraction.bLineVisible = false;
+        RescueInteraction.FeedbackCode = TEXT("rescue_climbing");
+        return true;
     }
     ++CompletedRescueCount;
     RemoveSwimmerAt(TargetIndex);
@@ -2525,6 +2672,7 @@ void ARaftSimRaftActor::RemoveSwimmerAt(int32 Index)
         return;
     }
     const FName PassengerId = Swimmers[Index].PassengerId;
+    if (PassengerId == BoardingPassenger) CancelTimedBoarding();
     if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(PassengerId))
     {
         AttachAvatarToSeat(Avatar, PassengerId);
@@ -2600,6 +2748,7 @@ bool ARaftSimRaftActor::TryRestoreCheckpoint(const FTransform& Destination)
     if (!Prepared.IsValid()) return false;
     // No crew repair, pose, velocity or saved checkpoint changes until the
     // scenario has activated terrain and verified destination water.
+    CancelTimedBoarding();
     CheckpointTransform=Prepared;
     for (const FRaftSimSwimmerRescueFrame& Swimmer : Swimmers)
     {

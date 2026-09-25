@@ -77,3 +77,144 @@ itself. No cap geometry, flow field, saved map, packaged stage or remote changed
 Standalone Development game target also rebuilds successfully in119.34s. Its
 binary is not yet restaged or separately packaged-play qualified. The normal
 editor-hosted game test above used the rebuilt production runtime without opt-in.
+
+## Timed boarding candidate: visual rejection
+
+The subsequent uncommitted candidate is gated by `-RaftSimTimedReentryReview`.
+It keeps the passenger detached and unoccupied until completion, interpolates
+the published body/PFD pose, and follows the raft-local transform. It is NOT
+enabled in ordinary play. Editor builds succeeded, but no standalone rebuild or
+packaged acceptance is claimed for this candidate.
+
+Native D3D12 receipt `tmp/crew-timed-reentry-v2-20260925/index.json` reports
+1 success, 0 failures and 0 warnings. The move spans 236 updates (3.933333333s),
+392.377744591cm total root displacement and 2.572115456cm maximum sampled step.
+Occupancy, duplicate request, finite pose and PFD checks pass in this fixture.
+The v1 log's zero elapsed label was erroneous; v2 logs simulated elapsed time.
+
+Actual engine keyposes are retained locally in
+`tmp/crew-timed-reentry-views-20260925/frame_*.png`, not added to Git. At frame120
+the passenger visibly floats above the raft with hands unanchored. The authored
+60cm sine-squared lift and interpolated pose therefore fail visual climb review,
+despite smooth numerical motion. Do not promote this trajectory or rerun it
+unchanged as an acceptance attempt. These dark geometry views are not a lighting
+review, a continuous motion review, or collision/contact qualification.
+
+Next work must establish a tube-contact hand/body path before seat transfer,
+then test interruptions, successful/rejected checkpoint restore, moving/tilted
+rafts and both boarding sides. Cancellation and checkpoint hooks exist in the
+candidate but are not yet regression-qualified. No river geometry, cooked field,
+normal playable boarding behavior or release acceptance is changed by this review.
+
+Follow-up without the experimental switch:
+`tmp/crew-timed-reentry-default-20260925/index.json` reports 1 success,
+0 warnings, 0 failures and 0 not-run; engine exit0. This checks the existing
+native default occupancy path, not a new normal-game visual/performance run.
+
+### Hand-support measurement
+
+The subsequent fixture measures published hand pose controls against the exact
+visible hull triangles (not bounding-box distance). This is control-point
+distance, not proof of rendered skin contact, a stable grip or support forces.
+`tmp/crew-boarding-hand-support-20260925/index.json` completes with engine exit0;
+the added test module builds in11.40s. Frame0 left/right gaps are
+101.862194847/137.533406722cm; frame120 gaps are119.278552440/117.416237470cm.
+The maximum nearest-hand gap is119.875484632cm. Both hands exceed10cm for217
+of236 sampled poses (initial pose plus235 pre-completion updates). The10cm
+counter is diagnostic, not a newly accepted contact tolerance.
+
+Thus the problem starts before the authored lift: the conservative whole-body
+pull envelope is not a reachable handhold. A reach/approach/contact stage must
+be resolved against rendered geometry before a supported pull-over and seat
+transfer. Removing only the sine arc does not establish such a climb.
+
+### Cancellation ownership repair (review-only controller)
+
+The new interruption regression reproduces two failures before the fix:
+the next rescue update reapplies Reentry, and another request restarts boarding
+without a new rescue interaction. Receipt:
+`tmp/crew-boarding-cancel-before-20260925/index.json`, engine exit1. The fixture
+starts a second passenger's real public boarding request, advances0.1s, cancels,
+then updates rescue and retries the public request.
+
+Cancellation now returns immediately when no boarding owner exists and clears
+the rescue interaction only when its target matches the cancelled passenger.
+The same regression passes afterward:
+`tmp/crew-boarding-cancel-after-20260925/index.json`, engine exit0. It also checks
+no cancellation teleport, no extra rescue completion, retained swimmer state and
+unchanged310kg seated crew mass. Editor builds11.29s (regression) and12.73s (fix).
+This qualifies interaction/pose ownership cancellation only; descending safely
+to the water, mid-climb checkpoint cases and supported rendered motion remain
+open. The prototype and this fix remain review-only and uncommitted, with no
+new normal-game, standalone or packaged validation claimed.
+
+### Reference for staged contact design
+
+[Andy Hinton, NRS: Guide School: Damage Control](https://community.nrs.com/duct-tape/2019/04/19/guide-school-damage-control/)
+is dated April19,2019, with July10,2023 also displayed. Its self-reentry section
+describes side-tube access, a hand on a line/ring and another on the tube,
+upper-body support over the tube, then an inward handhold. This supports a staged
+approach/contact/pull-over design rather than direct interpolation to a seat.
+It supplies no measured motion trajectories, timings, joint angles or dimensions.
+No source photos are downloaded, copied into assets or licensed for redistribution;
+the page credits Southeastern Expeditions and Chugach Outdoor Center for photos.
+
+A new event-only `FindBoardingTubeSupports` helper selects separated points on
+the published section0 tube triangles, upper half with upward-supporting slope,
+on the swimmer's side. Central-half preference and slope/spacing bounds are
+authored selection heuristics, not measured anatomy or grip/friction guarantees.
+Output is raft-local and fails closed with no valid pair. It does not install a
+new trajectory; the rejected arc remains disabled in ordinary play. Runtime
+integration must still preserve the selected surface under deformation, solve
+reach/arm lengths, review body clearance and transfer support before release.
+
+Editor rebuild succeeds in170.72s. D3D12 receipt
+`tmp/crew-boarding-support-query-20260925/index.json` reports1success,
+0warnings/0failures/0not-run, engine exit0. Selected fixture supports in raft-local
+centimetres are(-129.388,84.354,20.351) and(-81.031,86.937,21.773), rounded by
+the engine vector formatter. The test independently checks rendered-hull distance
+<0.00001m, distinct supports, selection covariance within0.001cm after a rigid
+translation/rotation, opposite-side selection, and rejection of zero spacing.
+Existing cancellation/occupancy/PFD assertions still pass. The unchanged hand-gap
+measurement confirms this helper alone has not repaired the rendered trajectory.
+Next integrate a reach pose using these surface points and check anatomical reach
+and body clearance before any pull-over or seat transfer.
+
+### Integrated reach key pose (still review-only)
+
+The latest prototype replaces the rejected60cm sine lift with two stages:
+start-to-tube reach, then the still-unqualified seat-transfer placeholder.
+The reach transform faces inward using the selected support-pair axis and
+positions the current hand midpoint at the supports; individual hand controls
+are mapped back into that transform. A3cm upward palm-center offset,35percent
+reach boundary, minimum4s duration and80cm/s nominal path rate are authored
+parameters, not measured rescue biomechanics. Body/PFD consume the same staged
+published pose. Ordinary gameplay still does not enable this prototype.
+
+Editor build177.12s succeeds. Actual D3D12 capture receipt
+`tmp/crew-boarding-reach-20260925/index.json` reports1success/0warnings/0failures,
+engine exit0. The transition takes343updates, maximum root step2.101126469cm.
+Reach boundary frame120 is saved in
+`tmp/crew-boarding-reach-views-20260925/frame_120.png`; additional inspected
+frames180and240 show the subsequent transfer going through the tube/raft.
+The former airborne lift is gone, but this is NOT a validated climb. Remaining
+work is a supported torso-over-tube phase, leg clearance and inward handhold
+transfer before seat placement, plus deformation, interruption and game checks.
+
+The whole-transition minimum hand gap0.654306987cm is not acceptance evidence:
+small unsigned distance can also occur while penetrating. The follow-up test
+therefore checks both hand controls at the reach boundary specifically and
+compares shoulder-hand spans with the starting pose (no increase over2cm).
+Those control-span checks still do not establish anatomical joint limits,
+rendered palm contact, body collision safety or support forces.
+
+The stricter boundary test passes in
+`tmp/crew-boarding-reach-boundary-20260925/index.json` (1success,0warnings,
+0failures,0not-run; engine exit0). Maximum of the two hand gaps at the boundary
+is2.539933526cm; both control-span assertions pass. Test-only rebuild12.16s.
+The no-opt-in native occupancy regression also passes in
+`tmp/crew-boarding-reach-default-20260925/index.json`, engine exit0. This is not
+a new normal-menu motion/performance run or standalone/package validation.
+The accumulated default-off prototype is being checkpointed in Git; local
+captures and unrelated work are excluded. It must remain disabled until the
+remaining supported transfer and collision/animation gates are satisfied.

@@ -8,6 +8,13 @@
 #include "RaftSimRaftActor.h"
 #include "UObject/Script.h"
 #include "ProceduralMeshComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "ImageUtils.h"
+#include "Misc/FileHelper.h"
+#include "Serialization/BufferArchive.h"
+#include "HAL/FileManager.h"
+#include "RenderingThread.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrewOccupancyTest,
@@ -180,17 +187,193 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
     Raft->RescueInteraction.Phase = ERaftSimRescueInteractionPhase::ReadyForReentry;
     Raft->UpdateRescueInteraction(0.f);
     const FVector BeforeBoarding = BoardingAvatar->GetActorLocation();
+    const auto BeforeBoardingPose = BoardingAvatar->GetPublishedCrewPose();
+    FVector LeftSupport, RightSupport;
+    TestTrue(TEXT("published side tube supplies two palm supports"),
+        Raft->FindBoardingTubeSupports(BeforeBoarding, 50., LeftSupport, RightSupport));
+    for (const FVector& Support : {LeftSupport, RightSupport})
+        TestTrue(TEXT("palm support lies on exact rendered hull"),
+            Raft->GetRenderedHullDistanceM(Raft->GetActorTransform().TransformPosition(Support) / 100.) < 1.e-5);
+    TestTrue(TEXT("palm supports remain distinct"), FVector::Distance(LeftSupport, RightSupport) >= 25.);
+    const FTransform OriginalRaft = Raft->GetActorTransform();
+    const FVector LocalSwimmer = OriginalRaft.InverseTransformPosition(BeforeBoarding);
+    const FTransform MovedRaft(FRotator(-9, 63, -14), FVector(1400, -900, 350));
+    Raft->SetActorTransform(MovedRaft);
+    FVector MovedLeft, MovedRight;
+    TestTrue(TEXT("moved tilted raft supplies supports"), Raft->FindBoardingTubeSupports(
+        MovedRaft.TransformPosition(LocalSwimmer), 50., MovedLeft, MovedRight));
+    TestTrue(TEXT("support selection is raft-local under rigid motion"),
+        LeftSupport.Equals(MovedLeft, .001) && RightSupport.Equals(MovedRight, .001));
+    Raft->SetActorTransform(OriginalRaft);
+    FVector OppositeLeft, OppositeRight;
+    TestTrue(TEXT("opposite side supplies supports"), Raft->FindBoardingTubeSupports(
+        OriginalRaft.TransformPosition(FVector(LocalSwimmer.X, -LocalSwimmer.Y, LocalSwimmer.Z)),
+        50., OppositeLeft, OppositeRight));
+    TestTrue(TEXT("opposite side does not reuse same tube"), LeftSupport.Y * OppositeLeft.Y < 0.);
+    TestFalse(TEXT("zero hand spacing fails closed"), Raft->FindBoardingTubeSupports(BeforeBoarding, 0., MovedLeft, MovedRight));
+    AddInfo(FString::Printf(TEXT("BOARDING_SUPPORT left_local_cm=%s right_local_cm=%s"),
+        *LeftSupport.ToString(), *RightSupport.ToString()));
     TestTrue(TEXT("ready swimmer at rendered tube boards through public request"), Raft->RequestSelectedReentry());
+    double BoardingSimSeconds = 0.;
+    if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimTimedReentryReview")))
+    {
+        FString CaptureDir;
+        FParse::Value(FCommandLine::Get(), TEXT("RaftSimBoardingCaptureDir="), CaptureDir);
+        AActor* Camera = nullptr;
+        USceneCaptureComponent2D* Capture = nullptr;
+        UTextureRenderTarget2D* Target = nullptr;
+        ON_SCOPE_EXIT { if (Camera) World->DestroyActor(Camera); FlushRenderingCommands(); };
+        if (!CaptureDir.IsEmpty())
+        {
+            if (!TestFalse(TEXT("preserve prior boarding captures"), IFileManager::Get().DirectoryExists(*CaptureDir))) return false;
+            IFileManager::Get().MakeDirectory(*CaptureDir, true);
+            Camera = World->SpawnActor<AActor>();
+            Capture = NewObject<USceneCaptureComponent2D>(Camera);
+            Camera->SetRootComponent(Capture);
+            Target = NewObject<UTextureRenderTarget2D>(Capture);
+            Target->RenderTargetFormat = RTF_RGBA8;
+            Target->InitAutoFormat(800, 600); Target->UpdateResourceImmediate(true);
+            Capture->TextureTarget = Target; Capture->CaptureSource = SCS_FinalColorLDR;
+            Capture->bCaptureEveryFrame = false; Capture->bCaptureOnMovement = false;
+            Capture->ShowFlags.SetLighting(false); // Unlit geometry review, not shading acceptance.
+            Capture->FOVAngle = 55.f; Capture->RegisterComponent();
+            const FVector Eye = Raft->GetActorTransform().TransformPosition(FVector(600,850,500));
+            const FVector Aim = Raft->GetActorTransform().TransformPosition(FVector(0,0,45));
+            Capture->SetWorldLocationAndRotation(Eye, (Aim-Eye).Rotation());
+        }
+        const auto SavePose = [&](int32 Frame)
+        {
+            if (!Capture) return;
+            World->SendAllEndOfFrameUpdates(); FlushRenderingCommands();
+            Capture->CaptureScene(); FlushRenderingCommands();
+            FBufferArchive Bytes;
+            TestTrue(TEXT("export actual boarding key pose"), FImageUtils::ExportRenderTarget2DAsPNG(Target, Bytes) &&
+                FFileHelper::SaveArrayToFile(Bytes, *FPaths::Combine(CaptureDir, FString::Printf(TEXT("frame_%03d.png"), Frame))));
+        };
+        SavePose(0);
+        TestTrue(TEXT("accepted boarding starts without root teleport"), BoardingAvatar->GetActorLocation().Equals(BeforeBoarding, .01));
+        TestEqual(TEXT("boarding has not completed the rescue"), Raft->GetCompletedRescueCount(), PreviousRescues);
+        TestTrue(TEXT("boarding passenger is still unseated"), Raft->IsPassengerSwimming(TEXT("paddler_1")));
+        TestFalse(TEXT("duplicate boarding request rejected during transition"), Raft->RequestSelectedReentry());
+        Step(235.);
+        FVector PreviousPosition = BoardingAvatar->GetActorLocation();
+        double MaxStepCm = 0.;
+        double MaxNearestHandGapCm = 0.;
+        double MinBothHandGapCm = DBL_MAX;
+        int32 UnsupportedFrames = 0;
+        const auto RecordHandSupport = [&](int32 Frame)
+        {
+            // Published pose controls, not a claim about skin contact or grip forces.
+            // Query the same visible triangles as the production distance gate.
+            const auto& Pose = BoardingAvatar->GetPublishedCrewPose();
+            const FTransform BodyTransform = BoardingAvatar->GetActorTransform();
+            const double LeftCm = 100. * Raft->GetRenderedHullDistanceM(
+                BodyTransform.TransformPosition(Pose.LeftHandCm) / 100.);
+            const double RightCm = 100. * Raft->GetRenderedHullDistanceM(
+                BodyTransform.TransformPosition(Pose.RightHandCm) / 100.);
+            const double NearestCm = FMath::Min(LeftCm, RightCm);
+            MaxNearestHandGapCm = FMath::Max(MaxNearestHandGapCm, NearestCm);
+            MinBothHandGapCm = FMath::Min(MinBothHandGapCm, FMath::Max(LeftCm, RightCm));
+            if (NearestCm > 10.) ++UnsupportedFrames;
+            if (Frame % 30 == 0)
+                AddInfo(FString::Printf(TEXT("BOARDING_HAND_GAP frame=%d left_cm=%.9f right_cm=%.9f"),
+                    Frame, LeftCm, RightCm));
+            TestTrue(TEXT("hand-to-rendered-hull measurements are finite"),
+                FMath::IsFinite(LeftCm) && FMath::IsFinite(RightCm));
+        };
+        RecordHandSupport(0);
+        int32 Frames = 0;
+        bool bCapturedReach = false;
+        double ReachBothHandGapCm = DBL_MAX;
+        Raft->UpdateRescueInteraction(-1.f);
+        TestTrue(TEXT("negative time cannot move boarding root"), BoardingAvatar->GetActorLocation().Equals(PreviousPosition, .01));
+        while (!Raft->BoardingPassenger.IsNone() && Frames < 720)
+        {
+            Raft->DriftSwimmers(1.f/60.f);
+            Raft->UpdateCrew(1.f/60.f);
+            Raft->UpdateRescueInteraction(1.f/60.f);
+            BoardingAvatar->Tick(1.f/60.f);
+            const FVector Current = BoardingAvatar->GetActorLocation();
+            MaxStepCm = FMath::Max(MaxStepCm, FVector::Distance(PreviousPosition, Current));
+            PreviousPosition = Current;
+            TestTrue(TEXT("timed body finite"), BoardingAvatar->HasFiniteVisualTransforms());
+            TestTrue(TEXT("timed PFD tracks body"), BoardingAvatar->GetProductionPfdTorsoErrorCm() < .01f);
+            if (!Raft->BoardingPassenger.IsNone())
+            {
+                TestTrue(TEXT("paddling cannot claim a boarding avatar"), BoardingAvatar->GetAttachParentActor() != Raft);
+                TestEqual(TEXT("count changes only on completion"), Raft->GetCompletedRescueCount(), PreviousRescues);
+            }
+            ++Frames;
+            if (!Raft->BoardingPassenger.IsNone()) RecordHandSupport(Frames);
+            if (!bCapturedReach && !Raft->BoardingPassenger.IsNone() &&
+                Raft->BoardingElapsed >= Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingReachFraction)
+            {
+                bCapturedReach = true;
+                const auto& ReachPose = BoardingAvatar->GetPublishedCrewPose();
+                const FTransform ReachWorld = BoardingAvatar->GetActorTransform();
+                ReachBothHandGapCm = 100. * FMath::Max(Raft->GetRenderedHullDistanceM(
+                    ReachWorld.TransformPosition(ReachPose.LeftHandCm)/100.), Raft->GetRenderedHullDistanceM(
+                    ReachWorld.TransformPosition(ReachPose.RightHandCm)/100.));
+                TestTrue(TEXT("reach does not lengthen left shoulder-hand control span by over 2cm"),
+                    FVector::Distance(ReachPose.LeftShoulderCm, ReachPose.LeftHandCm) <=
+                    FVector::Distance(BeforeBoardingPose.LeftShoulderCm, BeforeBoardingPose.LeftHandCm) + 2.);
+                TestTrue(TEXT("reach does not lengthen right shoulder-hand control span by over 2cm"),
+                    FVector::Distance(ReachPose.RightShoulderCm, ReachPose.RightHandCm) <=
+                    FVector::Distance(BeforeBoardingPose.RightShoulderCm, BeforeBoardingPose.RightHandCm) + 2.);
+                SavePose(Frames);
+                AddInfo(FString::Printf(TEXT("BOARDING_REACH frame=%d root_local_cm=%s"), Frames,
+                    *Raft->GetActorTransform().InverseTransformPosition(Current).ToString()));
+            }
+            BoardingSimSeconds += 1. / 60.;
+            if (Frames % 30 == 0 || Raft->BoardingPassenger.IsNone()) SavePose(Frames);
+        }
+        TestTrue(TEXT("timed boarding reaches completion"), Frames < 720 && Raft->BoardingPassenger.IsNone());
+        TestTrue(TEXT("no large per-frame root teleport"), MaxStepCm < 10.);
+        TestTrue(TEXT("reach stage is sampled"), bCapturedReach);
+        TestTrue(TEXT("both hand controls at reach boundary are within authored palm clearance"), ReachBothHandGapCm < 5.);
+        AddInfo(FString::Printf(TEXT("TIMED_REENTRY frames=%d max_step_cm=%.9f"), Frames, MaxStepCm));
+        AddInfo(FString::Printf(TEXT("BOARDING_HAND_SUPPORT max_nearest_gap_cm=%.9f samples_both_over_10cm=%d"),
+            MaxNearestHandGapCm, UnsupportedFrames));
+        AddInfo(FString::Printf(TEXT("BOARDING_REACH_SUPPORT min_both_gap_cm=%.9f"), MinBothHandGapCm));
+        AddInfo(FString::Printf(TEXT("BOARDING_REACH_BOUNDARY both_gap_cm=%.9f"), ReachBothHandGapCm));
+    }
     TestTrue(TEXT("boarding preserves avatar identity"), Raft->FindAvatar(TEXT("paddler_1")) == BoardingAvatar);
     TestEqual(TEXT("successful public boarding counts exactly one rescue"), Raft->GetCompletedRescueCount(), PreviousRescues + 1);
     TestFalse(TEXT("boarded passenger leaves swimming state"), Raft->IsPassengerSwimming(TEXT("paddler_1")));
     TestTrue(TEXT("boarded visual remains finite"), BoardingAvatar->HasFiniteVisualTransforms());
-    AddInfo(FString::Printf(TEXT("REENTRY_DISCONTINUITY elapsed_s=0 root_jump_cm=%.9f"),
-        FVector::Distance(BeforeBoarding, BoardingAvatar->GetActorLocation())));
+    AddInfo(FString::Printf(TEXT("REENTRY_DISPLACEMENT elapsed_s=%.9f root_displacement_cm=%.9f"),
+        BoardingSimSeconds, FVector::Distance(BeforeBoarding, BoardingAvatar->GetActorLocation())));
     TestFalse(TEXT("repeat boarding cannot rescue the already boarded passenger"), Raft->RequestSelectedReentry());
     TestEqual(TEXT("repeat boarding does not increment rescue count"), Raft->GetCompletedRescueCount(), PreviousRescues + 1);
     TestEqual(TEXT("one swimmer remains after single reseat"), Raft->GetSwimmerCount(), 1);
     Step(310.);
+    if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimTimedReentryReview")))
+    {
+        auto* InterruptedAvatar = Raft->FindAvatar(TEXT("paddler_2"));
+        const int32 InterruptedIndex = Raft->FindSwimmerIndex(TEXT("paddler_2"));
+        if (!TestNotNull(TEXT("interruption avatar"), InterruptedAvatar) ||
+            !TestTrue(TEXT("interruption swimmer"), Raft->Swimmers.IsValidIndex(InterruptedIndex))) return false;
+        InterruptedAvatar->SetAvatarAction(ERaftSimCrewAvatarAction::Reentry);
+        TestTrue(TEXT("interruption target"), Raft->GetSwimmerTubeTarget(TEXT("paddler_2"),
+            Raft->Swimmers[InterruptedIndex].SwimmerWorldPositionMeters, TubeTarget));
+        Raft->Swimmers[InterruptedIndex].SwimmerWorldPositionMeters = TubeTarget;
+        InterruptedAvatar->SetActorLocation(TubeTarget * 100.);
+        Raft->RescueInteraction.TargetPassengerId = TEXT("paddler_2");
+        Raft->RescueInteraction.Phase = ERaftSimRescueInteractionPhase::ReadyForReentry;
+        if (!TestTrue(TEXT("second passenger starts timed boarding"), Raft->RequestSelectedReentry())) return false;
+        Raft->UpdateTimedBoarding(.1f);
+        const FVector InterruptedPosition = InterruptedAvatar->GetActorLocation();
+        Raft->CancelTimedBoarding();
+        TestTrue(TEXT("cancel releases boarding owner"), Raft->BoardingPassenger.IsNone());
+        TestTrue(TEXT("cancel does not teleport the passenger"), InterruptedAvatar->GetActorLocation().Equals(InterruptedPosition, .01));
+        Raft->UpdateRescueInteraction(0.f);
+        TestEqual(TEXT("cancel cannot silently reacquire ready pose on next update"),
+            InterruptedAvatar->GetAvatarAction(), ERaftSimCrewAvatarAction::Swimming);
+        TestFalse(TEXT("cancel requires a new rescue interaction before boarding"), Raft->RequestSelectedReentry());
+        TestEqual(TEXT("cancel does not complete another rescue"), Raft->GetCompletedRescueCount(), PreviousRescues + 1);
+        TestTrue(TEXT("cancel retains swimmer occupancy"), Raft->IsPassengerSwimming(TEXT("paddler_2")));
+        Step(310.);
+    }
     Raft->RaftMode = ERaftSimRaftMode::Capsized;
     Adapter->SetFlexibleCapsized(true);
     Raft->SpawnSwimmers(5, true);
