@@ -148,3 +148,35 @@ runtime validation once the fresh pilot finishes.
 
 The pilot remains the original session92780/PID33552; latest inspected step520,
 26simulated seconds. Poll it rather than starting another cook.
+
+## Installed-scene collision union verified
+
+The no-save check loads the normal South Fork map, verifies installed ground and
+cap package/native hashes, preserves the ground, swaps only the existing cap
+actor's mesh, then restores that mesh. Its first invocation had a verifier-only
+map-extension typo, corrected from uasset to umap before the actual trace run.
+
+Legacy rays produced nine failures; preserve
+`tmp/troublemaker-mixed-installed-union-20260925.json`. Eight hit another part of
+the exact nonconvex source solid first; independent segment intersections match
+their native hit distances. The ninth legacy ray remains unexplained by isolated
+source-solid intersection alone and is not waived as a passing legacy query.
+
+The existing source-visible construction supplies ALL1607original vertices,
+without moving targets or changing tolerance. Every ray is certified against
+the closed source solid; all remain100cm half-length, max source first-hit error
+5.51e-11cm. Legacy6676probes remain preserved alongside the added vertex probes in
+`tmp/troublemaker-mixed-visible-probes-20260925.json`.
+
+Full-map source-visible run session71515 is terminal, exit0, with actual report
+passed=true: `tmp/troublemaker-mixed-installed-visible-union-20260925.json`, copied
+to `independent-lidar-followup/mixed-cap-installed-union.json`. All34887queries
+pass, including25600hydraulic cells,4466registered-ground centroids, all1607roof
+vertices,2966roof centroids and248boundary midpoints. Largest error0.031770cm;
+the physical0.1cm gate is unchanged. Actual cap/ground ownership also matches.
+Original cap restored;472protected saved files unchanged. No scene/asset save,
+water update, raft traversal, visual or performance acceptance.
+
+Cook remains original session92780/PID33552; latest inspected step800/40s.
+Next audit its terminal1000step snapshot, then export matching runtime fields
+and proceed to native water/mesh consistency and normal-play validation.
