@@ -23,6 +23,7 @@
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Engine/GameInstance.h"
 #include "Engine/StaticMesh.h"
+#include "Materials/MaterialInterface.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
@@ -1307,6 +1308,39 @@ static void HandleHideTaggedActors(const TArray<FString>& Args, UWorld* World)
     }
     const TArray<FString>& HideSpecs = Specs;
     FString CaptureLabel;
+    // "cam=<backM>:<sideM>:<upM>:<aheadM>" (colons: -ExecCmds splits on commas) sets the capture burst camera
+    // (raft-relative, same convention as RaftSim.CaptureRaftSeries).
+    FVector CaptureRelative(-300.0f, 300.0f, 200.0f);
+    float CaptureAheadM = 2.0f;
+    float CaptureDelayS = 8.0f;
+    int32 CaptureCount = 8;
+    float CaptureIntervalS = 0.25f;
+    for (const FString& Spec : HideSpecs)
+    {
+        if (Spec.StartsWith(TEXT("cam="), ESearchCase::IgnoreCase))
+        {
+            TArray<FString> Parts;
+            Spec.RightChop(4).ParseIntoArray(Parts, TEXT(":"));
+            if (Parts.Num() == 4)
+            {
+                CaptureRelative = FVector(-FCString::Atof(*Parts[0]) * 100.0f,
+                    FCString::Atof(*Parts[1]) * 100.0f, FCString::Atof(*Parts[2]) * 100.0f);
+                CaptureAheadM = FCString::Atof(*Parts[3]);
+            }
+        }
+        else if (Spec.StartsWith(TEXT("burst="), ESearchCase::IgnoreCase))
+        {
+            // "burst=<delayS>:<count>:<intervalS>" after the hide.
+            TArray<FString> Parts;
+            Spec.RightChop(6).ParseIntoArray(Parts, TEXT(":"));
+            if (Parts.Num() == 3)
+            {
+                CaptureDelayS = FMath::Max(FCString::Atof(*Parts[0]), 0.5f);
+                CaptureCount = FMath::Clamp(FCString::Atoi(*Parts[1]), 1, 200);
+                CaptureIntervalS = FMath::Max(FCString::Atof(*Parts[2]), 0.05f);
+            }
+        }
+    }
     int32 Hidden = 0;
     for (TActorIterator<AActor> It(World); It; ++It)
     {
@@ -1320,6 +1354,10 @@ static void HandleHideTaggedActors(const TArray<FString>& Args, UWorld* World)
             if (Tag.StartsWith(TEXT("capture="), ESearchCase::IgnoreCase))
             {
                 CaptureLabel = Tag.RightChop(8);
+                continue;
+            }
+            if (Tag.StartsWith(TEXT("cam="), ESearchCase::IgnoreCase) || Tag.StartsWith(TEXT("burst="), ESearchCase::IgnoreCase))
+            {
                 continue;
             }
             // "class=<UClass name>" hides by class instead of by tag (the live
@@ -1342,6 +1380,22 @@ static void HandleHideTaggedActors(const TArray<FString>& Args, UWorld* World)
                     }
                 }
             }
+            // "mesh=<substring>" matches a static mesh asset path (terrain
+            // reconstruction layers are plain StaticMeshActors with no tags).
+            if (Tag.StartsWith(TEXT("mesh="), ESearchCase::IgnoreCase))
+            {
+                const FString Needle = Tag.RightChop(5);
+                TInlineComponentArray<UStaticMeshComponent*> MeshComponents(Actor);
+                for (const UStaticMeshComponent* MeshComponent : MeshComponents)
+                {
+                    if (MeshComponent && MeshComponent->GetStaticMesh() &&
+                        MeshComponent->GetStaticMesh()->GetPathName().Contains(Needle))
+                    {
+                        bComponentMatch = true;
+                        break;
+                    }
+                }
+            }
             if (bClassMatch || bComponentMatch || Actor->ActorHasTag(FName(*Tag)))
             {
                 Actor->SetActorHiddenInGame(true);
@@ -1354,12 +1408,12 @@ static void HandleHideTaggedActors(const TArray<FString>& Args, UWorld* World)
     if (!CaptureLabel.IsEmpty())
     {
         FRaftSeriesSpec Spec;
-        Spec.Delay = 8.0f;
-        Spec.Count = 8;
-        Spec.Interval = 0.25f;
+        Spec.Delay = CaptureDelayS;
+        Spec.Count = CaptureCount;
+        Spec.Interval = CaptureIntervalS;
         Spec.Label = CaptureLabel;
-        Spec.RelativeLocation = FVector(-300.0f, 300.0f, 200.0f);
-        Spec.AheadM = 2.0f;
+        Spec.RelativeLocation = FVector(CaptureRelative.X, CaptureRelative.Y, CaptureRelative.Z);
+        Spec.AheadM = CaptureAheadM;
         StartRaftSeries(World, Spec);
     }
     }),
@@ -1371,5 +1425,105 @@ static FAutoConsoleCommandWithWorldAndArgs GHideTaggedActorsCommand(
     TEXT("Hide every actor carrying one of the given tags (e.g. RaftSimPhysicalCorridorWater to drop a "
          "reference map's static river ribbon and see the live carrier alone)."),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleHideTaggedActors));
+
+// ---------------------------------------------------------------------------
+// ListActorsNear (which asset renders what the review camera sees)
+// ---------------------------------------------------------------------------
+
+static void HandleListActorsNear(const TArray<FString>& Args, UWorld* World)
+{
+    if (World == nullptr)
+    {
+        return;
+    }
+    // Usage: RaftSim.ListActorsNear [radiusM=40] [delayS=6]. Deferred so the
+    // review-station teleport and late BeginPlay spawns have completed.
+    const float RadiusM = Args.Num() > 0 ? FCString::Atof(*Args[0]) : 40.0f;
+    const float DelayS = Args.Num() > 1 ? FCString::Atof(*Args[1]) : 6.0f;
+    TWeakObjectPtr<UWorld> WeakWorld(World);
+    FTimerHandle Handle;
+    World->GetTimerManager().SetTimer(
+        Handle,
+        FTimerDelegate::CreateLambda([WeakWorld, RadiusM]()
+    {
+        UWorld* World = WeakWorld.Get();
+        if (!World)
+        {
+            return;
+        }
+        FVector Center = FVector::ZeroVector;
+        if (TActorIterator<ARaftSimRaftActor> RaftIt(World); RaftIt)
+        {
+            Center = RaftIt->GetActorLocation();
+        }
+        const float RadiusCm = RadiusM * 100.0f;
+        int32 Listed = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (!Actor || Actor->IsHidden())
+            {
+                continue;
+            }
+            TInlineComponentArray<UPrimitiveComponent*> Primitives(Actor);
+            for (UPrimitiveComponent* Primitive : Primitives)
+            {
+                if (!Primitive || !Primitive->IsRegistered() || !Primitive->IsVisible())
+                {
+                    continue;
+                }
+                const FBoxSphereBounds Bounds = Primitive->Bounds;
+                const FBox Box = Bounds.GetBox();
+                const float DistanceCm = FMath::Sqrt(Box.ComputeSquaredDistanceToPoint(Center));
+                if (DistanceCm > RadiusCm)
+                {
+                    continue;
+                }
+                FString Asset = TEXT("-");
+                int32 Instances = -1;
+                if (const UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(Primitive))
+                {
+                    if (StaticMeshComponent->GetStaticMesh())
+                    {
+                        Asset = StaticMeshComponent->GetStaticMesh()->GetPathName();
+                    }
+                    if (const UInstancedStaticMeshComponent* Instanced = Cast<UInstancedStaticMeshComponent>(Primitive))
+                    {
+                        Instances = Instanced->GetInstanceCount();
+                    }
+                }
+                FString Tags;
+                for (const FName& Tag : Actor->Tags)
+                {
+                    Tags += Tag.ToString() + TEXT(" ");
+                }
+                FString Materials;
+                for (int32 Slot = 0; Slot < FMath::Min(Primitive->GetNumMaterials(), 3); ++Slot)
+                {
+                    if (const UMaterialInterface* Material = Primitive->GetMaterial(Slot))
+                    {
+                        Materials += Material->GetName() + TEXT(" ");
+                    }
+                }
+                UE_LOG(LogTemp, Display,
+                    TEXT("RaftSim near: dist=%.1fm actor=%s class=%s comp=%s(%s) asset=%s inst=%d extent=(%.1f,%.1f,%.1f)m mats=[%s] tags=[%s]"),
+                    DistanceCm / 100.0f, *Actor->GetName(), *Actor->GetClass()->GetName(),
+                    *Primitive->GetName(), *Primitive->GetClass()->GetName(), *Asset, Instances,
+                    Bounds.BoxExtent.X / 100.0f, Bounds.BoxExtent.Y / 100.0f, Bounds.BoxExtent.Z / 100.0f,
+                    *Materials, *Tags);
+                ++Listed;
+            }
+        }
+        UE_LOG(LogTemp, Display, TEXT("RaftSim near: listed %d primitives within %.0f m of (%.0f, %.0f, %.0f)"),
+            Listed, RadiusM, Center.X, Center.Y, Center.Z);
+    }),
+        FMath::Max(DelayS, 0.1f), false);
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GListActorsNearCommand(
+    TEXT("RaftSim.ListActorsNear"),
+    TEXT("Log every visible primitive within radiusM of the raft (asset, class, tags, materials). "
+         "Usage: RaftSim.ListActorsNear [radiusM=40] [delayS=6]"),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleListActorsNear));
 
 } // namespace RaftSimSurveyCommand
