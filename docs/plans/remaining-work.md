@@ -12,6 +12,15 @@ rapids. Next: exact-preserving publication/selection optimization, then matched
 healthy packaged timing and visual checks. Keep rejected experiments off and
 South Fork first. See [rapid evidence](../reconstruction-review-2026-09-07/south-fork-healthy-rapid11520.md).
 
+Follow-up analysis reuses that capture, not another unchanged game run: the
+strict CSV analyzer now supports an explicitly named unmeasured engine-counter
+duplicate while still rejecting every ambiguous measured timing. Seventeen
+tests pass. Verified timing-phase grouping finds438 overlapping refresh/crest
+selection frames, all>50ms (mean78.75ms); single-work groups also fail p95.
+The original85.2731ms p95 and all1,140 samples are unchanged. Supporting
+diagnostic repair only; game and acceptance status are unchanged. See the
+reproducible workload report in the linked rapid evidence.
+
 September26 packaged water-health repair: **the startup detail shutdown is
 resolved in the rebuilt playable game.** Exact diagnostic: cell10110 had
 aeration1.00000012 (one float step above1), with valid depth/velocity. The

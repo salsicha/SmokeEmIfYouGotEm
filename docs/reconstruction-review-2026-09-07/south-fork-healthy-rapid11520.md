@@ -71,6 +71,51 @@ requiring each selected scope name to appear exactly once and have a value
 in every selected row. No duplicate scope was used, no parser gate was
 relaxed, and the packaged profiler's frame receipt remains authoritative.
 
+### Reproducible workload analysis follow-up
+
+The parser now has an explicit `--ignore-duplicate-unmeasured-header` option.
+Default duplicate rejection is unchanged. The option cannot exempt any measured
+frame/thread/GPU/water scope, does not select either duplicate's values, and
+records the original column indices. Unknown additional duplicates, changed
+metric positions, truncated rows, missing footers and absent named exceptions
+still fail. Seventeen parser/workload tests pass. The local UE5.8 engine source
+registers `NumInstanceTransformUpdates` in both
+`Engine/Private/InstanceData/InstanceDataManager.cpp:741` and
+`Engine/Private/InstancedStaticMesh/ISMInstanceDataManager.cpp:685`.
+
+The retained CSV was reanalyzed without launching another game. Reproduction:
+
+```text
+python physics/scripts/audit_unreal_frame_csv.py
+  docs/reconstruction-review-2026-09-07/south-fork-healthy-rapid11520/frames.csv
+  --first-sample 30 --last-sample 1169 --target-fps 20 --require-water-scopes
+  --frame-time-scope-offset 1
+  --ignore-duplicate-unmeasured-header NumInstanceTransformUpdates
+  --report <new-output-path>
+```
+
+The [reproducible report](south-fork-healthy-rapid11520/workload.json) retains the
+original CSV hash, 1,140 samples and failed p95 85.2731 ms unchanged. It records
+the ignored unmeasured counter at columns 228 and 230. Timing phase 1 is justified
+by `csv.UseLegacyFrameTime = "false"` in the retained runtime log, not selected
+to improve correlations. Each elapsed interval is associated with the preceding
+logical frame's scopes:
+
+| Refresh / crest selection | Frames | Mean frame ms | p95 ms | Frames >50 ms |
+| --- | ---: | ---: | ---: | ---: |
+| No / yes | 352 | 46.45 | 53.53 | 69 |
+| Yes / no | 350 | 49.59 | 56.59 | 165 |
+| Yes / yes | 438 | 78.75 | 94.65 | 438 |
+
+All 1,140 samples remain; none has both timings zero. Overlapping refresh and
+selection is associated with the largest costs, but both single-work groups
+also exceed the p95 target. This is not proof of causality or authorization to
+skip either work item or change cadence. The follow-up fixes a diagnostic
+compatibility problem only; no new game build, visible improvement, performance
+pass, source acquisition or river acceptance is claimed. The single-insertion,
+parallel-emission and sparse-root candidates were checked against their prior
+rejection records and were not rerun or reintroduced.
+
 Earlier editor/host measurements are not a controlled before/after comparison
 with this run. Do not attribute the timing difference to the roundoff repair
 without matched measurements.

@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 import statistics
+from collections import Counter
 from pathlib import Path
 
 METRICS = ("FrameTime", "GameThreadTime", "RenderThreadTime", "RHIThreadTime", "GPUTime")
@@ -29,17 +30,28 @@ METADATA = {"config", "engineversion", "deviceprofile", "rhiname", "raytracing",
             "systemresolution.resx", "systemresolution.resy", "targetframerate"}
 
 
-def parse_capture(stream, require_water_scopes=False):
+def parse_capture(stream, require_water_scopes=False, ignore_duplicate_unmeasured_headers=()):
+    measured = METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES + RELIEF_SCOPES
+    ignored = set(ignore_duplicate_unmeasured_headers)
+    if ignored.intersection(measured) or any(not name or name.startswith('[') or name == 'EVENTS' for name in ignored):
+        raise ValueError('only explicitly named unmeasured counters may be ignored')
+
+    def validate_header(names):
+        counts = Counter(names or ())
+        duplicates = {name for name, count in counts.items() if count > 1}
+        if not names or duplicates - ignored:
+            raise ValueError('missing or duplicate CSV headers')
+        return duplicates
+
     reader = csv.reader(stream)
     header = next(reader, None)
-    if not header or len(set(header)) != len(header):
-        raise ValueError("missing or duplicate CSV headers")
+    validate_header(header)
     missing = set(METRICS) - set(header)
     if missing:
         raise ValueError(f"missing actual frame metrics: {sorted(missing)}")
     if require_water_scopes and set(WATER_SCOPES) - set(header):
         raise ValueError("capture is missing required water scope columns")
-    columns = {name: header.index(name) for name in METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES + RELIEF_SCOPES if name in header}
+    columns = {name: header.index(name) for name in measured if name in header}
     samples, metadata = [], {}
     footer = False
     completed_metadata = False
@@ -51,8 +63,17 @@ def parse_capture(stream, require_water_scopes=False):
             # Unreal FCsvStreamWriter appends series during continuous output, then
             # writes their complete header. Original metric positions cannot
             # change. Missing metrics are never filled with invented zeroes.
-            if footer or not samples or len(row) != width or len(set(row)) != len(row):
+            if footer or not samples or len(row) != width:
                 raise ValueError("unexpected repeated header")
+            duplicates = validate_header(row)
+            if ignored - duplicates:
+                raise ValueError('explicitly ignored duplicate is absent from completed header')
+            if duplicates:
+                # Keep every original column and row in place. Never select,
+                # combine, rename or report the ambiguous counters as metrics.
+                metadata['ignored_duplicate_unmeasured_headers'] = {
+                    name: [i for i, value in enumerate(row) if value == name]
+                    for name in sorted(duplicates)}
             footer = True  # Unreal's explicit trailing header, not another run.
             continue
         if row[0] == "[HasHeaderRowAtEnd]":
@@ -167,6 +188,8 @@ def main():
                         help="Acceptance target, independent of recorded engine metadata (default: 20)")
     parser.add_argument("--report", required=True, type=Path)
     parser.add_argument("--require-water-scopes", action="store_true")
+    parser.add_argument("--ignore-duplicate-unmeasured-header", action="append", default=[],
+                        help="Explicit engine counter exception; never permits duplicate measured timings. Recorded with original column indices.")
     parser.add_argument("--frame-time-scope-offset", type=int, choices=(0, 1),
                         help="Optional workload grouping: caller-verified FrameTime mode, 1 for UE5.8 default, 0 for legacy EndFrame")
     args = parser.parse_args()
@@ -175,7 +198,7 @@ def main():
     runs = []
     for path in args.captures:
         with path.open(newline="", encoding="utf-8-sig") as stream:
-            samples, metadata = parse_capture(stream, args.require_water_scopes)
+            samples, metadata = parse_capture(stream, args.require_water_scopes, args.ignore_duplicate_unmeasured_header)
         runs.append({"csv": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                      "total_samples": len(samples), "metadata": metadata,
                      "sample_indices_inclusive": [args.first_sample, args.last_sample],

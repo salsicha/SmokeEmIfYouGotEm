@@ -92,6 +92,50 @@ class UnrealFrameCsvTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_capture(io.StringIO(header + "10,8,3,1,4,0,1\n" + header + "[HasHeaderRowAtEnd],1\n"))
 
+    def test_explicit_unmeasured_duplicate_preserves_columns_rows_and_failed_budget(self):
+        counter = 'NumInstanceTransformUpdates'
+        # Both initial duplicates and append-only registration are engine layouts.
+        for initial_count in (0, 1, 2):
+            initial = HEADER.rstrip() + (',' + ','.join([counter] * initial_count) if initial_count else '') + '\n'
+            final = HEADER.rstrip() + ',' + counter + ',' + counter + '\n'
+            capture = initial + '200,180,4,2,70' + ',0' * initial_count + '\n210,190,5,3,80,999,1\n' + final + '[HasHeaderRowAtEnd],1\n'
+            with self.subTest(initial_count=initial_count):
+                with self.assertRaises(ValueError):
+                    parse_capture(io.StringIO(capture))
+                samples, metadata = parse_capture(io.StringIO(capture), ignore_duplicate_unmeasured_headers=[counter])
+                self.assertEqual(len(samples), 2)
+                self.assertEqual(samples[0]['GPUTime'], 70)
+                self.assertEqual(samples[1]['GPUTime'], 80)
+                self.assertNotIn(counter, samples[0])
+                self.assertEqual(metadata['ignored_duplicate_unmeasured_headers'], {counter: [5, 6]})
+                stats = summarize(samples, 0, 1)
+                self.assertEqual(stats['FrameTime']['mean_ms'], 205)
+                self.assertEqual(stats['FrameTime']['p95_ms_nearest_rank'], 210)
+                self.assertFalse(stats['frame_p95_within_target_budget'])
+
+    def test_duplicate_exception_never_allows_measured_or_unknown_duplicates(self):
+        measured = ('FrameTime',) + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES + RELIEF_SCOPES
+        for name in measured + ('', 'EVENTS', '[HasHeaderRowAtEnd]'):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                parse_capture(io.StringIO(HEADER + '20,18,4,2,5\n' + FOOTER), ignore_duplicate_unmeasured_headers=[name])
+        counter = 'NumInstanceTransformUpdates'
+        for extra in ('FrameTime', 'FMsgLogf/FMsgLogfCount'):
+            header = HEADER.rstrip() + ',' + ','.join([counter, counter, extra, extra]) + '\n'
+            with self.subTest(extra=extra), self.assertRaises(ValueError):
+                parse_capture(io.StringIO(header + '20,18,4,2,5,1,2,3,4\n' + header + '[HasHeaderRowAtEnd],1\n'), ignore_duplicate_unmeasured_headers=[counter])
+
+    def test_explicit_duplicate_does_not_hide_truncation_reordering_or_absent_counter(self):
+        counter = 'NumInstanceTransformUpdates'
+        header = HEADER.rstrip() + ',' + counter + ',' + counter + '\n'
+        rows = '20,18,4,2,5,1,2\n'
+        bad = [header + rows + '20,18,4,2,5,1\n' + header,
+               header + rows + header.replace('FrameTime,GameThreadTime', 'GameThreadTime,FrameTime'),
+               header + rows,
+               HEADER + '20,18,4,2,5\n' + HEADER]
+        for capture in bad:
+            with self.subTest(capture=capture), self.assertRaises(ValueError):
+                parse_capture(io.StringIO(capture + '[HasHeaderRowAtEnd],1\n'), ignore_duplicate_unmeasured_headers=[counter])
+
     def test_completed_capture_and_warmed_interval(self):
         rows = "1000,900,800,10,700\n10,7,6,2,5\n20,14,12,4,10\n"
         samples, metadata = parse_capture(io.StringIO(HEADER + rows + HEADER +
