@@ -31,7 +31,13 @@ ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT / 'physics/data/real_world/south_fork_american_chili_bar'
 WINDOWS = BASE / 'production_corridor/full_reach_windows'
 FULL = BASE / 'reconstruction_2026_09/full_reach'
-MASK = FULL / 'unknown_submerged_bed_mask.tif'
+# The context grid (10006 columns) extends the old composite grid (9871); use
+# its own mask so the added reaches also exclude the submerged bed.
+MASK = FULL / 'source_context_extension/unknown_submerged_bed_mask.tif'
+# Windows exported for the retired 49 km route lie beyond the playable run.
+# One is a much paler acquisition; blending it washed the lower gorge white.
+# They only fill pixels no current-route window covers, colour-matched.
+FALLBACK_WINDOWS = ('below_full_run_alias_33796_41500m', 'salmon_falls_takeout_approach_41500_49077m')
 CONTEXT = FULL / 'source_context_extension/manifest.json'
 COMPOSITE = FULL / 'composite_terrain/manifest.json'
 
@@ -77,6 +83,65 @@ def utm_to_lonlat(e, n, zone=10):
 def lonlat_to_mercator(lon, lat):
     r = 6378137.0
     return r * lon, r * np.log(np.tan(np.pi / 4 + lat / 2))
+
+
+def recolor_washed_tile(img, block=64, sat_max=0.08, min_blocks=64):
+    """Recolour a washed-out source tile inside a window export.
+
+    The image service mosaics several NAIP source tiles; one tile in the
+    salmon-falls window is desaturated and hazy (mean block saturation < 0.08
+    against ~0.2 elsewhere), and it covers the current lower gorge. Keep its
+    spatial structure (every pixel's luma rank) and transfer colour from the
+    same window's normal pixels: a pixel at luma quantile q takes the median
+    RGB of the normal pixels at luma quantile q. Returns (img, stats).
+    """
+    rgb = img[..., :3]
+    h, w = rgb.shape[:2]
+    mx = rgb.max(axis=2)
+    sat = (mx - rgb.min(axis=2)) / np.maximum(mx, 1e-4)
+    hb, wb = h // block, w // block
+    block_sat = sat[:hb * block, :wb * block].reshape(hb, block, wb, block).mean(axis=(1, 3))
+    grey_blocks = block_sat < sat_max
+    if grey_blocks.sum() < min_blocks:
+        return img, dict(recolored=False, grey_blocks=int(grey_blocks.sum()))
+    # Blocks straddling the tile edge are mixed; refine per pixel within one
+    # block of the grey blocks using locally smoothed saturation.
+    near = grey_blocks.copy()
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            near |= np.roll(np.roll(grey_blocks, dy, 0), dx, 1)
+    near = np.kron(near, np.ones((block, block), bool))
+    near = np.pad(near, ((0, h - near.shape[0]), (0, w - near.shape[1])), mode='edge')
+    k = 7
+    c = np.pad(sat.astype(np.float64), ((1, 0), (1, 0))).cumsum(0).cumsum(1)
+    y0 = np.clip(np.arange(h) - k, 0, h); y1 = np.clip(np.arange(h) + k + 1, 0, h)
+    x0 = np.clip(np.arange(w) - k, 0, w); x1 = np.clip(np.arange(w) + k + 1, 0, w)
+    local_sat = (c[y1][:, x1] - c[y0][:, x1] - c[y1][:, x0] + c[y0][:, x0]) / (
+        (y1 - y0)[:, None] * (x1 - x0)[None, :])
+    grey = near & (local_sat < sat_max * 1.5)
+    luma = rgb.mean(axis=2)
+    normal = ~grey
+    q = np.linspace(0, 1, 129)
+    normal_luma_q = np.quantile(luma[normal], q)
+    grey_luma_q = np.quantile(luma[grey], q)
+    # median colour of normal pixels per luma bin
+    bins = np.clip(np.searchsorted(normal_luma_q, luma[normal]) - 1, 0, 127)
+    lut = np.zeros((128, 3), np.float32)
+    nrgb = rgb[normal]
+    for b in range(128):
+        sel = nrgb[bins == b]
+        lut[b] = np.median(sel, axis=0) if len(sel) else lut[b - 1]
+    gq = np.interp(luma[grey], grey_luma_q, q)  # quantile of each grey pixel
+    pos = np.clip(gq * 128.0 - 0.5, 0, 127)
+    i0 = np.floor(pos).astype(np.int64)
+    i1 = np.minimum(i0 + 1, 127)
+    t = (pos - i0)[:, None]
+    out = img.copy()
+    out[..., :3][grey] = lut[i0] * (1 - t) + lut[i1] * t
+    stats = dict(recolored=True, grey_blocks=int(grey_blocks.sum()), grey_fraction=float(grey.mean()),
+                 grey_mean_saturation=float(sat[grey].mean()), normal_mean_saturation=float(sat[normal].mean()),
+                 method='luma-quantile colour transfer from the same window')
+    return out, stats
 
 
 def write_png_rgba(path, rgba):
@@ -139,9 +204,15 @@ def main():
     FEATHER_PX = 200.0
     acc = np.zeros((used_rows, WIDTH, 3), dtype=np.float32)
     wsum = np.zeros((used_rows, WIDTH), dtype=np.float32)
+    acc_fb = np.zeros((used_rows, WIDTH, 3), dtype=np.float32)
+    wsum_fb = np.zeros((used_rows, WIDTH), dtype=np.float32)
     ee = e0 + (np.arange(WIDTH) + 0.5) * px
     for window in windows:
+        fallback = window['name'] in FALLBACK_WINDOWS
+        window['role'] = 'fallback_retired_route' if fallback else 'primary'
+        target_acc, target_w = (acc_fb, wsum_fb) if fallback else (acc, wsum)
         img = load_rgba(window['path'])
+        img, window['washed_tile_correction'] = recolor_washed_tile(img)
         h, w = img.shape[:2]
         x0, y0, x1, y1 = window['bounds']
         count = 0
@@ -165,8 +236,8 @@ def main():
             edge = np.minimum(np.minimum(fx[inside], w - 1 - fx[inside]),
                               np.minimum(fy[inside], h - 1 - fy[inside]))
             weight = np.clip(edge / FEATHER_PX, 1e-4, 1.0).astype(np.float32)
-            acc[r0:r1][inside] += (c * weight[:, None]).astype(np.float32)
-            wsum[r0:r1][inside] += weight
+            target_acc[r0:r1][inside] += (c * weight[:, None]).astype(np.float32)
+            target_w[r0:r1][inside] += weight
             count += int(inside.sum())
         window['pixels_used'] = count
         del img
@@ -174,17 +245,30 @@ def main():
     out = np.zeros((HEIGHT, WIDTH, 4), dtype=np.uint8)
     filled = np.zeros((HEIGHT, WIDTH), dtype=bool)
     covered = wsum > 0
-    out[:used_rows][covered, :3] = np.clip(acc[covered] / wsum[covered][:, None] * 255.0 + 0.5, 0, 255).astype(np.uint8)
-    out[:used_rows][covered, 3] = 255
-    filled[:used_rows] = covered
-    del acc, wsum
+    primary = np.zeros(acc.shape, np.float32)
+    primary[covered] = acc[covered] / wsum[covered][:, None]
+    fb_covered = wsum_fb > 0
+    fallback_rgb = np.zeros(acc.shape, np.float32)
+    fallback_rgb[fb_covered] = acc_fb[fb_covered] / wsum_fb[fb_covered][:, None]
+    both = covered & fb_covered
+    gain = [1.0, 1.0, 1.0]
+    if both.sum() > 10000:
+        gain = [float(np.median(primary[both][:, k]) / max(np.median(fallback_rgb[both][:, k]), 1e-4)) for k in range(3)]
+    gap = fb_covered & ~covered
+    rgb = primary
+    rgb[gap] = np.clip(fallback_rgb[gap] * np.array(gain, np.float32), 0, 1)
+    any_cov = covered | fb_covered
+    out[:used_rows][any_cov, :3] = np.clip(rgb[any_cov] * 255.0 + 0.5, 0, 255).astype(np.uint8)
+    out[:used_rows][any_cov, 3] = 255
+    filled[:used_rows] = any_cov
+    fallback_stats = dict(gap_fill_pixels=int(gap.sum()), overlap_pixels=int(both.sum()), colour_gain=gain)
+    del acc, wsum, acc_fb, wsum_fb, primary, fallback_rgb
 
     # Submerged-bed exclusion from the terrain's own mask (composite grid).
     # Mask values: 0 dry corridor, 1 inferred submerged bed, 255 outside the corridor.
     mask = np.abs(load_rgba(MASK)[..., 0] * 255.0 - 1.0) < 0.5
-    mgrid = composite['grid']
-    me0, mn_top = mgrid['first_vertex_utm_m']
-    mcell = mgrid['cell_m']
+    me0, mn_top = context['grid']['first_vertex_utm_m']
+    mcell = context['grid']['cell_m']
     submerged_px = 0
     water_index_rows = []
     for r0 in range(0, used_rows, 512):
@@ -242,6 +326,7 @@ def main():
         windows=[{k: v for k, v in w_.items() if k != 'path'} | {'path': str(w_['path'].relative_to(ROOT).as_posix())}
                  for w_ in windows],
         filled_fraction=float(filled[:used_rows].mean()), submerged_pixels_excluded=submerged_px,
+        retired_route_fallback=fallback_stats,
         submerged_mask=str(MASK.relative_to(ROOT).as_posix()),
         registration_check=dict(method='(B-R)-luma water index vs terrain submerged mask in the corridor',
                                 correlation_at_zero=zero, best_correlation=best[0],
