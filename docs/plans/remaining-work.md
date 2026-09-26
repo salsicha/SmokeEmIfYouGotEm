@@ -15,11 +15,19 @@ the raft; neither river has photoreal or measured-hydraulics acceptance. See
 
 September26 standalone staging repair: normal Development rebuild succeeded
 (2,416 actions); all2,405 v3 runtime files and their dependency closure now
-verify in the actual standalone staged tree. Native comparison was stopped
-before validation to avoid the other session's editor rebuild; no success is
-claimed for it or cooked-game execution. Next: idle-host native comparison,
-then cooked-game validation. Do not repeat the resolved missing-file check. See
+verify in the actual standalone staged tree. A later idle-host native comparison
+passes 2,001 route and 2,601 initial-water queries with exactly zero staged/source
+error and no fallback. This is editor-hosted data validation, not cooked-game
+execution or motion acceptance. Next: cooked-game validation; do not repeat
+the resolved missing-file or native comparison checks. See
 [rebuild receipt and remaining gates](../reconstruction-review-2026-09-07/south-fork-v3-standalone-rebuild.md).
+
+September26 source-filter correction: Eldorado ignored ground is class20, not10.
+The retained Troublemaker archive has17 additional returns passing the original
+exposed-ground screen; they are provisional observations, not17 verified rocks.
+Source filters are corrected; captured archives, current geometry and cooks are
+unchanged. Review and consistent playable integration remain required. See
+[classification impact](../reconstruction-review-2026-09-07/south-fork-ignored-ground-correction.md).
 
 September26 playable delivery (normal FullReach): **South Fork riverbed is now
 discharge-consistent and the rapids have their captured drops.** The inferred

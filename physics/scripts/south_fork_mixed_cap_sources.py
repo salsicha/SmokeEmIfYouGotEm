@@ -18,7 +18,7 @@ def validate_mixed_sources(data, original, manifest, root, origin):
         raise ValueError('Integer per-vertex source identities required')
     if not np.isin(datasets,[0,1]).all() or not (datasets==1).any() or (ids<0).any():
         raise ValueError('Unknown mixed source identity')
-    if not np.isin(classes,[1,2,10]).all():
+    if not np.isin(classes,[1,2,20]).all():
         raise ValueError('Excluded mixed source classification')
     expected=np.empty_like(xyz); expected_class=np.empty(len(xyz),dtype=np.uint8)
     old=datasets==0

@@ -66,7 +66,7 @@ class SourceRockUnion:
                     raise ValueError('Candidate moved an original source vertex')
                 if not mixed and not np.array_equal(data['original_classification'],source['classification'][ids]):
                     raise ValueError('Candidate relabelled source classification')
-                if not mixed and not np.isin(data['original_classification'],[1,2,10]).all():
+                if not mixed and not np.isin(data['original_classification'],[1,2,20]).all():
                     raise ValueError('Excluded source class in rock interpretation')
             self.floor=float(m['inferred_solid']['internal_floor_m'])
             with np.load(paths['source_mesh'],allow_pickle=False) as parent:

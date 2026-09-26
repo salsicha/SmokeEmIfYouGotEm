@@ -24,7 +24,7 @@ def test_noise_water_and_outside_points_cannot_support_a_rock_bin():
 
 def test_clearance_is_strict_and_does_not_require_water_membership():
     xyz=np.array([[.1,.1,4],[.2,.2,5],[.3,.3,2]])
-    ids,counts=select_lower_returns(xyz,[1,10,2],[.4,.5,.3],REGION)
+    ids,counts=select_lower_returns(xyz,[1,20,2],[.4,.5,.3],REGION)
     assert ids.tolist()==[0] and counts.tolist()==[2]
 
 

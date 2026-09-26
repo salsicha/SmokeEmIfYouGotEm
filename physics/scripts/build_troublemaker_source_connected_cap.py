@@ -273,7 +273,7 @@ def run(previous_path, output, support_region=None, pulse_manifest=None):
         if not np.array_equal(xyz[old_ids], old_xyz):
             raise ValueError('Previous cap did not retain original XYZ')
         # Whole captured mesh interior, not a guessed expanding rock radius.
-        valid = np.isfinite(xyz).all(1) & np.isin(classes, [1, 2, 10])
+        valid = np.isfinite(xyz).all(1) & np.isin(classes, [1, 2, 20])
         valid &= (xyz[:, 0] >= sampler.east[0] + sampler.dx / 2) & (xyz[:, 0] <= sampler.east[-1] - sampler.dx / 2)
         valid &= (xyz[:, 1] >= sampler.north[-1] + sampler.dy / 2) & (xyz[:, 1] <= sampler.north[0] - sampler.dy / 2)
         pulse_selection = None

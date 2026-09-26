@@ -11,7 +11,7 @@ def lower_bin_witnesses(vertices, xyz, classes, residual, cell_m=.5):
         raise ValueError('Positive finite bin size required')
     if not np.isfinite(vertices).all():
         raise ValueError('Finite candidate coordinates required')
-    valid = np.isfinite(xyz).all(axis=1) & np.isfinite(residual) & np.isin(classes, [1, 2, 10])
+    valid = np.isfinite(xyz).all(axis=1) & np.isfinite(residual) & np.isin(classes, [1, 2, 20])
     bins = {}
     for i in np.flatnonzero(valid):
         key = tuple(np.floor(xyz[i, :2] / cell_m).astype(np.int64))

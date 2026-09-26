@@ -49,7 +49,7 @@ def run(output):
     # A diagnostic rectangular viewport only: not an accepted selection mask.
     bounds = [-5., 48., -15., 18.]
     scope = (xyz[:, 0] >= bounds[0]) & (xyz[:, 0] < bounds[1]) & (xyz[:, 1] >= bounds[2]) & (xyz[:, 1] < bounds[3])
-    scope &= np.isin(returns['classification'], [1, 2, 10])
+    scope &= np.isin(returns['classification'], [1, 2, 20])
     ids = np.flatnonzero(scope)
     # Preserve low/near-water returns in the picture; do not silently remove
     # the very evidence needed to distinguish a rock foot from whitewater.

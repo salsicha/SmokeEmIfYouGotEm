@@ -52,7 +52,7 @@ def main():
     col,row=(~affine)*(data['utm_easting_m'],data['utm_northing_m'])
     col,row=np.floor(col).astype(int),np.floor(row).astype(int)
     inside=(row>=0)&(col>=0)&(row<bed.shape[0])&(col<bed.shape[1])
-    good=inside & np.isin(data['classification'],[1,2,10]) & (data['height_above_flattened_surface_m']>.3)
+    good=inside & np.isin(data['classification'],[1,2,20]) & (data['height_above_flattened_surface_m']>.3)
     good &= data['height_above_flattened_surface_m']<8
     indices=np.where(good)[0]
     indices=indices[(region_mask[row[indices],col[indices]]>0)&wet[row[indices],col[indices]]]

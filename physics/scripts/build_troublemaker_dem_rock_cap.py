@@ -49,7 +49,7 @@ def select_lower_returns(xyz, classification, above_dem, polygon,
         raise ValueError('Valid positive-area interpreted region required')
     from shapely import intersects_xy
     inside = intersects_xy(polygon, xyz[:,0], xyz[:,1])
-    eligible = inside & np.isin(classification, [1,2,10]) & (above_dem > threshold_m)
+    eligible = inside & np.isin(classification, [1,2,20]) & (above_dem > threshold_m)
     indices = np.flatnonzero(eligible)
     if not len(indices):
         return indices, np.empty(0, dtype=np.int64)
@@ -282,7 +282,7 @@ def run(output):
         bins[valid]=np.floor(xyz[valid,:2]/0.5).astype(np.int64)
         support_by_bin={tuple(bins[i]):int(count) for i,count in zip(selected,support)}
         from shapely import intersects_xy
-        eligible=valid&np.isin(classification,[1,2,10])&(residual>.3)&intersects_xy(Polygon(REGION),xyz[:,0],xyz[:,1])
+        eligible=valid&np.isin(classification,[1,2,20])&(residual>.3)&intersects_xy(Polygon(REGION),xyz[:,0],xyz[:,1])
         pool=np.array([i for i in np.flatnonzero(eligible) if tuple(bins[i]) in support_by_bin],dtype=np.int64)
         # Duplicate horizontal observations remain in the original archive;
         # this height-field interpretation explicitly selects their lowest Z.
@@ -320,7 +320,7 @@ def run(output):
         solid_vertices,solid_faces,face_kind,solid_report=close_cap_below_retained_terrain(vertices,faces,internal_floor)
         nearby=np.all((xyz[:,:2]>=vertices[:,:2].min(axis=0))&(xyz[:,:2]<=vertices[:,:2].max(axis=0)),axis=1)
         observations={}
-        for name,classes in [('classified_ground',[2,10]),('unclassified',[1])]:
+        for name,classes in [('classified_ground',[2,20]),('unclassified',[1])]:
             ix=np.flatnonzero(nearby&np.isin(classification,classes))
             heights=sample_cap(vertices,faces,xyz[ix,:2]);inside=np.isfinite(heights)
             differences=heights[inside]-xyz[ix[inside],2]

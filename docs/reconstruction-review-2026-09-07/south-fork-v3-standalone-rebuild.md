@@ -1,8 +1,9 @@
 # South Fork v3: standalone build and staging repaired
 
 September 26, 2026. This closes the missing standalone payloads identified in
-[the staging-gap audit](south-fork-v3-staging-gap.md). It does not close native
-staged-path, cooked-package, geographic, hydraulic or performance acceptance.
+[the staging-gap audit](south-fork-v3-staging-gap.md). The subsequent native
+staged-path check below also passes. Cooked-package, geographic, hydraulic and
+performance acceptance remain open.
 
 ## Delivered build
 
@@ -41,7 +42,7 @@ the correct archived log was recovered only after matching the standalone
 target, success marker and exact 699.86-second duration. Do not attribute the
 editor build log to this standalone result.
 
-## Native validation remains pending
+## Native staged-data validation passed on the idle-host retry
 
 The read-only native staged-path comparison was started after the build.
 Another session had just started an editor rebuild, exposed as `dotnet.exe`
@@ -52,9 +53,17 @@ The verifier produced **no success receipt**. A later retry used a guard that
 also recognizes UnrealBuildTool under dotnet and Build.bat under cmd; it found
 the host occupied and stopped before launching an engine.
 
-Next idle-host step: run `verify_south_fork_runtime_bundle.py` against the
-actual staged root with a fresh `RAFTSIM_RUNTIME_BUNDLE_REPORT`. Then rebuild
-and validate the cooked game. The standalone executable has not been run or
+After the other session's P4 suite exited at 13:01 UTC, the guarded retry ran
+`verify_south_fork_runtime_bundle.py` against the actual staged root. It exited
+zero at 13:08 UTC and produced the [native receipt](south-fork-v3-native-stage.json):
+2,405 files verified, 2,001 native route queries and 2,601 native initial-water
+queries (691 wet), with maximum staged/source errors exactly zero. Absolute
+staged paths were used with no external source fallback. This was an editor
+process, with zero solver steps and no saved assets, not standalone gameplay.
+The local log is `tmp/discharge-bed-independent-audit-20260926/native-v3-idle.log`,
+SHA-256 `a559cbb80be68e5802deea1ed37b169975869b538973e0a7c78998d75a3502db`.
+
+Next: rebuild and validate the cooked game. The standalone executable has not been run or
 accepted in this pass, and older cooked content is not updated by this build.
 Normal-menu motion/20 FPS results from the preceding editor-hosted delivery
 are historical evidence, not new standalone measurements.

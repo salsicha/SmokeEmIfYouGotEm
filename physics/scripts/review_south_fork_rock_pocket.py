@@ -35,7 +35,7 @@ def main():
     x,y,z=[points[k] for k in ('utm_easting_m','utm_northing_m','navd88_m')]
     col,row=(~transform)*(x,y); col,row=np.floor(col).astype(int),np.floor(row).astype(int)
     classes=points['classification']; dz=points['height_above_flattened_surface_m']
-    accepted=np.isin(classes,[1,2,10])&(dz>.3)&(dz<8.)
+    accepted=np.isin(classes,[1,2,20])&(dz>.3)&(dz<8.)
     peak=json.loads((OUT/'gap-continuation-hotspots.json').read_text())['regions'][2]['largest_sampled_stage_variation_locations'][0]
     px,py=peak['east_north_utm_m']
     c,r=(~transform)*(px,py); c,r=int(np.floor(c)),int(np.floor(r))
@@ -53,7 +53,7 @@ def main():
     image=plt.imread(BASE/'sources/troublemaker_naip.png')
     extent=json.loads((BASE/'sources/troublemaker_naip_export.json').read_text())['extent']
     roi=[px-12,px+12,py-12,py+12]
-    selected=(x>roi[0])&(x<roi[1])&(y>roi[2])&(y<roi[3])&np.isin(classes,[1,2,10])
+    selected=(x>roi[0])&(x<roi[1])&(y>roi[2])&(y<roi[3])&np.isin(classes,[1,2,20])
     fig,axes=plt.subplots(1,3,figsize=(15,5),layout='constrained')
     axes[0].imshow(image,extent=[extent['xmin'],extent['xmax'],extent['ymin'],extent['ymax']])
     axes[0].set_title('Dated NAIP; registration uncertainty ~3 m')
@@ -74,7 +74,7 @@ def main():
         'point_cloud_sha256':hashlib.sha256((BASE/'troublemaker/classified_lidar_returns.npz').read_bytes()).hexdigest(),
         'hotspot':peak,'source_cell_containing_hotspot':[r,c], 'reviewed_cells':reviewed,
         'source_image_sha256':hashlib.sha256((BASE/'sources/troublemaker_naip.png').read_bytes()).hexdigest(),
-        'accepted_filter':'class 1,2,10; height above hydroflattened surface >0.3 and <8 m',
+        'accepted_filter':'class 1,2,20; height above hydroflattened surface >0.3 and <8 m',
         'registered_rapid_identity_verified':False,'geometry_modified':False,'production_promoted':False}
     output.write_text(json.dumps(report,indent=2,allow_nan=False),encoding='utf-8')
     print(json.dumps([p for p in reviewed if p['authority']==2],indent=2))

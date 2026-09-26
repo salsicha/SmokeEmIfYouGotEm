@@ -85,7 +85,7 @@ def main():
     eligible &= (points['height_above_flattened_surface_m'] > .3) & (points['height_above_flattened_surface_m'] < 8)
     # Outside the interpreted search regions use only classified ground and
     # ignored-ground, never unclassified canopy returns.
-    eligible &= np.isin(points['classification'], (2, 10))
+    eligible &= np.isin(points['classification'], (2, 20))
     indices = np.flatnonzero(eligible)
     cells = rows[indices]*shape[1]+cols[indices]
     counts = np.bincount(cells, minlength=np.prod(shape)).reshape(shape)

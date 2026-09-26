@@ -71,7 +71,7 @@ def main():
         col, row = np.floor(col).astype(int), np.floor(row).astype(int)
         rows, cols = packed['z_m'].shape
         valid = (row >= 0)&(row < rows)&(col >= 0)&(col < cols)
-        valid &= np.isin(points['classification'], [1,2,10])
+        valid &= np.isin(points['classification'], [1,2,20])
         valid &= (points['height_above_flattened_surface_m'] > .3)&(points['height_above_flattened_surface_m'] < 8)
         indices = np.flatnonzero(valid)
         indices = indices[packed['authority'][row[indices], col[indices]] == 3]

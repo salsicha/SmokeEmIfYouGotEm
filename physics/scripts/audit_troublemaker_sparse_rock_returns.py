@@ -33,7 +33,7 @@ def load_candidates(threshold=.3):
     c = np.floor((x-mesh['nominal_east_axis_m'][0]+.25)/.5).astype(int)
     rows, cols = mesh['authority'].shape
     eligible = (r >= 0)&(r < rows)&(c >= 0)&(c < cols)
-    eligible &= points['within_survey_water'] & np.isin(points['classification'], [1, 2, 10])
+    eligible &= points['within_survey_water'] & np.isin(points['classification'], [1, 2, 20])
     eligible &= (points['height_above_flattened_surface_m'] > threshold)&(points['height_above_flattened_surface_m'] < 8)
     region = np.zeros(len(x), bool)
     for polygon in json.loads((BASE/'rock_review_regions.json').read_text())['regions']:

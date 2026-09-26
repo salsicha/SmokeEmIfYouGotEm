@@ -20,7 +20,7 @@ def neighbour_evidence(vertices, original_ids, xyz, classification, radius_m=.3)
         raise ValueError('Positive finite diagnostic radius required')
     if not np.array_equal(vertices, xyz[original_ids]):
         raise ValueError('Cap vertices must reproduce exact original returns')
-    eligible = np.flatnonzero(np.isin(classification, [1, 2, 10]))
+    eligible = np.flatnonzero(np.isin(classification, [1, 2, 20]))
     tree = cKDTree(xyz[eligible, :2])
     rows = []
     for vertex, original_id in zip(vertices, original_ids):

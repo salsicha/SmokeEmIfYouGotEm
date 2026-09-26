@@ -27,6 +27,18 @@ def test_source_exact_rows_pass(mixed):
     assert result['source_vertices']==1
     assert not result['semantic_rock_classification_verified']
 
+
+@pytest.mark.parametrize('classification', [20, 10])
+def test_original_ignored_ground_class_is_preserved(mixed, classification):
+    data, original, _, _, _ = mixed
+    original['classification'][0] = classification
+    data['source_classification'][0] = classification
+    if classification == 20:
+        assert not validate_mixed_sources(*mixed)['semantic_rock_classification_verified']
+    else:
+        with pytest.raises(ValueError, match='Excluded mixed source classification'):
+            validate_mixed_sources(*mixed)
+
 @pytest.mark.parametrize('case',['moved','class','unknown','negative','old_bounds','new_bounds','dtype','legacy','offset','hash'])
 def test_forged_provenance_rejected(mixed,case):
     d,o,m,r,origin=mixed

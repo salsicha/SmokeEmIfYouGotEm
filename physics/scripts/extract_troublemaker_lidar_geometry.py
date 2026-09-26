@@ -59,7 +59,9 @@ def main():
         dem = map_coordinates(ds.read(1), [xy[1]-.5,xy[0]-.5], order=1, mode='constant', cval=np.nan)
     with rasterio.open(BASE / 'troublemaker/unknown_submerged_bed_mask.tif') as ds:
         water = map_coordinates(ds.read(1), [xy[1]-.5,xy[0]-.5], order=0, mode='constant', cval=255)==1
-    ground = np.isin(data[:,3], [2,10])
+    # Eldorado survey metadata: 2 = bare earth, 20 = ignored ground (not 10).
+    # Eligibility is an exposed-ground hypothesis, not a verified rock label.
+    ground = np.isin(data[:,3], [2,20])
     candidate = ground & water & (data[:,2] > dem+.3) & (data[:,2] < dem+12)
     out = BASE / 'troublemaker'
     np.savez_compressed(out / 'classified_lidar_returns.npz',

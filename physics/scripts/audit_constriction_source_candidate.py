@@ -88,7 +88,7 @@ def run(candidate, output, view_path=None):
     north = np.linspace(-13., 5., 1000)
     for ax, east in zip(axes, [6., 18.]):
         close = (abs(points[:, 0]-east) < .25) & (points[:, 1] >= -13) & (points[:, 1] <= 5)
-        close &= np.isin(returns['classification'], [1, 2, 10])
+        close &= np.isin(returns['classification'], [1, 2, 20])
         ax.scatter(points[close, 1], points[close, 2], s=10, color='black', alpha=.5, label='Original returns within +/-0.25m')
         ax.plot(north, old_sampler.sample(np.full_like(north, east), north), label='Installed source')
         ax.plot(north, sampler.sample(np.full_like(north, east), north), label='Isolated source candidate')

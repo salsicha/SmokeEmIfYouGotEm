@@ -52,7 +52,7 @@ def infer_surface(cap, seed_ids, cloud_xyz, last, classes, *, infer_boundary_hei
     boundary=np.zeros(len(xyz),bool);boundary[np.unique(cap['boundary_edges'])]=True
     protected=np.isin(ids,seed_ids)|(classes[ids]!=1)
     if not infer_boundary_heights:protected|=boundary
-    pool_ids=np.flatnonzero(last & np.isin(classes,[1,2,10]))
+    pool_ids=np.flatnonzero(last & np.isin(classes,[1,2,20]))
     tree=cKDTree(cloud_xyz[pool_ids,:2])
     result=xyz.copy();changes=[]
     for i in np.flatnonzero(~protected):

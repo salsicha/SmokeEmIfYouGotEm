@@ -42,7 +42,7 @@ def recover(mesh, returns, selection):
     rows, cols = mesh['authority'].shape
     eligible = (row >= 0) & (row < rows) & (col >= 0) & (col < cols)
     eligible &= inside_polygon(xyz[:, 0], xyz[:, 1], selection['interpreted_selection_polygon_m'])
-    eligible &= np.isin(returns['classification'], [1, 2, 10]) & returns['within_survey_water']
+    eligible &= np.isin(returns['classification'], [1, 2, 20]) & returns['within_survey_water']
     above = returns['height_above_flattened_surface_m']
     eligible &= (above > .3) & (above < 8)
     original_ids = np.flatnonzero(eligible)
