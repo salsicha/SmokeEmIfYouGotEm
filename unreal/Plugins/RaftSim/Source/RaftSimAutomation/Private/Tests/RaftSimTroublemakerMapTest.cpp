@@ -212,6 +212,21 @@ bool FRaftSimAssertRiverMapCommand::Update()
     const bool bUsesSolverOwnedVisibleRiver =
         bZambeziReferenceRun || bPacuareReferenceRun || bColoradoHanceReferenceRun ||
         bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
+    // The migrated volume-core reference runs (Colorado, Pacuare, Futaleufu,
+    // Chilko) present their 240 x 96 m windows on a 1 m lattice: at 0.5 m they
+    // had 92,833 CPU-updated vertices, and 1 m keeps several vertices per
+    // hydraulic crest while quartering presentation work (hydraulics
+    // unchanged; RaftSimWaterSurfaceActor.cpp, commit 25aefa24d). Zambezi keeps
+    // the 0.5 m refined lattice.
+    const bool bUsesOneMetreReferencePresentation =
+        bPacuareReferenceRun || bColoradoHanceReferenceRun ||
+        bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
+    const float ExpectedPresentationSpacingM =
+        bUsesOneMetreReferencePresentation ? 1.0f : 0.5f;
+    const int32 ExpectedPresentationVertices =
+        bUsesOneMetreReferencePresentation ? 23377 : 92833;
+    const int32 ExpectedPresentationTriangles =
+        bUsesOneMetreReferencePresentation ? 46080 : 184320;
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
     {
@@ -220,17 +235,21 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("runnable river uses the refined authored-river presentation grid"),
             It->IsRiverPresentationGridRefined());
         Test->TestTrue(
-            TEXT("runnable river presentation vertices use 0.5 m spacing"),
+            FString::Printf(
+                TEXT("runnable river presentation vertices use %.1f m spacing"),
+                ExpectedPresentationSpacingM),
             FMath::IsNearlyEqual(
-                It->GetPresentationVertexSpacingMeters(), 0.5f, 0.001f));
+                It->GetPresentationVertexSpacingMeters(),
+                ExpectedPresentationSpacingM,
+                0.001f));
         Test->TestEqual(
             TEXT("runnable river presentation window has the refined vertex count"),
             It->GetSurfaceVertexCount(),
-            92833);
+            ExpectedPresentationVertices);
         Test->TestEqual(
             TEXT("runnable river presentation window has the refined triangle count"),
             It->GetSurfaceTriangleCount(),
-            184320);
+            ExpectedPresentationTriangles);
         Test->TestEqual(
             TEXT("live surface carrier follows the saved river ownership contract"),
             It->IsLiveSurfaceCarrierEnabled(),
@@ -2477,14 +2496,18 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
             bAllBoulderContactsAreProxyOnly &= It->IsContactProxyOnly();
         }
     }
+    // The September 12 full-scene assembly retired the 113 legacy authored
+    // rock/contact actors (docs/reconstruction-review-2026-09-07/
+    // full-scene-assembly.md); rocks now come only from captured terrain and
+    // the registered Troublemaker geometry. No invented contact may return.
     Test->TestEqual(
-        TEXT("every rendered South Fork boulder has a D4 contact authority"),
+        TEXT("South Fork has no legacy authored boulder contact actors"),
         FullReachBoulderContactCount,
-        113);
+        0);
     Test->TestEqual(
-        TEXT("Troublemaker loads all twelve authored boulder contacts"),
+        TEXT("Troublemaker has no legacy authored boulder contacts"),
         TroublemakerBoulderContactCount,
-        12);
+        0);
     Test->TestTrue(
         TEXT("South Fork D4 boulder actors are renderer-free contact proxies"),
         bAllBoulderContactsAreProxyOnly);
@@ -2511,21 +2534,21 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
         Test->TestFalse(
             TEXT("South Fork single surface has no flashing roller texture"),
             Surface->IsBreakingRollerVolumeVisible());
+        // The Cartesian 1 m solver drives a 224 m square carrier with one
+        // vertex per solver cell (225 x 225); the former curved 3 m-stride
+        // carrier needed 1.5 m refinement to resolve crests.
         Test->TestTrue(
-            TEXT("South Fork full-reach carrier resolves rapid crest geometry"),
-            Surface->IsRiverPresentationGridRefined());
-        Test->TestTrue(
-            TEXT("South Fork full-reach carrier uses 1.5-metre presentation cells"),
+            TEXT("South Fork carrier samples every 1 m solver cell"),
             FMath::IsNearlyEqual(
-                Surface->GetPresentationVertexSpacingMeters(), 1.5f, 0.001f));
+                Surface->GetPresentationVertexSpacingMeters(), 1.0f, 0.001f));
         Test->TestEqual(
-            TEXT("South Fork full-reach carrier stays inside the 26,065-vertex budget"),
+            TEXT("South Fork Cartesian carrier has 225 x 225 vertices"),
             Surface->GetSurfaceVertexCount(),
-            26065);
+            50625);
         Test->TestEqual(
-            TEXT("South Fork full-reach carrier stays inside the 51,200-triangle budget"),
+            TEXT("South Fork Cartesian carrier has 224 x 224 x 2 triangles"),
             Surface->GetSurfaceTriangleCount(),
-            51200);
+            100352);
         Test->TestTrue(
             TEXT("South Fork disables the channel-wide periodic standing-wave bars"),
             FMath::IsNearlyZero(
@@ -2552,17 +2575,10 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
         Test->TestTrue(
             TEXT("South Fork visible rapid relief is coupled into raft support"),
             Water->IsRaftSupportSurfaceEnabled());
-        Test->TestTrue(
-            TEXT("South Fork boulder pillows and Y wakes are configured for raft support"),
-            Water->GetRaftSupportBoulderFootprintCount() > 0);
-        const float MeatGrinderPillowSupportM =
-            Water->ComputeConfiguredBoulderSupportDisplacementMeters(
-                FVector2D(904.84f - 2.54f * 1.10f, -3.02f),
-                1.8f,
-                0.0f);
-        Test->TestTrue(
-            TEXT("Meat Grinder upstream pillow raises the ridden surface"),
-            MeatGrinderPillowSupportM > 0.10f);
+        Test->TestEqual(
+            TEXT("South Fork raft support has no invented boulder pillows"),
+            Water->GetRaftSupportBoulderFootprintCount(),
+            0);
         Test->TestTrue(
             TEXT("South Fork support uses the rendered standing-wave scale"),
             FMath::IsNearlyEqual(
@@ -2622,104 +2638,6 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
     return true;
 }
 
-DEFINE_LATENT_AUTOMATION_COMMAND_TWO_PARAMETER(
-    FRaftSimMoveSouthForkToBoulderWakeCommand,
-    FAutomationTestBase*, Test,
-    float, TargetStationM);
-bool FRaftSimMoveSouthForkToBoulderWakeCommand::Update()
-{
-    UWorld* World = GetRiverTestWorld();
-    const UGameInstance* GI = World ? World->GetGameInstance() : nullptr;
-    URaftSimPhysicsBridgeSubsystem* Bridge =
-        GI ? GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
-    URaftSimWaterRuntimeAdapter* Water =
-        Bridge ? Bridge->GetWaterRuntime() : nullptr;
-    ARaftSimRaftActor* Raft = nullptr;
-    if (World)
-    {
-        if (TActorIterator<ARaftSimRaftActor> It(World); It)
-        {
-            Raft = *It;
-        }
-    }
-    if (!World || !Water || !Raft)
-    {
-        Test->AddError(TEXT("Could not move South Fork to the first Meat Grinder boulder"));
-        return true;
-    }
-
-    constexpr float BoulderStationM = 904.84f;
-    const float TargetLateralM = FMath::IsNearlyEqual(
-        TargetStationM, BoulderStationM, 0.1f)
-        ? -3.02f
-        : 0.0f;
-    FVector BoulderWorldCm = FVector::ZeroVector;
-    FVector DownstreamWorldCm = FVector::ZeroVector;
-    if (!Water->RiverToWorldPosition(
-            FVector2D(TargetStationM, TargetLateralM),
-            Water->GetRiverVerticalDatumM(), BoulderWorldCm) ||
-        !Water->RiverToWorldPosition(
-            FVector2D(TargetStationM + 1.0f, TargetLateralM),
-            Water->GetRiverVerticalDatumM(), DownstreamWorldCm))
-    {
-        Test->AddError(TEXT("Could not resolve the first Meat Grinder boulder in world space"));
-        return true;
-    }
-    BoulderWorldCm.Z = Raft->GetActorLocation().Z;
-    const float FacingYawDegrees =
-        (DownstreamWorldCm - BoulderWorldCm).Rotation().Yaw;
-    Raft->TeleportForTesting(
-        BoulderWorldCm, FacingYawDegrees, /*bApplyFacing=*/true);
-    if (FMath::IsNearlyEqual(TargetStationM, BoulderStationM, 0.1f))
-    {
-        Test->AddInfo(TEXT("Moved the live water window to the first Meat Grinder boulder"));
-    }
-    return true;
-}
-
-DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
-    FRaftSimAssertSouthForkBoulderWakeCommand, FAutomationTestBase*, Test);
-bool FRaftSimAssertSouthForkBoulderWakeCommand::Update()
-{
-    UWorld* World = GetRiverTestWorld();
-    ARaftSimWaterSurfaceActor* Surface = nullptr;
-    if (World)
-    {
-        if (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It)
-        {
-            Surface = *It;
-        }
-    }
-    Test->TestNotNull(TEXT("South Fork boulder check has a live water surface"), Surface);
-    if (Surface)
-    {
-        Test->TestTrue(
-            TEXT("Meat Grinder live window loads a cooked boulder footprint"),
-            Surface->GetCurrentBoulderFootprintCount() > 0);
-        Test->TestTrue(
-            TEXT("Meat Grinder boulder produces displaced rolling wake geometry"),
-            Surface->GetMaximumAbsoluteBoulderWakeMeters() > 0.01f);
-        Test->TestTrue(
-            TEXT("Meat Grinder boulder produces breaking wake foam"),
-            Surface->GetBoulderWakeFoamVertexCount() > 0);
-        Test->TestFalse(
-            TEXT("Meat Grinder wake foam stays in the unified water surface"),
-            Surface->IsRapidFoamMeshVisible());
-        Test->TestFalse(
-            TEXT("Meat Grinder crest remains in the unified water surface"),
-            Surface->IsBreakingLipVisible() ||
-                Surface->IsBreakingRollerVolumeVisible());
-        Test->TestTrue(
-            TEXT("South Fork single surface has no duplicate calm live skin"),
-            FMath::IsNearlyZero(Surface->GetCalmLiveSurfaceCoverage(), 0.001f));
-        Test->TestTrue(
-            TEXT("South Fork single surface has no duplicate active live skin"),
-            FMath::IsNearlyZero(
-                Surface->GetActiveLiveSurfaceCoverage(), 0.001f));
-    }
-    return true;
-}
-
 } // namespace
 
 void FRaftSimRiverMapLoadsTest::GetTests(
@@ -2770,20 +2688,9 @@ bool FRaftSimSouthForkFullReachSupportParityTest::RunTest(const FString&)
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(4.0f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertSouthForkSupportParityCommand(
         this, MakeShared<float>(-1.0f)));
-    // Advance through overlapping 80 m windows, matching the streamer's
-    // runtime contract. A direct 120 -> 905 m teleport is correctly rejected
-    // because it cannot transfer solver state across the intervening reach.
-    const float TraverseStationsM[] = {
-        200.0f, 280.0f, 360.0f, 440.0f, 520.0f,
-        600.0f, 680.0f, 760.0f, 840.0f, 904.84f};
-    for (const float StationM : TraverseStationsM)
-    {
-        ADD_LATENT_AUTOMATION_COMMAND(
-            FRaftSimMoveSouthForkToBoulderWakeCommand(this, StationM));
-        ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.6f));
-    }
-    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(3.0f));
-    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertSouthForkBoulderWakeCommand(this));
+    // The former traverse to the retired Meat Grinder D4 boulder (curved-route
+    // station 904.84 m) and its wake/pillow assertions were removed with those
+    // authored boulders; see the no-contact checks above.
     return true;
 }
 
