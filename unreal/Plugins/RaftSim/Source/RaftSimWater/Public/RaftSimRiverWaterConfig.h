@@ -69,6 +69,22 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming", meta = (ClampMin = "8.0"))
     float MovingWindowAdvanceM = 80.0f;
 
+    /** Curved-map live presentation strip across the channel, metres; 0 keeps
+     * the surface actor default (96 m). Geographic reaches whose wetted width
+     * or centreline offset exceeds +-48 m need the full cooked lateral span. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "0.0"))
+    float LivePresentationWidthM = 0.0f;
+
+    /** Curved-map live presentation strip along the river, metres; 0 keeps
+     * the surface actor default (240 m). */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "0.0"))
+    float LivePresentationLengthM = 0.0f;
+
+    /** Curved maps: draw the cooked presentation baseline (support_band_field_<band>.bin)
+     * as render-only water along the whole reach outside the live strip. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableCookedFarFieldWater = false;
+
     /** Full-reach production terrain exists in the map; suppress local bed proxy. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment")
     bool bMapProvidesTerrain = false;

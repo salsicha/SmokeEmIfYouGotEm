@@ -234,10 +234,12 @@ bool FRaftSimAssertRiverMapCommand::Update()
         bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
     const float ExpectedPresentationSpacingM = bZambeziReferenceRun
         ? 1.5f : (bUsesOneMetreReferencePresentation ? 1.0f : 0.5f);
+    // The geographic Hance reach draws its whole 160 m cooked lateral span
+    // (LivePresentationWidthM): 241 x 161 vertices at 1 m.
     const int32 ExpectedPresentationVertices = bZambeziReferenceRun
-        ? 10465 : (bUsesOneMetreReferencePresentation ? 23377 : 92833);
+        ? 10465 : (bColoradoHanceReferenceRun ? 38801 : (bUsesOneMetreReferencePresentation ? 23377 : 92833));
     const int32 ExpectedPresentationTriangles = bZambeziReferenceRun
-        ? 20480 : (bUsesOneMetreReferencePresentation ? 46080 : 184320);
+        ? 20480 : (bColoradoHanceReferenceRun ? 76800 : (bUsesOneMetreReferencePresentation ? 46080 : 184320));
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
     {
@@ -1619,15 +1621,26 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 continue;
             }
             Test->TestEqual(
-                TEXT("Colorado Hance loads the Hance cooked package"),
+                TEXT("Colorado Hance loads the evidence-based Hance cooked package"),
                 (*It)->CookedFieldsDir,
                 FString(TEXT("physics/data/real_world/"
                              "colorado_river_grand_canyon_rowing/"
-                             "scenario_hance/cooked_flow_fields")));
+                             "scenario_hance_evidence_2021/cooked_flow_fields")));
             Test->TestEqual(
-                TEXT("Colorado Hance loads the moderate release planning band"),
+                TEXT("Colorado Hance loads the 2021 8,000 cfs band"),
                 (*It)->FlowBand,
-                FName(TEXT("moderate_release_planning")));
+                FName(TEXT("steady_8000cfs_2021")));
+            Test->TestTrue(
+                TEXT("Colorado Hance streams a moving solver crop over the 2.5 km reach"),
+                (*It)->bEnableMovingWindowStreaming &&
+                    (*It)->StreamingManifestPath.EndsWith(
+                        TEXT("scenario_hance_evidence_2021/runtime/moving_water_streaming.json")) &&
+                    FMath::IsNearlyEqual((*It)->MovingWindowStationExtentM, 480.0f) &&
+                    FMath::IsNearlyEqual((*It)->MovingWindowLateralExtentM, 160.0f));
+            Test->TestTrue(
+                TEXT("Colorado Hance draws the full cooked lateral span and cooked far-field water"),
+                FMath::IsNearlyEqual((*It)->LivePresentationWidthM, 160.0f) &&
+                    (*It)->bEnableCookedFarFieldWater);
             Test->TestFalse(
                 TEXT("Colorado Hance preserves source station/lateral coordinates"),
                 (*It)->bRecenterHydraulicCrux);
@@ -1636,7 +1649,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 (*It)->CoordinateMapPath,
                 FString(TEXT("physics/data/real_world/"
                              "colorado_river_grand_canyon_rowing/terrain/"
-                             "hance_visual/hance_runtime_coordinate_map.json")));
+                             "hance_evidence_2021/hance_evidence_runtime_coordinate_map.json")));
             Test->TestTrue(
                 TEXT("Colorado Hance Landscape owns runtime terrain"),
                 (*It)->bMapProvidesTerrain);
@@ -1801,14 +1814,16 @@ bool FRaftSimAssertRiverMapCommand::Update()
             }
             ++CaptureOnlyWaterCount;
         }
+        // The geographic reach has no straight-grid solver-visualization
+        // field, so only the capture-only ribbon remains and no foam sheet.
         Test->TestEqual(
-            TEXT("Colorado Hance has capture-only static water and foam surfaces"),
+            TEXT("Colorado Hance has one capture-only static water surface"),
             CaptureOnlyWaterCount,
-            2);
-        Test->TestEqual(
-            TEXT("Colorado Hance has one cooked-field-derived capture foam surface"),
-            SolverFieldFoamCount,
             1);
+        Test->TestEqual(
+            TEXT("Colorado Hance has no straight-grid solver-visualization foam surface"),
+            SolverFieldFoamCount,
+            0);
 
         int32 DrylandComponentCount = 0;
         int32 DrylandGroundCoverInstanceCount = 0;

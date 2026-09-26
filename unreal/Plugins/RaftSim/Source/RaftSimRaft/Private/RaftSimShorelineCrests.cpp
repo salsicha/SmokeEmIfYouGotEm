@@ -23,6 +23,7 @@
 #include "RaftSimCrestAdjacentRangeAudit.h"
 #include "RaftSimCrestIntervalAudit.h"
 #include "RaftSimCrestCornerRangeAudit.h"
+#include "RaftSimCrestRootEdgesAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
@@ -140,6 +141,8 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
             // Keep the original map available for same-build controls.
             static const bool bIndexedEdges=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyCrestEdges"));
             Refinement.bIndexedEdges=bIndexedEdges;
+            static const bool bCachedRootEdges=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCachedCrestRootEdges"));
+            Refinement.bCachedRootEdges=bCachedRootEdges;
             static const bool bRetainStorage=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRetainCrestTopologyStorage"));
             Refinement.bRetainTopologyStorage=bRetainStorage;
             static const bool bLevelLocalMemos=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLevelLocalCrestMemos"));
@@ -216,6 +219,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         RaftSimCrestAdjacentRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestIntervalAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestCornerRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
+        RaftSimCrestRootEdgesAudit::Run(CachedXY,Triangles,Input,Refinement);
         ++BuildCount;
         TargetsMs=bTiming ? (FPlatformTime::Seconds()-Selected)*1000. : 0.;
     }

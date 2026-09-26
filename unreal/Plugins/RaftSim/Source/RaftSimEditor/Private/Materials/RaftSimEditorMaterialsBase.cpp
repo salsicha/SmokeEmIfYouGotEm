@@ -260,6 +260,19 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures"),
             TEXT("PhysicalCorridorMaterialZones"));
     }
+    // Evidence-based Hance: the 2021 corridor orthophoto (0.5 m export,
+    // 4096 x 2048 over the whole 2500 x 1212 m Landscape, north up) replaces
+    // the Lees Ferry pilot drape. Imported by
+    // unreal/Scripts/install_colorado_hance_evidence_drape.py.
+    UTexture2D* HanceEvidenceDrape = Candidate.PreviewSpec.RiverId == TEXT("colorado_river")
+        ? LoadObject<UTexture2D>(nullptr,
+              TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/T_RaftSim_ColoradoHance_EvidenceDrape."
+                   "T_RaftSim_ColoradoHance_EvidenceDrape"))
+        : nullptr;
+    if (HanceEvidenceDrape)
+    {
+        SourceMacroAlbedo = HanceEvidenceDrape;
+    }
     if (!SourceMacroAlbedo || !SourcePackedSurface || !SourceNormalDetail || !SourceMaterialZones ||
         !TerrainDetailAlbedo || !TerrainDetailPackedSurface || !TerrainDetailNormal)
     {
@@ -282,6 +295,16 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             Settings.DetailSurfaceResponseWeight = 0.18f;
             Settings.RiverbedBlendWeight = 0.18f;
             Settings.WetBankBlendWeight = 0.24f;
+        }
+        if (HanceEvidenceDrape)
+        {
+            // The photo carries the colour; the pilot zone map is Lees Ferry,
+            // so its riverbed/wet-bank tints would be misregistered. Detail
+            // tiles about 30 m (1.24 m Landscape quads).
+            Settings.DetailMappingScale = 24.0f;
+            Settings.DetailAlbedoWeight = 0.10f;
+            Settings.RiverbedBlendWeight = 0.0f;
+            Settings.WetBankBlendWeight = 0.0f;
         }
     }
     FString AssetToken = Candidate.PreviewSpec.RiverId;
@@ -531,7 +554,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             FinalBaseColor,
             0.58f);
     }
-    if (Candidate.bPhysicalScaleSourceCorridor)
+    if (Candidate.bPhysicalScaleSourceCorridor && !HanceEvidenceDrape)
     {
         UMaterialExpressionVertexNormalWS* VertexNormalWs =
             NewObject<UMaterialExpressionVertexNormalWS>(Material);
@@ -593,7 +616,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             ChilkoRotatedDetailAlbedoSample,
             WetBankBlendMask);
     }
-    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !HanceEvidenceDrape)
     {
         FinalBaseColor = BuildColoradoOrganicHanceBaseColor(
             Material,

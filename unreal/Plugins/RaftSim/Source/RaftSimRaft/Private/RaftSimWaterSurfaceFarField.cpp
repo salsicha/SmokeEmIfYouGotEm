@@ -297,3 +297,228 @@ void ARaftSimWaterSurfaceActor::UpdateCartesianFarFieldWater(float CarrierDrawCo
             CartesianFarFieldMesh->GetWaterIndices().Num() / 3, LastFarFieldWaterBuildMs);
     }
 }
+
+// Curved station/lateral maps (for example the 2.5 km geographic Hance reach)
+// draw their live water on a raft-following strip that fades over its first
+// and last 36 m. Beyond it, draw the cooked presentation baseline the strip
+// already falls back to outside the solver crop, on a global station/lateral
+// lattice mapped through the coordinate map, with the strip's own vertex
+// encoding (UV0 station/lateral texture metres, UV1 flow in river axes,
+// along-station tangents). A hole covers the strip's drawn rows; the kept
+// cells overlap it by at most one far cell, DropCm below. Render only.
+void ARaftSimWaterSurfaceActor::UpdateCurvedFarFieldWater(float CarrierDrawCoverage)
+{
+    CSV_SCOPED_TIMING_STAT(RaftSimFarField, CurvedUpdate);
+    const int32 N = GridStationN * GridLateralN;
+    const bool bEnabled = CVarRaftSimFarFieldWater.GetValueOnGameThread() != 0 &&
+        bCurvedFarFieldScene && CartesianFarFieldMesh && LiveVolumeCoreMesh &&
+        LiveVolumeCoreMesh->IsVisible() && WaterAdapter &&
+        !WaterAdapter->HasCartesianWaterCoordinates() && bUsesCurvedRiverCoordinates &&
+        bSingleLiveWaterSurfaceEnabled && GridStationN > 1 && GridLateralN > 1 &&
+        RiverCoordinatesM.Num() == N;
+    float MinimumStationM = 0.0f, MaximumStationM = 0.0f;
+    if (!bEnabled || !WaterAdapter->GetRiverStationRangeM(MinimumStationM, MaximumStationM))
+    {
+        HideCartesianFarFieldWater();
+        return;
+    }
+    // Station interval the strip draws (its rows at or above the core's
+    // coverage threshold) and its lateral span.
+    int32 FirstDrawn = INDEX_NONE, LastDrawn = INDEX_NONE;
+    for (int32 X = 0; X < GridStationN; ++X)
+    {
+        if (StationEdgeCoverage(X) >= CarrierDrawCoverage)
+        {
+            if (FirstDrawn == INDEX_NONE) FirstDrawn = X;
+            LastDrawn = X;
+        }
+    }
+    const float SpacingM = FMath::Clamp(CVarRaftSimFarFieldWaterSpacingM.GetValueOnGameThread(), 1.0f, 16.0f);
+    const float DropCm = FMath::Clamp(CVarRaftSimFarFieldWaterDropCm.GetValueOnGameThread(), 0.0f, 50.0f);
+    const float FoamScale = FMath::Clamp(CVarRaftSimFarFieldWaterFoam.GetValueOnGameThread(), 0.0f, 1.0f);
+    const float StripMinN = float(RiverCoordinatesM[0].Y);
+    const float StripMaxN = float(RiverCoordinatesM[(GridLateralN - 1) * GridStationN].Y);
+    const FVector2D HoleMin = FirstDrawn == INDEX_NONE ? FVector2D(1.0e9, 1.0e9)
+        : FVector2D(RiverCoordinatesM[FirstDrawn].X + SpacingM, StripMinN + SpacingM);
+    const FVector2D HoleMax = FirstDrawn == INDEX_NONE ? FVector2D(-1.0e9, -1.0e9)
+        : FVector2D(RiverCoordinatesM[LastDrawn].X - SpacingM, StripMaxN - SpacingM);
+    const FFarFieldWaterKey Key{HoleMin, HoleMax, WaterTextureOriginMeters, SpacingM, 0.0f, DropCm, 0u, FoamScale};
+    if (bFarFieldWaterKeyValid && Key == FarFieldWaterKey)
+    {
+        return;
+    }
+    const double StartSeconds = FPlatformTime::Seconds();
+    // Global lattice: fixed station/lateral nodes, so the far water never swims.
+    const double MarginM = 32.0;
+    const double S0 = FMath::FloorToDouble(MinimumStationM / SpacingM) * SpacingM;
+    const double L0 = FMath::FloorToDouble((StripMinN - MarginM) / SpacingM) * SpacingM;
+    const int32 Nx = FMath::FloorToInt((MaximumStationM - S0) / SpacingM) + 1;
+    const int32 Ny = FMath::CeilToInt((StripMaxN + MarginM - L0) / SpacingM) + 1;
+    if (Nx < 2 || Ny < 2)
+    {
+        HideCartesianFarFieldWater();
+        return;
+    }
+    const int32 Count = Nx * Ny;
+    const float DatumM = WaterAdapter->GetRiverVerticalDatumM();
+    const bool bFlipBinormal = WaterAdapter->GetRiverWorldYSign() < 0.0;
+    TArray<FVector> Positions; Positions.SetNumZeroed(Count);
+    TArray<FVector> VertexNormals; VertexNormals.Init(FVector::UpVector, Count);
+    TArray<FLinearColor> Colors; Colors.Init(FLinearColor(0.f, 0.f, 0.f, 0.f), Count);
+    TArray<FVector2D> TextureUVs; TextureUVs.SetNumZeroed(Count);
+    TArray<FVector2D> Flow; Flow.SetNumZeroed(Count);
+    TArray<FVector2D> Wake; Wake.SetNumZeroed(Count);
+    TArray<FProcMeshTangent> VertexTangents; VertexTangents.Init(FProcMeshTangent(FVector::ForwardVector, bFlipBinormal), Count);
+    TArray<uint8> Wet; Wet.SetNumZeroed(Count);
+    TArray<uint8> Available; Available.SetNumZeroed(Count);
+    TArray<uint8> Mapped; Mapped.SetNumZeroed(Count);
+    TArray<float> DepthM; DepthM.SetNumZeroed(Count);
+    TArray<float> BedM; BedM.SetNumZeroed(Count);
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimFarField, CurvedSample);
+        // Rows advance lateral (river-left), columns advance station, as the strip.
+        ParallelFor(TEXT("RaftSimCurvedFarFieldSample"), Ny, 1, [&](int32 Y)
+        {
+            for (int32 X = 0; X < Nx; ++X)
+            {
+                const int32 I = Y * Nx + X;
+                const FVector2D P(S0 + X * double(SpacingM), L0 + Y * double(SpacingM));
+                TextureUVs[I] = (P - WaterTextureOriginMeters) / kFarFieldTextureRepeatMeters;
+                FVector World;
+                if (!WaterAdapter->RiverToWorldPosition(P, DatumM, World)) continue;
+                Mapped[I] = 1;
+                Positions[I] = World;
+                if (P.X >= HoleMin.X && P.X <= HoleMax.X && P.Y >= HoleMin.Y && P.Y <= HoleMax.Y) continue;
+                FRaftSimWaterSample Sample;
+                if (!WaterAdapter->SamplePresentationBaselineFieldAtRiverCoordinates(P, Sample)) continue;
+                const bool bWet = Sample.bWet && Sample.DepthMeters > kFarFieldMinimumDepthM;
+                if (!bWet) continue;
+                Available[I] = 1;
+                Wet[I] = 1;
+                DepthM[I] = Sample.DepthMeters;
+                BedM[I] = Sample.BedHeightMeters;
+                Positions[I].Z = Sample.SurfaceHeightMeters * 100.0 - DropCm;
+                const FVector2D Velocity(Sample.VelocityMetersPerSecond.X, Sample.VelocityMetersPerSecond.Y);
+                Flow[I] = Velocity;
+                const float Speed = float(Velocity.Size());
+                // The curved baseline stores one presentation energy per cell
+                // and reports depth = lerp(0.8, 2.4, energy); its exporter
+                // encodes cooked speed and Froude there, so read the
+                // whitewater cue back from it (a Froude from these derived
+                // depth/speed pairs never exceeds 0.58).
+                const float Energy = FMath::Clamp((Sample.DepthMeters - 0.8f) / 1.6f, 0.0f, 1.0f);
+                const float FoamCue = FoamScale * 0.72f * FMath::SmoothStep(0.7f, 0.95f, Energy);
+                Colors[I] = FLinearColor(FoamCue, FMath::Clamp(DepthM[I] / 4.0f, 0.0f, 1.0f),
+                    FMath::Clamp(Speed / 8.0f, 0.0f, 1.0f), 1.0f);
+            }
+        });
+    }
+    int32 WetCount = 0;
+    for (uint8 W : Wet) WetCount += W;
+    if (WetCount == 0)
+    {
+        HideCartesianFarFieldWater();
+        return;
+    }
+    // The curved baseline stores only wet cells. Give mapped dry vertices
+    // beside water a nominal bank 0.25 m above their highest wet neighbour so
+    // the shoreline clipper cuts cells instead of dropping them (a 4 m stair
+    // along every bank). Hole vertices stay unavailable.
+    {
+        TArray<float> BankM; BankM.Init(-1.0e9f, Count);
+        for (int32 Y = 0; Y < Ny; ++Y)
+        {
+            for (int32 X = 0; X < Nx; ++X)
+            {
+                const int32 I = Y * Nx + X;
+                if (Wet[I] || !Mapped[I]) continue;
+                const FVector2D P(S0 + X * double(SpacingM), L0 + Y * double(SpacingM));
+                if (P.X >= HoleMin.X && P.X <= HoleMax.X && P.Y >= HoleMin.Y && P.Y <= HoleMax.Y) continue;
+                for (int32 DY = -1; DY <= 1; ++DY)
+                {
+                    for (int32 DX = -1; DX <= 1; ++DX)
+                    {
+                        const int32 NX = X + DX, NY = Y + DY;
+                        if (NX < 0 || NY < 0 || NX >= Nx || NY >= Ny) continue;
+                        const int32 J = NY * Nx + NX;
+                        if (Wet[J]) BankM[I] = FMath::Max(BankM[I], float((Positions[J].Z + DropCm) / 100.0) + 0.25f);
+                    }
+                }
+            }
+        }
+        for (int32 I = 0; I < Count; ++I)
+        {
+            if (BankM[I] < -1.0e8f) continue;
+            Available[I] = 1;
+            BedM[I] = BankM[I];
+            DepthM[I] = 0.0f;
+            Positions[I].Z = BankM[I] * 100.0 - DropCm;
+        }
+    }
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimFarField, CurvedNormals);
+        ParallelFor(TEXT("RaftSimCurvedFarFieldNormals"), Ny, 4, [&](int32 Y)
+        {
+            for (int32 X = 0; X < Nx; ++X)
+            {
+                const int32 I = Y * Nx + X;
+                if (!Mapped[I]) continue;
+                const auto At = [&](int32 NX, int32 NY)
+                {
+                    NX = FMath::Clamp(NX, 0, Nx - 1); NY = FMath::Clamp(NY, 0, Ny - 1);
+                    const int32 J = NY * Nx + NX;
+                    return Mapped[J] && Wet[J] ? Positions[J] : FVector(Mapped[J] ? Positions[J].X : Positions[I].X,
+                        Mapped[J] ? Positions[J].Y : Positions[I].Y, Positions[I].Z);
+                };
+                const FVector Along = At(X + 1, Y) - At(X - 1, Y);
+                const FVector Across = At(X, Y + 1) - At(X, Y - 1);
+                const FVector Tangent = FVector(Along.X, Along.Y, 0.0).GetSafeNormal();
+                VertexTangents[I] = FProcMeshTangent(Tangent.IsNearlyZero() ? FVector::ForwardVector : Tangent, bFlipBinormal);
+                if (!Wet[I]) continue;
+                FVector Normal = FVector::CrossProduct(Along, Across).GetSafeNormal();
+                if (Normal.Z < 0.0) Normal = -Normal;
+                VertexNormals[I] = Normal.IsNearlyZero() ? FVector::UpVector : Normal;
+            }
+        });
+    }
+    TArray<FProcMeshVertex> Source;
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimFarField, CurvedPack);
+        if (!RaftSimWaterSourcePacking::Pack(Positions, VertexNormals, Colors, TextureUVs, Flow, Wake,
+                VertexTangents, Source, true, Flow))
+        {
+            return;
+        }
+    }
+    UMaterialInterface* CarrierMaterial = LiveVolumeCoreMesh->GetMaterial(0);
+    if (CarrierMaterial && CartesianFarFieldMesh->GetMaterial(0) != CarrierMaterial)
+    {
+        CartesianFarFieldMesh->SetMaterial(0, CarrierMaterial);
+    }
+    bool bSubmitted = false;
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimFarField, CurvedSubmit);
+        bSubmitted = CartesianFarFieldMesh->SetClippedWaterMesh(Nx, Ny, MoveTemp(Source),
+            Wet, Available, DepthM, BedM, nullptr);
+    }
+    if (!bSubmitted)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim curved far-field water submission refused (%d x %d)"), Nx, Ny);
+        return;
+    }
+    if (!CartesianFarFieldMesh->IsVisible())
+    {
+        CartesianFarFieldMesh->SetVisibility(true);
+    }
+    FarFieldWaterKey = Key;
+    bFarFieldWaterKeyValid = true;
+    ++FarFieldWaterBuildCount;
+    LastFarFieldWaterBuildMs = (FPlatformTime::Seconds() - StartSeconds) * 1000.0;
+    if (FarFieldWaterBuildCount == 1 || FarFieldWaterBuildCount % 32 == 0)
+    {
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim curved far-field water: build=%d lattice=%dx%d spacing_m=%.1f hole_station=%.0f..%.0f wet=%d triangles=%d ms=%.3f"),
+            FarFieldWaterBuildCount, Nx, Ny, SpacingM, HoleMin.X, HoleMax.X, WetCount,
+            CartesianFarFieldMesh->GetWaterIndices().Num() / 3, LastFarFieldWaterBuildMs);
+    }
+}

@@ -8,6 +8,15 @@
 
 namespace RaftSimEditorEnvironment
 {
+namespace
+{
+// Evidence-based Hance reach: cooked stations 0-2512 m (2 m cells), upstream
+// (east) end first. The imagery whitewater starts near station 680 m.
+constexpr float kColoradoHanceLaunchStationM = 520.0f;
+constexpr float kColoradoHanceReachStationM = 2512.0f;
+constexpr float HanceProgress(float StationM) { return StationM / kColoradoHanceReachStationM; }
+}
+
 FString GetLandscapeCandidateCaptureRelativePath(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     const FString& CaptureId)
@@ -1748,16 +1757,19 @@ bool AddLandscapeCandidateRunnableGameplay(
     }
     else if (bColoradoHance)
     {
+        // Evidence-based 2.5 km geographic reach (2021 DEM and imagery at
+        // ~8,000 cfs, 2014 sonar pools, labelled inferred rapid bed); see
+        // docs/reconstruction-review-2026-09-07/colorado-hance-evidence.md.
         RuntimeConfigLabel = TEXT("RaftSim_ColoradoHance_RuntimeWaterConfig");
         CookedFieldsDir =
             TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/"
-                 "scenario_hance/cooked_flow_fields");
-        FlowBand = FName(TEXT("moderate_release_planning"));
-        WindowCenterM = FVector2D(300.0f, 0.0f);
-        WindowExtentM = 700.0f;
+                 "scenario_hance_evidence_2021/cooked_flow_fields");
+        FlowBand = FName(TEXT("steady_8000cfs_2021"));
+        WindowCenterM = FVector2D(kColoradoHanceLaunchStationM, 0.0f);
+        WindowExtentM = 480.0f;
         CoordinateMapPath =
             TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/"
-                 "hance_visual/hance_runtime_coordinate_map.json");
+                 "hance_evidence_2021/hance_evidence_runtime_coordinate_map.json");
         RunTag = FName(TEXT("RaftSimColoradoHanceRun"));
         PlayerRaftLabel = TEXT("RaftSim_ColoradoHance_PlayerRaft");
         DisplayName = TEXT("Colorado Hance");
@@ -1818,16 +1830,15 @@ bool AddLandscapeCandidateRunnableGameplay(
         return false;
     }
 
-    // Hance and Lava Canyon both have genuine cooked-field rapid structure
-    // outside the generic station-24 m launch carrier. Hance starts at 56% of
-    // its 600 m reach (station 336 m): all three committed release bands are
-    // deep and subcritical there, and each has an accepted interior breaking
-    // transition about 69 m downstream. Lava Canyon retains its independently
-    // reviewed station-228 m approach. These values change scenario framing
-    // only; cooked hydraulics, wet masks, collision, and raft forces are not
-    // synthesized or modified.
+    // Hance launches in the measured pool above the rapid (station 520 m of
+    // the 2.5 km evidence reach; the whitewater begins near 680 m), so a run
+    // covers the entry, the main rapid, the calm run and the lower rapid.
+    // Lava Canyon retains its independently reviewed station-228 m approach.
+    // These values change scenario framing only; cooked hydraulics, wet
+    // masks, collision, and raft forces are not synthesized or modified.
     const float StartProgress = bColoradoHance
-        ? 0.56f
+        ? FMath::Clamp(kColoradoHanceLaunchStationM /
+              FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f)
         : (bChilkoLavaCanyon
                ? 0.38f
                : (bReachLocalRun ? 0.04f : 0.0025f));
@@ -1885,7 +1896,21 @@ bool AddLandscapeCandidateRunnableGameplay(
     // The 30 km Zambezi run cannot simulate its whole 5999 x 25 cell corridor
     // every 1/60 s tick (~20 ms per step never keeps real time). Crop the same
     // cooked field around the raft and re-centre it every 80 m instead.
-    WaterConfig->bEnableMovingWindowStreaming = bZambezi;
+    WaterConfig->bEnableMovingWindowStreaming = bZambezi || bColoradoHance;
+    if (bColoradoHance)
+    {
+        // 2.5 km x 160 m at 2 m is 101,817 cells; crop 480 m of it around
+        // the raft (240 x 81 cells) and draw the whole cooked lateral span.
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/"
+                 "scenario_hance_evidence_2021/runtime/moving_water_streaming.json");
+        WaterConfig->WindowCenterM = FVector2D(kColoradoHanceLaunchStationM, 0.0f);
+        WaterConfig->MovingWindowStationExtentM = 480.0f;
+        WaterConfig->MovingWindowLateralExtentM = 160.0f;
+        WaterConfig->MovingWindowAdvanceM = 80.0f;
+        WaterConfig->LivePresentationWidthM = 160.0f;
+        WaterConfig->bEnableCookedFarFieldWater = true;
+    }
     if (bZambezi)
     {
         WaterConfig->StreamingManifestPath =
@@ -2551,8 +2576,9 @@ void RepositionLandscapeCandidatePhysicalCameras(
     };
     if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
     {
-        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.650f, 0.750f, 260.0f, 105.0f);
-        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.685f, 0.785f, 170.0f, 85.0f);
+        // Pool above the rapid looking into the entry (station metres).
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), HanceProgress(560.0f), HanceProgress(680.0f), 260.0f, 105.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), HanceProgress(600.0f), HanceProgress(700.0f), 170.0f, 85.0f);
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
     {
@@ -2581,7 +2607,7 @@ void RepositionLandscapeCandidatePhysicalCameras(
     }
     if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
     {
-        SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.705f, 0.805f, 185.0f, 90.0f);
+        SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), HanceProgress(740.0f), HanceProgress(830.0f), 185.0f, 90.0f);
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
     {
@@ -2604,14 +2630,16 @@ void RepositionLandscapeCandidatePhysicalCameras(
     {
         if (It->GetActorLabel() == TEXT("RaftSim_GuideSeat_PlayerStart"))
         {
-            It->SetActorLocation(RiverLocation(0.032f, 120.0f));
+            It->SetActorLocation(RiverLocation(
+                Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ? HanceProgress(500.0f) : 0.032f, 120.0f));
         }
     }
     for (TActorIterator<ASphereReflectionCapture> It(World); It; ++It)
     {
         if (It->GetActorLabel() == TEXT("RaftSim_RiverCorridorReflectionCapture"))
         {
-            It->SetActorLocation(RiverLocation(0.09f, 520.0f));
+            It->SetActorLocation(RiverLocation(
+                Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ? HanceProgress(760.0f) : 0.09f, 520.0f));
         }
     }
 }

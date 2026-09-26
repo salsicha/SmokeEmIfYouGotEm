@@ -232,7 +232,14 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     int32 DryScarpOutcropRejectedPlacementCount = 0;
     float DryScarpOutcropMaximumSlopeDegrees = 0.0f;
     float DryScarpOutcropMinimumHeightAboveWaterCm = TNumericLimits<float>::Max();
-    const int32 BoulderCount = bPhysicalCorridor
+    // The evidence-based Hance reach carries its rocks in the measured 2021
+    // DEM (emergent rock tops) and in the labelled imagery-located inferred
+    // boulders of its solver bed; a procedural scatter would add unmeasured,
+    // non-hydraulic rocks, some of them in the channel.
+    const bool bEvidenceRockTerrain = Spec.RiverId == TEXT("colorado_river");
+    const int32 BoulderCount = bEvidenceRockTerrain
+        ? 0
+        : bPhysicalCorridor
         ? 180
         : (Spec.bDesertCanyon ? 62 : (bRainforest ? 48 : 44));
     for (int32 BoulderIndex = 0; BoulderIndex < BoulderCount; ++BoulderIndex)

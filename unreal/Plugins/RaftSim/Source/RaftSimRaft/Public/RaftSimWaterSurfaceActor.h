@@ -732,9 +732,12 @@ private:
     FFarFieldWaterKey FarFieldWaterKey;
     bool bFarFieldWaterKeyValid = false;
     bool bCartesianFarFieldScene = false;
+    /** Curved (station/lateral) map whose config opts into cooked far-field water. */
+    bool bCurvedFarFieldScene = false;
     int32 FarFieldWaterBuildCount = 0;
     double LastFarFieldWaterBuildMs = 0.0;
     void UpdateCartesianFarFieldWater(float CarrierDrawCoverage);
+    void UpdateCurvedFarFieldWater(float CarrierDrawCoverage);
     void HideCartesianFarFieldWater();
     bool bRuntimeSurfaceReady = false;
     bool TryInitializeRuntimeSurface();

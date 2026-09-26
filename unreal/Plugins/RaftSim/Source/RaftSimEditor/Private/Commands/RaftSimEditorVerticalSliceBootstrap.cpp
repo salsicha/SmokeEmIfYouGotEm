@@ -354,8 +354,8 @@ struct FRiverMapSpec
 // package yet falls back to the dev tank at runtime until its fields land.
 static const FRiverMapSpec GRiverMaps[] = {
     {TEXT("L_Hance"),
-     TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields"),
-     TEXT("median_runnable"), -60.0f},
+     TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance_evidence_2021/cooked_flow_fields"),
+     TEXT("steady_8000cfs_2021"), 520.0f},
     {TEXT("L_UpperHuacas"),
      TEXT("physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields"),
      TEXT("median_runnable"), -60.0f},
@@ -369,12 +369,19 @@ static const FRiverMapSpec GRiverMaps[] = {
 
 static bool BuildRiverMap(const FRiverMapSpec& Spec)
 {
-    if (FCString::Strcmp(Spec.MapName, TEXT("L_UpperHuacas")) == 0)
+    // Reach-local maps with a Landscape candidate are built by that pipeline
+    // (terrain, water config, streaming, launch); the flat stub below would
+    // overwrite them.
+    const TCHAR* LandscapeRiverId =
+        FCString::Strcmp(Spec.MapName, TEXT("L_UpperHuacas")) == 0 ? TEXT("pacuare")
+        : FCString::Strcmp(Spec.MapName, TEXT("L_Hance")) == 0 ? TEXT("colorado_river")
+        : nullptr;
+    if (LandscapeRiverId)
     {
         for (const RaftSimEditorEnvironment::FRaftSimLandscapeImportCandidateSpec& Candidate :
              RaftSimEditorEnvironment::GetLandscapeImportCandidateSpecs())
         {
-            if (Candidate.PreviewSpec.RiverId != TEXT("pacuare"))
+            if (Candidate.PreviewSpec.RiverId != LandscapeRiverId)
             {
                 continue;
             }
@@ -394,7 +401,7 @@ static bool BuildRiverMap(const FRiverMapSpec& Spec)
                 *Summary);
             return bBuilt;
         }
-        UE_LOG(LogTemp, Error, TEXT("RaftSim bootstrap: no Pacuare Landscape candidate spec."));
+        UE_LOG(LogTemp, Error, TEXT("RaftSim bootstrap: no %s Landscape candidate spec."), LandscapeRiverId);
         return false;
     }
 

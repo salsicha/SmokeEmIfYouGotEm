@@ -2002,6 +2002,14 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     }
 
     bUsesCurvedRiverCoordinates = WaterAdapter && WaterAdapter->HasRiverCoordinateMap();
+    if (RiverWaterConfig && RiverWaterConfig->LivePresentationWidthM > 0.0f)
+    {
+        CurvedGridWidthMeters = RiverWaterConfig->LivePresentationWidthM;
+    }
+    if (RiverWaterConfig && RiverWaterConfig->LivePresentationLengthM > 0.0f)
+    {
+        CurvedGridLengthMeters = RiverWaterConfig->LivePresentationLengthM;
+    }
     if (bUsesSouthForkFullReachSingleSurface)
     {
         // The authored full-reach ribbons are deliberately hidden in play, so
@@ -2221,6 +2229,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     HideCartesianFarFieldWater();
     bCartesianFarFieldScene = GetWorld() &&
         GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
+    bCurvedFarFieldScene = RiverWaterConfig && RiverWaterConfig->bEnableCookedFarFieldWater &&
+        !(WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates());
     if (LiveVolumeCoreMaterial != nullptr)
     {
         LiveVolumeCoreMesh->SetMaterial(0, LiveVolumeCoreMaterial);
@@ -8409,9 +8419,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 LiveVolumeCoreTriangleCount = CartesianShorelineMesh->GetWaterIndices().Num()/3;
                 UpdateCartesianFarFieldWater(kLiveVolumeCoreMinimumStationCoverage);
             }
-            else if (!LiveVolumeCoreMesh->IsVisible())
+            else
             {
-                LiveVolumeCoreMesh->SetVisibility(true, true);
+                if (!LiveVolumeCoreMesh->IsVisible())
+                {
+                    LiveVolumeCoreMesh->SetVisibility(true, true);
+                }
+                UpdateCurvedFarFieldWater(kLiveVolumeCoreMinimumStationCoverage);
             }
         }
     }

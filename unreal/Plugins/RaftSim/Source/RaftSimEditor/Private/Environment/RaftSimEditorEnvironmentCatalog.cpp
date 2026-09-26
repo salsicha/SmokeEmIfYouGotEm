@@ -1292,36 +1292,34 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         }
         else if (PreviewSpec.RiverId == TEXT("colorado_river"))
         {
+            // Evidence-based geographic Hance (2021 corridor DEM, 2014 sonar
+            // pools, labelled inferred rapid bed): a 2500 x 1212 m north-up
+            // Landscape anchored at world X = 0 and centred in Y (Unreal +Y
+            // south). Relief and offset are the terrain manifest's
+            // target_relief_cm and (terrain_min - 740 m datum) * 100.
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_conditioned_heightfield_1009.png");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_heightfield_2017.png");
             Candidate.HeightfieldManifestRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_visual_terrain_manifest.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_terrain_manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_visual_terrain_manifest.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_terrain_manifest.json");
             Candidate.LocalCenterlineRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_local_centerline.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_local_centerline.json");
             Candidate.MapPackagePath =
                 TEXT("/Game/RaftSim/Maps/L_Hance");
-            Candidate.LandscapeSize = 1009;
-            Candidate.HorizontalSpanXCm = 60000.0f;
-            Candidate.HorizontalSpanYCm = 32000.0f;
-            Candidate.TargetReliefCm = 8932.6415f;
-            Candidate.WorldVerticalOffsetCm = -666.5288f;
+            Candidate.LandscapeSize = 2017;
+            Candidate.HorizontalSpanXCm = 250000.0f;
+            Candidate.HorizontalSpanYCm = 121200.0f;
+            Candidate.TargetReliefCm = 56485.927612f;
+            Candidate.WorldVerticalOffsetCm = -1460.458749f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
-            Candidate.bUseSolverVisualizationFields = true;
-            Candidate.SolverVisualizationFieldRelativePath =
-                TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
-                     "colorado_hance_moderate_depth_speed_froude_surface_v1.png");
-            Candidate.SolverVisualizationDepthCapM = 5.0f;
-            Candidate.SolverVisualizationSpeedCapMps = 8.0f;
-            Candidate.SolverVisualizationFroudeCap = 4.5f;
-            Candidate.SolverVisualizationSurfaceReliefCapM = 1.5f;
-            Candidate.SolverVisualizationLateralMinM = -39.0f;
-            Candidate.SolverVisualizationLateralMaxM = 39.0f;
+            // The live solver owns the water; the old straight-reach solver
+            // visualization field does not apply to the geographic reach.
+            Candidate.bUseSolverVisualizationFields = false;
             Candidate.bPhysicalScaleSourceCorridor = true;
             Candidate.bUseDensePhysicalTerrainRenderSurface = false;
             Candidate.bEnableLandscapeNanite = true;
-            Candidate.PreviewSpec.RiverHalfWidthCm = 2600.0f;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 3500.0f;
             Candidate.PreviewSpec.BankWidthCm = 6200.0f;
             Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
         }
