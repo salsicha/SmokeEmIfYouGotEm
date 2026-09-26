@@ -130,10 +130,15 @@ def main():
     gcell = ctx['grid']['cell_m']
     dem = load(DEM)[..., 0]
     comp = json.loads(COMPOSITE.read_text())
-    mask_raw = load(FULL / 'unknown_submerged_bed_mask.tif')[..., 0] * 255.0
+    # The DEM extends beyond the old composite footprint. Sampling that old
+    # mask with clipped indices admitted canopy over the added river channel.
+    water_mask_path = DEM.parent / 'unknown_submerged_bed_mask.tif'
+    mask_raw = load(water_mask_path)[..., 0] * 255.0
+    assert mask_raw.shape == dem.shape, 'Water mask must share the context DEM grid'
     submerged = np.abs(mask_raw - 1.0) < 0.5
-    me0, mn_top = comp['grid']['first_vertex_utm_m']
-    water_dist = dilate_distance(submerged, int(RIPARIAN_M / comp['grid']['cell_m']) + 2, comp['grid']['cell_m'])
+    me0, mn_top = ctx['grid']['first_vertex_utm_m']
+    water_dist = dilate_distance(submerged, int(RIPARIAN_M / gcell) + 2, gcell)
+    water_dist[mask_raw > 254.5] = -1.0  # Unknown coverage cannot admit a tree.
 
     # Existing captured canopy roots (world cm) -> UTM for exclusion.
     existing = []
@@ -174,8 +179,9 @@ def main():
     ok = np.isfinite(z) & np.isfinite(slope) & (slope <= MAX_SLOPE_DEG)
     E, N, frac, z = E[ok], N[ok], frac[ok], z[ok]
     # water clearance / riparian band
-    wi = np.clip(np.round((mn_top - N) / comp['grid']['cell_m']).astype(np.int64), 0, water_dist.shape[0] - 1)
-    wj = np.clip(np.round((E - me0) / comp['grid']['cell_m']).astype(np.int64), 0, water_dist.shape[1] - 1)
+    wi = np.round((mn_top - N) / gcell).astype(np.int64)
+    wj = np.round((E - me0) / gcell).astype(np.int64)
+    assert ((wi >= 0) & (wi < water_dist.shape[0]) & (wj >= 0) & (wj < water_dist.shape[1])).all()
     wd = water_dist[wi, wj]
     ok = wd >= WATER_CLEARANCE_M
     E, N, frac, z, wd = E[ok], N[ok], frac[ok], z[ok], wd[ok]
@@ -222,7 +228,7 @@ def main():
         level='/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach', scenario_id='south_fork_full_descent',
         world_y_sign=-1, vertical_datum_m=DATUM_M, world_origin_utm_m=list(WORLD_ORIGIN_UTM),
         drape_receipt=str((drape_dir / 'receipt.json').relative_to(ROOT).as_posix()), drape_sha256=receipt['sha256'],
-        sources={str(p.relative_to(ROOT).as_posix()): sha(p) for p in [DEM, FULL / 'unknown_submerged_bed_mask.tif', *EXISTING]},
+        sources={str(p.relative_to(ROOT).as_posix()): sha(p) for p in [DEM, water_mask_path, *EXISTING]},
         parameters=dict(spacing_m=SPACING_M, disc_radius_m=DISC_R_M, canopy_min_fraction=CANOPY_MIN_FRACTION,
                         luma_max=LUMA_MAX, max_slope_deg=MAX_SLOPE_DEG, water_clearance_m=WATER_CLEARANCE_M,
                         riparian_band_m=RIPARIAN_M, existing_clearance_m=EXISTING_CLEARANCE_M, seed=SEED),

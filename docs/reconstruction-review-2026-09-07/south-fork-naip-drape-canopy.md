@@ -72,7 +72,7 @@ riparian/pine actor per cell), non-colliding, settings mirrored from an
 existing canopy actor, roots sunk 20 cm. Existing actors are unchanged.
 `verify_south_fork_naip_canopy_roots.py` traces a deterministic 3,000-root
 sample against the loaded physical ground: 0 misses; stored root minus ground
-p1 -4.9 cm, median -0.01 cm, p99 +5.3 cm (one outlier +2.2 m).
+p1 -4.9 cm, median -0.01 cm, p99 +5.3 cm (maximum +2.2 m; see correction below).
 
 Archived: `physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach/naip_canopy_20260926/`
 (placement SHA256 `bda1ea1ff90e30d21c3c2eadbe888213eeaf8428c5e37fb170885098fce3852b`)
@@ -108,3 +108,9 @@ Both pass the 20 FPS goal (50 ms p95, no frame over 100 ms).
   far-field shards seen at 9 km remain a separate defect.
 - Trees beyond the World Partition loading range rely on HLODs, which were not
   rebuilt here; distant tree pop-in has not been reviewed in motion.
+
+Follow-through: the maximum root error led to an extended-grid water-mask bug.
+266 inferred channel trees are now removed from six normal-map actor packages;
+140,417 remain. The generator mask/frame is corrected and source data preserved.
+Fresh normal-launch p95 was74.35ms, failing50ms; no causal comparison is claimed.
+See [channel correction and evidence](south-fork-canopy-channel-repair.md).

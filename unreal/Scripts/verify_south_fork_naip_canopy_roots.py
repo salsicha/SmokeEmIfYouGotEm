@@ -34,7 +34,7 @@ def main():
     ignore = [a for a in loaded if a.get_name() not in names]
     rng = random.Random(20260926)
     sample = rng.sample(data['instances'], min(3000, len(data['instances'])))
-    diffs, misses = [], []
+    diffs, misses, outliers = [], [], []
     for r in sample:
         x, y, z = r['world_root_cm']
         hit = unreal.SystemLibrary.line_trace_single(world, unreal.Vector(x, y, z + 5000), unreal.Vector(x, y, z - 5000),
@@ -43,11 +43,16 @@ def main():
         if not t or not t[0]:
             misses.append(r['id'])
             continue
-        diffs.append(z - t[5].z)
+        delta = z - t[5].z
+        diffs.append(delta)
+        if abs(delta) > 20.0:
+            outliers.append(dict(id=r['id'], world_root_cm=r['world_root_cm'],
+                                 ground_z_cm=t[5].z, root_minus_ground_cm=delta,
+                                 form_index=r['form_index']))
     diffs.sort()
     p = lambda q: diffs[min(len(diffs) - 1, int(q * len(diffs)))] if diffs else None
     result = dict(ground_descriptors=len(ground), ground_actors_loaded=len(ground_actors), sample=len(sample),
-                  misses=len(misses), miss_ids=misses[:20],
+                  misses=len(misses), miss_ids=misses[:20], outliers_over_20cm=outliers,
                   root_minus_ground_cm=dict(p01=p(0.01), p05=p(0.05), p50=p(0.5), p95=p(0.95), p99=p(0.99),
                                             min=diffs[0] if diffs else None, max=diffs[-1] if diffs else None))
     report.write_text(json.dumps(result, indent=2) + '\n')

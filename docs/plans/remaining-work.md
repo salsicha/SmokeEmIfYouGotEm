@@ -1,5 +1,12 @@
 # Remaining requested work
 
+September26 canopy follow-through: removed266 inferred trees inside the captured
+context water mask from six normal FullReach actor packages;140,417 remain.
+Fixed the placement generator's older-mask/clipped-index defect. Fresh-engine
+readback and three grid tests pass; normal Boot/menu motion passes, but latest
+p9574.35ms FAILS50ms (one frame>100ms). No causal performance claim or river
+acceptance. See [channel correction](../reconstruction-review-2026-09-07/south-fork-canopy-channel-repair.md).
+
 September26 playable delivery (normal FullReach): **the 33 km run is no longer
 bare desert.** A ten-station survey showed every view outside Troublemaker and
 the put-in as tan hills with no vegetation. The full-reach NAIP windows already
