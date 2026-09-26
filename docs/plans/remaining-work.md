@@ -1,5 +1,13 @@
 # Remaining requested work
 
+September26 root-edge incidence experiment: native geometry/cache checks pass,
+and64 actual11,520m rapid pairs preserve exact topology/current coordinates.
+Whole-build timing fails the both-order improvement gate (12.617→12.728ms in
+one order,13.376→13.014ms in the other), with more retained storage. Candidate
+code removed; never enabled in ordinary play or installed in the game. Do not
+repeat this unchanged hypothesis. South Fork's packaged failure below remains
+open. See [rejection and restoration](../reconstruction-review-2026-09-07/crest-root-incidence-rejected.md).
+
 September26 healthy packaged busy-rapid check: station11,520m fails the20FPS
 budget: p9585.2731ms, max141.7508ms,17 individual frames>100ms. Detail remains
 healthy for72.654s with zero errors/backlog; the startup repair holds. CPU

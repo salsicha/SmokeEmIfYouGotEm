@@ -9,8 +9,6 @@
 #include "RaftSimIndexedEdgeMap.h"
 #include "RaftSimBoundCoordinateMemo.h"
 #include "RaftSimCrestRangeMemo.h"
-#include "RaftSimCrestRootEdges.h"
-#include <type_traits>
 
 // Conforming red/green triangle refinement. Midpoints retain parent indices so
 // every render attribute uses the same piecewise-linear hydraulic authority;
@@ -58,7 +56,6 @@ struct FRaftSimSurfaceRefinement
     bool bFlatCoordinateMemo=false; // Candidate: exact keys, unchanged profile epochs.
     bool bStrongEdgeHash=false; // Candidate until exact actual-input timing qualifies it.
     bool bIndexedEdges=false; // Shoreline enables the qualified indexed lookup.
-    bool bCachedRootEdges=false; // Candidate: exact root edge incidence only.
     bool bRetainTopologyStorage=false; // Reuse capacity, never stale selection/profile values.
     bool bLevelLocalMemos=false; // Candidate: retain coordinate slots separately per level.
     bool bInlineSelection=false; // Candidate: typed predicate, identical evaluations.
@@ -88,7 +85,7 @@ struct FRaftSimSurfaceRefinement
         // process allocation (<2^53 bytes); never controls cache ownership.
         return double(Bytes);
     }
-    void InvalidateTopologyCache() { CachedRootTriangles.Reset(); CachedLevels.Reset(); CachedRootPointCount=0; RootEdges.Reset(); }
+    void InvalidateTopologyCache() { CachedRootTriangles.Reset(); CachedLevels.Reset(); CachedRootPointCount=0; }
 
     bool Build(const TArray<FVector2D>& Coordinates,const TArray<int32>& SourceTriangles,
         const FBox2D& Window,int32 Levels,const FBox2D* FinalLevelWindow=nullptr)
@@ -323,7 +320,6 @@ private:
     TArray<int32> CachedRootTriangles;
     TArray<FTopologyLevel> CachedLevels;
     int32 CachedRootPointCount=0;
-    FRaftSimCrestRootEdges RootEdges;
 
     template<typename TSelect>
     bool BuildSelected(const TArray<FVector2D>& Coordinates,const TArray<int32>& SourceTriangles,
@@ -398,12 +394,6 @@ private:
             else Cached.Selection=MoveTemp(Selection);
             const auto Assemble=[&](auto& Midpoints)
             {
-                const auto EdgeKey=[&](int32 I,int32 E,int32 A,int32 B)->uint64
-                {
-                    if constexpr(std::is_same_v<std::decay_t<decltype(Midpoints)>,FRaftSimCrestRootEdges>)
-                        return uint64(I+E);
-                    else return Key(A,B);
-                };
                 for (int32 I=0;I<Triangles.Num();I+=3)
                 {
                     const int32 A=Triangles[I],B=Triangles[I+1],C=Triangles[I+2];
@@ -411,7 +401,7 @@ private:
                     const int32 Corners[]={A,B,C};
                     for (int32 E=0;E<3;++E)
                     {
-                        const int32 L=Corners[E],R=Corners[(E+1)%3];const uint64 K=EdgeKey(I,E,L,R);
+                        const int32 L=Corners[E],R=Corners[(E+1)%3];const uint64 K=Key(L,R);
                         if (!Midpoints.Contains(K))
                         {
                             const int32 NewIndex=Points.Num();
@@ -441,7 +431,7 @@ private:
                     int32 V[]={Triangles[I],Triangles[I+1],Triangles[I+2]};int32 M[3],Count=0;
                     for (int32 E=0;E<3;++E)
                     {
-                        const int32* Found=Midpoints.Find(EdgeKey(I,E,V[E],V[(E+1)%3]));M[E]=Found ? *Found : INDEX_NONE;
+                        const int32* Found=Midpoints.Find(Key(V[E],V[(E+1)%3]));M[E]=Found ? *Found : INDEX_NONE;
                         Count+=Found ? 1 : 0;
                     }
                     if (Count==0) { Add(V[0],V[1],V[2]);continue; }
@@ -463,9 +453,7 @@ private:
                 return true;
             };
             bool HasMidpoints=false;
-            if(bCachedRootEdges && Level==0)
-            { RootEdges.Prepare(Triangles,Points.Num()); HasMidpoints=Assemble(RootEdges); }
-            else if(bIndexedEdges)
+            if(bIndexedEdges)
             { FRaftSimIndexedEdgeMap Midpoints(Points.Num()); HasMidpoints=Assemble(Midpoints); }
             else if(bStrongEdgeHash)
             { TRaftSimEdgeMap<int32> Midpoints; HasMidpoints=Assemble(Midpoints); }
@@ -481,7 +469,7 @@ public:
     uint64 GetTopologyAllocatedBytes() const
     {
         uint64 Bytes=CachedRootTriangles.GetAllocatedSize()+CachedLevels.GetAllocatedSize()+
-            RetainedPoints.GetAllocatedSize()+RetainedNextTriangles.GetAllocatedSize()+RetainedNextOrigins.GetAllocatedSize()+RootEdges.GetAllocatedSize();
+            RetainedPoints.GetAllocatedSize()+RetainedNextTriangles.GetAllocatedSize()+RetainedNextOrigins.GetAllocatedSize();
         for(const auto& L:CachedLevels)Bytes+=L.Selection.GetAllocatedSize()+L.WorkingSelection.GetAllocatedSize()+
             L.Parents.GetAllocatedSize()+L.Triangles.GetAllocatedSize()+L.Origins.GetAllocatedSize();
         return Bytes;
