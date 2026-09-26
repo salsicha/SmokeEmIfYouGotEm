@@ -11,7 +11,9 @@ and bias along the route and interpolates depth continuously (largest bin step
 the v1 600 s state for 300 s over the new bed; accuracy against the captured
 surface is unchanged (median |error| 0.097 vs 0.094 m), still not settled. 190
 tiles re-imported, runtime re-exported, bundle v4 staged. The bed under water
-remains inferred. See [bed v2](../reconstruction-review-2026-09-07/south-fork-bed-v2.md).
+remains inferred. Busy rapids on v2 run p95 51.6-54.4 ms on a quieter host (11.5 and 27.6 km,
+no hitches): over the 50 ms goal, with more crest-topology rebuilds than v1;
+rapid-section performance stays open. See [bed v2](../reconstruction-review-2026-09-07/south-fork-bed-v2.md).
 
 September26 Colorado audit and source research (no download, no scene change):
 the shipping Hance scene is authored, not geographic (seeded boulders, imposed
