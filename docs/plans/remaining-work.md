@@ -31,6 +31,11 @@ exposed-ground screen; they are provisional observations, not17 verified rocks.
 Source filters are corrected; captured archives, current geometry and cooks are
 unchanged. Review and consistent playable integration remain required. See
 [classification impact](../reconstruction-review-2026-09-07/south-fork-ignored-ground-correction.md).
+The follow-through records exact registered-base residuals and source peers for
+all17 candidates (three have no other classified-ground return within0.5m).
+This is not the final playable union or permission to promote new rocks. Shared
+editor/capture/performance work is active; next isolated delivery run must
+rebuild the latest standalone code and refresh the cooked game before acceptance.
 
 September26 playable delivery (normal FullReach): **South Fork riverbed is now
 discharge-consistent and the rapids have their captured drops.** The inferred

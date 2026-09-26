@@ -43,3 +43,26 @@ must update render/collision/bed and recook consistently, then be checked in
 normal play at the current 20 FPS / p95 50 ms target. No new source download,
 captured-data deletion, solver enablement, asset import or cook occurred here.
 South Fork remains first in the queue; Colorado has not been started.
+
+## Follow-through: registered-base and peer screen
+
+The [registered-base screen](south-fork-ignored-ground-registered-screen.json)
+now samples all17 observations on exact retained base triangles and records
+nearby original ground-return indices/heights. Source and base hashes are
+checked before and after. Observations stand0.0406–1.2896m above this base.
+This is **not** the final playable cap/terrain union and is not a defect claim.
+
+Within a0.5m horizontal diagnostic radius,14 observations have at least one
+other class2/20 return; three (697210,889812,1867764) have none. The query itself
+is excluded from every peer count. Nearby ground does not establish a shared
+rock surface; the receipt preserves signed height differences for review.
+The largest base residual,1.2896m at697210, has no classified-ground peer in
+that radius and must not be promoted merely because it is the largest gap.
+Five new peer-screen regressions plus ten class-filter tests pass.
+
+The September26 13:54UTC follow-up found another session rebuilding the editor,
+then running South Fork captures and normal-menu timing. No competing cook or
+game process was launched. Its water-surface source edits were left intact.
+The next isolated delivery run must rebuild the standalone executable after
+those shared changes settle, refresh cooked content, and verify normal Boot/
+menu travel, motion and cost; the older staged-data comparison is already done.
