@@ -67,3 +67,24 @@ is still slowly filling: not settled hydraulics.
 Archived: `physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach/discharge_bed_v2_20260926/`
 (bed, cook input manifest, analysis, bank audit, render tiles), FBX exports in
 `unreal/SourceArt/RaftSim/SouthForkDischargeBedV2_20260926/`.
+
+## Performance (not accepted)
+
+Editor-hosted game, 1,200 frames, rows 30-1169. Every run overlapped other
+host work: 50-60% processor load before start, from the desktop app's git
+diff jobs over the new bundle and the other session's cook, so these are not
+idle-host results.
+
+| launch | mean ms | p95 ms | max ms | > 100 ms |
+| --- | ---: | ---: | ---: | ---: |
+| normal Boot/menu (two runs) | 35.4 / 36.6 | 43.5 / 43.9 | 52.7 / 54.2 | 0 / 0 |
+| station 1,320 m (Meat Grinder) | 28.6 | 41.0 | 75.1 | 0 |
+| station 27,600 m (gorge chute) | 40.9 | 51.3 | 85.5 | 0 |
+| station 11,520 m | 51.0 | 82.0 | 150.5 | 3 |
+
+The 11.5 km run is well over budget. Its slow frames scale every water stage
+by about the same factor against an earlier 11.5 km run (crest update 10.9 vs
+6.4 ms, crest selection 6.2 vs 3.1 ms, solver step 10.2 vs 6.4 ms), which points
+at processor contention rather than one new cost; the far-field ring is not
+among the top costs. A repeat on an idle host is required before any
+conclusion. Busy-rapid performance remains open.
