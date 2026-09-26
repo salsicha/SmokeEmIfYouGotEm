@@ -44,6 +44,11 @@ if ($PackagedRoot -ne '') {
     $gameBinary = $paths.Binary; $csvDir = $paths.CsvDirectory; $gameWorkingDirectory = $paths.WorkingDirectory
 }
 $receipt = Join-Path $root "unreal/Saved/RaftSimValidation/$Label-frame-audit.json"
+function Get-RaftSimRuntimeErrors([string]$LogText) {
+    # A fast frame after a failed water subsystem is not a healthy performance pass.
+    @([regex]::Matches($LogText, '(?m)^.*\bLog\w+: (?:Error|Fatal):[^\r\n]*') |
+        ForEach-Object { $_.Value })
+}
 if (Test-Path -LiteralPath $logFile) { throw "Log already exists: $logFile" }
 $started = Get-Date
 $review = $ReviewStationM -ge 0
@@ -79,6 +84,7 @@ $game.WaitForExit()
 if ($game.ExitCode -ne 0) { throw "Game failed with exit code $($game.ExitCode)" }
 if ((Get-FileHash -LiteralPath $gameBinary -Algorithm SHA256).Hash.ToLower() -ne $binaryHash) { throw 'Game binary changed during profiling' }
 $log = Get-Content -LiteralPath $logFile -Raw -Encoding UTF8
+$runtimeErrors = @(Get-RaftSimRuntimeErrors $log)
 $csvEnded = 'LogCsvProfiler: Display: Capture Ended\. Writing CSV to file : [^\r\n]*[/\\]([^/\\\r\n]+\.csv)\s*$'
 $patterns = if ($review) { @(
     'LogLoad: LoadMap: /Game/RaftSim/Maps/L_SouthForkAmerican_FullReach(?:\?|\s|$)', $csvEnded)
@@ -135,6 +141,10 @@ $result = [ordered]@{
     target_fps = 20; p95_budget_ms = 50; two_frame_hitch_ms = 100
     # Hitch = any single frame over two 50 ms frame budgets (as in the Sept 26 receipt).
     p95_passes = ($p95 -le 50); hitch_passes = (@($window | Where-Object { $_ -gt 100 }).Count -eq 0)
+    runtime_error_count = $runtimeErrors.Count; runtime_errors = $runtimeErrors
+    runtime_health_passes = ($runtimeErrors.Count -eq 0)
+    healthy_timing_passes = ($runtimeErrors.Count -eq 0 -and $p95 -le 50 -and @($window | Where-Object { $_ -gt 100 }).Count -eq 0)
+    physical_acceptance = $false
 }
 New-Item -ItemType Directory -Force -Path (Split-Path $receipt) | Out-Null
 $result | ConvertTo-Json | Set-Content -LiteralPath $receipt -Encoding UTF8

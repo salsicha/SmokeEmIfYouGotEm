@@ -43,14 +43,18 @@ over 100 ms; P4 8/9 (Zambezi spray unchanged). Rapids beyond the carrier are
 cooked, not white; a faint carrier-edge line remains (the 29.5 km dark water
 wedge was a bed ledge, removed by bed v2 above). See [far-field view](../reconstruction-review-2026-09-07/south-fork-far-field-view.md).
 
-September26 cooked-delivery retry: the actual Development package attempt
-exposed an editor-only Nanite query in the new canopy diagnostic. A narrow
-runtime-safe source correction is present, but rebuild verification is pending.
-Another session began asset imports mid-build, so this task stopped only its
-own packaging coordinator before cooking; no new stage was published. The
-normal-menu profiler now supports the cooked executable, with launch/path
-regressions passing. Reserve an exclusive build/cook/validation window before
-retrying. See [exact failure and next step](../reconstruction-review-2026-09-07/south-fork-cooked-delivery-retry.md).
+September26 cooked-game delivery: the Nanite build failure is repaired and the
+v4 Development package completed. Its 2,405 payload files verify, and actual
+Boot → main menu → South Fork travel and raft/paddle motion run in the package.
+**Normal-menu water health fails twice:** stateful detail rejects invalid
+mean-flow input and stops after ~3.25 s, before the CSV starts. The observed
+p95 39.37/38.87 ms and zero >100 ms frames therefore do NOT establish healthy
+20 FPS acceptance. The profiler now records runtime errors and a separate
+healthy-timing gate. Next: identify the rejected cell/value and repair its
+producer without weakening validation or disabling water, then rebuild and
+repeat normal play. Busy-rapid performance and physical acceptance remain open.
+Do not repeat the resolved compiler/package/data checks as the main task. See
+[package evidence and exact next step](../reconstruction-review-2026-09-07/south-fork-v4-packaged.md).
 
 September26 all-scene water review, Chilko and Zambezi: **Zambezi went from
 about 5 FPS to 11-13 ms mean frames (p95 24-27 ms).** Its fixed live window

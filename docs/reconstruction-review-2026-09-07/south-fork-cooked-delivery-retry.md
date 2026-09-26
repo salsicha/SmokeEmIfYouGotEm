@@ -53,3 +53,45 @@ successful fresh package, use the new option with 1,200 frames and inspect
 actual raft telemetry and rendered motion separately. Keep the 20 FPS / 50 ms
 p95 and >100 ms hitch gates; no physics or quality settings were relaxed.
 South Fork remains unfinished; later rivers remain queued.
+
+## 16:54 UTC follow-up — compiler repaired; v4 cook running
+
+The next guarded retry started from `0e8448c27` (bed v2 / runtime bundle v4)
+with a clean tracked tree and no competing engine/build/cook at launch.
+The corrected Nanite query is now included in the shared history. The actual
+standalone Development build **passed**: 2,408 actions in 89.91 seconds,
+including the game link. This supersedes the unverified correction and old
+executable status above; it does not yet establish a working packaged game.
+The retained build log is `tmp/south-fork-v4-build-success-20260926.log`,
+SHA-256 `049fd6d25e4b7411c004fb8ff24ea8e74c59f44951a2a53ef268fbd4ff463149`.
+
+The same UAT pipeline continues through iterative cook, stage, pak and package
+to the fresh destination `tmp/south-fork-playable-v4-20260926`. At 17:05 UTC,
+2,265 of 2,266 packages were cooked. The remaining package is waiting on
+`M_RaftSim_SouthForkRaftTransmissionWaterV4` shader jobs; six shader workers
+were consuming CPU, so this is active compilation, not an established hang.
+No duplicate cook was launched and no previous playable stage was removed.
+
+Resume this existing pipeline before starting more work: UAT PID2240, parent
+PID15024, cook PID30284 (identities must be rechecked, not trusted after exit).
+Cook log: `C:/Program Files/Epic Games/UE_5.8/Engine/Programs/AutomationTool/Saved/Cook-2026.09.26-09.57.24.txt`.
+
+Another session ran M9 tests and changed other-river materials during this
+cook. No other session was stopped. At the follow-up check, the South Fork
+map, terrain, canopy, plugin code, configuration and active v4 bundle still
+matched the build-start revision. Nevertheless this is **not a clean
+whole-project acceptance build**. Any completed package needs the active v4
+payload verifier followed by the packaged normal-menu profiler and separate
+rendered motion/collision/shoreline checks. No package completion, new FPS
+result, visual acceptance or river completion is claimed here. Keep the
+20 FPS / 50 ms p95 and single-frame >100 ms hitch gates unchanged.
+
+## 17:55 UTC follow-up — package complete; runtime health fails
+
+The existing UAT process completed successfully in 751.53 seconds (exit 0).
+The v4 payload verifies and actual packaged Boot/menu travel and motion now
+have receipts. The former compiler/cook blocker is resolved. However, both
+normal-menu runs reject stateful detail input after about 3.25 seconds;
+apparently passing CSV timings occur after that subsystem stops updating and
+are not healthy-performance acceptance. See [the packaged-game report](south-fork-v4-packaged.md)
+for retained evidence and the next repair. No duplicate cook was launched.
