@@ -1,5 +1,12 @@
 # Remaining requested work
 
+September26 candidate-bed consistency: an independent read-only audit checks all
+441 original/replacement tiles against the new inferred grid; XY/topology,
+dry vertices and the protected rapid rectangle are preserved. Six mutation
+tests pass. The other session's import and cook remain active; no duplicate
+engine job or new playable delivery is claimed. See
+[candidate audit and remaining gates](../reconstruction-review-2026-09-07/south-fork-discharge-bed-independent-audit.md).
+
 September26 historical-source location screen: explicit datum conversion places
 the four site endpoints near the current route, but does not register their
 transects or elevations. Original coordinates would be shifted about216.7m
