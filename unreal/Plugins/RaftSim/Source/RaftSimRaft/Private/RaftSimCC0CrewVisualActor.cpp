@@ -955,14 +955,18 @@ void ARaftSimCC0CrewVisualActor::SetSegmentBone(
     FTransform Target = *Reference;
     Target.SetLocation(ToMeshSpace(DesiredStartCm));
     Target.SetRotation((Swing * Twist * Reference->GetRotation()).GetNormalized());
-    if (BoneName == TEXT("calf_l") || BoneName == TEXT("calf_r"))
+    const bool bCalf = BoneName == TEXT("calf_l") || BoneName == TEXT("calf_r");
+    const bool bThigh = BoneName == TEXT("thigh_l") || BoneName == TEXT("thigh_r");
+    if (bCalf || bThigh)
     {
         const FVector LocalAxis = Reference->GetRotation().UnrotateVector(ReferenceDirection);
         const FVector AbsAxis = LocalAxis.GetAbs();
         const int32 Axis = AbsAxis.X > AbsAxis.Y ? (AbsAxis.X > AbsAxis.Z ? 0 : 2) : (AbsAxis.Y > AbsAxis.Z ? 1 : 2);
         const FVector SourceEndLocal = Reference->InverseTransformPosition(ReferenceEnd->GetLocation());
         const double BeforeError = FVector::Distance(Target.TransformPosition(SourceEndLocal), ToMeshSpace(DesiredEndCm));
-        static const bool bFit = FParse::Param(FCommandLine::Get(), TEXT("RaftSimFitCalfSpanReview"));
+        static const bool bFitCalf = FParse::Param(FCommandLine::Get(), TEXT("RaftSimFitCalfSpanReview"));
+        static const bool bFitLeg = FParse::Param(FCommandLine::Get(), TEXT("RaftSimFitLegSpanReview"));
+        const bool bFit = bFitLeg || (bCalf && bFitCalf);
         if (bFit && AbsAxis[Axis] > .9999)
         {
             FVector Scale = Target.GetScale3D();
@@ -970,12 +974,12 @@ void ARaftSimCC0CrewVisualActor::SetSegmentBone(
                 FVector::Distance(Reference->GetLocation(), ReferenceEnd->GetLocation());
             Target.SetScale3D(Scale);
         }
-        static bool bLoggedCalfSpan = false;
-        if (!bLoggedCalfSpan)
+        static TSet<FName> LoggedLegSpans;
+        if (!LoggedLegSpans.Contains(BoneName))
         {
-            bLoggedCalfSpan = true;
-            UE_LOG(LogTemp, Display, TEXT("CALF_SPAN_REVIEW fit=%d axis=%s source_cm=%.9f target_cm=%.9f endpoint_before_cm=%.9f endpoint_after_cm=%.9f"),
-                bFit, *LocalAxis.ToString(), FVector::Distance(Reference->GetLocation(), ReferenceEnd->GetLocation()),
+            LoggedLegSpans.Add(BoneName);
+            UE_LOG(LogTemp, Display, TEXT("LEG_SPAN_REVIEW bone=%s fit=%d axis=%s source_cm=%.9f target_cm=%.9f endpoint_before_cm=%.9f endpoint_after_cm=%.9f"),
+                *BoneName.ToString(), bFit, *LocalAxis.ToString(), FVector::Distance(Reference->GetLocation(), ReferenceEnd->GetLocation()),
                 FVector::Distance(ToMeshSpace(DesiredStartCm), ToMeshSpace(DesiredEndCm)), BeforeError,
                 FVector::Distance(Target.TransformPosition(SourceEndLocal), ToMeshSpace(DesiredEndCm)));
         }
@@ -1143,13 +1147,11 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
 
     const float LegFacingTwistDegrees =
         CVarRaftSimCC0LegFacingTwistDegrees.GetValueOnGameThread();
-    // Leg skin squashes between explicitly placed bone heads (the foot
-    // bone is pinned at the pose foot target and scaled to zero), so pose
-    // spans are free of the source rig's limb lengths. Log the source
-    // lengths once anyway — they document how far the skin is being
-    // compressed, which matters when diagnosing shin/boot junctions
-    // ("the feet seem to be coming out of the shins", 2026-09-01: the
-    // real cause was a 10 cm shin drop inside a 12 cm boot cuff).
+    // Explicit joint heads do not by themselves fit a source bone shaft:
+    // without longitudinal fitting, blended skin can extend beyond its
+    // posed child joint. Log source lengths for the endpoint audit. The
+    // review-only fit corrects that mismatch; whole-skin hull clearance
+    // and the normal-play promotion gate remain separate requirements.
     static bool bLoggedLegSegmentLengths = false;
     if (!bLoggedLegSegmentLengths)
     {

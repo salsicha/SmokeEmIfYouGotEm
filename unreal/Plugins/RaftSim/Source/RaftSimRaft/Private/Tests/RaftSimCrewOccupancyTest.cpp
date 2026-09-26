@@ -24,6 +24,7 @@
 #include "Rendering/SkeletalMeshRenderData.h"
 #include "Rendering/SkeletalMeshLODRenderData.h"
 #include "Rendering/SkinWeightVertexBuffer.h"
+#include "Materials/Material.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCrewOccupancyTest,
@@ -259,13 +260,22 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         const auto SavePose = [&](int32 Frame)
         {
             if (!Capture) return;
+            TArray<UMaterialInterface*> SavedHullMaterials;
+            ON_SCOPE_EXIT {
+                for (int32 M = 0; M < SavedHullMaterials.Num(); ++M)
+                    Raft->RaftVisual->SetMaterial(M, SavedHullMaterials[M]);
+            };
             if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimBoardingHandCapture")))
             {
                 const FTransform HostTransform = BoardingAvatar->GetActorTransform();
                 auto* Visual = BoardingAvatar->GetProductionVisualActor();
                 auto* Mesh = Visual ? Visual->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
                 if (!TestNotNull(TEXT("close contact capture has production hand"), Mesh)) return;
-                const FVector Aim = Mesh->GetBoneTransformByName(TEXT("thumb_03_r"), EBoneSpaces::WorldSpace).GetLocation();
+                FString HandSide = TEXT("r");
+                FParse::Value(FCommandLine::Get(), TEXT("RaftSimBoardingCaptureHand="), HandSide);
+                if (!TestTrue(TEXT("capture hand is left or right"), HandSide == TEXT("l") || HandSide == TEXT("r"))) return;
+                const FName Thumb(*FString::Printf(TEXT("thumb_03_%s"), *HandSide));
+                const FVector Aim = Mesh->GetBoneTransformByName(Thumb, EBoneSpaces::WorldSpace).GetLocation();
                 const FVector Eye = Aim + HostTransform.TransformVectorNoScale(FVector(45,70,40));
                 Capture->SetWorldLocationAndRotation(Eye,(Aim-Eye).Rotation());
                 Capture->FOVAngle = 40.f;
@@ -276,7 +286,15 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
                 Capture->ShowOnlyActorComponents(Visual, true);
                 Capture->ShowFlags.SetLighting(true);
                 Capture->ShowFlags.SetMaterials(false);
-                // Isolated right-hand/hull diagnostic: no normal shading or
+                // Unlit hull materials do not populate the normal buffer.
+                // Use an opaque diagnostic material only while capturing;
+                // triangles, collision and saved production materials stay intact.
+                for (int32 M = 0; M < Raft->RaftVisual->GetNumMaterials(); ++M)
+                {
+                    SavedHullMaterials.Add(Raft->RaftVisual->GetMaterial(M));
+                    Raft->RaftVisual->SetMaterial(M, UMaterial::GetDefaultMaterial(MD_Surface));
+                }
+                // Isolated selected-hand/hull diagnostic: no normal shading or
                 // crew-to-crew visibility/collision acceptance from these views.
                 Capture->CaptureSource = SCS_Normal;
             }
@@ -353,6 +371,24 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         auto* HandVisual = Cast<ARaftSimCC0CrewVisualActor>(BoardingAvatar->GetProductionVisualActor());
         auto* HandBody = HandVisual ? HandVisual->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
         if (!TestNotNull(TEXT("handoff audit observes actual production bones"), HandBody)) return false;
+        const FName LegStarts[] = {TEXT("thigh_l"), TEXT("calf_l"), TEXT("thigh_r"), TEXT("calf_r")};
+        const FName LegEnds[] = {TEXT("calf_l"), TEXT("foot_l"), TEXT("calf_r"), TEXT("foot_r")};
+        FVector ReferenceLegEnds[4];
+        double MaxLegEndpointErrorCm[4] = {};
+        const auto& Skeleton = HandBody->GetSkinnedAsset()->GetRefSkeleton();
+        TArray<FTransform> ReferenceComponents;
+        for (int32 B = 0; B < Skeleton.GetNum(); ++B)
+        {
+            const int32 Parent = Skeleton.GetParentIndex(B);
+            ReferenceComponents.Add(Parent == INDEX_NONE ? Skeleton.GetRefBonePose()[B] :
+                Skeleton.GetRefBonePose()[B] * ReferenceComponents[Parent]);
+        }
+        for (int32 L = 0; L < 4; ++L)
+        {
+            const int32 Start = Skeleton.FindBoneIndex(LegStarts[L]), End = Skeleton.FindBoneIndex(LegEnds[L]);
+            if (!TestTrue(TEXT("leg audit has both source joints"), Start != INDEX_NONE && End != INDEX_NONE)) return false;
+            ReferenceLegEnds[L] = ReferenceComponents[Start].InverseTransformPosition(ReferenceComponents[End].GetLocation());
+        }
         TArray<FName> HandBones;
         TArray<FTransform> PreviousHandWorld;
         for (const TCHAR* Side : {TEXT("l"), TEXT("r")})
@@ -406,6 +442,13 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         FName WorstHandBone;
         int32 WorstHandAngleFrame = -1;
         FName WorstHandAngleBone;
+        FVector SupportedPalms[2];
+        double MaxPalmFrameErrorCm = 0.;
+        FRaftSimCrewAvatarPose GripDestination;
+        TestTrue(TEXT("transfer has actual destination grip"), BoardingAvatar->TryGetBoardingGripDestination(GripDestination));
+        const FVector GripTargets[2] = {
+            Raft->BoardingSeatLocal.TransformPosition(GripDestination.LeftHandCm),
+            Raft->BoardingSeatLocal.TransformPosition(GripDestination.RightHandCm)};
         Raft->UpdateRescueInteraction(-1.f);
         TestTrue(TEXT("negative time cannot move boarding root"), BoardingAvatar->GetActorLocation().Equals(PreviousPosition, .01));
         while (!Raft->BoardingPassenger.IsNone() && Frames < 720)
@@ -414,6 +457,13 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             Raft->UpdateCrew(1.f/60.f);
             Raft->UpdateRescueInteraction(1.f/60.f);
             BoardingAvatar->Tick(1.f/60.f);
+            for (int32 L = 0; L < 4; ++L)
+            {
+                const FVector DrivenEnd = HandBody->GetBoneTransformByName(LegStarts[L], EBoneSpaces::WorldSpace)
+                    .TransformPosition(ReferenceLegEnds[L]);
+                const FVector Child = HandBody->GetBoneTransformByName(LegEnds[L], EBoneSpaces::WorldSpace).GetLocation();
+                MaxLegEndpointErrorCm[L] = FMath::Max(MaxLegEndpointErrorCm[L], FVector::Distance(DrivenEnd, Child));
+            }
             if (Frames+1 == 240 || Frames+1 == 258 || Frames+1 == 264 || Frames+1 == 270)
             {
                 const auto& HandPose = BoardingAvatar->GetPublishedCrewPose();
@@ -451,12 +501,29 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
                 if (Raft->BoardingElapsed > Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingLegOverFraction)
                 {
                     ++GripHandoffSamples;
+                    const float T = (Raft->BoardingElapsed / Raft->BoardingDuration - ARaftSimCrewAvatarActor::BoardingLegOverFraction) /
+                        (1.f - ARaftSimCrewAvatarActor::BoardingLegOverFraction);
+                    const double Blend = T*T*(3.f-2.f*T);
+                    const FVector Hands[2] = {HandPose.LeftHandCm, HandPose.RightHandCm};
+                    for (int32 H = 0; H < 2; ++H)
+                    {
+                        const FVector Actual = Raft->GetActorTransform().InverseTransformPosition(
+                            BoardingAvatar->GetActorTransform().TransformPosition(Hands[H]));
+                        MaxPalmFrameErrorCm = FMath::Max(MaxPalmFrameErrorCm,
+                            FVector::Distance(Actual, FMath::Lerp(SupportedPalms[H], GripTargets[H], Blend)));
+                    }
                     TestTrue(TEXT("handoff retains full palm anchoring while changing grip"),
                         FMath::IsNearlyEqual(HandPose.BoardingPalmSupportBlend + HandPose.BoardingPaddleGripBlend, 1.f, 1.e-5f));
                     TestFalse(TEXT("paddle prop remains hidden during handoff"), HandPose.bShowPaddle);
                 }
                 else
+                {
+                    SupportedPalms[0] = Raft->GetActorTransform().InverseTransformPosition(
+                        BoardingAvatar->GetActorTransform().TransformPosition(HandPose.LeftHandCm));
+                    SupportedPalms[1] = Raft->GetActorTransform().InverseTransformPosition(
+                        BoardingAvatar->GetActorTransform().TransformPosition(HandPose.RightHandCm));
                     TestEqual(TEXT("paddle grip does not start before leg clearance"), HandPose.BoardingPaddleGripBlend, 0.f);
+                }
             }
             for (int32 P = 0; P < 4; ++P)
             {
@@ -615,9 +682,18 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             if (Frames % 30 == 0 || Raft->BoardingPassenger.IsNone()) SavePose(Frames);
         }
         TestTrue(TEXT("timed boarding reaches completion"), Frames < 720 && Raft->BoardingPassenger.IsNone());
+        for (int32 L = 0; L < 4; ++L)
+        {
+            AddInfo(FString::Printf(TEXT("BOARDING_LEG_ENDPOINT bone=%s max_error_cm=%.9f"),
+                *LegStarts[L].ToString(), MaxLegEndpointErrorCm[L]));
+            if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimFitLegSpanReview")))
+                TestTrue(TEXT("fitted leg source shaft reaches the posed child joint within 0.001cm"), MaxLegEndpointErrorCm[L] <= .001);
+        }
         TestTrue(TEXT("no large per-frame root teleport"), MaxStepCm < 10.);
         TestTrue(TEXT("no foot or knee control teleport above 10cm per update"), MaxLegPointStepCm < 10.);
         TestTrue(TEXT("grip handoff was sampled"), GripHandoffSamples > 0);
+        TestTrue(TEXT("release palms follow the raft-frame anchor path within 0.001cm"), MaxPalmFrameErrorCm <= .001);
+        AddInfo(FString::Printf(TEXT("BOARDING_PALM_FRAME max_error_cm=%.9f"), MaxPalmFrameErrorCm));
         TestTrue(TEXT("thumb support preserves both shaft lengths within 0.001cm"), MaxThumbSupportLengthErrorCm <= .001);
         AddInfo(FString::Printf(TEXT("BOARDING_THUMB_LENGTH max_support_error_cm=%.9f"), MaxThumbSupportLengthErrorCm));
         TestTrue(TEXT("no wrist or finger teleport above 10cm per update"), MaxHandStepCm < 10.);

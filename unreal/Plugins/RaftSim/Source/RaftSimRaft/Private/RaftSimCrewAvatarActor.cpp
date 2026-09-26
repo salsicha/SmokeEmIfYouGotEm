@@ -3533,6 +3533,7 @@ void ARaftSimCrewAvatarActor::SetBoardingPose(const FRaftSimCrewAvatarPose& Star
     BoardingStartPose = Start;
     BoardingEndPose = End;
     bBoardingHasReach = false;
+    bBoardingHasTransferFrames = false;
     AdvanceBoardingPose(Alpha);
 }
 
@@ -3588,6 +3589,17 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
             &FRaftSimCrewAvatarPose::PaddleTopCm, &FRaftSimCrewAvatarPose::PaddleBottomCm};
         for (auto Point : Points)
             Pose.*Point = FMath::Lerp(From.*Point, To.*Point, Blend);
+        if (bBoardingHasReach && !bLegOver && bBoardingHasTransferFrames)
+        {
+            // Both anchors belong to the raft, but are authored in different
+            // avatar root frames. Interpolate them in one frame; a second
+            // local-space lerp while the root rotates sweeps the supported
+            // hands through the tube instead of releasing toward the grip.
+            Pose.LeftHandCm = FMath::Lerp(BoardingReachToCurrent.TransformPosition(From.LeftHandCm),
+                BoardingSeatToCurrent.TransformPosition(To.LeftHandCm), double(Blend));
+            Pose.RightHandCm = FMath::Lerp(BoardingReachToCurrent.TransformPosition(From.RightHandCm),
+                BoardingSeatToCurrent.TransformPosition(To.RightHandCm), double(Blend));
+        }
         if (bBoardingHasReach && !bApproaching && bPulling)
         {
             // Blend leg directions, not endpoints: endpoint lerp shortens the

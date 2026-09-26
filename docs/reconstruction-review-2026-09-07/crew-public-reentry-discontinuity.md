@@ -536,3 +536,63 @@ provided by this diagnostic run.
 No-opt-in regression `tmp/crew-thumb-support-default-retry-20260925/index.json`
 passes the native occupancy test with engine exit0. This preserves the ordinary
 crew regression, not the disabled boarding candidate's clearance acceptance.
+
+### Leg-span consistency and raft-frame release (September26 UTC)
+
+The source thigh shafts were not reaching the explicitly positioned calf
+joints: initial left41.389486707cm source vs33.645207683cm target (7.744279024cm
+error); right41.389486707cm vs34.525353003cm (6.864133704cm error). A new
+`-RaftSimFitLegSpanReview` extends longitudinal-only fitting to both thighs and
+calves. The older calf-only flag keeps its original behavior. Neither is a
+production default. The actual transformed source endpoint is now audited
+against the child bone on all343updates, including seated completion.
+
+`tmp/crew-leg-span-fit-20260926/index.json` fails only body clearance. Fitted
+endpoint maximum errors are left thigh0.000000486cm, left calf0.000000316cm,
+right thigh0.000000237cm, right calf0.000001382cm. Correcting joint endpoints
+does not solve skin contact: worst deficit6.949300449cm atframe343, vertex10948,
+100% calf_l. Raft point(135.248,-50.365,15.544)cm; avatar point
+(20.248,11.635,21.641)cm. Surface distance5.072355232cm, tube winding1.
+Thumb maximum5.136705491cm atframe270, vertex1058. Body samples583603.
+The wide engine frame343 was inspected but is too dark for local skin
+acceptance; its capture is retained in `tmp/crew-leg-span-fit-views-20260926/`.
+
+The release stage also blended avatar-local palm coordinates while separately
+translating/rotating the avatar root between different reach and seat frames.
+The runtime now transforms each anchor into the current root frame first,
+equivalent to interpolating the fixed support and destination in raft space.
+This removes that extra swept path without changing the root trajectory, the
+grip solver, mass ownership, thresholds or normal-play boarding selection.
+Transfer frames reset when a new boarding pose is initialized.
+
+Retained comparison `tmp/crew-raft-frame-hands-20260926/index.json` and final
+`tmp/crew-release-path-audit-20260926/index.json` both fail only body clearance.
+The final expanded audit records:
+
+- Raft-frame palm anchor interpolation error0.000000000cm (limit0.001cm).
+- All four source leg endpoints meet the0.001cm gate with maxima above.
+- Hand max step5.521370529cm atframe299, pinky_01_l; max rotation
+  6.607589208degrees atframe301, index_03_r. No continuity failure.
+- Thumb mask616vertices/14784supported samples:4.948800467cm maximum deficit,
+  frame276, vertex1059. Whole body583582samples retains6.949300449cm atframe343.
+
+Editor builds19.04s (leg fitting),84.61s (root-frame change) and22.30s (audit)
+all succeeded. The final capture uses an opaque default material temporarily
+on the existing hull triangles, then restores every material after capture;
+it changes neither geometry nor saved assets. Frame270 of
+`tmp/crew-release-path-views-20260926/` was inspected and now visibly contains
+the hand and tube together. It is a diagnostic normal-buffer view, not normal
+lighting, continuous clearance, or moving-raft acceptance. The actual worst
+thumb frame276 is not among those every30-frame captures.
+
+Next repair the supported hand release across the curved tube and the seated
+knee/shin posture. Endpoint mismatch alone is now ruled out as a sufficient
+repair: the remaining worst point is entirely calf-weighted despite aligned
+shafts. Do not move boots off their validated supports, hide calf vertices,
+raise the2cm limit or promote the candidate based on the new coordinate tests.
+No normal-play visual improvement, standalone/package rebuild, performance
+acceptance or river reconstruction acceptance is claimed.
+
+No-opt-in native follow-up `tmp/crew-leg-release-default-20260926/index.json`
+passes the ordinary occupancy regression, engine exit0. The strict candidate's
+remaining clearance failure is preserved separately; no gate was weakened.

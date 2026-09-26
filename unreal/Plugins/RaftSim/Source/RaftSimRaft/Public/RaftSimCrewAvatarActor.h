@@ -145,6 +145,8 @@ public:
     void SetBoardingPullPose(const FRaftSimCrewAvatarPose& Pull) { BoardingPullPose = Pull; }
     void SetBoardingLegOverPoses(const FRaftSimCrewAvatarPose& Lift, const FRaftSimCrewAvatarPose& Over) { BoardingLiftPose = Lift; BoardingLegOverPose = Over; }
     void AdvanceBoardingPose(float Alpha);
+    void SetBoardingTransferFrames(const FTransform& ReachToCurrent, const FTransform& SeatToCurrent)
+    { BoardingReachToCurrent = ReachToCurrent; BoardingSeatToCurrent = SeatToCurrent; bBoardingHasTransferFrames = true; }
     static constexpr float BoardingReachFraction = .35f;
     static constexpr float BoardingPullFraction = .6f;
     static constexpr float BoardingLiftFraction = .675f;
@@ -493,6 +495,8 @@ private:
     float ActionIntensity = 1.0f;
     FRaftSimCrewAvatarPose BoardingStartPose, BoardingReachPose, BoardingPullPose, BoardingLiftPose, BoardingLegOverPose, BoardingEndPose;
     bool bBoardingHasReach = false;
+    FTransform BoardingReachToCurrent, BoardingSeatToCurrent;
+    bool bBoardingHasTransferFrames = false;
     float BoardingPoseAlpha = -1.f;
     float PfdPresentationWetness = 0.0f;
 };

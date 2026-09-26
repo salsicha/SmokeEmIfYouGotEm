@@ -2593,6 +2593,8 @@ void ARaftSimRaftActor::UpdateTimedBoarding(float DeltaSeconds)
         FMath::Lerp(From.GetLocation(), To.GetLocation(), Ease),
         FMath::Lerp(From.GetScale3D(), To.GetScale3D(), Ease));
     Avatar->SetActorTransform(Local * GetActorTransform());
+    Avatar->SetBoardingTransferFrames(BoardingReachLocal.GetRelativeTransform(Local),
+        BoardingSeatLocal.GetRelativeTransform(Local));
     Avatar->AdvanceBoardingPose(T);
     Swimmers[Index].SwimmerWorldPositionMeters = Avatar->GetActorLocation() / kCmPerM;
     if (T >= 1.f)

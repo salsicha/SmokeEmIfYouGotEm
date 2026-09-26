@@ -6,6 +6,14 @@ the 30/60 FPS targets in historical entries and referenced plans. Existing
 measurements and reports remain unchanged; this is not new performance evidence
 or river acceptance. Visual quality, physics rates and solver budgets are unchanged.
 
+September26 follow-through: the review candidate now fits both thigh and calf
+shafts to their posed child joints and interpolates release palms in one raft
+frame. Native endpoint/path/continuity audits pass, but strict body clearance
+still FAILS6.949cm on100% left-calf vertex10948 at completion; thumbs still
+FAIL4.949cm near release. Normal play is unchanged. The corrected diagnostic
+capture finally shows the actual hand and hull together. See the leg-span/
+raft-frame section of [reentry evidence](../reconstruction-review-2026-09-07/crew-public-reentry-discontinuity.md).
+
 September26 UTC boarding follow-through: planar thumb support preserves shaft
 lengths and hand continuity, but does NOT clear the hull. A new skin-weight-based
 thumb-region audit records 5.125cm deficit at frame270; the overall worst is
