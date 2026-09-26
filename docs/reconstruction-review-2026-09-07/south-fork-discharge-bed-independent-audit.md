@@ -52,3 +52,36 @@ animation, shorelines and surface continuity; rebuild/test the normal launch
 with motion and idle-host performance at the user's 20 FPS target. This audit
 does not authorize enabling the known-broken experimental solver or advancing
 to Colorado.
+
+## V2 follow-through — September26 15:54 UTC heartbeat
+
+The owning session is now smoothing its inferred along-route depth transitions
+and continuing the hydraulic state over that revised bed. Its v2 hydraulic cook
+and in-place coarse-terrain import were active; neither was duplicated or
+interrupted. This is a new-candidate consistency check, not a repeat of v1's
+resolved staging diagnostics or a new playable acceptance claim.
+
+The same independent full-tile audit **passes** against v2 bed manifest
+`c637966b3b70e1f28847bb339d8eecad91772066d1806f4c0e309a0271b8a1c5`.
+The [v2 receipt](south-fork-discharge-bed-v2-tile-audit.json) covers all441 tiles
+(188 coarse and2 context replacements),4,301,917 vertex occurrences and384,982
+changed grid vertices. All3,832,673 dry vertices,27,010 protected rapid vertices,
+33,596,317 nodata values, source XY/topology/indices and actor metadata remain
+unchanged. Revised/unchanged tile heights agree exactly with their indexed v2
+bed; coarse/context offsets remain(0,71)/(0,0). Max changes relative to the
+original prior are2.199996948m coarse and2.293281555m context.
+
+A separate hash-checked v1/v2 array comparison gives maximum bed lowering
+0.6294708251953125m. The existing inner backdrop's recorded1.5m minimum clearance
+therefore retains a conservative **0.8705291748046875m source-vertex clearance**
+against v2. This bound relies on the prior backdrop clearance receipt; it is
+not a fresh rendered-triangle, collision or shoreline acceptance test. Compared
+bed hashes are v1`4b7b8b3b16ede96ee6745f1eed27af83a1dca80767bf8718c45d325ebf96e51d`
+and v2`a47fbebd0ee05c1a6eee9951229aa64cc70672ef38772728614f72ad18e0dc50`;
+backdrop source mesh hash is`4dc6183c0d07adc095e96b916e0cab9df8dc89480cabc61d23b5414bc11dfe8c`.
+
+Do not substitute this check for the forthcoming v2 cooked-field/bed audit,
+saved engine collision readback, normal-scene motion and isolated20FPS run.
+The v3 native staged-data receipt describes the preceding delivery, not these
+in-progress v2 geometry/water changes. Rebuild and stage the final matching
+dependencies together once the owning session completes its integration.
