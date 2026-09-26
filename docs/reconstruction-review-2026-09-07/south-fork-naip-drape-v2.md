@@ -43,10 +43,29 @@ of zero (0.233 at zero, 0.234 best).
 
 ![Lower gorge before and after (29.5 and 32.8 km)](south-fork-naip-drape-v2/lower-gorge-before-after.jpg)
 
+## Lower-gorge canopy (same day, after the channel repair)
+
+With the recoloured drape the corrected placement builder (context water mask,
+from the other session's repair) finds 164,046 trees. The candidate lattice and
+jitter are unchanged, so additions are the positions absent from the installed
+placement: 24,211 trees, 99% of them in the lower gorge west end. They are
+installed as 203 separate actors labelled "South Fork lower-gorge NAIP canopy"
+(existing actors untouched). Root sample: 0 misses, p1..p99 -3.9..+3.3 cm.
+848 installed positions no longer pass the corrected filters (266 are the
+water-cell trees already removed); the others were left in place, not removed.
+Archive: `naip_canopy_20260926/lower_gorge_additions_placement.json`.
+
+![Lower gorge: drape only, with trees, raft view](south-fork-naip-drape-v2/lower-gorge-canopy.jpg)
+
+Frame cost on an otherwise idle host (the September 26 channel-repair run that
+failed at p95 74.3 ms overlapped this session's Blender/capture jobs):
+
+| launch | mean ms | p95 ms | max ms | frames > 100 ms |
+| --- | ---: | ---: | ---: | ---: |
+| normal Boot/menu, idle host | 26.2 | 35.2 | 54.8 | 0 |
+| review station 30,500 m with lower-gorge trees | 24.2 | 37.2 | 58.5 | 0 |
+
 ## Still open
 
-- No trees yet in the lower gorge: the canopy classifier (dark and green) could
-  not see crowns in the washed tile. A canopy pass for the recoloured region is
-  pending the other session's channel repair of the canopy actors.
 - A dark notch at the left waterline at 29.5 km and the flat reservoir-like
   water surface ahead at 32.8 km need separate inspection.

@@ -25,7 +25,8 @@ LEVEL = '/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach'
 CELL_CM = 25600.0
 GROUPS = ((0, 1, 2), (3, 4, 5))
 NAMES = ('canopy_a', 'canopy_b', 'canopy_c')
-LABEL_PREFIX = 'South Fork NAIP canopy'
+# A later additive pass (e.g. the recoloured lower gorge) uses its own prefix.
+LABEL_PREFIX = os.environ.get('RAFTSIM_NAIP_CANOPY_LABEL', 'South Fork NAIP canopy')
 SAMPLE_TRACES = 3000
 
 
@@ -136,6 +137,9 @@ def main():
     # Sampled root check against the physical ground actually rendered.
     ground = [d for d in descriptors if str(d.label).startswith(('SouthFork_coarse_terrain_', 'SouthFork_captured_context_'))]
     unreal.WorldPartitionBlueprintLibrary.load_actors([d.guid for d in ground])
+    # Loaded ground has no collision until compilation is flushed; without
+    # this every trace missed in the first installation's sample.
+    unreal.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
     world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
     ground_names = {str(d.name) for d in ground}
     ignore = [a for a in subsystem.get_all_level_actors() if a.get_name() not in ground_names]
