@@ -1,5 +1,13 @@
 # Remaining requested work
 
+September26 standalone staging correction: the new v3 bundle is selected by
+build rules but is missing from the actual standalone staged tree. The native
+verifier still hardcoded v2; it now follows the active build selection, and a
+real v3 check correctly fails. Rebuild/stage when the other session's rendered
+traversal profile is finished, then verify native loading and the cooked game.
+Do not repeat the unchanged failed check. See
+[staging gap and repaired verifier](../reconstruction-review-2026-09-07/south-fork-v3-staging-gap.md).
+
 September26 playable delivery (normal FullReach): **South Fork riverbed is now
 discharge-consistent and the rapids have their captured drops.** The inferred
 bed had been a uniform 2.2 m shore-distance trough, so riffles were as deep as
@@ -12,7 +20,7 @@ cooks (+30% riffle depth). A full-river 600 s cook now sits 0.09 m median
 absolute off the captured surface (-0.21/+0.18 m); Meat Grinder, 11.5, 12.0 km
 and the 27.6 km gorge chute become supercritical and foam in play. 190 terrain
 tiles were rebuilt (collision within 0.0015 cm), the water config points at the
-new export and bundle v3 is staged. A reproducible 430 ms streaming frame at the
+new export and bundle v3 is selected for staging (standalone gap above). A reproducible 430 ms streaming frame at the
 Troublemaker cell is removed by loading those four actors with the map. Normal
 launch p95 34-35 ms; busy rapid stations p95 42-51 ms (one run 1 ms over):
 **rapid-section performance is not accepted.** P4 passes 8/9 (Lava Canyon jump

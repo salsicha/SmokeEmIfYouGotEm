@@ -13,11 +13,14 @@ import unreal
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT/'physics/scripts'))
 from package_runtime_bundle import verify_staged, sha
+from verify_active_south_fork_stage import selected_bundle
 
 
 def main():
-    bundle = ROOT/'physics/data/runtime_bundles/south_fork_source_matched_v2'
+    bundle = selected_bundle(ROOT)
     staged = Path(os.environ['RAFTSIM_RUNTIME_BUNDLE_ROOT']).resolve()
+    if staged == ROOT:
+        raise ValueError('An actual staged tree, not the source root, is required')
     report = Path(os.environ['RAFTSIM_RUNTIME_BUNDLE_REPORT']).resolve()
     if report.exists() or not report.is_relative_to(ROOT/'tmp'):
         raise ValueError('Fresh local verification report required')
@@ -82,7 +85,8 @@ def main():
         native_water_center_m=[cx,cy],absolute_staged_paths_verified=True,
         editor_process=True,solver_steps_run=0,saved_assets=False,
         native_route_and_initial_fields_verified=True,
-        source_stream_sha256=sha(ROOT/entries['streaming_manifest']))
+        source_stream_sha256=sha(ROOT/entries['streaming_manifest']),
+        selected_bundle=bundle.relative_to(ROOT).as_posix())
     report.write_text(json.dumps(result,indent=2)+'\n')
     unreal.log('Native staged runtime bundle verified: '+str(report))
 
