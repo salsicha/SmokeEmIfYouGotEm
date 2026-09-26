@@ -10,6 +10,8 @@
 #include "Engine/Texture2D.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "Camera/PlayerCameraManager.h"
+#include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInterface.h"
 #include "Misc/AutomationTest.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
@@ -224,17 +226,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
     // Chilko) present their 240 x 96 m windows on a 1 m lattice: at 0.5 m they
     // had 92,833 CPU-updated vertices, and 1 m keeps several vertices per
     // hydraulic crest while quartering presentation work (hydraulics
-    // unchanged; RaftSimWaterSurfaceActor.cpp, commit 25aefa24d). Zambezi keeps
-    // the 0.5 m refined lattice.
+    // unchanged; RaftSimWaterSurfaceActor.cpp, commit 25aefa24d). Zambezi's
+    // 5 x 10 m solver cells use its documented 1.5 m lattice (161 x 65) since
+    // September 26: at 0.5 m the map ran at ~5 FPS.
     const bool bUsesOneMetreReferencePresentation =
         bPacuareReferenceRun || bColoradoHanceReferenceRun ||
         bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
-    const float ExpectedPresentationSpacingM =
-        bUsesOneMetreReferencePresentation ? 1.0f : 0.5f;
-    const int32 ExpectedPresentationVertices =
-        bUsesOneMetreReferencePresentation ? 23377 : 92833;
-    const int32 ExpectedPresentationTriangles =
-        bUsesOneMetreReferencePresentation ? 46080 : 184320;
+    const float ExpectedPresentationSpacingM = bZambeziReferenceRun
+        ? 1.5f : (bUsesOneMetreReferencePresentation ? 1.0f : 0.5f);
+    const int32 ExpectedPresentationVertices = bZambeziReferenceRun
+        ? 10465 : (bUsesOneMetreReferencePresentation ? 23377 : 92833);
+    const int32 ExpectedPresentationTriangles = bZambeziReferenceRun
+        ? 20480 : (bUsesOneMetreReferencePresentation ? 46080 : 184320);
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
     {
@@ -850,6 +853,24 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TArray<ARaftSimWaterSurfaceActor::FBreakingSite> BreakingSites;
             It->GetBreakingSites(BreakingSites);
             BreakingSiteCount = BreakingSites.Num();
+            if (const APlayerController* Controller = World->GetFirstPlayerController())
+            {
+                if (Controller->PlayerCameraManager)
+                {
+                    const FVector Camera = Controller->PlayerCameraManager->GetCameraLocation();
+                    float Nearest = TNumericLimits<float>::Max();
+                    FVector NearestSite = FVector::ZeroVector;
+                    for (const auto& Site : BreakingSites)
+                    {
+                        const float D = FVector::Dist(Camera, Site.WorldPositionCm);
+                        if (D < Nearest) { Nearest = D; NearestSite = Site.WorldPositionCm; }
+                    }
+                    Test->AddInfo(FString::Printf(
+                        TEXT("Zambezi breaking sites: %d; camera (%.0f, %.0f, %.0f) cm; nearest site %.0f cm away at (%.0f, %.0f, %.0f)"),
+                        BreakingSites.Num(), Camera.X, Camera.Y, Camera.Z, Nearest,
+                        NearestSite.X, NearestSite.Y, NearestSite.Z));
+                }
+            }
             Test->TestTrue(
                 FString::Printf(
                     TEXT("Zambezi retains advected foam data for the single carrier (%d vertices)"),
@@ -2306,12 +2327,27 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     TEXT("Chilko strongest launch-window jump is in the interpreted Lava Canyon crux"),
                     StrongestSite.RiverCoordinatesMeters.X >= 285.0f &&
                         StrongestSite.RiverCoordinatesMeters.X <= 365.0f);
+                // Single-surface rivers accept a solver jump inside the organic
+                // bank feather (coverage >= 0.55, clearance >= max(lattice, 3 m);
+                // RaftSimWaterSurfaceActor.cpp, the rule that keeps the measured
+                // Troublemaker hole at 3 m). The complete-coverage / 15 m margin
+                // applies to legacy overlay carriers, whose separate crest sheet
+                // could expose a rectangular edge.
+                const bool bSingleSurface = It->IsSingleLiveWaterSurfaceEnabled();
+                const float RequiredCoverage = bSingleSurface ? 0.55f : 0.999f;
+                const float RequiredClearanceM = bSingleSurface
+                    ? FMath::Max(It->GetPresentationVertexSpacingMeters(), 3.0f)
+                    : 15.0f;
                 Test->TestTrue(
-                    TEXT("Chilko strongest launch-window jump has complete presentation coverage"),
-                    StrongestSite.PresentationCoverage >= 0.999f);
+                    FString::Printf(
+                        TEXT("Chilko strongest launch-window jump meets the carrier coverage rule (>= %.3f)"),
+                        RequiredCoverage),
+                    StrongestSite.PresentationCoverage >= RequiredCoverage);
                 Test->TestTrue(
-                    TEXT("Chilko strongest launch-window jump retains 15 m bank/edge clearance"),
-                    StrongestSite.PresentationEdgeClearanceMeters >= 15.0f);
+                    FString::Printf(
+                        TEXT("Chilko strongest launch-window jump meets the carrier bank/edge clearance rule (>= %.1f m)"),
+                        RequiredClearanceM),
+                    StrongestSite.PresentationEdgeClearanceMeters >= RequiredClearanceM);
             }
             Test->TestTrue(
                 TEXT("Chilko single carrier retains solver-derived foam data"),

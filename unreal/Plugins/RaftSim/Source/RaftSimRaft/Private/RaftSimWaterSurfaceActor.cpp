@@ -1353,6 +1353,13 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     const bool bUsesPacuarePresentation = RiverWaterConfig &&
         RiverWaterConfig->CookedFieldsDir.Contains(
             TEXT("pacuare_river_costa_rica"), ESearchCase::CaseSensitive);
+    // Presentation-only identity (like Pacuare): Zambezi keeps its own optics
+    // and relief, but its 5 x 10 m solver cells gain nothing from a 0.5 m
+    // carrier (10 x 20 vertices per cell, 92,833 vertices refreshed at 15 Hz).
+    // Its resolved subdivision is chosen below.
+    const bool bUsesZambeziPresentation = RiverWaterConfig &&
+        RiverWaterConfig->CookedFieldsDir.Contains(
+            TEXT("zambezi_batoka_gorge"), ESearchCase::CaseSensitive);
     const bool bUsesMigratedColdWaterVolumeCore =
         // Backward-compatible rollout for already-versioned cold-water maps.
         // Future regeneration persists the explicit flag; unique cooked-field
@@ -2031,6 +2038,12 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     // stride, so this adds render shape without multiplying solver work.
     const int32 ResolvedSubdivision = bUsesSouthForkFullReachSingleSurface
         ? 2
+        // Zambezi's live solver cells are 5 x 10 m: a 1.5 m carrier (161 x 65
+        // vertices, its documented pre-refinement lattice) still samples each
+        // cell many times, while its 15 Hz big-water refresh at 1 m cost
+        // ~35 ms and pushed p95 over the 50 ms budget.
+        : (bUsesZambeziPresentation && bSingleLiveWaterSurfaceEnabled)
+        ? FMath::Clamp(ConfiguredRapidSubdivision, 1, 2)
         // These 240 x 96 m windows at 0.5 m had 92,833 CPU-updated
         // vertices. One metre retains multiple vertices per hydraulic crest
         // while quartering the presentation work; hydraulics are unchanged.

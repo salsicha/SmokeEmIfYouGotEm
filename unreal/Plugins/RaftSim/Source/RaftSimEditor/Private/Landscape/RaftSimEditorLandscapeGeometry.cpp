@@ -1882,7 +1882,20 @@ bool AddLandscapeCandidateRunnableGameplay(
     WaterConfig->WindowExtentM = WindowExtentM;
     WaterConfig->bRecenterHydraulicCrux = false;
     WaterConfig->CoordinateMapPath = CoordinateMapPath;
-    WaterConfig->bEnableMovingWindowStreaming = false;
+    // The 30 km Zambezi run cannot simulate its whole 5999 x 25 cell corridor
+    // every 1/60 s tick (~20 ms per step never keeps real time). Crop the same
+    // cooked field around the raft and re-centre it every 80 m instead.
+    WaterConfig->bEnableMovingWindowStreaming = bZambezi;
+    if (bZambezi)
+    {
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+                 "scenario_zambezi_run/runtime/moving_water_streaming.json");
+        WaterConfig->WindowCenterM = FVector2D(320.0f, 0.0f);
+        WaterConfig->MovingWindowStationExtentM = 640.0f;
+        WaterConfig->MovingWindowLateralExtentM = 250.0f;
+        WaterConfig->MovingWindowAdvanceM = 80.0f;
+    }
     WaterConfig->bMapProvidesTerrain = true;
     WaterConfig->bLiveSolverOwnsRuntimeRendering = bSolverOwnedRuntimeWater;
     if (bPacuare)

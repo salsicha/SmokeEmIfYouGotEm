@@ -1113,6 +1113,45 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     AddBoundary(TEXT("east"), Col1 == FullNx - 1, "transmissive");
     AddBoundary(TEXT("south"), Row0 == 0, Row0 == 0 ? "bank" : "transmissive");
     AddBoundary(TEXT("north"), Row1 == FullNy - 1, Row1 == FullNy - 1 ? "bank" : "transmissive");
+    // A moving corridor crop's internal cut is not a free outflow: copying the
+    // neighbour there removes the downstream control, so a backwater-held
+    // reach drains out of the cut and exposes its banks (Zambezi, September
+    // 26). Where two source cells exist beyond the cut, hold it to the cooked
+    // state with ghost layers, as Cartesian crops do. Full-grid edges keep
+    // their authored boundaries; fixed crux windows are unchanged.
+    if (!bCartesianCoupled && !bRecenterHydraulicCrux)
+    {
+        for (raftsim::BoundaryCondition& Boundary : Scenario.boundaries)
+        {
+            const bool bWest = Boundary.edge == "west", bEast = Boundary.edge == "east";
+            const bool bSouth = Boundary.edge == "south", bNorth = Boundary.edge == "north";
+            const bool bInternal = (bWest && Col0 >= 2) || (bEast && Col1 + 2 < FullNx) ||
+                (bSouth && Row0 >= 2) || (bNorth && Row1 + 2 < FullNy);
+            if (!bInternal || Boundary.kind != "transmissive")
+            {
+                continue;
+            }
+            raftsim::BoundaryCondition Ghost = MakeEdgeBoundary(Boundary.edge.c_str(), "ghost");
+            const bool bXEdge = bWest || bEast;
+            const int32 Count = static_cast<int32>(bXEdge ? Ny : Nx);
+            Ghost.ghost_cells.reserve(2 * Count);
+            for (int32 Layer = 0; Layer < 2; ++Layer)
+            {
+                for (int32 Along = 0; Along < Count; ++Along)
+                {
+                    const int64 Col = bXEdge ? (bWest ? Col0 - 1 - Layer : Col1 + 1 + Layer) : Col0 + Along;
+                    const int64 Row = bXEdge ? Row0 + Along : (bSouth ? Row0 - 1 - Layer : Row1 + 1 + Layer);
+                    const int64 Index = Row * FullNx + Col;
+                    const bool bCookedWet = WetMask.Bytes[Index] != 0;
+                    Ghost.ghost_cells.push_back({Bed.Float64[Index] - VerticalDatum,
+                        bCookedWet ? FMath::Max(Depth.Float64[Index], 0.0) : 0.0,
+                        bCookedWet ? VelU.Float64[Index] : 0.0,
+                        bCookedWet ? VelV.Float64[Index] : 0.0});
+                }
+            }
+            Boundary = MoveTemp(Ghost);
+        }
+    }
 
     // --- Solver config: the manifest's cook settings ----------------------
     raftsim::SolverConfig Config;
