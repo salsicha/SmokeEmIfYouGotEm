@@ -84,7 +84,30 @@ def main():
     parser.add_argument('--sections', default='')
     parser.add_argument('--overlap-m', type=float, default=400.0)
     parser.add_argument('--old-bed', action='store_true', help='control: keep the previous bed (verifies reproduction)')
+    parser.add_argument('--seed-frame', type=Path, help='cook output frame (h.npy, u.npy, v.npy) to continue from')
+    parser.add_argument('--seed-manifest', type=Path, help='the full-river cook manifest that produced --seed-frame')
     args = parser.parse_args()
+    seed = None
+    if args.seed_frame:
+        # Continue from a cooked state on a revised bed: keep the seeded free
+        # surface (eta = seed bed + seed depth) and velocity, re-derive depth
+        # over the new bed. Package order and tile layout are verified against
+        # the seed cook's own frame 0 and initial states.
+        seed_manifest = json.loads(args.seed_manifest.read_text())
+        seed_root = args.seed_manifest.parent
+        frame0 = args.seed_frame.parent / 'frame_000000'
+        arrays = {k: np.load(args.seed_frame / f'{k}.npy') for k in ('h', 'u', 'v')}
+        h0 = np.load(frame0 / 'h.npy')
+        names = seed_manifest['packages']
+        assert all(a.shape == (80 * len(names), 80) for a in arrays.values())
+        for k in (0, len(names) // 2, len(names) - 1):
+            with np.load(seed_root / names[k] / 'initial_state.npz') as st:
+                assert np.allclose(h0[80 * k:80 * (k + 1)], st['depth']), 'seed frame layout mismatch'
+        seed = dict(index={n: k for k, n in enumerate(names)}, root=seed_root, **arrays,
+                    frame=args.seed_frame.resolve().relative_to(ROOT).as_posix(),
+                    manifest=args.seed_manifest.resolve().relative_to(ROOT).as_posix(),
+                    manifest_sha256=sha(args.seed_manifest),
+                    h_sha256=sha(args.seed_frame / 'h.npy'))
     out = args.output.resolve()
     assert out.is_relative_to(ROOT / 'tmp') and not out.exists(), 'Fresh tmp output required'
     bed_manifest = json.loads((args.bed_dir / 'manifest.json').read_text())
@@ -247,13 +270,25 @@ def main():
                         geometry_manifest=geometry_path.relative_to(ROOT).as_posix(), geometry_manifest_sha256=sha(geometry_path),
                         target_discharge_m3s=Q, authored_combined_inlet_discharge_m3s=imposed, vertical_datum_navd88_m=datum,
                         section=dict(name=sec['name'], core_range_m=sec['core_range_m'], overlap_m=args.overlap_m, tile_count=len(sec['tiles'])),
-                        initial_state='captured surface inside captured water mask; conveyance velocity seed along route tangent',
+                        initial_state=('continued from ' + seed['frame'] + ': seeded free surface and velocity over the revised bed') if seed
+                        else 'captured surface inside captured water mask; conveyance velocity seed along route tangent',
+                        seed=dict(frame=seed['frame'], manifest=seed['manifest'], manifest_sha256=seed['manifest_sha256'],
+                                  h_sha256=seed['h_sha256']) if seed else None,
                         measured_velocity=False, measured_bathymetry=False, settled_hydraulics=False, normal_map_integrated=False, inputs=[])
         for i in sec['tiles']:
             rec = new_regions[i]; c = cells[i]
             pkg = sdir / rec['name']; pkg.mkdir()
             np.save(pkg / 'bed.npy', c['bed'])
             h, u, v = c['depth'], c['u'], c['v']
+            if seed:
+                k = seed['index'][rec['name']]
+                rows = slice(80 * k, 80 * (k + 1))
+                h1 = seed['h'][rows]
+                eta = np.load(seed['root'] / rec['name'] / 'bed.npy') + h1
+                h = np.where(h1 > 1e-6, np.maximum(eta - c['bed'], 0.0), 0.0)
+                wet = h > 1e-6
+                u = np.where(wet, seed['u'][rows], 0.0)
+                v = np.where(wet, seed['v'][rows], 0.0)
             np.savez_compressed(pkg / 'initial_state.npz', depth=h, eta=c['bed'] + h, u=u, v=v, hu=h * u, hv=h * v, wet=h > 1e-6)
             (pkg / 'features.json').write_text('{"features":[]}\n')
             (pkg / 'probes.json').write_text('{"probes":[]}\n')

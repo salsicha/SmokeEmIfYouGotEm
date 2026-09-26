@@ -89,7 +89,11 @@ def main():
     parser.add_argument('output', type=Path)
     parser.add_argument('--bias', type=Path)
     parser.add_argument('--label', default='discharge-consistent bed')
+    parser.add_argument('--along-route-sigma-bins', type=float, default=0.0,
+                        help='v2: Gaussian-smooth pool weight and bias along the route and interpolate depth '
+                             'continuously in station (0 reproduces v1 piecewise-constant 5 m bins)')
     args = parser.parse_args()
+    sigma = args.along_route_sigma_bins
     out = args.output.resolve()
     assert not out.exists(), 'Fresh output directory required; retain earlier revisions'
     extension = json.loads((EXT / 'manifest.json').read_text())
@@ -187,12 +191,19 @@ def main():
     dmax = np.zeros(nb)
     np.maximum.at(dmax, b, d_w)
     L = np.maximum(L_MIN_M, L_FRACTION * gauss1d(dmax, 2.0))
-    f = np.clip(d_w / L[b_all], 0.0, 1.0)
+    L_cell = np.interp(station, centers, L) if sigma > 0 else L[b_all]
+    f = np.clip(d_w / L_cell, 0.0, 1.0)
     K = np.bincount(b, weights=f ** (5.0 / 3.0) * cell * cell, minlength=nb) / BIN_M
     K = np.maximum(gauss1d(K, 1.0), 1e-3)
     Hn = (Q * N_MANNING / (np.sqrt(S) * K)) ** 0.6
     Hn = np.clip(gauss1d(np.clip(Hn, H_MIN, H_MAX), 2.0), H_MIN, H_MAX)
     wpool = np.clip((S_POOL_HI - S) / (S_POOL_HI - S_POOL_LO), 0.0, 1.0)
+    if sigma > 0:
+        # v1 applied a raw per-bin pool weight: where the smoothed slope crossed
+        # the 0.002-0.006 band, neighbouring 5 m bins jumped up to ~1 m in depth
+        # and every channel cell took its bin's constant depth, leaving straight
+        # cross-channel ledges in the inferred bed.
+        wpool = np.clip(gauss1d(wpool, sigma), 0.0, 1.0)
     H = np.maximum(Hn, Hn + (POOL_DEPTH_M - Hn) * wpool)
     bias_info = None
     if args.bias:
@@ -201,12 +212,15 @@ def main():
         # Only along the route itself: beyond-end water used the previous prior
         # in the cook that measured this bias.
         bias[(centers < 0) | (centers > pts[-1, 0])] = 0.0
+        if sigma > 0:
+            bias = gauss1d(bias, sigma)
         H = H + bias
         bias_info = dict(path=args.bias.resolve().relative_to(ROOT).as_posix(), sha256=sha(args.bias),
                          median_abs_m=float(np.median(np.abs(bias))), max_abs_m=float(np.abs(bias).max()))
     H = np.clip(H, H_MIN, H_MAX)
 
-    new_depth = np.where(bank, 0.0, H[b_all] * f)
+    H_cell = np.interp(station, centers, H) if sigma > 0 else H[b_all]
+    new_depth = np.where(bank, 0.0, H_cell * f)
     # Protect the registered Troublemaker rapid/seam rectangle and blend near it.
     ax, ay, bx, by = composite['coarse_exclusion_boundary_utm_m']
     dx = np.maximum(np.maximum(ax - east, east - bx), 0.0)
@@ -241,7 +255,10 @@ def main():
                         manning_n=N_MANNING, bin_m=BIN_M, slope_clip=[S_MIN, S_MAX], depth_clip_m=[H_MIN, H_MAX],
                         pool_depth_m=POOL_DEPTH_M, pool_slope_band=[S_POOL_LO, S_POOL_HI], bank_shape_length=dict(minimum_m=L_MIN_M, fraction_of_half_width=L_FRACTION),
                         protected_rectangle_utm_m=composite['coarse_exclusion_boundary_utm_m'], protect_blend_m=PROTECT_BLEND_M, stage_core_distance_m=STAGE_CORE_M, bank_tolerance_above_stage_m=BANK_TOL_M,
-                        beyond_route_ends='station projected along the end tangent (as the cook preparation)'),
+                        beyond_route_ends='station projected along the end tangent (as the cook preparation)',
+                        along_route_sigma_bins=sigma,
+                        depth_along_route='continuous (station-interpolated), pool weight and bias Gaussian-smoothed' if sigma > 0
+                        else 'piecewise constant per 5 m bin (v1)'),
         bias=bias_info,
         outputs=dict(coarse_bed=dict(path=(out / 'coarse_bed_navd88_m.npz').relative_to(ROOT).as_posix(), sha256=sha(out / 'coarse_bed_navd88_m.npz'), array='coarse_bed_navd88_m', dtype='float32'),
                      design=dict(path=(out / 'design.json').relative_to(ROOT).as_posix(), sha256=sha(out / 'design.json')),

@@ -104,7 +104,7 @@ public class RaftSimWater : ModuleRules
                 StagedFileType.NonUFS);
         }
         StageVerifiedRuntimeBundle(RepoRoot,
-            "physics/data/runtime_bundles/south_fork_discharge_bed_v3", RuntimeDestinations);
+            "physics/data/runtime_bundles/south_fork_discharge_bed_v4", RuntimeDestinations);
     }
 
     private static string CheckedRelativePath(string Value)

@@ -1,5 +1,28 @@
 # Remaining requested work
 
+September26 playable delivery (normal FullReach): **the inferred South Fork
+riverbed no longer has ledges.** Bed v1 held one depth per 5 m bin with a raw
+pool weight and calibration bias, so neighbouring bins jumped up to 1.07 m and
+the bed had straight cross-channel ledges; in play they read as straight dark
+wedges on the water (the 29.5 km "dark notch"). Bed v2 smooths the pool weight
+and bias along the route and interpolates depth continuously (largest bin step
+0.38 m, none over 0.5 m; channel-interior neighbour jumps over 0.4 m: 2,294 to
+178); measured inputs unchanged, v1 reproducible bit-exactly. The cook continued
+the v1 600 s state for 300 s over the new bed; accuracy against the captured
+surface is unchanged (median |error| 0.097 vs 0.094 m), still not settled. 190
+tiles re-imported, runtime re-exported, bundle v4 staged. The bed under water
+remains inferred. See [bed v2](../reconstruction-review-2026-09-07/south-fork-bed-v2.md).
+
+September26 Colorado audit and source research (no download, no scene change):
+the shipping Hance scene is authored, not geographic (seeded boulders, imposed
+slope, procedural canyon infill), and every Colorado source in the repository
+covers Lees Ferry, not Hance (river mile ~76.7). Public-domain USGS/GCMRC
+sources cover Hance: measured multibeam channel bathymetry (river miles 61-88,
+2011 and 2014; the 2014 DEM is a 4.87 MB archive), 1 m corridor DEM/DSMs
+(2002-2021) and 20 cm 2013 imagery. Downloading them needs the user's explicit
+permission; Colorado stays queued behind South Fork. See
+[Colorado plan](colorado-evidence-reconstruction.md#scene-audit-and-source-research-2026-09-26).
+
 September26 playable delivery (normal FullReach): **long views no longer end
 at the edge of the loaded world.** The river stopped in a straight line ~110 m
 ahead over dry bed (the 224 m live carrier was the only water); a render-only
