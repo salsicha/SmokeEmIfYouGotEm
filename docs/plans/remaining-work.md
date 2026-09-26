@@ -1,5 +1,13 @@
 # Remaining requested work
 
+September26 combined-canopy verification: a fresh engine readback checks all
+164,628 surviving original/additive NAIP trees in 862 normal FullReach actors,
+not only sampled roots. Source/mesh/position/scale/streaming/non-collision
+checks pass; four data-backed tests confirm the 266 water-cell removals remain
+excluded and all 24,211 additions are dry, covered and non-duplicated. This is
+supporting validation only, not another visual delivery or river acceptance.
+See [combined readback](../reconstruction-review-2026-09-07/south-fork-combined-canopy-validation.md).
+
 September26 lower-gorge delivery: the current route's last ~7 km rendered
 near-white because its only NAIP window contains a washed, desaturated source
 tile. The drape builder recolours that tile by luma-quantile transfer from the
@@ -15,9 +23,11 @@ Blender job is live.
 September26 canopy follow-through: removed266 inferred trees inside the captured
 context water mask from six normal FullReach actor packages;140,417 remain.
 Fixed the placement generator's older-mask/clipped-index defect. Fresh-engine
-readback and three grid tests pass; normal Boot/menu motion passes, but latest
-p9574.35ms FAILS50ms (one frame>100ms). No causal performance claim or river
-acceptance. See [channel correction](../reconstruction-review-2026-09-07/south-fork-canopy-channel-repair.md).
+readback and three grid tests pass; normal Boot/menu motion passes. That run's
+p9574.35ms failed50ms (one frame>100ms), but shared-host overlap was subsequently
+identified; the later idle-host measurement above supersedes it for current
+performance status. Preserve both receipts; neither establishes river acceptance.
+See [channel correction](../reconstruction-review-2026-09-07/south-fork-canopy-channel-repair.md).
 
 September26 playable delivery (normal FullReach): **the 33 km run is no longer
 bare desert.** A ten-station survey showed every view outside Troublemaker and
