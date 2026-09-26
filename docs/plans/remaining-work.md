@@ -1,5 +1,12 @@
 # Remaining requested work
 
+September26 runtime follow-through: the owning session's new600s state and190
+terrain imports are now saved. An independent read-only check verifies all799
+bundled windows,841 atlas beds and saved scene/terrain hashes; protected beds
+and captured masks are retained. Existing game captures were inspected, but
+they are review-station starts, not normal-menu/FPS acceptance. See
+[runtime audit and remaining gates](../reconstruction-review-2026-09-07/south-fork-discharge-runtime-independent-audit.md).
+
 September26 candidate-bed consistency: an independent read-only audit checks all
 441 original/replacement tiles against the new inferred grid; XY/topology,
 dry vertices and the protected rapid rectangle are preserved. Six mutation
