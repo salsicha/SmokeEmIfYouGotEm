@@ -22,10 +22,45 @@ param(
     [switch]$ProfileCrewOverboard,
     [switch]$StartupDisableDynamicShadows,
     [switch]$NormalScenarioStart,
+    [switch]$NormalMenuLaunch,
     [ValidateRange(0, 1000000)][Nullable[double]]$ReviewStationM = $null,
     [switch]$CheckpointResetReplay
 )
 $ErrorActionPreference = 'Stop'
+if ($NormalMenuLaunch) {
+    if ($NativePerformanceGate -or $DetailStreamingReplay -or $StartupRenderReplay -or $CheckpointResetReplay -or
+        $ProfileHighSide -or $ProfileCrewOverboard -or $null -ne $ReviewStationM -or $ExtraGameArgument -or
+        $ExtraGameArguments.Count -or $null -ne $SolverLanes) {
+        throw 'NormalMenuLaunch requires an ordinary unmodified post-travel CSV run'
+    }
+    $NormalScenarioStart = $true
+}
+function Get-RaftSimLaunchPrefix([string]$ProjectPath, [bool]$BootMenu) {
+    $ProjectPath
+    if (-not $BootMenu) { '/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach' }
+}
+function Get-RaftSimPostTravelCsvLeaf([string]$LogText, [int]$ExpectedFrames) {
+    $patterns = @(
+        'LogLoad: LoadMap: /Game/RaftSim/Maps/L_RaftSimBoot(?:\?|\s|$)',
+        'LogTemp: Display: RaftSim\.MenuScreen: showing main',
+        'LogLoad: LoadMap: /Game/RaftSim/Maps/L_SouthForkAmerican_FullReach(?:\?|\s|$)',
+        'LogTemp: Display: RaftSim post-travel CSV event: world=/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach\.',
+        ('LogTemp: Display: RaftSim post-travel CSV capture: frames=' + $ExpectedFrames + '(?:\s|$)'),
+        'LogCsvProfiler: Display: Capture Ended\. Writing CSV to file : [^\r\n]*[/\\]([^/\\\r\n]+\.csv)\s*$'
+    )
+    $previous = -1
+    $leaf = ''
+    foreach ($pattern in $patterns) {
+        $matches = [regex]::Matches($LogText, $pattern, [Text.RegularExpressions.RegexOptions]::Multiline)
+        if ($matches.Count -ne 1 -or $matches[0].Index -le $previous) {
+            throw 'Boot/menu travel and one post-travel CSV capture were not confirmed in order'
+        }
+        $previous = $matches[0].Index
+        if ($matches[0].Groups.Count -gt 1) { $leaf = $matches[0].Groups[1].Value }
+    }
+    if ($leaf -notmatch '^[a-zA-Z0-9_().-]+\.csv$') { throw 'Unexpected post-travel CSV filename' }
+    return $leaf
+}
 if ($NormalScenarioStart -and $null -ne $ReviewStationM) {
     throw 'An explicit review station is not a normal scenario start'
 }
@@ -200,6 +235,8 @@ $report.profile_frames = if ($NativePerformanceGate -or $DetailStreamingReplay -
 $report.detail_replay_passed = $null
 $report.startup_render_replay = [bool]$StartupRenderReplay
 $report.normal_scenario_start = [bool]$NormalScenarioStart
+$report.launch_mode = if ($NormalMenuLaunch) { 'boot_menu' } else { 'direct_map' }
+$report.menu_travel_confirmed = $null
 $report.startup_buffer_visualization = $StartupBufferVisualization
 $report.startup_disable_dynamic_shadows = [bool]$StartupDisableDynamicShadows
 $report.startup_shadow_control_confirmed = $null
@@ -233,8 +270,8 @@ try {
     $start.FileName = 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe'
     $start.UseShellExecute = $false
     $start.CreateNoWindow = $true
-    foreach ($argument in @((Join-Path $projectRoot 'unreal/SmokeEmIfYouGotEm.uproject'),
-        '/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach', '-game', '-RenderOffscreen', '-Unattended',
+    foreach ($argument in @((Get-RaftSimLaunchPrefix (Join-Path $projectRoot 'unreal/SmokeEmIfYouGotEm.uproject') ([bool]$NormalMenuLaunch))) + @(
+        '-game', '-RenderOffscreen', '-Unattended',
         '-NoSplash', '-NoSound', '-ResX=1280', '-ResY=720', '-Windowed', '-RaftSimEphemeralProfile',
         '-RaftSimScenario=south_fork_full_descent', '-csvCompression=0',
         "-abslog=$logFile")) { $start.ArgumentList.Add($argument) }
@@ -290,7 +327,12 @@ try {
         # the water scopes on the same CSV row. No frame limit is changed.
         $profileCrewCommands = if ($ProfileHighSide) { 'RaftSim.ProfileHighSide,' } elseif ($ProfileCrewOverboard) { 'RaftSim.ProfileCrewOverboard,' } else { '' }
         $profileCommands = "-ExecCmds=${profileCrewCommands}csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 20,CsvCategory FMsgLogf disable,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames"
-        $start.ArgumentList.Add($profileCommands)
+        if ($NormalMenuLaunch) {
+            # The existing gameplay controller starts CSV only after menu travel.
+            # Do not start it on Boot or replace the real menu's scenario command.
+            $start.ArgumentList.Add("-RaftSimPostTravelCsvFrames=$ProfileFrames")
+            $start.ArgumentList.Add('-ExecCmds=RaftSim.MenuScreen main start=south_fork_full_descent,csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 20,CsvCategory FMsgLogf disable')
+        } else { $start.ArgumentList.Add($profileCommands) }
     }
     if ($ExtraGameArgument) { $start.ArgumentList.Add($ExtraGameArgument) }
     foreach ($argument in $ExtraGameArguments) { $start.ArgumentList.Add($argument) }
@@ -345,6 +387,14 @@ try {
     }
     if (-not $NativePerformanceGate -and -not $DetailStreamingReplay -and -not $StartupRenderReplay -and -not $CheckpointResetReplay -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
         $csvFile = Join-Path $projectRoot "unreal/Saved/Profiling/CSV/$Label.csv"
+        if ($NormalMenuLaunch) {
+            $csvLeaf = Get-RaftSimPostTravelCsvLeaf (Get-Content -LiteralPath $logFile -Raw) $ProfileFrames
+            $csvFile = Join-Path $projectRoot "unreal/Saved/Profiling/CSV/$csvLeaf"
+            if ((Get-Item -LiteralPath $csvFile).LastWriteTimeUtc -lt $game.StartTime.ToUniversalTime()) {
+                throw 'Post-travel CSV predates this process'
+            }
+            $report.menu_travel_confirmed = $true
+        }
         if (-not (Test-Path -LiteralPath $csvFile) -or (Get-Item -LiteralPath $csvFile).Length -eq 0) {
             throw 'Profiler exited without a nonempty CSV; no timing evidence'
         }
