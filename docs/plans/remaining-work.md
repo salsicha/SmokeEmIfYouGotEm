@@ -1,5 +1,17 @@
 # Remaining requested work
 
+September26 healthy packaged busy-rapid check: station11,520m fails the20FPS
+budget: p9585.2731ms, max141.7508ms,17 individual frames>100ms. Detail remains
+healthy for72.654s with zero errors/backlog; the startup repair holds. CPU
+surface work averages34.609ms, including crest selection8.490ms (nested scopes,
+not additive). Even the late slice has p9556.582ms. Short actual paddling
+capture shows motion without an obvious open seam, but rapid water still looks
+too smooth for physical acceptance. This is new packaged validation, not a
+visible delivery; normal-menu startup's narrow pass below does not cover busy
+rapids. Next: exact-preserving publication/selection optimization, then matched
+healthy packaged timing and visual checks. Keep rejected experiments off and
+South Fork first. See [rapid evidence](../reconstruction-review-2026-09-07/south-fork-healthy-rapid11520.md).
+
 September26 packaged water-health repair: **the startup detail shutdown is
 resolved in the rebuilt playable game.** Exact diagnostic: cell10110 had
 aeration1.00000012 (one float step above1), with valid depth/velocity. The
