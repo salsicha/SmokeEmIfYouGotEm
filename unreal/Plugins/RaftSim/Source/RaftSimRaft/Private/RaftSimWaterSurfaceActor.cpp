@@ -481,6 +481,10 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
     CartesianShorelineMesh = CreateDefaultSubobject<URaftSimShorelineMeshComponent>(TEXT("CartesianShorelineMesh"));
     CartesianShorelineMesh->SetupAttachment(SurfaceMesh);
     CartesianShorelineMesh->SetVisibility(false);
+    CartesianFarFieldMesh = CreateDefaultSubobject<URaftSimShorelineMeshComponent>(TEXT("CartesianFarFieldMesh"));
+    CartesianFarFieldMesh->SetupAttachment(SurfaceMesh);
+    CartesianFarFieldMesh->SetVisibility(false);
+    CartesianFarFieldMesh->ComponentTags.AddUnique(TEXT("RaftSimFarFieldCookedWater"));
 
     BreakingLipMesh = CreateDefaultSubobject<UProceduralMeshComponent>(
         TEXT("BreakingLipMesh"));
@@ -2214,6 +2218,9 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     SurfaceMesh->SetMeshSectionVisible(0, !bSingleLiveWaterSurfaceEnabled);
     LiveVolumeCoreMesh->SetVisibility(false, true);
     CartesianShorelineMesh->SetVisibility(false);
+    HideCartesianFarFieldWater();
+    bCartesianFarFieldScene = GetWorld() &&
+        GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
     if (LiveVolumeCoreMaterial != nullptr)
     {
         LiveVolumeCoreMesh->SetMaterial(0, LiveVolumeCoreMaterial);
@@ -8400,6 +8407,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 if (LiveVolumeCoreMesh->IsVisible()) LiveVolumeCoreMesh->SetVisibility(false);
                 if (!CartesianShorelineMesh->IsVisible()) CartesianShorelineMesh->SetVisibility(true);
                 LiveVolumeCoreTriangleCount = CartesianShorelineMesh->GetWaterIndices().Num()/3;
+                UpdateCartesianFarFieldWater(kLiveVolumeCoreMinimumStationCoverage);
             }
             else if (!LiveVolumeCoreMesh->IsVisible())
             {
@@ -8415,6 +8423,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         bLiveVolumeCoreInterpolationActive = false;
         LiveVolumeCoreMesh->SetVisibility(false, true);
         CartesianShorelineMesh->SetVisibility(false);
+        HideCartesianFarFieldWater();
     }
 
     Perf.Mark(TEXT("foam_core_publish"));

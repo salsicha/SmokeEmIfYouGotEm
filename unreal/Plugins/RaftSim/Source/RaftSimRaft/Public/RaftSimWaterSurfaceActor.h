@@ -436,6 +436,16 @@ public:
         return LiveVolumeCoreTriangleCount;
     }
 
+    /** Triangles drawn by the cooked-atlas far-field ring (0 when hidden). */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    int32 GetFarFieldWaterTriangleCount() const;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    int32 GetFarFieldWaterBuildCount() const
+    {
+        return FarFieldWaterBuildCount;
+    }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
     bool IsLivePresentationSurfaceSmoothingEnabled() const
     {
@@ -551,6 +561,12 @@ protected:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     TObjectPtr<URaftSimShorelineMeshComponent> CartesianShorelineMesh;
+
+    /** Render-only cooked-atlas water beyond the live Cartesian carrier square.
+     * Same material instance and vertex encoding as the carrier, a hole where
+     * the carrier draws, no collision and no gameplay or physics authority. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<URaftSimShorelineMeshComponent> CartesianFarFieldMesh;
 
     /** Non-colliding curled sheets generated only at solver-detected hydraulic
      * jumps. Kept separate from SurfaceMesh so they can overhang without ever
@@ -695,6 +711,30 @@ private:
     // Scratch capacity only; Pack rewrites every field before submission.
     // Downstream may consume the rvalue; a moved-from buffer simply regrows.
     TArray<FProcMeshVertex> CartesianSourcePackingScratch;
+    struct FFarFieldWaterKey
+    {
+        FVector2D NearMin = FVector2D::ZeroVector;
+        FVector2D NearMax = FVector2D::ZeroVector;
+        FVector2D TextureOrigin = FVector2D::ZeroVector;
+        float SpacingM = 0.0f;
+        float RadiusM = 0.0f;
+        float DropCm = 0.0f;
+        uint32 CarrierDrawableCrc = 0;
+        bool operator==(const FFarFieldWaterKey& Other) const
+        {
+            return NearMin == Other.NearMin && NearMax == Other.NearMax &&
+                TextureOrigin == Other.TextureOrigin && SpacingM == Other.SpacingM &&
+                RadiusM == Other.RadiusM && DropCm == Other.DropCm &&
+                CarrierDrawableCrc == Other.CarrierDrawableCrc;
+        }
+    };
+    FFarFieldWaterKey FarFieldWaterKey;
+    bool bFarFieldWaterKeyValid = false;
+    bool bCartesianFarFieldScene = false;
+    int32 FarFieldWaterBuildCount = 0;
+    double LastFarFieldWaterBuildMs = 0.0;
+    void UpdateCartesianFarFieldWater(float CarrierDrawCoverage);
+    void HideCartesianFarFieldWater();
     bool bRuntimeSurfaceReady = false;
     bool TryInitializeRuntimeSurface();
     void BuildGrid();

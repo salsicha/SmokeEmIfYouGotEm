@@ -2604,6 +2604,16 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
             TEXT("South Fork disables the channel-wide periodic standing-wave bars"),
             FMath::IsNearlyZero(
                 Surface->GetLivePresentationStandingWaveScale(), 0.001f));
+        // The authored band water stays hidden (below), so the cooked-atlas
+        // ring is the only water beyond the 224 m carrier. Without it every
+        // view longer than ~112 m ended in a straight edge over dry bed.
+        Test->AddInfo(FString::Printf(
+            TEXT("South Fork far-field water: builds=%d triangles=%d"),
+            Surface->GetFarFieldWaterBuildCount(), Surface->GetFarFieldWaterTriangleCount()));
+        Test->TestTrue(
+            TEXT("South Fork draws cooked far-field water beyond the live carrier"),
+            Surface->GetFarFieldWaterBuildCount() > 0 &&
+                Surface->GetFarFieldWaterTriangleCount() > 0);
         int32 TaggedAuthoredWaterCount = 0;
         bool bAllTaggedAuthoredWaterHidden = true;
         for (TActorIterator<AActor> It(World); It; ++It)

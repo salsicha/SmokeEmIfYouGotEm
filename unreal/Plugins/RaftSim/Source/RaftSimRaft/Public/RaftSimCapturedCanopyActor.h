@@ -28,4 +28,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Captured Canopy")
     FString PlacementSourceSha256;
+
+protected:
+    virtual void BeginPlay() override;
 };
