@@ -1,5 +1,26 @@
 # Remaining requested work
 
+September26 playable delivery (normal FullReach, rebuilt editor game):
+**Troublemaker rock spikes and lattice foam replaced.** Layer isolation
+attributes the bank "spike field" to `SM_CapturedRockInferredFlanks`; an
+explicitly inferred lower envelope (paraboloid opening, radius fixed a priori at
+the capture's 1 m edge limit, never within 0.3 m of nearby cooked water and never
+below a wet cell's hydraulic bed) cuts roof area steeper than 60 degrees from
+114.8 to 13.5 m2. Captured returns and cooked fields are unchanged; the flat
+inferred vertical walls remain and are next. See
+[rock envelope](../reconstruction-review-2026-09-07/troublemaker-rock-envelope.md).
+The transported-foam optical pattern is regenerated as a flow-stretched Voronoi
+web with verified exact expected coverage (worst error 0.58%), replacing the
+rounded-square lattice. Crossfade ghosting and breaking crests remain. See
+[foam web](../reconstruction-review-2026-09-07/south-fork-foam-web.md).
+Normal Boot/menu runs (1200 frames): p95 32.6 and 41.2 ms, no frame over 100 ms,
+passing the 20 FPS goal. `RaftSim.M6` passes 3/3. `RaftSim.P4` fails 8/9
+identically on the committed baseline: stale retired-architecture assertions,
+now an explicit regression-maintenance item. This host lacks Python with
+pytest/scipy and PowerShell 7; Blender's numpy and a PowerShell 5.1 profiler
+(`unreal/Scripts/profile_south_fork_menu_launch_ps5.ps1`) were used instead.
+No geographic, visual or release acceptance is claimed.
+
 September26 Boot/menu profiler verification: explicit `NormalMenuLaunch` now
 distinguishes project-default Boot/menu travel from direct-map normal station
 starts. Regression checks pass and a fresh 1200-frame actual engine run exits0;
