@@ -13,6 +13,8 @@ param(
     [Parameter(Mandatory = $true)][ValidatePattern('^[a-zA-Z0-9_.-]+$')][string]$Label,
     [ValidateRange(300, 2400)][int]$ProfileFrames = 1200,
     [int]$TimeoutS = 900,
+    # A cooked Windows stage (containing SmokeEmIfYouGotEm/), not an editor game.
+    [string]$PackagedRoot = '',
     # Optional diagnostic: a direct FullReach review-station start instead of
     # the normal Boot/menu launch, to cover other parts of the run.
     [ValidateRange(-1, 33280)][int]$ReviewStationM = -1,
@@ -23,15 +25,32 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $project = Join-Path $root 'unreal/SmokeEmIfYouGotEm.uproject'
+$gameBinary = 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe'
+$gameWorkingDirectory = $root
 $logFile = Join-Path $root "unreal/Saved/Logs/$Label.log"
 $csvDir = Join-Path $root 'unreal/Saved/Profiling/CSV'
+function Get-RaftSimPackagedLaunchPaths([string]$RepositoryRoot, [string]$StageRoot) {
+    $stage = [IO.Path]::GetFullPath($StageRoot)
+    $allowed = [IO.Path]::GetFullPath((Join-Path $RepositoryRoot 'tmp')) + [IO.Path]::DirectorySeparatorChar
+    if (-not $stage.StartsWith($allowed, [StringComparison]::OrdinalIgnoreCase)) { throw 'Use a retained project-local tmp stage' }
+    $gameRoot = Join-Path $stage 'SmokeEmIfYouGotEm'
+    $binary = Join-Path $gameRoot 'Binaries/Win64/SmokeEmIfYouGotEm.exe'
+    if (-not (Test-Path -LiteralPath $binary -PathType Leaf)) { throw 'Cooked inner executable missing' }
+    if (-not (Test-Path -LiteralPath (Join-Path $gameRoot 'Content/Paks') -PathType Container)) { throw 'Cooked Paks missing' }
+    @{ Binary=$binary; CsvDirectory=(Join-Path $gameRoot 'Saved/Profiling/CSV'); WorkingDirectory=$stage }
+}
+if ($PackagedRoot -ne '') {
+    $paths = Get-RaftSimPackagedLaunchPaths $root $PackagedRoot
+    $gameBinary = $paths.Binary; $csvDir = $paths.CsvDirectory; $gameWorkingDirectory = $paths.WorkingDirectory
+}
 $receipt = Join-Path $root "unreal/Saved/RaftSimValidation/$Label-frame-audit.json"
 if (Test-Path -LiteralPath $logFile) { throw "Log already exists: $logFile" }
 $started = Get-Date
 $review = $ReviewStationM -ge 0
 $csvCommands = 'csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 20,CsvCategory FMsgLogf disable'
 if ($DiagnosticExecCmds -ne '') { $csvCommands += ',' + (($DiagnosticExecCmds.Split(';') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }) -join ',') }
-$gameArgs = @("`"$project`"")
+$gameArgs = @()
+if ($PackagedRoot -eq '') { $gameArgs += "`"$project`"" }
 if ($review) { $gameArgs += '/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach' }
 $gameArgs += @(
     '-game', '-RenderOffscreen', '-Unattended', '-NoSplash', '-NoSound',
@@ -45,11 +64,20 @@ if ($review) {
     $gameArgs += @("-RaftSimPostTravelCsvFrames=$ProfileFrames",
         "`"-ExecCmds=RaftSim.MenuScreen main start=south_fork_full_descent,$csvCommands`"")
 }
-$game = Start-Process -FilePath 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe' -ArgumentList $gameArgs -PassThru
+$busy = @(Get-CimInstance Win32_Process | Where-Object {
+    $_.Name -match '^(UnrealEditor|UnrealBuildTool|SmokeEm|raftsim_cartesian_cook)' -or
+    ($_.Name -in @('dotnet.exe','cmd.exe') -and $_.CommandLine -match 'UnrealBuildTool|Build\.bat|RunUAT|AutomationTool')
+})
+if ($busy.Count) { throw 'Isolated profiling requires no other game, engine, build or hydraulic cook' }
+$binaryHash = (Get-FileHash -LiteralPath $gameBinary -Algorithm SHA256).Hash.ToLower()
+$game = Start-Process -FilePath $gameBinary -ArgumentList $gameArgs -WorkingDirectory $gameWorkingDirectory -WindowStyle Hidden -PassThru
 if (-not $game.WaitForExit($TimeoutS * 1000)) {
     Stop-Process -Id $game.Id -Force -Confirm:$false
     throw "Game timed out after $TimeoutS s"
 }
+$game.WaitForExit()
+if ($game.ExitCode -ne 0) { throw "Game failed with exit code $($game.ExitCode)" }
+if ((Get-FileHash -LiteralPath $gameBinary -Algorithm SHA256).Hash.ToLower() -ne $binaryHash) { throw 'Game binary changed during profiling' }
 $log = Get-Content -LiteralPath $logFile -Raw -Encoding UTF8
 $csvEnded = 'LogCsvProfiler: Display: Capture Ended\. Writing CSV to file : [^\r\n]*[/\\]([^/\\\r\n]+\.csv)\s*$'
 $patterns = if ($review) { @(
@@ -97,6 +125,8 @@ for ($i = 1; $i -lt $window.Count; $i++) { $twoFrame = [Math]::Max($twoFrame, $w
 $result = [ordered]@{
     schema = 'raftsim.south_fork_menu_launch_frame_audit.v1'; label = $Label
     launch_mode = $(if ($review) { "review_station_$ReviewStationM" } else { 'boot_menu' })
+    execution_host = $(if ($PackagedRoot -eq '') { 'editor_game' } else { 'cooked_standalone' })
+    game_binary = $gameBinary; game_binary_sha256 = $binaryHash
     diagnostic_exec_cmds = $DiagnosticExecCmds
     game_exit_code = $game.ExitCode; csv = $csv; csv_sha256 = (Get-FileHash -LiteralPath $csv -Algorithm SHA256).Hash.ToLower()
     frames_total = $times.Count; audited_rows = "30..$($times.Count - 31)"; audited_frames = $window.Count

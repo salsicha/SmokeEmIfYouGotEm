@@ -1,5 +1,14 @@
 # Remaining requested work
 
+September26 cooked-delivery retry: the actual Development package attempt
+exposed an editor-only Nanite query in the new canopy diagnostic. A narrow
+runtime-safe source correction is present, but rebuild verification is pending.
+Another session began asset imports mid-build, so this task stopped only its
+own packaging coordinator before cooking; no new stage was published. The
+normal-menu profiler now supports the cooked executable, with launch/path
+regressions passing. Reserve an exclusive build/cook/validation window before
+retrying. See [exact failure and next step](../reconstruction-review-2026-09-07/south-fork-cooked-delivery-retry.md).
+
 September26 all-scene water review, Chilko and Zambezi: **Zambezi went from
 about 5 FPS to 11-13 ms mean frames (p95 24-27 ms).** Its fixed live window
 simulated the whole 30 km procedural corridor every 1/60 s tick (~20 ms per
