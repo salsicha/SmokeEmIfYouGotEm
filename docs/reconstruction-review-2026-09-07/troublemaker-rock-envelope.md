@@ -97,3 +97,34 @@ They are an existing regression-maintenance item, not caused by this change.
 
 Not established: surveyed rock shape, underwater geometry, rendered-wall
 realism, full-route geometry, or visual acceptance against dated references.
+
+## Independent installed-envelope check - September26 follow-through
+
+`physics/tests/test_troublemaker_rock_envelope.py` runs directly with Python
+and numpy, without pytest or another engine launch. Six checks pass against
+the archived envelope and current normal-game packages:
+
+- Source and envelope SHA256 match the build receipt; inference labels remain.
+- Triangle indices/kinds, all XY coordinates and the internal floor are exact;
+  roof edits are lower-only and the 970 changed vertices match the receipt.
+- All 6,404 solid triangles have nonzero area. Every undirected edge has exactly
+  two incidences with opposite direction (closed, consistently oriented edges).
+- Changed wet-cell vertices stay above the recorded bed; changed dry vertices
+  near water retain the recorded 0.3 m margin.
+- Export/install receipts identify the same envelope and triangle count.
+- Actual current new mesh, preserved old mesh and FullReach external actor
+  package hashes match the installation receipt, not merely a candidate file.
+
+The retained engine chase comparison was inspected independently: roof spikes
+are reduced, while flat vertical walls and the broad angular bank face remain.
+No additional geometry, material, collision setting or cooked field changed in
+this check. An active foam follow-up was left untouched; no duplicate engine
+run, cook, or build was started.
+
+Limits: edge incidence is not a self-intersection or volumetric collision test.
+The water constraints use recorded vertex samples from eleven cook frames,
+not every triangle interior or continuous water time. They do not establish
+hydraulic equivalence after lowering the rendered roof. The 1 m smoothing
+radius remains an inference heuristic, not measured rock curvature or proof
+that every removed feature was vegetation. Reshaping wetted walls still needs
+source review, matching hydraulic geometry and real engine traversal checks.
