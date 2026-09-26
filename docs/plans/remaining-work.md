@@ -1,5 +1,11 @@
 # Remaining requested work
 
+September26 source follow-through: a newly screened historical channel survey
+offers a registration path for checking inferred bathymetry. It is not yet
+registered or licensed for source-media redistribution; no production geometry
+was changed, and the other session's six active cooks were left untouched.
+See [source screen and limitations](../reconstruction-review-2026-09-07/south-fork-historical-survey-20260926.md).
+
 September26 combined-canopy verification: a fresh engine readback checks all
 164,628 surviving original/additive NAIP trees in 862 normal FullReach actors,
 not only sampled roots. Source/mesh/position/scale/streaming/non-collision
