@@ -102,8 +102,15 @@ in the P4 telemetry tests, which teleport the raft between stations.
 
 ## Limits and next steps
 
-- The ring is the 600 s cooked field: rapids beyond the carrier read as fast
-  water, not whitewater, and do not move.
+- The ring is the cooked field. Distant rapids get only an inferred
+  whitewater cue: fast, near-critical cooked water (the carrier generator's
+  Froude onset 0.78, plus a speed gate standing in for the surface-roughness
+  gate a 4 m lattice cannot resolve) whitens the ring. On the v2 cook it marks
+  3-12% of rapid reaches and at most 1% of flats and pools, and reads as a pale
+  band across the river ahead (`raftsim.FarFieldWaterFoam`). It does not break,
+  move or carry foam, and is appearance, not measured aeration.
+
+![Meat Grinder seen from 0.95 km: ring cue off (left) and on](south-fork-far-field-view/ring-rapid-cue.jpg)
 - A faint straight line remains visible under magnification where the carrier's
   north-south edge meets the ring; changing the ring's drop (0.5-12 cm) or
   flattening carrier normals does not change it, so it lies in the carrier's

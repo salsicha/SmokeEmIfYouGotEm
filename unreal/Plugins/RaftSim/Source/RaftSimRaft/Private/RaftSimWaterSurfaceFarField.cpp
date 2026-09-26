@@ -39,6 +39,11 @@ static TAutoConsoleVariable<float> CVarRaftSimFarFieldWaterDropCm(
     TEXT("Far-field water sits this far below the cooked surface so the live carrier wins where they overlap."),
     ECVF_Default);
 
+static TAutoConsoleVariable<float> CVarRaftSimFarFieldWaterFoam(
+    TEXT("raftsim.FarFieldWaterFoam"), 1.0f,
+    TEXT("Scale of the far ring's supercritical whitewater cue (0 disables)."),
+    ECVF_Default);
+
 CSV_DEFINE_CATEGORY(RaftSimFarField, true);
 
 namespace
@@ -119,10 +124,11 @@ void ARaftSimWaterSurfaceActor::UpdateCartesianFarFieldWater(float CarrierDrawCo
     const float SpacingM = FMath::Clamp(CVarRaftSimFarFieldWaterSpacingM.GetValueOnGameThread(), 1.0f, 16.0f);
     const float RadiusM = FMath::Clamp(CVarRaftSimFarFieldWaterRadiusM.GetValueOnGameThread(), 128.0f, 2048.0f);
     const float DropCm = FMath::Clamp(CVarRaftSimFarFieldWaterDropCm.GetValueOnGameThread(), 0.0f, 50.0f);
+    const float FoamScale = FMath::Clamp(CVarRaftSimFarFieldWaterFoam.GetValueOnGameThread(), 0.0f, 1.0f);
     // The carrier's actual lattice corners, in hydraulic east/north metres.
     const FVector2D NearMin = RiverCoordinatesM[0];
     const FVector2D NearMax = RiverCoordinatesM[N - 1];
-    const FFarFieldWaterKey Key{NearMin, NearMax, WaterTextureOriginMeters, SpacingM, RadiusM, DropCm, DrawableCrc};
+    const FFarFieldWaterKey Key{NearMin, NearMax, WaterTextureOriginMeters, SpacingM, RadiusM, DropCm, DrawableCrc, FoamScale};
     if (bFarFieldWaterKeyValid && Key == FarFieldWaterKey)
     {
         return;
@@ -199,9 +205,21 @@ void ARaftSimWaterSurfaceActor::UpdateCartesianFarFieldWater(float CarrierDrawCo
                 const FVector2D Velocity(Sample.VelocityMetersPerSecond.X, Sample.VelocityMetersPerSecond.Y);
                 Flow[I] = bWet ? Velocity : FVector2D::ZeroVector;
                 // R foam, G depth, B speed, A wet: the carrier's channel
-                // meanings. No foam is invented for cooked-only water.
+                // meanings. Beyond the carrier there is no breaking or foam
+                // transport, so distant rapids read as flat fast water. A
+                // presentation cue aerates fast, near-critical cooked water
+                // with the carrier generator's Froude onset (0.78); its
+                // surface-roughness gate cannot be resolved on a 4 m lattice,
+                // so a speed gate stands in (on the v2 cook, Fr > 0.8 with
+                // v > 2 m/s marks 3-12% of rapid reaches and <= 1% of flats
+                // and pools). Inferred appearance, not measured foam.
+                const float Speed = float(Velocity.Size());
+                const float Froude = bWet && Sample.DepthMeters > 0.05f
+                    ? Speed / FMath::Sqrt(9.81f * Sample.DepthMeters) : 0.0f;
+                const float FoamCue = FoamScale * 0.72f * FMath::SmoothStep(0.75f, 1.3f, Froude) *
+                    FMath::SmoothStep(1.7f, 2.6f, Speed);
                 Colors[I] = FLinearColor(
-                    0.0f,
+                    FoamCue,
                     FMath::Clamp(DepthM[I] / 4.0f, 0.0f, 1.0f),
                     bWet ? FMath::Clamp(float(Velocity.Size()) / 8.0f, 0.0f, 1.0f) : 0.0f,
                     bWet ? 1.0f : 0.0f);

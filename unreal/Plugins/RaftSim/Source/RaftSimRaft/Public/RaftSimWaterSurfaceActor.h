@@ -720,12 +720,13 @@ private:
         float RadiusM = 0.0f;
         float DropCm = 0.0f;
         uint32 CarrierDrawableCrc = 0;
+        float FoamScale = 0.0f;
         bool operator==(const FFarFieldWaterKey& Other) const
         {
             return NearMin == Other.NearMin && NearMax == Other.NearMax &&
                 TextureOrigin == Other.TextureOrigin && SpacingM == Other.SpacingM &&
                 RadiusM == Other.RadiusM && DropCm == Other.DropCm &&
-                CarrierDrawableCrc == Other.CarrierDrawableCrc;
+                CarrierDrawableCrc == Other.CarrierDrawableCrc && FoamScale == Other.FoamScale;
         }
     };
     FFarFieldWaterKey FarFieldWaterKey;
