@@ -6,6 +6,15 @@ the 30/60 FPS targets in historical entries and referenced plans. Existing
 measurements and reports remain unchanged; this is not new performance evidence
 or river acceptance. Visual quality, physics rates and solver budgets are unchanged.
 
+September26 UTC boarding follow-through: planar thumb support preserves shaft
+lengths and hand continuity, but does NOT clear the hull. A new skin-weight-based
+thumb-region audit records 5.125cm deficit at frame270; the overall worst is
+7.136cm at frame343 on left calf/thigh-weighted vertex10943. The Editor build
+passes after repairing the poseable-mesh accessor. Strict native validation
+still fails the unchanged body2cm gate. Keep both review flags disabled and
+repair the support-to-seat path and seated leg skin fit before promotion. See
+the planar-thumb section in [reentry evidence](../reconstruction-review-2026-09-07/crew-public-reentry-discontinuity.md).
+
 September25 destination-grip boarding handoff now passes the new32-bone
 continuity audit: max5.693cm/6.608degrees per update. The strict body gate still
 fails8.277cm atframe270 on right-thumb vertex6151 (tube winding1); boots remain

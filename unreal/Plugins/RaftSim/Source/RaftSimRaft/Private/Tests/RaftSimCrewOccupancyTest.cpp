@@ -261,13 +261,23 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             if (!Capture) return;
             if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimBoardingHandCapture")))
             {
-                const auto& HandPose = BoardingAvatar->GetPublishedCrewPose();
                 const FTransform HostTransform = BoardingAvatar->GetActorTransform();
-                const FVector Aim = HostTransform.TransformPosition((HandPose.LeftHandCm+HandPose.RightHandCm)*0.5);
-                const FVector Eye = Aim + HostTransform.TransformVectorNoScale(FVector(140,-200,140));
+                auto* Visual = BoardingAvatar->GetProductionVisualActor();
+                auto* Mesh = Visual ? Visual->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
+                if (!TestNotNull(TEXT("close contact capture has production hand"), Mesh)) return;
+                const FVector Aim = Mesh->GetBoneTransformByName(TEXT("thumb_03_r"), EBoneSpaces::WorldSpace).GetLocation();
+                const FVector Eye = Aim + HostTransform.TransformVectorNoScale(FVector(45,70,40));
                 Capture->SetWorldLocationAndRotation(Eye,(Aim-Eye).Rotation());
+                Capture->FOVAngle = 40.f;
+                Capture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
+                Capture->ClearShowOnlyComponents();
+                Capture->ShowOnlyActorComponents(Raft, false);
+                Capture->ShowOnlyActorComponents(BoardingAvatar, false);
+                Capture->ShowOnlyActorComponents(Visual, true);
                 Capture->ShowFlags.SetLighting(true);
-                // Diagnostic world-normal view, not normal-game lighting acceptance.
+                Capture->ShowFlags.SetMaterials(false);
+                // Isolated right-hand/hull diagnostic: no normal shading or
+                // crew-to-crew visibility/collision acceptance from these views.
                 Capture->CaptureSource = SCS_Normal;
             }
             World->SendAllEndOfFrameUpdates(); FlushRenderingCommands();
@@ -358,6 +368,40 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             PreviousHandWorld.Add(HandBody->GetBoneTransformByName(Bone, EBoneSpaces::WorldSpace));
         }
         double MaxHandStepCm = 0., MaxHandAngleDegrees = 0.;
+        const int32 ThumbStarts[] = {1,2,17,18};
+        double ThumbSupportLengths[4];
+        for (int32 I = 0; I < 4; ++I)
+            ThumbSupportLengths[I] = FVector::Distance(PreviousHandWorld[ThumbStarts[I]].GetLocation(),
+                PreviousHandWorld[ThumbStarts[I]+1].GetLocation());
+        double MaxThumbSupportLengthErrorCm = 0.;
+        TSet<int32> ThumbVertices;
+        if (const USkeletalMesh* Mesh = Cast<USkeletalMesh>(HandBody->GetSkinnedAsset()))
+        {
+            const auto* Data = Mesh->GetResourceForRendering();
+            if (Data && !Data->LODRenderData.IsEmpty())
+            {
+                const auto& LOD = Data->LODRenderData[0];
+                const auto* Weights = LOD.GetSkinWeightVertexBuffer();
+                if (Weights)
+                    for (uint32 V = 0; V < LOD.GetNumVertices(); ++V)
+                    {
+                        int32 Section = INDEX_NONE, SectionVertex = INDEX_NONE;
+                        LOD.GetSectionFromVertexIndex(V, Section, SectionVertex);
+                        if (!LOD.RenderSections.IsValidIndex(Section)) continue;
+                        const auto& BoneMap = LOD.RenderSections[Section].BoneMap;
+                        for (uint32 I = 0; I < Weights->GetMaxBoneInfluences(); ++I)
+                        {
+                            const uint32 Bone = Weights->GetBoneIndex(V,I);
+                            if (Weights->GetBoneWeight(V,I) && Bone < uint32(BoneMap.Num()) &&
+                                Mesh->GetRefSkeleton().GetBoneName(BoneMap[Bone]).ToString().StartsWith(TEXT("thumb_")))
+                            { ThumbVertices.Add(V); break; }
+                        }
+                    }
+            }
+        }
+        TestTrue(TEXT("thumb region has actual nonzero skin weights"), ThumbVertices.Num() > 0);
+        double MaximumThumbDeficitCm = 0.;
+        int32 ThumbClearanceSamples = 0, WorstThumbFrame = -1, WorstThumbVertex = -1;
         int32 WorstHandFrame = -1, GripHandoffSamples = 0;
         FName WorstHandBone;
         int32 WorstHandAngleFrame = -1;
@@ -370,6 +414,20 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             Raft->UpdateCrew(1.f/60.f);
             Raft->UpdateRescueInteraction(1.f/60.f);
             BoardingAvatar->Tick(1.f/60.f);
+            if (Frames+1 == 240 || Frames+1 == 258 || Frames+1 == 264 || Frames+1 == 270)
+            {
+                const auto& HandPose = BoardingAvatar->GetPublishedCrewPose();
+                AddInfo(FString::Printf(TEXT("BOARDING_THUMB_PHASE frame=%d support=%.9f grip=%.9f palm_host=%s"),
+                    Frames+1, HandPose.BoardingPalmSupportBlend, HandPose.BoardingPaddleGripBlend, *HandPose.RightHandCm.ToString()));
+                for (const TCHAR* Bone : {TEXT("hand_r"), TEXT("thumb_01_r"), TEXT("thumb_02_r"), TEXT("thumb_03_r")})
+                {
+                    const FVector WorldPoint = HandBody->GetBoneTransformByName(FName(Bone), EBoneSpaces::WorldSpace).GetLocation();
+                    const FVector Local = BoardingAvatar->GetActorTransform().InverseTransformPosition(WorldPoint);
+                    const FVector HandLocal = HandBody->GetBoneTransformByName(TEXT("hand_r"), EBoneSpaces::WorldSpace).InverseTransformPosition(WorldPoint);
+                    AddInfo(FString::Printf(TEXT("BOARDING_THUMB_JOINT frame=%d bone=%s host_cm=%s hand_local_units=%s surface_distance_cm=%.9f"),
+                        Frames+1, Bone, *Local.ToString(), *HandLocal.ToString(), 100.*Raft->GetRenderedHullDistanceM(WorldPoint/100.)));
+                }
+            }
             for (int32 H = 0; H < HandBones.Num(); ++H)
             {
                 const FTransform HandWorld = HandBody->GetBoneTransformByName(HandBones[H], EBoneSpaces::WorldSpace);
@@ -385,6 +443,11 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             if (!Raft->BoardingPassenger.IsNone())
             {
                 const auto& HandPose = BoardingAvatar->GetPublishedCrewPose();
+                if (HandPose.BoardingPaddleGripBlend == 0.f)
+                    for (int32 I = 0; I < 4; ++I)
+                        MaxThumbSupportLengthErrorCm = FMath::Max(MaxThumbSupportLengthErrorCm, FMath::Abs(
+                            FVector::Distance(PreviousHandWorld[ThumbStarts[I]].GetLocation(),
+                                PreviousHandWorld[ThumbStarts[I]+1].GetLocation()) - ThumbSupportLengths[I]));
                 if (Raft->BoardingElapsed > Raft->BoardingDuration * ARaftSimCrewAvatarActor::BoardingLegOverFraction)
                 {
                     ++GripHandoffSamples;
@@ -470,6 +533,12 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
                             if (Solid[V] == -DBL_MAX) continue;
                             ++BodyClearanceSamples;
                             const double Deficit = Solid[V] - Points[V].Z;
+                            if (ThumbVertices.Contains(V))
+                            {
+                                ++ThumbClearanceSamples;
+                                if (Deficit > MaximumThumbDeficitCm)
+                                { MaximumThumbDeficitCm = Deficit; WorstThumbFrame = Frames; WorstThumbVertex = V; }
+                            }
                             if (Deficit > MaximumBodyDeficitCm)
                             {
                                 MaximumBodyDeficitCm = Deficit; WorstBodyFrame = Frames; WorstBodyPoint = Points[V];
@@ -549,6 +618,8 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         TestTrue(TEXT("no large per-frame root teleport"), MaxStepCm < 10.);
         TestTrue(TEXT("no foot or knee control teleport above 10cm per update"), MaxLegPointStepCm < 10.);
         TestTrue(TEXT("grip handoff was sampled"), GripHandoffSamples > 0);
+        TestTrue(TEXT("thumb support preserves both shaft lengths within 0.001cm"), MaxThumbSupportLengthErrorCm <= .001);
+        AddInfo(FString::Printf(TEXT("BOARDING_THUMB_LENGTH max_support_error_cm=%.9f"), MaxThumbSupportLengthErrorCm));
         TestTrue(TEXT("no wrist or finger teleport above 10cm per update"), MaxHandStepCm < 10.);
         TestTrue(TEXT("no wrist or finger rotation jump above 30 degrees per update"), MaxHandAngleDegrees <= 30.);
         AddInfo(FString::Printf(TEXT("BOARDING_HAND_CONTINUITY samples=%d max_step_cm=%.9f frame=%d bone=%s max_angle_deg=%.9f angle_frame=%d angle_bone=%s"),
@@ -560,6 +631,9 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
         TestTrue(TEXT("pull stage is sampled"), bCapturedPull && PullSamples > 0);
         TestTrue(TEXT("transfer boot audit has supported vertex samples"), BootClearanceSamples > 0);
         TestTrue(TEXT("transfer body audit has supported vertex samples"), BodyClearanceSamples > 0);
+        TestTrue(TEXT("thumb clearance audit has supported vertex samples"), ThumbClearanceSamples > 0);
+        AddInfo(FString::Printf(TEXT("BOARDING_THUMB_CLEARANCE vertices=%d samples=%d max_top_envelope_deficit_cm=%.9f frame=%d vertex=%d"),
+            ThumbVertices.Num(), ThumbClearanceSamples, MaximumThumbDeficitCm, WorstThumbFrame, WorstThumbVertex));
         AddInfo(FString::Printf(TEXT("BOARDING_BODY_CONTACT surface_distance_cm=%.9f tube_winding=%.9f"),
             WorstBodySurfaceDistanceCm, WorstBodyTubeWinding));
         if (WorstBodyVertex >= 0)

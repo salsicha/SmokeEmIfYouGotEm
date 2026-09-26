@@ -1937,6 +1937,58 @@ void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
         {
             ApplyFingerChain(bLeft, Digit, GripAlpha);
         }
+        if (!Pose.bShowPaddle && Pose.BoardingPalmSupportBlend > 0.f)
+        {
+            // The reference thumb is opposed below the knuckle plane. A
+            // supported open palm needs thumb abduction into that plane,
+            // not its curled grip posture embedded in the tube. Rotate the
+            // shafts without changing their lengths, wrist or palm target.
+            const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+            const FName Hand(*FString::Printf(TEXT("hand_%s"), Side));
+            const auto* RefHand = ReferenceComponentTransforms.Find(Hand);
+            const auto* RefIndex = ReferenceComponentTransforms.Find(FName(*FString::Printf(TEXT("index_01_%s"), Side)));
+            const auto* RefMiddle = ReferenceComponentTransforms.Find(FName(*FString::Printf(TEXT("middle_01_%s"), Side)));
+            const auto* RefPinky = ReferenceComponentTransforms.Find(FName(*FString::Printf(TEXT("pinky_01_%s"), Side)));
+            if (RefHand && RefIndex && RefMiddle && RefPinky)
+            {
+                const FVector Width = RefIndex->GetLocation()-RefPinky->GetLocation();
+                const FVector Forward = RefMiddle->GetLocation()-RefHand->GetLocation();
+                const FVector Normal = (bLeft ? FVector::CrossProduct(Width,Forward) :
+                    FVector::CrossProduct(Forward,Width)).GetSafeNormal();
+                const FQuat HandDelta = Body->GetBoneTransformByName(Hand, EBoneSpaces::ComponentSpace).GetRotation() *
+                    RefHand->GetRotation().Inverse();
+                const FVector PlaneNormal = HandDelta.RotateVector(Normal).GetSafeNormal();
+                FName Bones[3]; FTransform Current[3];
+                for (int32 I = 0; I < 3; ++I)
+                {
+                    Bones[I] = FName(*FString::Printf(TEXT("thumb_%02d_%s"), I+1, Side));
+                    Current[I] = Body->GetBoneTransformByName(Bones[I], EBoneSpaces::ComponentSpace);
+                }
+                FVector Start = Current[0].GetLocation();
+                for (int32 I = 0; I < 3; ++I)
+                {
+                    FVector Shaft = I < 2 ? Current[I+1].GetLocation()-Current[I].GetLocation() :
+                        Current[2].GetLocation()-Current[1].GetLocation();
+                    if (I == 2)
+                    {
+                        const auto* RefTip = ReferenceComponentTransforms.Find(Bones[2]);
+                        const auto* RefParent = ReferenceComponentTransforms.Find(Bones[1]);
+                        if (RefTip && RefParent)
+                            Shaft = (Current[2].GetRotation()*RefTip->GetRotation().Inverse()).RotateVector(
+                                RefTip->GetLocation()-RefParent->GetLocation());
+                    }
+                    const FVector Flat = FVector::VectorPlaneProject(Shaft,PlaneNormal).GetSafeNormal();
+                    const FQuat Swing = Flat.IsNearlyZero() || Shaft.IsNearlyZero() ? FQuat::Identity :
+                        FQuat::Slerp(FQuat::Identity,FQuat::FindBetweenNormals(Shaft.GetSafeNormal(),Flat),
+                            Pose.BoardingPalmSupportBlend).GetNormalized();
+                    FTransform Target = Current[I];
+                    Target.SetLocation(Start);
+                    Target.SetRotation((Swing*Current[I].GetRotation()).GetNormalized());
+                    Body->SetBoneTransformByName(Bones[I],Target,EBoneSpaces::ComponentSpace);
+                    Start += Swing.RotateVector(Shaft);
+                }
+            }
+        }
     }
     if (GripWeight <= 0.f)
     {

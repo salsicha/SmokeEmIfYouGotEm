@@ -488,3 +488,51 @@ is claimed from this candidate.
 No-opt-in follow-up `tmp/crew-destination-grip-default-20260925/index.json`
 passes1success/0warnings/0failures/0not-run, engine exit0. This verifies the
 ordinary native occupancy regression, not rescue animation or packaged play.
+
+### Planar thumb support and region-specific clearance (September26 UTC)
+
+The review-only supported palm now abducts the thumb shafts into the current
+palm plane without moving the wrist/thumb base or changing shaft lengths. The
+normal paddle-grip path is unchanged. Before this correction, frame240 thumb
+joints descended from37.598cm to35.258cm and32.970cm in avatar space; after it,
+all three sit at37.598cm. This is a joint-plane repair, not proof of skin clearance.
+
+Retained runs `tmp/crew-thumb-contact-isolated-20260925/` and
+`tmp/crew-thumb-planar-support-20260925/` preserve before/after diagnostics.
+The latest strict run is `tmp/crew-thumb-region-retry-20260925/index.json`, with
+timed boarding, calf-span fitting, strict clearance and hand capture enabled.
+It exits1 and fails only the unchanged body-envelope assertion:
+
+- Thumb mask:616 LOD0 vertices with nonzero thumb-bone influence;14784 supported
+  samples, maximum5.124845262cm deficit at frame270, vertex1058. The thumb is
+  **not clear**. No vertices were removed from the whole-body audit.
+- Whole body:583717 supported samples, maximum7.136132923cm deficit at frame343,
+  vertex10943. Raw weights:calf_l44718, thigh_l20817. Raft-local point
+  (140.941,-54.034,19.777)cm; avatar-local(25.941,7.966,25.701)cm.
+  Exact hull distance5.901943013cm and raw tube winding1 support an interior
+  concern; winding is diagnostic, not certified continuous containment.
+- Thumb support shaft-length error0.000000000cm. Hand continuity retains
+  maximum5.693478932cm/update and6.607625101degrees/update over86handoff samples.
+
+The pending test accessor was repaired from the nonexistent poseable-mesh
+GetSkeletalMeshAsset to Cast<USkeletalMesh>(GetSkinnedAsset()). Editor target
+build succeeded in17.98s after the write-approval interruption was resolved.
+
+Actual engine frame270 in `tmp/crew-thumb-region-retry-views-20260925/` was
+inspected. Isolated world normals make the hand visible, but the hull remains
+black even with materials disabled; this is not a usable surface-contact or
+normal-shading acceptance view. Preserve it, do not present it as visual proof.
+
+Next inspect the support-to-seat trajectory in raft coordinates: the current
+root and avatar-local hand targets interpolate simultaneously during settling.
+That is a contact-path hypothesis, not a verified cause of the remaining thumb
+deficit. Separately inspect the seated thigh/calf transform and actual skin:
+the41.4cm source thigh is not longitudinally fitted, while the calf is fitted
+only under the existing review flag. Do not promote either experimental flag,
+raise the2cm tolerance, hide body vertices or claim a playable improvement.
+No standalone/package rebuild, new normal-launch cost or river acceptance is
+provided by this diagnostic run.
+
+No-opt-in regression `tmp/crew-thumb-support-default-retry-20260925/index.json`
+passes the native occupancy test with engine exit0. This preserves the ordinary
+crew regression, not the disabled boarding candidate's clearance acceptance.
