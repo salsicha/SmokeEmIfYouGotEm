@@ -161,6 +161,12 @@ Editor-hosted game, 1280 x 720, 1,200 frames, rows 30-1169
 | station 11,520 m, before the streaming fix (3 runs) | 30.9-32.8 | 39.1-40.5 | 427-433 | 1 each |
 | station 11,520 m, after the fix (2 runs) | 32.1 / 38.3 | 42.6 / 51.0 | 63.7 / 73.0 | 0 |
 
+A streaming check CSV-profiled the approach-telemetry test, which hops the raft
+from the put-in to Troublemaker (about 11 times natural drift speed, so cells
+stream in far more often than in play): 11,769 frames after map load, mean
+27.1 ms, p95 41.1 ms, no frame over 100 ms while canopy and terrain cells
+loaded and purged along the way.
+
 The normal launch passes the 20 FPS goal with margin. Busy rapids cost 8-16 ms
 more game-thread time (crest selection, shoreline mesh and Cartesian publishing
 grow with breaking water), leaving p95 at 42-51 ms: one of seven rapid-station
