@@ -864,6 +864,18 @@ void ARaftSimRaftActor::UpdateRockObstacles()
         {
             continue;
         }
+        // Vertical broad-phase: D4 contacts are planar (a rock is an infinite
+        // vertical cylinder), so a rock whose rendered crest lies well below
+        // the tubes pinned the raft on nothing visible (Lava Canyon crests sit
+        // about 1 m under the surface). Skip rocks whose top is more than
+        // 25 cm below the tube bottom; rocks without rendered bounds keep
+        // their contact. The D4 contact model itself is unchanged.
+        const FBox RockBounds = Rock->GetComponentsBoundingBox(true);
+        if (RockBounds.IsValid &&
+            RockBounds.Max.Z < GetActorLocation().Z - (TubeRadiusM + 0.25f) * kCmPerM)
+        {
+            continue;
+        }
 
         FRaftSimFlexRockObstacle Obstacle;
         Obstacle.ObstacleId = Rock->GetName();

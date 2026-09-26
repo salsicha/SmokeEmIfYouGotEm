@@ -19,11 +19,15 @@ or real-world hydraulic acceptance for either river.
   rivers deliberately accept jumps inside the bank feather (coverage >= 0.55,
   clearance >= max(lattice, 3 m); the rule that keeps the measured Troublemaker
   hole), so the test now applies the carrier's own rule and prints the values.
-- **Still open:** the launch view shows dark banded water without whitewater;
-  the four review-gated D4 rocks still contact the raft as full-height
-  cylinders although their crests sit about 1 m under water, so the raft can
-  snag on nothing visible (changing the contact rule needs the Python
-  reference model and parity fixtures to change with it).
+- **Invisible snags removed.** D4 rock contacts are planar (a rock acts as an
+  infinite vertical cylinder), so the four review-gated rocks, whose crests sit
+  1.03-1.1 m under the surface, pinned the raft on nothing visible. The raft's
+  obstacle broad-phase now skips a rock whose rendered top is more than 25 cm
+  below the tube bottom (`ARaftSimRaftActor::UpdateRockObstacles`); the D4
+  contact model and its Python reference are unchanged, and Terminator's
+  marker rock (crest 0.7 m above the surface) keeps its contact. Lava Canyon
+  and Terminator P4 pass.
+- **Still open:** the launch view shows dark banded water without whitewater.
 
 ## Zambezi
 
@@ -43,11 +47,10 @@ Changes:
   (`physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/moving_water_streaming.json`;
   saved map via `unreal/Scripts/set_zambezi_moving_window.py`; the map
   generator writes the same values).
-- Internal cut edges of curved moving windows are now held to the cooked state
-  with two ghost layers (as Cartesian crops already were) instead of a
-  zero-gradient copy that lets a backwater-held reach drain out of the cut.
-  Fixed crux windows and full-grid edges are unchanged; the four river-window
-  regression tests pass.
+- A trial that held curved crop edges to the cooked state with ghost layers
+  was reverted: it made no visible difference (see below) and the existing
+  guard `RaftSim.M3.CartesianCropBoundaries` requires legacy crops to keep
+  their transmissive edges.
 - The carrier returns to Zambezi's documented 1.5 m lattice (10,465 vertices),
   still many vertices per 5 x 10 m solver cell. At 1 m the 15 Hz big-water
   refresh (~35 ms) left p95 at 54.3 ms.
@@ -62,8 +65,8 @@ Changes:
 
 In the before run the solver ran in slow motion, so after the same wall time
 the raft had hardly moved; in real time it drifts to the right-bank flat
-visible in the other two frames. The water level there is not draining (ghost
-boundaries made no visible difference).
+visible in the other two frames. The water level there is not draining (the
+reverted ghost-boundary trial, right, looks the same).
 
 **Consequence, left failing:** P4 expects six rapid roller, aerosol and spray
 emitters at the start apron and now gets zero. Twelve breaking sites exist (the

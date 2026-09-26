@@ -64,6 +64,14 @@ bool FRaftSimM9ReleaseCandidateQATest::RunTest(const FString&)
 {
     FString ReportJson;
     const bool bPassed = ARaftSimContentLockDirector::RunReleaseCandidateQA(ReportJson);
+    if (!bPassed)
+    {
+        // Name the failing gates; the command-line QA mode saves the full report.
+        for (int32 Offset = 0; Offset < ReportJson.Len(); Offset += 900)
+        {
+            AddInfo(ReportJson.Mid(Offset, 900));
+        }
+    }
     TestTrue(TEXT("logical release-candidate QA passes"), bPassed);
     TSharedPtr<FJsonObject> Root;
     if (!ParseJsonText(ReportJson, Root))

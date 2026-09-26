@@ -4,13 +4,16 @@ September26 all-scene water review, Chilko and Zambezi: **Zambezi went from
 about 5 FPS to 11-13 ms mean frames (p95 24-27 ms).** Its fixed live window
 simulated the whole 30 km procedural corridor every 1/60 s tick (~20 ms per
 step, never real time) on a 0.5 m carrier. It now streams a 640 x 250 m window
-over the unchanged cooked field on its documented 1.5 m carrier; curved moving
-windows hold internal cut edges to the cooked state with ghost layers. P4's
+over the unchanged cooked field on its documented 1.5 m carrier. P4's
 Zambezi start-apron spray count now fails (0 of 6): in real time the procedural
 field's strongest breaking intensity is 0.146 against the 0.12 emitter
 threshold. Lava Canyon passes (p95 36.5 ms); its P4 jump check now applies the
-single-surface carrier rule. Open: Lava Canyon's submerged D4 rocks still snag
-the raft; neither river has photoreal or measured-hydraulics acceptance. See
+single-surface carrier rule, and its rocks 1 m under water no longer snag the
+raft (vertical broad-phase; D4 model unchanged). Release QA: the input matrix
+now passes after adding the bootstrap's four rescue/reseat mappings to the
+saved IMC; the legacy twenty-rapid matrix still fails (Troublemaker legacy
+fields 8.3-8.7 ms per step vs the 1.6 ms budget; fields unchanged since
+September 12). Neither river has photoreal or measured-hydraulics acceptance. See
 [review](../reconstruction-review-2026-09-07/chilko-zambezi-water-review-20260926.md).
 
 September26 standalone staging repair: normal Development rebuild succeeded
