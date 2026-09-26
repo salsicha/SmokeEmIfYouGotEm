@@ -1,5 +1,25 @@
 # Remaining requested work
 
+September26 playable delivery (normal FullReach): **South Fork riverbed is now
+discharge-consistent and the rapids have their captured drops.** The inferred
+bed had been a uniform 2.2 m shore-distance trough, so riffles were as deep as
+pools: the game's cooked water sat a median 0.46 m off the captured surface
+(-1.06/+0.69 m 10th/90th percentile), still draining at twice its inflow, with
+exposed trough banks and subcritical rapids. The new bed keeps the captured
+surface, outline and 1,600 cfs, sets riffle depth by Manning normal depth from
+the captured slope, keeps 2.2 m pools, and is calibrated on settled section
+cooks (+30% riffle depth). A full-river 600 s cook now sits 0.09 m median
+absolute off the captured surface (-0.21/+0.18 m); Meat Grinder, 11.5, 12.0 km
+and the 27.6 km gorge chute become supercritical and foam in play. 190 terrain
+tiles were rebuilt (collision within 0.0015 cm), the water config points at the
+new export and bundle v3 is staged. A reproducible 430 ms streaming frame at the
+Troublemaker cell is removed by loading those four actors with the map. Normal
+launch p95 34-35 ms; busy rapid stations p95 42-51 ms (one run 1 ms over):
+**rapid-section performance is not accepted.** P4 passes 8/9 (Lava Canyon jump
+clearance remains). Bed below water is inferred, not measured. See
+[discharge-consistent bed](../reconstruction-review-2026-09-07/south-fork-discharge-bed.md).
+Two sessions share this host: time performance runs when no other engine job is live.
+
 September26 runtime follow-through: the owning session's new600s state and190
 terrain imports are now saved. An independent read-only check verifies all799
 bundled windows,841 atlas beds and saved scene/terrain hashes; protected beds

@@ -17,6 +17,7 @@
 #include "Misc/Paths.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimRunCoordinateProvider.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "Tests/AutomationCommon.h"
@@ -132,6 +133,18 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
         Test->AddError(TEXT("Approach telemetry needs a raft and water runtime"));
         return true;
     }
+    // Stations are downstream route stations. Cartesian hydraulics answer
+    // only east/north metres, so every station is resolved through the
+    // scenario's progress (route) map and the hydraulic field is sampled at
+    // that world position. Legacy curved-ribbon maps return the water adapter
+    // itself as their route map.
+    const URaftSimWaterRuntimeAdapter* Route =
+        RaftSimReviewCoordinates::GetMap(World, Water);
+    if (Route == nullptr)
+    {
+        Test->AddError(TEXT("Approach telemetry needs the scenario route coordinates"));
+        return true;
+    }
 
     // Wet channel sample at a station. The wetted channel is rarely centred
     // on the river axis — entrance tongues hug a bank and several reaches
@@ -140,19 +153,25 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
     // outward from the axis and adopt the first wet hit. Transit then
     // follows the channel instead of ending at the first off-axis reach.
     const auto SampleWetStation =
-        [Water](float StationM, float& OutZCm, FVector& OutWorldCm) -> bool
+        [Water, Route](float StationM, float& OutZCm, FVector& OutWorldCm) -> bool
     {
         constexpr float LateralProbesM[] = {
             0.0f, -4.0f, 4.0f, -8.0f, 8.0f, -12.0f, 12.0f, -16.0f, 16.0f};
         for (const float LateralM : LateralProbesM)
         {
+            FVector ProbeWorldCm = FVector::ZeroVector;
+            if (!Route->RiverToWorldPosition(
+                    FVector2D(StationM, LateralM),
+                    Route->GetRiverVerticalDatumM(), ProbeWorldCm))
+            {
+                continue;
+            }
             FRaftSimWaterSample Probe;
-            if (Water->SampleWaterAtRiverCoordinates(
-                    FVector2D(StationM, LateralM), Probe) &&
+            if (Water->SampleWaterAtWorldPosition(ProbeWorldCm, Probe) &&
                 Probe.bWet)
             {
                 OutZCm = Probe.SurfaceHeightMeters * 100.0f;
-                OutWorldCm = Probe.WorldPosition;
+                OutWorldCm = FVector(ProbeWorldCm.X, ProbeWorldCm.Y, OutZCm);
                 return true;
             }
         }
@@ -222,8 +241,9 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
             FVector2D RaftRiverM;
             FVector RaftTangent;
             FVector RaftLeftNormal;
-            if (Water->WorldToRiverCoordinates(
-                    Raft->GetActorLocation(), RaftRiverM, RaftTangent, RaftLeftNormal))
+            if (RaftSimReviewCoordinates::WorldToCoordinates(
+                    World, Water, Raft->GetActorLocation(), RaftRiverM,
+                    RaftTangent, RaftLeftNormal))
             {
                 ScanStartM = FMath::Max(0.0f, static_cast<float>(RaftRiverM.X) - 50.0f);
             }
@@ -254,6 +274,12 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
         State->CurrentStationM = FirstWetStationM + 10.0f;
         if (!TeleportToStation(State->CurrentStationM))
         {
+            float ProbeZCm = 0.0f;
+            FVector ProbeWorldCm = FVector::ZeroVector;
+            Test->AddInfo(FString::Printf(
+                TEXT("approach-telemetry first wet station %.1f m (scan from %.1f m); station %.1f m wet within 16 m: %s"),
+                FirstWetStationM, ScanStartM, State->CurrentStationM,
+                SampleWetStation(State->CurrentStationM, ProbeZCm, ProbeWorldCm) ? TEXT("yes") : TEXT("no")));
             Test->AddError(TEXT("approach-telemetry failed initial placement"));
             return true;
         }
@@ -348,9 +374,9 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
                     const float BlindStationM =
                         State->CurrentStationM + HopAdvanceM;
                     FVector BlindWorldCm = FVector::ZeroVector;
-                    if (Water->RiverToWorldPosition(
+                    if (Route->RiverToWorldPosition(
                             FVector2D(BlindStationM, 0.0f),
-                            Water->GetRiverVerticalDatumM(),
+                            Route->GetRiverVerticalDatumM(),
                             BlindWorldCm))
                     {
                         // Only the plan-view projection is trustworthy here

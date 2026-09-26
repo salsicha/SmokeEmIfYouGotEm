@@ -15,7 +15,10 @@ param(
     [int]$TimeoutS = 900,
     # Optional diagnostic: a direct FullReach review-station start instead of
     # the normal Boot/menu launch, to cover other parts of the run.
-    [ValidateRange(-1, 33280)][int]$ReviewStationM = -1
+    [ValidateRange(-1, 33280)][int]$ReviewStationM = -1,
+    # Optional diagnostic console variables, e.g. 'r.Shadow.Virtual.Enable 0'
+    # (';'-separated). Recorded in the receipt; never a normal-launch result.
+    [ValidatePattern('^[a-zA-Z0-9_. ;-]*$')][string]$DiagnosticExecCmds = ''
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -27,6 +30,7 @@ if (Test-Path -LiteralPath $logFile) { throw "Log already exists: $logFile" }
 $started = Get-Date
 $review = $ReviewStationM -ge 0
 $csvCommands = 'csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 20,CsvCategory FMsgLogf disable'
+if ($DiagnosticExecCmds -ne '') { $csvCommands += ',' + (($DiagnosticExecCmds.Split(';') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }) -join ',') }
 $gameArgs = @("`"$project`"")
 if ($review) { $gameArgs += '/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach' }
 $gameArgs += @(
@@ -93,6 +97,7 @@ for ($i = 1; $i -lt $window.Count; $i++) { $twoFrame = [Math]::Max($twoFrame, $w
 $result = [ordered]@{
     schema = 'raftsim.south_fork_menu_launch_frame_audit.v1'; label = $Label
     launch_mode = $(if ($review) { "review_station_$ReviewStationM" } else { 'boot_menu' })
+    diagnostic_exec_cmds = $DiagnosticExecCmds
     game_exit_code = $game.ExitCode; csv = $csv; csv_sha256 = (Get-FileHash -LiteralPath $csv -Algorithm SHA256).Hash.ToLower()
     frames_total = $times.Count; audited_rows = "30..$($times.Count - 31)"; audited_frames = $window.Count
     mean_ms = [Math]::Round($mean, 4); p95_ms = [Math]::Round($p95, 4); max_ms = [Math]::Round($max, 4)

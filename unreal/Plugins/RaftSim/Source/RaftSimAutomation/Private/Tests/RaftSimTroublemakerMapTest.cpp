@@ -200,10 +200,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Colorado Hance support uses the unified-carrier smoothing strength"),
                 FMath::IsNearlyEqual(
                     Water->GetRaftSupportSurfaceSmoothingStrength(), 1.0f, 0.001f));
+            Test->AddInfo(FString::Printf(
+                TEXT("Colorado Hance support scales: standing-wave %.3f, hydraulic-relief %.3f"),
+                Water->GetRaftSupportStandingWaveScale(),
+                Water->GetRaftSupportHydraulicReliefScale()));
+            // Single-surface rivers render no station-periodic standing-wave
+            // train (it produced grazing-angle reflection bars; commit
+            // 25aefa24d), and support follows the rendered surface: the
+            // standing-wave share is 0 and hydraulic relief keeps 0.55.
             Test->TestTrue(
-                TEXT("Colorado Hance support uses the visible standing-wave scale"),
+                TEXT("Colorado Hance support uses the visible standing-wave and relief scales"),
                 FMath::IsNearlyEqual(
-                    Water->GetRaftSupportStandingWaveScale(), 0.55f, 0.001f) &&
+                    Water->GetRaftSupportStandingWaveScale(), 0.0f, 0.001f) &&
                 FMath::IsNearlyEqual(
                     Water->GetRaftSupportHydraulicReliefScale(), 0.55f, 0.001f));
         }
@@ -2287,6 +2295,13 @@ bool FRaftSimAssertRiverMapCommand::Update()
             {
                 const ARaftSimWaterSurfaceActor::FBreakingSite& StrongestSite =
                     BreakingSites[0];
+                Test->AddInfo(FString::Printf(
+                    TEXT("Chilko strongest launch-window jump: station %.1f m, lateral %.1f m, coverage %.4f, edge clearance %.2f m, sites %d"),
+                    StrongestSite.RiverCoordinatesMeters.X,
+                    StrongestSite.RiverCoordinatesMeters.Y,
+                    StrongestSite.PresentationCoverage,
+                    StrongestSite.PresentationEdgeClearanceMeters,
+                    BreakingSites.Num()));
                 Test->TestTrue(
                     TEXT("Chilko strongest launch-window jump is in the interpreted Lava Canyon crux"),
                     StrongestSite.RiverCoordinatesMeters.X >= 285.0f &&
