@@ -167,11 +167,15 @@ void RunViewInventory(UWorld* World, double MinDistanceCm, const FString& OutPat
     const FVector Eye = PC->PlayerCameraManager->GetCameraLocation();
     const FVector Forward = PC->PlayerCameraManager->GetCameraRotation().Vector();
     const double HalfFovCos = FMath::Cos(FMath::DegreesToRadians(PC->PlayerCameraManager->GetFOVAngle() * 0.5 + 2.0));
-    struct FGroup { int32 Count = 0; double MinD = TNumericLimits<double>::Max(), MaxD = 0, MinZ = TNumericLimits<double>::Max(), MaxZ = -TNumericLimits<double>::Max(); FString Tags; };
+    struct FGroup { int32 Count = 0; double MinD = TNumericLimits<double>::Max(), MaxD = 0, MinZ = TNumericLimits<double>::Max(), MaxZ = -TNumericLimits<double>::Max(); FString Tags; float CachedMaxDraw = -1.f, LDMaxDraw = -1.f; bool bNanite = false; };
     TMap<FString, FGroup> Groups;
-    const auto Add = [&](const FString& Key, const FVector& P, const AActor* Owner)
+    const auto Add = [&](const FString& Key, const FVector& P, const AActor* Owner, const UStaticMeshComponent* Comp)
     {
         FGroup& G = Groups.FindOrAdd(Key);
+        G.CachedMaxDraw = Comp->CachedMaxDrawDistance; G.LDMaxDraw = Comp->LDMaxDrawDistance;
+        // Inspect resident render data in both cooked games and the editor.
+        // IsNaniteEnabled() is an editor-only asset-build setting query.
+        G.bNanite = Comp->GetStaticMesh() && Comp->GetStaticMesh()->HasValidNaniteData();
         const double D = FVector::Dist(P, Eye);
         ++G.Count; G.MinD = FMath::Min(G.MinD, D); G.MaxD = FMath::Max(G.MaxD, D);
         G.MinZ = FMath::Min(G.MinZ, P.Z); G.MaxZ = FMath::Max(G.MaxZ, P.Z);
@@ -201,13 +205,13 @@ void RunViewInventory(UWorld* World, double MinDistanceCm, const FString& OutPat
                 const FVector P = T.GetLocation();
                 if (!InView(P)) continue;
                 if (Ism->InstanceEndCullDistance > 0 && FVector::Dist(P, Eye) > Ism->InstanceEndCullDistance) continue;
-                Add(Base, P, Owner);
+                Add(Base, P, Owner, Comp);
             }
         }
         else
         {
             const FVector P = Comp->Bounds.Origin;
-            if (InView(P)) Add(Base, P, Owner);
+            if (InView(P)) Add(Base, P, Owner, Comp);
         }
     }
     TArray<TPair<FString, FGroup>> Sorted;
@@ -224,6 +228,9 @@ void RunViewInventory(UWorld* World, double MinDistanceCm, const FString& OutPat
         Row->SetNumberField(TEXT("min_z_cm"), Sorted[I].Value.MinZ);
         Row->SetNumberField(TEXT("max_z_cm"), Sorted[I].Value.MaxZ);
         Row->SetStringField(TEXT("tags"), Sorted[I].Value.Tags);
+        Row->SetNumberField(TEXT("cached_max_draw_distance_cm"), Sorted[I].Value.CachedMaxDraw);
+        Row->SetNumberField(TEXT("ld_max_draw_distance_cm"), Sorted[I].Value.LDMaxDraw);
+        Row->SetBoolField(TEXT("nanite"), Sorted[I].Value.bNanite);
         Rows.Add(MakeShared<FJsonValueObject>(Row));
     }
     auto Report = MakeShared<FJsonObject>();

@@ -1,5 +1,23 @@
 # Remaining requested work
 
+September26 playable delivery (normal FullReach): **long views no longer end
+at the edge of the loaded world.** The river stopped in a straight line ~110 m
+ahead over dry bed (the 224 m live carrier was the only water); a render-only
+ring now draws the verified cooked atlas water beyond it (same material and
+vertex encoding, bank-clipped, hole cut exactly where the carrier stops
+drawing, no physics authority). Floating distant trees were canopy cells that
+outlived the terrain streamed out under them (game-world trace audit: 809 trees
+at 2.07-2.36 km with no ground; all others within -23..+10 cm); streamed canopy
+now culls at 1,950 m. The map had no far-field terrain at all: two always-loaded,
+non-colliding Nanite backdrops now fill the horizon, an inner 8 m one provably
+1.5 m or more below every tile, and an outer 16 m one from the repository's USGS
+3DEP windows (registration against the context grid: median -0.05 m). No
+hydraulics, collision, cook, bed or tile changed; the map file keeps its
+bundle-pinned hash. Normal launch p95 35-48 ms under shared-host load, 0 frames
+over 100 ms; P4 8/9 (Zambezi spray unchanged). Rapids beyond the carrier are
+cooked, not white; a faint carrier-edge line and a pre-existing dark water wedge
+at 29.5 km remain. See [far-field view](../reconstruction-review-2026-09-07/south-fork-far-field-view.md).
+
 September26 cooked-delivery retry: the actual Development package attempt
 exposed an editor-only Nanite query in the new canopy diagnostic. A narrow
 runtime-safe source correction is present, but rebuild verification is pending.

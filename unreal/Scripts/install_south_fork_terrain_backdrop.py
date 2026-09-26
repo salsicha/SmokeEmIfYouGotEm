@@ -14,7 +14,8 @@ no collision, no shadow casting, no navigation. Existing tiles, collision,
 water and cooks are untouched. Refuses to run twice.
 
 Environment: RAFTSIM_BACKDROP_EXPORT (repo-relative export manifest),
-RAFTSIM_BACKDROP_REPORT (fresh repo tmp JSON).
+RAFTSIM_BACKDROP_REPORT (fresh repo tmp JSON), optional RAFTSIM_BACKDROP_LABEL.
+Only the new external actor package and the mesh asset are saved.
 """
 import hashlib
 import json
@@ -27,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[2]
 LEVEL = '/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach'
 ASSETS = '/Game/RaftSim/Environment/SouthForkReconstruction/FullReach/Backdrop'
 MATERIAL_SOURCE_TILE = '/Game/RaftSim/Environment/SouthForkReconstruction/FullReach/Tiles/SM_SouthFork_coarse_0000_4096'
-LABEL = 'SouthFork terrain backdrop - 8 m min-eroded, inferred presentation, no collision'
+LABEL = os.environ.get('RAFTSIM_BACKDROP_LABEL', 'SouthFork terrain backdrop - 8 m min-eroded, inferred presentation, no collision')
 TAG = 'RaftSimTerrainBackdrop'
 
 
@@ -115,8 +116,13 @@ def main():
     component.set_editor_property('affect_distance_field_lighting', False)
     actor.set_editor_property('is_spatially_loaded', False)
     bounds_origin, bounds_extent = actor.get_actor_bounds(False)
-    assert levels.save_current_level()
-    package = actor.get_package().get_name() if actor.get_package() else ''
+    # Save only the new one-file-per-actor package. The map file is a pinned
+    # input of the verified runtime bundle (RaftSimWater.Build.cs) and must
+    # not be resaved just to add an external actor.
+    package_object = actor.get_package()
+    assert package_object and '__ExternalActors__' in package_object.get_name(), 'Expected an external actor package'
+    assert unreal.EditorLoadingAndSavingUtils.save_packages([package_object], False)
+    package = package_object.get_name()
     report = dict(asset=asset, fbx=tile['fbx'], fbx_sha256=tile['fbx_sha256'], source_triangles=tile['triangle_count'],
                   nanite_fallback_triangles=fallback_triangles, bound_error_cm=bound_error,
                   material=material.get_path_name(), nanite_fallback_percent_triangles=0.1,
