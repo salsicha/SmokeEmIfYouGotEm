@@ -1,5 +1,17 @@
 # Remaining requested work
 
+September26 lower-gorge delivery: the current route's last ~7 km rendered
+near-white because its only NAIP window contains a washed, desaturated source
+tile. The drape builder recolours that tile by luma-quantile transfer from the
+same window (structure kept) and now uses the context-grid water mask; 24,211
+imagery-placed trees are added there as separately labelled actors (roots
+p1..p99 -3.9..+3.3 cm). Idle-host normal Boot/menu p95 35.2 ms, station 30.5 km
+p95 37.2 ms, no frame over 100 ms; the concurrent 74.3 ms channel-repair
+measurement overlapped this session's Blender/capture jobs. See
+[drape v2](../reconstruction-review-2026-09-07/south-fork-naip-drape-v2.md).
+Two sessions share this host: time performance runs when no other engine or
+Blender job is live.
+
 September26 canopy follow-through: removed266 inferred trees inside the captured
 context water mask from six normal FullReach actor packages;140,417 remain.
 Fixed the placement generator's older-mask/clipped-index defect. Fresh-engine
