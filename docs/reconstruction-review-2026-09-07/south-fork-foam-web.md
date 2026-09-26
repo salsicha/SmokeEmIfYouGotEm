@@ -79,13 +79,27 @@ PowerShell 5.1 and reads the CSV using the footer header (Unreal appends
 columns as stats first appear, so early rows are narrower). Receipt:
 `unreal/Saved/RaftSimValidation/south-fork-foam-rock-20260926b-frame-audit.json`.
 
+## Phase morph (follow-up, same day)
+
+The inherited two-phase flow map crossfaded two coverages whose patterns are
+displaced by half a second of current (0.5 x speed). With sharp foam up to half
+of all foam pixels sat at half opacity (pale ghost copies; the old lattice
+smeared the same way). The generator now morphs the phases in rank space:
+`s = w*Va + (1-w)*Vb`, mapped back to uniform by blending its independent-
+uniform (trapezoid) CDF with the identity using a displacement-indexed
+factor calibrated per mix (21 knots at 0.1 m, speed-to-stretch coupling
+included). Off-knot verification over weights 0.1-0.9, p 0.05-0.95 and
+displacements 0.05-1.7 m: worst coverage error 1.75% (gate 2.5%; the static
+mixes stay within 0.6%). Receipt: `south-fork-foam-web/froth_web_receipt_v2.json`.
+
+![Fast bursts, linear crossfade (top) vs rank morph (bottom)](south-fork-foam-web/burst-linear-vs-morph.jpg)
+
+Foam now reads as crisp streaks that evolve between frames rather than
+doubled pale copies. Normal Boot/menu run with the morph: mean 24.5 ms,
+p95 33.0 ms, max 49.3 ms, no frame over 100 ms (not a matched A/B).
+
 ## Remaining foam defects
 
-- **Crossfade ghosting.** The inherited two-phase flow map blends two patterns
-  displaced by up to half a second of current. With sharp foam this shows as
-  pale half-opacity copies (fast burst: `south-fork-foam-web/burst-crossfade-ghosting.jpg`).
-  It predates this change (it produced the old smear). A morph-style blend or a
-  shorter backtrace needs its own coverage calibration.
 - Foam edges are flat-shaded and decal-like at close range; bubble-scale
   brightness/normal variation is still missing.
 - Breaking crests and hole faces are unchanged: this is the transported-foam
