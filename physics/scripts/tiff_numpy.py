@@ -1,10 +1,11 @@
-"""Minimal numpy/zlib reader for the project's single-band GeoTIFF grids.
+"""Minimal numpy/zlib reader for the project's GeoTIFF grids and imagery.
 
 Supports the layouts written by the reconstruction scripts (rasterio, tiled
 or striped, uncompressed or deflate, optional horizontal/float predictor)
 so grid tools can run where rasterio is unavailable. Georeferencing is read
 from ModelPixelScale/ModelTiepoint only; callers must still check the grid
-against the manifest that owns the file.
+against the manifest that owns the file. Multi-band chunky (interleaved)
+images such as ArcGIS ImageServer exports return [rows, cols, bands].
 """
 import struct
 import zlib
@@ -33,7 +34,7 @@ def _ifd(data, endian, offset):
 
 
 def read_geotiff(path):
-    """Return (array[rows, cols], dict(first_vertex_utm_m=(x, y), cell_m=...), nodata)."""
+    """Return (array[rows, cols] or [rows, cols, bands], dict(corner_utm_m=(x, y), cell_m=...), nodata)."""
     data = Path(path).read_bytes()
     endian = {b'II': '<', b'MM': '>'}[data[:2]]
     assert struct.unpack_from(endian + 'H', data, 2)[0] == 42, 'BigTIFF not supported'
@@ -43,10 +44,12 @@ def read_geotiff(path):
     compression = tags.get(259, [1])[0]
     predictor = tags.get(317, [1])[0]
     sample_format = tags.get(339, [1])[0]
-    assert tags.get(277, [1])[0] == 1, 'single band only'
+    spp = tags.get(277, [1])[0]
+    assert spp == 1 or tags.get(284, [1])[0] == 1, 'multi-band images must be chunky (interleaved)'
+    assert spp == 1 or predictor != 3, 'float predictor supported for single band only'
     dtype = {(3, 32): 'f4', (3, 64): 'f8', (1, 8): 'u1', (1, 16): 'u2', (2, 16): 'i2', (1, 32): 'u4', (2, 32): 'i4'}[(sample_format, bits)]
     dt = np.dtype(endian + dtype)
-    out = np.empty((height, width), dt.newbyteorder('='))
+    out = np.empty((height, width) if spp == 1 else (height, width, spp), dt.newbyteorder('='))
     if 322 in tags:
         tw, th = tags[322][0], tags[323][0]
         offsets, counts = tags[324], tags[325]
@@ -56,6 +59,10 @@ def read_geotiff(path):
         offsets, counts = tags[273], tags[279]
         blocks = [(r, 0, width, rps) for r in range(0, height, rps)]
     for (r, c, bw, bh), off, cnt in zip(blocks, offsets, counts):
+        if cnt == 0:
+            # Sparse tile (ArcGIS exports omit tiles with no data): zeros.
+            out[r:r + min(bh, height - r), c:c + min(bw, width - c)] = 0
+            continue
         raw = data[off:off + cnt]
         if compression == 8 or compression == 32946:
             raw = zlib.decompress(raw)
@@ -69,7 +76,7 @@ def read_geotiff(path):
             b = b.reshape(rows_here, dt.itemsize, bw).transpose(0, 2, 1)
             block = np.ascontiguousarray(b).view(np.dtype('>' + dtype)).reshape(rows_here, bw)
         else:
-            block = np.frombuffer(raw, dt).reshape(rows_here, bw)
+            block = np.frombuffer(raw, dt).reshape((rows_here, bw) if spp == 1 else (rows_here, bw, spp))
             if predictor == 2:
                 block = np.cumsum(block, axis=1, dtype=block.dtype)
         h = min(bh, height - r); w = min(bw, width - c)
