@@ -1,5 +1,10 @@
 # Current South Fork bundle: standalone staging gap
 
+Resolved later September26: standalone Development rebuild and the actual v3
+staged-tree check now pass. Native comparison/cooked execution remain pending.
+See [repair receipt and exact limits](south-fork-v3-standalone-rebuild.md).
+The failure and attempted repair below are retained as historical evidence.
+
 September 26, 2026 follow-through after `ce5260aeb`.
 
 The saved editor scene uses the new discharge-bed runtime and the build rules
