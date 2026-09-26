@@ -38,8 +38,8 @@ non-colliding Nanite backdrops now fill the horizon, an inner 8 m one provably
 hydraulics, collision, cook, bed or tile changed; the map file keeps its
 bundle-pinned hash. Normal launch p95 35-48 ms under shared-host load, 0 frames
 over 100 ms; P4 8/9 (Zambezi spray unchanged). Rapids beyond the carrier are
-cooked, not white; a faint carrier-edge line and a pre-existing dark water wedge
-at 29.5 km remain. See [far-field view](../reconstruction-review-2026-09-07/south-fork-far-field-view.md).
+cooked, not white; a faint carrier-edge line remains (the 29.5 km dark water
+wedge was a bed ledge, removed by bed v2 above). See [far-field view](../reconstruction-review-2026-09-07/south-fork-far-field-view.md).
 
 September26 cooked-delivery retry: the actual Development package attempt
 exposed an editor-only Nanite query in the new canopy diagnostic. A narrow

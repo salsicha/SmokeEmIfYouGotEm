@@ -63,6 +63,13 @@ Nanite backdrops now fill the view:
   -0.05 m, 10th/90th percentile -0.62/+0.47 m, so the registration is right.
   Inside the context grid only a one-cell edge band is drawn, kept below it.
 
+Provenance and rights: the outer backdrop's source files are the hash-locked
+full-reach window exports, USGS 3DEP, U.S. public domain, credited in
+`CREDITS.md`. Their source policy forbids promoting the raw files to game
+geometry on their own; here they are reprojected, checked against the
+captured context grid, lowered by a margin, kept non-colliding and used only as
+distant presentation, never as river, bank or collision geometry.
+
 Both use the tiles' draped ground material. Installing them saved only their
 mesh assets and two external actor packages
 (`unreal/Scripts/install_south_fork_terrain_backdrop.py`); the map file keeps
@@ -100,8 +107,9 @@ in the P4 telemetry tests, which teleport the raft between stations.
 - A faint straight line remains visible under magnification where the carrier's
   north-south edge meets the ring; changing the ring's drop (0.5-12 cm) or
   flattening carrier normals does not change it, so it lies in the carrier's
-  edge row. A straight-edged dark wedge on the water at 29.5 km predates the
-  ring (present in the pre-change capture) and is a separate shading defect.
+  edge row. A straight-edged dark wedge on the water at 29.5 km predated the
+  ring; it was an inferred-bed ledge and is removed by
+  [bed v2](south-fork-bed-v2.md).
 - Distant hills beyond 1.95 km have no trees, and the backdrops lower ridges
   (inner: median 4.7 m) until tiles stream in. The outer backdrop ends where
   the repository's 3DEP windows end; there is still no terrain beyond them.
