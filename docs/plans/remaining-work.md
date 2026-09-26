@@ -1,5 +1,12 @@
 # Remaining requested work
 
+September26 historical-source location screen: explicit datum conversion places
+the four site endpoints near the current route, but does not register their
+transects or elevations. Original coordinates would be shifted about216.7m
+if treated directly as scene UTM. The provisional operation/precision limits
+are recorded; no geometry or cook change. See
+[location screen](../reconstruction-review-2026-09-07/south-fork-historical-survey-location-screen.md).
+
 September26 source follow-through: a newly screened historical channel survey
 offers a registration path for checking inferred bathymetry. It is not yet
 registered or licensed for source-media redistribution; no production geometry
