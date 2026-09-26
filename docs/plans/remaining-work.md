@@ -1,5 +1,17 @@
 # Remaining requested work
 
+September26 playable delivery (normal FullReach): **the 33 km run is no longer
+bare desert.** A ten-station survey showed every view outside Troublemaker and
+the put-in as tan hills with no vegetation. The full-reach NAIP windows already
+in the repository are now reprojected into a 1.22 m drape on all terrain tiles
+(after correcting a 2x axis stretch from square-size image exports), and
+140,683 trees are placed where that imagery shows canopy (roots traced within
++/-5.3 cm for 98% of a 3,000 sample). Species, heights and forms are inferred.
+Normal launch p95 36.7 ms; densest forest (2.5 km) p95 34.1 ms. See
+[drape and canopy](../reconstruction-review-2026-09-07/south-fork-naip-drape-canopy.md).
+Open: bank rocks/gravel bars, understory, HLOD rebuild for distant trees, the
+far-field shards, and the flat inferred Troublemaker walls.
+
 September26 playable delivery (normal FullReach, rebuilt editor game):
 **Troublemaker rock spikes and lattice foam replaced.** Layer isolation
 attributes the bank "spike field" to `SM_CapturedRockInferredFlanks`; an

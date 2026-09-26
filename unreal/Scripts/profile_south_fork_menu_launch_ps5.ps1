@@ -12,7 +12,10 @@ September 26 receipt. No review station, solver override or quality change.
 param(
     [Parameter(Mandatory = $true)][ValidatePattern('^[a-zA-Z0-9_.-]+$')][string]$Label,
     [ValidateRange(300, 2400)][int]$ProfileFrames = 1200,
-    [int]$TimeoutS = 900
+    [int]$TimeoutS = 900,
+    # Optional diagnostic: a direct FullReach review-station start instead of
+    # the normal Boot/menu launch, to cover other parts of the run.
+    [ValidateRange(-1, 33280)][int]$ReviewStationM = -1
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -22,25 +25,38 @@ $csvDir = Join-Path $root 'unreal/Saved/Profiling/CSV'
 $receipt = Join-Path $root "unreal/Saved/RaftSimValidation/$Label-frame-audit.json"
 if (Test-Path -LiteralPath $logFile) { throw "Log already exists: $logFile" }
 $started = Get-Date
-$gameArgs = @(
-    "`"$project`"", '-game', '-RenderOffscreen', '-Unattended', '-NoSplash', '-NoSound',
+$review = $ReviewStationM -ge 0
+$csvCommands = 'csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 20,CsvCategory FMsgLogf disable'
+$gameArgs = @("`"$project`"")
+if ($review) { $gameArgs += '/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach' }
+$gameArgs += @(
+    '-game', '-RenderOffscreen', '-Unattended', '-NoSplash', '-NoSound',
     '-ResX=1280', '-ResY=720', '-Windowed', '-RaftSimEphemeralProfile',
     '-RaftSimScenario=south_fork_full_descent', '-csvCompression=0', "`"-abslog=$logFile`"",
-    '-ExitAfterCsvProfiling', "-RaftSimPostTravelCsvFrames=$ProfileFrames",
-    '"-ExecCmds=RaftSim.MenuScreen main start=south_fork_full_descent,csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 20,CsvCategory FMsgLogf disable"')
+    '-ExitAfterCsvProfiling')
+if ($review) {
+    $gameArgs += @("-RaftSimWaterReviewStation=$ReviewStationM",
+        "`"-ExecCmds=$csvCommands,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames`"")
+} else {
+    $gameArgs += @("-RaftSimPostTravelCsvFrames=$ProfileFrames",
+        "`"-ExecCmds=RaftSim.MenuScreen main start=south_fork_full_descent,$csvCommands`"")
+}
 $game = Start-Process -FilePath 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe' -ArgumentList $gameArgs -PassThru
 if (-not $game.WaitForExit($TimeoutS * 1000)) {
     Stop-Process -Id $game.Id -Force -Confirm:$false
     throw "Game timed out after $TimeoutS s"
 }
 $log = Get-Content -LiteralPath $logFile -Raw -Encoding UTF8
-$patterns = @(
+$csvEnded = 'LogCsvProfiler: Display: Capture Ended\. Writing CSV to file : [^\r\n]*[/\\]([^/\\\r\n]+\.csv)\s*$'
+$patterns = if ($review) { @(
+    'LogLoad: LoadMap: /Game/RaftSim/Maps/L_SouthForkAmerican_FullReach(?:\?|\s|$)', $csvEnded)
+} else { @(
     'LogLoad: LoadMap: /Game/RaftSim/Maps/L_RaftSimBoot(?:\?|\s|$)',
     'LogTemp: Display: RaftSim\.MenuScreen: showing main',
     'LogLoad: LoadMap: /Game/RaftSim/Maps/L_SouthForkAmerican_FullReach(?:\?|\s|$)',
     'LogTemp: Display: RaftSim post-travel CSV event: world=/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach\.',
     ('LogTemp: Display: RaftSim post-travel CSV capture: frames=' + $ProfileFrames + '(?:\s|$)'),
-    'LogCsvProfiler: Display: Capture Ended\. Writing CSV to file : [^\r\n]*[/\\]([^/\\\r\n]+\.csv)\s*$')
+    $csvEnded) }
 $previous = -1; $leaf = ''
 foreach ($pattern in $patterns) {
     $m = [regex]::Matches($log, $pattern, [Text.RegularExpressions.RegexOptions]::Multiline)
@@ -75,7 +91,8 @@ $max = ($window | Measure-Object -Maximum).Maximum
 $twoFrame = 0.0
 for ($i = 1; $i -lt $window.Count; $i++) { $twoFrame = [Math]::Max($twoFrame, $window[$i] + $window[$i - 1]) }
 $result = [ordered]@{
-    schema = 'raftsim.south_fork_menu_launch_frame_audit.v1'; label = $Label; launch_mode = 'boot_menu'
+    schema = 'raftsim.south_fork_menu_launch_frame_audit.v1'; label = $Label
+    launch_mode = $(if ($review) { "review_station_$ReviewStationM" } else { 'boot_menu' })
     game_exit_code = $game.ExitCode; csv = $csv; csv_sha256 = (Get-FileHash -LiteralPath $csv -Algorithm SHA256).Hash.ToLower()
     frames_total = $times.Count; audited_rows = "30..$($times.Count - 31)"; audited_frames = $window.Count
     mean_ms = [Math]::Round($mean, 4); p95_ms = [Math]::Round($p95, 4); max_ms = [Math]::Round($max, 4)
