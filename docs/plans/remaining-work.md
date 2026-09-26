@@ -1,5 +1,19 @@
 # Remaining requested work
 
+September26 packaged water-health repair: **the startup detail shutdown is
+resolved in the rebuilt playable game.** Exact diagnostic: cell10110 had
+aeration1.00000012 (one float step above1), with valid depth/velocity. The
+entrainment ramps now evaluate the same cubic with a range-preserving upper
+complement; strict validation, thresholds, shaders, fields and experimental
+solver settings are unchanged. Three native regressions pass, including
+2,000,002 bounded/monotone ramp samples. Actual packaged Boot → menu → FullReach
+runs with zero errors,352 updates over53.476s and zero backlog; p9549.7416ms,
+max82.0997ms, no >100ms frames. This is a narrow start-section20FPS pass with
+little margin, not full-route acceptance. Packaged paddling capture also passes
+runtime health. Next: longer healthy route/rapid checks, the already-open busy
+rapid cost, shoreline/geometry/collision and physical acceptance; do not repeat
+the resolved startup shutdown. See [repair evidence](../reconstruction-review-2026-09-07/south-fork-entrainment-roundoff.md).
+
 September26 playable delivery (normal FullReach): **the inferred South Fork
 riverbed no longer has ledges.** Bed v1 held one depth per 5 m bin with a raw
 pool weight and calibration bias, so neighbouring bins jumped up to 1.07 m and
@@ -46,13 +60,13 @@ wedge was a bed ledge, removed by bed v2 above). See [far-field view](../reconst
 September26 cooked-game delivery: the Nanite build failure is repaired and the
 v4 Development package completed. Its 2,405 payload files verify, and actual
 Boot → main menu → South Fork travel and raft/paddle motion run in the package.
-**Normal-menu water health fails twice:** stateful detail rejects invalid
+**Historical failure, repaired above:** normal-menu stateful detail rejected invalid
 mean-flow input and stops after ~3.25 s, before the CSV starts. The observed
 p95 39.37/38.87 ms and zero >100 ms frames therefore do NOT establish healthy
 20 FPS acceptance. The profiler now records runtime errors and a separate
-healthy-timing gate. Next: identify the rejected cell/value and repair its
-producer without weakening validation or disabling water, then rebuild and
-repeat normal play. Busy-rapid performance and physical acceptance remain open.
+healthy-timing gate. The later repair above identifies the cell/value, fixes
+its producer without weakening validation, and rechecks normal play.
+Busy-rapid performance and physical acceptance remain open.
 Do not repeat the resolved compiler/package/data checks as the main task. See
 [package evidence and exact next step](../reconstruction-review-2026-09-07/south-fork-v4-packaged.md).
 

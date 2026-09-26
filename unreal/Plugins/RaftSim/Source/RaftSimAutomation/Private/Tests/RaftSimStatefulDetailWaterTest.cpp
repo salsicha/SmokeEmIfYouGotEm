@@ -55,6 +55,11 @@ bool FRaftSimDetailWaterValidationTest::RunTest(const FString&)
     Flow[0]=FVector4f(2,2,0,2);
     TestFalse(TEXT("invalid source rejected"),Grid.Validate(Flow,Error));
     Flow[0]=FVector4f(2,2,0,0);
+    Flow[17].W=2;
+    TestFalse(TEXT("invalid nonzero cell rejected"),Grid.Validate(Flow,Error));
+    TestTrue(TEXT("rejection identifies the exact producer cell and values"),
+        Error.Contains(TEXT("cell=17 xy=(1,1)")) && Error.Contains(TEXT("aeration=2")));
+    Flow[17].W=0;
     Grid.TurbulentHeadMeters=-0.01f;
     TestFalse(TEXT("negative pressure forcing rejected"),Grid.Validate(Flow,Error));
     Grid.TurbulentHeadMeters=0.11f;

@@ -1,5 +1,11 @@
 # South Fork v4 packaged execution — September 26
 
+Follow-up: the startup detail failure below is repaired by the
+[range-preserving entrainment change](south-fork-entrainment-roundoff.md).
+This report and its binary hash describe the original failed candidate. The
+same stage now contains the repaired executable; the old executable/symbols
+are retained separately for rollback. Original receipts remain unchanged.
+
 The Development package at `tmp/south-fork-playable-v4-20260926/Windows`
 completed build, cook, stage and package with exit 0 in 751.53 seconds.
 This delivers the current bed-v2 / bundle-v4 scene and far-field presentation

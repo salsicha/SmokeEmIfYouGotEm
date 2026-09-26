@@ -256,11 +256,16 @@ bool FRaftSimDetailWaterGrid::Validate(TConstArrayView<FVector4f> Flow,FString& 
         (bExperimentalMeanStrain && !bFiniteDepthDispersion))
     { Error=TEXT("Invalid detail grid, timestep, rates or input size");return false; }
     float MaxSignal=0;
-    for (const FVector4f& F:Flow)
+    for (int32 Index=0;Index<Flow.Num();++Index)
     {
+        const FVector4f& F=Flow[Index];
         if (!FMath::IsFinite(F.X) || !FMath::IsFinite(F.Y) || !FMath::IsFinite(F.Z) || !FMath::IsFinite(F.W) ||
             F.X<0 || F.W<0 || F.W>1)
-        { Error=TEXT("Invalid mean-flow depth, velocity or aeration");return false; }
+        {
+            Error=FString::Printf(TEXT("Invalid mean-flow depth, velocity or aeration: cell=%d xy=(%d,%d) depth=%.9g u=%.9g v=%.9g aeration=%.9g origin=(%.9g,%.9g)"),
+                Index,Index%Size.X,Index/Size.X,F.X,F.Y,F.Z,F.W,OriginMeters.X,OriginMeters.Y);
+            return false;
+        }
         if (F.X>0.01f) MaxSignal=FMath::Max(MaxSignal,FMath::Abs(F.Y)+FMath::Abs(F.Z)+2*FMath::Sqrt(9.81f*F.X));
     }
     if (StepSeconds*MaxSignal/CellMeters>0.45f)

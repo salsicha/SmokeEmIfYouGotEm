@@ -6,6 +6,21 @@
 // Compute from the complete immutable depth/velocity input; output only W.
 struct FRaftSimDetailEntrainment
 {
+    // Algebraically the same cubic ramp as SmoothStep. Evaluate the upper
+    // half from its complement: t*t*(3-2*t) can round one ULP above one
+    // in the optimized game producer. That invalidated
+    // the normal river's aeration input and stopped its detail simulation.
+    // No input/state clipping or relaxed validation: each branch constructs
+    // a value in [0,1]; non-finite interior inputs still propagate as invalid.
+    static float BoundedSmoothStep(float A,float B,float X)
+    {
+        if(X<A)return 0.f;
+        if(X>=B)return 1.f;
+        const float T=(X-A)/(B-A);
+        if(T<=.5f)return T*T*(3.f-2.f*T);
+        const float U=(B-X)/(B-A);
+        return 1.f-U*U*(3.f-2.f*U);
+    }
     // Two estimates of the same source do not create additive production.
     // Retain flow-driven rock/wake transitions and the accepted crest source.
     static float MergeBreakingSource(const FVector4f& Flow,float CrestSource)
@@ -45,8 +60,8 @@ struct FRaftSimDetailEntrainment
             for (const FVector4f* F:{L,R,B,T})if (F)LocalFroude=FMath::Max(LocalFroude,Froude(*F));
             // Rates in 1/s; intentionally stated heuristic thresholds. Density
             // is then transported/decayed by the GPU, not repainted each frame.
-            C.W=FMath::SmoothStep(0.65f,1.1f,LocalFroude)*
-                FMath::SmoothStep(0.05f,0.65f,FMath::Max(Compression,Deceleration));
+            C.W=BoundedSmoothStep(0.65f,1.1f,LocalFroude)*
+                BoundedSmoothStep(0.05f,0.65f,FMath::Max(Compression,Deceleration));
         }
     }
 };
