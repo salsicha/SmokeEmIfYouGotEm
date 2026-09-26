@@ -1,5 +1,12 @@
 # Remaining requested work
 
+September26 Boot/menu profiler verification: explicit `NormalMenuLaunch` now
+distinguishes project-default Boot/menu travel from direct-map normal station
+starts. Regression checks pass and a fresh 1200-frame actual engine run exits0;
+rows30-1170 p95=45.9231ms passes50ms, with sampled raft motion. This is supporting
+validation repair, not new river geometry or visual delivery; no acceptance or
+next-river promotion. See [launch validation](../reconstruction-review-2026-09-07/south-fork-menu-launch-validation-20260926.md).
+
 Current desktop performance goal (user revision, September 25, 2026): **20 FPS**,
 50 ms p95 frame budget and 100 ms two-frame hitch threshold. This supersedes
 the 30/60 FPS targets in historical entries and referenced plans. Existing
