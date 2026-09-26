@@ -82,9 +82,20 @@ idle-host results.
 | station 27,600 m (gorge chute) | 40.9 | 51.3 | 85.5 | 0 |
 | station 11,520 m | 51.0 | 82.0 | 150.5 | 3 |
 
-The 11.5 km run is well over budget. Its slow frames scale every water stage
-by about the same factor against an earlier 11.5 km run (crest update 10.9 vs
-6.4 ms, crest selection 6.2 vs 3.1 ms, solver step 10.2 vs 6.4 ms), which points
-at processor contention rather than one new cost; the far-field ring is not
-among the top costs. A repeat on an idle host is required before any
-conclusion. Busy-rapid performance remains open.
+That 11.5 km run was contended. Repeated on a quieter host (14-29% load before
+start, though two other processes were still present):
+
+| launch | mean ms | p95 ms | max ms | > 100 ms |
+| --- | ---: | ---: | ---: | ---: |
+| station 11,520 m (two runs) | 44.5 / 45.1 | 51.6 / 52.7 | 94.4 / 95.2 | 0 / 0 |
+| station 27,600 m | 46.6 | 54.4 | 74.5 | 0 |
+
+No hitches, but both busy rapids sit just over the 50 ms p95 budget (v1 runs at
+11.5 km were 42.6-51.0 ms). Against the v1 run at 11.5 km, per-frame costs
+changed as follows: crest topology rebuilds 0.58 to 1.16 per frame and crest
+selection 3.1 to 4.9 ms (more breaking-site changes on the v2 flow), solver
+3.0 to 3.5 ms per fixed tick, and 2.1 to 2.7 fixed ticks per frame because
+the frames are longer, which compounds. GPU time rose 12.3 to 15.6 ms. The
+far-field ring costs 0.2 ms. Busy-rapid performance is not accepted and remains
+open; the crest-refinement path (owned by separate measured work) is the
+largest lever.
