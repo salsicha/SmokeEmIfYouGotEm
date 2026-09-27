@@ -1,5 +1,24 @@
 # Remaining requested work
 
+September27 implementation follow-through: Cartesian far-field packing-capacity
+reuse candidate and actual native mesh-parity tests are now in source; candidate
+defaults OFF, original colors/geometry/physics retained. Editor build28379
+completed exit0 (499.14s); native wrapper22259/PID24236 completed exit0 with
+all FOUR tests passing, zero test warnings/errors/unrun/in-process. Source/DLL
+hashes stayed unchanged during the D3D12 replay. No build/native test remains
+live; do not duplicate. This verifies fixture parity, not runtime performance,
+production-scene motion or a clean release log. Packaged v12 remains unchanged.
+Exact hydraulic continuation99863 remains live (native12676/wrapper34600),
+last inspected3090steps/604.5s. No FPS run until solve/audits are terminal.
+See [candidate and pending gates](../reconstruction-review-2026-09-07/v12-cpu-hitch-attribution.md).
+
+September27 CPU follow-through: retained v12 CSV isolates the sole far-field
+rebuild at row1080 immediately before the103.5941ms FrameTime hitch. This is
+not a fix for recurring busy p95: crest selection/update remain major CPU
+costs. See [scope attribution and exact packing candidate](../reconstruction-review-2026-09-07/v12-cpu-hitch-attribution.md).
+No production change or new performance run; same continuation99863 remains
+live, observed1690steps/534.5s. Do not sum nested/shared scopes or restart jobs.
+
 September27 bank-control follow-through: passive v12 capture91743/PID35444
 completed exit0 and passed the prior8404m contact point, reaching8486.616m.
 The earlier recording held AllForward with no guide steering; it does not

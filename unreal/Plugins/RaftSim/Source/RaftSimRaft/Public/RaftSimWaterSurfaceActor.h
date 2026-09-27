@@ -711,6 +711,9 @@ private:
     // Scratch capacity only; Pack rewrites every field before submission.
     // Downstream may consume the rvalue; a moved-from buffer simply regrows.
     TArray<FProcMeshVertex> CartesianSourcePackingScratch;
+    // Capacity only; the Cartesian far-field packer rewrites every attribute.
+    // Separate from the carrier scratch because both can publish in one tick.
+    TArray<FProcMeshVertex> FarFieldSourcePackingScratch;
     struct FFarFieldWaterKey
     {
         FVector2D NearMin = FVector2D::ZeroVector;

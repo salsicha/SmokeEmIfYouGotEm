@@ -15,6 +15,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/StaticMeshActor.h"
+#include "HAL/IConsoleManager.h"
+#include "RaftSimCrestMidpointExpansion.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCapturedGroundRenderingTest,"RaftSim.M4.ShorelineCapturedGroundRendering",
@@ -772,6 +774,69 @@ bool FRaftSimCartesianShorelineSurfaceTest::RunTest(const FString&)
         Surface->SampleCartesianCarrierSupport(DryWorld,Height,bWet) && !bWet);
     TestFalse(TEXT("off-grid provider is unavailable"),
         Surface->SampleCartesianCarrierSupport(DryWorld+FVector(100000.,0.,0.),Height,bWet));
+    // Actual far-field publication, not a packer-only fixture. Compare fresh
+    // and retained paths over changed UV origin, hole and lattice size. This
+    // is correctness coverage, never a performance measurement.
+    {
+        auto* Reuse = IConsoleManager::Get().FindConsoleVariable(TEXT("raftsim.FarFieldReusePacking"));
+        auto* Radius = IConsoleManager::Get().FindConsoleVariable(TEXT("raftsim.FarFieldWaterRadiusM"));
+        auto* Enabled = IConsoleManager::Get().FindConsoleVariable(TEXT("raftsim.FarFieldWater"));
+        auto* Spacing = IConsoleManager::Get().FindConsoleVariable(TEXT("raftsim.FarFieldWaterSpacingM"));
+        if (!Reuse || !Radius || !Enabled || !Spacing) return false;
+        const int32 OldReuse=Reuse->GetInt(), OldEnabled=Enabled->GetInt();
+        const float OldRadius=Radius->GetFloat(), OldSpacing=Spacing->GetFloat();
+        const FVector2D OldOrigin=Surface->WaterTextureOriginMeters;
+        const auto OldAvailable=Surface->CartesianShoreAvailable;
+        const bool OldScene=Surface->bCartesianFarFieldScene;
+        ON_SCOPE_EXIT {
+            Reuse->Set(OldReuse,ECVF_SetByCode); Enabled->Set(OldEnabled,ECVF_SetByCode);
+            Radius->Set(OldRadius,ECVF_SetByCode); Spacing->Set(OldSpacing,ECVF_SetByCode);
+            Surface->WaterTextureOriginMeters=OldOrigin;
+            Surface->CartesianShoreAvailable=OldAvailable;
+            Surface->bCartesianFarFieldScene=OldScene;
+            Surface->HideCartesianFarFieldWater();
+        };
+        Enabled->Set(1,ECVF_SetByCode); Spacing->Set(4.f,ECVF_SetByCode);
+        Surface->bCartesianFarFieldScene=true;
+        for (int32 Step=0; Step<4; ++Step)
+        {
+            Radius->Set(Step==2 ? 132.f : 128.f,ECVF_SetByCode);
+            Surface->WaterTextureOriginMeters=OldOrigin+FVector2D(Step*.25,-Step*.5);
+            Surface->CartesianShoreAvailable=OldAvailable;
+            if (Step==1) Surface->CartesianShoreAvailable.Init(0,OldAvailable.Num());
+            Reuse->Set(0,ECVF_SetByCode);
+            Surface->bFarFieldWaterKeyValid=false;
+            const int32 Before=Surface->FarFieldWaterBuildCount;
+            Surface->UpdateCartesianFarFieldWater(.5f);
+            if (!TestEqual(TEXT("fresh far-field publishes current inputs"),Surface->FarFieldWaterBuildCount,Before+1)) return false;
+            const auto ReferenceVertices=Surface->CartesianFarFieldMesh->GetWaterVertices();
+            const auto ReferenceIndices=Surface->CartesianFarFieldMesh->GetWaterIndices();
+            if (!TestTrue(TEXT("fixture actually draws far water"),ReferenceIndices.Num()>0)) return false;
+            // Poison all observable attributes before candidate overwrite.
+            for (auto& V:Surface->FarFieldSourcePackingScratch)
+            {
+                V.Position=FVector(999.,888.,777.); V.Normal=FVector(1.,2.,3.);
+                V.Color=FColor(17,34,51,68); V.UV0=V.UV1=V.UV2=V.UV3=FVector2D(123.,456.);
+                V.Tangent=FProcMeshTangent(FVector(3.,2.,1.),true);
+            }
+            Reuse->Set(1,ECVF_SetByCode); Surface->bFarFieldWaterKeyValid=false;
+            Surface->UpdateCartesianFarFieldWater(.5f);
+            if (!TestEqual(TEXT("retained far-field publishes current inputs"),Surface->FarFieldWaterBuildCount,Before+2)) return false;
+            const auto& Actual=Surface->CartesianFarFieldMesh->GetWaterVertices();
+            bool Exact=Actual.Num()==ReferenceVertices.Num() && Surface->CartesianFarFieldMesh->GetWaterIndices()==ReferenceIndices;
+            for (int32 I=0; Exact && I<Actual.Num(); ++I)
+                Exact=FRaftSimCrestMidpointExpansion::EqualAttributes(Actual[I],ReferenceVertices[I]);
+            if (!TestTrue(TEXT("all source/reserve/shore attributes and indices match fresh publication"),Exact)) return false;
+            const auto* Storage=Surface->FarFieldSourcePackingScratch.GetData();
+            if (!TestTrue(TEXT("consumer retains source ownership in actor"),Storage!=nullptr)) return false;
+            Surface->bFarFieldWaterKeyValid=false;
+            Surface->UpdateCartesianFarFieldWater(.5f);
+            TestTrue(TEXT("same-size rebuild retains allocation"),Surface->FarFieldSourcePackingScratch.GetData()==Storage);
+            const int32 StableBuilds=Surface->FarFieldWaterBuildCount;
+            Surface->UpdateCartesianFarFieldWater(.5f);
+            TestEqual(TEXT("unchanged key still skips rebuild"),Surface->FarFieldWaterBuildCount,StableBuilds);
+        }
+    }
     // Physical collision can resolve rock finer than the hydraulic lattice.
     // Exercise the actual carrier/provider, not just a height comparison helper.
     if (!TestTrue(TEXT("fixture has a wet ground-contact probe"),bHaveGroundProbe)) return false;

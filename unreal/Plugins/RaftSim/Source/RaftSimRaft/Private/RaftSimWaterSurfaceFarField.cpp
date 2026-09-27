@@ -46,6 +46,11 @@ static TAutoConsoleVariable<float> CVarRaftSimFarFieldWaterFoam(
 
 CSV_DEFINE_CATEGORY(RaftSimFarField, true);
 
+static TAutoConsoleVariable<int32> CVarRaftSimFarFieldReusePacking(
+    TEXT("raftsim.FarFieldReusePacking"), 0,
+    TEXT("Candidate Cartesian far-field source capacity reuse; default remains fresh until native and whole-frame qualification."),
+    ECVF_Default);
+
 namespace
 {
 constexpr float kFarFieldTextureRepeatMeters = 3.0f; // Matches the carrier's UV0 repeat.
@@ -256,7 +261,9 @@ void ARaftSimWaterSurfaceActor::UpdateCartesianFarFieldWater(float CarrierDrawCo
             }
         });
     }
-    TArray<FProcMeshVertex> Source;
+    TArray<FProcMeshVertex> FreshSource;
+    auto& Source = CVarRaftSimFarFieldReusePacking.GetValueOnGameThread() != 0
+        ? FarFieldSourcePackingScratch : FreshSource;
     {
         CSV_SCOPED_TIMING_STAT(RaftSimFarField, Pack);
         if (!RaftSimWaterSourcePacking::Pack(Positions, VertexNormals, Colors, TextureUVs, Flow, Wake,
