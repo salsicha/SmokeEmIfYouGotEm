@@ -246,9 +246,17 @@ backdrop is placed and that it does not collide. That test and
 - **Whitewater** now takes its extent from the photographs (appearance
   evidence), so it is only valid at the photographed flow. The solver does
   not predict it, and it does not move with the raft's own disturbance. The
-  water between the white masses is paler green than the photo's dark
-  tongues and pools, and the 2 m cooked surface has no hole or crest relief
-  under the white.
+  2 m cooked surface has no hole or crest relief under the white.
+- **Open water is too bright from overhead.** The deep pool below the main
+  rapid measures 0.7% of the bank luminance in the orthophoto (the bank is
+  near clipping) and 35% in the game at the same framing. Real deep clear
+  water reflects about 1-3% against 20-35% for bank soil, so the game is
+  several times too bright. Neither ~4x more red-weighted absorption nor
+  halving the fallback sky-reflection floor changed it visibly, so the body
+  colour is not the cause. The sparkle texture points to sun glints on the
+  ripple normals and lit reflections. Not yet fixed. The eye-level pale teal
+  is less clearly wrong, because canyon water at grazing angles reflects the
+  lit walls.
 - Rapid bed and boulder heights are inferred; velocities are not measured.
   The bed is 2014 and the surface 2021.
 - The grid has no metric terms: cell lengths are 0.87-1.17 of true on bends.
