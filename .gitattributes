@@ -71,3 +71,5 @@ physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/tro
 # Hash-locked downloaded source metadata (manifest.json records their LF bytes).
 physics/data/real_world/colorado_river_grand_canyon_rowing/hance_sources_2026_09/**/*.xml text eol=lf
 physics/data/real_world/colorado_river_grand_canyon_rowing/hance_sources_2026_09/**/*.json text eol=lf
+# Hash-locked Overpass requests (source manifests record their LF bytes).
+physics/data/real_world/*/*_sources_2026_09/**/*.overpassql text eol=lf

@@ -76,13 +76,35 @@ downloaded):
 
 Assessment: Hance quality is not reachable. The contours and orthophoto can
 fix the gorge walls, planform and banks where the canopy allows. The channel
-bed and cross-section must remain inferred. Proposed downloads, awaiting the
-user's permission:
+bed and cross-section must remain inferred.
 
-1. IGN_5 contours and hydrography clipped to the Huacas-Pinball corridor
-   (small vector files).
-2. One orthophoto preview tile to check coverage and resolution, then the
-   corridor tiles if it is usable.
-3. The OSM centreline and rapid nodes.
-4. A cloud-screened Sentinel-2 L2A scene from the AWS open archive (no
-   account needed).
+### Downloaded (2026-09-26, with the user's permission)
+
+Archived with hashes, requests, CRS and licences in
+`physics/data/real_world/pacuare_river_costa_rica/huacas_sources_2026_09/manifest.json`:
+
+- **IGN_5 vectors** (EPSG:5367): 4,051 contour lines at a 10 m interval
+  (vertices every 11 m), 139 hydrography lines and 23 tree-cover polygons
+  for 9.985-10.045 N, 83.475-83.545 W.
+- **Orthophoto 2014-2017**: the service is a tile cache (WMS GetMap fails
+  unless tile-aligned), so it is read through WMTS on the EPSG:3857 grid.
+  - 148 zoom-18 tiles (0.59 m/px) cover 400 m either side of the OSM
+    centreline, OSM chainage 81.8-85.0 km. The coverage is complete.
+  - Channel, gravel bars, emergent boulders and whitewater are visible.
+  - The effective resolution is about 0.8-1 m: z19 and z20 are
+    interpolated from z18.
+  - The exact flight date is not published.
+- **OSM** (ODbL): relation 12000489 joined into a 141.35 km centreline, with
+  chainage. The chainage agrees with GoRafting: Lower Huacas to Dos Montañas
+  is 9.44 km on OSM against 9.34 km from GoRafting. GoRafting's km 0 is
+  about 4.07 km above the Linda Vista put-in, so Upper Huacas (GoRafting
+  12.85) sits at OSM 82.56 km and Lower Pinball (GoRafting 14.40) at OSM
+  84.11 km.
+- **Sentinel-2 L2A** (10 m; blue, green, red, NIR and SCL; tile 17PKM):
+  2018-04-01, 2021-12-11 and 2025-01-19. I screened 22 candidate scenes by
+  the scene-classification (SCL) layer inside the window; these three have
+  no cloud or shadow over the reach.
+
+Tools (numpy only): `fetch_wmts_corridor.py`, `fetch_sentinel2_window.py`
+(windowed COG range reads), `extract_osm_river_centreline.py`,
+`png_numpy.py`.

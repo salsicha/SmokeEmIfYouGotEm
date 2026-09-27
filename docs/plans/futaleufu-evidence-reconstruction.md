@@ -66,3 +66,18 @@ Assessment: Hance quality is not reachable with open data. The planform and
 wetted width can come from Sentinel-2. Banks, boulders and the Terminator
 geometry stay largely inferred unless commercial imagery or elevation is
 purchased.
+
+### Downloaded (2026-09-26, with the user's permission)
+
+Archived in `physics/data/real_world/futaleufu_river_chile/futaleufu_sources_2026_09/manifest.json`:
+
+- **OSM** (ODbL): relation 9751030 joined into a 104.87 km centreline, with
+  chainage. The rapid nodes run from Initiation (44.07 km) to La Cosa
+  (65.65 km). El Trono (Throne Room) is at 62.40 km against GoRafting's
+  km 27.5, an offset of 34.9 km. That puts the Terminator (GoRafting 39.25)
+  near OSM 74.2 km, to be checked against the imagery.
+- **Sentinel-2 L2A** (10 m; blue, green, red, NIR and SCL): 2020-02-20,
+  2024-02-19 and 2026-01-04, over 43.18-43.42 S, 71.82-72.12 W.
+  - Tile 18GYT is mosaicked with the same-datatake 18GYS for the southern
+    1.5 km. Both are on one UTM 18S 10 m grid.
+  - None of the three mosaics has cloud or shadow.
