@@ -49,8 +49,11 @@ def package_file(desc):
 
 def main():
     mode = os.environ['RAFTSIM_BIND_MODE']
-    report_path = ROOT / os.environ['RAFTSIM_BIND_REPORT']
-    assert report_path.is_relative_to(ROOT / 'tmp') and not report_path.exists()
+    if mode not in ('set', 'inventory'):
+        raise ValueError('RAFTSIM_BIND_MODE must be set or inventory')
+    report_path = (ROOT / os.environ['RAFTSIM_BIND_REPORT']).resolve()
+    if not report_path.is_relative_to((ROOT / 'tmp').resolve()) or report_path.exists():
+        raise ValueError('RAFTSIM_BIND_REPORT must be a fresh file inside tmp')
     descs, config, manager = load()
     before = entries(config, manager)
     if mode == 'set':
@@ -65,8 +68,10 @@ def main():
         config.modify()
         config.set_editor_property('streaming_manifest_path', stream)
         config.set_editor_property('cooked_fields_dir', fields_dir)
-        assert unreal.EditorAssetLibrary.save_loaded_asset(config, only_if_is_dirty=False) or \
-            unreal.EditorLoadingAndSavingUtils.save_dirty_packages(False, True)
+        # A failed actor save must never fall back to saving unrelated dirty
+        # packages. World Partition actors own an external package; save only it.
+        if not unreal.EditorLoadingAndSavingUtils.save_packages([config.get_package()], False):
+            raise RuntimeError('Failed to save the water config package; no other packages were saved')
         after = entries(config, manager)
         assert after['streaming_manifest'] == stream and after['initial_fields_manifest'] == fields_dir + '/manifest.json'
         assert after['hydraulic_coordinate_map'] == before['hydraulic_coordinate_map'] and after['route_coordinate_map'] == before['route_coordinate_map']

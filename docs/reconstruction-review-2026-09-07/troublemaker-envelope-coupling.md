@@ -371,3 +371,27 @@ progress, not a final safety, settling or visual pass. Continue session42718 and
 its recorded outputs. Do not duplicate preparation or replace this work with
 another unchanged initial-state analysis. Next inspect final300s safety and
 regional/rapid behavior before selecting the next playable field candidate.
+
+## Scoped save protection for the next data-only field trial
+
+The existing `bind_south_fork_discharge_bed_runtime.py` promised to save only
+the config actor, but its failed actor-save fallback called `save_dirty_packages`,
+which could persist unrelated editor work. It now calls `save_packages` with
+only the config actor's external package. A failed save raises without a bulk
+fallback or success receipt. Invalid modes and existing/outside-tmp report
+paths are rejected before loading the scene; paths are resolved before checking
+containment, so `tmp/../outside.json` is not accepted.
+
+Seven mocked regressions pass in0.51s:
+`physics/tests/test_south_fork_runtime_binding.py`, temporary fixtures in
+`tmp/runtime-binding-scope-tests-20260927`. These exercise save scope, failure,
+read-only inventory, invalid mode and report confinement. They are not native
+Unreal save/reload validation or a runtime payload closure check. Existing
+`load`, `entries` and `package_file` helper contracts are unchanged.
+
+No binding command, asset save, export, rebuild or engine timing was run in
+this follow-up. Normal v6 remains unchanged and unaccepted. The SAME native
+solver35776/wrapper30456 is still progressing: observed local step2160,
+absolute258s, maximum step conservation residual9.1124e-9m3. Final300s audits
+remain owned by that wrapper; do not duplicate it. Review the final physical
+state before deciding whether new fields warrant a normal playable trial.
