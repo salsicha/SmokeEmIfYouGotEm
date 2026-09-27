@@ -58,6 +58,41 @@ no old-bed evolved state transferred. Wrapper runs final finite-state and dry-ba
 audits only after successful native completion; storage and station analysis
 remain separate checks. Solver gates are unchanged.
 
+## Combined native check prepared during the same solve
+
+The coupling implementation is committed locally as `6d4d3206e`; no push.
+New `prepare_envelope_union_native.py` builds 132,763 physical-union probes:
+129,242 changed ground-triangle centroids, 2,954 inferred roof-triangle centroids,
+319 hydraulic-envelope cells, 246 exposed inferred flanks and two covered
+boundary points. Source-space roof/ground ownership and reflected flank normals
+have unit coverage; the combined focused suite has 70 passing tests. Engine
+scripts parse, but this is not evidence that engine traces or installation pass.
+
+Probe file `tmp/envelope-ground-union-probes-v1-20260927.json` has SHA-256
+`a295d6b2d5c7967ad6009b5ca1d0268f93a1433b30375bd7c681ce5acd0cdb97`.
+Preparation initially stopped before output on a mistyped geometry path; the
+correct `geometry_manifest.json` path comes from the input manifest, and the
+subsequent preparation succeeded. No data or validation gate was weakened.
+
+Deferred shell session **25615** waits on the existing Python wrapper PID38948
+(identified by its actual command line), then checks native exit0 and final
+banks before launching ONE no-save Unreal check. Helper:
+`tmp/after-envelope-cook-native-v1-20260927.ps1`; native launch recipe:
+`tmp/run-envelope-union-native-v1-20260927.py`. Do not duplicate this stage.
+Future engine report/process receipt use prefix
+`tmp/envelope-ground-union-native-v1-20260927`. The check reuses the saved candidate
+ground mesh, validates all directed mesh identities, traces each probe in simple
+and complex modes against all physical ground, restores the original ground and
+checks protected scene/source hashes. No saved scene mutation or FPS claim.
+
+`install_envelope_conveyance_runtime.py` is prepared but NOT EXECUTED. It requires
+successful native proof with unchanged protected files, exact source-packet /
+geometry identity and full runtime dependency closure. It backs up only the two
+actors to be changed, duplicates the native-verified ground to a fresh production
+asset, and saves only the existing ground and water-config packages. The current
+rock actor, materials, coordinate maps and runtime solver settings remain intact.
+Native execution, fresh reload and rebuilt normal play are still required.
+
 Next inspect this same solve's completion and audits, regional storage/surface
 coverage, then export matching runtime fields. Reuse the already verified new
 ground mesh; do not repeat the unchanged ground-only import. Verify the actual
