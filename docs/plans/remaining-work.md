@@ -1,5 +1,63 @@
 # Remaining requested work
 
+September27 supporting integration repair: the fresh native inventory script
+now accepts an ordered `RAFTSIM_ENVELOPE_FIELD_BIND_REPORTS` JSON list, retaining
+the legacy singular option. It verifies every before/after hash and entrypoint
+transition from the original geometry installation; missing/reordered/repeated
+saves, changed map/config/coordinates and ambiguous inputs fail closed. Original
+geometry evidence is not rewritten.35 focused mocked regressions pass; replay
+of the real300s receipt matches current saved entrypoints/package hashes. This
+is not a native engine pass or a visible change. For450s integration, supply the
+existing300s receipt followed by the new450s receipt, then fresh native inventory,
+bundle closure, normal game rebuild and actual motion/cost qualification.
+
+September27 hydraulic follow-through continuation58416 is LIVE: nativePID5884,
+wrapper24200. Started once after v11 timing/motion and video decode completed;
+no other engine/build/solver was present,25.7GB disk headroom. Native frame0
+restart audit PASSES all5,382,400 h/u/v cells bit-exact, no added water, unchanged
+bed/roughness/boundaries/features. Observed step780 at339s; this is progress,
+not settled-flow acceptance. Poll SAME session/receipt, never launch a duplicate:
+`tmp/troublemaker-envelope300to450-process-v1-20260927.json`.
+Output `tmp/troublemaker-envelope300to450-v1-20260927`; final450s state/bank/
+storage/station audits are pending. Do not run performance measurements during
+this solve. Current normal playable300s binding is unchanged; inspect final
+audits before a data-only playable integration. South Fork remains unfinished.
+
+September27 v11 timing61751 and motion23227 COMPLETE exit0. Normal Boot/menu
+p9545.3673ms/max58.9092ms passes this run, busy11520 p9580.6179ms/max130.1238ms/
+three frames over100ms fails; legacy reference p9552.7137ms/max104.6116ms/one
+over100ms also fails. All zero runtime errors. No demonstrated whole-game gain.
+Decoded772 frames/25.7s; inspected original1/6/20s shows changing raft/paddle
+positions but persistent flat foam/smooth water/coarse banks, NOT ACCEPTED.
+All35 capped contact observations match native ground; not full traversal.
+No v11 engine/build/capture remains live. Do not repeat unchanged validation.
+See [metric search evidence](../reconstruction-review-2026-09-07/south-fork-metric-breaking-search.md).
+
+Historical preparation checkpoint (superseded by live continuation above):
+September27 hydraulic follow-through preparation56214 completed exit0:
+`tmp/troublemaker-envelope-restart300-input-v1-20260927/manifest.json`, SHA256
+`3f3e2ff4a9bc63a438b0690698d03d78e2592824b1dd8fa60d1a25df1241604c`.
+All5,382,400 native300s cells retained, zero added context/water, identical
+geometry hash. No solver was launched and no playable binding changed.
+After v11 timing/motion finishes, prepared continuation recipe
+`tmp/continue-envelope300to450-v1-20260927.py` advances the same state150s,
+with native restart, final finite/bank/storage/station audits. Check no other
+solver/engine/build and enough disk before launching ONCE. Do not overlap with
+FPS measurements or interpret state-preparation success as settled hydraulics.
+
+September27 endpoint-prefilter increment: native build/tests90921 completed
+exit0 (seven clean tests).1,600 differential cases match frozen v10 exactly,
+including291 accepted transitions;2,463 intermediate direction calls avoided.
+This is not a game-speed claim. Only impossible endpoint searches exit early;
+all surviving wet-path/corner/direction/Froude/clearance gates remain intact.
+V11 package38451 completed exit0 in568.71s. Staged closure passes unchanged
+2,405-file v7 bundle. At this historical checkpoint timing61751 was live. Normal
+Boot/menu passes this run p9545.3673ms/max58.9092ms/zero errors or >100ms frames;
+busy/legacy and motion subsequently completed as recorded above; do not rerun
+`tmp/capture-sf-v11-metric-search-20260927.ps1` unchanged.
+Keep current v10 results separate: it does NOT contain this prefilter.
+V10 tested-source/evidence checkpoint is local commit6a5199861, no push.
+
 September27 corrected v10 build87171, timing41699 and motion2862 COMPLETE exit0;
 no job from that sequence remains live. Do not repeat unchanged validation.
 Normal Boot/menu passes this run at p9548.0122ms/max62.6394ms, but busy11520

@@ -1,11 +1,48 @@
-# Troublemaker inferred-envelope coupling — September 27
+# Troublemaker inferred-envelope coupling - September 27
 
-Latest: normal-scene candidate SAVED and fresh reload verified. V6 game build
-session5004 is LIVE. No visual/settling/performance acceptance. Earlier live-cook
-and unchanged-scene notes below are historical; see the completion section.
+Latest continuation58416 is LIVE: nativePID5884, wrapper24200, output
+`tmp/troublemaker-envelope300to450-v1-20260927`. Single launch after completed
+v11 timing/motion/decode and empty engine/build/solver process inventory.
+Receipt `tmp/troublemaker-envelope300to450-process-v1-20260927.json`.
+Native restart independently passes all5,382,400 original h/u/v cells bit-exact,
+zero added water and unchanged physical inputs, report
+`tmp/troublemaker-envelope300to450-restart-v1-20260927.json`.
+Observed step780/339s, conservation residual2.25e-10m3. Final450s audits are
+pending; do not duplicate or run FPS measurements during this solve. No settling
+acceptance or playable binding change. The preparation note below is historical.
 
-Supporting implementation and fresh solve in progress; no visible delivery or
-river acceptance. Normal playable v5, its ground and rock actors are unchanged.
+The water-only fresh-inventory verifier now supports an explicitly ordered
+`RAFTSIM_ENVELOPE_FIELD_BIND_REPORTS` JSON list. Each saved transition must chain
+from the original installation through the preceding exact config hash and
+entrypoints, retaining map, coordinate maps, initial window and target package.
+Every receipt's interpreted bytes are hashed into `field_binding_chain`; the
+last hash also retains the legacy `field_binding_sha256` field. Singular input
+remains supported, but simultaneous singular/plural inputs and repeated or
+out-of-tmp paths are rejected. This is a read-only verifier, not a scene saver.
+35 mocked save/history regressions pass in1.15s. A read-only replay of the real
+300s receipt matches its existing native inventory and both changed-package
+hashes; no engine was launched. Fresh native450s inventory is still required.
+
+Exact300s restart preparation56214 completed exit0. Fresh input is
+`tmp/troublemaker-envelope-restart300-input-v1-20260927/manifest.json`, SHA256
+`3f3e2ff4a9bc63a438b0690698d03d78e2592824b1dd8fa60d1a25df1241604c`.
+All5,382,400 cells and2,283,323.7482376685m3 are retained; zero context/water
+added, unchanged geometry hash. Prepared continuation
+`tmp/continue-envelope300to450-v1-20260927.py` is NOT launched. Finish v11
+timing/motion first, then check live jobs and disk. It advances3,000 steps at
+0.05s on the qualified eight-lane solver, with native restart and final state,
+bank, storage and station audits. Existing300s playable fields remain unchanged.
+Preparation is not settled hydraulics or a visible delivery.
+
+Latest: normal FullReach retains the v7 geometry-matched300s bundle. V6/v7/v8/v9/
+v10 builds and validations are completed, not live. No visual, settling or
+whole-river performance acceptance. Code-only v11 package38451, timing61751 and
+motion23227 are completed, not live. Busy p9580.6179ms/max130.1238ms fails;
+normal-menu p9545.3673ms passes only that run. Actual reviewed motion retains
+flat foam/smooth water/coarse banks. Current
+validation/handles are in [metric search](south-fork-metric-breaking-search.md)
+and [remaining work](../plans/remaining-work.md). Earlier live-job and unchanged-
+v5 notes below are historical, not authorization to repeat a completed job.
 
 The previous candidate used the captured-return roof while the installed mesh
 uses a lower interpreted envelope. The new explicit envelope contract validates

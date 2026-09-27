@@ -1,4 +1,5 @@
 """Fresh-process verification of installed ground, unchanged envelope and water bindings."""
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -38,13 +39,8 @@ def main():
     assert output.is_relative_to(ROOT/'tmp') and not output.exists()
     saved=json.loads(installation.read_text())
     assert saved['normal_map_saved'] and saved['other_scene_packages_unchanged']
-    field_report = os.environ.get('RAFTSIM_ENVELOPE_FIELD_BIND_REPORT')
-    if field_report:
-        field_report = (ROOT/field_report).resolve()
-        assert field_report.is_relative_to(ROOT/'tmp')
-        bound = json.loads(field_report.read_text())
-        assert bound['map_sha256'] == sha(ROOT/MAP_PATH)
-        saved = with_field_binding(saved, bound)
+    field_reports = field_binding_paths(os.environ)
+    saved, field_proofs = with_field_binding_reports(saved, field_reports, sha(ROOT/MAP_PATH))
     for name,row in saved['changed_packages'].items():assert sha(ROOT/name)==row['after']
     descs,config,manager=load()
     assert entries(config,manager)==saved['after']
@@ -82,13 +78,53 @@ def main():
     result=dict(schema='raftsim.saved_runtime_bindings.v1',level=LEVEL,map_sha256=sha(ROOT/MAP_PATH),
         bindings=bindings,entrypoints=entries(config,manager),saved_assets=False,
         native_geometry=proofs,installation_sha256=sha(installation),fresh_reload_verified=True)
-    if field_report:
+    if field_proofs:
         # Keep original geometry installation evidence distinct from the later
         # water-only save; do not fabricate a second geometry installation.
         config_desc, = [d for d in all_descs if str(d.name) == config.get_name()]
-        assert package_file(config_desc) == bound['config_package']
-        result['field_binding_sha256'] = sha(field_report)
+        assert package_file(config_desc) == field_proofs[-1]['config_package']
+        result['field_binding_sha256'] = field_proofs[-1]['sha256']
+        result['field_binding_chain'] = field_proofs
     with output.open('x') as f:json.dump(result,f,indent=2)
+
+
+def field_binding_paths(environment):
+    """Legacy single receipt or an explicit ordered JSON list; never guess history."""
+    single = environment.get('RAFTSIM_ENVELOPE_FIELD_BIND_REPORT')
+    chain = environment.get('RAFTSIM_ENVELOPE_FIELD_BIND_REPORTS')
+    if single and chain:
+        raise ValueError('Specify either a single field receipt or its ordered chain')
+    names = json.loads(chain) if chain else ([single] if single else [])
+    if not isinstance(names, list) or (chain and not names):
+        raise ValueError('Field binding chain must be a nonempty JSON list')
+    paths = []
+    for name in names:
+        if not isinstance(name, str) or not name:
+            raise ValueError('Field receipt paths must be nonempty strings')
+        path = (ROOT/name).resolve()
+        if not path.is_relative_to((ROOT/'tmp').resolve()) or path in paths:
+            raise ValueError('Field receipts must be distinct files inside tmp')
+        paths.append(path)
+    return paths
+
+
+def with_field_binding_reports(saved, paths, map_sha256):
+    """Replay every verified save from original geometry to current water state."""
+    proofs = []
+    for path in paths:
+        # Hash the very bytes being interpreted, not a second read that could
+        # identify different contents if a receipt changes during inventory.
+        data = path.read_bytes()
+        bound = json.loads(data)
+        if bound['map_sha256'] != map_sha256:
+            raise ValueError('Field receipt map identity changed')
+        if proofs and bound['config_package'] != proofs[0]['config_package']:
+            raise ValueError('Field history changes the target config package')
+        saved = with_field_binding(saved, bound)
+        proofs.append(dict(path=path.relative_to(ROOT).as_posix(),
+                           sha256=hashlib.sha256(data).hexdigest(),
+                           config_package=bound['config_package']))
+    return saved, proofs
 
 
 if __name__=='__main__':

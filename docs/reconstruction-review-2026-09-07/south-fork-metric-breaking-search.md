@@ -204,3 +204,66 @@ audited frames and use the authoritative final header. Busy v9 mean game-thread
 81.2347ms, GPU23.7099ms, surface tick56.2584ms, SetMesh21.1259ms, crest update
 18.9971ms and selection12.1565ms. These scopes are inclusive: do NOT sum them
 or mistake correlation for the extension's isolated causal cost.
+
+## Exact endpoint-first rejection candidate
+
+V10 source/evidence checkpoint: local commit `6a5199861`, no push. Its motion
+and cost qualification remains failed as recorded above, not an accepted release.
+
+The next source increment first checks whether either eligible3/6m endpoint
+can possibly meet the same wet/finite/Froude/distance conditions. If neither
+can, it skips intermediate direction queries. If either can, it executes the
+unchanged path/corner/direction checks; it adds no feature, amplitude, damping,
+resolution change or looser tolerance. A frozen test-only v10 implementation
+provides independent path-first comparison.
+
+Editor build/native session90921 completed exit0, build72.73s, testPID21100.
+Seven successes, zero failures/warnings in
+`tmp/sf-metric-prefilter-20260927-tests/index.json`.1,600 randomized native
+comparisons (multiple spacings, oblique directions, boundaries, wet holes,
+reversals, ineligible starts) match exact upstream-index decisions, including
+291 accepted transitions. They avoid2,463 direction samples; the all-subcritical
+fixture makes zero instead of six. Counts are not an engine-time measurement.
+Recipe `tmp/validate-sf-metric-prefilter-20260927.ps1`, adjacent build/test logs.
+
+V11 package session38451 completed exit0 in568.71s; recipe
+`tmp/package-south-fork-v11-20260927.ps1`, log
+`tmp/south-fork-v11-package-20260927.log`. Fresh stage
+`tmp/south-fork-playable-v11-20260927`; same geometry/fields and v10 physics.
+Executable SHA256 `91ec929e81c465c5d91769aa7a49c7b7da08bf33f3f6c92d459e30228b01218f`.
+Staged closure passes2,405 files/917,995,570 bytes with no fallback. Timing61751
+and motion23227/PID26200 completed exit0; no job from this sequence remains live.
+All timing runs retain1,200 frames/1,140 audited and zero runtime errors.
+
+| Launch | Mean ms | p95 ms | Max ms | Frames over100ms |20FPS gate|
+|---|---:|---:|---:|---:|---|
+| Normal Boot/menu |38.2193|45.3673|58.9092|0|PASS this run|
+| Busy11520m, default |56.7741|80.6179|130.1238|3|FAIL|
+| Busy11520m, legacy reference |45.5138|52.7137|104.6116|1|FAIL|
+
+Receipts: `unreal/Saved/RaftSimValidation/sf-v11-{normal-menu,rapid11520,legacy11520}-20260927-frame-audit.json`.
+No engine/build/solver overlap or quality overrides. Legacy remains diagnostic,
+not normal qualification. The exact prefilter has NOT demonstrated a whole-game
+performance gain: busy timing is worse than v10. Sequential fixed-frame runs
+can cover different elapsed physical times and boat trajectories; they do not
+establish an order-independent, identical-input causal comparison.
+Hash-bound scope summary: `tmp/sf-v11-recorded-cost-summary-20260927.json`.
+Busy mean game-thread55.1074ms, GPU17.9955ms, surface tick32.6273ms,
+SetMesh15.3119ms, crest update13.1311ms, selection7.98262ms; inclusive, do not sum.
+
+Motion recipe: `tmp/capture-sf-v11-metric-search-20260927.ps1`; crest/mesh/contact
+reports share `tmp/sf-v11-search-candidate-20260927` prefix. Fourteen sites have
+the same station/lateral keys as v10, but differing capture times do not prove
+identical heights.48,383 triangles; target error0.795766cm, fine tracking0.166755cm,
+source displacement0. All35 capped contact observations match current native
+ConveyanceGround and solver heights, maximum projection1.58915cm; not a complete
+collision ledger or traversal acceptance.
+
+Video `RaftSim_20260927-143806.mp4`, SHA256
+`9967ed9beb557392b8e9bd857a7e7d9d7d835a142f44f909dee156ef9034e3d0`,
+decoded772 frames/25.7s/two adjacent duplicates,1280x720. Report/original frames:
+`tmp/sf-v11-candidate-decoded-20260927/`. Inspected1/6/20s: crew paddle positions
+and raft position/orientation change, the raft approaches the rock and later
+faces downstream. Broad flat white foam, smooth water and coarse banks remain.
+No convincing breaking/recirculation improvement or full shoreline/surface
+continuity acceptance follows. Encoded30FPS is not game FPS. V11 NOT ACCEPTED.

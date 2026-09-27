@@ -135,3 +135,77 @@ def test_field_followup_rejects_changed_identity(field_followup, change):
     elif change == 'keys': del bound['after']['route_coordinate_map']
     with pytest.raises(ValueError):
         inventory.with_field_binding(saved, bound)
+
+
+@pytest.fixture
+def field_chain(field_followup, tmp_path, monkeypatch):
+    inventory, saved, first = field_followup
+    monkeypatch.setattr(inventory, 'ROOT', tmp_path)
+    first['map_sha256'] = 'map'
+    second = copy.deepcopy(first)
+    second.update(before=copy.deepcopy(first['after']),
+                  after=dict(first['after'], streaming_manifest='tmp/final/stream.json',
+                             initial_fields_manifest='tmp/final/region_0008/manifest.json'),
+                  config_package_sha256_before='next', config_package_sha256_after='final')
+    paths = [tmp_path/'tmp/first.json', tmp_path/'tmp/second.json']
+    for path, receipt in zip(paths, (first, second)):
+        path.write_text(json.dumps(receipt))
+    return inventory, saved, paths
+
+
+def test_ordered_field_chain_preserves_original_and_records_each_receipt(field_chain):
+    import hashlib
+    inventory, saved, paths = field_chain
+    original = copy.deepcopy(saved)
+    updated, proofs = inventory.with_field_binding_reports(saved, paths, 'map')
+    assert saved == original
+    assert updated['changed_packages']['unreal/Content/Water.uasset'] == dict(before='original', after='final')
+    assert updated['changed_packages']['unreal/Content/Ground.uasset'] == saved['changed_packages']['unreal/Content/Ground.uasset']
+    assert updated['after']['streaming_manifest'] == 'tmp/final/stream.json'
+    assert [p['sha256'] for p in proofs] == [hashlib.sha256(p.read_bytes()).hexdigest() for p in paths]
+    assert [p['path'] for p in proofs] == ['tmp/first.json', 'tmp/second.json']
+
+
+@pytest.mark.parametrize('fault', ['skip', 'reverse', 'repeat', 'map', 'hash', 'coordinates', 'package'])
+def test_field_chain_rejects_discontinuous_or_altered_history(field_chain, fault):
+    inventory, saved, paths = field_chain
+    original = copy.deepcopy(saved)
+    if fault == 'skip': paths = paths[1:]
+    elif fault == 'reverse': paths = list(reversed(paths))
+    elif fault == 'repeat': paths = [paths[0], paths[0]]
+    else:
+        bound = json.loads(paths[1].read_text())
+        if fault == 'map': bound['map_sha256'] = 'other-map'
+        elif fault == 'hash': bound['config_package_sha256_before'] = 'wrong'
+        elif fault == 'coordinates': bound['after']['route_coordinate_map'] = 'wrong'
+        elif fault == 'package': bound['config_package'] = 'unreal/Content/Ground.uasset'
+        paths[1].write_text(json.dumps(bound))
+    with pytest.raises(ValueError):
+        inventory.with_field_binding_reports(saved, paths, 'map')
+    assert saved == original
+
+
+def test_field_receipt_modes_and_legacy_compatibility(field_chain):
+    inventory, saved, paths = field_chain
+    assert inventory.field_binding_paths({}) == []
+    assert inventory.field_binding_paths({'RAFTSIM_ENVELOPE_FIELD_BIND_REPORT': 'tmp/first.json'}) == paths[:1]
+    assert inventory.field_binding_paths({'RAFTSIM_ENVELOPE_FIELD_BIND_REPORTS':
+                                          '["tmp/first.json", "tmp/second.json"]'}) == paths
+    updated, proofs = inventory.with_field_binding_reports(saved, paths[:1], 'map')
+    assert updated['changed_packages']['unreal/Content/Water.uasset']['after'] == 'next'
+    assert len(proofs) == 1
+
+
+@pytest.mark.parametrize('value', ['[]', '{}', '"tmp/first.json"', '[null]', '[""]',
+                                    '["tmp/../outside.json"]', '["tmp/first.json", "tmp/./first.json"]'])
+def test_bad_field_receipt_paths_rejected(field_chain, value):
+    inventory, _, _ = field_chain
+    with pytest.raises(ValueError):
+        inventory.field_binding_paths({'RAFTSIM_ENVELOPE_FIELD_BIND_REPORTS': value})
+
+
+def test_ambiguous_field_receipt_modes_rejected(field_chain):
+    inventory, _, _ = field_chain
+    with pytest.raises(ValueError):
+        inventory.field_binding_paths({'RAFTSIM_ENVELOPE_FIELD_BIND_REPORT': 'tmp/first.json',
+                                       'RAFTSIM_ENVELOPE_FIELD_BIND_REPORTS': '["tmp/second.json"]'})
