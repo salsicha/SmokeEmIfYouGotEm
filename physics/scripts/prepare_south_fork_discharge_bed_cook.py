@@ -84,6 +84,8 @@ def main():
     parser.add_argument('--sections', default='')
     parser.add_argument('--overlap-m', type=float, default=400.0)
     parser.add_argument('--old-bed', action='store_true', help='control: keep the previous bed (verifies reproduction)')
+    parser.add_argument('--geometry', type=Path, default=GEOMETRY,
+                        help='Verified full-river core geometry, including an explicit registered-bed revision')
     parser.add_argument('--seed-frame', type=Path, help='cook output frame (h.npy, u.npy, v.npy) to continue from')
     parser.add_argument('--seed-manifest', type=Path, help='the full-river cook manifest that produced --seed-frame')
     args = parser.parse_args()
@@ -116,7 +118,10 @@ def main():
     with np.load(bed_path) as a:
         coarse = a['coarse_bed_navd88_m']
     x0, y0 = bed_manifest['grid']['first_vertex_utm_m']; cell = bed_manifest['grid']['cell_m']
-    geometry = json.loads(GEOMETRY.read_text())
+    geometry_path_input = args.geometry.resolve()
+    if not geometry_path_input.is_relative_to(ROOT):
+        raise ValueError('Geometry must be an in-project verified source')
+    geometry = json.loads(geometry_path_input.read_text())
     datum = float(geometry['vertical_datum_navd88_m'])
     origin_utm = np.asarray(geometry['world_origin_utm_m'])
     route = json.loads((BASE / 'playable_route/coordinate_map.json').read_text())
@@ -167,8 +172,8 @@ def main():
     new_geometry['discharge_bed'] = dict(manifest=(args.bed_dir / 'manifest.json').resolve().relative_to(ROOT).as_posix(),
                                          manifest_sha256=sha(args.bed_dir / 'manifest.json'), previous_bed_control=args.old_bed,
                                          changed_core_count=changed_cores, maximum_absolute_bed_change_m=max_abs_change,
-                                         retained_geometry_manifest=GEOMETRY.relative_to(ROOT).as_posix(),
-                                         retained_geometry_manifest_sha256=sha(GEOMETRY))
+                                         retained_geometry_manifest=geometry_path_input.relative_to(ROOT).as_posix(),
+                                         retained_geometry_manifest_sha256=sha(geometry_path_input))
     geometry_path = out / 'geometry_manifest.json'
     geometry_path.write_text(json.dumps(new_geometry, indent=2) + '\n')
     print('changed cores', changed_cores, 'max change', max_abs_change, flush=True)
