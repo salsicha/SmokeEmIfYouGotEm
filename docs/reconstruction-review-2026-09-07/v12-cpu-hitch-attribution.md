@@ -2,6 +2,19 @@
 
 ## V13 playable build in progress
 
+Validation is now queued behind the existing jobs, not running concurrently
+with them: session69752/wrapper38444 runs
+`tmp/validate-sf-v13-20260927.ps1`, with durable state in
+`tmp/south-fork-v13-validation-process-20260927.json`. It checks the completed
+build's frozen identities and staged bundle closure, requires hydraulic final
+audits and wrapper exit, then runs normal Boot/menu and busy11520 OFF/ON/ON/OFF
+with1,200 frames per run. Every invocation also uses the profiler's independent
+isolation check. No candidate/default/field change occurs. The recipe's syntax
+passes; execution is waiting for the known build owner, not yet timing evidence.
+Read all eventual receipts and confirm CVar application and rebuild coverage
+before drawing performance conclusions. Original motion/spatial review remains
+separate and pending. Do not launch duplicate profiling while this owner is live.
+
 The next bounded step now compiles the candidate into the normal packaged game,
 not another isolated fixture. Session6197/wrapper39720 is running
 `tmp/package-south-fork-v13-20260927.ps1`, stage
@@ -15,10 +28,11 @@ explicitly requested. No completed build, visual delivery or timing gain yet.
 The recipe permits only the identified independent hydraulic continuation
 PID12676 to overlap compilation; it rejects other engine/build/solver processes
 and requires20GiB free before starting. This overlap is NOT performance evidence.
-No game profiling/capture is queued automatically. After build success, verify
-the staged v8 payload; after the continuation and final audits finish, perform
-the ordinary Boot/menu launch, real-scene candidate/control runs in both orders
-and original motion review. Retain the20FPS/50ms p95/no-over100ms gates. Do not
+The build recipe itself does not queue game profiling/capture; the separate
+guarded validation owner above now handles closure and profiling. After success,
+inspect the staged v8 payload, ordinary Boot/menu receipt and both-order
+candidate/control receipts, then perform original motion/spatial review.
+Retain the20FPS/50ms p95/no-over100ms gates. Do not
 promote buffer reuse from native fixture parity or one hitch measurement alone.
 
 September 27, 2026. Supporting diagnosis only: no new playable delivery,

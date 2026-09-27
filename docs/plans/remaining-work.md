@@ -1,5 +1,19 @@
 # Remaining requested work
 
+September27 validation follow-through: ONE guarded validation owner is LIVE,
+session69752/wrapper38444, recipe `tmp/validate-sf-v13-20260927.ps1`, receipt
+`tmp/south-fork-v13-validation-process-20260927.json`. Syntax parsed successfully
+under the approved full-language shell (restricted-shell parser access was
+unavailable, not a script parse failure). The runner waits for the existing
+v13 build6197, verifies staged v8 closure, then waits for the existing hydraulic
+wrapper34600 AND its final-audit completion before profiling. It will run normal
+Boot/menu plus busy11520 OFF/ON/ON/OFF at1200 frames each, same build/450s fields.
+It checks runtime health but does not promote a failed timing result or enable
+the candidate by default. Do not duplicate these queued runs or change inputs.
+Inspect individual frame receipts, actual CVar application and far-field rebuild
+coverage; both-order speed attribution and motion/spatial review remain pending.
+The original solve is still live (observed779.5s), not restarted or settled.
+
 September27 playable follow-through: v13 packaging is LIVE, session6197,
 wrapper39720, UAT/UBT dotnet39232/15924. Recipe
 `tmp/package-south-fork-v13-20260927.ps1`; durable identity/status receipt
