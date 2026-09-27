@@ -1,5 +1,9 @@
 # Troublemaker inferred-envelope coupling — September 27
 
+Latest: normal-scene candidate SAVED and fresh reload verified. V6 game build
+session5004 is LIVE. No visual/settling/performance acceptance. Earlier live-cook
+and unchanged-scene notes below are historical; see the completion section.
+
 Supporting implementation and fresh solve in progress; no visible delivery or
 river acceptance. Normal playable v5, its ground and rock actors are unchanged.
 
@@ -134,3 +138,71 @@ coupled native union, incrementally bind ground plus matching water in the norma
 scene, rebuild, and check actual motion, shoreline/continuity/collision and the
 20 FPS / p95 50 ms / no frame over 100 ms gates. Do not promote the old-roof
 runtime export, claim settling from global storage alone, or advance to Colorado.
+
+## Completed solve, native union, export and normal-scene installation
+
+Same cook PID31092/session3804 completed150s with native exit0 and wrapper exit0.
+Final state and86,720 dry-bank checks pass. Maximum depth2.904861m and
+speed8.208481m/s; no settling claim. Final receipts:
+`tmp/troublemaker-envelope150-state-v1-20260927.json`,
+`tmp/troublemaker-envelope150-banks-v1-20260927.json`,
+`tmp/troublemaker-envelope150-storage-v1-20260927.json`, and
+`tmp/troublemaker-envelope150-analysis-v1-20260927/report.json`.
+Final75s net filling remains11.220582m3/s and8-9km drains about14.20m3/s.
+Local surface deviations near8430..8465m remain about-0.59m; not calibration.
+
+The queued native check PID4800 exits0. All132,763 points pass both simple and
+complex traces (265,526 total), preserving1,356 protected source/scene files.
+Largest positional error is0.00634514cm on roof centroids; hydraulic-envelope
+cell maximum0.00016557cm. Full native directed-triangle hashes match both meshes.
+Report: `tmp/envelope-ground-union-native-v1-20260927.json`, SHA-256
+`0cc0a68ddfaa895df9fe0aa20eb5104cae0f5ab4f811d24088569f97dc883c6f`.
+This is enumerated collision verification, not continuous surface or motion proof.
+
+Same deferred session25615 exits0 after final analysis and runtime export.
+`tmp/troublemaker-envelope-runtime150-v1-20260927/export_audit.json` verifies
+all799 packets /841 atlas tiles and42,185,039 exact bed-intersection samples.
+Atlas SHA-256 `17ceb1e86301b8715ff110d978f1d0d19d036f92fb58a3a1e8a327fd16dc6bc7`;
+streaming SHA-256 `9379b7a803bd2022f70aa64c297b82fc7777664c54e8451e22f1abb4d93812a4`.
+No old-roof fields are substituted. Final h/u/v hashes:
+`070421c254126316526f7a5f1c7bc0340995543ef9d0cc7325bcc8e561eb8f2b`,
+`6ab5a5a988bbd36a49fdcde22fb4e9b6b3edd345292ae86c654f779505dac411`,
+`c2b6b39d7deeeca2e686c653bc4b6049c80d1b552d90123b0864c8964780265e`.
+
+Normal installer PID31316 saved the new production mesh and only the existing
+ground/water-config actors. It then exited with3221225477 (0xC0000005) during
+shutdown, after the install receipt and final log close; no Python exception
+is in the log. This is an abnormal exit, not a clean successful process.
+The writes were NOT repeated. Session98485 stopped on that return code.
+Exact two-actor backup:
+`tmp/envelope-conveyance-install-v1-20260927.before.zip`, SHA-256
+`0a6dc2874c5c97924d8e5ff33dcd59bf73ae4d974617a8a3252324b693ad1a00`.
+Installation receipt/log/process record share that prefix. Preserve them.
+
+Independent inventory PID35040 exits0; recovery session33436 exits0 after bundle
+creation. Fresh reload verifies ground/envelope native geometry, transforms,
+ground fallback policy and matching normal water bindings. No scene writes.
+Inventory: `tmp/envelope-conveyance-inventory-v1-20260927.json`.
+Production ground:
+`/Game/RaftSim/Environment/SouthForkReconstruction/Troublemaker/ConveyanceEnvelope20260927/SM_ConveyanceGround`,
+package SHA-256 `056d670dd2bb25fece3f67d9268d5083b8ee46dc5936451b6a83092c2e359489`.
+Its native triangle hash stays`d6a5f18ffe07c881b6dcbe40201cafa863b93d78b6f086e86c78effabdae743a`.
+Ground actor package`3/LY/MFF59H58N6AWIGUAUQOON1.uasset` now has hash
+`8695405868c2c071f32620e4dce13643088b20b21533106d38733f5efee1d979`.
+Water-config package`0/P0/A1GOUPANCXW4AY40QJTLTK.uasset` now has hash
+`6f1262d278e0ceb230990f256397c8f98d252b4218e4c7eb595844c9dc529bb3`.
+Rock actor, map, manager, materials and coordinate maps remain unchanged.
+
+Frozen bundle`physics/data/runtime_bundles/south_fork_discharge_bed_v6` verifies
+2,405 logical files /917,995,570 bytes. Manifest SHA-256
+`243ec143409f1c698e3fe567c1b3436fd8fd3a9451d0bd22503390d81c5dd25b`.
+Its saved-scene hashes include the ground and rock actors as well as water
+configuration and run manager. Build.cs stages v6;38 bundle regressions pass.
+V5 package and bundle are preserved. BuildCookRun session**5004** is LIVE,
+recipe`tmp/package-south-fork-v6-20260927.ps1`, log
+`tmp/south-fork-v6-package-20260927.log`, fresh stage
+`tmp/south-fork-playable-v6-20260927`. Do not duplicate it.
+Next actual staged hash closure, normal Boot/menu launch, motion/contact capture,
+shoreline/surface/crest review and20FPS performance. Saved integration is not
+yet a visually inspected rebuilt-game delivery. Retain the abnormal installer
+shutdown as a release issue until assessed; do not erase or silently waive it.
