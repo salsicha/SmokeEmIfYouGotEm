@@ -67,7 +67,15 @@ v5 cooks it at 750.2-750.3 m. Calm-water levels are known only to about
 ±0.5 m (lower bound: DEM over water; upper bound: bank edge). Remaining
 textured misfit: the lower-rapid crest (1,350-1,390 m) sits +0.5 to +0.9 m
 high. A 2 m grid cannot reproduce the local trough behind a pour-over, and
-that rapid stays under-active.
+that rapid stays under-active. A third calibration step (v6, not shipped)
+improved the median absolute error by 1 cm and left that crest unchanged,
+so the residual is structural, not bed calibration.
+
+Whitewater lace and patch floors from 0.12 to 0.30 turned most of the main
+rapid into one white-grey sheet, because the cooked foam field is broad. The
+shipped 0.06 / 0.04 keeps green water between filaments, but underplays the
+imagery's massed white. Concentrating the source foam is the lever, not the
+material floors.
 
 Evidence, validation figures and the calibration file are archived in
 `scenario_hance_evidence_2021/evidence/`.
