@@ -1,4 +1,5 @@
 #include "RaftSimChronoRuntimeAdapter.h"
+#include "RaftSimDynamicsStageAudit.h"
 
 namespace
 {
@@ -224,6 +225,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     State.LinearVelocity = KinematicState.LinearVelocityMetersPerSecond;
     State.AngularVelocity = KinematicState.AngularVelocityRadiansPerSecond;
     const FRaftSimFlexRigidState PreviousFiniteState = State;
+    TOptional<FRaftSimDynamicsStageAudit> DynamicsAudit;
+    if(FRaftSimDynamicsStageAudit::ShouldRecord(GetWorld())) DynamicsAudit.Emplace();
 
     const RaftSimFlex::EModelMode Mode = RaftConfig.bEnableCompliantContacts
         ? RaftSimFlex::EModelMode::Compliant
@@ -408,6 +411,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         TorqueNm += FVector::CrossProduct(WorldOffset, SegmentForce);
     }
 
+    if(DynamicsAudit)
+    { DynamicsAudit->RetainedForce=ForceN;DynamicsAudit->RetainedTorque=TorqueNm; }
     for (const FRaftSimFlexRockContact& Contact : Contacts.Contacts)
     {
         if (Contact.bRecovering)
@@ -432,6 +437,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         }
     }
 
+    if(DynamicsAudit)
+    { DynamicsAudit->ObstacleForce=ForceN;DynamicsAudit->ObstacleTorque=TorqueNm; }
     const double NominalMassKg = FMath::Max(static_cast<double>(RaftConfig.MassKg), 1.0e-3);
     const double MassKg = bBodyMassIncludesFlexibleCrew
         ? FMath::Max(NominalMassKg - NominalFlexibleCrewMassKg +
@@ -717,6 +724,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     }
 
     // External (paddle) impulses queued since the last substep.
+    if(DynamicsAudit)
+    { DynamicsAudit->LinearImpulse=PendingLinearImpulseNs;DynamicsAudit->AngularImpulse=PendingAngularImpulseNms; }
     State.LinearVelocity += PendingLinearImpulseNs / MassKg;
     State.AngularVelocity += FVector(
         PendingAngularImpulseNms.X / Inertia.X,
@@ -747,6 +756,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         State.Orientation = (Delta * State.Orientation).GetNormalized();
     }
 
+    if(DynamicsAudit)
+    { DynamicsAudit->PreContactVelocity=State.LinearVelocity;DynamicsAudit->PreContactOmega=State.AngularVelocity; }
     if(HullGroundQuery)
     {
         LastHullContact=RaftSimHullContact::Integrate(State,PreviousFiniteState,PublishedHullGeometry,
@@ -906,6 +917,11 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     KinematicState.AngularVelocityRadiansPerSecond = State.AngularVelocity;
     if(HullGeometryProvider && !bInvalidState)HullGeometryCommit();
 
+    if(DynamicsAudit)
+        DynamicsAudit->Write(GetWorld()->GetTimeSeconds(),Dt,MassKg,Inertia,
+            PreviousFiniteState.LinearVelocity,PreviousFiniteState.AngularVelocity,State.LinearVelocity,State.AngularVelocity,
+            ForceN,TorqueNm,bSupportStage ? FMath::Clamp(1.-double(RaftConfig.AngularDampingPerSecond)*Dt,0.,1.) : 1.,
+            LastGroundedSupportPointCount,LastMaximumGroundPenetrationM,bInvalidState,bool(HullGroundQuery)||bool(GroundSphereSweep));
     LastFlexStepTelemetry.bEvaluated = true;
     LastFlexStepTelemetry.OccupiedCrewMassKg = SeatSolve.CrewTelemetry.TotalCrewMassKg;
     LastFlexStepTelemetry.IntegratedMassKg = MassKg;

@@ -1,5 +1,29 @@
 # Remaining requested work
 
+September27 turn-attribution live check completed after other engine work exited:
+964 consecutive fixed steps close the velocity budget within2.22e-16, with zero
+ground response (including<5mm), obstacle yaw or queued angular impulse. This
+run's turning comes from support-stage water drag opposed by angular damping.
+It advances8365.790 to8376.553m while turning; the earlier packaged reversal is
+NOT exactly reproduced, so its cause remains unresolved. Four observer-disabled
+native regressions pass without warnings/errors; eight parser tests and editor
+build also pass. Actual scene images inspected, healthy detail for38.047s,exit0.
+Supporting attribution only: packaged game/geometry unchanged, no FPS or river
+acceptance. Do not repeat the same ledger; investigate sampled-flow/drag accuracy
+or the distinct busy-rapid CPU bottleneck before choosing a playable change.
+See [bounded dynamics budget](../reconstruction-review-2026-09-07/south-fork-turn-dynamics-budget.md).
+
+September27 healthy v4 Troublemaker approach motion: unchanged packaged game
+at8,330m runs38.079s with820 paired detail commits,zero backlog/errors and exit0.
+Full25.720s recording decodes; inspected views show raft/paddle/water changes,
+but coarse flanks and broad smooth foam remain unaccepted. Twelve samples
+advance8341.408 to8367.994m, with temporary turning/reversal near8364m. All54
+recorded >=5mm ground corrections occur before12.673s, not during that later
+turn; this does not exclude smaller contact or establish force attribution.
+No code/geometry/cook changes or FPS acceptance. Next isolate the later-turn
+forces, not another unchanged projection/source lookup. See
+[motion and limits](../reconstruction-review-2026-09-07/south-fork-v4-troublemaker-motion.md).
+
 September27 independent source-ground follow-through: all2,044 saved packaged
 v4 contact probes match the archived v2 terrain triangles, maximum error
 0.000701296cm; no missing coverage or wet/dry disagreement. Both occluded
