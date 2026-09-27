@@ -28,8 +28,10 @@ def dependencies(geometry_path,root=ROOT):
     cap_path=root/geometry['rock_cap_manifest'];cap=json.loads(cap_path.read_text())
     origin=cap['origin_utm_and_vertical_datum_m']
     revision=geometry.get('terrain_revision_manifest')
+    envelope=geometry.get('interpreted_envelope_manifest')
     union=SourceRockUnion(cap_path,root,root/cap['source_mesh_path'],origin[:2],origin[2],
-                          terrain_revision=root/revision if revision else None)
+                          terrain_revision=root/revision if revision else None,
+                          interpreted_envelope=root/envelope if envelope else None)
     if geometry['terrain_union']!=union.identity:raise ValueError('Different source union in hydraulic geometry')
     return geometry,source_path,source,union
 
@@ -65,7 +67,9 @@ def prepare(geometry_path,output):
         retained_source_manifest=source_path.relative_to(ROOT).as_posix(),retained_source_manifest_sha256=sha(source_path),
         hydraulic_geometry_manifest=geometry_path.relative_to(ROOT).as_posix(),hydraulic_geometry_manifest_sha256=sha(geometry_path),
         terrain_union=union.identity,source_geometry_sha256=None,
-        source_geometry_authority='Explicit retained terrain plus original-return roof / inferred-flank solid; not an unchanged captured source',
+        source_geometry_authority=('Explicit registered terrain plus inferred rock-envelope solid; original returns retained separately'
+                                   if 'interpreted_envelope' in union.identity else
+                                   'Explicit retained terrain plus original-return roof / inferred-flank solid; not an unchanged captured source'),
         original_sources_modified=False,hydraulic_state_solved=False,normal_map_integrated=False,
         full_reconstruction_accepted=False)
     path=output/'manifest.json';path.write_text(json.dumps(result,indent=2)+'\n')

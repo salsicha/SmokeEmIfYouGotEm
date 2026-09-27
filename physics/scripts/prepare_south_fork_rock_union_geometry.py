@@ -37,13 +37,15 @@ def retained_union(geometry,root):
     if revision is not None:
         revision=(root/revision).resolve()
         if not revision.is_relative_to(root):raise ValueError('Previous revision outside project')
-    previous=SourceRockUnion(path,root,root/cap['source_mesh_path'],origin[:2],origin[2],revision)
+    envelope=geometry.get('interpreted_envelope_manifest')
+    previous=SourceRockUnion(path,root,root/cap['source_mesh_path'],origin[:2],origin[2],revision,
+                            root/envelope if envelope else None)
     if previous.identity!=geometry['terrain_union']:
         raise ValueError('Previous union dependencies do not match current geometry')
     return previous
 
 
-def prepare(base_flow,cap_manifest,output,terrain_revision=None,replace_union=False):
+def prepare(base_flow,cap_manifest,output,terrain_revision=None,replace_union=False,interpreted_envelope=None):
     output=Path(output).resolve();base_flow=Path(base_flow).resolve()
     if output.exists() or not output.is_relative_to(ROOT/'tmp'):
         raise ValueError('Fresh project tmp candidate directory required')
@@ -58,6 +60,8 @@ def prepare(base_flow,cap_manifest,output,terrain_revision=None,replace_union=Fa
     cap_manifest=Path(cap_manifest).resolve();cap=json.loads(cap_manifest.read_text())
     origin=np.asarray(cap['origin_utm_and_vertical_datum_m'])
     previous_union=retained_union(geometry,ROOT)
+    if interpreted_envelope is None and geometry.get('interpreted_envelope_manifest'):
+        interpreted_envelope=ROOT/geometry['interpreted_envelope_manifest']
     if replace_union and previous_union is None:
         raise ValueError('Replacement requires a verified existing union')
     if replace_union and geometry.get('terrain_revision_manifest'):
@@ -65,7 +69,8 @@ def prepare(base_flow,cap_manifest,output,terrain_revision=None,replace_union=Fa
         if terrain_revision is not None and Path(terrain_revision).resolve()!=retained_revision:
             raise ValueError('Cap replacement must preserve the current bed revision')
         terrain_revision=retained_revision
-    union=SourceRockUnion(cap_manifest,ROOT,ROOT/cap['source_mesh_path'],origin[:2],origin[2],terrain_revision)
+    union=SourceRockUnion(cap_manifest,ROOT,ROOT/cap['source_mesh_path'],origin[:2],origin[2],terrain_revision,
+                          interpreted_envelope)
     if previous_union is not None:
         if not replace_union and previous_union.identity['cap_manifest_sha256']!=sha(cap_manifest):
             raise ValueError('Revision must retain the exact current rock union')
@@ -153,12 +158,18 @@ def prepare(base_flow,cap_manifest,output,terrain_revision=None,replace_union=Fa
         result.update(terrain_revision_manifest=Path(terrain_revision).resolve().relative_to(ROOT).as_posix(),
             terrain_revision=union.terrain_revision.identity,
             notes='Explicit registered terrain revision, then the selected source-rock solid. Captured masks/stages and physical endpoints retained. Fresh solve required; no old-bed state transfer.')
+    if interpreted_envelope is not None:
+        result.update(interpreted_envelope_manifest=Path(interpreted_envelope).resolve().relative_to(ROOT).as_posix(),
+            notes='Explicit inferred rock envelope replaces the captured-return roof after registered terrain revision. Captured returns/masks/stages remain unchanged. Fresh solve required.')
+    else:
+        result.pop('interpreted_envelope_manifest',None)
     manifest_path=output/'manifest.json';manifest_path.write_text(json.dumps(result,indent=2)+'\n')
     audit=dict(manifest_sha256=sha(manifest_path),passed=True,checked_core_count=len(result['regions']),
         checked_original_cell_count=total,changed_cores=changes,changed_cell_count=sum(r['changed_cells'] for r in changes),
         original_source_fields_exact_before_union=True,captured_masks_and_surfaces_unchanged=True,
         declared_endpoint_faces_match_current_flow=True,undeclared_captured_wet_exterior_faces=0,
         source_roof_sampler_and_saved_bed_match=True,original_sources_modified=False,
+        active_roof_is_inferred_envelope=interpreted_envelope is not None,
         native_collision_acceptance=False,hydraulic_state_solved=False,normal_map_integrated=False)
     (output/'source_exact_audit.json').write_text(json.dumps(audit,indent=2)+'\n')
     return audit
@@ -173,5 +184,7 @@ if __name__=='__main__':
                         help='Explicit source-preserving registered-bed candidate; requires a fresh solve')
     parser.add_argument('--replace-union',action='store_true',
                         help='Verify and replace the previous cap while retaining its bed revision; fresh solve required')
+    parser.add_argument('--interpreted-envelope',type=Path,
+                        help='Explicit inferred envelope descriptor; replaces active roof, never captured returns')
     args=parser.parse_args()
-    print(json.dumps(prepare(args.base_flow,args.cap_manifest,args.output,args.terrain_revision,args.replace_union),indent=2),flush=True)
+    print(json.dumps(prepare(args.base_flow,args.cap_manifest,args.output,args.terrain_revision,args.replace_union,args.interpreted_envelope),indent=2),flush=True)

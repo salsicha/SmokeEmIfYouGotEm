@@ -11,15 +11,18 @@ def sha(path):
 
 
 class SourceRockUnion:
-    """Maximum of retained terrain and a source-exact roof with inferred sides.
+    """Maximum of retained terrain and an explicitly identified rock roof.
 
     Inputs/outputs use absolute UTM / NAVD88 metres. Owner 5 means candidate
     solid, NOT measured rock classification; owner 6 is an explicit registered
     terrain revision (whose identity distinguishes bed priors/source additions).
     Without a revision, unsupported cap XY retains the
-    original bed. Source water masks/stages are never changed here.
+    original bed. Source water masks/stages are never changed here. The default
+    roof is source-exact; an optional separately validated inferred envelope
+    replaces the active roof without changing any captured returns.
     """
-    def __init__(self, manifest_path, root, parent_path, origin_utm_m, datum_m, terrain_revision=None):
+    def __init__(self, manifest_path, root, parent_path, origin_utm_m, datum_m, terrain_revision=None,
+                 interpreted_envelope=None):
         root=Path(root).resolve();manifest_path=Path(manifest_path).resolve()
         self.manifest=json.loads(manifest_path.read_text())
         m=self.manifest
@@ -103,6 +106,16 @@ class SourceRockUnion:
                 operation=('explicit source-supported registered terrain revision, then maximum with retained source roof'
                            if self.terrain_revision.identity['schema']=='raftsim.registered_source_supported_terrain_revision.v1'
                            else 'explicit registered submerged-bed revision, then maximum with retained source roof'))
+        if interpreted_envelope is not None:
+            # Validate the captured cap above WITHOUT exceptions, then replace
+            # its active roof under a separate, explicitly inferred contract.
+            # apply() must never take a second maximum with the old roof.
+            from south_fork_interpreted_envelope import load_interpreted_envelope
+            self.xyz,envelope_identity=load_interpreted_envelope(
+                interpreted_envelope,root,manifest_path,paths['cap'],m,self.floor,self.origin)
+            self.identity.update(schema='raftsim.interpreted_envelope_terrain_union.v1',
+                interpreted_envelope=envelope_identity,roof_measured=False,
+                operation='registered terrain (including explicit revision), then maximum with inferred envelope ONLY')
 
     def apply(self,east,north,parent,with_owner=False):
         east,north,parent=np.broadcast_arrays(np.asarray(east,float),np.asarray(north,float),np.asarray(parent,float))
