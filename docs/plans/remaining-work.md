@@ -1,5 +1,21 @@
 # Remaining requested work
 
+September27 bank-control follow-through: passive v12 capture91743/PID35444
+completed exit0 and passed the prior8404m contact point, reaching8486.616m.
+The earlier recording held AllForward with no guide steering; it does not
+justify removing captured geometry. Source-field/contact contrast and original
+motion review are in [v12 bank control](../reconstruction-review-2026-09-07/v12-bank-control.md).
+No new visual acceptance: broad flat foam/spray/coarse rocks persist.
+ONE exact450->900s continuation99863 is LIVE, native12676/wrapper34600,
+recipe `tmp/continue-envelope450to900-v1-20260927.py`, receipt
+`tmp/troublemaker-envelope450to900-process-v1-20260927.json`.
+Native restart verifies all5,382,400 retained h/u/v cells bit-exact, no added
+water/context or geometry/settings change. Observed180steps/459s; final900s
+state/bank/storage/local-flow audits pending. Poll SAME handle, no duplicate,
+no performance run during solve. Current rebuilt v12/450s fields stay installed.
+Only promote reviewed results, not a completed snapshot alone. Breaking dynamics,
+local equilibrium and busy performance remain unaccepted; no later-river advance.
+
 September27 v12 verification COMPLETE: build19892 exit0 (495.88s), staged
 v8 closure and isolated timing72084 exit0, upstream capture3980/PID32144 exit0.
 No job from this sequence remains live. Normal Boot/menu p9543.428ms,

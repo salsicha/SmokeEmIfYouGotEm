@@ -1,5 +1,11 @@
 # Troublemaker inferred-envelope coupling - September 27
 
+Follow-through: [v12 bank control](v12-bank-control.md) records the completed
+passive trajectory past8404m (the earlier capture held AllForward without
+steering), source-field context, and live exact450->900s continuation99863.
+No geometry change or visual/traversal acceptance follows. Current v12 fields
+remain450s; poll the existing continuation, do not duplicate it.
+
 ## V12 rebuilt normal scene: verification completed, not accepted
 
 Build19892 completed exit0 in495.88s. Stage:
