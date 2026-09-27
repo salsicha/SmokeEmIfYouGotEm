@@ -11,12 +11,40 @@ from package_runtime_bundle import sha
 from bind_south_fork_discharge_bed_runtime import load,entries,package_file,LEVEL,MAP_PATH
 
 
+def with_field_binding(saved, bound):
+    """Verify a subsequent water-only save without changing the geometry receipt."""
+    if (bound.get('mode') != 'set' or bound.get('level') != LEVEL or
+            bound.get('before') != saved['after'] or
+            bound.get('coordinate_maps_changed') is not False or
+            bound.get('run_manager_changed') is not False):
+        raise ValueError('Field update must follow the verified installation without coordinate changes')
+    name = bound['config_package']
+    if (name not in saved['changed_packages'] or
+            saved['changed_packages'][name]['after'] != bound['config_package_sha256_before']):
+        raise ValueError('Field update does not follow the installed config package')
+    before, after = bound['before'], bound['after']
+    if (set(after) != set(before) or
+            any(after[key] != before[key] for key in ('hydraulic_coordinate_map', 'route_coordinate_map')) or
+            after['initial_fields_manifest'].rsplit('/', 2)[-2] != before['initial_fields_manifest'].rsplit('/', 2)[-2]):
+        raise ValueError('Field update must retain coordinate maps and initial window')
+    changed = {key: dict(value) for key, value in saved['changed_packages'].items()}
+    changed[name]['after'] = bound['config_package_sha256_after']
+    return dict(saved, after=dict(after), changed_packages=changed)
+
+
 def main():
     installation=ROOT/os.environ['RAFTSIM_ENVELOPE_INSTALL_REPORT']
     output=(ROOT/os.environ['RAFTSIM_ENVELOPE_INVENTORY']).resolve()
     assert output.is_relative_to(ROOT/'tmp') and not output.exists()
     saved=json.loads(installation.read_text())
     assert saved['normal_map_saved'] and saved['other_scene_packages_unchanged']
+    field_report = os.environ.get('RAFTSIM_ENVELOPE_FIELD_BIND_REPORT')
+    if field_report:
+        field_report = (ROOT/field_report).resolve()
+        assert field_report.is_relative_to(ROOT/'tmp')
+        bound = json.loads(field_report.read_text())
+        assert bound['map_sha256'] == sha(ROOT/MAP_PATH)
+        saved = with_field_binding(saved, bound)
     for name,row in saved['changed_packages'].items():assert sha(ROOT/name)==row['after']
     descs,config,manager=load()
     assert entries(config,manager)==saved['after']
@@ -54,6 +82,12 @@ def main():
     result=dict(schema='raftsim.saved_runtime_bindings.v1',level=LEVEL,map_sha256=sha(ROOT/MAP_PATH),
         bindings=bindings,entrypoints=entries(config,manager),saved_assets=False,
         native_geometry=proofs,installation_sha256=sha(installation),fresh_reload_verified=True)
+    if field_report:
+        # Keep original geometry installation evidence distinct from the later
+        # water-only save; do not fabricate a second geometry installation.
+        config_desc, = [d for d in all_descs if str(d.name) == config.get_name()]
+        assert package_file(config_desc) == bound['config_package']
+        result['field_binding_sha256'] = sha(field_report)
     with output.open('x') as f:json.dump(result,f,indent=2)
 
 

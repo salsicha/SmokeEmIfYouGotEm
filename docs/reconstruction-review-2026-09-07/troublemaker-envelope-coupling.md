@@ -395,3 +395,77 @@ solver35776/wrapper30456 is still progressing: observed local step2160,
 absolute258s, maximum step conservation residual9.1124e-9m3. Final300s audits
 remain owned by that wrapper; do not duplicate it. Review the final physical
 state before deciding whether new fields warrant a normal playable trial.
+
+## Exact continuation completed;300s water-only playable trial
+
+Solver35776 and wrapper30456/session42718 completed with exit0. The wrapper's
+final state, bank, storage and station audits all completed; do not repeat this
+solve. Snapshot time300.000000000034s,5,382,400 finite/nonnegative cells,
+maximum depth2.935468m, speed8.208481m/s. All86,720 artificial-bank cells remain
+exactly dry. Maximum step conservation residual9.1124e-9m3. Final h/u/v hashes:
+
+- h:`7c2c8ebb604ab235cbf676c8f3e265a9395df9789597e2e9f5e24b21c91278c3`
+- u:`5264eb15d993287705a60517a42483412a2c10bf126bf184bec58375a4611861`
+- v:`ba47ffd0632cba499163a52e8a7a657c63c21a7b16fee3e89e6eb8d4db0cc8e6`
+
+This is NOT settled. Whole-domain storage increases16.8657m3/s over150–225s
+and20.3041m3/s over225–300s. The8–9km region changes from−3.6930 to+6.5717m3/s;
+its225–300s common-wet stage change p05/median/p95 is−.03120/−.00399/+.06618m.
+That small median is not equilibrium: regional volume still changes materially.
+Final instantaneous inflow45.30695m3/s, outflow31.75277m3/s. Storage/flux closure
+errors remain below1.1e-10m3 for the audited intervals.
+
+Station analysis at225s was independently run once for temporal comparison:
+`tmp/troublemaker-envelope225-analysis-v1-20260927/report.json`.
+At8362.5m, median speed evolves3.0021→3.1441→3.2762m/s over150/225/300s;
+supercritical fractions remain approximately65%. At8402.5m simulated-minus-
+captured surface deviation changes−.5727→−.4453→−.3912m, but8342.5m changes
++.4518→+.5589→+.6532m. This is not uniformly better alignment to captured water.
+Flight discharge is unknown, and signed transport proxies are not numerical
+cross-section fluxes. No bathymetry is refitted from these unsteady deviations.
+
+The300s field trial is selected to test evolved rapid behavior in the actual
+normal playable path, not to claim settled hydraulics or visual improvement.
+Export session86559 completed exit0 at
+`tmp/troublemaker-envelope-runtime300-v1-20260927`:799 packets,841 atlas tiles,
+42,185,039 exact bed-intersection cells. Stream SHA-256
+`8b7e7d4ae939c024c8753667d7b92bf4c0cc695cfdb4e571c956384dee8bd105`,
+atlas SHA-256`431383a4d6b215423a3a66d7405346ceef2b18d546b1caa20e0553da80c99d37`.
+The guarded field installer additionally compares all packet bed/mask/grid/
+solver settings, coverage and atlas bed/layout/boundaries/provenance to150s.
+All are unchanged; only h/u/v and their time/provenance references advance.
+Receipt:`tmp/envelope-fields300-parity-v1-20260927.json`.
+
+Fresh native inventory supports a subsequent water-only binding receipt while
+retaining the original geometry installation evidence. It rejects changed
+baseline identities, coordinate maps, initial window and unrelated package;
+then independently checks the actual config identity and both native meshes.
+18 mocked save/follow-up regressions pass in0.73s. These are not native passes.
+The guarded recipe is`tmp/install-envelope-fields300-v1-20260927.py`.
+Its session94164 owns set PID6732, with fresh inventory and v7 bundle queued.
+Do not repeat writes if editor shutdown is abnormal; inspect saved state first.
+No v7 build/motion/performance result exists at this checkpoint. V6 and its
+config backup are preserved for comparison. South Fork remains unaccepted.
+
+### Water-only installation complete; v7 build live
+
+Set6732 and fresh inventory38340 both exit0; session94164 completed exit0.
+Protected-file checks pass with only the water config changed, new SHA-256
+`c08b2c93e1e203b1cebdd535a3a135d1ebc55ac9e5b9b23afa3ee5e3d611d882`.
+Backup:`tmp/envelope-fields300-v1-20260927-before.uasset` retains exact v6.
+Fresh four-actor inventory rechecks both native collision sources, transforms,
+profiles and ground Nanite exclusion; native records exactly equal v6.
+Receipts:`tmp/envelope-fields300-v1-20260927-{set,inventory}.json` and process
+receipts. These clean exits do not erase the earlier v6 installer shutdown issue.
+
+V7 bundle:`physics/data/runtime_bundles/south_fork_discharge_bed_v7`,2405 logical
+files/917995570 bytes, manifest SHA-256
+`734727793623c2e63b0396fcee3d327b3dbda53e3ad23704b7c9802c52e1a721`.
+Build.cs stages it by default. ONE BuildCookRun session37291 is live, recipe
+`tmp/package-south-fork-v7-20260927.ps1`, log
+`tmp/south-fork-v7-package-20260927.log`, fresh stage
+`tmp/south-fork-playable-v7-20260927`. Do not duplicate it. After completion,
+`tmp/validate-south-fork-v7-20260927.ps1` is prepared for staged closure,
+normal Boot/menu, busy11520m and actual Troublemaker motion/contact evidence.
+No v7 visual or performance acceptance follows from installation. Cook warnings
+about missing crew texture dependencies remain release issues to investigate.

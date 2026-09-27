@@ -1,5 +1,6 @@
 """Mocked save-scope regressions; these are not native scene validation."""
 import importlib.util
+import copy
 import json
 import sys
 from pathlib import Path
@@ -84,3 +85,53 @@ def test_bad_request_rejected_before_loading_scene(binding, monkeypatch, mode, r
     with pytest.raises(ValueError):
         module.main()
     assert saves == []
+
+
+@pytest.fixture
+def field_followup(binding):
+    module, _, _, _ = binding
+    source = Path(__file__).resolve().parents[2] / 'unreal/Scripts/inventory_envelope_conveyance_runtime.py'
+    spec = importlib.util.spec_from_file_location('inventory_under_test', source)
+    inventory = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(inventory)
+    old = dict(streaming_manifest='tmp/old/stream.json',
+               initial_fields_manifest='tmp/old/region_0008/manifest.json',
+               hydraulic_coordinate_map='coords.json', route_coordinate_map='route.json')
+    saved = dict(after=old, changed_packages={
+        'unreal/Content/Water.uasset': dict(before='original', after='installed'),
+        'unreal/Content/Ground.uasset': dict(before='old-ground', after='new-ground')})
+    bound = dict(mode='set', level=module.LEVEL, before=dict(old),
+                 after=dict(old, streaming_manifest='tmp/new/stream.json',
+                            initial_fields_manifest='tmp/new/region_0008/manifest.json'),
+                 coordinate_maps_changed=False, run_manager_changed=False,
+                 config_package='unreal/Content/Water.uasset',
+                 config_package_sha256_before='installed', config_package_sha256_after='next')
+    return inventory, saved, bound
+
+
+def test_field_followup_retains_original_geometry_receipt(field_followup):
+    inventory, saved, bound = field_followup
+    original = copy.deepcopy(saved)
+    updated = inventory.with_field_binding(saved, bound)
+    assert saved == original
+    assert updated['changed_packages']['unreal/Content/Ground.uasset'] == saved['changed_packages']['unreal/Content/Ground.uasset']
+    assert updated['changed_packages']['unreal/Content/Water.uasset']['after'] == 'next'
+    assert updated['after'] == bound['after']
+
+
+@pytest.mark.parametrize('change', ['mode', 'level', 'before', 'coordinates_flag', 'manager_flag',
+                                   'package', 'previous_hash', 'coordinates_path', 'window', 'keys'])
+def test_field_followup_rejects_changed_identity(field_followup, change):
+    inventory, saved, bound = field_followup
+    if change == 'mode': bound['mode'] = 'inventory'
+    elif change == 'level': bound['level'] = '/Game/Other'
+    elif change == 'before': bound['before']['streaming_manifest'] = 'unrelated.json'
+    elif change == 'coordinates_flag': bound['coordinate_maps_changed'] = True
+    elif change == 'manager_flag': bound['run_manager_changed'] = True
+    elif change == 'package': bound['config_package'] = 'unrelated.uasset'
+    elif change == 'previous_hash': bound['config_package_sha256_before'] = 'different'
+    elif change == 'coordinates_path': bound['after']['hydraulic_coordinate_map'] = 'different.json'
+    elif change == 'window': bound['after']['initial_fields_manifest'] = 'tmp/new/region_0009/manifest.json'
+    elif change == 'keys': del bound['after']['route_coordinate_map']
+    with pytest.raises(ValueError):
+        inventory.with_field_binding(saved, bound)
