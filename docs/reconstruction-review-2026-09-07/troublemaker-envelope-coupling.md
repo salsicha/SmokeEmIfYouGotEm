@@ -206,3 +206,68 @@ Next actual staged hash closure, normal Boot/menu launch, motion/contact capture
 shoreline/surface/crest review and20FPS performance. Saved integration is not
 yet a visually inspected rebuilt-game delivery. Retain the abnormal installer
 shutdown as a release issue until assessed; do not erase or silently waive it.
+
+## Completed v6 packaged validation — not accepted
+
+BuildCookRun session5004 exited0 after276.73s. Validation session92941 also
+exited0 after normal Boot/menu, busy11520m and actual8330m paddling capture.
+The motion process was PID21480. A subsequent process inventory found no live
+Unreal/game/Python/AutomationTool processes. Do not duplicate these runs.
+Recipe: `tmp/validate-south-fork-v6-20260927.ps1`.
+
+Actual staged closure `tmp/south-fork-v6-staged-payload-20260927.json` passes
+2,405 files /917,995,570 bytes without external source fallback. The packaged
+executable SHA-256 remains
+`8ffc14bef18cf155290b62bf60686346e1a639d3cbb50188371abf7bd1f2fff8`,
+identical to v5. This was a ground/water data change, not a C++ optimization.
+
+Both1200-frame runs have clean game exits and zero logged runtime errors.
+Audited rows30..1169 (1,140 frames) fail the unchanged20FPS acceptance gates:
+
+| Normal packaged run | Mean ms | p95 ms | Maximum ms | Frames over100ms |
+| --- | ---: | ---: | ---: | ---: |
+| Boot/menu FullReach |47.6834|85.4841|165.9686|22|
+| Busy11520m |55.9701|81.5321|110.0699|2|
+
+Receipts in `unreal/Saved/RaftSimValidation/`:
+`sf-v6-normal-menu-20260927-frame-audit.json` and
+`sf-v6-rapid11520-20260927-frame-audit.json`. The profiling wrapper returning0
+does NOT mean the timing gate passed. V5's earlier corresponding p95 values
+were44.4436ms and71.8342ms; these are sequential, not controlled interleaved
+measurements, so the difference does not isolate a causal data regression.
+
+Existing CSV scope inspection (same audited rows; overlapping scopes must not
+be summed) points primarily to game-thread cost. Busy11520m mean game thread
+54.274ms versus GPU17.457ms; water-surface Tick32.290ms, SetMesh15.296ms,
+crest Update12.919ms, solver StepWater12.466ms, ground Sample0.641ms.
+Normal-menu means are46.196ms game thread,15.699ms GPU,26.297ms surface Tick,
+10.690ms SetMesh and10.797ms StepWater. These identify investigation targets,
+not a proven optimization or grounds to reduce simulation/quality settings.
+
+Original engine movie:
+`tmp/south-fork-playable-v6-20260927/Windows/SmokeEmIfYouGotEm/Saved/VideoCaptures/RaftSim_20260927-121302.mp4`,
+SHA-256 `ea117ef5f489e36303c7bdb7fa34a7aff3753832f518c7527a342f10f0aa0098`.
+Decode receipt `tmp/sf-v6-troublemaker-decoded-20260927/report.json` verifies
+770 frames,25.6333s,1280x720 and2 exact adjacent duplicates. Recording frame
+rate is not game FPS. Reviewed original decoded1s,9s and20s views: boat and
+paddles change pose and advance from displayed8.37km to8.40km; the raft reaches
+large rocks and slows. Broad smooth reflective water/flat white foam and coarse
+bank/rock shape remain visible. This is not convincing breaking-water realism,
+proof of stable shoreline over time, or successful collision traversal.
+
+Motion log `tmp/sf-v6-troublemaker-motion-20260927.log` confirms AllForward.
+Logged raft speeds progress4.745,1.480,0.275m/s; the final sample has2 dry
+support points and1 ground point. These observations do not alone diagnose
+whether current direction, steering, inferred geometry or contact response is
+responsible. Contact receipt with the same prefix and `-contact.json` contains
+64 capped observations over15.4564..36.2351 world seconds. All resample the
+NEW `ConveyanceEnvelope20260927/SM_ConveyanceGround` and match the solver's
+float ground height; maximum vertical projection is0.01574287m. This is bounded
+identity evidence, not a complete collision ledger or traversal acceptance.
+
+The normal scene and rebuilt package now contain the coupled geometry/fields;
+their visible delivery is verified, but an improvement in realism is not.
+Keep South Fork first. Next investigate measured CPU surface/mesh-update work
+and the rock-contact route, without repeating the completed cook/build or
+turning on a broken solver. The unsettled150s hydraulic state and abnormal
+installer shutdown remain open; later rivers and release acceptance stay gated.
