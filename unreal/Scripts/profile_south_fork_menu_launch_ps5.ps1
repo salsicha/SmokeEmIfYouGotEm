@@ -20,7 +20,9 @@ param(
     [ValidateRange(-1, 33280)][int]$ReviewStationM = -1,
     # Optional diagnostic console variables, e.g. 'r.Shadow.Virtual.Enable 0'
     # (';'-separated). Recorded in the receipt; never a normal-launch result.
-    [ValidatePattern('^[a-zA-Z0-9_. ;-]*$')][string]$DiagnosticExecCmds = ''
+    [ValidatePattern('^[a-zA-Z0-9_. ;-]*$')][string]$DiagnosticExecCmds = '',
+    # Same-build reference only; receipt explicitly identifies the non-default search.
+    [switch]$LegacyBreakingSearch
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -62,6 +64,7 @@ $gameArgs += @(
     '-ResX=1280', '-ResY=720', '-Windowed', '-RaftSimEphemeralProfile',
     '-RaftSimScenario=south_fork_full_descent', '-csvCompression=0', "`"-abslog=$logFile`"",
     '-ExitAfterCsvProfiling')
+if ($LegacyBreakingSearch) { $gameArgs += '-RaftSimLegacyBreakingSearch' }
 if ($review) {
     $gameArgs += @("-RaftSimWaterReviewStation=$ReviewStationM",
         "`"-ExecCmds=$csvCommands,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames`"")
@@ -134,6 +137,8 @@ $result = [ordered]@{
     execution_host = $(if ($PackagedRoot -eq '') { 'editor_game' } else { 'cooked_standalone' })
     game_binary = $gameBinary; game_binary_sha256 = $binaryHash
     diagnostic_exec_cmds = $DiagnosticExecCmds
+    diagnostic_legacy_breaking_search = [bool]$LegacyBreakingSearch
+    normal_configuration = ($DiagnosticExecCmds -eq '' -and -not $LegacyBreakingSearch)
     game_exit_code = $game.ExitCode; csv = $csv; csv_sha256 = (Get-FileHash -LiteralPath $csv -Algorithm SHA256).Hash.ToLower()
     frames_total = $times.Count; audited_rows = "30..$($times.Count - 31)"; audited_frames = $window.Count
     mean_ms = [Math]::Round($mean, 4); p95_ms = [Math]::Round($p95, 4); max_ms = [Math]::Round($max, 4)

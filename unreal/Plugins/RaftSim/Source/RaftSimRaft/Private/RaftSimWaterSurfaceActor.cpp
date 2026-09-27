@@ -4,6 +4,7 @@
 #include "RaftSimCartesianHydraulicRelief.h"
 #include "RaftSimBreakingTileAudit.h"
 #include "RaftSimBreakingCandidateGate.h"
+#include "RaftSimMetricBreakingSearch.h"
 #include "RaftSimWetEdgeAudit.h"
 #include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimTerrainProbeSources.h"
@@ -5763,6 +5764,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     static const bool bReferenceBreakingGate=FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceBreakingGate"));
     const bool bEarlyBreakingGate=!bReferenceBreakingGate && (bForceEarlyBreakingGate ||
         (bCartesianFlow && GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"))));
+    static const bool bLegacyBreakingSearch=FParse::Param(
+        FCommandLine::Get(),TEXT("RaftSimLegacyBreakingSearch"));
+    const bool bMetricBreakingSearch=!bLegacyBreakingSearch && bCartesianFlow &&
+        bSingleLiveWaterSurfaceEnabled && GetWorld() &&
+        GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
 #if !UE_BUILD_SHIPPING
     static const bool bGateAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimBreakingGateAudit"));
     static int32 GateAuditCalls=0;
@@ -5831,6 +5837,20 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     UpstreamIndex = FarUpstreamIndex;
                     UpstreamFroude = FroudeField[UpstreamIndex];
                 }
+            }
+            // The Cartesian carrier is now 1 m, so its old one/two analysis
+            // offsets no longer cover the documented 3/6 m jump search.
+            // Preserve those detections; extend only missing transitions on
+            // the South Fork single carrier with a continuous live wet path.
+            if (UpstreamFroude < 1.12f && bMetricBreakingSearch)
+            {
+                const int32 MetricUpstream=RaftSimMetricBreakingSearch::Find(
+                    Index,GridStationN,GridLateralN,ResolvedVertexSpacingMeters,
+                    2*PresentationAnalysisStride,DownstreamDirection,
+                    LiveSolverWetVertexMask,FroudeField,
+                    [&](int32 I){return FlowDirectionFor(WaterSamples[I]);});
+                if(MetricUpstream!=INDEX_NONE)
+                {UpstreamIndex=MetricUpstream;UpstreamFroude=FroudeField[UpstreamIndex];}
             }
             if (UpstreamFroude < 1.12f)
             {
