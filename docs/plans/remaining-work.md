@@ -1,5 +1,57 @@
 # Remaining requested work
 
+September27 inline edge-storage trial rejected:64 exact actual-input pairs
+retain ordered geometry and cache decisions, but four-entry contiguous buckets
+lose assembly time in both execution orders against installed indexed chains.
+Three native regressions pass; normal game/source/cooked data unchanged.
+Candidate and temporary audit removed, not promoted. Do not repeat this storage
+hypothesis or infer an FPS improvement; South Fork remains first and unaccepted.
+See [trial evidence](../reconstruction-review-2026-09-07/crest-inline-edge-storage-rejected.md).
+
+September27 first post-repair healthy packaged rapid stage subdivision:
+441 ticks/crest updates,239 refreshes,599 paired commits,zero errors/backlog,
+exit0. Changed-input crest selection averages11.763ms:profile sampling5.633ms
+and ordered assembly5.210ms; retained crest updates average1.836ms. Minor
+copy/midpoint loops are not the main cost. Stage parser now rejects missing
+ticks and malformed/inconsistent metrics;eight tests pass. No game/source/
+physics change or FPS/visual acceptance. Do not repeat unchanged localization
+or previously rejected region/root/emission/cache/solver-lane candidates.
+See [healthy subdivision and evidence](../reconstruction-review-2026-09-07/healthy-rapid-stage-localization.md).
+
+September27 dated-image follow-through:two supported class20 groups (five
+observations) reviewed against locked July21,2022 NAIP and original LiDAR.
+Both appear on bank/water transitions, not independently resolved closed
+boulders. Preserve as provisional bank constraints; do not add standalone rocks.
+2,180 context ground returns compared to BASE only;65 outside its exact boundary
+explicitly excluded without filling. Three selection tests pass. No playable,
+hydraulic or performance change. Do not repeat these unchanged crops/screens;
+next geometry work requires a coupled bank/underwater transition, not cosmetic
+rock placement. Busy-rapid performance remains open at20FPS/p95 50ms. See
+[cluster interpretation and limits](../reconstruction-review-2026-09-07/south-fork-ignored-ground-cluster-review.md).
+
+September27 original class-20 observations now checked against the CURRENT
+normal FullReach ground plus September26 rock envelope:34 native simple/complex
+traces pass, maximum predicted-hit distance0.001548052cm. Independent triangle
+hashes match both collision providers. Return689294 is4.347cm BELOW the envelope,
+not a missing protrusion as a base-only comparison could imply. Other positive
+residuals remain unconfirmed, not17 new boulders. Seven Python tests pass.
+No assets/cooked fields/game changed; no visual, motion, FPS or river acceptance.
+Two preliminary fixtures used the obsolete September17 cap receipt and stopped;
+the current envelope binding is verified, not reverted. Do not repeat this
+unchanged point snapshot; select a supported cluster and cross-check dated
+imagery before a bounded scene change. See
+[current installed-union evidence](../reconstruction-review-2026-09-07/south-fork-ignored-ground-installed-union.md).
+
+September27 crest-target expansion measurement:64 actual-input pairs preserve
+all expanded scalars and corrections byte-for-byte; two native regressions pass.
+Fusing the three parent traversals saves only0.029..0.049ms per target update
+(original averages0.277..0.306ms). Deprioritized, not a numerical/performance
+failure: no whole-frame or packaged qualification was attempted. Candidate and
+temporary fixture removed; original source restored. No playable change or
+FPS acceptance. Do not repeat this minor-loop experiment; prioritize measured
+multi-millisecond surface/selection work or unresolved geometry/hydraulics.
+See [measurement and decision](../reconstruction-review-2026-09-07/crest-target-expansion-measurement.md).
+
 September27 turn-attribution live check completed after other engine work exited:
 964 consecutive fixed steps close the velocity budget within2.22e-16, with zero
 ground response (including<5mm), obstacle yaw or queued angular impulse. This

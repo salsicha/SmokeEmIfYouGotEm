@@ -33,6 +33,32 @@ class WaterStageTimingsTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "no tick/refresh"):
                 self.read(text)
 
+    def test_missing_tick_rejected(self):
+        text='\n'.join(f'WaterPerf scope=tick frame={f} total_ms=1' for f in (30,31,33))
+        with self.assertRaisesRegex(ValueError,'incomplete tick'):
+            self.read(text+'\nWaterPerf scope=refresh frame=30 total_ms=1')
+
+    def test_invalid_values_and_duplicate_keys(self):
+        for metrics in ('total_ms=nan','total_ms=inf','total_ms=-1','total_ms=1 total_ms=2','work_ms=1'):
+            with self.assertRaises(ValueError):
+                self.read(f'WaterPerf scope=tick frame=30 {metrics}')
+
+    def test_changed_metric_set_rejected(self):
+        with self.assertRaisesRegex(ValueError,'changed metrics'):
+            self.read('WaterPerf scope=tick frame=30 total_ms=1 work_ms=0.5\n'
+                      'WaterPerf scope=tick frame=31 total_ms=1')
+
+    def test_sparse_refresh_records_its_actual_frames(self):
+        text='\n'.join(f'WaterPerf scope=tick frame={f} total_ms=1' for f in range(30,34))
+        report=self.read(text+'\nWaterPerf scope=refresh frame=31 total_ms=0.0')
+        self.assertTrue(report['complete_tick_coverage'])
+        self.assertEqual(report['scope_frames']['refresh'],[31])
+        self.assertEqual(report['stages']['refresh']['total_ms']['count'],1)
+
+    def test_invalid_interval(self):
+        with self.assertRaisesRegex(ValueError,'invalid frame interval'):
+            self.read('',first=33,last=30)
+
 
 if __name__ == "__main__":
     unittest.main()

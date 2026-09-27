@@ -10,13 +10,16 @@ import statistics
 from pathlib import Path
 
 ROW = re.compile(r"WaterPerf scope=(\w+) frame=(\d+) (.*)")
-VALUE = re.compile(r"(\w+_ms)=([0-9.]+)")
+VALUE = re.compile(r"(\w+_ms)=([^\s]+)")
 
 
 def summarize(path: Path, first: int, last: int) -> dict:
+    if first < 0 or last < first:
+        raise ValueError('invalid frame interval')
     raw = path.read_bytes()
     scopes: dict[str, dict[str, list[float]]] = {}
     frames: dict[str, set[int]] = {}
+    keys_by_scope: dict[str, set[str]] = {}
     for line in raw.decode("utf-8", errors="replace").splitlines():
         row = ROW.search(line)
         if not row or not first <= int(row[2]) <= last:
@@ -25,10 +28,21 @@ def summarize(path: Path, first: int, last: int) -> dict:
         if frame in frames.setdefault(scope, set()):
             raise ValueError(f"duplicate {scope} frame {frame}: select a post-startup interval")
         frames[scope].add(frame)
-        for key, value in VALUE.findall(row[3]):
-            scopes.setdefault(scope, {}).setdefault(key, []).append(float(value))
+        values = VALUE.findall(row[3])
+        keys = {key for key, _ in values}
+        if len(keys) != len(values) or 'total_ms' not in keys:
+            raise ValueError(f'duplicate metric or missing total in {scope} frame {frame}')
+        if keys != keys_by_scope.setdefault(scope, keys):
+            raise ValueError(f'changed metrics in {scope} frame {frame}')
+        for key, value in values:
+            value = float(value)
+            if not math.isfinite(value) or value < 0:
+                raise ValueError(f'nonfinite or negative {key} in {scope} frame {frame}')
+            scopes.setdefault(scope, {}).setdefault(key, []).append(value)
     if not scopes.get("tick") or not scopes.get("refresh"):
         raise ValueError(f"no tick/refresh data in selected interval: {path}")
+    if frames['tick'] != set(range(first, last+1)):
+        raise ValueError('incomplete tick frame coverage')
     result = {}
     for scope, values in scopes.items():
         result[scope] = {}
@@ -42,7 +56,9 @@ def summarize(path: Path, first: int, last: int) -> dict:
                 "maximum": samples[-1],
             }
     return {"log": str(path.resolve()), "sha256": hashlib.sha256(raw).hexdigest(),
-            "frame_range_inclusive": [first, last], "stages": result}
+            "frame_range_inclusive": [first, last],
+            "scope_frames": {scope: sorted(ids) for scope, ids in frames.items()},
+            "complete_tick_coverage": True, "stages": result}
 
 
 def main() -> None:
