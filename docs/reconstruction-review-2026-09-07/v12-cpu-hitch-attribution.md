@@ -1,5 +1,26 @@
 # V12 CPU cost and far-field rebuild investigation
 
+## V13 playable build in progress
+
+The next bounded step now compiles the candidate into the normal packaged game,
+not another isolated fixture. Session6197/wrapper39720 is running
+`tmp/package-south-fork-v13-20260927.ps1`, stage
+`tmp/south-fork-playable-v13-20260927`. Build receipt and log are
+`tmp/south-fork-v13-package-20260927.json` and the same basename `.log`.
+The receipt freezes source/config/geometry/v8-bundle identities from local
+commit5ef6e4318. Candidate default remains0, with the same450s fields and
+geometry. The new spatial height observer is included but only logs when
+explicitly requested. No completed build, visual delivery or timing gain yet.
+
+The recipe permits only the identified independent hydraulic continuation
+PID12676 to overlap compilation; it rejects other engine/build/solver processes
+and requires20GiB free before starting. This overlap is NOT performance evidence.
+No game profiling/capture is queued automatically. After build success, verify
+the staged v8 payload; after the continuation and final audits finish, perform
+the ordinary Boot/menu launch, real-scene candidate/control runs in both orders
+and original motion review. Retain the20FPS/50ms p95/no-over100ms gates. Do not
+promote buffer reuse from native fixture parity or one hitch measurement alone.
+
 September 27, 2026. Supporting diagnosis only: no new playable delivery,
 performance acceptance, geometry change or solver setting change.
 

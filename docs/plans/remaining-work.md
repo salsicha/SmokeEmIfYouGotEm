@@ -1,5 +1,24 @@
 # Remaining requested work
 
+September27 playable follow-through: v13 packaging is LIVE, session6197,
+wrapper39720, UAT/UBT dotnet39232/15924. Recipe
+`tmp/package-south-fork-v13-20260927.ps1`; durable identity/status receipt
+`tmp/south-fork-v13-package-20260927.json`; log
+`tmp/south-fork-v13-package-20260927.log`. It builds current C++ into a fresh
+normal playable stage, including the opt-in spatial observer and native-tested
+far-field buffer candidate (still OFF by default). Same450s v8 fields and
+captured/inferred geometry; no new solver enablement or quality change.
+Source at launch5ef6e4318; selected source/config/geometry/bundle hashes are
+frozen in the receipt and checked after build. No visible improvement or
+performance gain claimed. Do not duplicate this build or change its inputs.
+The independent hydraulic continuation99863/native12676/wrapper34600 remains
+live, observed758s, with final900s audits already queued. Packaging is not an
+FPS measurement. Wait for BOTH workloads and hydraulic audits to finish before
+normal-menu timing, paired OFF/ON candidate timing and actual motion review.
+Next verify v13 staged v8 payload closure, then test the real build; do not
+enable buffer reuse by default without production correctness/motion and
+both-order timing qualification. South Fork remains first unfinished.
+
 September27 sealed600s checkpoint independently audited (38191 exit0): all
 5,382,400 cells finite/nonnegative;86,720 artificial-bank cells exactly dry.
 Troublemaker8..9km storage450->600 averages+3.01883m3/s (prior375->450 was
