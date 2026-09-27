@@ -153,10 +153,10 @@ simulated bias as measured bathymetry or call this state settled.
 
 ## Required follow-through
 
-1. Poll that exact process/helper to completion; preserve failures. Check final
-   native state, dry-bank exclusion, signed flux/storage balance and temporal
-   regional changes. Do not compare a fresh150s transient to a450s evolved
-   baseline as if the runs differed only in bed shape.
+1. The150s solve, native ground check and runtime export are now complete; do
+   not duplicate them. First repair the newly quantified installed-envelope
+   versus retained-roof hydraulic mismatch below. Preserve these trial outputs.
+   Do not compare fresh150s and evolved baselines as a bed-only experiment.
 2. Inspect actual local drop/jump/recirculation behavior and bed continuity;
    numerical safety alone cannot justify promotion. No lower Froude/shoreline
    gates, decorative extra foam sheets or broken alternative solver.
@@ -168,3 +168,90 @@ simulated bias as measured bathymetry or call this state settled.
 4. South Fork remains first unfinished, with20FPS/p95<=50ms and no frame>100ms,
    convincing single-surface breaking water and captured-reference fidelity
    still required. All later rivers and the wider goal remain open.
+
+## Completed150s solve and native ground check
+
+This section supersedes the live-cook status above. Native PID33592 terminated
+after writing `completed.json` with completed=true and a complete step3000
+snapshot at149.99999999999986s (wall1500.396s). Stderr is empty. Its PowerShell
+observer session30490 exited1 because `.ExitCode` was null after observation;
+do NOT report a known native exit0 or re-run the solve. The old process receipt
+therefore remains stale with completed=false. Independent final-state audit
+was run directly against the finished files and passed, followed by storage
+and station analysis (session44747 exit0).
+
+Final state: `tmp/troublemaker-conveyance150-state-v1-20260927.json`.
+Final banks: `tmp/troublemaker-conveyance150-banks-v1-20260927.json`.
+Final storage: `tmp/troublemaker-conveyance150-storage-v1-20260927.json`.
+Station analysis: `tmp/troublemaker-conveyance150-analysis-v1-20260927/report.json`.
+All5,382,400 cells pass finite/nonnegative checks; maximum depth2.904861m,
+speed8.208481m/s; all86,720 artificial-bank cells remain exactly dry.
+Final h/u/v SHA-256 respectively:
+`06f355a22e492b1f0aa03dbcd7787f2b2123375c1a9f7e7fb1543cd92e755fdd`,
+`1df9689fb27a6bbe47b945768117d08ad9b49daed28708a3727e55f5e1bf431f`,
+`d1027b13d923a4c39729350bb00bf9712c940bff7c8d4dcda342325466468160`.
+
+Full storage change1184.655054m3 closes to integrated exterior flow within
+4.53e-11m3. This is conservation, NOT equilibrium. Final75s net filling
+11.220582m3/s hides regional gains185.556836 and losses174.336255m3/s.
+The8-9km band changes from -0.496936m3/s over0..75s to -14.198846m3/s over
+75..150s. Whole captured-mask wet coverage96.5898%; several8430..8465m bins
+remain near -0.59m surface deviation with reduced wet coverage. Source-time
+discharge is unknown; do not calibrate inferred bathymetry from these evolving
+offsets or call the hole physically accepted.
+
+The older v2 input explicitly seeds from v1 `frame_012000`; even its150s
+snapshot is not an identically initialized bed-only control. No paired-causal
+improvement claim is justified. A coupled playable trial still requires the
+candidate's exact ground, runtime packets and conservative quality gates.
+
+Deferred checker session77718 and Unreal PID2284 completed with exit0. The
+ground-only check compares all803,842 native directed triangles, preserves
+all unmodified corners and XY/winding bit-exactly, and verifies all129,242
+changed-triangle collision probes with maximum error0.001671582cm. All1,334
+protected scene packages remain unchanged. Only the new candidate mesh is
+saved. Package SHA-256 `d135f429a065e1d9d50391beaed0f20fc0b109fbb7a6e32d28c4b44b93062c86`;
+native collision-source SHA-256 `d6a5f18ffe07c881b6dcbe40201cafa863b93d78b6f086e86c78effabdae743a`.
+No engine motion/FPS or rock-union acceptance follows from this ground-only
+NullRHI check. Import warnings remain (memory estimate, smoothing groups and
+deprecated trace enum). See the [native receipt](runtime450-evidence/conveyance-native-ground.json).
+Preparation/export guard commit is `aecf70b3b`.
+
+Runtime export session39935 exits0: `tmp/troublemaker-conveyance-runtime150-v1-20260927`.
+All799 packets/841 atlas tiles verify42,185,039 exact bed-intersection samples.
+Atlas hash `3440032389ba92bdf0be8a61ae3936ee492f4d2b93fa65aa63b505cb17ec4f28`;
+streaming hash `f053b3ba5554b421bb1bcdd02560e7dbc004c386b6345abd246a648331a73a82`.
+[Export receipt](runtime450-evidence/conveyance-export.json). Do NOT bind this
+export as a consistent normal-scene update until the mismatch below is fixed.
+
+## Newly quantified promotion failure: current rock envelope not cooked
+
+The installed September26 rock envelope is explicitly inferred and lower than
+the old source-return roof. The source-union cook still uses the old roof.
+`tmp/audit-conveyance-envelope-parity-20260927.py` independently samples the
+candidate registered ground plus the CURRENT envelope, replacing the old roof
+before taking a maximum. All319 hydraulic sample locations under the old roof
+footprint match the old-roof cook exactly, but284 differ by more than1mm from
+the rendered/collision envelope. Maximum mismatch1.546649m;10 of17 currently
+wet samples differ, by up to0.067565m. Affected cores are0629 and0631.
+See the [failed parity receipt](runtime450-evidence/conveyance-envelope-parity.json).
+This is a quantified coupling problem, not proof that the envelope is surveyed
+or that a1m raster resolves every rock face. Initial audit stopped on a missing
+top-level origin key; using the hash-verified geometry manifest frame completed
+the check. No geometry or fields were altered.
+The current envelope mesh still matches its install hash `7071bab3248cc49f09cb1962eb527b1b13a9c2fefaaec2761dfc920926526f57`.
+Its actor hash is now `0194ca78355f8488fd5166887aa8586f0a48d352ec2ecd8af475bab3c4d35ecc`,
+matching the later September27 successful native installed-union receipt
+`tmp/ignored-ground-installed-union-v3-20260927.json` (SHA-256
+`53b11d23b48b0cf5f323b216cbf769e44c8a9a959a85066f08df998086730469`).
+The older September26 installation actor hash is stale; its mismatch is not
+evidence that the envelope disappeared, and no actor was reverted.
+
+Next: introduce an explicit inferred-envelope union contract and resample the
+same installed rock/registered-bed surface into hydraulic cores and packets,
+preserving all original source returns. Do not relax the existing source-exact
+cap validator, relabel the lowered envelope as measured, restore the old visual
+spikes just for parity, or keep the old roof via a second maximum. Recompute
+changed-bed flow and verify the coupled geometry before normal playable
+installation and rebuilding. The ground candidate itself has now passed its
+native source/collision checks; do not repeat that unchanged stage.
