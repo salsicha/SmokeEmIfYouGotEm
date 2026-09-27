@@ -108,3 +108,33 @@ Archived with hashes, requests, CRS and licences in
 Tools (numpy only): `fetch_wmts_corridor.py`, `fetch_sentinel2_window.py`
 (windowed COG range reads), `extract_osm_river_centreline.py`,
 `png_numpy.py`.
+
+### Registration check (2026-09-27)
+
+All sources were brought into CRTM05 (EPSG:5367) with
+`physics/scripts/geo_frames.py`: generic transverse Mercator, plus Web
+Mercator for the orthophoto tiles. Findings:
+
+- **Registration.** The IGN river-bank lines (hydrography layer D01, drawn as
+  double lines) follow the orthophoto water edges within a few metres, and
+  the OSM centreline runs inside the channel. The 1:5,000 cartography was
+  evidently compiled from the same 2014-2017 photographs, so the bank lines
+  give the wetted extent at the photo flow.
+- **Water-surface evidence.** The 10 m contours stop at the banks. Each
+  contour end on a bank fixes the water surface at that point to within the
+  contour's accuracy, which gives a stepwise surface profile along the reach.
+  The D01 `elevacion` attribute is unusable (−38,252 to 11,459 m). D03
+  features are small ponds outside the reach.
+- **Orthophoto.** The photo shows the rapids' whitewater, pools, gravel bars
+  and emergent boulders at about 1 m. It can supply a wetted mask, a
+  whitewater mask (for the observed-whitewater field used at Hance) and
+  emergent-rock positions.
+- **Discharge.** No gauge is attached. The cook will use the existing 45 m³/s
+  runnable-planning band, labelled as not measured.
+
+Next, following the Hance pipeline:
+1. Contour-to-DEM interpolation, with the banks held at the surface profile.
+2. A discharge-consistent inferred bed.
+3. Orthophoto-derived rocks and whitewater.
+4. The curvilinear scenario and cook, then runtime export as a geographic
+   `L_UpperHuacas` replacement.
