@@ -5936,14 +5936,20 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     TEXT("BreakingHeightAudit world_s=%.3f station_m=%.3f lateral_m=%.3f "
                          "up_depth_m=%.4f up_fr=%.4f down_fr=%.4f raw_rise_m=%.4f "
                          "optical_rise_m=%.4f raw_extra_m=%.4f optical_extra_m=%.4f "
-                         "coverage=%.3f clearance_m=%.3f accepted=%d"),
+                         "coverage=%.3f clearance_m=%.3f accepted=%d "
+                         "down_station_m=%.3f down_lateral_m=%.3f up_surface_m=%.4f down_surface_m=%.4f "
+                         "up_bed_m=%.4f down_bed_m=%.4f flow_direction_x=%.6f flow_direction_y=%.6f"),
                     GetWorld()->GetTimeSeconds(), RiverCoordinatesM[UpstreamIndex].X,
                     RiverCoordinatesM[UpstreamIndex].Y, WaterSamples[UpstreamIndex].DepthMeters,
                     UpstreamFroude, LocalFroude, RawRise, OpticalRise,
                     RawDimensions.X, OpticalDimensions.X, PresentationCoverage,
                     PresentationEdgeClearanceMeters,
                     PresentationCoverage >= MinimumBreakingCoverage &&
-                        PresentationEdgeClearanceMeters >= MinimumBreakingClearanceMeters);
+                        PresentationEdgeClearanceMeters >= MinimumBreakingClearanceMeters,
+                    RiverCoordinatesM[Index].X, RiverCoordinatesM[Index].Y,
+                    WaterSamples[UpstreamIndex].SurfaceHeightMeters, WaterSamples[Index].SurfaceHeightMeters,
+                    WaterSamples[UpstreamIndex].BedHeightMeters, WaterSamples[Index].BedHeightMeters,
+                    FlowDirectionFor(WaterSamples[UpstreamIndex]).X, FlowDirectionFor(WaterSamples[UpstreamIndex]).Y);
             }
             if (PresentationCoverage < MinimumBreakingCoverage ||
                 PresentationEdgeClearanceMeters <

@@ -24,3 +24,40 @@ def test_height_audit_rejects_incomplete_or_mixed_snapshots():
         except ValueError:
             continue
         raise AssertionError('Invalid audit accepted')
+
+
+SPATIAL = (' down_station_m=8364 down_lateral_m=1 up_surface_m=100 down_surface_m=100.3 '
+           'up_bed_m=99.2 down_bed_m=99.3 flow_direction_x=.6 flow_direction_y=.8')
+
+
+def test_spatial_endpoints_preserved_without_claiming_a_rendered_profile():
+    rows = HELPERS['parse'](ROW+SPATIAL)
+    result = HELPERS['summarize'](rows, 8355, 8365)
+    assert result['spatial_geometry_available']
+    assert result['candidates'][0]['down_station_m'] == 8364
+    assert not HELPERS['summarize'](HELPERS['parse'](ROW),8355,8365)['spatial_geometry_available']
+    assert not HELPERS['summarize'](rows,8400,8410)['spatial_geometry_available']
+
+
+def test_spatial_records_reject_partial_inconsistent_or_mixed_endpoints():
+    valid = ROW+SPATIAL
+    for text in [ROW+' down_station_m=8364', valid.replace('down_surface_m=100.3','down_surface_m=100.4'),
+                 valid.replace('flow_direction_x=.6','flow_direction_x=0'),
+                 valid+'\n'+ROW, valid.replace('down_bed_m=99.3','up_bed_m=99.2')]:
+        try:
+            HELPERS['parse'](text)
+        except ValueError:
+            continue
+        raise AssertionError('Invalid spatial record accepted')
+
+
+def test_independent_native_rounding_is_allowed():
+    text = (ROW+SPATIAL).replace('down_surface_m=100.3','down_surface_m=100.3001')
+    assert HELPERS['parse'](text)[0]['down_surface_m'] == 100.3001
+
+
+def test_depth_is_not_assumed_to_include_every_presentation_height():
+    # Some adapter paths add a traveling presentation wave but retain physical
+    # source depth. Preserve this evidence rather than assert a false identity.
+    text = (ROW+SPATIAL).replace('up_bed_m=99.2','up_bed_m=99')
+    assert HELPERS['parse'](text)[0]['up_depth_m'] == .8

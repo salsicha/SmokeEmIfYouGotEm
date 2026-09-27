@@ -1,5 +1,18 @@
 # Remaining requested work
 
+September27 realism follow-through: v12's41 eligible upstream height candidates
+show no raw/optical correction difference; strongest nearby front has0.3593m
+resolved rise plus0.0470m extra. Small added height alone does not justify
+amplification. Spatial accounting is not provable from old logs because their
+downstream endpoint is missing. The existing one-shot observer now records paired
+coordinates/elevations/bed/flow direction; six parser regressions pass and legacy
+v12 evidence remains explicitly spatially unavailable. Editor build46600 passed
+(exit0,59.07s), no build from this sequence remains live;
+no new game capture, geometry or physics change. See
+[height and spatial evidence](../reconstruction-review-2026-09-07/v12-crest-height-spatial-audit.md).
+Use the observer in the next justified motion review, not another unchanged v12
+run. Same hydraulic continuation99863 remains live; no FPS test during it.
+
 September27 implementation follow-through: Cartesian far-field packing-capacity
 reuse candidate and actual native mesh-parity tests are now in source; candidate
 defaults OFF, original colors/geometry/physics retained. Editor build28379
