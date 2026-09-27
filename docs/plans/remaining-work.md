@@ -1,5 +1,16 @@
 # Remaining requested work
 
+September27 packaged v4 paired support/GPU check at station11,520m passes:
+2,042 wet contact probes,541 with nonzero detail;4,226 GPU queries; matching
+published sequence99. Maximum support error0.000011898cm; GPU error2.98e-8.
+Two ground-occluded probes correctly have dry support. Process exit0, no runtime
+errors,899 paired commits over81.117s and zero PDE backlog. This closes the
+deferred single-snapshot numerical check, not swept collision, shoreline,
+visual or FPS acceptance. No gameplay code/fields changed. See
+[paired check](../reconstruction-review-2026-09-07/south-fork-v4-paired-contact-pending.md).
+Do not repeat this unchanged snapshot or the already-failed FPS run; return
+to a distinct exact-preserving CPU improvement or unresolved physical geometry.
+
 September26 root-edge incidence experiment: native geometry/cache checks pass,
 and64 actual11,520m rapid pairs preserve exact topology/current coordinates.
 Whole-build timing fails the both-order improvement gate (12.617→12.728ms in
@@ -67,6 +78,23 @@ sources cover Hance: measured multibeam channel bathymetry (river miles 61-88,
 (2002-2021) and 20 cm 2013 imagery. Downloading them needs the user's explicit
 permission; Colorado stays queued behind South Fork. See
 [Colorado plan](colorado-evidence-reconstruction.md#scene-audit-and-source-research-2026-09-26).
+
+September26 Colorado delivery (playable, L_Hance): **Hance is now a 2.5 km
+evidence-based geographic reach** built from the downloaded USGS sources (2021
+corridor DEM and orthophoto at ~8,000 cfs, 2014 sonar pools). The rapid bed has
+no sonar, so it is a labelled discharge-consistent inference with 141 inferred
+boulders placed at imagery whitewater. Only that inferred bed was calibrated,
+twice, against the textured 2021 surface: median error +0.04 m, median absolute
+0.18 m, wet-extent IoU 0.95, discharge within 1.3%. The Landscape and drape come
+from the same evidence. It uses moving-window streaming, a full-width 1.5 m live
+strip and a new curved far-field water mesh. A fix for mirrored curved grids
+(their surfaces faced down) and a whitewater onset calibrated to the imagery are
+included. Performance: p95 29.4/36.5/37.1 ms at the put-in, main rapid and lower
+rapid, with no hitches. Open: whitewater appearance (lace, not massed white),
+calm-water levels only to about ±0.5 m, invented terrain beyond the corridor DEM
+(a 3DEP backdrop would need download permission), inferred bed/boulder heights.
+See [Hance evidence review](../reconstruction-review-2026-09-07/colorado-hance-evidence.md).
+Next in order: Pacuare.
 
 September26 playable delivery (normal FullReach): **long views no longer end
 at the edge of the loaded world.** The river stopped in a straight line ~110 m

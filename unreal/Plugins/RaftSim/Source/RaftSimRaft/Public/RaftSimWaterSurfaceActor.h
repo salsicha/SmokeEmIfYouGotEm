@@ -959,6 +959,16 @@ private:
     FVector2D FoamTextureAdvectionMeters = FVector2D::ZeroVector;
     FVector2D SmoothedFoamTextureVelocityMps = FVector2D::ZeroVector;
     bool bLoggedPresentationDiagnostics = false;
+    /** Curved (non-Cartesian) grids whose station/lateral axes map to a
+     * mirrored world frame (for example world_y_sign -1 on a westward reach)
+     * need reversed triangle winding, or every surface faces down. */
+    bool bFlipCurvedGridWinding = false;
+    void ApplyCurvedGridWinding(TArray<int32>& Indices) const
+    {
+        if (!bFlipCurvedGridWinding) return;
+        for (int32 I = 0; I + 2 < Indices.Num(); I += 3) Swap(Indices[I + 1], Indices[I + 2]);
+    }
+    double LastPresentationDiagnosticsSeconds = -1.0e9;
     bool bLoggedHydraulicReliefDiagnostics = false;
     bool bLoggedBoulderWakeDiagnostics = false;
     bool bLoggedRaftInteriorWaterTransmission = false;
@@ -1029,6 +1039,9 @@ private:
     int32 LastLoggedOpticalSmoothingPassCount = INDEX_NONE;
     float ResolvedPresentationSurfaceSmoothingStrength = 0.0f;
     float ResolvedPresentationStandingWaveScale = 1.0f;
+    /** Generic breaking-aeration Froude onset and ramp (config; 0.78 / 1.25 by default). */
+    float ResolvedFoamFroudeOnset = 0.78f;
+    float ResolvedFoamFroudeRamp = 1.25f;
     float ResolvedPresentationHydraulicReliefScale = 1.0f;
     float ResolvedRaftLocalFluidWindowMeters = 100.0f;
     float ResolvedRaftLocalFluidHeightfieldStrength = 0.0f;

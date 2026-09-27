@@ -232,14 +232,14 @@ bool FRaftSimAssertRiverMapCommand::Update()
     const bool bUsesOneMetreReferencePresentation =
         bPacuareReferenceRun || bColoradoHanceReferenceRun ||
         bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
-    const float ExpectedPresentationSpacingM = bZambeziReferenceRun
-        ? 1.5f : (bUsesOneMetreReferencePresentation ? 1.0f : 0.5f);
     // The geographic Hance reach draws its whole 160 m cooked lateral span
-    // (LivePresentationWidthM): 241 x 161 vertices at 1 m.
+    // (LivePresentationWidthM) on a 1.5 m lattice: 161 x 108 vertices.
+    const float ExpectedPresentationSpacingM = (bZambeziReferenceRun || bColoradoHanceReferenceRun)
+        ? 1.5f : (bUsesOneMetreReferencePresentation ? 1.0f : 0.5f);
     const int32 ExpectedPresentationVertices = bZambeziReferenceRun
-        ? 10465 : (bColoradoHanceReferenceRun ? 38801 : (bUsesOneMetreReferencePresentation ? 23377 : 92833));
+        ? 10465 : (bColoradoHanceReferenceRun ? 17388 : (bUsesOneMetreReferencePresentation ? 23377 : 92833));
     const int32 ExpectedPresentationTriangles = bZambeziReferenceRun
-        ? 20480 : (bColoradoHanceReferenceRun ? 76800 : (bUsesOneMetreReferencePresentation ? 46080 : 184320));
+        ? 20480 : (bColoradoHanceReferenceRun ? 34240 : (bUsesOneMetreReferencePresentation ? 46080 : 184320));
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
     {

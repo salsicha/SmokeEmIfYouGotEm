@@ -48,6 +48,9 @@ SPAN_X, SPAN_Y = 2500.0, 1212.0
 LANDSCAPE = 2017
 DATUM = 740.0
 FILL_RISE, FILL_RISE_CAP_M = 0.45, 350.0
+EDGE_TRIM_M = 10
+ALBEDO_MEDIAN, ALBEDO_CAP = 0.11, 0.45
+WET_BED_DARKENING = 0.55
 BAND = 'steady_8000cfs_2021'
 Q = 226.534772736
 
@@ -262,6 +265,12 @@ def main():
                        (ev / 'boulders.json', 'inferred_boulders.json'), (ev / 'centreline.json', 'evidence_centreline.json'),
                        (sr / 'build_report.json', 'scenario_build_report.json'), (args.compare / 'compare.json', 'cook_compare.json')):
         shutil.copyfile(srcf, scen_out / 'evidence' / name)
+    corr = evm.get('parameters', {}).get('bed_correction')
+    if corr:
+        # archive the cook calibration that built this evidence bed
+        corr_path = Path(corr) if Path(corr).is_absolute() else ROOT / corr
+        assert sha(corr_path) == evm['parameters']['bed_correction_sha256']
+        shutil.copyfile(corr_path, scen_out / 'evidence' / 'bed_correction.npz')
     for png in ('profile.png', 'whitewater.png', 'wet_agreement.png', 'speed.png', 'surface_error.png'):
         shutil.copyfile(args.compare / png, scen_out / 'evidence' / ('cook_' + png))
     (scen_out / 'runtime').mkdir()
@@ -279,13 +288,29 @@ def main():
     terr_out.mkdir(parents=True)
     g = np.load(ev / 'evidence_grid.npz')
     ebed = g['bed'].astype(np.float64); cls = g['class_code']
+    # Photogrammetric DEM edges are unreliable (isolated high cells at the
+    # corridor boundary read as spires from the river): drop the outermost
+    # EDGE_TRIM_M of measured ground and let the fill take over there.
+    core = np.isfinite(ebed)
+    for _ in range(EDGE_TRIM_M):
+        k_ = core.copy()
+        k_[1:] &= core[:-1]; k_[:-1] &= core[1:]; k_[:, 1:] &= core[:, :-1]; k_[:, :-1] &= core[:, 1:]
+        core = k_
+    ebed = np.where(core | (cls > 0), ebed, np.nan)
     missing = ~np.isfinite(ebed)
     # Outside the 2021 corridor DEM (it reaches ~200-250 m from the channel)
     # the canyon keeps rising; a flat push-pull fill would read as plateaus.
     # Presentation fill: smooth continuation plus a rise of FILL_RISE per metre
     # from the measured edge, capped. Invented, not measured (manifest).
     smooth, dist_out = smooth_fill(ebed, ~missing, 8)
+    # Continuity at the measured edge: the coarse fill averages 8 m blocks and
+    # can sit tens of metres off a cliff-top edge cell (a one-pixel wall seen
+    # as a needle). Relax the fill harmonically within 40 m of the edge.
     filled = smooth + np.where(missing, np.minimum(FILL_RISE * dist_out, FILL_RISE_CAP_M), 0.0)
+    band = missing & (dist_out < 40.0)
+    for _ in range(600):  # Jacobi: measured cells and the deep fill stay fixed
+        p_ = np.pad(filled, 1, mode='edge')
+        filled = np.where(band, 0.25 * (p_[:-2, 1:-1] + p_[2:, 1:-1] + p_[1:-1, :-2] + p_[1:-1, 2:]), filled)
     jj = np.arange(LANDSCAPE) * (SPAN_X / (LANDSCAPE - 1)); ii = np.arange(LANDSCAPE) * (SPAN_Y / (LANDSCAPE - 1))
     FX, FY = np.meshgrid(jj - 0.5, ii - 0.5)  # evidence cell centres sit at +0.5 m
     height = bilinear(filled, FX, FY)
@@ -304,15 +329,32 @@ def main():
     DW, DH = 4096, 2048
     fx = (np.arange(DW) + 0.5) * (img.shape[1] / DW) - 0.5; fy = (np.arange(DH) + 0.5) * (img.shape[0] / DH) - 0.5
     FX2, FY2 = np.meshgrid(fx, fy)
-    drape = np.zeros((DH, DW, 3), np.uint8)
+    vmask = bilinear(valid.astype(np.float32), FX2, FY2) > 0.5
+    # The orthophoto already contains the capture sunlight; used as albedo it
+    # is lit again. Stretch the bands, then scale linear colour so the median
+    # ground luminance is ALBEDO_MEDIAN (typical canyon rock/soil albedo),
+    # capped at ALBEDO_CAP. One global factor: relative colour is unchanged.
+    lin = np.zeros((DH, DW, 3))
     for k in range(3):
         band = bilinear(rgb[..., k], FX2, FY2)
-        drape[..., k] = np.round(np.clip((band - lo[k]) / (hi[k] - lo[k]), 0, 1) ** (1 / 1.15) * 255)
-    vmask = bilinear(valid.astype(np.float32), FX2, FY2) > 0.5
-    # outside the imagery footprint: smooth outward continuation of the
-    # measured colours (invented presentation colour, labelled in the manifest)
+        lin[..., k] = np.clip((band - lo[k]) / (hi[k] - lo[k]), 0, 1) ** 2.2
+    lum = 0.2126 * lin[..., 0] + 0.7152 * lin[..., 1] + 0.0722 * lin[..., 2]
+    albedo_scale = ALBEDO_MEDIAN / max(float(np.median(lum[vmask])), 1e-6)
+    drape = np.round(np.clip(lin * albedo_scale, 0, ALBEDO_CAP) ** (1 / 2.2) * 255).astype(np.uint8)
+    # Under water the photo shows the 2021 water surface (dark water and
+    # whitewater), not the bed; seen through the transparent live water it
+    # read as a bright bed. Replace imagery water with a smooth continuation
+    # of the surrounding dry-bank colours, darkened for wet ground. Outside
+    # the imagery footprint, continue the measured colours outward. Both are
+    # invented presentation colour, labelled in the manifest.
+    g_ev = np.load(ev / 'evidence_grid.npz')
+    wr = np.clip(((np.arange(DH) + 0.5) * (NYE / DH)).astype(int), 0, NYE - 1)
+    wc = np.clip(((np.arange(DW) + 0.5) * (NXE / DW)).astype(int), 0, NXE - 1)
+    water_px = g_ev['river'][wr][:, wc]
+    keep = vmask & ~water_px
     for k in range(3):
-        drape[..., k] = np.round(np.clip(smooth_fill(drape[..., k].astype(np.float64), vmask, 16, iters=400)[0], 0, 255))
+        drape[..., k] = np.round(np.clip(smooth_fill(drape[..., k].astype(np.float64), keep, 16, iters=400)[0], 0, 255))
+    drape[water_px] = np.round(drape[water_px] * WET_BED_DARKENING).astype(np.uint8)
     drape_path = terr_out / 'hance_evidence_drape_4096x2048.png'
     write_png_rgb(drape_path, drape)
     # centreline (Unreal frame) and coordinate map
@@ -357,10 +399,12 @@ def main():
                              world_origin_epsg6404_m=dict(west_edge_e=X0, centre_n=ORIGIN[1]), world_min_x_cm=0.0),
               drape=dict(size_px=[DW, DH], source='2021 corridor imagery 0.5 m export, bands R,G,B', stretch_percentiles=[0.5, 99.7],
                          outside_footprint='smooth outward continuation of measured colours (invented)',
+                         under_water=f'imagery water replaced by the continuation of dry-bank colours x {WET_BED_DARKENING} (invented bed colour)',
                          footprint_share=float(vmask.mean()),
-                         gamma=1.15, uv='U = world_x / 250000 cm; V = (world_y + 60600) / 121200 cm (north up)',
+                         albedo_median=ALBEDO_MEDIAN, albedo_cap=ALBEDO_CAP, albedo_scale=float(albedo_scale), uv='U = world_x / 250000 cm; V = (world_y + 60600) / 121200 cm (north up)',
                          note='orthophoto colour with its capture lighting and shadows; appearance evidence, not albedo'),
               composition=dict(class_share={str(k): float((cls == k).mean()) for k in range(5)}, nan_filled_share=float(missing.mean()),
+                               edge_trim_m=EDGE_TRIM_M,
                                nan_fill=f'outside the 2021 corridor DEM: pyramid push-pull from the measured edge plus {FILL_RISE} m rise per metre '
                                         f'from it (cap {FILL_RISE_CAP_M} m); invented presentation terrain, not measured'),
               solver_consistency=dict(terrain_minus_solver_bed_wet_cells_m_p5_p50_p95=np.percentile(diff, [5, 50, 95]).tolist(),

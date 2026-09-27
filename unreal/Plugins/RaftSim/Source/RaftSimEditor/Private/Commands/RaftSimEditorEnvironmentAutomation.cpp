@@ -431,11 +431,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         }
         FRaftSimLandscapeCandidateWaterSettings WaterSettings =
             GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
+        // Mirror BuildLandscapeImportCandidateMap's material rule
+        // (bDisableSolverVisualizationFieldsInMaterial) so the manifest
+        // records the water material actually built.
         if ((Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
              Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
              Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon")) &&
-            Candidate.bUseSolverVisualizationFields &&
-            !Candidate.SolverVisualizationFieldRelativePath.IsEmpty())
+            (!Candidate.bUseSolverVisualizationFields ||
+             !Candidate.SolverVisualizationFieldRelativePath.IsEmpty()))
         {
             // These reach-local packed fields are already sampled into capture
             // geometry and vertex colours. Their materials must not re-sample
@@ -528,8 +531,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
         const bool bUsesSouthForkOrganicFoothillSurface =
             Candidate.PreviewSpec.RiverId == TEXT("american_south_fork");
+        // The evidence-based Hance Landscape takes its colour from the 2021
+        // orthophoto drape (see LoadOrCreateLandscapeCandidateMaterial); the
+        // organic palette is only built when that texture is absent.
+        const bool bUsesColoradoEvidenceDrape =
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river") &&
+            LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/T_RaftSim_ColoradoHance_EvidenceDrape."
+                     "T_RaftSim_ColoradoHance_EvidenceDrape")) != nullptr;
         const bool bUsesColoradoOrganicHanceSurface =
-            Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !bUsesColoradoEvidenceDrape;
         const bool bUsesFutaleufuOrganicTemperateSurface =
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
         const bool bUsesChilkoOrganicLavaCanyonSurface =
@@ -999,7 +1010,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? TEXT("south_fork_v1_three_scale_world_space_dry_grass_oak_litter_granitic_soil_and_slope_aware_weathered_granite_response")
                 : (bUsesPacuareOrganicRainforestSurface
                 ? TEXT("pacuare_v1_three_scale_world_space_canopy_soil_moss_leaf_litter_and_slope_aware_wet_rock_response")
-                : (bUsesColoradoOrganicHanceSurface
+                : (bUsesColoradoEvidenceDrape
+                       ? TEXT("colorado_hance_evidence_2021_orthophoto_drape_albedo_scaled_no_procedural_palette")
+                       : bUsesColoradoOrganicHanceSurface
                        ? TEXT("colorado_hance_v1_four_scale_world_space_sandy_bench_weathered_iron_cliff_dark_rock_talus_and_fine_grain_response")
                        : (bUsesFutaleufuOrganicTemperateSurface
                        ? TEXT("futaleufu_v1_three_scale_world_space_forest_floor_moss_leaf_litter_and_slope_aware_wet_granite_response")

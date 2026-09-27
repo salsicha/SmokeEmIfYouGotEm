@@ -102,6 +102,10 @@ private:
 };
 }
 
+static TAutoConsoleVariable<float> CVarRaftSimPresentationDiagnosticsIntervalS(
+    TEXT("raftsim.PresentationDiagnosticsIntervalS"), 0.0f,
+    TEXT("Review: re-log the live water presentation diagnostics every N seconds (0 = once)."),
+    ECVF_Default);
 static TAutoConsoleVariable<int32> CVarRaftSimForceBoatWakeTest(
     TEXT("raftsim.ForceBoatWakeTest"), 0,
     TEXT("1 = force the geometry-only paddle wake on and use ground-relative ")
@@ -2002,6 +2006,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     }
 
     bUsesCurvedRiverCoordinates = WaterAdapter && WaterAdapter->HasRiverCoordinateMap();
+    ResolvedFoamFroudeOnset = RiverWaterConfig ? RiverWaterConfig->LiveFoamFroudeOnset : 0.78f;
+    ResolvedFoamFroudeRamp = RiverWaterConfig ? FMath::Max(RiverWaterConfig->LiveFoamFroudeRamp, 0.05f) : 1.25f;
     if (RiverWaterConfig && RiverWaterConfig->LivePresentationWidthM > 0.0f)
     {
         CurvedGridWidthMeters = RiverWaterConfig->LivePresentationWidthM;
@@ -2187,9 +2193,20 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         }
     }
 
+    bFlipCurvedGridWinding = false;
     if (bUsesCurvedRiverCoordinates)
     {
         UpdateCurvedGridPlanarGeometry();
+        // The winding below faces up when station maps to +X and lateral to
+        // +Y (every legacy curved map). Measure the actual world orientation.
+        if (!(WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates()) &&
+            GridStationN > 1 && GridLateralN > 1)
+        {
+            const int32 Centre = (GridLateralN / 2) * GridStationN + FMath::Min(GridStationN / 2, GridStationN - 2);
+            const FVector AlongStation = Vertices[Centre + 1] - Vertices[Centre];
+            const FVector AlongLateral = Vertices[FMath::Min(Centre + GridStationN, Vertices.Num() - 1)] - Vertices[Centre];
+            bFlipCurvedGridWinding = AlongStation.X * AlongLateral.Y - AlongStation.Y * AlongLateral.X < 0.0;
+        }
     }
 
     for (int32 Y = 0; Y < GridLateralN - 1; ++Y)
@@ -2204,6 +2221,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             Triangles.Add(I1); Triangles.Add(I2); Triangles.Add(I3);
         }
     }
+    ApplyCurvedGridWinding(Triangles);
 
     const TArray<FVector2D> EmptyUVs;
     UpdateSurfaceCarrierMesh(true,VertexColors);
@@ -2305,7 +2323,14 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                             // Chilko needs connected froth inside the web, not
                             // an additive bias that grays every aerated cell.
                             TEXT("WhitewaterFrothLaceModulationFloor"),
-                            bUsesMigratedChilkoVolumeCore ? 0.10f : 0.02f);
+                            RiverWaterConfig && RiverWaterConfig->LiveWhitewaterLaceFloor >= 0.0f
+                                ? RiverWaterConfig->LiveWhitewaterLaceFloor
+                                : (bUsesMigratedChilkoVolumeCore ? 0.10f : 0.02f));
+                        if (RiverWaterConfig && RiverWaterConfig->LiveWhitewaterPatchOutsideFloor >= 0.0f)
+                        {
+                            VolumeMaterial->SetScalarParameterValue(TEXT("WhitewaterFrothPatchOutsideFloor"),
+                                RiverWaterConfig->LiveWhitewaterPatchOutsideFloor);
+                        }
                         VolumeMaterial->SetScalarParameterValue(TEXT("FoamRoughness"), 0.80f);
                     }
                     VolumeMaterial->SetScalarParameterValue(
@@ -2994,6 +3019,7 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingLipMesh()
         }
     }
 
+    ApplyCurvedGridWinding(LipTriangles);
     LogWaterRenderStateEvent(GetWorld(), TEXT("breaking_lip_create"));
     BreakingLipMesh->CreateMeshSection_LinearColor(
         0,
@@ -3280,6 +3306,7 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
         }
     }
 
+    ApplyCurvedGridWinding(RollerTriangles);
     LogWaterRenderStateEvent(GetWorld(), TEXT("breaking_roller_create"));
     BreakingRollerVolumeMesh->CreateMeshSection_LinearColor(
         0, RollerVertices, RollerTriangles, RollerNormals, RollerUvs,
@@ -5540,9 +5567,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 const float RoughnessGate = FMath::SmoothStep(
                     0.015f, 0.06f, SurfaceWorkingSlope);
                 Foam = RoughnessGate *
-                    FMath::Clamp((Froude - 0.78f) / 1.25f, 0.0f, 1.0f);
+                    FMath::Clamp((Froude - ResolvedFoamFroudeOnset) / ResolvedFoamFroudeRamp, 0.0f, 1.0f);
                 float LegacyFoam = FoamSourceAudit.IsEmpty() ? 0.f : FMath::SmoothStep(0.015f,0.06f,LegacyWorkingSlope)*
-                    FMath::Clamp((Froude-.78f)/1.25f,0.f,1.f);
+                    FMath::Clamp((Froude-ResolvedFoamFroudeOnset)/ResolvedFoamFroudeRamp,0.f,1.f);
                 if (!FoamSourceAudit.IsEmpty())FoamSourceAudit[Index]=FVector4f(LegacyFoam,Foam,0,0);
                 // Standing-wave crests aerate at their tops: a wave train
                 // below a drop reads as alternating white crest caps over
@@ -7790,6 +7817,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     LiveVolumeCoreTriangles.Add(I3);
                 }
             }
+            ApplyCurvedGridWinding(LiveVolumeCoreTriangles);
         }
         // (The diagonal stitch triangles the one-row bank steps used to need
         // are gone: every dry cell is emitted and collapses onto the
@@ -8740,9 +8768,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         CartesianShorelineMesh->PrefetchCrestProfile(CartesianCrestInput);
     const double RefreshCpuMilliseconds =
         (FPlatformTime::Seconds() - RefreshStartSeconds) * 1000.0;
-    if (!bLoggedPresentationDiagnostics && WetVertexCount > 0)
+    const float DiagnosticsIntervalS = CVarRaftSimPresentationDiagnosticsIntervalS.GetValueOnGameThread();
+    const double DiagnosticsNow = FPlatformTime::Seconds();
+    if (WetVertexCount > 0 && (!bLoggedPresentationDiagnostics ||
+        (DiagnosticsIntervalS > 0.0f && DiagnosticsNow - LastPresentationDiagnosticsSeconds >= DiagnosticsIntervalS)))
     {
         bLoggedPresentationDiagnostics = true;
+        LastPresentationDiagnosticsSeconds = DiagnosticsNow;
         UE_LOG(
             LogTemp, Display,
             TEXT("RaftSim live water presentation: material=%s "

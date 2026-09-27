@@ -85,6 +85,25 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     bool bEnableCookedFarFieldWater = false;
 
+    /** Froude number where the generic rough-surface aeration starts (0.78 by
+     * default). A map may calibrate it against measured whitewater coverage
+     * at its cooked flow; it changes appearance only, never hydraulics. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "0.1", ClampMax = "2.0"))
+    float LiveFoamFroudeOnset = 0.78f;
+
+    /** Froude span from onset to full generic aeration (1.25 by default). */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "0.05", ClampMax = "3.0"))
+    float LiveFoamFroudeRamp = 1.25f;
+
+    /** Volume-core whitewater lace floor (negative keeps the built-in value).
+     * Higher values fill foam cells more solidly between lace filaments. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    float LiveWhitewaterLaceFloor = -1.0f;
+
+    /** Volume-core foam outside compact froth patches (negative keeps the built-in value). */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    float LiveWhitewaterPatchOutsideFloor = -1.0f;
+
     /** Full-reach production terrain exists in the map; suppress local bed proxy. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment")
     bool bMapProvidesTerrain = false;

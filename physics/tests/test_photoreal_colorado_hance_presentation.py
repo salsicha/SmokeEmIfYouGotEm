@@ -49,6 +49,26 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+# These reviews hash-locked the interpreted 600 m Hance map. On 2026-09-26 it
+# was replaced by the evidence-based geographic reach (2021 corridor DEM and
+# orthophoto, 2014 sonar pools, labelled inferred rapid bed). The reviews stay
+# as historical records; their locked map and captures are no longer shipped.
+SUPERSEDING_REVIEW = REPO_ROOT / (
+    "docs/reconstruction-review-2026-09-07/colorado-hance-evidence.md"
+)
+
+
+def _assert_superseded_by_evidence_reconstruction(review: dict) -> None:
+    assert SUPERSEDING_REVIEW.is_file()
+    locked_maps = [
+        artifact for artifact in review["retained_artifacts"]
+        if artifact["path"] == "unreal/Content/RaftSim/Maps/L_Hance.umap"
+    ]
+    assert locked_maps
+    for artifact in locked_maps:
+        assert _sha256(REPO_ROOT / artifact["path"]) != artifact["sha256"]
+
+
 def test_hance_organic_terrain_is_multiscale_and_non_displacing() -> None:
     terrain = TERRAIN_SOURCE.read_text(encoding="utf-8")
     base = read_base_material_source(REPO_ROOT)
@@ -230,13 +250,10 @@ def test_hance_v3_terrain_ecology_review_is_hash_locked_and_honest() -> None:
     assert len(review["remaining_photoreal_defects"]) >= 7
     assert len(review["required_external_acceptance_gates"]) == 6
 
-    for artifact in review["retained_artifacts"]:
-        path = REPO_ROOT / artifact["path"]
-        assert path.is_file()
-        assert _sha256(path) == artifact["sha256"]
+    _assert_superseded_by_evidence_reconstruction(review)
 
 
-def test_hance_manifest_records_organic_terrain_and_native_water() -> None:
+def test_hance_manifest_records_evidence_drape_and_native_water() -> None:
     candidate = json.loads(MANIFEST.read_text(encoding="utf-8"))["candidates"][0]
 
     assert candidate["river_id"] == "colorado_river"
@@ -246,15 +263,9 @@ def test_hance_manifest_records_organic_terrain_and_native_water() -> None:
     )
     assert candidate["landscape_material_shading_model"] == "DefaultLit"
     assert candidate["landscape_material_organic_surface_status"] == (
-        "colorado_hance_v1_four_scale_world_space_sandy_bench_weathered_iron_"
-        "cliff_dark_rock_talus_and_fine_grain_response"
+        "colorado_hance_evidence_2021_orthophoto_drape_albedo_scaled_no_procedural_palette"
     )
-    assert candidate["landscape_material_organic_world_noise_scales_per_cm"] == [
-        0.00014,
-        0.00053,
-        0.0023,
-        0.0068,
-    ]
+    assert candidate["landscape_material_organic_world_noise_scales_per_cm"] == []
     assert candidate["water_material_parent"] == (
         "/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
         "M_RaftSim_Colorado_HanceDefaultLitWater"
@@ -309,25 +320,7 @@ def test_hance_presentation_review_is_hash_locked_and_honest() -> None:
     assert len(review["remaining_photoreal_defects"]) >= 6
     assert len(review["required_external_acceptance_gates"]) == 6
 
-    superseded_paths = {
-        "unreal/Content/RaftSim/Maps/L_Hance.umap",
-        "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_colorado_river.json",
-        "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_guide_seat_downstream.png",
-        "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png",
-        "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_solver_rapid_river_eye_downstream.png",
-        "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/colorado_hance_moderate_visualization_manifest.json",
-        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp",
-        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp",
-        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
-        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
-        "unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimRiverWaterConfig.h",
-    }
-    for artifact in review["retained_artifacts"]:
-        if artifact["path"] in superseded_paths:
-            continue
-        path = REPO_ROOT / artifact["path"]
-        assert path.is_file()
-        assert _sha256(path) == artifact["sha256"]
+    _assert_superseded_by_evidence_reconstruction(review)
 
 
 def test_hance_v2_visual_textures_are_first_party_and_fail_closed() -> None:
@@ -384,10 +377,4 @@ def test_hance_transmitting_water_v2_review_is_hash_locked_and_honest() -> None:
     assert successor.is_file()
     superseded_paths = set(supersession["paths"])
     assert len(superseded_paths) == 5
-    for artifact in review["retained_artifacts"]:
-        path = REPO_ROOT / artifact["path"]
-        assert path.is_file()
-        if artifact["path"] in superseded_paths:
-            assert _sha256(path) != artifact["sha256"]
-        else:
-            assert _sha256(path) == artifact["sha256"]
+    _assert_superseded_by_evidence_reconstruction(review)

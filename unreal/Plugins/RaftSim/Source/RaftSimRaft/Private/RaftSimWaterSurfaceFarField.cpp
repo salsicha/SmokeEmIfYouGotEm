@@ -514,7 +514,7 @@ void ARaftSimWaterSurfaceActor::UpdateCurvedFarFieldWater(float CarrierDrawCover
     bFarFieldWaterKeyValid = true;
     ++FarFieldWaterBuildCount;
     LastFarFieldWaterBuildMs = (FPlatformTime::Seconds() - StartSeconds) * 1000.0;
-    if (FarFieldWaterBuildCount == 1 || FarFieldWaterBuildCount % 32 == 0)
+    if (FarFieldWaterBuildCount <= 4 || FarFieldWaterBuildCount % 32 == 0)
     {
         UE_LOG(LogTemp, Display,
             TEXT("RaftSim curved far-field water: build=%d lattice=%dx%d spacing_m=%.1f hole_station=%.0f..%.0f wet=%d triangles=%d ms=%.3f"),

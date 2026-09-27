@@ -1,8 +1,11 @@
 # Colorado Grand Canyon evidence-based reconstruction
 
-Requested 2026-09-06. Queued after completion and validation of the South Fork
-reconstruction; not started or accepted. Do not switch away from unfinished
-South Fork work merely because its source data has been downloaded.
+Requested 2026-09-06. **Status 2026-09-26: Hance delivered as a playable
+evidence-based reach, not accepted** (whitewater appearance, calm-water level
+uncertainty and invented outer terrain remain open). See
+[the Hance evidence review](../reconstruction-review-2026-09-07/colorado-hance-evidence.md).
+Other Colorado rapids are not reconstructed; the run's only playable Colorado
+map is Hance.
 
 ## Objective
 

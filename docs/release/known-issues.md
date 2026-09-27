@@ -39,5 +39,11 @@ Editor-hosted Development build on the development host; no packaged-build resul
   (`RaftSim.M3.DetailFullRouteCoverage`, `DetailNativeHandoff`,
   `TerrainResidencyRoundTrip`, `RaftSim.M4.MeatGrinderLiveD3LineCalibration`).
 - South Fork submerged geometry is inferred (discharge-consistent bed v2), not
-  measured; Colorado, Pacuare and Futaleufu evidence reconstructions have not
-  started.
+  measured. Colorado Hance is now an evidence-based geographic reach (2021 DEM
+  and orthophoto, 2014 sonar pools, labelled inferred rapid bed and
+  imagery-located inferred boulders; runs p95 29-37 ms with no hitches). It is
+  not accepted: its whitewater renders as fine lace, well short of the imagery's
+  white crests; calm-water levels are known to about ±0.5 m; and the terrain
+  beyond the 2021 corridor DEM is invented
+  ([review](../reconstruction-review-2026-09-07/colorado-hance-evidence.md)).
+  Pacuare and Futaleufu evidence reconstructions have not started.

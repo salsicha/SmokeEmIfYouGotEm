@@ -68,7 +68,11 @@ public class RaftSimWater : ModuleRules
             "physics/data/real_world/south_fork_american_chili_bar/cooked_flow_fields",
             "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/cooked_flow_fields",
             "physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker/cooked_flow_fields",
-            "physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/troublemaker/playable_flow"
+            "physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/troublemaker/playable_flow",
+            // Evidence-based Colorado Hance (L_Hance): cooked field, its
+            // render-only presentation baseline and the moving-window manifest.
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance_evidence_2021/cooked_flow_fields",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance_evidence_2021/runtime"
         };
         foreach (string RelativeRoot in RuntimeRoots)
         {
@@ -80,7 +84,9 @@ public class RaftSimWater : ModuleRules
             foreach (string SourceFile in Directory.GetFiles(SourceRoot, "*", SearchOption.AllDirectories))
             {
                 string Extension = Path.GetExtension(SourceFile).ToLowerInvariant();
-                if (Extension != ".json" && Extension != ".npy")
+                bool bPresentationBaseline = Extension == ".bin" &&
+                    Path.GetFileName(SourceFile).StartsWith("support_band_field_", StringComparison.OrdinalIgnoreCase);
+                if (Extension != ".json" && Extension != ".npy" && !bPresentationBaseline)
                 {
                     continue;
                 }
@@ -92,16 +98,19 @@ public class RaftSimWater : ModuleRules
                     StagedFileType.NonUFS);
             }
         }
-        string CoordinateMapRelative =
-            "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/river_coordinate_map.json";
-        string CoordinateMapSource = Path.Combine(RepoRoot, CoordinateMapRelative);
-        if (File.Exists(CoordinateMapSource))
+        foreach (string CoordinateMapRelative in new[] {
+            "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/river_coordinate_map.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_runtime_coordinate_map.json" })
         {
-            RuntimeDestinations.Add(CoordinateMapRelative);
-            RuntimeDependencies.Add(
-                "$(TargetOutputDir)/RaftSimRuntimeData/" + CoordinateMapRelative,
-                CoordinateMapSource,
-                StagedFileType.NonUFS);
+            string CoordinateMapSource = Path.Combine(RepoRoot, CoordinateMapRelative);
+            if (File.Exists(CoordinateMapSource))
+            {
+                RuntimeDestinations.Add(CoordinateMapRelative);
+                RuntimeDependencies.Add(
+                    "$(TargetOutputDir)/RaftSimRuntimeData/" + CoordinateMapRelative,
+                    CoordinateMapSource,
+                    StagedFileType.NonUFS);
+            }
         }
         StageVerifiedRuntimeBundle(RepoRoot,
             "physics/data/runtime_bundles/south_fork_discharge_bed_v4", RuntimeDestinations);

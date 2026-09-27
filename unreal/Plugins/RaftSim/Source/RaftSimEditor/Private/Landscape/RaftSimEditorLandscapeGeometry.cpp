@@ -1910,6 +1910,16 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->MovingWindowAdvanceM = 80.0f;
         WaterConfig->LivePresentationWidthM = 160.0f;
         WaterConfig->bEnableCookedFarFieldWater = true;
+        // Calibrated on the v5 cook against the 2021 imagery whitewater at the
+        // same flow: with the default onset (Fr 0.78, ramp 1.25) the main
+        // rapid shows 0.3% visible foam against 14% in the imagery. Onset 0.6
+        // with ramp 0.5 gives 6% before downstream foam transport, which in
+        // play fills the rapid's working water; a thin lace floor keeps green
+        // tongues between white crests (0.3 turned the rapid into one sheet).
+        WaterConfig->LiveFoamFroudeOnset = 0.6f;
+        WaterConfig->LiveFoamFroudeRamp = 0.5f;
+        WaterConfig->LiveWhitewaterLaceFloor = 0.06f;
+        WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.04f;
     }
     if (bZambezi)
     {
@@ -2267,7 +2277,10 @@ bool AddLandscapeCandidateRunnableGameplay(
     // bounded carrier plus a 100 m raft-local GPU heightfield. Both deform the
     // solver-owned surface; neither adds another water sheet.
     WaterConfig->bEnableLiveRapidSurfaceRefinement = true;
-    WaterConfig->LiveRapidSurfaceSubdivision = 6;
+    // The geographic Hance strip spans the whole 160 m cooked lateral range;
+    // at 1 m its 38,801-vertex refresh cost 19 ms mean (41 ms p95) of game
+    // thread. 1.5 m (17k vertices) still samples each 2 m solver cell.
+    WaterConfig->LiveRapidSurfaceSubdivision = bColoradoHance ? 2 : 6;
     WaterConfig->bEnableLiveRaftLocalFluidHeightfield = true;
     WaterConfig->LiveRaftLocalFluidWindowMeters = 100.0f;
     WaterConfig->LiveRaftLocalFluidHeightfieldStrength = 0.65f;
