@@ -271,3 +271,62 @@ Keep South Fork first. Next investigate measured CPU surface/mesh-update work
 and the rock-contact route, without repeating the completed cook/build or
 turning on a broken solver. The unsettled150s hydraulic state and abnormal
 installer shutdown remain open; later rivers and release acceptance stay gated.
+
+## V6 crest diagnosis and exact150→300s continuation
+
+The prior goal turn completed validation and changed the next action: v6 was
+not accepted. This follow-through uses the current coupled fields, not a repeat
+of the older v5 diagnostic. Packaged process4116/session44439 exits0; recipe
+`tmp/profile-sf-v6-crest-shape-20260927.ps1`. Same executable and normal FullReach
+at8330m, ephemeral profile, AllForward, no solver/material/quality overrides.
+Stage instrumentation makes this diagnostic unsuitable as a new FPS baseline.
+
+At10.17255s the persistent shared-crest report contains7 sites, heights
+0.109499..0.211680m. Only1 has positive spilling fraction,0.0519040; all others
+are zero. The raw detection audit has68 candidates,20 accepted before site
+consolidation, and equal raw/optical rises at the logged precision. Neither the
+candidate count nor the spilling fraction proves physical realism.
+
+Actual-submitted topology at10.01377s:42,343 triangles,1,303,200 sampled points,
+maximum target crest error0.905407cm, fine-correction tracking1.295259cm and
+zero source-anchor displacement (8,183 audited anchors). The coarse regular-grid
+error6.82313cm is NOT the actual submitted-mesh error. More tessellation and
+lowering the breaking onset have no support from these results.
+
+Receipts: `tmp/sf-v6-crest-shape-20260927.log`, `.json`, and
+`.json.cartesian-mesh.json`. The existing SetMesh CSV scope includes crest
+refinement; it must not be added to the refinement scope or called upload cost.
+In this instrumented8330m run, logged frames120..399 contain142 rebuilt calls
+and139 cached calls (calls, not unique frames). Rebuilt crest mean11.6530ms,
+selection7.3315ms (sampling3.6326ms, assembly2.8913ms), targets1.5650ms,
+vertex work1.3824ms, topology publication0.2703ms and normals1.1037ms.
+Cached calls average1.6875ms. This narrows the CPU investigation, not a speedup.
+
+Because the new150s fields still have substantial regional storage drift,
+continue that exact state before another geometry refit or presentation change.
+Preparation session98932 completed; input:
+`tmp/troublemaker-envelope-restart150-input-v1-20260927/manifest.json`, SHA-256
+`c7fb7d8719184c013d226bc914a9555a225c173c9e5ebd384229e5cd6d29d9ea`.
+No bank context or water was added. Geometry manifest remains
+`0007939ed34e8cfcc033623f7bbeb5c20e5f4982e7553928a69bac7f15789738`.
+Native restart audit verifies all5,382,400 h/u/v cells bit-exact, zero volume
+error, identical clock and all retained grid/bed/roughness/boundaries/settings.
+Report: `tmp/troublemaker-envelope150to300-restart-v1-20260927.json`.
+
+ONE continuation is LIVE as solver PID35776, wrapper30456, shell session42718;
+recipe `tmp/continue-envelope150to300-v1-20260927.py`. Qualified solver SHA-256
+`458a1fcd3f2f12391012032398d29a4b2eadb792df2e9ee09b88dff263abc8e4`,
+3,000 additional0.05s steps, snapshots every1,500 steps,8 workers. Output:
+`tmp/troublemaker-envelope150to300-v1-20260927`; process receipt:
+`tmp/troublemaker-envelope150to300-process-v1-20260927.json`.
+Native local frame003000 will correspond to absolute300s; do not request6000.
+
+The owned wrapper independently checks the actual native restart, waits for
+the same child process, records its real exit, and runs final state, dry-bank,
+regional-storage and station analysis. Final report prefixes:
+`tmp/troublemaker-envelope300-{state,banks,storage,analysis}-v1-20260927`.
+Observation timeouts are not terminal and must not trigger a second cook.
+Inspect those results before deciding on a further continuation or runtime
+export. No automatic scene install or acceptance follows from completion.
+Normal v6 remains unchanged; this is supporting hydraulic work, not a new
+visible improvement. Preserve the full reconstruction and release queue.
