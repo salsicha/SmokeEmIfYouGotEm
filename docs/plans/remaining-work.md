@@ -1,10 +1,313 @@
 # Remaining requested work
 
+September27 corrected v10 build87171, timing41699 and motion2862 COMPLETE exit0;
+no job from that sequence remains live. Do not repeat unchanged validation.
+Normal Boot/menu passes this run at p9548.0122ms/max62.6394ms, but busy11520
+fails at p9576.3335ms/max106.3955ms/one frame over100ms. Same-build legacy search
+reference also fails at p9550.9677ms, max89.3852ms. All zero runtime errors.
+Six corrected native regressions pass; same verified2,405-file v7 bundle.
+Actual motion decoded/reviewed: raft/paddles move, but flat foam/smooth water
+and coarse rock forms remain unaccepted. Fourteen crest sites; submitted target
+error0.795794cm, fine tracking0.352530cm, source displacement0. All61 capped
+contact projections match native ground, not full traversal acceptance.
+Next test an exact endpoint-first rejection before expensive intermediate path
+checks; preserve every survivor and physics/quality gate. Do not infer a visual
+success from more sites or accept a slower river from the normal-launch pass.
+Details in the metric-search trial below. South Fork is still first unfinished.
+
+September27 v9 validation COMPLETE, NOT ACCEPTED. Build12165, original native
+tests78247, candidate/legacy motion32444/87953 and isolated timing79689 all
+completed exit0; do NOT repeat them. Staged closure verifies the same2,405 v7
+files, no fallback. Six native regressions pass. Actual candidate/legacy motion
+retains flat foam/coarse banks;14 versus10 crest sites is not a visual success.
+Recorded62/57 contact projections all match current native ground, but are not
+full traversal proof. Normal Boot/menu p9556.3295ms/max84.0096ms fails20FPS;
+busy11520 p9593.6782ms/max134.7194ms/17 frames over100ms also fails. Zero runtime
+errors, no quality overrides. Not a controlled causal timing comparison.
+Review fixed skipped repeated oblique-grid endpoints and hoisted the map guard
+out of the per-cell loop. These source corrections are NOT in packaged v9.
+Fresh editor build/native regression session71385 completed exit0; six tests
+pass with zero warnings/failures. No job from this checkpoint remains live.
+Do not repeat these tests unchanged. Corrected-source game rebuild and actual normal/
+busy motion/cost qualification remain required before any acceptance. Same v7
+geometry/fields and physics gates; no new solver. South Fork remains first.
+See [metric search trial](../reconstruction-review-2026-09-07/south-fork-metric-breaking-search.md).
+
+September27 latest: code-only playable V8 is rebuilt, still NOT ACCEPTED.
+Build59010, actual-input audit10369, native tests55008 and timing18049 completed
+exit0; no job from these runs remains live. Same verified v7 fields/geometry.
+Unused legacy lift/tail calculations are skipped only for shared analytic crests
+with localized foam;64 native foam comparisons are exact, five crest/support
+regressions pass. Unused reference cost averages0.309ms per refresh, not a
+whole-frame speedup claim. Normal Boot/menu now passes this run at p9549.5245ms,
+max61.3514ms; busy11520m still fails p95 at53.8839ms, max99.6944ms. Both have zero
+runtime errors or frames over100ms. Actual motion was decoded and reviewed:
+paddles/raft move, rocks remain, broad flat foam/coarse banks remain unaccepted.
+The normal pass does not establish whole-river performance or wave realism.
+Next address the remaining CPU costs and evidenced rapid/rock behavior; do not
+repeat the completed cook/build/audits or advance Colorado yet. Details in
+[v8 validation](../reconstruction-review-2026-09-07/troublemaker-envelope-coupling.md#v7-crest-diagnosis-and-v8-unused-work-candidate).
+
+Earlier checkpoints below are historical and superseded by the latest block.
+
+September27 latest: normal playable V7 is built and validated, NOT ACCEPTED.
+Continuation42718, export86559, install94164, build37291 and validation56840
+all completed exit0; no job from these runs remains live. DO NOT repeat them.
+The300s fields are saved in normal FullReach, with exact unchanged native
+ground/rock geometry. Staged closure verifies2405 files without source fallback.
+18 binding/inventory tests pass; local integration commit aa887d8b2, no push.
+Normal Boot/menu p9554.6598ms/max88.8584ms fails the50ms budget; busy11520m
+p9571.9342ms/max108.8423ms/two frames over100ms also fails. Zero runtime errors.
+Actual video decoded/reviewed: raft/paddles move, then contact rocks/nearly stop;
+smooth water and broad flat foam remain unaccepted.58 contact observations all
+match current native ground (max projection1.42cm), not full traversal proof.
+Flow remains unsteady;8-9km storage changes from draining to gaining water.
+Next address measured CPU surface/crest costs and evidenced rapid/rock-contact
+behavior, not another unchanged initial audit or weaker breaking/quality gates.
+See [completed v7 validation](../reconstruction-review-2026-09-07/troublemaker-envelope-coupling.md#completed-v7-packaged-validation--not-accepted).
+
+The preceding-job checkpoints below are historical; the latest block above
+supersedes their live process/session status.
+
+September27 bounded follow-up: SAME continuation35776/wrapper30456 is live
+beyond258s; final300s audits remain pending. No duplicate solve or engine run.
+The next data-only playable binding tool now saves only the water config's
+external package, never all unrelated dirty packages after an actor-save failure.
+Seven mocked regressions pass, including failure/no-success-receipt, read-only
+inventory, invalid mode and resolved report-path confinement. This is supporting
+installation safety, not a new playable improvement or native acceptance.
+Inspect the same completion receipt and final audits before exporting new fields.
+
+September27 continuation analysis repaired while SAME solver35776/session42718
+runs. Restart preparation does not duplicate station_map.npz; the analyzer now
+resolves it through verified unchanged-domain ancestry, rejecting changed
+geometry, package order, physical inputs and added context.39 regressions pass.
+Actual restart frame0 reproduces every150s bin, summary and mass-balance value
+exactly; no simulation/scene change. The source's dry-cell NaN stations are
+intentional and excluded, while captured-water samples must be finite. Same
+continuation has passed200s; final300s audit still pending. No extra cook or
+engine job. Details in the coupling record below.
+
+September27 follow-through: v6 crest diagnosis44439 completed exit0. Seven
+persistent sites have only one small spilling fraction(0.051904); submitted
+crest target error0.905407cm, fine tracking1.295259cm, source vertices unchanged.
+Do not add tessellation or lower breaking gates to manufacture whitewater.
+ONE exact continuation150->300s is LIVE: solver35776, wrapper30456,
+session42718. Native restart verifies all5,382,400 cells bit-exact, no added
+water/context, unchanged bed/roughness/boundaries. Inspect this SAME job and
+its final state/bank/storage/station audits; do not repeat the cook or run
+contended engine timing. Normal v6 remains unchanged and unaccepted. See
+[v6 crest diagnosis and continuation](../reconstruction-review-2026-09-07/troublemaker-envelope-coupling.md#v6-crest-diagnosis-and-exact150300s-continuation).
+
+September27 v6 packaged validation COMPLETE, NOT ACCEPTED: BuildCookRun5004
+and validation92941 both exited0; no engine/cook process remains from these
+runs. Actual staged closure passes2,405 files with no source fallback. Normal
+Boot/menu p9585.4841ms/max165.9686ms/22 frames over100ms and busy11520m
+p9581.5321ms/max110.0699ms/2 frames over100ms both FAIL the20FPS gate.
+Both runs report zero runtime errors. Actual v6 motion is decoded and reviewed:
+raft/paddles move, but the raft reaches rocks and nearly stops; smooth water,
+flat foam and coarse banks remain unaccepted. All64 capped contact observations
+match the NEW conveyance ground, not full traversal proof. No repeat cook/build
+or unchanged launch audit is needed. Next isolate CPU surface/mesh-update costs
+and investigate the observed rock-contact route before further candidate work;
+retain the unsettled-flow and installer-shutdown issues. See
+[completed v6 validation](../reconstruction-review-2026-09-07/troublemaker-envelope-coupling.md#completed-v6-packaged-validation--not-accepted).
+
+The dated checkpoints below are historical; their LIVE handles are superseded
+by the completed result above.
+
+September27 envelope-coupled candidate is SAVED in normal FullReach: same ground
+actor now uses the verified conveyance mesh, and water uses the matching150s
+fields. Cook31092/session3804 and native/export25615 completed; DO NOT repeat.
+265,526 simple/complex collision traces pass,799 runtime packets have exact bed
+parity, and fresh read-only reload35040 exits0. Installer31316 saved successfully
+but exited with access violation during shutdown; this failure is retained, not
+reported as a clean exit. Exact two-actor ZIP backup preserved. V6 bundle has
+2,405 files;38 regressions pass. BuildCookRun session5004 is LIVE for
+tmp/south-fork-playable-v6-20260927. Next verify that same build and staged closure,
+normal Boot/menu, actual motion/shoreline/collision/crest realism and20FPS gates.
+No visual, settling or performance acceptance. See
+[completion, installation and live build](../reconstruction-review-2026-09-07/troublemaker-envelope-coupling.md).
+
+September27 continuation: same cook31092/session3804 remains live; its75s state
+and86,720 dry-bank checks pass. Combined native probes are ready:132,763 points,
+70 focused regressions pass. Deferred session25615 waits on the owned cook
+wrapper38948 and final bank audit, then runs the no-save native check. Do not
+launch a duplicate cook or engine check. Guarded two-actor normal-scene installer
+is prepared, not executed. Details and exact identities are in
+[the coupling record](../reconstruction-review-2026-09-07/troublemaker-envelope-coupling.md).
+
+September27 inferred-envelope coupling advances the candidate:65 regressions
+pass, all841 cores and799 source packets rebuild with original returns intact.
+The independent319-point ground/envelope check now has zero bed mismatch;
+296 samples in two cores change, with masks/stages/forcing unchanged. ONE fresh
+150s solve is LIVE as PID31092/session3804; inspect its process receipt and
+completion, do not duplicate it. Normal v5 remains unchanged; this is supporting
+work, not visible delivery, settling or acceptance. Next coupled native/runtime
+verification and normal-scene rebuild/motion/FPS. See
+[exact identities and continuation](../reconstruction-review-2026-09-07/troublemaker-envelope-coupling.md).
+
+September27 candidate/native/export COMPLETE, promotion held for a concrete
+coupling failure: candidate ground passes all803,842 native triangles and
+129,242 changed-face traces; all799 water packets export with exact bed parity.
+But the installed inferred rock envelope differs from the retained-roof cook
+at284/319 sampled points, including10 wet cells (max wet error6.76cm). Do NOT
+install that inconsistent combination or restore old spikes. Next explicitly
+couple the current interpreted envelope into geometry/packets and recook with
+unchanged safety gates, then normal playable integration/rebuild/motion/FPS.
+No jobs remain live from this candidate: cook33592, native2284/session77718,
+export39935 and audits44747 are done. See
+[completed checks and exact parity failure](../reconstruction-review-2026-09-07/troublemaker-conveyance-bed.md).
+
+September27 final150s candidate solve COMPLETE: independent finite-state,
+dry-bank and storage audits pass, but the8-9km region still drains14.20m3/s
+over the last75s. Not settled or accepted. Cook PID33592 is gone; its wrapper
+lost ExitCode and left a stale process receipt, so do not restart from that
+receipt. SAME deferred checker session77718 has launched Unreal PID2284 for
+ground-native verification; no pass yet. Native comparison/export guard work
+is committed as `aecf70b3b`, no push. Normal v5 remains unchanged. See
+[completion evidence and live checker](../reconstruction-review-2026-09-07/troublemaker-conveyance-bed.md).
+
+September27 coupled-candidate follow-through: all799 matching source packets
+and the exact803,842-triangle terrain FBX are prepared; no scene promotion.
+The75s state/dry-bank checks pass, but local captured-water coverage/surface
+deviation near Troublemaker requires final-state scrutiny. SAME cook PID33592
+is live (102s verified); deferred native ground checker session77718 will wait
+for it, verify final banks, then test the candidate on the existing ground
+actor without saving the scene. Do not duplicate either job. See the updated
+[candidate record](../reconstruction-review-2026-09-07/troublemaker-conveyance-bed.md)
+for exact inputs, receipts, limits and the remaining normal-playable integration.
+
+September27 continuation checkpoint: source-preserving Troublemaker preparation,
+six new tests and the independent input-comparison receipt are committed locally
+as `1e734f16c` (no push). The same PID33592 solve reached40s of its150s target
+with no logged safety failure; this is intermediate only. No second solve,
+scene promotion, package rebuild or acceptance. Continue the existing job and
+its final audits before considering the coupled playable geometry update.
+
+September27 Troublemaker inferred-bed candidate LIVE: the v2 discharge bed
+protected the registered rapid's old depth prior. An unbiased conveyance-based
+candidate now changes only authority2 underwater vertices, preserving captured
+geometry/XY/topology and seam.46 regressions pass. Independent841-core comparison
+finds16,064 changed hydraulic cells in11 local cores; physical boundaries and
+solver settings unchanged. Fresh full-river150s solve is PID33592/session30490;
+initial state and86,720 exactly dry artificial-bank cells pass. Do not duplicate
+the live cook. Normal v5 scene/package unchanged; this is not visible delivery
+or acceptance. See [candidate, live handle and required playable follow-through](../reconstruction-review-2026-09-07/troublemaker-conveyance-bed.md).
+
+September27 v5 crest diagnosis COMPLETE: guarded packaged session76733 exits0.
+At10.13s there are4 persistent waves, all with zero modeled spilling;13/64
+raw candidates pass interior gates, all upstream Froude1.1209..1.2033.
+Raw/optical rises match at logged precision. A separate10.01s actual-submitted
+mesh audit bounds sampled target error at8.24mm, so extra tessellation is not
+the supported first fix. Next examine inferred submerged controls/resulting
+hole flow and spilling criteria; do not manufacture froth by lowering gates.
+This is new diagnostic evidence, not a visual improvement or river acceptance.
+See [durable receipts and limits](../reconstruction-review-2026-09-07/south-fork-runtime450-playable-trial.md).
+
+September27 normal-scene450s trial COMPLETE, NOT ACCEPTED: BuildCookRun89262
+and validation71636 both exited0; no duplicate cook needed. Actual staged
+v5 payload verifies2,405 files with no source fallback;38 bundle regressions
+pass. Ordinary Boot/menu/FullReach timing passes20FPS (p9544.4436ms), but busy
+11520m fails (p9571.8342ms, max107.4702ms, one frame>100ms). Both have zero
+runtime errors. Actual8330m recorded motion is decoded/reviewed: raft/paddles
+move, but smooth water/flat foam and coarse banks remain visually unaccepted.
+All50 capped contact observations match source-ground collision; not full
+traversal acceptance. Retain v5 candidate and intact v4 backup; next address
+visible breaking/froth and busy-rapid cost, not another unchanged diagnostic.
+South Fork remains first unfinished. Historical pending notes below are superseded.
+See [normal playable trial and rollback](../reconstruction-review-2026-09-07/south-fork-runtime450-playable-trial.md).
+
+September27 follow-through: the450s runtime candidate is EXPORTED at
+`tmp/discharge-bed-v2-runtime450-20260927` (session83207 exit0). Independent
+comparison to v4 confirms all799 packet grids/beds/masks/solver settings and
+coverage bounds unchanged,1,598 actual array hashes checked, same841-tile atlas
+bed (session7190 exit0). No scene, bundle or game changed. Next normal-scene
+binding/versioned bundle/rebuild and actual rapid comparison, not another
+export/cook or claims of visible delivery. See the [candidate record](../reconstruction-review-2026-09-07/south-fork-v2-continuation.md).
+
+September27 v2 continuation COMPLETE: PID28988/session49009 exited0 at450s;
+independent state, dry-bank and regional-storage audits also exit0. No restart.
+Final75s net filling4.707915m3/s hides regional gains71.816178 and losses67.108263;
+both aggregates improve, but absolute rates worsen in17/34 regions. The8-9km
+loss grows to12.434415m3/s and14-15km flips from slight filling to7.033751m3/s
+drainage. Do not promote or refit from the improved global total alone. No
+scene/package change or acceptance. Signed zero-step inspection now verifies
+all841 tiles, unchanged snapshots and1,138 shared pairs cancelling within
+4.44e-16m3/s: conservative redistribution, not a broken exchange seam. Next
+prepare a versioned450s field candidate and compare actual normal playable
+rapid motion/shoreline/collision/cost against v4; no settling claim and no repeat
+of these unchanged diagnostics. See [completed comparison and evidence](../reconstruction-review-2026-09-07/south-fork-v2-continuation.md).
+
+Historical launch/intermediate notes below are superseded by that completion.
+
+September27 signed-calibration correction committed as2aa30574f: route-aligned
+signed transport replaces the speed-magnitude proxy; analysis/fit metadata no
+longer claim settling or measured bathymetry. Eighteen regressions pass. Old
+data and playable assets unchanged. The LIVE v2 continuation's375s snapshot
+passes independent state checks and all86,720 artificial-bank face cells stay
+exactly dry. Final450s/regional-storage validation remains pending on the SAME
+PID28988/session49009. Do not restart it. See [calibration evidence](../reconstruction-review-2026-09-07/south-fork-signed-transport-calibration.md)
+and [continuation](../reconstruction-review-2026-09-07/south-fork-v2-continuation.md).
+
+September27 exact v2 continuation LIVE: PID28988/session49009 advances the
+existing300s checkpoint to450s with unchanged0.05s steps and qualified8-lane
+offline solver. Native restart verifies5,382,400 bit-exact cells, no new water
+or geometry, unchanged physical settings, and all4 exterior fluxes exact.
+Latest verified step90/304.5s remains within existing safety gates. Do not
+duplicate/restart while live. Next verify final state, dry banks and regional
+storage decay before any runtime export or playable promotion; current game
+unchanged. See [live identity and next checks](../reconstruction-review-2026-09-07/south-fork-v2-continuation.md).
+
+September27 v2 hydraulic follow-through: independent5-snapshot/5,382,400-cell
+storage audit closes against integrated boundary volume within5.85e-11m3.
+Final75s net filling6.164m3/s hides regional gains86.149 and losses79.985m3/s;
+28-29km gains18.40m3/s while13-14km loses17.13m3/s. These are storage rates,
+not cross-section flows. Seventeen audit regressions pass. No engine/cook/
+scene/package change or acceptance. The existing bin "discharge" magnitude
+proxy is not a signed-flow or settling gate; establish temporal/regional and
+face-flux evidence before calibrating another bed correction. Do not repeat
+the unchanged snapshots. See [v2 storage and limits](../reconstruction-review-2026-09-07/south-fork-bed-v2-storage-localization.md).
+
+September27 15:05UTC: the deferred post-restoration native check is complete.
+All three original crest/refinement tests pass with zero warnings, failures or
+skips; engine and helper exit0. No other engine/build/cook was active at launch;
+runtime DLL hashes remained unchanged through the run. The rejected direct
+emission source/flags remain absent. This closes the restoration-test deferral
+below, not the South Fork reconstruction. No new scene, cook, package, motion,
+collision, shoreline or20FPS qualification was performed. Do not rerun this
+unchanged restoration or rejected optimization; advance coupled geometry/
+hydraulics or a materially different measured performance change. See
+[completed regression evidence](../reconstruction-review-2026-09-07/crest-direct-emission-rejected.md).
+
+September27 follow-through: shared editor builds9 and10 now succeed (29.19s
+and30.80s), including the repaired landscape Editor module. The compilation
+blocker in the historical note below is resolved; no repair to those shared
+files was made by this follow-up. Post-restoration native tests remain deferred:
+the next shared engine run (PID18480) started after build10. No competing
+build, engine, cook, or source experiment was launched. South Fork's existing
+playable geometry/physics and20FPS acceptance gaps are unchanged. See the
+later verification in the [restoration record](../reconstruction-review-2026-09-07/crest-direct-emission-rejected.md).
+
+September27 direct serial emission not qualified:64 exact actual-input pairs
+improve the component, but audit-free ABBA p95 worsens in both orders. Candidate
+removed; packaged v4 unchanged. Full Editor build also fails in separate shared
+landscape edits: malformed multiline strings and unresolved PACUARE_* constants.
+Those edits are preserved; runtime tests are partial-build diagnostics, not a
+full-build pass. Scoped runtime restoration build succeeds (266.16s); its native
+recheck is deferred because another build is active. Pacuare placeholders have
+since been replaced, but the full-editor repair is not yet verified. No new
+full-build pass. Do not repeat this candidate or the unchanged failing build.
+South Fork remains first, with geometry/physics and20FPS performance open.
+See [comparison and build boundary](../reconstruction-review-2026-09-07/crest-direct-emission-rejected.md).
+
+
 September27 inline edge-storage trial rejected:64 exact actual-input pairs
 retain ordered geometry and cache decisions, but four-entry contiguous buckets
 lose assembly time in both execution orders against installed indexed chains.
 Three native regressions pass; normal game/source/cooked data unchanged.
-Candidate and temporary audit removed, not promoted. Do not repeat this storage
+Candidate and temporary audit removed, not promoted; restoration build and
+three original native regressions also pass. Do not repeat this storage
 hypothesis or infer an FPS improvement; South Fork remains first and unaccepted.
 See [trial evidence](../reconstruction-review-2026-09-07/crest-inline-edge-storage-rejected.md).
 

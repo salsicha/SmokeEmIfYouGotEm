@@ -28,8 +28,9 @@ self edges, repeated updates and misses, plus 36 moving/cropped/reversed roots,
 flat/nonflat profiles, detail windows, 0/1/3 levels and explicit invalidation.
 
 One isolated 600-frame D3D12 editor-hosted FullReach run at station 11,520 m
-produced all 64 exact pairs after two warm builds. Execution order alternates;
-all pairs are retained. Both native and gameplay processes exited 0 without
+produced all 64 exact pairs after two warm builds (engine frames 124-213,
+1,942,596 expanded vertices compared). Execution order alternates; all pairs
+are retained. Both native and gameplay processes exited 0 without
 runtime Error/Fatal records. Gameplay remained healthy for 31.222 s, with
 599 paired commits, zero PDE backlog and no GPU waits.
 
@@ -67,4 +68,16 @@ pair IDs, alternating order and finite stage times within the whole build.
 Packaged v4 executable remains SHA-256
 `12d71f2830633d51d9b8851e9b4524b58fd74be33176d331092e6fd76433e523`.
 South Fork stays first; its geometry/hydraulic/visual and busy-rapid performance
-gates remain open. Restoration build and recheck are recorded below when done.
+gates remain open.
+
+## Restoration verified
+
+Post-removal Editor Development rebuild succeeded in 238.08 s, exit 0;
+`tmp/inline-edge-restored-build-20260927.log`. Content diffs in both pre-existing
+runtime files are empty. The original indexed-edge selection, conforming
+refinement and topology-cache tests then pass in the restored editor: three
+successes, zero failures/warnings/not-run tests, exit 0. Report
+`tmp/inline-edge-restored-native-20260927/index.json`, SHA-256
+`e203be988b0bcef04235691de7a79c9af276d2f80b65bba85d7446b9da82fa6f`.
+These are NullRHI algorithm tests, not rendered-motion acceptance. No engine,
+build or cook was left running by this experiment.
