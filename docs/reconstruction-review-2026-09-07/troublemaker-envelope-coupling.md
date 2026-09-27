@@ -469,3 +469,58 @@ Build.cs stages it by default. ONE BuildCookRun session37291 is live, recipe
 normal Boot/menu, busy11520m and actual Troublemaker motion/contact evidence.
 No v7 visual or performance acceptance follows from installation. Cook warnings
 about missing crew texture dependencies remain release issues to investigate.
+
+## Completed v7 packaged validation - not accepted
+
+Build37291 completed exit0 in278.49s. Validation56840 completed exit0, both
+timing games and motion PID38792 exited0. No job remains live from this sequence.
+No second solve, geometry import or engine timing in parallel was launched.
+Local integration commit:`aa887d8b2`, no push. V6 package and config backup retained.
+
+The actual staged closure passes2405 files/917995570 bytes with no external
+source fallback:`tmp/south-fork-v7-staged-payload-20260927.json`.
+Executable SHA-256`8ffc14bef18cf155290b62bf60686346e1a639d3cbb50188371abf7bd1f2fff8`
+is unchanged fromv6. Normal Boot/menu order is verified by the normal launch
+profiler; neither timing run changes physics or quality. Each audits1140 of
+1200 recorded frames (rows30..1169),20FPS/p95<=50ms/no frame>100ms:
+
+| Run | Mean ms | p95 ms | Max ms | Frames >100ms | Result |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Normal Boot/menu |44.0486|54.6598|88.8584|0|FAIL p95|
+| Busy11520m |49.0838|71.9342|108.8423|2|FAIL p95/hitch|
+
+Both report zero runtime errors. Receipts:
+`unreal/Saved/RaftSimValidation/sf-v7-{normal-menu,rapid11520}-20260927-frame-audit.json`.
+Successful command exit is not a frame-gate pass. Sequential v6/v7 timings are
+not a controlled causal performance experiment.
+
+Already-recorded CSV cost summary (no extra game launch):
+`tmp/sf-v7-recorded-cost-summary-20260927.json`.
+Busy mean GameThread47.597ms vs GPU16.100ms; surface Tick27.538ms, SetMesh12.918ms,
+crest Update10.706ms and crest Selection6.141ms. These are nested/inclusive
+scopes; never add them. Normal mean GameThread42.662ms vs GPU14.713ms, surface
+Tick23.967ms and SetMesh9.698ms. CPU surface/crest cost remains a concrete target.
+
+Actual motion:
+`tmp/south-fork-playable-v7-20260927/Windows/SmokeEmIfYouGotEm/Saved/VideoCaptures/RaftSim_20260927-130218.mp4`,
+SHA-256`3acf3f8b8c00402ab8af241598d16c2baab89e49fc9f0f022977050366b66ef6`.
+Decode receipt:`tmp/sf-v7-troublemaker-decoded-20260927/report.json`:
+772 frames,25.7s,1280x720,three adjacent duplicate frames. Encoded30FPS is NOT
+game performance. Original1/9/20s frames were visually inspected: HUD river
+km8.38 to8.40, raft and paddle positions change, raft approaches the rocks and
+turns alongside them. Water remains mostly smooth, with broad flat white foam
+patches; no convincing breaking/recirculating-wave acceptance. Coarse banks and
+rock shape remain apparent. Sparse inspected views do not establish whole-run
+shoreline stability, surface continuity or crew realism.
+
+The capture issues AllForward; logged raft speeds4.937,2.351,0.114m/s show the
+near-stop. Final logged state has one dry point and one ground point. Contact
+receipt:`tmp/sf-v7-troublemaker-motion-20260927-contact.json`,58 observations
+over15.0219..33.9370s, all current conveyance-ground mesh and exact resampled
+height match. Maximum vertical projection0.0142112m. This supports the installed
+collision identity, not complete traversal or proof that collision caused all
+deceleration. Do not erase rocks or weaken collision merely to pass AllForward.
+
+The next work must target observed rapid behavior and measured CPU costs while
+retaining captured-source distinctions and all existing gates. Neither this
+evolved-state trial nor its finite-state/native checks completes South Fork.
