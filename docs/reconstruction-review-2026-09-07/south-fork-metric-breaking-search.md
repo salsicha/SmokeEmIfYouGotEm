@@ -267,3 +267,30 @@ and raft position/orientation change, the raft approaches the rock and later
 faces downstream. Broad flat white foam, smooth water and coarse banks remain.
 No convincing breaking/recirculation improvement or full shoreline/surface
 continuity acceptance follows. Encoded30FPS is not game FPS. V11 NOT ACCEPTED.
+
+### Camera-coverage correction for the next motion run
+
+Existing-log/route/site analysis, no new game run:
+`tmp/audit-v11-crest-framing-20260927.py`, hash-bound output
+`tmp/sf-v11-crest-framing-20260927.json`. The crest report's station/lateral
+labels contain hydraulic east/north XY, NOT route station/lateral. Projecting
+onto the actual playable-route segments puts the strongest spilling site
+(fraction0.973664, zero *extra* height) near route8342.350m and the next nearby
+spilling site (0.340221, extra height0.219194m) near8355.315m.
+
+The first recorded camera is already at raft station8370.365m/world12.401s.
+Those two site's horizontal angles relative to the camera are160.971 and
+105.667degrees, outside its91.226degree horizontal field of view. Thus the
+recording misses their upstream approach. They enter the horizontal cone only
+later as the raft turns (indices7..11 and5..10 respectively), from farther
+downstream. Horizontal inclusion is NOT actual visibility: this calculation
+does not include vertical framing, occlusion, or changing sites after the10s
+snapshot. It neither proves realism nor negates flat foam seen in the sampled
+views; it narrows what those views can establish about the strongest front.
+
+Prepared, NOT run: `tmp/capture-sf-v11-upstream-approach-20260927.ps1` retains
+the exact v11 binary and ordinary gameplay camera, starts at route8310m and
+records from2s for40 one-second samples instead of starting after12s of drift.
+No quality/physics override or teleport loop. Run only after continuation58416
+AND its audits are terminal; verify the actual first camera and front framing,
+then decode/view motion. This is targeted visual evidence, not FPS qualification.

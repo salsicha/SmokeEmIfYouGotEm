@@ -1,5 +1,25 @@
 # Remaining requested work
 
+September27 next-action correction: v11 camera telemetry shows recording began
+at route8370.365m, downstream of the strongest spilling front near8342.350m.
+That front is behind the first camera, entering its horizontal cone only after
+the raft turns. Prior flat-foam observations remain valid for sampled views,
+not a close approach assessment of that front. Hash-bound coverage report:
+`tmp/sf-v11-crest-framing-20260927.json`. After SAME continuation58416 and its
+audits finish, run prepared `tmp/capture-sf-v11-upstream-approach-20260927.ps1`
+ONCE: same v11 scene/physics, ordinary camera, route8310 start,2s recording delay.
+Verify actual front coverage and review motion. Do not overlap engine with solve.
+
+Prepared `tmp/install-envelope-fields450-v1-20260927.py` requires explicit
+`--reviewed-final-audits`, completed exact restart and matching final450s
+state/bank/storage hashes. Syntax and both pre-install refusal guards pass;
+NO native save/export/bundle/build has run. After final numerical/local-flow
+review, export450 with the existing verified packet geometry and streaming
+coverage, then use this recipe for the water-only trial and v8 runtime bundle.
+It retains the300s receipt in the ordered history and saves a fresh config
+backup. Update the staging bundle reference only after successful installation;
+normal launch, actual motion/contact/shoreline and20FPS tests remain required.
+
 September27 supporting integration repair: the fresh native inventory script
 now accepts an ordered `RAFTSIM_ENVELOPE_FIELD_BIND_REPORTS` JSON list, retaining
 the legacy singular option. It verifies every before/after hash and entrypoint
