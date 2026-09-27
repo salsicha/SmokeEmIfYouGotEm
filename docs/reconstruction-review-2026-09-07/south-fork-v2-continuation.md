@@ -167,3 +167,24 @@ This is eligibility for an incremental trial, not permission to label the
 fields settled or the river accepted. Keep the current playable baseline until
 that trial demonstrates benefit; do not substitute another identical diagnostic
 or infer improved breaking-wave appearance from storage decay alone.
+
+## Versioned runtime candidate prepared (not yet integrated)
+
+Export session83207 exited0. Candidate:
+`tmp/discharge-bed-v2-runtime450-20260927`.
+Its841-tile atlas and799 packets verify42,185,039 exact bed-intersection cells.
+An independent comparison against `tmp/discharge-bed-runtime-v2-20260926`
+then verifies all1,598 actual packet bed/mask file hashes, atlas bed, tile grids,
+solver settings, physical boundary definitions and all window coverage bounds
+unchanged (session7190, exit0). Only the flow state and its provenance change.
+The export's798 changed-bed packets count is relative to the older source
+packet input, NOT a change from the currently playable v4 bed.
+
+- Export audit SHA-256: `27b2cfae13314a71c3a8ab84f84f22498b1b5affeb6fb75e683b66c39f02ecd3`.
+- Atlas manifest SHA-256: `9bc7abc90e45aad90061d2f6fdbc0a12ca6ccf8067be3ec546b330dd2176b2d5`.
+- Streaming manifest SHA-256: `ea118f9c08d59759313e5ac32e3a373e79f426d7a26f71e239884cd86753d2e3`.
+
+No engine, saved scene, runtime bundle or packaged game was changed. Next
+work is the normal-scene candidate binding, reproducible bundle/rebuild and
+actual motion/collision/shoreline/performance comparison; do not mistake this
+completed export for visible delivery or redo it in another directory.
