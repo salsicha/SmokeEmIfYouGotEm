@@ -124,7 +124,7 @@ public class RaftSimWater : ModuleRules
             }
         }
         StageVerifiedRuntimeBundle(RepoRoot,
-            "physics/data/runtime_bundles/south_fork_discharge_bed_v7", RuntimeDestinations);
+            "physics/data/runtime_bundles/south_fork_discharge_bed_v8", RuntimeDestinations);
     }
 
     private static string CheckedRelativePath(string Value)

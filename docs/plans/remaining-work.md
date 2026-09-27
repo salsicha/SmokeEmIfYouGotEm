@@ -1,5 +1,25 @@
 # Remaining requested work
 
+September27 latest:450s continuation58416, corrected upstream motion66896,
+runtime export15732 and water-only installation47433 all COMPLETE exit0.
+No job from those sequences remains live. All final state/bank/storage audits
+pass their numerical scope, but8..9km still accumulates6.72m3/s: NOT SETTLED.
+The corrected ordinary-camera video starts at8314m and covers the approach;
+flat foam/separate spray/coarse banks remain unaccepted. Do not repeat it.
+
+Normal FullReach now saves the450s fields with unchanged geometry/collision,
+verified by fresh native inventory3664 after scoped config save6452. Config
+SHA256 `b5cf0069166ebc1c64eea95d836b4474d3cf1717fe58e001486c3aa9a1e64bf7`.
+Both ordered water-only receipts and original geometry evidence are retained.
+Fresh v8 runtime bundle verifies2,405 files/917,995,570 bytes; manifest SHA256
+`8190b5e81951986070664344a8a53c953a44961fc7d881f0633ba2cf9a7eb190`.
+Water.Build.cs now stages v8. Prepared game rebuild:
+`tmp/package-south-fork-v12-20260927.ps1`. V12 is NOT built/validated yet.
+Next rebuild ONCE, verify staged closure, then isolated normal/busy20FPS tests
+and actual upstream motion/contact/shoreline/surface review. No new physics
+mode, weaker gate, source deletion or later-river advance. Earlier live/pending
+checkpoints below are historical and superseded by this block.
+
 September27 next-action correction: v11 camera telemetry shows recording began
 at route8370.365m, downstream of the strongest spilling front near8342.350m.
 That front is behind the first camera, entering its horizontal cone only after

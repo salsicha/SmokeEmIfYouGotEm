@@ -1,5 +1,45 @@
 # Troublemaker inferred-envelope coupling - September 27
 
+## Completed450s continuation and guarded playable-field trial
+
+Continuation58416/native5884/wrapper24200 completed exit0, including final
+state/bank/storage/local-flow audits. No process from this solve remains live.
+All5,382,400 cells are finite/nonnegative,86,720 artificial-bank cells exactly
+dry. Maximum depth2.977300m, speed8.208481m/s, step conservation residual
+8.291243e-9m3, final volume2,285,259.929786m3. Geometry/physical settings unchanged.
+Reports: `tmp/troublemaker-envelope450-{state,banks,storage}-v1-20260927.json`
+and `tmp/troublemaker-envelope450-analysis-v1-20260927/report.json`.
+
+Whole-domain storage rates300..375 and375..450s are+17.57144 and+8.24432m3/s.
+The8..9km band stays at+6.75375 then+6.72168m3/s: not settled. Final instantaneous
+inflow45.30695/outflow39.77849m3/s. In that band,375..450s common-wet stage change
+p05/median/p95 is-.00997/+.01100/+.02196m. Small whole-domain residuals do not
+prove local equilibrium. Compared with300s, median speed at8362.5m changes
+3.27620 to3.33552m/s. Simulated-minus-captured surface at8402.5m changes
+-.39123 to-.31647m, but8342.5m changes+.65323 to+.71337m. Not uniformly improved
+reference agreement; flight discharge remains unknown. No bathymetry refit.
+
+Fresh export15732 completed exit0:799 packets,841 atlas tiles and42,185,039
+exact bed-intersection cells. Stream SHA256
+`a37abbcc3168546e799b215ef26977fddf70aaa1355e8bda43e8c7ea44a695cd`, atlas
+`361c461715565157c1e09198f241d76aa3f083d82197c57043f6fdb909cdd965`.
+`tmp/envelope-fields450-parity-v1-20260927.json` verifies unchanged packet
+bed/masks/grid/solver, atlas bed/layout/boundaries/provenance and coverage.
+This is an evolved-state playable trial, not hydraulic or visual acceptance.
+Installer47433 completed exit0: water-only save6452 and fresh native inventory
+3664 both exit0. Only the config package changed, SHA256
+`b5cf0069166ebc1c64eea95d836b4474d3cf1717fe58e001486c3aa9a1e64bf7`.
+Both ground/rock native hashes and unrelated scene/source packages are unchanged.
+Native inventory records the original installation and both ordered300/450s
+water-save receipts. Backup: `tmp/envelope-fields450-v1-20260927-before.uasset`.
+V8 bundle closure passes2,405 files/917,995,570 bytes; manifest SHA256
+`8190b5e81951986070664344a8a53c953a44961fc7d881f0633ba2cf9a7eb190`.
+Water.Build.cs stages v8. V12 recipe is prepared but not run at this checkpoint.
+Actual normal-scene rebuild, staged closure, motion/shoreline/contact and
+performance qualification remain required. No visible improvement is claimed.
+
+Earlier status below is historical; the completed450s checkpoint supersedes it.
+
 Latest continuation58416 is LIVE: nativePID5884, wrapper24200, output
 `tmp/troublemaker-envelope300to450-v1-20260927`. Single launch after completed
 v11 timing/motion/decode and empty engine/build/solver process inventory.

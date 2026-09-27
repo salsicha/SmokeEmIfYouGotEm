@@ -294,3 +294,30 @@ records from2s for40 one-second samples instead of starting after12s of drift.
 No quality/physics override or teleport loop. Run only after continuation58416
 AND its audits are terminal; verify the actual first camera and front framing,
 then decode/view motion. This is targeted visual evidence, not FPS qualification.
+
+### Corrected upstream approach completed
+
+Session66896/PID24552 completed exit0, unchanged v11 executable, geometry,
+300s fields and quality/physics settings. All40 camera records are present,
+first world2.431s/route8314.055m and last world41.075s/route8415.774m. The two
+nearby spilling fronts above are inside the first horizontal cone (angles
+16.256 and40.684degrees, camera FOV86.814degrees), unlike the previous run.
+Hash-bound report `tmp/sf-v11-upstream-framing-20260927.json` retains the same
+snapshot/vertical/occlusion limitations. No runtime errors were logged.
+
+Actual game video `RaftSim_20260927-151008.mp4`, SHA256
+`0679e84fe84633113c00f1b5e913365dcde8a5bbd3ed2d257bd6c4523aa150c8`:
+1,283 decoded frames,42.7333s,28 adjacent duplicates,1280x720; encoded30FPS is
+not engine FPS. Original3/6/9/11/20/40s frames inspected in
+`tmp/sf-v11-upstream-approach-decoded-20260927/`. Raft/crew move through the
+upstream approach, pass the front and continue downstream, later nearing the
+right rock. The closer view still shows broad flat foam and separate spray
+puffs, not convincing overturning/recirculating water. Coarse rock/bank shapes
+remain. This closes the approach-framing gap, not the water-realism requirement.
+
+Actual submitted mesh:51,364 triangles, target error0.780309cm, fine tracking
+0.001697cm, source displacement0. All44 capped contact observations resample
+the current native ConveyanceGround and match solver float heights; maximum
+projection2.29085cm. Not a complete collision ledger or whole-reach traversal.
+Reports use `tmp/sf-v11-upstream-approach-20260927` prefix. NOT ACCEPTED; do not
+repeat this capture unchanged or infer a performance result from recording.
