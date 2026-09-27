@@ -1310,7 +1310,7 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
             Candidate.LandscapeSize = 2017;
             Candidate.HorizontalSpanXCm = 250000.0f;
             Candidate.HorizontalSpanYCm = 121200.0f;
-            Candidate.TargetReliefCm = 39412.861625f;
+            Candidate.TargetReliefCm = 53216.407299f;
             Candidate.WorldVerticalOffsetCm = -1460.458749f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
             // The live solver owns the water; the old straight-reach solver

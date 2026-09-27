@@ -1,7 +1,54 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "Engine/CollisionProfile.h"
+
 namespace RaftSimEditorEnvironment
 {
+namespace
+{
+// Measured USGS 3DEP terrain around the Hance Landscape (6.5 km window,
+// 10 m): mesh from unreal/Scripts/install_colorado_hance_backdrop.py. The
+// translation and (1, -1, 1) scale come from the `backdrop` block of
+// terrain/hance_evidence_2021/hance_evidence_terrain_manifest.json
+// (physics/tests/test_colorado_hance_evidence.py checks they match). Under
+// the Landscape the mesh sits at least 3 m below it, so the Landscape wins.
+bool AddColoradoHanceTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    UStaticMesh* Mesh = LoadObject<UStaticMesh>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/SM_RaftSim_ColoradoHance_3DEPBackdrop."
+             "SM_RaftSim_ColoradoHance_3DEPBackdrop"));
+    if (!Mesh)
+    {
+        OutSummary += TEXT("Missing the Hance 3DEP terrain backdrop mesh; run unreal/Scripts/install_colorado_hance_backdrop.py.\n");
+        return false;
+    }
+    const FVector BackdropTranslationCm(-199500.0, -340100.0, 0.0);
+    AStaticMeshActor* Actor = World->SpawnActor<AStaticMeshActor>(BackdropTranslationCm, FRotator::ZeroRotator);
+    if (!Actor)
+    {
+        OutSummary += TEXT("Failed to spawn the Hance terrain backdrop actor.\n");
+        return false;
+    }
+    Actor->SetActorScale3D(FVector(1.0, -1.0, 1.0));
+    Actor->SetActorLabel(TEXT("RaftSim_ColoradoHance_3DEPBackdrop"));
+    Actor->Tags.AddUnique(TEXT("RaftSimTerrainBackdrop"));
+    Actor->Tags.AddUnique(TEXT("RaftSimColoradoHance3DEPBackdrop"));
+    UStaticMeshComponent* Component = Actor->GetStaticMeshComponent();
+    Component->SetMobility(EComponentMobility::Static);
+    Component->SetStaticMesh(Mesh);
+    Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    Component->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+    Component->SetCanEverAffectNavigation(false);
+    Component->bAffectDistanceFieldLighting = false;
+    // Canyon walls beyond the Landscape shade the river at low sun.
+    Component->SetCastShadow(true);
+    OutSummary += FString::Printf(
+        TEXT("Placed the Hance 3DEP terrain backdrop (%s, no collision).\n"), *Mesh->GetPathName());
+    return true;
+}
+} // namespace
+
 bool BuildLandscapeImportCandidateMap(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     FRaftSimLandscapeImportCandidateResult& OutResult,
@@ -396,6 +443,11 @@ bool BuildLandscapeImportCandidateMap(
             "no duplicate dense source-terrain overlay is active.\n");
     }
     AddPreviewLightRig(World, Candidate.PreviewSpec);
+    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river") &&
+        !AddColoradoHanceTerrainBackdrop(World, OutSummary))
+    {
+        return false;
+    }
     AActor* WaterActor = Candidate.bPhysicalScaleSourceCorridor
         ? AddLandscapeCandidatePhysicalRiverRibbon(
               World,

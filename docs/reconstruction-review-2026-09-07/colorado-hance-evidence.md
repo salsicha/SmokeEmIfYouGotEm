@@ -18,6 +18,7 @@ Archived with hashes, DOIs and datums in
 | USGS/GCMRC channel mapping, river miles 61-88 (doi:10.5066/P99SSSU6) | pool bathymetry (multibeam/singlebeam) and total-station banks, 1 m | May 2014 |
 | USGS corridor DEM, zone 5 (doi:10.5066/P93Y4FMJ), 1 m crop | ground, emergent rocks, water-surface texture | May-June 2021, steady ~8,000 cfs |
 | USGS corridor imagery (ImageServer, 0.5 m and 0.2 m exports) | water outline, whitewater, colour | same flights as the DEM |
+| USGS 3DEP seamless DEM, 10 m export of a 6.5 km window (added 2026-09-27) | terrain beyond the corridor DEM | NAVD88 heights |
 
 The 2021 imagery replaced the 2013 mosaic in the approved list: same provider
 and resolution, same epoch and flow as the DEM. The rapid itself (about 900 m)
@@ -111,13 +112,46 @@ Evidence, validation figures and the calibration file are archived in
   floor, via new `ARaftSimRiverWaterConfig` fields. Default values keep every
   other map unchanged. With the old onset, the main rapid showed 0.3% visible
   foam against 14% in the imagery.
-- Terrain presentation. The drape is scaled to albedo (median 0.11). Under water
-  it uses a darkened continuation of the bank colours instead of the
-  photographed water. The outer 10 m of corridor DEM is dropped: its edge cells
-  held photogrammetric spikes up to 70 m, which read as a spire from the river.
-  Outside the corridor, the terrain is an invented, smooth, rising continuation
-  (0.45 m/m, capped at 350 m), and so is its colour. The procedural boulder
-  scatter is removed; rocks come from the DEM and the labelled boulder bed.
+- Terrain presentation:
+  - The drape is scaled to albedo (median 0.11).
+  - Under water, the drape uses a darkened continuation of the bank colours
+    instead of the photographed water.
+  - The outer 10 m of the corridor DEM is dropped. Its edge cells held
+    photogrammetric spikes up to 70 m, which read as a spire from the river.
+  - The procedural boulder scatter is removed. Rocks come from the DEM and
+    the labelled boulder bed.
+- **Measured terrain beyond the corridor (2026-09-27).** Outside the 2021
+  corridor DEM (59% of the Landscape), the terrain is now USGS 3DEP 10 m
+  instead of the invented rising fill.
+  - Datum: 3DEP is NAVD88, so it is shifted by the median corridor-DEM-minus-3DEP
+    difference over dry measured ground, −23.25 m (1.07 M cells; p10/p90
+    −25.6/−18.3 m). This is the local geoid separation.
+  - Seam: the remaining corridor-edge residual is extended harmonically and
+    faded out over 150 m.
+  - Upsampling uses Catmull-Rom; bilinear upsampling left grid-aligned slope
+    creases that the lighting showed.
+  - Landscape relief rises from 394 to 532 m. The water and bed inside the
+    corridor are byte-identical, via the exporter's `--terrain-only` mode.
+- **Terrain-conditioned colour** outside the photo footprint (57% of the
+  Landscape). The photo's median albedo is computed for each bin of 10 m slope
+  and height above the 3DEP river level. That colour is then applied to the
+  3DEP terrain, blended over 60 m from the photo edge. The colour is still
+  invented, but it follows the measured slopes and benches rather than one
+  smeared tone.
+- **3DEP terrain backdrop.** The builder places a render-only, always-loaded
+  Nanite mesh around the Landscape.
+  - Geometry: the whole 6.5 km 3DEP window at 10 m (786 k triangles).
+  - Colour: a 2,048² drape with the same palette. 3DEP's hydro-flattened
+    river cells take the photo's median open-water colour.
+  - It has no collision, and it casts shadows (canyon walls shade the river at
+    low sun).
+  - Outside the Landscape it keeps the measured heights. Under the Landscape
+    it sits 0.5 m below within 20 m of the edge, and 3 m below the local
+    minimum further in. An earlier version lowered it outside the edge too,
+    which drew a shadowed trench along the Landscape edge.
+  - Pipeline: `export_hance_evidence_runtime.py --terrain-only`, then
+    `unreal/Scripts/export_colorado_hance_backdrop_fbx.py` (Blender), then
+    `unreal/Scripts/install_colorado_hance_backdrop.py`, then the map build.
 - Packaged builds stage the cooked field, baseline, streaming manifest and
   coordinate map (`RaftSimWater.Build.cs`).
 
@@ -126,6 +160,10 @@ Evidence, validation figures and the calibration file are archived in
 ![Lower rapid](colorado-hance-evidence/overhead-1320m-imagery-vs-game.png)
 
 ![Put-in pool (520 m), main rapid (795 m), calm run (1,070 m), lower rapid (1,345 m)](colorado-hance-evidence/eye-level-520-795-1070-1345m.png)
+
+![Downstream from 520 m and 1,020 m: invented fill (left) and 3DEP terrain plus backdrop (right)](colorado-hance-evidence/eye-level-before-after-3dep-520-1020m.png)
+
+![3DEP backdrop: oblique from 1.2 km looking south, and overhead (top = west)](colorado-hance-evidence/3dep-backdrop-oblique-and-overhead.png)
 
 ## Validation
 
@@ -139,7 +177,13 @@ p95 and no frame over 100 ms.
 | main rapid (740 m) | 18.3 | 36.5 | 51.3 | 0 | 19.2 | 7.8 |
 | lower rapid (1,250 m) | 19.3 | 37.1 | 54.8 | 0 | 20.3 | 7.7 |
 
-Before the 1.5 m lattice the put-in ran p95 61.3 ms.
+Before the 1.5 m lattice the put-in ran p95 61.3 ms. With the 3DEP terrain and
+backdrop (2026-09-27, same method): put-in 17.2 / 30.7 / 40.4 ms (mean / p95 /
+max), main rapid 19.1 / 36.9 / 55.2, lower rapid 19.2 / 37.1 / 57.3. There are
+no frames over 100 ms, and GPU mean is 7.6-7.9 ms, so the backdrop costs
+little. `RaftSim.P4.RiverMapLoads.L_Hance` now also checks that exactly one
+backdrop is placed and that it does not collide. That test and
+`RaftSim.M9.FColoradoHanceEvidenceTerrain` pass.
 
 - Reach surveys (`RaftSim.SurveyReach`, 520-1,720 m): every station wet, no
   grounding, integrity 1.0, current 0.7 m/s in the pool and 2.1-3.2 m/s in
@@ -170,9 +214,14 @@ Before the 1.5 m lattice the put-in ran p95 61.3 ms.
 - Rapid bed and boulder heights are inferred; velocities are not measured.
   The bed is 2014 and the surface 2021.
 - The grid has no metric terms: cell lengths are 0.87-1.17 of true on bends.
-- Terrain beyond the 2021 corridor DEM (59% of the Landscape) and its colour
-  are invented. A measured wider backdrop (for example USGS 3DEP 10 m) would be
-  a new download and needs the user's permission.
+- Terrain beyond the 2021 corridor DEM is now measured, but only at 10 m.
+  Cliff lines that run diagonal to the grid alias into single-cell steps,
+  which are present in the 3DEP export itself. Its colour is still invented
+  (terrain-conditioned palette): no imagery beyond the corridor was
+  downloaded.
+- The cooked water ends 35-55 m inside the Landscape at both reach ends. From
+  there to the edge the channel shows dry bed, and past the edge the backdrop
+  shows 3DEP's flat river surface as coloured ground.
 - The orthophoto colour includes its capture lighting. Distant slopes still
   read pale and hazy; some faceted flat-shaded patches show on the water.
 - The far-field water takes its depth and speed from one encoded energy value,

@@ -107,6 +107,17 @@ def test_catalog_and_runtime_match_the_exported_terrain() -> None:
     assert abs(offset - landscape["world_vertical_offset_cm"]) < 0.01
     assert "LandscapeSize = 2017" in block and "HorizontalSpanXCm = 250000.0f" in block
     assert "HorizontalSpanYCm = 121200.0f" in block and "bUseSolverVisualizationFields = false" in block
+    # Outside the corridor DEM the Landscape is measured 3DEP, and the
+    # builder places the 3DEP backdrop where the export put it.
+    assert "USGS 3DEP 10 m" in terrain["composition"]["nan_fill"]
+    assert -24.5 < terrain["dep_3dep"]["offset_to_ellipsoid_m"] < -22.0
+    backdrop = terrain["backdrop"]
+    assert _sha(REPO_ROOT / backdrop["mesh"]) == terrain["outputs"]["backdrop_mesh_sha256"]
+    assert backdrop["collision"] is False and backdrop["actor_scale"] == [1.0, -1.0, 1.0]
+    build = (EDITOR / "Landscape/RaftSimEditorLandscapeBuild.cpp").read_text(encoding="utf-8")
+    tx, ty, tz = backdrop["actor_translation_cm"]
+    assert f"BackdropTranslationCm({tx:.1f}, {ty:.1f}, {tz:.1f})" in build
+    assert "SetActorScale3D(FVector(1.0, -1.0, 1.0))" in build
     geometry = (EDITOR / "Landscape/RaftSimEditorLandscapeGeometry.cpp").read_text(encoding="utf-8")
     assert "scenario_hance_evidence_2021/cooked_flow_fields" in geometry
     assert 'FName(TEXT("steady_8000cfs_2021"))' in geometry

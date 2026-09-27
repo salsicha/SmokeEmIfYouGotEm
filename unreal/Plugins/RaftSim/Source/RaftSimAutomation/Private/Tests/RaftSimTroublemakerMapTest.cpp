@@ -5,6 +5,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Components/ExponentialHeightFogComponent.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Containers/Set.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/Texture2D.h"
@@ -1611,6 +1612,23 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Colorado Hance launch keeps every person in the raft"),
             PlayerRaft->GetSwimmerCount(),
             0);
+
+        // Measured 3DEP terrain beyond the Landscape: one render-only mesh.
+        int32 BackdropCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimColoradoHance3DEPBackdrop")))
+            {
+                continue;
+            }
+            ++BackdropCount;
+            const UStaticMeshComponent* Backdrop = (*It)->FindComponentByClass<UStaticMeshComponent>();
+            Test->TestTrue(TEXT("Colorado Hance 3DEP backdrop has its mesh"), Backdrop && Backdrop->GetStaticMesh());
+            Test->TestTrue(
+                TEXT("Colorado Hance 3DEP backdrop never collides"),
+                Backdrop && Backdrop->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+        }
+        Test->TestEqual(TEXT("Colorado Hance places one 3DEP terrain backdrop"), BackdropCount, 1);
 
         int32 RuntimeWaterConfigCount = 0;
         for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)

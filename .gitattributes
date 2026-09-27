@@ -73,3 +73,4 @@ physics/data/real_world/colorado_river_grand_canyon_rowing/hance_sources_2026_09
 physics/data/real_world/colorado_river_grand_canyon_rowing/hance_sources_2026_09/**/*.json text eol=lf
 # Hash-locked Overpass requests (source manifests record their LF bytes).
 physics/data/real_world/*/*_sources_2026_09/**/*.overpassql text eol=lf
+unreal/SourceArt/RaftSim/ColoradoHance*/**/*.fbx filter=lfs diff=lfs merge=lfs -text
