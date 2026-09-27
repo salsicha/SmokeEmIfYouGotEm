@@ -1,5 +1,26 @@
 # Remaining requested work
 
+September27 v12 verification COMPLETE: build19892 exit0 (495.88s), staged
+v8 closure and isolated timing72084 exit0, upstream capture3980/PID32144 exit0.
+No job from this sequence remains live. Normal Boot/menu p9543.428ms,
+max51.6971ms/zero frames over100ms passes this run. Busy11520 p9553.7239ms,
+max103.5941ms/one frame over100ms FAILS. Both have zero runtime errors and
+unchanged20FPS/50ms gates; no quality or solver override. See current evidence
+in `docs/reconstruction-review-2026-09-07/troublemaker-envelope-coupling.md`.
+Actual450s-field video covers route8314.392 through8404.225; original frames
+3/6/9/11/20/40s show raft/paddle motion but broad flat foam/separate spray and
+coarse banks. The raft ends against right-bank geometry, not a clean traversal.
+57 capped contacts match native ground exactly; maximum projection4.822cm.
+This does not establish collision/traversal or shoreline stability acceptance.
+The new fields are in the rebuilt normal scene, but no visual improvement or
+overall performance gain is established. South Fork remains first unfinished.
+Do not rerun unchanged v12 tests or duplicate a completed build. Next inspect
+the recorded approach/contact trajectory and local flow/support around8404m
+before changing any geometry; preserve measured rocks and diagnose whether
+control, inferred bed or evolving flow directs the raft into that bank. Breaking
+realism, local storage balance and busy-scene CPU cost remain open. No later
+river advance, source deletion, rejected solver enablement or push.
+
 September27 latest:450s continuation58416, corrected upstream motion66896,
 runtime export15732 and water-only installation47433 all COMPLETE exit0.
 No job from those sequences remains live. All final state/bank/storage audits
@@ -13,10 +34,13 @@ SHA256 `b5cf0069166ebc1c64eea95d836b4474d3cf1717fe58e001486c3aa9a1e64bf7`.
 Both ordered water-only receipts and original geometry evidence are retained.
 Fresh v8 runtime bundle verifies2,405 files/917,995,570 bytes; manifest SHA256
 `8190b5e81951986070664344a8a53c953a44961fc7d881f0633ba2cf9a7eb190`.
-Water.Build.cs now stages v8. Prepared game rebuild:
-`tmp/package-south-fork-v12-20260927.ps1`. V12 is NOT built/validated yet.
-Next rebuild ONCE, verify staged closure, then isolated normal/busy20FPS tests
-and actual upstream motion/contact/shoreline/surface review. No new physics
+Water.Build.cs now stages v8. Local integration commit6048eace6, no push.
+V12 build session19892 completed exit0, recipe `tmp/package-south-fork-v12-20260927.ps1`,
+log `tmp/south-fork-v12-package-20260927.log`, fresh stage
+`tmp/south-fork-playable-v12-20260927`. Former UAT/UBT dotnet39528/32144
+completed; do not poll or duplicate. Closure, normal/busy timing and upstream
+motion/contact/shoreline/surface review completed as recorded above; not accepted.
+No new physics
 mode, weaker gate, source deletion or later-river advance. Earlier live/pending
 checkpoints below are historical and superseded by this block.
 

@@ -1,5 +1,65 @@
 # Troublemaker inferred-envelope coupling - September 27
 
+## V12 rebuilt normal scene: verification completed, not accepted
+
+Build19892 completed exit0 in495.88s. Stage:
+`tmp/south-fork-playable-v12-20260927/Windows`. Inner executable SHA256
+`91ec929e81c465c5d91769aa7a49c7b7da08bf33f3f6c92d459e30228b01218f`
+is identical to v11: this is a450s-field data increment, not new C++ physics.
+Staged audit `tmp/south-fork-v12-staged-payload-20260927.json` verifies all
+2,405 v8 files/917,995,570 bytes without external source fallback. Existing
+MetaHuman missing-texture dependency warnings remain; not a clean release.
+
+Isolated timing72084 completed exit0, with no overlapping build/cook/solve.
+Receipts under `unreal/Saved/RaftSimValidation/`:
+
+| Receipt prefix | Mean ms | p95 ms | Maximum ms | Frames >100ms | Gate |
+| --- | ---: | ---: | ---: | ---: | --- |
+| sf-v12-normal-menu-20260927 |36.3089|43.4280|51.6971|0|Pass this run|
+| sf-v12-rapid11520-20260927 |46.5146|53.7239|103.5941|1|Fail|
+
+Each records1,200 frames/1,140 audited rows30..1169, zero runtime errors,
+normal configuration and unchanged20FPS/50ms p95/no frame over100ms gates.
+Boot -> actual menu -> FullReach launch order verified. Busy timing is a
+review-station start, not a menu-path claim. Lower times than v11 are not an
+isolated causal optimization result: evolved fields and trajectories differ.
+
+Upstream ordinary-camera capture3980/PID32144 completed exit0 without logged
+runtime errors; no engine remains live. Recipe:
+`tmp/capture-sf-v12-upstream-approach-20260927.ps1`. Recording:
+`tmp/south-fork-playable-v12-20260927/Windows/SmokeEmIfYouGotEm/Saved/VideoCaptures/RaftSim_20260927-153034.mp4`,
+SHA256 `06e860fb24a1bd38f0f456ff3a72f10cdaa53c38586add716af333ff8c38b74d`.
+Decoded1,285 original1280x720 frames/42.8s,28 adjacent duplicates, into
+`tmp/sf-v12-upstream-approach-decoded-20260927`; encoded rate is not game FPS.
+Inspected original3/6/9/11/20/40s: raft and paddle positions change, broad flat
+white foam and separate spray persist, with mostly smooth water/coarse rocks.
+No convincing overturning or recirculating roller is established. By40s the
+raft faces directly into right-bank geometry, HUD still zero incidents/swims;
+that HUD is not proof of a clean traversal. No visual acceptance or stable
+shoreline/full-surface temporal acceptance. No proven visual improvement.
+
+Hash-bound `tmp/sf-v12-upstream-framing-20260927.json` records40 cameras,
+first route8314.392 atworld2.452s and last8404.225 at41.092s. The strongest
+front near8342.35m is inside the first horizontal cone (16.524deg atFOV86.874),
+with spilling0.9810 and extra crest0.04699m; this is not occlusion proof.
+The second near8355.315m is at41.042deg, spilling0.34595/extra0.23701m.
+Compared with v11 these are evolved states, not measured wave calibration.
+
+Actual submitted-mesh audit
+`tmp/sf-v12-upstream-approach-20260927.json.cartesian-mesh.json`:
+48,952 triangles/1,534,356 sampled points, max target error0.827834cm,
+fine temporal correction0.024752cm, source-anchor movement0 over8,627 anchors.
+This excludes macro lag/other base relief/GPU perturbations, not shaded-motion
+acceptance. Contact report `tmp/sf-v12-upstream-approach-20260927-contact.json`
+has57 capped projections, all resampled native ConveyanceGround with exact
+solver-float height agreement, max4.821822cm. Not a full contact ledger.
+
+Next use this trajectory/contact evidence to localize the bank-end condition
+near8404m and its flow/support/control causes before modifying inferred bed
+or any measured geometry. Do not delete obstructing rocks or repeat unchanged
+captures. The8..9km storage imbalance, breaking realism and busy CPU gate remain
+unresolved; South Fork is not accepted and later rivers have not advanced.
+
 ## Completed450s continuation and guarded playable-field trial
 
 Continuation58416/native5884/wrapper24200 completed exit0, including final
@@ -34,9 +94,11 @@ Native inventory records the original installation and both ordered300/450s
 water-save receipts. Backup: `tmp/envelope-fields450-v1-20260927-before.uasset`.
 V8 bundle closure passes2,405 files/917,995,570 bytes; manifest SHA256
 `8190b5e81951986070664344a8a53c953a44961fc7d881f0633ba2cf9a7eb190`.
-Water.Build.cs stages v8. V12 recipe is prepared but not run at this checkpoint.
-Actual normal-scene rebuild, staged closure, motion/shoreline/contact and
-performance qualification remain required. No visible improvement is claimed.
+Water.Build.cs stages v8. Integration is local commit6048eace6, no push.
+V12 build19892 completed exit0; recipe `tmp/package-south-fork-v12-20260927.ps1`,
+log `tmp/south-fork-v12-package-20260927.log`. Rebuild, closure, motion/contact
+and timing now completed as recorded above, with failed acceptance gates.
+No visible improvement is claimed. Do not duplicate completed jobs.
 
 Earlier status below is historical; the completed450s checkpoint supersedes it.
 
