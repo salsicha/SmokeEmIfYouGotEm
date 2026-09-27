@@ -6,6 +6,45 @@ steering), source-field context, and live exact450->900s continuation99863.
 No geometry change or visual/traversal acceptance follows. Current v12 fields
 remain450s; poll the existing continuation, do not duplicate it.
 
+## Sealed 600-second checkpoint: local storage improving, not settled
+
+The existing450->900 continuation reached its sealed step3000/time600 snapshot.
+Independent checkpoint audit session38191 completed exit0; no new cook or scene
+installation was started. All5,382,400 cells are finite/nonnegative, maximum
+depth2.98183977m, speed8.20848070m/s, volume2,286,164.90179m3. Maximum per-step
+mass residual is8.85076e-9m3. All86,720 artificial-bank cells remain exactly dry.
+These are numerical/closure checks, not observed shoreline or motion acceptance.
+
+Between450 and600s, whole-domain storage increases904.972004m3, averaging
+6.033147m3/s. The8..9km nearest-route region containing Troublemaker increases
+452.824461m3, averaging3.018830m3/s, down from6.72168m3/s during375..450s.
+Its common-wet depth-change p05/median/p95 are-0.032406/+0.020722/+0.028449m.
+The intervals differ in duration, so this is evidence of less average local
+accumulation, not a calibrated convergence rate or proof of equilibrium.
+
+Other regions remain strongly transient:13..14km loses15.4382m3/s while
+11..12km gains12.6132m3/s and7..8km loses12.5750m3/s. Global cancellation cannot
+establish local settling. Region sums match integrated exterior volume within
+4.55e-11m3; these nearest-route bands are storage partitions, not flux sections.
+Do not adjust inferred bed geometry to fit these unsteady stage differences.
+
+Reports (SHA256):
+
+- `tmp/troublemaker-envelope600-state-v1-20260927.json`:
+  `b5f8eb011127de0e3b8ce03e53a1a0ac5d352a84935cb347307a8d085a5d0b0f`
+- `tmp/troublemaker-envelope600-banks-v1-20260927.json`:
+  `d05628fdd4c9774fd4619a43c398f2594cc79a830b25841b70402915fa545d79`
+- `tmp/troublemaker-envelope600-storage-v1-20260927.json`:
+  `ee21ac55bc70c46f7fb18b524f5076b5bdaa1738e82b3d9edf17e868a699729b`
+
+Continue SAME live99863/native12676/wrapper34600 to900s and its already queued
+final audits. Latest process/log inspection reached5250steps/712.5s. No interim
+600s promotion or repeated v12 recording. Current normal playable450s state
+stays installed; the pending far-field candidate still needs isolated production
+timing, and the next justified motion review should collect spatial crest
+endpoints. Breaking/recirculation realism remains unresolved independently of
+settling and numerical conservation.
+
 ## V12 rebuilt normal scene: verification completed, not accepted
 
 Build19892 completed exit0 in495.88s. Stage:

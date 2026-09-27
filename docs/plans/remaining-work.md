@@ -1,5 +1,14 @@
 # Remaining requested work
 
+September27 sealed600s checkpoint independently audited (38191 exit0): all
+5,382,400 cells finite/nonnegative;86,720 artificial-bank cells exactly dry.
+Troublemaker8..9km storage450->600 averages+3.01883m3/s (prior375->450 was
++6.72168); whole-domain+6.03315m3/s and large opposing regional changes persist.
+NOT SETTLED; no field promotion. See [600s evidence](../reconstruction-review-2026-09-07/troublemaker-envelope-coupling.md).
+SAME continuation99863/native12676/wrapper34600 remains live, observed712.5s;
+its900s final audits are already queued. No other build/test from recent turns
+is live. Keep v12/450s installed, no concurrent FPS run or duplicate solve.
+
 September27 realism follow-through: v12's41 eligible upstream height candidates
 show no raw/optical correction difference; strongest nearby front has0.3593m
 resolved rise plus0.0470m extra. Small added height alone does not justify
