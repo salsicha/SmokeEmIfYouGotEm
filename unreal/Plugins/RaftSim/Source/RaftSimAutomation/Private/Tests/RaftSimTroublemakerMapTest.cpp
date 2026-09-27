@@ -235,12 +235,14 @@ bool FRaftSimAssertRiverMapCommand::Update()
         bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
     // The geographic Hance reach draws its whole 160 m cooked lateral span
     // (LivePresentationWidthM) on a 1.5 m lattice: 161 x 108 vertices; the
-    // geographic Pacuare Huacas reach its 96 m span: 161 x 65.
-    const float ExpectedPresentationSpacingM = (bZambeziReferenceRun || bColoradoHanceReferenceRun || bPacuareReferenceRun)
+    // geographic Pacuare Huacas and Futaleufu Terminator reaches their 96 m
+    // spans: 161 x 65.
+    const bool bNinetySixMetreGeographicRun = bPacuareReferenceRun || bFutaleufuTerminatorReferenceRun;
+    const float ExpectedPresentationSpacingM = (bZambeziReferenceRun || bColoradoHanceReferenceRun || bNinetySixMetreGeographicRun)
         ? 1.5f : (bUsesOneMetreReferencePresentation ? 1.0f : 0.5f);
-    const int32 ExpectedPresentationVertices = (bZambeziReferenceRun || bPacuareReferenceRun)
+    const int32 ExpectedPresentationVertices = (bZambeziReferenceRun || bNinetySixMetreGeographicRun)
         ? 10465 : (bColoradoHanceReferenceRun ? 17388 : (bUsesOneMetreReferencePresentation ? 23377 : 92833));
-    const int32 ExpectedPresentationTriangles = (bZambeziReferenceRun || bPacuareReferenceRun)
+    const int32 ExpectedPresentationTriangles = (bZambeziReferenceRun || bNinetySixMetreGeographicRun)
         ? 20480 : (bColoradoHanceReferenceRun ? 34240 : (bUsesOneMetreReferencePresentation ? 46080 : 184320));
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
@@ -2043,14 +2045,22 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 continue;
             }
             Test->TestEqual(
-                TEXT("Futaleufu loads the Terminator cooked package"),
+                TEXT("Futaleufu loads the evidence Terminator cooked package"),
                 (*It)->CookedFieldsDir,
                 FString(TEXT("physics/data/real_world/futaleufu_river_chile/"
-                             "scenario_terminator/cooked_flow_fields")));
+                             "scenario_terminator_evidence_2026/cooked_flow_fields")));
             Test->TestEqual(
-                TEXT("Futaleufu loads the median runnable band"),
+                TEXT("Futaleufu loads the 400 m3/s high runnable band"),
                 (*It)->FlowBand,
-                FName(TEXT("median_runnable")));
+                FName(TEXT("high_runnable_400cms")));
+            Test->TestTrue(
+                TEXT("Futaleufu streams a moving window over the 2.4 km reach"),
+                (*It)->bEnableMovingWindowStreaming && (*It)->bEnableCookedFarFieldWater &&
+                    FMath::IsNearlyEqual((*It)->MovingWindowStationExtentM, 480.0f) &&
+                    FMath::IsNearlyEqual((*It)->LivePresentationWidthM, 96.0f));
+            Test->TestTrue(
+                TEXT("Futaleufu floors the displayed foam with the Sentinel-2 whitewater"),
+                FMath::IsNearlyEqual((*It)->ObservedWhitewaterGain, 0.9f));
             Test->TestFalse(
                 TEXT("Futaleufu preserves source station/lateral coordinates"),
                 (*It)->bRecenterHydraulicCrux);
@@ -2058,8 +2068,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Futaleufu binds the local-world vertical datum map"),
                 (*It)->CoordinateMapPath,
                 FString(TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
-                             "terminator_visual/"
-                             "terminator_runtime_coordinate_map.json")));
+                             "terminator_evidence_2026/"
+                             "terminator_evidence_runtime_coordinate_map.json")));
             Test->TestTrue(
                 TEXT("Futaleufu Landscape owns runtime terrain"),
                 (*It)->bMapProvidesTerrain);
@@ -2227,15 +2237,49 @@ bool FRaftSimAssertRiverMapCommand::Update()
             }
             ++CaptureOnlyWaterCount;
         }
+        // The geographic reach keeps one capture-only water surface; its
+        // whitewater is the live foam floored by the observed (Sentinel-2)
+        // field, not a baked solver-visualization foam surface.
         Test->TestEqual(
-            TEXT("Futaleufu has capture-only static water and foam surfaces"),
+            TEXT("Futaleufu has one capture-only static water surface"),
             CaptureOnlyWaterCount,
-            2);
-        Test->TestEqual(
-            TEXT("Futaleufu has one cooked-field-derived capture foam surface"),
-            SolverFieldFoamCount,
             1);
+        Test->TestEqual(
+            TEXT("Futaleufu has no baked solver-visualization foam surface"),
+            SolverFieldFoamCount,
+            0);
 
+        int32 BackdropCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            BackdropCount += (*It)->Tags.Contains(TEXT("RaftSimFutaleufuTerminatorGLO30Backdrop")) ? 1 : 0;
+        }
+        Test->TestEqual(TEXT("Futaleufu places one GLO-30 terrain backdrop"), BackdropCount, 1);
+
+        // Evidence canopy (build_futaleufu_evidence_dressing.py): a lattice
+        // inside Sentinel-2 forest cover plus an inferred understory near the water.
+        int32 EvidenceCanopyActorCount = 0;
+        int32 EvidenceCanopyInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimFutaleufuEvidenceCanopy")))
+            {
+                continue;
+            }
+            const UHierarchicalInstancedStaticMeshComponent* Instances =
+                (*It)->FindComponentByClass<UHierarchicalInstancedStaticMeshComponent>();
+            Test->TestTrue(
+                TEXT("Futaleufu evidence canopy is visual-only, labelled inferred vegetation"),
+                Instances && Instances->GetCollisionEnabled() == ECollisionEnabled::NoCollision &&
+                    (*It)->Tags.Contains(TEXT("InferredVegetationNotSurveyedTrees")));
+            EvidenceCanopyInstanceCount += Instances ? Instances->GetInstanceCount() : 0;
+            ++EvidenceCanopyActorCount;
+        }
+        Test->TestEqual(TEXT("Futaleufu evidence canopy has two tree forms and an understory"), EvidenceCanopyActorCount, 3);
+        Test->TestTrue(TEXT("Futaleufu evidence canopy covers the valley walls"), EvidenceCanopyInstanceCount >= 50000);
+
+        // The evidence bed carries its own inferred boulders; the interpreted
+        // entry-marker contact of the old reach-local scene is gone.
         int32 InterpretedD4RockCount = 0;
         for (TActorIterator<ARaftSimRockObstacleActor> It(World); It; ++It)
         {
@@ -2247,9 +2291,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
             }
         }
         Test->TestEqual(
-            TEXT("Futaleufu retains one review-gated interpreted D4 contact"),
+            TEXT("Futaleufu has no interpreted D4 contact on the evidence reach"),
             InterpretedD4RockCount,
-            1);
+            0);
         return true;
     }
 

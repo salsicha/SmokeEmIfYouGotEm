@@ -265,7 +265,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     // - Hance: the 2021 corridor orthophoto, 4096 x 2048 over 2500 x 1212 m
     //   (unreal/Scripts/install_colorado_hance_evidence_drape.py);
     // - Pacuare Huacas: the 2014-2017 IGN orthophoto with Sentinel-2 colour
-    //   outside its footprint, 2048 x 2048 (unreal/Scripts/install_evidence_drape.py).
+    //   outside its footprint, 2048 x 2048 (unreal/Scripts/install_evidence_drape.py);
+    // - Futaleufu Terminator: Sentinel-2 10 m colour, 2048 x 2048 (same script).
     const TCHAR* EvidenceDrapePath =
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river")
             ? TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/T_RaftSim_ColoradoHance_EvidenceDrape."
@@ -273,6 +274,9 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         : Candidate.PreviewSpec.RiverId == TEXT("pacuare")
             ? TEXT("/Game/RaftSim/Environment/PacuareRun/Terrain/T_RaftSim_PacuareHuacas_EvidenceDrape."
                    "T_RaftSim_PacuareHuacas_EvidenceDrape")
+        : Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator")
+            ? TEXT("/Game/RaftSim/Environment/FutaleufuRun/Terrain/T_RaftSim_FutaleufuTerminator_EvidenceDrape."
+                   "T_RaftSim_FutaleufuTerminator_EvidenceDrape")
             : nullptr;
     UTexture2D* EvidenceDrape = EvidenceDrapePath ? LoadObject<UTexture2D>(nullptr, EvidenceDrapePath) : nullptr;
     if (EvidenceDrape)
@@ -610,7 +614,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         Material->GetExpressionCollection().AddExpression(SlopeConditionedBaseColor);
         FinalBaseColor = SlopeConditionedBaseColor;
     }
-    if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+    if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") && !EvidenceDrape)
     {
         FinalBaseColor = BuildFutaleufuOrganicTemperateBaseColor(
             Material,

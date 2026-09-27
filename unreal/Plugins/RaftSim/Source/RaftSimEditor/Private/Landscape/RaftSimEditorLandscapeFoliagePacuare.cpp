@@ -643,156 +643,23 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
             PacuareShorelineMaximumSlopeDegrees);
     }
 
-    // Evidence dressing (physics/scripts/build_pacuare_evidence_dressing.py)
-    // written beside the terrain: the placement rows, or null (with a
-    // summary line) when the file is missing or has the wrong schema.
-    TArray<TSharedPtr<FJsonObject>> PlacementRoots;
-    const auto LoadEvidencePlacement = [&OutSummary, &PlacementRoots](const TCHAR* FileName, const TCHAR* Schema)
-        -> const TArray<TSharedPtr<FJsonValue>>*
+    // Evidence dressing (physics/scripts/build_pacuare_evidence_dressing.py),
+    // written beside the terrain. The canopy: orthophoto crown tops plus
+    // infill inside the IGN tree-cover polygons over the whole Landscape
+    // window, so the gorge walls carry the closed forest the photographs show
+    // instead of a bare drape.
+    const FString EvidenceFolder = TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017");
+    FEvidenceCanopyCounts EvidenceCanopy;
+    if (bPacuare && bPhysicalCorridor)
     {
-        const FString Path = FPaths::ConvertRelativePathToFull(FPaths::Combine(
-            GetRepoRoot(), TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017"), FileName));
-        FString Text;
-        TSharedPtr<FJsonObject> Root;
-        if (FFileHelper::LoadFileToString(Text, *Path))
-        {
-            const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Text);
-            FJsonSerializer::Deserialize(Reader, Root);
-        }
-        const TArray<TSharedPtr<FJsonValue>>* Rows = nullptr;
-        if (!Root.IsValid() || Root->GetStringField(TEXT("schema")) != Schema ||
-            !Root->TryGetArrayField(TEXT("instances"), Rows) || Rows->Num() == 0)
-        {
-            OutSummary += FString::Printf(TEXT("Pacuare evidence placement missing or invalid: %s\n"), *Path);
-            return nullptr;
-        }
-        PlacementRoots.Add(Root);
-        return Rows;
-    };
-
-    // Evidence canopy: orthophoto crown tops plus infill inside the IGN
-    // tree-cover polygons over the whole Landscape window, so the gorge walls
-    // carry the closed forest the photographs show instead of a bare drape.
-    // Positions come from the imagery; crown size (from spacing), heights and
-    // species are inferred. Own components keep its count and cost separable.
-    int32 EvidenceCanopyExpected = 0;
-    int32 EvidenceCanopyPlaced = 0;
-    if (bPacuare && bPhysicalCorridor && Context.BroadleafTreeMesh && Context.ConiferTreeMesh &&
-        Context.BroadleafTreeInstances && Context.ConiferTreeInstances)
-    {
-        const TArray<TSharedPtr<FJsonValue>>* Rows = LoadEvidencePlacement(
-            TEXT("huacas_evidence_canopy_placement.json"), TEXT("raftsim.pacuare.huacas_evidence_canopy.v1"));
-        if (!Rows)
-        {
-            EvidenceCanopyExpected = 1;
-        }
-        else
-        {
-            EvidenceCanopyExpected = Rows->Num();
-            UStaticMesh* const Meshes[2] = {Context.BroadleafTreeMesh, Context.ConiferTreeMesh};
-            UHierarchicalInstancedStaticMeshComponent* const Sources[2] = {
-                Context.BroadleafTreeInstances, Context.ConiferTreeInstances};
-            UHierarchicalInstancedStaticMeshComponent* Components[2] = {nullptr, nullptr};
-            FVector MeshSizes[2];
-            for (int32 Form = 0; Form < 2; ++Form)
-            {
-                Components[Form] = AddLandscapeCandidateInstancedMeshComponent(
-                    Context.World, Meshes[Form],
-                    FString::Printf(TEXT("RaftSim_PacuareEvidenceCanopy%s_pacuare"), Form == 0 ? TEXT("A") : TEXT("B")),
-                    true);
-                if (Components[Form])
-                {
-                    Components[Form]->GetOwner()->Tags.Append(
-                        {TEXT("RaftSimPacuareEvidenceCanopy"), TEXT("RaftSimImageryCanopyPositions"),
-                         TEXT("InferredVegetationNotSurveyedTrees")});
-                    for (int32 Slot = 0; Slot < Sources[Form]->GetNumMaterials(); ++Slot)
-                    {
-                        Components[Form]->SetMaterial(Slot, Sources[Form]->GetMaterial(Slot));
-                    }
-                }
-                MeshSizes[Form] = GetLandscapeCandidateEffectiveMeshBounds(Meshes[Form]).GetSize();
-            }
-            if (Components[0] && Components[1])
-            {
-                for (const TSharedPtr<FJsonValue>& Value : *Rows)
-                {
-                    const TArray<TSharedPtr<FJsonValue>>* Row = nullptr;
-                    if (!Value.IsValid() || !Value->TryGetArray(Row) || Row->Num() < 8)
-                    {
-                        continue;
-                    }
-                    // x_cm, y_cm, terrain_z_cm, crown_radius_m, height_m, form, kind, yaw_deg
-                    const float X = static_cast<float>((*Row)[0]->AsNumber());
-                    const float Y = static_cast<float>((*Row)[1]->AsNumber());
-                    const float RadiusM = static_cast<float>((*Row)[3]->AsNumber());
-                    const float HeightM = static_cast<float>((*Row)[4]->AsNumber());
-                    const int32 Form = FMath::Clamp(static_cast<int32>((*Row)[5]->AsNumber()), 0, 1);
-                    const float YawDegrees = static_cast<float>((*Row)[7]->AsNumber());
-                    const FVector& Size = MeshSizes[Form];
-                    const float CrownScale = 200.0f * RadiusM / FMath::Max(1.0f, FMath::Max(Size.X, Size.Y));
-                    const float HeightScale = FMath::Clamp(
-                        100.0f * HeightM / FMath::Max(1.0f, Size.Z), 0.8f * CrownScale, 1.8f * CrownScale);
-                    // Sink roots 30 cm so trunks meet the sloping Landscape.
-                    AddGroundedInstance(
-                        Components[Form], Meshes[Form], FVector2D(X, Y), GetLandscapeHeight(X, Y) - 30.0f,
-                        FRotator(0.0f, YawDegrees, 0.0f), FVector(CrownScale, CrownScale, HeightScale));
-                    ++EvidenceCanopyPlaced;
-                }
-            }
-            const int32 TreesPlaced = EvidenceCanopyPlaced;
-            // Inferred understory beside each tree (same file), so the trunk
-            // zone of the walls reads as layered rainforest.
-            const TArray<TSharedPtr<FJsonValue>>* UnderstoryRows = nullptr;
-            UHierarchicalInstancedStaticMeshComponent* UnderstoryComponent =
-                Context.ShrubMesh && Context.ShrubInstances
-                    ? AddLandscapeCandidateInstancedMeshComponent(
-                          Context.World, Context.ShrubMesh, TEXT("RaftSim_PacuareEvidenceUnderstory_pacuare"), true)
-                    : nullptr;
-            if (UnderstoryComponent && PlacementRoots.Last()->TryGetArrayField(TEXT("understory"), UnderstoryRows))
-            {
-                UnderstoryComponent->GetOwner()->Tags.Append(
-                    {TEXT("RaftSimPacuareEvidenceCanopy"), TEXT("InferredVegetationNotSurveyedTrees")});
-                for (int32 Slot = 0; Slot < Context.ShrubInstances->GetNumMaterials(); ++Slot)
-                {
-                    UnderstoryComponent->SetMaterial(Slot, Context.ShrubInstances->GetMaterial(Slot));
-                }
-                const FVector Size = GetLandscapeCandidateEffectiveMeshBounds(Context.ShrubMesh).GetSize();
-                EvidenceCanopyExpected += UnderstoryRows->Num();
-                for (const TSharedPtr<FJsonValue>& Value : *UnderstoryRows)
-                {
-                    const TArray<TSharedPtr<FJsonValue>>* Row = nullptr;
-                    if (!Value.IsValid() || !Value->TryGetArray(Row) || Row->Num() < 5)
-                    {
-                        continue;
-                    }
-                    // x_cm, y_cm, height_m, width_m, yaw_deg
-                    const float X = static_cast<float>((*Row)[0]->AsNumber());
-                    const float Y = static_cast<float>((*Row)[1]->AsNumber());
-                    const float WidthScale = 100.0f * static_cast<float>((*Row)[3]->AsNumber()) /
-                        FMath::Max(1.0f, static_cast<float>(FMath::Max(Size.X, Size.Y)));
-                    const float HeightScale = 100.0f * static_cast<float>((*Row)[2]->AsNumber()) /
-                        FMath::Max(1.0f, static_cast<float>(Size.Z));
-                    AddGroundedInstance(
-                        UnderstoryComponent, Context.ShrubMesh, FVector2D(X, Y), GetLandscapeHeight(X, Y) - 20.0f,
-                        FRotator(0.0f, static_cast<float>((*Row)[4]->AsNumber()), 0.0f),
-                        FVector(WidthScale, WidthScale, HeightScale));
-                    ++EvidenceCanopyPlaced;
-                }
-            }
-            else
-            {
-                EvidenceCanopyExpected += 1;
-            }
-            OutResult.DressingFoliageInstanceCount += EvidenceCanopyPlaced;
-            OutResult.DressingCanopyTreeInstanceCount += TreesPlaced;
-            OutResult.DressingUnderstoryInstanceCount += EvidenceCanopyPlaced - TreesPlaced;
-            OutSummary += FString::Printf(
-                TEXT("Pacuare evidence canopy: %d trees and %d understory shrubs, %d/%d rows (orthophoto crown tops ")
-                TEXT("and infill inside IGN forestal2017 tree cover; crown size, heights, species and understory ")
-                TEXT("inferred), Landscape-grounded, non-colliding.\n"),
-                TreesPlaced, EvidenceCanopyPlaced - TreesPlaced, EvidenceCanopyPlaced, EvidenceCanopyExpected);
-        }
+        EvidenceCanopy = AddEvidenceCanopy(
+            Context, Queries, EvidenceFolder, TEXT("huacas_evidence_canopy_placement.json"),
+            TEXT("raftsim.pacuare.huacas_evidence_canopy.v1"), TEXT("RaftSim_PacuareEvidence"),
+            TEXT("RaftSimPacuareEvidenceCanopy"),
+            TEXT("orthophoto crown tops and infill inside IGN forestal2017 tree cover"));
     }
+    const int32 EvidenceCanopyExpected = EvidenceCanopy.Expected;
+    const int32 EvidenceCanopyPlaced = EvidenceCanopy.Placed;
 
     // Emergent-rock shells: the photographed rocks are Landscape bumps of the
     // evidence bed (collision and solver obstacle) that render as faceted
@@ -804,9 +671,11 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
     if (bPacuare && bPhysicalCorridor && ReviewedRockMeshes.Num() == 6 &&
         PacuareOrganicShorelineRockInstances.Num() == 6)
     {
-        const TArray<TSharedPtr<FJsonValue>>* Rows = LoadEvidencePlacement(
-            TEXT("huacas_evidence_rock_placement.json"), TEXT("raftsim.pacuare.huacas_evidence_rocks.v1"));
-        if (!Rows)
+        const TSharedPtr<FJsonObject> RockRoot = LoadEvidencePlacement(
+            EvidenceFolder, TEXT("huacas_evidence_rock_placement.json"), TEXT("raftsim.pacuare.huacas_evidence_rocks.v1"),
+            OutSummary);
+        const TArray<TSharedPtr<FJsonValue>>* Rows = nullptr;
+        if (!RockRoot.IsValid() || !RockRoot->TryGetArrayField(TEXT("instances"), Rows))
         {
             EvidenceRockExpected = 1;
         }

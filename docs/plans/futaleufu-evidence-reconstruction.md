@@ -2,7 +2,9 @@
 
 Requested 2026-09-06. Queued after completion and validation of Pacuare.
 Order: South Fork, Colorado Grand Canyon, Pacuare, Futaleufu.
-Not started or accepted.
+Implemented 2026-09-27 as the geographic `L_Terminator` (OSM 72.9-75.3 km).
+Not accepted; see
+`docs/reconstruction-review-2026-09-07/futaleufu-terminator-evidence.md`.
 
 ## Objective
 
@@ -81,3 +83,24 @@ Archived in `physics/data/real_world/futaleufu_river_chile/futaleufu_sources_202
   - Tile 18GYT is mosaicked with the same-datatake 18GYS for the southern
     1.5 km. Both are on one UTM 18S 10 m grid.
   - None of the three mosaics has cloud or shadow.
+
+### Reconstruction (2026-09-27)
+
+Done at the resolution the open data allows. The review doc holds the
+method, results, validation, performance and limits.
+
+- **Terminator located.** `audit_futaleufu_terminator_location.py` finds the
+  strongest persistent Sentinel-2 whitewater at OSM 74.0-74.2 km. The
+  GoRafting chainage predicts 74.15 km, and the indicator also fires at El
+  Trono.
+- **Surface.** GLO-30's edited water surface gives anchors every 200 m (about
+  ±2 m, epoch flow unknown). The cook meets them within -0.34 to +1.14 m
+  after two bed calibrations.
+
+Open against the acceptance steps:
+- **Step 3.** No rock or feature is resolvable at 10 m; boulders are
+  inferred from whitewater.
+- **Step 4.** The rapid's supercritical flow is under-produced (5 % of cells
+  above Froude 0.8 against 25 % photographed whitewater). The image-date
+  flows are unknown, since the DGA records need download permission.
+- **Step 5.** No licensed footage comparison yet.

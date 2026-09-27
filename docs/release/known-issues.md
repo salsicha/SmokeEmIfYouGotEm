@@ -63,4 +63,14 @@ Editor-hosted Development build on the development host; no packaged-build resul
   - IGN commercial redistribution is unconfirmed.
 
   See the [review](../reconstruction-review-2026-09-07/pacuare-huacas-evidence.md).
-  Futaleufu has sources downloaded but no reconstruction yet.
+  Futaleufu Terminator is now an evidence-based 2.4 km geographic reach. It
+  uses Sentinel-2 10 m wetted extent and whitewater, Copernicus GLO-30
+  terrain and surface anchors, and a Terminator located by persistent
+  whitewater at its chainage. It runs p95 25-38 ms with no hitches. It is not
+  accepted:
+  - The imagery is 10 m and the elevation 30 m, so rocks, holes and banks are
+    unresolved.
+  - The bed and flow are inferred.
+  - The rapid is hydraulically milder than its whitewater.
+
+  See the [review](../reconstruction-review-2026-09-07/futaleufu-terminator-evidence.md).

@@ -1657,6 +1657,19 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     }
 
     const FPacuarePlacementCounts PacuareCounts = AddPacuarePlacements(Context, Queries);
+    // Evidence canopy over the Futaleufu Terminator Landscape
+    // (physics/scripts/build_futaleufu_evidence_dressing.py): Sentinel-2
+    // vegetation cover at 10 m, where crowns are not resolved, so positions
+    // are an inferred lattice inside the measured cover.
+    FEvidenceCanopyCounts FutaleufuEvidenceCanopy;
+    if (bFutaleufu && bPhysicalCorridor)
+    {
+        FutaleufuEvidenceCanopy = AddEvidenceCanopy(
+            Context, Queries, TEXT("physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026"),
+            TEXT("terminator_evidence_canopy_placement.json"), TEXT("raftsim.futaleufu.terminator_evidence_canopy.v1"),
+            TEXT("RaftSim_FutaleufuEvidence"), TEXT("RaftSimFutaleufuEvidenceCanopy"),
+            TEXT("inferred lattice inside Sentinel-2 10 m vegetation cover"));
+    }
     const int32 PacuareShorelineRockPlacedCount = PacuareCounts.PacuareShorelineRockPlacedCount;
     const int32 PacuareShorelineGroundCoverPlacedCount = PacuareCounts.PacuareShorelineGroundCoverPlacedCount;
     const int32 PacuareScannedFernPlacedCount = PacuareCounts.PacuareScannedFernPlacedCount;
@@ -1681,6 +1694,13 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
         constexpr int32 BankSideCount = 2;
         const int32 InstancesPerSide =
             TemperateNearBankEcologyTargetInstanceCount / BankSideCount;
+        // Geographic reaches (the 2.4 km evidence Terminator) spread the same
+        // targets along real, steeper banks: search more candidates, further
+        // along the bank, instead of lowering the minimum. The 600 m
+        // reach-local scenes keep their original search.
+        const bool bGeographicReach = Queries.CenterlineLengthM > 1000.0f;
+        const int32 NearBankCandidateCount = bGeographicReach ? 192 : 64;
+        const float NearBankAlongJitterCm = bGeographicReach ? 450.0f : 150.0f;
         const TArray<UStaticMesh*> NearBankMeshes = {
             UnderstoryMesh,
             TemperateUnderstoryMeshB,
@@ -1711,12 +1731,12 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             float BestSlopeDegrees = TNumericLimits<float>::Max();
             float BestCenterlineDistanceCm = 0.0f;
             float BestScore = TNumericLimits<float>::Max();
-            for (int32 CandidateIndex = 0; CandidateIndex < 64;
+            for (int32 CandidateIndex = 0; CandidateIndex < NearBankCandidateCount;
                  ++CandidateIndex)
             {
                 const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
-                    -150.0f,
-                    150.0f,
+                    -NearBankAlongJitterCm,
+                    NearBankAlongJitterCm,
                     ZambeziVegetationUnitRandom(
                         PatchIndex * 67 + CandidateIndex,
                         10223));
@@ -2452,6 +2472,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
 
     const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
         PacuareCounts.EvidenceCanopyPlaced +
+        FutaleufuEvidenceCanopy.Placed +
         PacuareShorelineGroundCoverPlacedCount +
         PacuareShorelineShrubPlacedCount +
         TemperateNearBankPlacedCount +
@@ -2492,6 +2513,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
              PacuareCounts.WoodyMinimum) &&
         PacuareCounts.EvidenceCanopyPlaced == PacuareCounts.EvidenceCanopyExpected &&
         PacuareCounts.EvidenceRockPlaced == PacuareCounts.EvidenceRockExpected &&
+        FutaleufuEvidenceCanopy.Placed == FutaleufuEvidenceCanopy.Expected &&
         (!bOpaqueTemperate ||
          TemperateWaterlinePlacedCount >=
              TemperateWaterlineStructureMinimumInstanceCount) &&
@@ -2537,7 +2559,8 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     {
         OutSummary += FString::Printf(
             TEXT("Dressing checks for %s: boulders %d/%d, foliage %d/%d, pacuare rock %d/%d ground %d/%d fern %d/%d shrub %d/%d litter %d/%d woody %d/%d, "
-                 "evidence canopy %d/%d rocks %d/%d, canopy %d, understory %d, launch strata %d, materials %d.\n"),
+                 "evidence canopy %d/%d rocks %d/%d, futaleufu canopy %d/%d, temperate waterline %d/%d near-bank %d/%d scanned %d/1200, "
+                 "canopy %d, understory %d, launch strata %d, materials %d.\n"),
             *Spec.RiverId, OutResult.DressingBoulderInstanceCount,
             BoulderCount + TemperateWaterlinePlacedCount + ChilkoShorelineGravelPlacedCount + PacuareShorelineRockPlacedCount +
                 RunnableLaunchTalusPlacedCount + DryScarpOutcropPlacedCount,
@@ -2550,6 +2573,10 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             PacuareForestFloorWoodyPlacedCount, PacuareCounts.WoodyMinimum,
             PacuareCounts.EvidenceCanopyPlaced, PacuareCounts.EvidenceCanopyExpected,
             PacuareCounts.EvidenceRockPlaced, PacuareCounts.EvidenceRockExpected,
+            FutaleufuEvidenceCanopy.Placed, FutaleufuEvidenceCanopy.Expected,
+            TemperateWaterlinePlacedCount, TemperateWaterlineStructureMinimumInstanceCount,
+            TemperateNearBankPlacedCount, TemperateNearBankEcologyMinimumInstanceCount,
+            FutaleufuScannedUnderstoryPlacedCount,
             OutResult.DressingCanopyTreeInstanceCount, OutResult.DressingUnderstoryInstanceCount,
             bRunnableLaunchEcologyStrataValidated ? 1 : 0, OutResult.bDressingFoliageMaterialsValidated ? 1 : 0);
     }

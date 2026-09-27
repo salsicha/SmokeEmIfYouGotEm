@@ -64,6 +64,17 @@ bool AddPacuareHuacasTerrainBackdrop(UWorld* World, FString& OutSummary)
              "SM_RaftSim_PacuareHuacas_ContourBackdrop"),
         PacuareBackdropTranslationCm, TEXT("RaftSim_PacuareHuacas_ContourBackdrop"), TEXT("RaftSimPacuareHuacasContourBackdrop"), OutSummary);
 }
+
+bool AddFutaleufuTerminatorTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    // Copernicus GLO-30 at 20 m, 3 km around the Landscape (terminator_evidence_terrain_manifest.json).
+    const FVector FutaleufuBackdropTranslationCm(-299600.0, -388850.0, 0.0);
+    return AddEvidenceTerrainBackdrop(World,
+        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Terrain/SM_RaftSim_FutaleufuTerminator_GLO30Backdrop."
+             "SM_RaftSim_FutaleufuTerminator_GLO30Backdrop"),
+        FutaleufuBackdropTranslationCm, TEXT("RaftSim_FutaleufuTerminator_GLO30Backdrop"),
+        TEXT("RaftSimFutaleufuTerminatorGLO30Backdrop"), OutSummary);
+}
 } // namespace
 
 bool BuildLandscapeImportCandidateMap(
@@ -461,7 +472,8 @@ bool BuildLandscapeImportCandidateMap(
     }
     AddPreviewLightRig(World, Candidate.PreviewSpec);
     if ((Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !AddColoradoHanceTerrainBackdrop(World, OutSummary)) ||
-        (Candidate.PreviewSpec.RiverId == TEXT("pacuare") && !AddPacuareHuacasTerrainBackdrop(World, OutSummary)))
+        (Candidate.PreviewSpec.RiverId == TEXT("pacuare") && !AddPacuareHuacasTerrainBackdrop(World, OutSummary)) ||
+        (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") && !AddFutaleufuTerminatorTerrainBackdrop(World, OutSummary)))
     {
         return false;
     }

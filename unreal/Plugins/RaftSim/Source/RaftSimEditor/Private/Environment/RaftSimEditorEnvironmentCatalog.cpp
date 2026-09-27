@@ -1378,36 +1378,29 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         }
         else if (PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
         {
+            // Evidence-based Terminator reach (Sentinel-2 10 m, Copernicus
+            // GLO-30, OSM chainage; see futaleufu-terminator-evidence.md):
+            // 2017^2 over the 2,422 x 1,777 m UTM 18S evidence window,
+            // anchored at X = 0 and centred in Y (Unreal +Y south).
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
-                     "terminator_visual/terminator_conditioned_heightfield_1009.png");
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_heightfield_2017.png");
             Candidate.HeightfieldManifestRelativePath =
-                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
-                     "terminator_visual/terminator_visual_terrain_manifest.json");
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_terrain_manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
-                     "terminator_visual/terminator_visual_terrain_manifest.json");
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_terrain_manifest.json");
             Candidate.LocalCenterlineRelativePath =
-                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
-                     "terminator_visual/terminator_local_centerline.json");
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_local_centerline.json");
             Candidate.MapPackagePath =
                 TEXT("/Game/RaftSim/Maps/L_Terminator");
-            Candidate.LandscapeSize = 1009;
-            Candidate.HorizontalSpanXCm = 60000.0f;
-            Candidate.HorizontalSpanYCm = 60000.0f;
-            Candidate.TargetReliefCm = 7188.1457f;
-            Candidate.WorldVerticalOffsetCm = -640.6583f;
+            Candidate.LandscapeSize = 2017;
+            Candidate.HorizontalSpanXCm = 242200.0f;
+            Candidate.HorizontalSpanYCm = 177700.0f;
+            Candidate.TargetReliefCm = 73518.011539f;
+            Candidate.WorldVerticalOffsetCm = -1400.006168f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
-            Candidate.bUseSolverVisualizationFields = true;
-            Candidate.SolverVisualizationFieldRelativePath =
-                TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
-                     "futaleufu_terminator_median_depth_speed_froude_surface_v1.png");
-            Candidate.SolverVisualizationDepthCapM = 6.0f;
-            Candidate.SolverVisualizationSpeedCapMps = 10.0f;
-            Candidate.SolverVisualizationFroudeCap = 6.0f;
-            Candidate.SolverVisualizationSurfaceReliefCapM = 2.5f;
-            Candidate.SolverVisualizationLateralMinM = -41.0f;
-            Candidate.SolverVisualizationLateralMaxM = 41.0f;
+            // The live solver owns the water; the old reach-local solver
+            // visualization field does not apply to the geographic reach.
+            Candidate.bUseSolverVisualizationFields = false;
             Candidate.bPhysicalScaleSourceCorridor = true;
             Candidate.bUseDensePhysicalTerrainRenderSurface = false;
             Candidate.bEnableLandscapeNanite = true;

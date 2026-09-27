@@ -428,6 +428,22 @@ struct FZambeziPlacementCounts
     bool bRunnableLaunchEcologyStrataValidated;
 };
 
+struct FEvidenceCanopyCounts
+{
+    int32 Expected = 0;
+    int32 Placed = 0;
+    int32 Trees = 0;
+};
+
+// Evidence dressing placements written beside a reach's terrain
+// (RaftSimEditorLandscapeFoliageEvidence.cpp).
+TSharedPtr<FJsonObject> LoadEvidencePlacement(
+    const FString& TerrainFolder, const TCHAR* FileName, const TCHAR* Schema, FString& OutSummary);
+FEvidenceCanopyCounts AddEvidenceCanopy(
+    const FPlacementContext& Context, const FPlacementQueries& Queries, const FString& TerrainFolder,
+    const TCHAR* FileName, const TCHAR* Schema, const TCHAR* ComponentPrefix, const TCHAR* ActorTag,
+    const TCHAR* SourceDescription);
+
 bool AddLandscapeCandidatePlacements(const FPlacementContext& Context);
 FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, const FPlacementQueries& Queries);
 FZambeziPlacementCounts AddZambeziLaunchPlacements(const FPlacementContext& Context, const FPlacementQueries& Queries);

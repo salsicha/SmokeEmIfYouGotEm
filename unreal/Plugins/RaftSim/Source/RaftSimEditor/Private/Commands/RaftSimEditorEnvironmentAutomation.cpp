@@ -549,8 +549,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                      "T_RaftSim_ColoradoHance_EvidenceDrape")) != nullptr;
         const bool bUsesColoradoOrganicHanceSurface =
             Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !bUsesColoradoEvidenceDrape;
+        // The evidence-based Futaleufu Terminator Landscape takes its colour
+        // from the Sentinel-2 drape; the organic temperate palette is only
+        // built when that texture is absent.
+        const bool bUsesFutaleufuEvidenceDrape =
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") &&
+            LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/FutaleufuRun/Terrain/T_RaftSim_FutaleufuTerminator_EvidenceDrape."
+                     "T_RaftSim_FutaleufuTerminator_EvidenceDrape")) != nullptr;
         const bool bUsesFutaleufuOrganicTemperateSurface =
-            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") && !bUsesFutaleufuEvidenceDrape;
         const bool bUsesChilkoOrganicLavaCanyonSurface =
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
         const bool bUsesDefaultLitLandscape =
@@ -1024,6 +1032,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("colorado_hance_evidence_2021_orthophoto_drape_albedo_scaled_no_procedural_palette")
                        : bUsesColoradoOrganicHanceSurface
                        ? TEXT("colorado_hance_v1_four_scale_world_space_sandy_bench_weathered_iron_cliff_dark_rock_talus_and_fine_grain_response")
+                       : bUsesFutaleufuEvidenceDrape
+                       ? TEXT("futaleufu_terminator_evidence_sentinel2_10m_drape_albedo_scaled_no_procedural_palette")
                        : (bUsesFutaleufuOrganicTemperateSurface
                        ? TEXT("futaleufu_v1_three_scale_world_space_forest_floor_moss_leaf_litter_and_slope_aware_wet_granite_response")
                        : (bUsesChilkoOrganicLavaCanyonSurface
