@@ -90,7 +90,66 @@ max depth2.671577m and speed6m/s. All86,720 artificial-bank cells are exactly
 dry. Reports: `tmp/troublemaker-conveyance-initial-state-v1-20260927.json` and
 `tmp/troublemaker-conveyance-initial-banks-v1-20260927.json`. Initial outflow
 exceeds inflow: no initial equilibrium claim. The same live process reached
-step110/5.5s without a logged safety failure; this is not final validation.
+step2040/102s without a logged safety failure; this is not final validation.
+
+## Matching runtime and native-ground preparation
+
+Preparation code/tests and input comparison are committed locally as
+`1e734f16c`; nothing was pushed. The normal scene/package remains v5.
+
+The existing source-union packet builder completed in session67946:
+`tmp/troublemaker-conveyance-source-packets-v1-20260927/manifest.json`, SHA-256
+`3f07dbcef054ca7a1706cf3155000babd0a3f4d8b8b7747ef006507b547ba479`.
+All799 source packets verify;15 packets/124,123 samples differ from the retained
+pre-union source. Captured masks and stages remain exact. These counts are NOT
+comparisons to current v5. Use this explicit `--source-packets` argument with
+the discharge runtime exporter; its default references the older rapid bed.
+The exporter now verifies the retained hydraulic manifest hash, exact terrain
+union identity and coordinate frame before creating any output directory.
+All13 packet-identity/composite-terrain regressions pass. Real paired old and
+new inputs pass; old packets with new geometry are explicitly rejected. The
+existing per-cell atlas/packet equality check remains mandatory afterward.
+
+Blender export session98248 exits0. Exact403,200 vertices/803,842 triangles:
+`unreal/SourceArt/RaftSim/TroublemakerConveyance20260927/manifest.json`.
+FBX SHA-256 `8c1a0367e54863d7dcf3facbe4f43c28c982fdbccc33d76d70bfbbec0013b3cb`;
+source mesh SHA-256 matches the candidate above. This is not native validation.
+
+`prepare_troublemaker_bed_native_check.py` prepares the immediate installed
+ablated mesh comparison, not the older pre-ablation ancestor used by union
+lineage. Installed ground package remains SHA-256
+`367c0324203b9dcc31b5a73c6082d10b04d481c5aa9c68c694273983ed758053`.
+Preflight `tmp/troublemaker-conveyance-native-preflight-v1-20260927.json`, SHA-256
+`3acd7a0dd09fa03adccce130610d29c696cb7b78e433ffa2470428e9473b41a0`,
+covers62,985 changed vertices and129,242 changed triangle centroids.
+New/preparation/source-preservation suite:18 pass; native-comparison suite:16
+pass. Neither is actual engine verification.
+
+The deferred native-check wrapper is LIVE as session77718:
+`tmp/check-conveyance-ground-after-cook-20260927.ps1`.
+It waits for the SAME PID33592 (exact UTC identity), checks final artificial
+banks, refuses another live engine/build/solver, then runs
+`unreal/Scripts/verify_troublemaker_conveyance_ground.py`. It may save only a
+new verified candidate mesh. Normal actor binding and all saved scene packages
+must remain unchanged. Its ground-only traces intentionally ignore rocks;
+complete rock-union/runtime/playable checks remain mandatory. Expected receipt:
+`tmp/troublemaker-conveyance-ground-native-v1-20260927.json`; native PID receipt
+will be the adjacent `-process.json`. Do not launch a duplicate checker.
+The first wrapper attempt stopped before launch because PowerShell parsed a
+UTC literal into local DateTime; explicit DateTimeOffset UTC comparison fixed
+the guard after independently confirming the original cook identity.
+
+At the75s snapshot, independent state and bank checks pass, with all86,720
+artificial-bank cells exactly dry. Maximum depth2.913112m; maximum speed8.208481m/s.
+Reports: `tmp/troublemaker-conveyance75-state-v1-20260927.json` and
+`tmp/troublemaker-conveyance75-banks-v1-20260927.json`. The signed-transport
+analysis is `tmp/troublemaker-conveyance75-analysis-v1-20260927/report.json`.
+It reports96.64% wet coverage of the full captured mask, but local bins near
+8380..8465m have roughly0.5m negative surface deviations and some reduced wet
+coverage. Flight-time discharge is unknown, so this alone neither proves a
+physical failure nor justifies promotion. Inspect the final local state and
+regional storage before making a playable candidate. Do not apply the generated
+simulated bias as measured bathymetry or call this state settled.
 
 ## Required follow-through
 

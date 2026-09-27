@@ -44,6 +44,25 @@ def array_meta(path, relative_to, shape, dtype):
     return dict(file=Path(os.path.relpath(path, relative_to)).as_posix(), sha256=sha(path), shape=list(shape), dtype=dtype)
 
 
+def verify_packet_geometry_identity(source, geometry, root=ROOT):
+    """Fail before writing runtime payloads if packets retain a different bed.
+
+The later per-cell atlas comparisons remain mandatory; matching metadata is
+not a substitute for checking actual arrays or native render/collision.
+"""
+    retained = geometry['discharge_bed']
+    path = (root/retained['retained_geometry_manifest']).resolve()
+    if not path.is_relative_to(root.resolve()) or sha(path) != retained['retained_geometry_manifest_sha256']:
+        raise ValueError('Retained hydraulic geometry changed')
+    if (source.get('hydraulic_geometry_manifest') != retained['retained_geometry_manifest'] or
+            source.get('hydraulic_geometry_manifest_sha256') != retained['retained_geometry_manifest_sha256'] or
+            not geometry.get('terrain_union') or source.get('terrain_union') != geometry['terrain_union']):
+        raise ValueError('Source packets belong to a different registered bed/rock union')
+    for key in ('world_origin_utm_m', 'vertical_datum_navd88_m', 'grid_spacing_m'):
+        if source.get(key) != geometry[key]:
+            raise ValueError('Source packet frame/lattice mismatch: '+key)
+
+
 def sample_regular_triangles(z, x0, y0, cell, east, north):
     cf, rf = (east - x0) / cell, (y0 - north) / cell
     c, r = np.floor(cf).astype(int), np.floor(rf).astype(int)
@@ -84,6 +103,7 @@ def main():
         coarse = a['coarse_bed_navd88_m']
     x0, y0 = bed_manifest['grid']['first_vertex_utm_m']; cell = bed_manifest['grid']['cell_m']
     source = json.loads(args.source_packets.read_text())
+    verify_packet_geometry_identity(source, geometry)
     template = json.loads(args.streaming_template.read_text())
     assert [w['window_id'] for w in template['windows']] == [r['name'] for r in source['regions']]
     frame = cook / f'frame_{args.step:06d}'
