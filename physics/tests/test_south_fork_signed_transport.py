@@ -2,8 +2,10 @@ import numpy as np
 import pytest
 import json
 import sys
+import copy
+import shutil
 
-from analyze_south_fork_discharge_bed_cook import main, signed_transport
+from analyze_south_fork_discharge_bed_cook import main, signed_transport, station_map_source, file_sha
 
 
 EAST = [[0, 0, 0, 0, 1], [10, 10, 0, 0, 1]]
@@ -128,3 +130,143 @@ def test_fit_preserves_numerics_but_labels_simulated_not_measured_bathymetry(tmp
         assert result['fractional_factor'] == .1
         assert not result['settling_accepted']
         assert 'not measured bathymetry' in str(result['provenance'])
+
+
+@pytest.fixture
+def restart_snapshot(counterflow_snapshot):
+    from prepare_cartesian_snapshot_restart import make_restart_manifest
+    output, command, frame, package = counterflow_snapshot
+    original = package.parent
+    scenario_path = package/'scenario.json'
+    scenario = json.loads(scenario_path.read_text())
+    scenario.update(metadata=dict(scenario_id=package.name, generator='fixture',
+                                 description='fixture', provenance={}),
+                    roughness=.035, boundaries=[])
+    scenario_path.write_text(json.dumps(scenario))
+    for name in ('features.json', 'probes.json'):
+        (package/name).write_text('{}')
+    manifest = json.loads((original/'manifest.json').read_text())
+    manifest.update(dt_seconds=.05, geometry_manifest='same-geometry.json',
+                    geometry_manifest_sha256='same-geometry-hash',
+                    inputs=[dict(name=package.name, files={name: file_sha(package/name)
+                        for name in ('scenario.json', 'bed.npy', 'features.json', 'probes.json')})])
+    (original/'manifest.json').write_text(json.dumps(manifest))
+    restart = original.parent/'restart'
+    shutil.copytree(original, restart, ignore=shutil.ignore_patterns('station_map.npz'))
+    current = make_restart_manifest(manifest, 1.)
+    current.update(packages=copy.deepcopy(manifest['packages']), inputs=copy.deepcopy(manifest['inputs']),
+                   restart=dict(source_manifest=str(original/'manifest.json'),
+                                source_manifest_sha256=file_sha(original/'manifest.json'),
+                                added_context_count=0, added_initial_water_volume_m3=0))
+    (restart/'manifest.json').write_text(json.dumps(current))
+    command[3] = str(restart)
+    return output, command, original, restart, current
+
+
+def test_analysis_of_restart_uses_identical_map_and_state_statistics(restart_snapshot):
+    output, command, original, restart, current = restart_snapshot
+    command[3] = str(original)
+    main()
+    reference = json.loads((output/'report.json').read_text())
+    command[3] = str(restart)
+    command[1] = str(output.parent/'restart-analysis')
+    main()
+    result = json.loads((output.parent/'restart-analysis/report.json').read_text())
+    assert result['summary'] == reference['summary']
+    assert result['bins'] == reference['bins']
+    assert result['mass_balance'] == reference['mass_balance']
+    assert result['station_map_sources'][0] == dict(prep=str(restart),
+        path=str(original/'station_map.npz'), sha256=file_sha(original/'station_map.npz'),
+        inherited_from_restart=True)
+    assert not result['settling_accepted'] and not result['normal_map_integrated']
+    assert not (restart/'station_map.npz').exists()  # read-only inheritance
+
+
+def test_station_map_can_cross_multiple_exact_restarts(restart_snapshot):
+    _, _, original, restart, current = restart_snapshot
+    next_dir = restart.parent/'next'
+    shutil.copytree(restart, next_dir)
+    next_manifest = copy.deepcopy(current)
+    next_manifest['initial_time_seconds'] = 2.
+    next_manifest['restart'].update(source_manifest=str(restart/'manifest.json'),
+                                   source_manifest_sha256=file_sha(restart/'manifest.json'))
+    assert station_map_source(next_dir, next_manifest) == original/'station_map.npz'
+
+
+@pytest.mark.parametrize('change', ['hash', 'geometry', 'packages', 'context', 'volume',
+                                  'clock_claim', 'new_physics', 'bed', 'features', 'probes',
+                                  'grid', 'roughness', 'boundary', 'tampered_file'])
+def test_restart_map_rejects_mismatched_ancestry(restart_snapshot, change):
+    _, _, _, restart, current = restart_snapshot
+    name = current['packages'][0]
+    if change == 'hash':
+        current['restart']['source_manifest_sha256'] = 'wrong'
+    elif change == 'geometry':
+        current['geometry_manifest_sha256'] = 'different'
+    elif change == 'packages':
+        current['packages'] = ['different']
+    elif change == 'context':
+        current['restart']['added_context_count'] = 1
+    elif change == 'volume':
+        current['restart']['added_initial_water_volume_m3'] = 1
+    elif change == 'clock_claim':
+        current['initialization_is_fresh_not_restart'] = True
+    elif change == 'new_physics':
+        current['new_solver_option'] = True
+    else:
+        filename = {'bed': 'bed.npy', 'features': 'features.json', 'probes': 'probes.json'}.get(change, 'scenario.json')
+        path = restart/name/filename
+        if change == 'bed':
+            np.save(path, np.ones((80, 80)))
+        elif change in ('features', 'probes'):
+            path.write_text('{"changed":true}')
+        else:
+            scenario = json.loads(path.read_text())
+            if change in ('grid', 'tampered_file'):
+                scenario['grid']['dx'] = 2.
+            elif change == 'roughness':
+                scenario['roughness'] = .02
+            else:
+                scenario['boundaries'] = [dict(kind='outflow')]
+            path.write_text(json.dumps(scenario))
+        if change != 'tampered_file':
+            current['inputs'][0]['files'][filename] = file_sha(path)
+    with pytest.raises(ValueError):
+        station_map_source(restart, current)
+
+
+def test_missing_station_map_without_ancestry_is_rejected(tmp_path):
+    with pytest.raises(ValueError, match='No station map'):
+        station_map_source(tmp_path, {})
+
+
+@pytest.mark.parametrize('bad_map', ['shape', 'nonfinite', 'numeric_mask'])
+def test_analysis_rejects_invalid_station_map(counterflow_snapshot, bad_map):
+    output, _, _, package = counterflow_snapshot
+    path = package.parent/'station_map.npz'
+    with np.load(path) as saved:
+        fields = {key: saved[key] for key in saved.files}
+    if bad_map == 'shape':
+        fields['station'] = fields['station'][:, :-1]
+    elif bad_map == 'nonfinite':
+        fields['surface'][0, 0, 0] = np.nan
+    else:
+        fields['water'] = fields['water'].astype(float)
+    np.savez(path, **fields)
+    with pytest.raises(ValueError, match='Station map must match'):
+        main()
+    assert not output.exists()
+
+
+def test_dry_unassigned_station_sentinel_is_not_a_water_sample(counterflow_snapshot):
+    output, _, _, package = counterflow_snapshot
+    path = package.parent/'station_map.npz'
+    with np.load(path) as saved:
+        fields = {key: saved[key] for key in saved.files}
+    fields['station'][~fields['water']] = np.nan
+    np.savez(path, **fields)
+    main()
+    report = json.loads((output/'report.json').read_text())
+    assert report['summary']['cells'] == 6
+    assert report['summary']['cook_wet_fraction_of_captured_mask'] == 1.
+    assert report['bins']['signed_transport_proxy_m3s'][0] == 0

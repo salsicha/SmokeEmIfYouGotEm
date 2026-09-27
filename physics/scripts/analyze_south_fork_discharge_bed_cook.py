@@ -23,6 +23,66 @@ ROOT = Path(__file__).resolve().parents[2]
 ROUTE = ROOT / 'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach/playable_route/coordinate_map.json'
 
 
+def file_sha(path):
+    with Path(path).open('rb') as source:
+        return hashlib.file_digest(source, 'sha256').hexdigest()
+
+
+def station_map_source(prep, manifest):
+    """Resolve unchanged station geometry through exact-state restarts only.
+
+    A restart serializes state but need not duplicate the diagnostic station
+    map. Never take a map from a different bed/domain or silently assign newly
+    added cells to old stations. The returned path is read-only provenance.
+    """
+    from audit_cartesian_snapshot_restart import verify_retained_inputs
+
+    directory = Path(prep).resolve()
+    seen = set()
+    while True:
+        if directory in seen:
+            raise ValueError('Cyclic station-map restart ancestry')
+        seen.add(directory)
+        path = directory/'station_map.npz'
+        if path.is_file():
+            return path
+        restart = manifest.get('restart')
+        if not restart:
+            raise ValueError('No station map or verified restart ancestor')
+        if restart['added_context_count'] != 0 or restart['added_initial_water_volume_m3'] != 0:
+            raise ValueError('Added context requires its own station map')
+        parent_path = Path(restart['source_manifest'])
+        if not parent_path.is_absolute():
+            parent_path = ROOT/parent_path
+        parent_path = parent_path.resolve()
+        if file_sha(parent_path) != restart['source_manifest_sha256']:
+            raise ValueError('Station-map ancestor manifest hash mismatch')
+        parent = json.loads(parent_path.read_text())
+        if (parent['packages'] != manifest['packages'] or
+                parent['geometry_manifest'] != manifest['geometry_manifest'] or
+                parent['geometry_manifest_sha256'] != manifest['geometry_manifest_sha256']):
+            raise ValueError('Station-map ancestor geometry or package order changed')
+        try:
+            verify_retained_inputs(parent, manifest)
+            old_records = {row['name']: row for row in parent['inputs']}
+            new_records = {row['name']: row for row in manifest['inputs']}
+            for name in manifest['packages']:
+                before = json.loads((parent_path.parent/name/'scenario.json').read_text())
+                after = json.loads((directory/name/'scenario.json').read_text())
+                verify_retained_inputs(before, after, scenario=True)
+                for filename in ('bed.npy', 'features.json', 'probes.json', 'scenario.json'):
+                    previous_hash = file_sha(parent_path.parent/name/filename)
+                    current_hash = file_sha(directory/name/filename)
+                    if (previous_hash != old_records[name]['files'][filename] or
+                            current_hash != new_records[name]['files'][filename]):
+                        raise ValueError('Station-map ancestry file hash mismatch')
+                    if filename != 'scenario.json' and previous_hash != current_hash:
+                        raise ValueError('Station-map ancestor physical input changed')
+        except AssertionError as exc:
+            raise ValueError('Station-map ancestor physical settings changed') from exc
+        directory, manifest = parent_path.parent, parent
+
+
 def signed_transport(station, depth, east_velocity, north_velocity, route_points):
     """h * velocity dot local route tangent (m2/s), in native east/north.
 
@@ -70,10 +130,23 @@ def main():
         raise ValueError('Native UTM32610 route required')
     rows = []
     balance = []
+    station_sources = []
     for prep, cook, step in args.cook:
         prep, cook, step = Path(prep), Path(cook), int(step)
         manifest = json.loads((prep / 'manifest.json').read_text())
-        smap = np.load(prep / 'station_map.npz')
+        station_path = station_map_source(prep, manifest)
+        with np.load(station_path, allow_pickle=False) as smap:
+            st, surf, water = (smap[name].copy() for name in ('station', 'surface', 'water'))
+        expected_shape = (len(manifest['packages']), 80, 80)
+        if (any(a.shape != expected_shape for a in (st, surf, water)) or
+                water.dtype != np.dtype(bool) or
+                not np.isfinite(st[water]).all() or not np.isfinite(surf[water]).all()):
+            # Preparation intentionally leaves dry-cell stations NaN; only
+            # captured-water cells enter the station comparison below.
+            raise ValueError('Station map must match native layout, boolean mask and finite captured-water samples')
+        station_sources.append(dict(prep=str(prep), path=str(station_path),
+                                    sha256=file_sha(station_path),
+                                    inherited_from_restart=station_path.parent != prep.resolve()))
         a, b = manifest['section']['core_range_m']
         frame = cook / ('frame_%06d' % step)
         done = json.loads((frame / 'complete.json').read_text())
@@ -87,7 +160,6 @@ def main():
         u = np.load(frame / 'u.npy').reshape(-1, 80, 80)
         v = np.load(frame / 'v.npy').reshape(-1, 80, 80)
         bed = np.stack([np.load(prep / name / 'bed.npy') for name in manifest['packages']])
-        st, surf, water = smap['station'], smap['surface'], smap['water']
         keep = water & (st >= a) & (st < b)
         eta = bed + h
         wet = keep & (h > args.wet_depth_m)
@@ -142,6 +214,7 @@ def main():
     report = dict(schema='raftsim.south_fork.discharge_bed_cook_comparison.v2', cooks=[dict(prep=p, out=o, step=int(s)) for p, o, s in args.cook],
                   settling_accepted=False, normal_map_integrated=False,
                   route=dict(path=str(args.route.resolve()), sha256=hashlib.sha256(route_bytes).hexdigest()),
+                  station_map_sources=station_sources,
                   transport_screen_only=args.transport_screen_only,
                   transport_note='local_discharge is a legacy alias for signed route-aligned cell-centred transport / bin length, not numerical section flux or temporal equilibrium. Bias is simulated-minus-captured surface, not measured bathymetry.',
                   mass_balance=balance, summary=summary,

@@ -330,3 +330,44 @@ Inspect those results before deciding on a further continuation or runtime
 export. No automatic scene install or acceptance follows from completion.
 Normal v6 remains unchanged; this is supporting hydraulic work, not a new
 visible improvement. Preserve the full reconstruction and release queue.
+
+## Restart station-analysis repair during the same live continuation
+
+Inspection found a concrete upcoming failure in the owned final-analysis
+command: `prepare_cartesian_snapshot_restart.py` does not duplicate
+`station_map.npz`, while the analyzer required it in the restart directory.
+The solver does not use that diagnostic file and is unaffected. No solver
+restart, captured-source edit, state transfer or new engine run was needed.
+
+`analyze_south_fork_discharge_bed_cook.py` now resolves the map through the
+restart's hash-verified source-manifest ancestry. Every hop requires identical
+geometry identity and ordered packages, unchanged retained physical settings,
+actual scenario/grid/bed/features/probes checks and zero added context/water.
+Missing maps without valid ancestry fail closed; an expanded domain requires
+its own map. The report records the exact map path/hash and inherited status.
+Only analysis reads the ancestor; native h/u/v still come from the requested
+new cook snapshot. No old flow arrays are substituted.
+
+The first stricter map-validation trial rejected3,750,110 intentionally
+unassigned dry-cell stations. Preparation uses NaN there, and those cells never
+enter the captured-water station bins. The corrected contract requires matching
+array shapes and a boolean mask, with finite station/surface for every captured
+water cell. A regression retains these dry NaNs without admitting nonfinite
+water samples.39 tests pass in2.48s, including exact full-analysis comparison,
+multi-hop ancestry and14 changed-input rejection cases. Test output:
+`tmp/restart-station-analysis-tests2-20260927`.
+
+Actual end-to-end proof (exit0):
+`tmp/troublemaker-envelope-restart150-analysis-proof-20260927/report.json`.
+It analyzes native frame000000 of the running continuation at absolute150s.
+All summary fields, all station bins and the mass-balance block are exactly
+equal to the original150s analysis. Inherited station-map SHA-256:
+`207694af0285b46ed8524b54240587e98c1c38bbb381ed0fd0d1d8eb6d2d6097`.
+The queued final subprocess loads this repaired analyzer after the cook ends.
+
+The same native process/session remains live beyond200s. An observed209.5s
+checkpoint has maximum step conservation residual8.47e-9m3; this is intermediate
+progress, not a final safety, settling or visual pass. Continue session42718 and
+its recorded outputs. Do not duplicate preparation or replace this work with
+another unchanged initial-state analysis. Next inspect final300s safety and
+regional/rapid behavior before selecting the next playable field candidate.
