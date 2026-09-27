@@ -1,5 +1,22 @@
 # Remaining requested work
 
+September27 independent source-ground follow-through: all2,044 saved packaged
+v4 contact probes match the archived v2 terrain triangles, maximum error
+0.000701296cm; no missing coverage or wet/dry disagreement. Both occluded
+points remain dry against independently computed source heights. Twelve
+regressions pass. No new game run, scene change or acceptance; inferred bed,
+swept collision, visual fidelity and busy-rapid performance remain unresolved.
+See [source-ground comparison](../reconstruction-review-2026-09-07/south-fork-v4-independent-ground.md).
+Do not repeat this unchanged snapshot; no engine/cook was started.
+
+September27 blend-factor preparation experiment rejected:37 actual-input
+pairs preserve exact vertex/history/statistic state and reduce the base-loop
+component cost, but whole-frame ABBA does not retain the gain. Prepared B
+mean/p95=44.013/50.285ms versus original B43.576/49.635ms. Candidate branches
+removed, packaged game unchanged. See
+[decision](../reconstruction-review-2026-09-07/base-blend-preparation-rejected.md).
+Do not repeat this unchanged hypothesis or claim a new playable improvement.
+
 September27 packaged v4 paired support/GPU check at station11,520m passes:
 2,042 wet contact probes,541 with nonzero detail;4,226 GPU queries; matching
 published sequence99. Maximum support error0.000011898cm; GPU error2.98e-8.

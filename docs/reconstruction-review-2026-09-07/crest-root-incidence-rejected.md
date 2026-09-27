@@ -88,3 +88,18 @@ is pending. No other session's process was stopped.
 
 Repository write access is now explicitly granted and the scoped removal
 succeeded. No OS ACL, ownership or security-setting change was made.
+
+### Deferred restoration regression completed (September 26, 23:02 UTC)
+
+After the shared engine exited, the two post-removal native regressions ran
+against the rebuilt editor using NullRHI and `/Engine/Maps/Entry`. Both exact
+test paths listed above succeeded: 2 successes, 0 failures, 0 not-run tests;
+engine exit 0. The topology-cache test compared 38,416 current vertices, with
+25 cached builds, 33 reuses and 58 fresh builds. Receipt and raw log:
+`tmp/crest-root-edges-restored-native-20260926/index.json` and
+`tmp/crest-root-edges-restored-native-20260926.log`.
+
+This closes the deferred restoration check only. NullRHI is not a rendered
+view, normal playable launch, motion/collision acceptance or a frame-time
+measurement. No candidate was restored or enabled, and the packaged rapid
+performance failure remains open. No other session's engine was stopped.
