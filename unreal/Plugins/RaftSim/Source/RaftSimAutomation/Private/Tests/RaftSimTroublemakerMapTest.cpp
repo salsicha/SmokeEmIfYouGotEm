@@ -875,6 +875,16 @@ bool FRaftSimAssertRiverMapCommand::Update()
                         TEXT("Zambezi breaking sites: %d; camera (%.0f, %.0f, %.0f) cm; nearest site %.0f cm away at (%.0f, %.0f, %.0f)"),
                         BreakingSites.Num(), Camera.X, Camera.Y, Camera.Z, Nearest,
                         NearestSite.X, NearestSite.Y, NearestSite.Z));
+                    // Particle pools take the nearest sites within 120 m whose
+                    // intensity exceeds 0.12 (RaftSimWaterVfxActor.cpp).
+                    FString SiteSummary;
+                    for (const auto& Site : BreakingSites)
+                    {
+                        SiteSummary += FString::Printf(TEXT(" [%.0f m, I %.2f, station %.0f]"),
+                            FVector::Dist(Camera, Site.WorldPositionCm) / 100.0f, Site.Intensity,
+                            Site.RiverCoordinatesMeters.X);
+                    }
+                    Test->AddInfo(TEXT("Zambezi breaking site distance/intensity:") + SiteSummary);
                 }
             }
             Test->TestTrue(

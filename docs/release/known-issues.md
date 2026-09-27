@@ -32,7 +32,12 @@ Editor-hosted Development build on the development host; no packaged-build resul
   101 x 21 fields). Play no longer uses that legacy field, but the gate is kept.
 - `RaftSim.P4.RiverMapLoads.L_Zambezi` fails its start-apron spray count (0 of
   6 emitters): Zambezi's procedural field, run in real time, breaks below the
-  emitter threshold.
+  emitter threshold. On 2026-09-27 all nine start-apron breaking sites (55-96 m
+  from the camera, station 160 m) read intensity 0.00 against the 0.12
+  threshold; the test now logs each site. The fix is evidence-based Zambezi
+  hydraulics, not a lower threshold. The repository holds GLO-30 and only a
+  rendered Sentinel-2 route image, so the Futaleufu method would need the
+  Sentinel-2 bands downloaded (permission required).
 - South Fork busy-rapid frame time is borderline against the 20 FPS goal (50 ms
   p95); earlier rapid-station runs ranged 42-51 ms.
 - Several editor-context suites need explicit inputs or GPU fixtures
