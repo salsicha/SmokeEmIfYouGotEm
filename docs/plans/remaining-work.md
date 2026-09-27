@@ -1,5 +1,32 @@
 # Remaining requested work
 
+September27 v13 packaging6197 COMPLETE exit0: BuildCookRun798.77s; all frozen
+input hashes unchanged. New cooked executable SHA256
+`efe039224bc328d5b335705fc34aa7c925a3c44ab716922982386b87398d7652`.
+Existing optional MetaHuman missing-dependency cook messages remain; this is
+not a clean-release claim. Same450s fields/geometry and buffer reuse default0.
+Staged v8 closure PASS:2,405 files/917,995,570 bytes verified, no external-source
+fallback (`tmp/south-fork-v13-staged-payload-20260927.json`). Validation69752 now
+waits for the existing hydraulic solve/audits before timing (observed831s).
+Capture77798 waits behind that validation.
+Do NOT rebuild v13 or start duplicate timing/capture. No visual/performance
+acceptance or later-river advance follows from successful packaging alone.
+
+September27 motion follow-through: ONE normal-camera capture owner is LIVE,
+session77798/wrapper36000, recipe
+`tmp/capture-sf-v13-spatial-approach-20260927.ps1`, durable receipt
+`tmp/sf-v13-spatial-approach-20260927-process.json`. It waits for existing
+validation69752 to finish, verifies the normally launched v13 executable,
+then captures the same passive8310m approach (2s delay,80 one-second samples).
+No paddle, camera, quality, solver or buffer-candidate override. It records
+actual motion, crest mesh/contact audits and new paired spatial height data;
+parser output alone is NOT visual/physical acceptance. Decode/review the video
+and match actual selected sites from the crest JSON to candidate endpoints
+before changing the height formula. The v12 retained09s boat view still shows
+broad flat foam patches; no new appearance improvement is established.
+All four owners (hydraulics, build, timing, capture) are distinct ordered stages,
+not duplicate work. No capture or FPS run while the solve/build/audits are live.
+
 September27 validation follow-through: ONE guarded validation owner is LIVE,
 session69752/wrapper38444, recipe `tmp/validate-sf-v13-20260927.ps1`, receipt
 `tmp/south-fork-v13-validation-process-20260927.json`. Syntax parsed successfully

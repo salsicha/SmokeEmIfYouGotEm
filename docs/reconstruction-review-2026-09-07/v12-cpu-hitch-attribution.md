@@ -1,6 +1,19 @@
 # V12 CPU cost and far-field rebuild investigation
 
-## V13 playable build in progress
+## V13 playable build complete; validation in progress
+
+Build6197 completed exit0, BuildCookRun798.77s, frozen input hashes unchanged.
+New executable SHA256:
+`efe039224bc328d5b335705fc34aa7c925a3c44ab716922982386b87398d7652`.
+Staged closure also PASS:2,405 files/917,995,570 bytes, no external fallback;
+report `tmp/south-fork-v13-staged-payload-20260927.json`. Existing optional
+MetaHuman missing-dependency messages remain; packaging success is not a
+clean-release, performance or appearance pass. Validation69752/wrapper38444
+now waits for the same hydraulic continuation and final audits (observed831s)
+before its ordered profile runs. Capture77798/wrapper36000 is queued behind
+validation for the actual default-camera8310m approach and spatial observer.
+Do not repeat the build, closure check, queued profiles or capture. Candidate
+still defaults OFF; all physics/geometry/450s fields are unchanged.
 
 Validation is now queued behind the existing jobs, not running concurrently
 with them: session69752/wrapper38444 runs

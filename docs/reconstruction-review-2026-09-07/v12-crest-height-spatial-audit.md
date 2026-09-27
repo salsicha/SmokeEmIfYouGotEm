@@ -1,5 +1,30 @@
 # V12 crest height: amplitude versus spatial placement
 
+V13 build6197 subsequently completed exit0 (BuildCookRun798.77s), with frozen
+inputs unchanged. Its cooked executable SHA256 is
+`efe039224bc328d5b335705fc34aa7c925a3c44ab716922982386b87398d7652`.
+The observer is now present in a new packaged executable, but no spatial
+capture has completed yet. Closure/timing owner69752 and capture owner77798
+remain live and ordered behind the original hydraulic continuation/audits.
+
+September27 follow-through: capture session77798/wrapper36000 is now queued
+behind the existing v13 validation owner69752/wrapper38444. Recipe
+`tmp/capture-sf-v13-spatial-approach-20260927.ps1`; durable status
+`tmp/sf-v13-spatial-approach-20260927-process.json`. The recipe syntax passes.
+It requires that validation finish, verifies the v13 normal-menu executable
+identity, and captures the passive8310m approach with the ordinary camera,
+default buffer packing and unchanged450s fields/geometry. It parses paired
+spatial endpoints and records video identity, but deliberately leaves motion,
+spatial and physical acceptance pending. Do not run duplicate captures.
+
+The existing crest-sampling JSON contains the actual selected `sites` array,
+including positions, height, length and direction. Match this to the new
+height-audit candidates at the same snapshot rather than assuming every
+pre-deduplication candidate is rendered. The retained v12 selected site at
+(-5428,3607) has height0.0470152833m, length2m and direction
+(-0.9965839049,0.0825864431). Its current boat-height09s image was reviewed again:
+broad flat foam remains; this is not new motion or acceptance evidence.
+
 September27. This is a focused diagnostic, not a visible improvement or water
 acceptance. Current v12/450s playable fields and physics settings are unchanged.
 
