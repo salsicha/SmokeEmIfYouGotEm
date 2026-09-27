@@ -15,7 +15,7 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'physics/scripts'))
 sys.path.insert(0,str(ROOT/'unreal/Scripts'))
 from package_runtime_bundle import Closure,sha
-from export_south_fork_discharge_bed_runtime import verify_packet_geometry_identity
+from south_fork_packet_geometry_identity import verify_packet_geometry_identity
 from bind_south_fork_discharge_bed_runtime import entries
 from verify_envelope_ground_union import package_file,LEVEL
 DEST='/Game/RaftSim/Environment/SouthForkReconstruction/Troublemaker/ConveyanceEnvelope20260927/SM_ConveyanceGround'

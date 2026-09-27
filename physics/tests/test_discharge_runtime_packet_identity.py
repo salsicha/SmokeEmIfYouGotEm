@@ -35,3 +35,12 @@ def test_retained_geometry_mutation_refused(tmp_path):
     (tmp_path/'geometry.json').write_text('{"changed":true}')
     with pytest.raises(ValueError,match='hydraulic geometry changed'):
         verify_packet_geometry_identity(source,geometry,tmp_path)
+def test_identity_guard_imports_without_site_packages():
+    import subprocess
+    import sys
+    from pathlib import Path
+    scripts=Path(__file__).resolve().parents[1]/'scripts'
+    code=(f'import sys; sys.path.insert(0,{str(scripts)!r}); '
+          'from south_fork_packet_geometry_identity import verify_packet_geometry_identity; '
+          'assert "numpy" not in sys.modules')
+    subprocess.run([sys.executable,'-I','-S','-c',code],check=True,capture_output=True,text=True)

@@ -103,6 +103,30 @@ exactly dry. Maximum step conservation residual is 8.99e-9 m3. Receipts:
 safety checks, not settling or playable acceptance; retain PID31092/session3804
 and deferred native session25615 until their actual terminal results.
 
+The75s regional audit closes343.111421m3 of storage change to exterior flux
+within1.49e-10m3; this is not equilibrium. Surface analysis still has local
+8380..8465m bins roughly0.5m below the captured surface and reduced wet coverage.
+Receipts: `tmp/troublemaker-envelope75-storage-v1-20260927.json` and
+`tmp/troublemaker-envelope75-analysis-v1-20260927/report.json`.
+
+Paired snapshot check `tmp/envelope-fresh75-comparison-20260927.json` finds exact
+initial h/u/v and exact75s h/u/v versus the previous fresh conveyance candidate.
+All296 changed bed cells are still dry at75s in both runs; the old candidate has
+11 of those cells wet at150s. The loader reads each package's actual `bed.npy`.
+Thus unchanged75s state is explained by dry changed terrain, not evidence of an
+improved hole or grounds to substitute an old final snapshot for the new solve.
+
+The same deferred native helper now runs final0/75/150s regional storage and
+station analysis, then exports `tmp/troublemaker-envelope-runtime150-v1-20260927`
+only after native collision passes. No scene installation is automatic. Inspect
+session25615 and its receipts before running any of these stages again.
+
+The installer identity guard was separated into a standard-library-only module:
+`south_fork_packet_geometry_identity.py`. Unreal's embedded Python no longer
+imports the NumPy-based exporter merely to validate identity. Nine identity
+tests pass, including isolated `-I -S` import with no NumPy or site packages.
+The full-array exporter and native checks remain mandatory; no gate relaxed.
+
 Next inspect this same solve's completion and audits, regional storage/surface
 coverage, then export matching runtime fields. Reuse the already verified new
 ground mesh; do not repeat the unchanged ground-only import. Verify the actual
