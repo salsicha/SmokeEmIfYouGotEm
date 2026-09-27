@@ -5722,11 +5722,33 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // pile, and record the site for bounded aerosol/mist. Visual only.
     BreakingSites.Reset();
     TArray<FBreakingSite> CandidateSites;
+    // The shared analytic carrier never reads the legacy grid-lift history.
+    // With localized crest foam it also never reads the old tailwater foam.
+    // Keep detection/support sites intact, but do not build an unused second
+    // displacement field. A reference switch retains the previous work for
+    // controlled checks without changing the shared surface's appearance.
+    static const bool bReferenceLegacyBreakingWork=FParse::Param(
+        FCommandLine::Get(),TEXT("RaftSimReferenceLegacyBreakingWork"));
+    const bool bNeedsLegacyBreakingWork=!bSharedBreakingReliefEnabled ||
+        !bCrestLocalizedFoam || bReferenceLegacyBreakingWork;
+#if !UE_BUILD_SHIPPING
+    static const bool bLegacyBreakingWorkAudit=FParse::Param(
+        FCommandLine::Get(),TEXT("RaftSimLegacyBreakingWorkAudit"));
+    static int32 LegacyBreakingAuditCalls=0;
+    const bool bAuditLegacyBreakingWork=bLegacyBreakingWorkAudit && !bNeedsLegacyBreakingWork &&
+        LegacyBreakingAuditCalls<64 && GetWorld() && GetWorld()->GetTimeSeconds()>=10.f;
+#else
+    constexpr bool bAuditLegacyBreakingWork=false;
+#endif
+    const bool bEvaluateLegacyBreakingWork=bNeedsLegacyBreakingWork || bAuditLegacyBreakingWork;
+    TArray<float> LegacyAuditFoamBefore;
+    if(bAuditLegacyBreakingWork)LegacyAuditFoamBefore=SourceFoam;
+    double LegacyBreakingWorkSeconds=0.;
     // Raw per-refresh crest/tail lift accumulates here and is eased into the
     // carried vertices after the detection loop, so threshold flicker and
     // lattice hops of the detected front cannot step the carved geometry.
     TArray<float> BreakingLiftTargetCm;
-    BreakingLiftTargetCm.SetNumZeroed(Vertices.Num());
+    if(bEvaluateLegacyBreakingWork)BreakingLiftTargetCm.SetNumZeroed(Vertices.Num());
     int32 EdgeRejectedSiteCount = 0;
     float MaximumEdgeRejectedIntensity = 0.0f;
     float StrongestEdgeRejectedCoverage = 0.0f;
@@ -5920,57 +5942,63 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 continue;
             }
 
-            // Crest leans up; the first subcritical station dips, forming the
-            // overturning face into the white pile.
-            const float LiftCm = BreakingCrestLiftMeters * kSurfCmPerM *
-                Intensity * ShoreDisplacementWeight[UpstreamIndex];
-            BreakingLiftTargetCm[UpstreamIndex] += LiftCm;
-            BreakingLiftTargetCm[Index] -= 0.45f * LiftCm;
-
-            const float BreakingFrothStrength = FMath::Lerp(
-                0.62f, 1.0f, FMath::Sqrt(Intensity));
-            if (!bCrestLocalizedFoam)
+            if(bEvaluateLegacyBreakingWork)
             {
-                SourceFoam[UpstreamIndex] = FMath::Max(
-                    SourceFoam[UpstreamIndex], 0.75f * BreakingFrothStrength);
-                SourceFoam[Index] = FMath::Max(
-                    SourceFoam[Index], 0.95f * BreakingFrothStrength);
-            }
+                const double LegacyStarted=bAuditLegacyBreakingWork ? FPlatformTime::Seconds() : 0.;
+                // Crest leans up; the first subcritical station dips, forming the
+                // overturning face into the white pile.
+                const float LiftCm = BreakingCrestLiftMeters * kSurfCmPerM *
+                    Intensity * ShoreDisplacementWeight[UpstreamIndex];
+                BreakingLiftTargetCm[UpstreamIndex] += LiftCm;
+                BreakingLiftTargetCm[Index] -= 0.45f * LiftCm;
 
-            // Decaying tailwater wave train: the oscillatory surface every
-            // hydraulic jump sheds downstream. Alternating, exponentially
-            // decaying crests/troughs (bounded by the crest lift) give the
-            // rapid readable hydraulic volume instead of a flat run-out, and
-            // each surviving crest keeps generating a little foam.
-            const int32 TailStepCount = FMath::Max(
-                1,
-                FMath::RoundToInt(18.0f / ResolvedVertexSpacingMeters));
-            int32 PreviousTailIndex = Index;
-            for (int32 TailStep = 1; TailStep <= TailStepCount; ++TailStep)
-            {
-                const int32 TailIndex = bCartesianFlow
-                    ? RaftSimWaterFlowFrame::OffsetIndex(Index,GridStationN,GridLateralN,DownstreamDirection,TailStep)
-                    : Index+TailStep;
-                if (TailIndex == INDEX_NONE || (!bCartesianFlow && X + TailStep >= GridStationN) ||
-                    WetVertexMask[TailIndex] == 0)
-                {
-                    break;
-                }
-                if (TailIndex==PreviousTailIndex) continue;
-                PreviousTailIndex=TailIndex;
-                const float TailDistanceMeters =
-                    TailStep * ResolvedVertexSpacingMeters;
-                const float Decay = FMath::Exp(-0.14f * TailDistanceMeters);
-                const float Phase = FMath::Cos(
-                    (2.05f / 3.0f) * TailDistanceMeters);
-                BreakingLiftTargetCm[TailIndex] += 0.62f * LiftCm * Decay *
-                    Phase * ShoreDisplacementWeight[TailIndex];
+                const float BreakingFrothStrength = FMath::Lerp(
+                    0.62f, 1.0f, FMath::Sqrt(Intensity));
                 if (!bCrestLocalizedFoam)
                 {
-                    SourceFoam[TailIndex] = FMath::Max(
-                        SourceFoam[TailIndex],
-                        Intensity * FMath::Max(Phase, 0.0f) * 0.65f * Decay + 0.38f * Decay);
+                    SourceFoam[UpstreamIndex] = FMath::Max(
+                        SourceFoam[UpstreamIndex], 0.75f * BreakingFrothStrength);
+                    SourceFoam[Index] = FMath::Max(
+                        SourceFoam[Index], 0.95f * BreakingFrothStrength);
                 }
+
+                // Decaying tailwater wave train: the oscillatory surface every
+                // hydraulic jump sheds downstream. Alternating, exponentially
+                // decaying crests/troughs (bounded by the crest lift) give the
+                // rapid readable hydraulic volume instead of a flat run-out, and
+                // each surviving crest keeps generating a little foam.
+                const int32 TailStepCount = FMath::Max(
+                    1,
+                    FMath::RoundToInt(18.0f / ResolvedVertexSpacingMeters));
+                int32 PreviousTailIndex = Index;
+                for (int32 TailStep = 1; TailStep <= TailStepCount; ++TailStep)
+                {
+                    const int32 TailIndex = bCartesianFlow
+                        ? RaftSimWaterFlowFrame::OffsetIndex(Index,GridStationN,GridLateralN,DownstreamDirection,TailStep)
+                        : Index+TailStep;
+                    if (TailIndex == INDEX_NONE || (!bCartesianFlow && X + TailStep >= GridStationN) ||
+                        WetVertexMask[TailIndex] == 0)
+                    {
+                        break;
+                    }
+                    if (TailIndex==PreviousTailIndex) continue;
+                    PreviousTailIndex=TailIndex;
+                    const float TailDistanceMeters =
+                        TailStep * ResolvedVertexSpacingMeters;
+                    const float Decay = FMath::Exp(-0.14f * TailDistanceMeters);
+                    const float Phase = FMath::Cos(
+                        (2.05f / 3.0f) * TailDistanceMeters);
+                    BreakingLiftTargetCm[TailIndex] += 0.62f * LiftCm * Decay *
+                        Phase * ShoreDisplacementWeight[TailIndex];
+                    if (!bCrestLocalizedFoam)
+                    {
+                        SourceFoam[TailIndex] = FMath::Max(
+                            SourceFoam[TailIndex],
+                            Intensity * FMath::Max(Phase, 0.0f) * 0.65f * Decay + 0.38f * Decay);
+                    }
+                }
+
+                if(bAuditLegacyBreakingWork)LegacyBreakingWorkSeconds+=FPlatformTime::Seconds()-LegacyStarted;
             }
 
             FBreakingSite Site;
@@ -6004,33 +6032,50 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // Ease the accumulated crest/tail lift into the carried vertices. The
     // slower release also keeps a momentary detection dropout from deleting
     // a rendered crest outright; residue decays over roughly half a second.
-    if (SmoothedBreakingLiftCm.Num() != Vertices.Num())
+    if(bEvaluateLegacyBreakingWork)
     {
-        SmoothedBreakingLiftCm.SetNumZeroed(Vertices.Num());
+        const double LegacyStarted=bAuditLegacyBreakingWork ? FPlatformTime::Seconds() : 0.;
+        if (SmoothedBreakingLiftCm.Num() != Vertices.Num())
+        {
+            SmoothedBreakingLiftCm.SetNumZeroed(Vertices.Num());
+        }
+        const float LiftAttackBlend = 1.0f - FMath::Exp(
+            -8.0f * FMath::Max(RefreshIntervalSeconds, 0.0f));
+        const float LiftReleaseBlend = 1.0f - FMath::Exp(
+            -5.0f * FMath::Max(RefreshIntervalSeconds, 0.0f));
+        for (int32 LiftIndex = 0; LiftIndex < Vertices.Num(); ++LiftIndex)
+        {
+            const float TargetCm = BreakingLiftTargetCm[LiftIndex];
+            float SmoothedCm = FMath::Lerp(
+                SmoothedBreakingLiftCm[LiftIndex],
+                TargetCm,
+                FMath::Abs(TargetCm) > FMath::Abs(SmoothedBreakingLiftCm[LiftIndex])
+                    ? LiftAttackBlend
+                    : LiftReleaseBlend);
+            if (TargetCm == 0.0f && FMath::Abs(SmoothedCm) < 0.05f)
+            {
+                SmoothedCm = 0.0f;
+            }
+            SmoothedBreakingLiftCm[LiftIndex] = SmoothedCm;
+            if (SmoothedCm != 0.0f && !bSharedBreakingReliefEnabled)
+            {
+                Vertices[LiftIndex].Z += SmoothedCm;
+            }
+        }
+
+        if(bAuditLegacyBreakingWork)LegacyBreakingWorkSeconds+=FPlatformTime::Seconds()-LegacyStarted;
     }
-    const float LiftAttackBlend = 1.0f - FMath::Exp(
-        -8.0f * FMath::Max(RefreshIntervalSeconds, 0.0f));
-    const float LiftReleaseBlend = 1.0f - FMath::Exp(
-        -5.0f * FMath::Max(RefreshIntervalSeconds, 0.0f));
-    for (int32 LiftIndex = 0; LiftIndex < Vertices.Num(); ++LiftIndex)
+#if !UE_BUILD_SHIPPING
+    if(bAuditLegacyBreakingWork)
     {
-        const float TargetCm = BreakingLiftTargetCm[LiftIndex];
-        float SmoothedCm = FMath::Lerp(
-            SmoothedBreakingLiftCm[LiftIndex],
-            TargetCm,
-            FMath::Abs(TargetCm) > FMath::Abs(SmoothedBreakingLiftCm[LiftIndex])
-                ? LiftAttackBlend
-                : LiftReleaseBlend);
-        if (TargetCm == 0.0f && FMath::Abs(SmoothedCm) < 0.05f)
-        {
-            SmoothedCm = 0.0f;
-        }
-        SmoothedBreakingLiftCm[LiftIndex] = SmoothedCm;
-        if (SmoothedCm != 0.0f && !bSharedBreakingReliefEnabled)
-        {
-            Vertices[LiftIndex].Z += SmoothedCm;
-        }
+        ++LegacyBreakingAuditCalls;
+        const bool ExactFoam=LegacyAuditFoamBefore==SourceFoam;
+        UE_LOG(LogTemp,Display,TEXT("LegacyBreakingWorkAudit call=%d candidates=%d vertices=%d shared=%d localized=%d foam_exact=%d unused_reference_ms=%.9f"),
+            LegacyBreakingAuditCalls,CandidateSites.Num(),Vertices.Num(),int32(bSharedBreakingReliefEnabled),
+            int32(bCrestLocalizedFoam),int32(ExactFoam),LegacyBreakingWorkSeconds*1000.);
+        if(!ExactFoam){UE_LOG(LogTemp,Error,TEXT("Legacy breaking work unexpectedly changed shared foam"));return;}
     }
+#endif
 
     // Strongest sites first, deduplicated to 6 m so one long jump line yields a
     // handful of overlapping crest lobes rather than a wall of emitters.

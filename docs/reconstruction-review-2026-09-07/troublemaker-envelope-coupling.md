@@ -524,3 +524,76 @@ deceleration. Do not erase rocks or weaken collision merely to pass AllForward.
 The next work must target observed rapid behavior and measured CPU costs while
 retaining captured-source distinctions and all existing gates. Neither this
 evolved-state trial nor its finite-state/native checks completes South Fork.
+
+## V7 crest diagnosis and v8 unused-work candidate
+
+The completed v7 instrumented run `tmp/sf-v7-crest-shape-20260927.log`
+(PID24552/session99843, exit0) finds ten persistent sites, four with positive
+spilling fraction, maximum0.9736502171 and maximum extra height0.2938319743m.
+The strongest spilling site needs zero *additional* height because resolved
+rise already supplies it; zero extra displacement must not disable spilling.
+The actual submitted mesh audit has1,450,476 samples, target error0.795791cm,
+fine tracking error0.034860cm and zero source-vertex change. Its coarse regular
+grid error is not the error of the submitted adaptive mesh. These findings do
+not support adding tessellation or lowering physical breaking thresholds.
+
+V8 is a code-only candidate retaining the exact v7 runtime bundle and geometry.
+In `RaftSimWaterSurfaceActor.cpp`, shared analytic relief with localized crest
+foam no longer computes the legacy grid lift/tail field that neither rendering
+nor support consumes. Detection, persistent sites, shared crest profiles and
+foam remain unchanged; other modes retain the legacy work. The optional
+`RaftSimReferenceLegacyBreakingWork` switch restores it for comparisons.
+`RaftSimLegacyBreakingWorkAudit` executes64 reference refreshes on actual game
+inputs and checks foam equality, separately measuring unused reference cost.
+This is not evidence of faster frames until measured in the rebuilt game.
+
+Build session59010 uses `tmp/package-south-fork-v8-20260927.ps1`; do not launch
+a duplicate. Native audit and regression recipes are
+`tmp/audit-sf-v8-legacy-work-20260927.ps1` and
+`tmp/test-sf-v8-crests-20260927.ps1`. Results below supersede this live checkpoint.
+
+V8 build59010 completed exit0 in462.94s; executable SHA-256
+`98d30c3d56b7510599e1f3ec852b2a7e12c1808c507d0f918e2c139cd542bb3e`.
+Pre-existing missing crew-texture cook warnings remain unresolved.
+Audit10369/PID33204 completed exit0: all64 actual-input shared/localized foam
+comparisons are exact. The unused reference work averaged0.309249ms per audited
+refresh (range0.152808..0.465088ms), excluding allocation and audit-copy cost.
+This is a small isolated CPU opportunity, not a measured whole-frame speedup.
+The actual submitted mesh still has0.795768cm maximum target error,
+0.016125cm fine tracking error and zero source-vertex change.
+Five existing native regressions pass with zero failures/warnings
+(session55008/PID34628, `tmp/sf-v8-crest-regressions-20260927/index.json`).
+
+The new actual-game recording is
+`tmp/south-fork-playable-v8-20260927/Windows/SmokeEmIfYouGotEm/Saved/VideoCaptures/RaftSim_20260927-132305.mp4`,
+SHA-256`8d36c214192dc9a7ac5ac2830aae4d65749befd801f283f55785b31a8d31698e`.
+Decode receipt:`tmp/sf-v8-troublemaker-decoded-20260927/report.json`:
+772 frames over25.7s,1280x720,four adjacent duplicates. Original1/9/20s views
+were inspected: HUD8.37 to8.40km, moving paddles/raft, close approach to rocks
+and subsequent turning downstream. Final logged speed1.97m/s does not establish
+complete safe traversal or a causal improvement over v7's different trajectory.
+Broad flat foam and coarse banks remain; no new wave-realism acceptance and no
+whole-reach shoreline/continuity claim. Encoded frame rate is not game FPS.
+
+V8 packaged timing session18049 also completed exit0. The unchanged v7 bundle's
+2405 files/917995570 bytes verify in the v8 stage with no source fallback
+(`tmp/south-fork-v8-staged-payload-20260927.json`). Both games use normal quality
+and physics, without the unused-work reference/audit flags; each audits1140 of
+1200 frames. The normal launch verifies Boot/menu/FullReach travel order.
+
+| Run | Mean ms | p95 ms | Max ms | Frames >100ms | Result |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Normal Boot/menu |40.3116|49.5245|61.3514|0|PASS this run|
+| Busy11520m |45.4353|53.8839|99.6944|0|FAIL p95|
+
+Both have zero runtime errors. Receipts:
+`unreal/Saved/RaftSimValidation/sf-v8-{normal-menu,rapid11520}-20260927-frame-audit.json`.
+CSV hashes: normal `4deff921f11b2e61655b81fa6e54eb6aa7007f6b5cab5176c1b83c32b4ae64b4`,
+busy `6539bb83e3f95137ea0fcadf23ac4c0d424f17afc7eb53e5dc058a2a86323a42`.
+These sequential v7/v8 runs are not a controlled same-build A/B; do not attribute
+the full timing difference to skipping0.309ms of unused work. The first normal
+launch pass is a bounded result, not whole-river performance acceptance.
+All build/audit/test/timing jobs described here are complete; none remains live.
+No solver recook, geometry change, source deletion, weaker acceptance threshold
+or later-river advance occurred. Next work remains the busier surface/crest CPU
+cost and unaccepted rapid/rock/wave behavior, not repeating unchanged diagnostics.
