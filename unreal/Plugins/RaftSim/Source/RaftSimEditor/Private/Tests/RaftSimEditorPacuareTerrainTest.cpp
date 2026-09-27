@@ -5,6 +5,8 @@
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialExpressionTextureBase.h"
+#include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Materials/MaterialInstanceConstant.h"
 #include "Misc/AutomationTest.h"
@@ -117,81 +119,37 @@ bool FRaftSimPacuareOrganicRainforestTerrainTest::RunTest(
             EditorOnlyData->WorldPositionOffset.Expression);
     }
 
-    TMap<FName, float> ScalarDefaults;
-    TMap<FName, FLinearColor> VectorDefaults;
-    TArray<float> NoiseScales;
+    // The evidence reach (pacuare-huacas-evidence.md) is coloured by the
+    // 2014-2017 IGN orthophoto drape; the invented procedural palette (noise
+    // fields, litter/moss/wet-rock tints) must not come back over it.
+    const UTexture2D* EvidenceDrape = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Terrain/T_RaftSim_PacuareHuacas_EvidenceDrape."
+             "T_RaftSim_PacuareHuacas_EvidenceDrape"));
+    TestNotNull(TEXT("Pacuare evidence orthophoto drape exists"), EvidenceDrape);
+    bool bSamplesEvidenceDrape = false;
+    int32 NoiseCount = 0;
+    bool bHasPaletteTint = false;
     for (const TObjectPtr<UMaterialExpression>& Expression :
          Material->GetExpressionCollection().Expressions)
     {
-        if (const UMaterialExpressionScalarParameter* Scalar =
-                Cast<UMaterialExpressionScalarParameter>(Expression.Get()))
+        if (const UMaterialExpressionTextureBase* Texture =
+                Cast<UMaterialExpressionTextureBase>(Expression.Get()))
         {
-            ScalarDefaults.Add(Scalar->ParameterName, Scalar->DefaultValue);
+            bSamplesEvidenceDrape |= EvidenceDrape && Texture->Texture == EvidenceDrape;
         }
+        NoiseCount += Cast<UMaterialExpressionNoise>(Expression.Get()) ? 1 : 0;
         if (const UMaterialExpressionVectorParameter* Vector =
                 Cast<UMaterialExpressionVectorParameter>(Expression.Get()))
         {
-            VectorDefaults.Add(Vector->ParameterName, Vector->DefaultValue);
-        }
-        if (const UMaterialExpressionNoise* Noise =
-                Cast<UMaterialExpressionNoise>(Expression.Get()))
-        {
-            NoiseScales.Add(Noise->Scale);
+            bHasPaletteTint |= Vector->ParameterName == TEXT("PacuareLeafLitterTint") ||
+                Vector->ParameterName == TEXT("PacuareMossTint") ||
+                Vector->ParameterName == TEXT("PacuareWetRockTint");
         }
     }
-
-    TestEqual(
-        TEXT("Three world-space scales break terrain repetition"),
-        NoiseScales.Num(),
-        3);
-    auto HasNoiseScale = [&NoiseScales](float ExpectedScale)
-    {
-        return NoiseScales.ContainsByPredicate(
-            [ExpectedScale](float Value)
-            {
-                return FMath::IsNearlyEqual(Value, ExpectedScale, 0.000001f);
-            });
-    };
-    TestTrue(TEXT("Broad rainforest macro field exists"), HasNoiseScale(0.00021f));
-    TestTrue(TEXT("Moss and litter patch field exists"), HasNoiseScale(0.00095f));
-    TestTrue(TEXT("Fine mineral field exists"), HasNoiseScale(0.00350f));
-
-    auto TestScalar = [this, &ScalarDefaults](
-                          const TCHAR* ParameterName,
-                          float ExpectedValue)
-    {
-        const float* Value = ScalarDefaults.Find(ParameterName);
-        TestNotNull(FString::Printf(TEXT("%s exists"), ParameterName), Value);
-        if (Value)
-        {
-            TestTrue(
-                FString::Printf(TEXT("%s keeps its accepted default"), ParameterName),
-                FMath::IsNearlyEqual(*Value, ExpectedValue, 0.001f));
-        }
-    };
-    TestScalar(TEXT("PacuareMacroShadowScale"), 0.62f);
-    TestScalar(TEXT("PacuareMacroHighlightScale"), 1.16f);
-    TestScalar(TEXT("PacuareForestFloorPaletteWeight"), 0.38f);
-    TestScalar(TEXT("PacuareWetRockSlopeStart"), 0.025f);
-    TestScalar(TEXT("PacuareWetRockSlopeGain"), 5.50f);
-    TestScalar(TEXT("PacuareRockMossPatchStrength"), 0.62f);
-    TestScalar(TEXT("PacuareFineShadowScale"), 0.86f);
-    TestScalar(TEXT("PacuareFineHighlightScale"), 1.12f);
-
-    const FLinearColor* LeafLitter =
-        VectorDefaults.Find(TEXT("PacuareLeafLitterTint"));
-    const FLinearColor* Moss = VectorDefaults.Find(TEXT("PacuareMossTint"));
-    const FLinearColor* WetRock =
-        VectorDefaults.Find(TEXT("PacuareWetRockTint"));
-    TestNotNull(TEXT("Leaf-litter response exists"), LeafLitter);
-    TestNotNull(TEXT("Moss response exists"), Moss);
-    TestNotNull(TEXT("Wet-rock response exists"), WetRock);
-    if (LeafLitter && Moss && WetRock)
-    {
-        TestTrue(TEXT("Leaf litter remains warmer than moss"), LeafLitter->R > Moss->R);
-        TestTrue(TEXT("Moss remains the greenest ground response"), Moss->G > Moss->R);
-        TestTrue(TEXT("Wet rock remains darker than moss"), WetRock->G < Moss->G);
-    }
+    TestTrue(TEXT("Pacuare terrain samples the evidence orthophoto drape"), bSamplesEvidenceDrape);
+    TestEqual(TEXT("No procedural noise palette over the photographed colour"), NoiseCount, 0);
+    TestFalse(TEXT("No invented litter/moss/wet-rock tints over the photographed colour"), bHasPaletteTint);
     return !HasAnyErrors();
 }
 

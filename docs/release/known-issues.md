@@ -41,9 +41,26 @@ Editor-hosted Development build on the development host; no packaged-build resul
 - South Fork submerged geometry is inferred (discharge-consistent bed v2), not
   measured. Colorado Hance is now an evidence-based geographic reach (2021 DEM
   and orthophoto, 2014 sonar pools, labelled inferred rapid bed and
-  imagery-located inferred boulders; runs p95 29-37 ms with no hitches). It is
-  not accepted: its whitewater renders as fine lace, well short of the imagery's
-  white crests; calm-water levels are known to about ±0.5 m; and the terrain
-  beyond the 2021 corridor DEM is invented
-  ([review](../reconstruction-review-2026-09-07/colorado-hance-evidence.md)).
-  Pacuare and Futaleufu evidence reconstructions have not started.
+  imagery-located inferred boulders, USGS 3DEP terrain and backdrop beyond the
+  corridor; runs p95 31-37 ms with no hitches). It is not accepted:
+  - Its whitewater extent comes from the photographs (appearance evidence), not
+    the solver, and has no hole or crest relief.
+  - Open water is several times brighter than the photo's deep pools.
+  - Calm-water levels are known to about ±0.5 m.
+  - Terrain colour beyond the photo footprint is invented.
+
+  See the [review](../reconstruction-review-2026-09-07/colorado-hance-evidence.md).
+  Pacuare Huacas-Pinball is now an evidence-based 2.3 km geographic reach.
+  It uses IGN 1:5,000 contours and banks, the 2014-2017 orthophoto,
+  contour-crossing water-surface anchors and imagery-placed canopy. It runs
+  p95 24-30 ms with no hitches. It is not accepted:
+  - It has no bathymetry. The bed is inferred and calibrated to three anchors
+    (+0.11 to +0.31 m).
+  - At the 45 m³/s planning flow the water covers bars the photo shows dry.
+  - The lower rapids are hydraulically milder than their photographed
+    whitewater.
+  - Vegetation structure and rock heights are inferred.
+  - IGN commercial redistribution is unconfirmed.
+
+  See the [review](../reconstruction-review-2026-09-07/pacuare-huacas-evidence.md).
+  Futaleufu has sources downloaded but no reconstruction yet.

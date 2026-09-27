@@ -255,6 +255,7 @@ struct FSurveyState
     int32 StationHops = 0;
     int32 UnreachableCount = 0;
     float BestWorldErrorM = TNumericLimits<float>::Max();
+    float BestRemainingStationM = TNumericLimits<float>::Max();
     TWeakObjectPtr<ACameraActor> ChaseCamera;
     TWeakObjectPtr<ACameraActor> SideCamera;
     FTimerHandle Timer;
@@ -744,6 +745,7 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
                 ++State->StationIndex;
                 State->StationHops = 0;
                 State->BestWorldErrorM = TNumericLimits<float>::Max();
+                State->BestRemainingStationM = TNumericLimits<float>::Max();
             }
             return;
         }
@@ -759,13 +761,19 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
             State->PhaseStartSeconds = Now;
             State->StationHops = 0;
             State->BestWorldErrorM = TNumericLimits<float>::Max();
+            State->BestRemainingStationM = TNumericLimits<float>::Max();
             return;
         }
         // Only hops that fail to close the world distance count toward the
         // give-up bound: a long walk-in from the spawn needs ~90 hops.
-        if (WorldErrorM < State->BestWorldErrorM - 1.0f)
+        // On a meandering reach (Pacuare Huacas) walking downstream carries
+        // the raft away from the target for many hops, so progress along
+        // the river station also counts.
+        if (WorldErrorM < State->BestWorldErrorM - 1.0f ||
+            FMath::Abs(RemainingM) < State->BestRemainingStationM - 1.0f)
         {
-            State->BestWorldErrorM = WorldErrorM;
+            State->BestWorldErrorM = FMath::Min(State->BestWorldErrorM, WorldErrorM);
+            State->BestRemainingStationM = FMath::Min(State->BestRemainingStationM, FMath::Abs(RemainingM));
             State->StationHops = 0;
         }
         if (State->StationHops >= 10)
@@ -778,6 +786,7 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
             ++State->StationIndex;
             State->StationHops = 0;
             State->BestWorldErrorM = TNumericLimits<float>::Max();
+            State->BestRemainingStationM = TNumericLimits<float>::Max();
             return;
         }
         const float StepStationM = RiverPosition.X + FMath::Clamp(RemainingM, -79.0f, 79.0f);

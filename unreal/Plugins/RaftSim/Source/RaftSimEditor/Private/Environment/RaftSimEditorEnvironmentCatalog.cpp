@@ -1325,32 +1325,29 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         }
         else if (PreviewSpec.RiverId == TEXT("pacuare"))
         {
+            // Evidence-based Huacas-Pinball reach (IGN contours, banks and
+            // orthophoto; see pacuare-huacas-evidence.md): 2017^2 over the
+            // 1,452 x 1,620 m CRTM05 evidence window, anchored at X = 0 and
+            // centred in Y (Unreal +Y south).
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_conditioned_heightfield_1009.png");
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_heightfield_2017.png");
             Candidate.HeightfieldManifestRelativePath =
-                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_visual_terrain_manifest.json");
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_terrain_manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("unreal/Content/RaftSim/River/pacuare_heightfield_import_test.json");
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_terrain_manifest.json");
             Candidate.LocalCenterlineRelativePath =
-                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_local_centerline.json");
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_local_centerline.json");
             Candidate.MapPackagePath =
                 TEXT("/Game/RaftSim/Maps/L_UpperHuacas");
-            Candidate.LandscapeSize = 1009;
-            Candidate.HorizontalSpanXCm = 60000.0f;
-            Candidate.HorizontalSpanYCm = 7800.0f;
-            Candidate.TargetReliefCm = 2395.6667f;
-            Candidate.WorldVerticalOffsetCm = -470.1597f;
+            Candidate.LandscapeSize = 2017;
+            Candidate.HorizontalSpanXCm = 145200.0f;
+            Candidate.HorizontalSpanYCm = 162000.0f;
+            Candidate.TargetReliefCm = 31000.711060f;
+            Candidate.WorldVerticalOffsetCm = -1000.711060f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
-            Candidate.bUseSolverVisualizationFields = true;
-            Candidate.SolverVisualizationFieldRelativePath =
-                TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
-                     "pacuare_upper_huacas_rainfed_depth_speed_froude_surface_v1.png");
-            Candidate.SolverVisualizationDepthCapM = 3.5f;
-            Candidate.SolverVisualizationSpeedCapMps = 4.5f;
-            Candidate.SolverVisualizationFroudeCap = 2.5f;
-            Candidate.SolverVisualizationSurfaceReliefCapM = 1.0f;
-            Candidate.SolverVisualizationLateralMinM = -39.0f;
-            Candidate.SolverVisualizationLateralMaxM = 39.0f;
+            // The live solver owns the water; the old straight-reach solver
+            // visualization field does not apply to the geographic reach.
+            Candidate.bUseSolverVisualizationFields = false;
             Candidate.bPhysicalScaleSourceCorridor = true;
             Candidate.bUseDensePhysicalTerrainRenderSurface = false;
             Candidate.bEnableLandscapeNanite = true;

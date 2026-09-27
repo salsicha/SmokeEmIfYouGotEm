@@ -15,6 +15,12 @@ namespace
 constexpr float kColoradoHanceLaunchStationM = 520.0f;
 constexpr float kColoradoHanceReachStationM = 2512.0f;
 constexpr float HanceProgress(float StationM) { return StationM / kColoradoHanceReachStationM; }
+// Evidence-based Pacuare Huacas-Pinball reach (scenario stations, 2 m grid).
+// Launch in the calm pool above Upper Huacas (cooked depth > 1 m across
+// 26 m, < 1 m/s); the first rapid starts near 400 m.
+constexpr float kPacuareHuacasLaunchStationM = 280.0f;
+constexpr float kPacuareHuacasReachStationM = 2328.0f;
+constexpr float PacuareProgress(float StationM) { return StationM / kPacuareHuacasReachStationM; }
 }
 
 FString GetLandscapeCandidateCaptureRelativePath(
@@ -1741,16 +1747,20 @@ bool AddLandscapeCandidateRunnableGameplay(
     FString DisplayName;
     if (bPacuare)
     {
+        // Evidence-based Huacas-Pinball reach (IGN 1:5,000 contours and
+        // banks, 2014-2017 orthophoto, OSM chainage; inferred bed at the 45
+        // m3/s planning discharge); see
+        // docs/reconstruction-review-2026-09-07/pacuare-huacas-evidence.md.
         RuntimeConfigLabel = TEXT("RaftSim_PacuareUpperHuacas_RuntimeWaterConfig");
         CookedFieldsDir =
             TEXT("physics/data/real_world/pacuare_river_costa_rica/"
-                 "scenario_upper_huacas/cooked_flow_fields");
-        FlowBand = FName(TEXT("rainfed_runnable_planning"));
-        WindowCenterM = FVector2D(300.0f, 0.0f);
-        WindowExtentM = 700.0f;
+                 "scenario_huacas_evidence_2017/cooked_flow_fields");
+        FlowBand = FName(TEXT("rainfed_runnable_45cms"));
+        WindowCenterM = FVector2D(kPacuareHuacasLaunchStationM, 0.0f);
+        WindowExtentM = 480.0f;
         CoordinateMapPath =
             TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/"
-                 "upper_huacas_visual/upper_huacas_runtime_coordinate_map.json");
+                 "huacas_evidence_2017/huacas_evidence_runtime_coordinate_map.json");
         RunTag = FName(TEXT("RaftSimPacuareUpperHuacasRun"));
         PlayerRaftLabel = TEXT("RaftSim_PacuareUpperHuacas_PlayerRaft");
         DisplayName = TEXT("Pacuare Upper Huacas");
@@ -1839,6 +1849,9 @@ bool AddLandscapeCandidateRunnableGameplay(
     const float StartProgress = bColoradoHance
         ? FMath::Clamp(kColoradoHanceLaunchStationM /
               FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f)
+        : bPacuare
+        ? FMath::Clamp(kPacuareHuacasLaunchStationM /
+              FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f)
         : (bChilkoLavaCanyon
                ? 0.38f
                : (bReachLocalRun ? 0.04f : 0.0025f));
@@ -1896,7 +1909,7 @@ bool AddLandscapeCandidateRunnableGameplay(
     // The 30 km Zambezi run cannot simulate its whole 5999 x 25 cell corridor
     // every 1/60 s tick (~20 ms per step never keeps real time). Crop the same
     // cooked field around the raft and re-centre it every 80 m instead.
-    WaterConfig->bEnableMovingWindowStreaming = bZambezi || bColoradoHance;
+    WaterConfig->bEnableMovingWindowStreaming = bZambezi || bColoradoHance || bPacuare;
     if (bColoradoHance)
     {
         // 2.5 km x 160 m at 2 m is 101,817 cells; crop 480 m of it around
@@ -1910,21 +1923,39 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->MovingWindowAdvanceM = 80.0f;
         WaterConfig->LivePresentationWidthM = 160.0f;
         WaterConfig->bEnableCookedFarFieldWater = true;
-        // Calibrated on the v5 cook against the 2021 imagery whitewater at the
-        // same flow: with the default onset (Fr 0.78, ramp 1.25) the main
-        // rapid shows 0.3% visible foam against 14% in the imagery. Onset 0.6
-        // with ramp 0.5 gives 6% before downstream foam transport, which in
-        // play fills the rapid's working water; a thin lace floor keeps green
-        // tongues between white crests (0.3 turned the rapid into one sheet).
+        // No cooked-field indicator places the whitewater where the 2021
+        // imagery shows it (best matched-area IoU 0.14, Froude 0.07;
+        // audit_hance_whitewater_indicators.py). The photographed extent at
+        // the same flow floors the displayed foam (appearance evidence,
+        // export_hance_observed_whitewater.py), so the generic Froude onset
+        // stays at its default and the lace/patch floors can mass the white
+        // where the photo has it (with the broad Froude foam alone, 0.3 had
+        // turned the whole rapid into one sheet).
         WaterConfig->LiveFoamFroudeOnset = 0.78f;
         WaterConfig->LiveFoamFroudeRamp = 1.25f;
         WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
         WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
-        // No cooked-field indicator places the whitewater where the 2021
-        // imagery shows it (best matched-area IoU 0.14, Froude 0.07;
-        // audit_hance_whitewater_indicators.py). The photographed extent at
-        // the same flow is therefore a foam source of its own (appearance
-        // evidence, export_hance_observed_whitewater.py).
+        WaterConfig->ObservedWhitewaterGain = 0.9f;
+    }
+    if (bPacuare)
+    {
+        // 2.33 km x 96 m at 2 m: crop 480 m around the raft and draw the
+        // whole cooked lateral span, with the cooked far field beyond it.
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/pacuare_river_costa_rica/"
+                 "scenario_huacas_evidence_2017/runtime/moving_water_streaming.json");
+        WaterConfig->WindowCenterM = FVector2D(kPacuareHuacasLaunchStationM, 0.0f);
+        WaterConfig->MovingWindowStationExtentM = 480.0f;
+        WaterConfig->MovingWindowLateralExtentM = 96.0f;
+        WaterConfig->MovingWindowAdvanceM = 80.0f;
+        WaterConfig->LivePresentationWidthM = 96.0f;
+        WaterConfig->bEnableCookedFarFieldWater = true;
+        // As at Hance: the orthophoto whitewater floors the displayed foam
+        // (the 2 m cooked field under-places it), Froude onset at default.
+        WaterConfig->LiveFoamFroudeOnset = 0.78f;
+        WaterConfig->LiveFoamFroudeRamp = 1.25f;
+        WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
+        WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
         WaterConfig->ObservedWhitewaterGain = 0.9f;
     }
     if (bZambezi)
@@ -2286,7 +2317,7 @@ bool AddLandscapeCandidateRunnableGameplay(
     // The geographic Hance strip spans the whole 160 m cooked lateral range;
     // at 1 m its 38,801-vertex refresh cost 19 ms mean (41 ms p95) of game
     // thread. 1.5 m (17k vertices) still samples each 2 m solver cell.
-    WaterConfig->LiveRapidSurfaceSubdivision = bColoradoHance ? 2 : 6;
+    WaterConfig->LiveRapidSurfaceSubdivision = (bColoradoHance || bPacuare) ? 2 : 6;
     WaterConfig->bEnableLiveRaftLocalFluidHeightfield = true;
     WaterConfig->LiveRaftLocalFluidWindowMeters = 100.0f;
     WaterConfig->LiveRaftLocalFluidHeightfieldStrength = 0.65f;
@@ -2593,7 +2624,13 @@ void RepositionLandscapeCandidatePhysicalCameras(
             return;
         }
     };
-    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+    if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+    {
+        // Above Upper Huacas looking into its entry (station metres).
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), PacuareProgress(300.0f), PacuareProgress(300.0f + 100.0f), 260.0f, 105.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), PacuareProgress(300.0f + 40.0f), PacuareProgress(300.0f + 140.0f), 170.0f, 85.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
     {
         // Pool above the rapid looking into the entry (station metres).
         SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), HanceProgress(560.0f), HanceProgress(680.0f), 260.0f, 105.0f);

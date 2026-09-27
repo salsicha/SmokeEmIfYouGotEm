@@ -6,34 +6,32 @@ namespace RaftSimEditorEnvironment
 {
 namespace
 {
-// Measured USGS 3DEP terrain around the Hance Landscape (6.5 km window,
-// 10 m): mesh from unreal/Scripts/install_colorado_hance_backdrop.py. The
-// translation and (1, -1, 1) scale come from the `backdrop` block of
-// terrain/hance_evidence_2021/hance_evidence_terrain_manifest.json
-// (physics/tests/test_colorado_hance_evidence.py checks they match). Under
-// the Landscape the mesh sits at least 3 m below it, so the Landscape wins.
-bool AddColoradoHanceTerrainBackdrop(UWorld* World, FString& OutSummary)
+// Evidence reaches place an always-loaded, render-only terrain backdrop
+// around their Landscape (measured terrain beyond it). Meshes come from
+// unreal/Scripts/install_colorado_hance_backdrop.py (Hance) and
+// install_terrain_backdrop.py (others); the translation and (1, -1, 1)
+// scale come from the `backdrop` block of each terrain manifest (the
+// python evidence tests check they match). Under the Landscape the mesh
+// sits below it, so the Landscape wins.
+bool AddEvidenceTerrainBackdrop(
+    UWorld* World, const TCHAR* MeshPath, const FVector& TranslationCm, const TCHAR* Label, const TCHAR* Tag, FString& OutSummary)
 {
-    UStaticMesh* Mesh = LoadObject<UStaticMesh>(
-        nullptr,
-        TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/SM_RaftSim_ColoradoHance_3DEPBackdrop."
-             "SM_RaftSim_ColoradoHance_3DEPBackdrop"));
+    UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, MeshPath);
     if (!Mesh)
     {
-        OutSummary += TEXT("Missing the Hance 3DEP terrain backdrop mesh; run unreal/Scripts/install_colorado_hance_backdrop.py.\n");
+        OutSummary += FString::Printf(TEXT("Missing the terrain backdrop mesh %s; run its install script.\n"), MeshPath);
         return false;
     }
-    const FVector BackdropTranslationCm(-199500.0, -340100.0, 0.0);
-    AStaticMeshActor* Actor = World->SpawnActor<AStaticMeshActor>(BackdropTranslationCm, FRotator::ZeroRotator);
+    AStaticMeshActor* Actor = World->SpawnActor<AStaticMeshActor>(TranslationCm, FRotator::ZeroRotator);
     if (!Actor)
     {
-        OutSummary += TEXT("Failed to spawn the Hance terrain backdrop actor.\n");
+        OutSummary += TEXT("Failed to spawn the terrain backdrop actor.\n");
         return false;
     }
     Actor->SetActorScale3D(FVector(1.0, -1.0, 1.0));
-    Actor->SetActorLabel(TEXT("RaftSim_ColoradoHance_3DEPBackdrop"));
+    Actor->SetActorLabel(Label);
     Actor->Tags.AddUnique(TEXT("RaftSimTerrainBackdrop"));
-    Actor->Tags.AddUnique(TEXT("RaftSimColoradoHance3DEPBackdrop"));
+    Actor->Tags.AddUnique(Tag);
     UStaticMeshComponent* Component = Actor->GetStaticMeshComponent();
     Component->SetMobility(EComponentMobility::Static);
     Component->SetStaticMesh(Mesh);
@@ -41,11 +39,30 @@ bool AddColoradoHanceTerrainBackdrop(UWorld* World, FString& OutSummary)
     Component->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
     Component->SetCanEverAffectNavigation(false);
     Component->bAffectDistanceFieldLighting = false;
-    // Canyon walls beyond the Landscape shade the river at low sun.
+    // Valley walls beyond the Landscape shade the river at low sun.
     Component->SetCastShadow(true);
-    OutSummary += FString::Printf(
-        TEXT("Placed the Hance 3DEP terrain backdrop (%s, no collision).\n"), *Mesh->GetPathName());
+    OutSummary += FString::Printf(TEXT("Placed the terrain backdrop %s (no collision).\n"), *Mesh->GetPathName());
     return true;
+}
+
+bool AddColoradoHanceTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    // USGS 3DEP 10 m over a 6.5 km window (hance_evidence_terrain_manifest.json).
+    const FVector BackdropTranslationCm(-199500.0, -340100.0, 0.0);
+    return AddEvidenceTerrainBackdrop(World,
+        TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/SM_RaftSim_ColoradoHance_3DEPBackdrop."
+             "SM_RaftSim_ColoradoHance_3DEPBackdrop"),
+        BackdropTranslationCm, TEXT("RaftSim_ColoradoHance_3DEPBackdrop"), TEXT("RaftSimColoradoHance3DEPBackdrop"), OutSummary);
+}
+
+bool AddPacuareHuacasTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    // IGN 10 m contours over their download extent (huacas_evidence_terrain_manifest.json).
+    const FVector PacuareBackdropTranslationCm(-375900.0, -385900.0, 0.0);
+    return AddEvidenceTerrainBackdrop(World,
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Terrain/SM_RaftSim_PacuareHuacas_ContourBackdrop."
+             "SM_RaftSim_PacuareHuacas_ContourBackdrop"),
+        PacuareBackdropTranslationCm, TEXT("RaftSim_PacuareHuacas_ContourBackdrop"), TEXT("RaftSimPacuareHuacasContourBackdrop"), OutSummary);
 }
 } // namespace
 
@@ -443,8 +460,8 @@ bool BuildLandscapeImportCandidateMap(
             "no duplicate dense source-terrain overlay is active.\n");
     }
     AddPreviewLightRig(World, Candidate.PreviewSpec);
-    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river") &&
-        !AddColoradoHanceTerrainBackdrop(World, OutSummary))
+    if ((Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !AddColoradoHanceTerrainBackdrop(World, OutSummary)) ||
+        (Candidate.PreviewSpec.RiverId == TEXT("pacuare") && !AddPacuareHuacasTerrainBackdrop(World, OutSummary)))
     {
         return false;
     }

@@ -1,7 +1,9 @@
 # Pacuare evidence-based reconstruction
 
 Requested 2026-09-06. Queued after completion and validation of Colorado,
-which follows South Fork. Not started or accepted.
+which follows South Fork. Implemented 2026-09-27 as the geographic
+`L_UpperHuacas` (Upper Huacas to Lower Pinball). Not accepted; see
+`docs/reconstruction-review-2026-09-07/pacuare-huacas-evidence.md`.
 
 ## Objective
 
@@ -138,3 +140,28 @@ Next, following the Hance pipeline:
 3. Orthophoto-derived rocks and whitewater.
 4. The curvilinear scenario and cook, then runtime export as a geographic
    `L_UpperHuacas` replacement.
+
+### Reconstruction (2026-09-27)
+
+Done, following the steps above. The review doc holds the method, results,
+validation, performance and limits. The corrections to the registration
+findings:
+
+- **Banks.** The D01 bank lines enclose the gravel bars. They give the active
+  channel, not the wetted width. The wetted water, bars and rocks come from
+  the orthophoto instead.
+- **Water-surface anchors.** Contour ends alone are ambiguous. The anchor is
+  where an L contour first comes within 10 m of a bank going downstream: the
+  water crosses L there. Stations are stable for bank distances of 8-25 m.
+- **Midline.** The OSM centreline leaves the channel in places. The midline is
+  built from facing bank points, and OSM only orders them.
+
+Open against the acceptance steps above:
+- **Step 3.** Rocks are orthophoto-located with inferred heights.
+  Rapid-by-rapid confidence is recorded only as the measured and inferred
+  split.
+- **Step 4.** The lower rapids are hydraulically milder than their
+  photographed whitewater. At 45 m³/s the water covers bars the photo shows
+  dry.
+- **Step 5.** No in-engine comparison with licensed reference footage yet.
+  The views were checked against the orthophoto only.

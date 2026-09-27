@@ -260,18 +260,24 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures"),
             TEXT("PhysicalCorridorMaterialZones"));
     }
-    // Evidence-based Hance: the 2021 corridor orthophoto (0.5 m export,
-    // 4096 x 2048 over the whole 2500 x 1212 m Landscape, north up) replaces
-    // the Lees Ferry pilot drape. Imported by
-    // unreal/Scripts/install_colorado_hance_evidence_drape.py.
-    UTexture2D* HanceEvidenceDrape = Candidate.PreviewSpec.RiverId == TEXT("colorado_river")
-        ? LoadObject<UTexture2D>(nullptr,
-              TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/T_RaftSim_ColoradoHance_EvidenceDrape."
-                   "T_RaftSim_ColoradoHance_EvidenceDrape"))
-        : nullptr;
-    if (HanceEvidenceDrape)
+    // Evidence-based reaches drape the whole Landscape with their own
+    // orthophoto (north up) instead of the pilot drape:
+    // - Hance: the 2021 corridor orthophoto, 4096 x 2048 over 2500 x 1212 m
+    //   (unreal/Scripts/install_colorado_hance_evidence_drape.py);
+    // - Pacuare Huacas: the 2014-2017 IGN orthophoto with Sentinel-2 colour
+    //   outside its footprint, 2048 x 2048 (unreal/Scripts/install_evidence_drape.py).
+    const TCHAR* EvidenceDrapePath =
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river")
+            ? TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/T_RaftSim_ColoradoHance_EvidenceDrape."
+                   "T_RaftSim_ColoradoHance_EvidenceDrape")
+        : Candidate.PreviewSpec.RiverId == TEXT("pacuare")
+            ? TEXT("/Game/RaftSim/Environment/PacuareRun/Terrain/T_RaftSim_PacuareHuacas_EvidenceDrape."
+                   "T_RaftSim_PacuareHuacas_EvidenceDrape")
+            : nullptr;
+    UTexture2D* EvidenceDrape = EvidenceDrapePath ? LoadObject<UTexture2D>(nullptr, EvidenceDrapePath) : nullptr;
+    if (EvidenceDrape)
     {
-        SourceMacroAlbedo = HanceEvidenceDrape;
+        SourceMacroAlbedo = EvidenceDrape;
     }
     if (!SourceMacroAlbedo || !SourcePackedSurface || !SourceNormalDetail || !SourceMaterialZones ||
         !TerrainDetailAlbedo || !TerrainDetailPackedSurface || !TerrainDetailNormal)
@@ -296,9 +302,10 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             Settings.RiverbedBlendWeight = 0.18f;
             Settings.WetBankBlendWeight = 0.24f;
         }
-        if (HanceEvidenceDrape)
+        if (EvidenceDrape)
         {
-            // The photo carries the colour; the pilot zone map is Lees Ferry,
+            // The photo carries the colour; the pilot zone maps belong to other
+            // windows (Lees Ferry, the old straight Huacas reach),
             // so its riverbed/wet-bank tints would be misregistered. Detail
             // tiles about 30 m (1.24 m Landscape quads).
             Settings.DetailMappingScale = 24.0f;
@@ -546,7 +553,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     ConditionedBaseColor->Alpha.Expression = RiverbedBlendMask;
     Material->GetExpressionCollection().AddExpression(ConditionedBaseColor);
 
-    UMaterialExpression* FinalBaseColor = Candidate.PreviewSpec.RiverId == TEXT("pacuare") ? BuildPacuareOrganicRainforestBaseColor(Material, ConditionedBaseColor) : ConditionedBaseColor;
+    UMaterialExpression* FinalBaseColor = Candidate.PreviewSpec.RiverId == TEXT("pacuare") && !EvidenceDrape
+        ? BuildPacuareOrganicRainforestBaseColor(Material, ConditionedBaseColor) : ConditionedBaseColor;
     if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
     {
         FinalBaseColor = BuildSouthForkOrganicFoothillBaseColor(
@@ -554,7 +562,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             FinalBaseColor,
             0.58f);
     }
-    if (Candidate.bPhysicalScaleSourceCorridor && !HanceEvidenceDrape)
+    if (Candidate.bPhysicalScaleSourceCorridor && !EvidenceDrape)
     {
         UMaterialExpressionVertexNormalWS* VertexNormalWs =
             NewObject<UMaterialExpressionVertexNormalWS>(Material);
@@ -616,7 +624,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             ChilkoRotatedDetailAlbedoSample,
             WetBankBlendMask);
     }
-    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !HanceEvidenceDrape)
+    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !EvidenceDrape)
     {
         FinalBaseColor = BuildColoradoOrganicHanceBaseColor(
             Material,

@@ -392,6 +392,8 @@ struct FPlacementQueries
     TFunctionRef<float(float, float)> GetLandscapeHeight;
     TFunctionRef<float(float, float)> GetLandscapeSlopeDegrees;
     TFunctionRef<int32(UHierarchicalInstancedStaticMeshComponent*, UStaticMesh*, const FVector2D&, float, const FRotator&, const FVector&)> AddGroundedInstance;
+    // Station length of the physical centreline (0 when there is none).
+    float CenterlineLengthM = 0.0f;
 };
 
 struct FPacuarePlacementCounts
@@ -402,6 +404,21 @@ struct FPacuarePlacementCounts
     int32 PacuareShorelineShrubPlacedCount;
     int32 PacuareForestFloorLeafLitterPlacedCount;
     int32 PacuareForestFloorWoodyPlacedCount;
+    // Minimums scaled with the reach length like the targets (density per
+    // metre of centreline, set on the 600 m straight Upper Huacas reach).
+    int32 RockMinimum = PacuareOrganicShorelineRockMinimumInstanceCount;
+    int32 GroundCoverMinimum = PacuareOrganicShorelineGroundCoverMinimumInstanceCount;
+    int32 FernMinimum = PacuareScannedFernMinimumInstanceCount;
+    int32 ShrubMinimum = PacuareOrganicShorelineShrubMinimumInstanceCount;
+    int32 LeafLitterMinimum = PacuareForestFloorLeafLitterMinimumInstanceCount;
+    int32 WoodyMinimum = PacuareForestFloorWoodyMinimumInstanceCount;
+    // Evidence canopy over the whole Landscape window and emergent-rock
+    // shells (placement JSON rows and the instances placed; 0 when the reach
+    // has no placement).
+    int32 EvidenceCanopyExpected = 0;
+    int32 EvidenceCanopyPlaced = 0;
+    int32 EvidenceRockExpected = 0;
+    int32 EvidenceRockPlaced = 0;
 };
 
 struct FZambeziPlacementCounts

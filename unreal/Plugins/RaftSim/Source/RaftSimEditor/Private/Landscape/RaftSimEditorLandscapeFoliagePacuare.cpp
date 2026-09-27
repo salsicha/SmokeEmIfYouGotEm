@@ -27,6 +27,25 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
     auto& GetLandscapeSlopeDegrees = Queries.GetLandscapeSlopeDegrees;
     auto& AddGroundedInstance = Queries.AddGroundedInstance;
 
+    // Target densities were set on the 600 m straight Upper Huacas reach; a
+    // longer (geographic) reach keeps them per metre of centreline, and the
+    // validation minimums scale the same way (FPacuarePlacementCounts).
+    const float PacuareLengthScale = FMath::Max(1.0f, Queries.CenterlineLengthM / 600.0f);
+    const auto Scaled = [PacuareLengthScale](int32 Count)
+    {
+        return 2 * FMath::RoundToInt(0.5f * static_cast<float>(Count) * PacuareLengthScale);
+    };
+    const int32 RockTarget = Scaled(PacuareOrganicShorelineRockTargetInstanceCount);
+    const int32 GroundTarget = Scaled(PacuareOrganicShorelineGroundCoverTargetInstanceCount);
+    const int32 FernTarget = Scaled(PacuareScannedFernTargetInstanceCount);
+    const int32 ShrubTarget = Scaled(PacuareOrganicShorelineShrubTargetInstanceCount);
+    const int32 LitterTarget = Scaled(PacuareForestFloorLeafLitterTargetInstanceCount);
+    const int32 WoodyTarget = Scaled(PacuareForestFloorWoodyTargetInstanceCount);
+    // The geographic reach has the real (steeper) gorge walls: search more
+    // candidates, further along the bank, for each instance instead of
+    // lowering the placement minimums.
+    const int32 SearchScale = PacuareLengthScale > 1.0f ? 5 : 1;
+    const float AlongJitterScale = PacuareLengthScale > 1.0f ? 4.0f : 1.0f;
     int32 PacuareShorelineRockPlacedCount = 0;
     int32 PacuareShorelineRockRejectedPlacementCount = 0;
     int32 PacuareShorelineGroundCoverPlacedCount = 0;
@@ -56,9 +75,9 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
             FMath::Max(1700.0f, ActiveRiverHalfWidth * 1.32f);
         constexpr int32 BankSideCount = 2;
         const int32 RockInstancesPerSide =
-            PacuareOrganicShorelineRockTargetInstanceCount / BankSideCount;
+            RockTarget / BankSideCount;
         for (int32 RockIndex = 0;
-             RockIndex < PacuareOrganicShorelineRockTargetInstanceCount;
+             RockIndex < RockTarget;
              ++RockIndex)
         {
             const float Side = RockIndex % 2 == 0 ? -1.0f : 1.0f;
@@ -78,10 +97,10 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
             float BestSlopeDegrees = TNumericLimits<float>::Max();
             float BestCenterlineDistanceCm = 0.0f;
             float BestScore = TNumericLimits<float>::Max();
-            for (int32 CandidateIndex = 0; CandidateIndex < 28;
+            for (int32 CandidateIndex = 0; CandidateIndex < 28 * SearchScale;
                  ++CandidateIndex)
             {
-                const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
+                const float CandidateLogicalX = BaseLogicalX + AlongJitterScale * FMath::Lerp(
                     -90.0f,
                     90.0f,
                     ZambeziVegetationUnitRandom(
@@ -195,8 +214,8 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
         }
 
         const int32 ForestFloorTargetCount =
-            PacuareForestFloorLeafLitterTargetInstanceCount +
-            PacuareForestFloorWoodyTargetInstanceCount;
+            LitterTarget +
+            WoodyTarget;
         if (PacuareForestFloorMeshes.Num() == 4 &&
             PacuareForestFloorInstances.Num() == 4)
         {
@@ -205,14 +224,14 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
                  ++ForestFloorIndex)
             {
                 const bool bWoody = ForestFloorIndex >=
-                    PacuareForestFloorLeafLitterTargetInstanceCount;
+                    LitterTarget;
                 const int32 FamilyIndex = bWoody
                     ? ForestFloorIndex -
-                        PacuareForestFloorLeafLitterTargetInstanceCount
+                        LitterTarget
                     : ForestFloorIndex;
                 const int32 FamilyTargetCount = bWoody
-                    ? PacuareForestFloorWoodyTargetInstanceCount
-                    : PacuareForestFloorLeafLitterTargetInstanceCount;
+                    ? WoodyTarget
+                    : LitterTarget;
                 const float Side = FamilyIndex % 2 == 0 ? -1.0f : 1.0f;
                 const int32 AlongIndex = FamilyIndex / BankSideCount;
                 const int32 InstancesPerSide = FamilyTargetCount / BankSideCount;
@@ -236,23 +255,27 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
                 float BestSlopeDegrees = TNumericLimits<float>::Max();
                 float BestCenterlineDistanceCm = 0.0f;
                 float BestScore = TNumericLimits<float>::Max();
+                // The geographic reach's real walls leave too few <= 32 degree
+                // spots near the banks in its gorge stretches; roots and
+                // deadwood lie on the same slopes as leaf litter there.
                 const float SlopeCeilingDegrees = bWoody
-                    ? PacuareForestFloorWoodySlopeCeilingDegrees
+                    ? (PacuareLengthScale > 1.0f ? PacuareForestFloorLeafLitterSlopeCeilingDegrees
+                                                 : PacuareForestFloorWoodySlopeCeilingDegrees)
                     : PacuareForestFloorLeafLitterSlopeCeilingDegrees;
                 for (int32 CandidateIndex = 0;
-                     CandidateIndex < 32;
+                     CandidateIndex < 32 * SearchScale * (bWoody ? 2 : 1);
                      ++CandidateIndex)
                 {
                     const int32 CandidateSeed =
                         (ForestFloorIndex + PacuareForestFloorDeterministicSeed) * 41 +
                         CandidateIndex;
-                    const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
+                    const float CandidateLogicalX = BaseLogicalX + AlongJitterScale * FMath::Lerp(
                         -150.0f,
                         150.0f,
                         ZambeziVegetationUnitRandom(CandidateSeed, 12227));
                     const float AdditionalOffset = FMath::Lerp(
                         bWoody ? 210.0f : 55.0f,
-                        bWoody ? 2350.0f : 2100.0f,
+                        bWoody ? (PacuareLengthScale > 1.0f ? 3500.0f : 2350.0f) : 2100.0f,
                         FMath::Pow(
                             ZambeziVegetationUnitRandom(CandidateSeed, 12239),
                             bWoody ? 1.22f : 1.58f));
@@ -378,21 +401,21 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
         }
 
         const int32 EcologyTargetCount =
-            PacuareOrganicShorelineGroundCoverTargetInstanceCount +
-            PacuareOrganicShorelineShrubTargetInstanceCount;
+            GroundTarget +
+            ShrubTarget;
         for (int32 EcologyIndex = 0;
              EcologyIndex < EcologyTargetCount;
              ++EcologyIndex)
         {
             const bool bShrub = EcologyIndex >=
-                PacuareOrganicShorelineGroundCoverTargetInstanceCount;
+                GroundTarget;
             const int32 FamilyIndex = bShrub
                 ? EcologyIndex -
-                    PacuareOrganicShorelineGroundCoverTargetInstanceCount
+                    GroundTarget
                 : EcologyIndex;
             const int32 FamilyTargetCount = bShrub
-                ? PacuareOrganicShorelineShrubTargetInstanceCount
-                : PacuareOrganicShorelineGroundCoverTargetInstanceCount;
+                ? ShrubTarget
+                : GroundTarget;
             const float Side = FamilyIndex % 2 == 0 ? -1.0f : 1.0f;
             const int32 AlongIndex = FamilyIndex / BankSideCount;
             const int32 InstancesPerSide = FamilyTargetCount / BankSideCount;
@@ -414,10 +437,10 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
             const float SlopeCeilingDegrees = bShrub
                 ? PacuareOrganicShorelineShrubSlopeCeilingDegrees
                 : PacuareOrganicShorelineGroundCoverSlopeCeilingDegrees;
-            for (int32 CandidateIndex = 0; CandidateIndex < 24;
+            for (int32 CandidateIndex = 0; CandidateIndex < 24 * SearchScale;
                  ++CandidateIndex)
             {
-                const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
+                const float CandidateLogicalX = BaseLogicalX + AlongJitterScale * FMath::Lerp(
                     -125.0f,
                     125.0f,
                     ZambeziVegetationUnitRandom(
@@ -590,13 +613,13 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
             TEXT("non-colliding procedural gap fill with no lithology, species, ")
             TEXT("ecology, survey, hydraulic, bathymetry, or raft-force authority.\n"),
             PacuareShorelineRockPlacedCount,
-            PacuareOrganicShorelineRockTargetInstanceCount,
+            RockTarget,
             PacuareShorelineGroundCoverPlacedCount,
-            PacuareOrganicShorelineGroundCoverTargetInstanceCount,
+            GroundTarget,
             PacuareScannedFernPlacedCount,
-            PacuareScannedFernTargetInstanceCount,
+            FernTarget,
             PacuareShorelineShrubPlacedCount,
-            PacuareOrganicShorelineShrubTargetInstanceCount,
+            ShrubTarget,
             PacuareShorelineRockRejectedPlacementCount,
             PacuareShorelineGroundCoverRejectedPlacementCount,
             PacuareShorelineShrubRejectedPlacementCount,
@@ -611,15 +634,248 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
             TEXT("grounded and non-colliding with no species, ecology, terrain, ")
             TEXT("water, hydraulic, bathymetric, or raft-force authority.\n"),
             PacuareForestFloorLeafLitterPlacedCount,
-            PacuareForestFloorLeafLitterTargetInstanceCount,
+            LitterTarget,
             PacuareForestFloorWoodyPlacedCount,
-            PacuareForestFloorWoodyTargetInstanceCount,
+            WoodyTarget,
             PacuareForestFloorRejectedPlacementCount,
             PacuareForestFloorDeterministicSeed,
             PacuareShorelineMinimumCenterlineDistanceCm,
             PacuareShorelineMaximumSlopeDegrees);
     }
 
-    return {PacuareShorelineRockPlacedCount, PacuareShorelineGroundCoverPlacedCount, PacuareScannedFernPlacedCount, PacuareShorelineShrubPlacedCount, PacuareForestFloorLeafLitterPlacedCount, PacuareForestFloorWoodyPlacedCount};
+    // Evidence dressing (physics/scripts/build_pacuare_evidence_dressing.py)
+    // written beside the terrain: the placement rows, or null (with a
+    // summary line) when the file is missing or has the wrong schema.
+    TArray<TSharedPtr<FJsonObject>> PlacementRoots;
+    const auto LoadEvidencePlacement = [&OutSummary, &PlacementRoots](const TCHAR* FileName, const TCHAR* Schema)
+        -> const TArray<TSharedPtr<FJsonValue>>*
+    {
+        const FString Path = FPaths::ConvertRelativePathToFull(FPaths::Combine(
+            GetRepoRoot(), TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017"), FileName));
+        FString Text;
+        TSharedPtr<FJsonObject> Root;
+        if (FFileHelper::LoadFileToString(Text, *Path))
+        {
+            const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Text);
+            FJsonSerializer::Deserialize(Reader, Root);
+        }
+        const TArray<TSharedPtr<FJsonValue>>* Rows = nullptr;
+        if (!Root.IsValid() || Root->GetStringField(TEXT("schema")) != Schema ||
+            !Root->TryGetArrayField(TEXT("instances"), Rows) || Rows->Num() == 0)
+        {
+            OutSummary += FString::Printf(TEXT("Pacuare evidence placement missing or invalid: %s\n"), *Path);
+            return nullptr;
+        }
+        PlacementRoots.Add(Root);
+        return Rows;
+    };
+
+    // Evidence canopy: orthophoto crown tops plus infill inside the IGN
+    // tree-cover polygons over the whole Landscape window, so the gorge walls
+    // carry the closed forest the photographs show instead of a bare drape.
+    // Positions come from the imagery; crown size (from spacing), heights and
+    // species are inferred. Own components keep its count and cost separable.
+    int32 EvidenceCanopyExpected = 0;
+    int32 EvidenceCanopyPlaced = 0;
+    if (bPacuare && bPhysicalCorridor && Context.BroadleafTreeMesh && Context.ConiferTreeMesh &&
+        Context.BroadleafTreeInstances && Context.ConiferTreeInstances)
+    {
+        const TArray<TSharedPtr<FJsonValue>>* Rows = LoadEvidencePlacement(
+            TEXT("huacas_evidence_canopy_placement.json"), TEXT("raftsim.pacuare.huacas_evidence_canopy.v1"));
+        if (!Rows)
+        {
+            EvidenceCanopyExpected = 1;
+        }
+        else
+        {
+            EvidenceCanopyExpected = Rows->Num();
+            UStaticMesh* const Meshes[2] = {Context.BroadleafTreeMesh, Context.ConiferTreeMesh};
+            UHierarchicalInstancedStaticMeshComponent* const Sources[2] = {
+                Context.BroadleafTreeInstances, Context.ConiferTreeInstances};
+            UHierarchicalInstancedStaticMeshComponent* Components[2] = {nullptr, nullptr};
+            FVector MeshSizes[2];
+            for (int32 Form = 0; Form < 2; ++Form)
+            {
+                Components[Form] = AddLandscapeCandidateInstancedMeshComponent(
+                    Context.World, Meshes[Form],
+                    FString::Printf(TEXT("RaftSim_PacuareEvidenceCanopy%s_pacuare"), Form == 0 ? TEXT("A") : TEXT("B")),
+                    true);
+                if (Components[Form])
+                {
+                    Components[Form]->GetOwner()->Tags.Append(
+                        {TEXT("RaftSimPacuareEvidenceCanopy"), TEXT("RaftSimImageryCanopyPositions"),
+                         TEXT("InferredVegetationNotSurveyedTrees")});
+                    for (int32 Slot = 0; Slot < Sources[Form]->GetNumMaterials(); ++Slot)
+                    {
+                        Components[Form]->SetMaterial(Slot, Sources[Form]->GetMaterial(Slot));
+                    }
+                }
+                MeshSizes[Form] = GetLandscapeCandidateEffectiveMeshBounds(Meshes[Form]).GetSize();
+            }
+            if (Components[0] && Components[1])
+            {
+                for (const TSharedPtr<FJsonValue>& Value : *Rows)
+                {
+                    const TArray<TSharedPtr<FJsonValue>>* Row = nullptr;
+                    if (!Value.IsValid() || !Value->TryGetArray(Row) || Row->Num() < 8)
+                    {
+                        continue;
+                    }
+                    // x_cm, y_cm, terrain_z_cm, crown_radius_m, height_m, form, kind, yaw_deg
+                    const float X = static_cast<float>((*Row)[0]->AsNumber());
+                    const float Y = static_cast<float>((*Row)[1]->AsNumber());
+                    const float RadiusM = static_cast<float>((*Row)[3]->AsNumber());
+                    const float HeightM = static_cast<float>((*Row)[4]->AsNumber());
+                    const int32 Form = FMath::Clamp(static_cast<int32>((*Row)[5]->AsNumber()), 0, 1);
+                    const float YawDegrees = static_cast<float>((*Row)[7]->AsNumber());
+                    const FVector& Size = MeshSizes[Form];
+                    const float CrownScale = 200.0f * RadiusM / FMath::Max(1.0f, FMath::Max(Size.X, Size.Y));
+                    const float HeightScale = FMath::Clamp(
+                        100.0f * HeightM / FMath::Max(1.0f, Size.Z), 0.8f * CrownScale, 1.8f * CrownScale);
+                    // Sink roots 30 cm so trunks meet the sloping Landscape.
+                    AddGroundedInstance(
+                        Components[Form], Meshes[Form], FVector2D(X, Y), GetLandscapeHeight(X, Y) - 30.0f,
+                        FRotator(0.0f, YawDegrees, 0.0f), FVector(CrownScale, CrownScale, HeightScale));
+                    ++EvidenceCanopyPlaced;
+                }
+            }
+            const int32 TreesPlaced = EvidenceCanopyPlaced;
+            // Inferred understory beside each tree (same file), so the trunk
+            // zone of the walls reads as layered rainforest.
+            const TArray<TSharedPtr<FJsonValue>>* UnderstoryRows = nullptr;
+            UHierarchicalInstancedStaticMeshComponent* UnderstoryComponent =
+                Context.ShrubMesh && Context.ShrubInstances
+                    ? AddLandscapeCandidateInstancedMeshComponent(
+                          Context.World, Context.ShrubMesh, TEXT("RaftSim_PacuareEvidenceUnderstory_pacuare"), true)
+                    : nullptr;
+            if (UnderstoryComponent && PlacementRoots.Last()->TryGetArrayField(TEXT("understory"), UnderstoryRows))
+            {
+                UnderstoryComponent->GetOwner()->Tags.Append(
+                    {TEXT("RaftSimPacuareEvidenceCanopy"), TEXT("InferredVegetationNotSurveyedTrees")});
+                for (int32 Slot = 0; Slot < Context.ShrubInstances->GetNumMaterials(); ++Slot)
+                {
+                    UnderstoryComponent->SetMaterial(Slot, Context.ShrubInstances->GetMaterial(Slot));
+                }
+                const FVector Size = GetLandscapeCandidateEffectiveMeshBounds(Context.ShrubMesh).GetSize();
+                EvidenceCanopyExpected += UnderstoryRows->Num();
+                for (const TSharedPtr<FJsonValue>& Value : *UnderstoryRows)
+                {
+                    const TArray<TSharedPtr<FJsonValue>>* Row = nullptr;
+                    if (!Value.IsValid() || !Value->TryGetArray(Row) || Row->Num() < 5)
+                    {
+                        continue;
+                    }
+                    // x_cm, y_cm, height_m, width_m, yaw_deg
+                    const float X = static_cast<float>((*Row)[0]->AsNumber());
+                    const float Y = static_cast<float>((*Row)[1]->AsNumber());
+                    const float WidthScale = 100.0f * static_cast<float>((*Row)[3]->AsNumber()) /
+                        FMath::Max(1.0f, static_cast<float>(FMath::Max(Size.X, Size.Y)));
+                    const float HeightScale = 100.0f * static_cast<float>((*Row)[2]->AsNumber()) /
+                        FMath::Max(1.0f, static_cast<float>(Size.Z));
+                    AddGroundedInstance(
+                        UnderstoryComponent, Context.ShrubMesh, FVector2D(X, Y), GetLandscapeHeight(X, Y) - 20.0f,
+                        FRotator(0.0f, static_cast<float>((*Row)[4]->AsNumber()), 0.0f),
+                        FVector(WidthScale, WidthScale, HeightScale));
+                    ++EvidenceCanopyPlaced;
+                }
+            }
+            else
+            {
+                EvidenceCanopyExpected += 1;
+            }
+            OutResult.DressingFoliageInstanceCount += EvidenceCanopyPlaced;
+            OutResult.DressingCanopyTreeInstanceCount += TreesPlaced;
+            OutResult.DressingUnderstoryInstanceCount += EvidenceCanopyPlaced - TreesPlaced;
+            OutSummary += FString::Printf(
+                TEXT("Pacuare evidence canopy: %d trees and %d understory shrubs, %d/%d rows (orthophoto crown tops ")
+                TEXT("and infill inside IGN forestal2017 tree cover; crown size, heights, species and understory ")
+                TEXT("inferred), Landscape-grounded, non-colliding.\n"),
+                TreesPlaced, EvidenceCanopyPlaced - TreesPlaced, EvidenceCanopyPlaced, EvidenceCanopyExpected);
+        }
+    }
+
+    // Emergent-rock shells: the photographed rocks are Landscape bumps of the
+    // evidence bed (collision and solver obstacle) that render as faceted
+    // prisms at the Landscape spacing. Compact rocks get a reviewed rock mesh
+    // fitted to the footprint ellipse, from below the surface to just above
+    // the bump. Visual only, like the shoreline rocks whose materials they use.
+    int32 EvidenceRockExpected = 0;
+    int32 EvidenceRockPlaced = 0;
+    if (bPacuare && bPhysicalCorridor && ReviewedRockMeshes.Num() == 6 &&
+        PacuareOrganicShorelineRockInstances.Num() == 6)
+    {
+        const TArray<TSharedPtr<FJsonValue>>* Rows = LoadEvidencePlacement(
+            TEXT("huacas_evidence_rock_placement.json"), TEXT("raftsim.pacuare.huacas_evidence_rocks.v1"));
+        if (!Rows)
+        {
+            EvidenceRockExpected = 1;
+        }
+        else
+        {
+            EvidenceRockExpected = Rows->Num();
+            UHierarchicalInstancedStaticMeshComponent* Components[6] = {};
+            FVector MeshSizes[6];
+            bool bComponentsReady = true;
+            for (int32 Variant = 0; Variant < 6; ++Variant)
+            {
+                Components[Variant] = AddLandscapeCandidateInstancedMeshComponent(
+                    Context.World, ReviewedRockMeshes[Variant],
+                    FString::Printf(TEXT("RaftSim_PacuareEvidenceRock%d_pacuare"), Variant), true);
+                if (!Components[Variant] || !PacuareOrganicShorelineRockInstances[Variant])
+                {
+                    bComponentsReady = false;
+                    continue;
+                }
+                Components[Variant]->GetOwner()->Tags.Append(
+                    {TEXT("RaftSimPacuareEvidenceRock"), TEXT("RaftSimImageryRockPositions"),
+                     TEXT("RaftSimNoTerrainCollisionOrWaterAuthority")});
+                const UHierarchicalInstancedStaticMeshComponent* Source = PacuareOrganicShorelineRockInstances[Variant];
+                for (int32 Slot = 0; Slot < Source->GetNumMaterials(); ++Slot)
+                {
+                    Components[Variant]->SetMaterial(Slot, Source->GetMaterial(Slot));
+                }
+                MeshSizes[Variant] = GetLandscapeCandidateEffectiveMeshBounds(ReviewedRockMeshes[Variant]).GetSize();
+            }
+            for (const TSharedPtr<FJsonValue>& Value : *Rows)
+            {
+                const TArray<TSharedPtr<FJsonValue>>* Row = nullptr;
+                if (!bComponentsReady || !Value.IsValid() || !Value->TryGetArray(Row) || Row->Num() < 8)
+                {
+                    continue;
+                }
+                // x_cm, y_cm, base_z_cm, length_m, width_m, height_m, yaw_deg, variant
+                const int32 Variant = FMath::Clamp(static_cast<int32>((*Row)[7]->AsNumber()), 0, 5);
+                const FVector& Size = MeshSizes[Variant];
+                const FVector Scale(
+                    100.0f * static_cast<float>((*Row)[3]->AsNumber()) / FMath::Max(1.0f, static_cast<float>(Size.X)),
+                    100.0f * static_cast<float>((*Row)[4]->AsNumber()) / FMath::Max(1.0f, static_cast<float>(Size.Y)),
+                    100.0f * static_cast<float>((*Row)[5]->AsNumber()) / FMath::Max(1.0f, static_cast<float>(Size.Z)));
+                AddGroundedInstance(
+                    Components[Variant], ReviewedRockMeshes[Variant],
+                    FVector2D((*Row)[0]->AsNumber(), (*Row)[1]->AsNumber()),
+                    static_cast<float>((*Row)[2]->AsNumber()),
+                    FRotator(0.0f, static_cast<float>((*Row)[6]->AsNumber()), 0.0f), Scale);
+                ++EvidenceRockPlaced;
+            }
+            OutSummary += FString::Printf(
+                TEXT("Pacuare emergent-rock shells: %d/%d reviewed rock meshes fitted to photographed rock ")
+                TEXT("footprints (heights inferred); visual only over the Landscape rock bumps.\n"),
+                EvidenceRockPlaced, EvidenceRockExpected);
+        }
+    }
+
+    FPacuarePlacementCounts Counts{PacuareShorelineRockPlacedCount, PacuareShorelineGroundCoverPlacedCount, PacuareScannedFernPlacedCount,
+                                   PacuareShorelineShrubPlacedCount, PacuareForestFloorLeafLitterPlacedCount, PacuareForestFloorWoodyPlacedCount};
+    Counts.RockMinimum = Scaled(PacuareOrganicShorelineRockMinimumInstanceCount);
+    Counts.GroundCoverMinimum = Scaled(PacuareOrganicShorelineGroundCoverMinimumInstanceCount);
+    Counts.FernMinimum = Scaled(PacuareScannedFernMinimumInstanceCount);
+    Counts.ShrubMinimum = Scaled(PacuareOrganicShorelineShrubMinimumInstanceCount);
+    Counts.LeafLitterMinimum = Scaled(PacuareForestFloorLeafLitterMinimumInstanceCount);
+    Counts.WoodyMinimum = Scaled(PacuareForestFloorWoodyMinimumInstanceCount);
+    Counts.EvidenceCanopyExpected = EvidenceCanopyExpected;
+    Counts.EvidenceCanopyPlaced = EvidenceCanopyPlaced;
+    Counts.EvidenceRockExpected = EvidenceRockExpected;
+    Counts.EvidenceRockPlaced = EvidenceRockPlaced;
+    return Counts;
 }
 }

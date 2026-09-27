@@ -234,12 +234,13 @@ bool FRaftSimAssertRiverMapCommand::Update()
         bPacuareReferenceRun || bColoradoHanceReferenceRun ||
         bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
     // The geographic Hance reach draws its whole 160 m cooked lateral span
-    // (LivePresentationWidthM) on a 1.5 m lattice: 161 x 108 vertices.
-    const float ExpectedPresentationSpacingM = (bZambeziReferenceRun || bColoradoHanceReferenceRun)
+    // (LivePresentationWidthM) on a 1.5 m lattice: 161 x 108 vertices; the
+    // geographic Pacuare Huacas reach its 96 m span: 161 x 65.
+    const float ExpectedPresentationSpacingM = (bZambeziReferenceRun || bColoradoHanceReferenceRun || bPacuareReferenceRun)
         ? 1.5f : (bUsesOneMetreReferencePresentation ? 1.0f : 0.5f);
-    const int32 ExpectedPresentationVertices = bZambeziReferenceRun
+    const int32 ExpectedPresentationVertices = (bZambeziReferenceRun || bPacuareReferenceRun)
         ? 10465 : (bColoradoHanceReferenceRun ? 17388 : (bUsesOneMetreReferencePresentation ? 23377 : 92833));
-    const int32 ExpectedPresentationTriangles = bZambeziReferenceRun
+    const int32 ExpectedPresentationTriangles = (bZambeziReferenceRun || bPacuareReferenceRun)
         ? 20480 : (bColoradoHanceReferenceRun ? 34240 : (bUsesOneMetreReferencePresentation ? 46080 : 184320));
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
@@ -1160,6 +1161,22 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Pacuare launch keeps every person in the raft"),
             PlayerRaft->GetSwimmerCount(),
             0);
+        // Contour-derived terrain beyond the Landscape: one render-only mesh.
+        int32 PacuareBackdropCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimPacuareHuacasContourBackdrop")))
+            {
+                continue;
+            }
+            ++PacuareBackdropCount;
+            const UStaticMeshComponent* Backdrop = (*It)->FindComponentByClass<UStaticMeshComponent>();
+            Test->TestTrue(TEXT("Pacuare contour backdrop has its mesh"), Backdrop && Backdrop->GetStaticMesh());
+            Test->TestTrue(
+                TEXT("Pacuare contour backdrop never collides"),
+                Backdrop && Backdrop->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+        }
+        Test->TestEqual(TEXT("Pacuare places one contour terrain backdrop"), PacuareBackdropCount, 1);
 
         int32 HumidAtmosphereActorCount = 0;
         int32 HumidityDirectionalLightCount = 0;
@@ -1271,14 +1288,22 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 continue;
             }
             Test->TestEqual(
-                TEXT("Pacuare loads the Upper Huacas cooked package"),
+                TEXT("Pacuare loads the evidence-based Huacas cooked package"),
                 (*It)->CookedFieldsDir,
                 FString(TEXT("physics/data/real_world/pacuare_river_costa_rica/"
-                             "scenario_upper_huacas/cooked_flow_fields")));
+                             "scenario_huacas_evidence_2017/cooked_flow_fields")));
             Test->TestEqual(
-                TEXT("Pacuare loads the rain-fed runnable planning band"),
+                TEXT("Pacuare loads the 45 m3/s planning band"),
                 (*It)->FlowBand,
-                FName(TEXT("rainfed_runnable_planning")));
+                FName(TEXT("rainfed_runnable_45cms")));
+            Test->TestTrue(
+                TEXT("Pacuare streams a moving solver crop over the 2.3 km reach"),
+                (*It)->bEnableMovingWindowStreaming &&
+                    (*It)->StreamingManifestPath.EndsWith(TEXT("scenario_huacas_evidence_2017/runtime/moving_water_streaming.json")));
+            Test->TestTrue(
+                TEXT("Pacuare draws the full cooked lateral span, cooked far field and observed whitewater"),
+                FMath::IsNearlyEqual((*It)->LivePresentationWidthM, 96.0f) && (*It)->bEnableCookedFarFieldWater &&
+                    (*It)->ObservedWhitewaterGain > 0.0f);
             Test->TestFalse(
                 TEXT("Pacuare preserves source station/lateral coordinates"),
                 (*It)->bRecenterHydraulicCrux);
@@ -1286,8 +1311,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Pacuare binds the local-world vertical datum map"),
                 (*It)->CoordinateMapPath,
                 FString(TEXT("physics/data/real_world/pacuare_river_costa_rica/"
-                             "terrain/upper_huacas_visual/"
-                             "upper_huacas_runtime_coordinate_map.json")));
+                             "terrain/huacas_evidence_2017/"
+                             "huacas_evidence_runtime_coordinate_map.json")));
             Test->TestTrue(
                 TEXT("Pacuare Landscape owns runtime terrain"),
                 (*It)->bMapProvidesTerrain);
@@ -1378,14 +1403,17 @@ bool FRaftSimAssertRiverMapCommand::Update()
             }
             ++CaptureOnlyWaterCount;
         }
+        // The geographic reach (like Hance) keeps one capture-only water
+        // surface; its whitewater is the live foam floored by the observed
+        // (orthophoto) field, not a baked solver-visualization foam surface.
         Test->TestEqual(
-            TEXT("Pacuare has capture-only static water and foam surfaces"),
+            TEXT("Pacuare has one capture-only static water surface"),
             CaptureOnlyWaterCount,
-            2);
-        Test->TestEqual(
-            TEXT("Pacuare has one cooked-field-derived capture foam surface"),
-            SolverFieldFoamCount,
             1);
+        Test->TestEqual(
+            TEXT("Pacuare has no baked solver-visualization foam surface"),
+            SolverFieldFoamCount,
+            0);
 
         int32 OrganicShorelineActorCount = 0;
         int32 OrganicShorelineRockActorCount = 0;
@@ -1543,28 +1571,30 @@ bool FRaftSimAssertRiverMapCommand::Update()
             6);
         Test->TestTrue(
             TEXT("Pacuare organic shoreline retains dense moss-rock structure"),
-            OrganicShorelineRockInstanceCount >= 2350);
+            OrganicShorelineRockInstanceCount >= 9118);
         Test->TestEqual(
             TEXT("Pacuare organic shoreline has one procedural plus four scanned ground-cover actors"),
             OrganicShorelineGroundCoverActorCount,
             5);
         Test->TestTrue(
             TEXT("Pacuare organic shoreline retains dense rainforest-floor cover"),
-            OrganicShorelineGroundCoverInstanceCount >= 4700);
+            OrganicShorelineGroundCoverInstanceCount >= 18236);
         Test->TestEqual(
             TEXT("Pacuare uses all four reviewed scanned fern variants"),
             ScannedFernActorCount,
             4);
         Test->TestTrue(
             TEXT("Pacuare replaces most near-bank ground cover with scanned fern morphology"),
-            ScannedFernInstanceCount >= 3300);
+            ScannedFernInstanceCount >= 12804);
         Test->TestEqual(
             TEXT("Pacuare organic shoreline has one shrub actor"),
             OrganicShorelineShrubActorCount,
             1);
+        // Minimums scale with the reach (2,328 m against the 600 m reach they
+        // were set on; RaftSimEditorLandscapeFoliagePacuare.cpp).
         Test->TestTrue(
             TEXT("Pacuare organic shoreline retains a layered shrub transition"),
-            OrganicShorelineShrubInstanceCount >= 1050);
+            OrganicShorelineShrubInstanceCount >= 4074);
         Test->TestEqual(
             TEXT("Pacuare forest floor has four dedicated solid morphology actors"),
             ForestFloorActorCount,
@@ -1573,26 +1603,72 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Pacuare forest floor has two folded-leaf litter variants"),
             ForestFloorLeafActorCount,
             2);
-        Test->TestEqual(
-            TEXT("Pacuare forest floor places the complete leaf-litter population"),
-            ForestFloorLeafInstanceCount,
-            2600);
+        Test->TestTrue(
+            TEXT("Pacuare forest floor places at least its leaf-litter minimum"),
+            ForestFloorLeafInstanceCount >= 9118);
         Test->TestEqual(
             TEXT("Pacuare forest floor has one buttress-root actor"),
             ForestFloorRootActorCount,
             1);
-        Test->TestEqual(
-            TEXT("Pacuare forest floor places half its woody targets as roots"),
-            ForestFloorRootInstanceCount,
-            350);
+        Test->TestTrue(
+            TEXT("Pacuare forest floor places at least its woody minimum"),
+            ForestFloorRootInstanceCount + ForestFloorDeadwoodInstanceCount >= 2406);
+        Test->TestTrue(
+            TEXT("Pacuare forest floor splits its woody targets between roots and deadwood"),
+            FMath::Abs(ForestFloorRootInstanceCount - ForestFloorDeadwoodInstanceCount) <=
+                (ForestFloorRootInstanceCount + ForestFloorDeadwoodInstanceCount) / 10);
         Test->TestEqual(
             TEXT("Pacuare forest floor has one deadwood actor"),
             ForestFloorDeadwoodActorCount,
             1);
-        Test->TestEqual(
-            TEXT("Pacuare forest floor places half its woody targets as deadwood"),
-            ForestFloorDeadwoodInstanceCount,
-            350);
+
+        // Evidence canopy over the whole Landscape window
+        // (build_pacuare_evidence_dressing.py: orthophoto crowns plus infill
+        // inside IGN tree cover, about 27,000 trees, and an inferred
+        // understory shrub beside each).
+        int32 EvidenceCanopyActorCount = 0;
+        int32 EvidenceCanopyInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimPacuareEvidenceCanopy")))
+            {
+                continue;
+            }
+            const UHierarchicalInstancedStaticMeshComponent* Instances =
+                (*It)->FindComponentByClass<UHierarchicalInstancedStaticMeshComponent>();
+            Test->TestTrue(
+                TEXT("Pacuare evidence canopy is visual-only, labelled inferred vegetation"),
+                Instances && Instances->GetCollisionEnabled() == ECollisionEnabled::NoCollision &&
+                    (*It)->Tags.Contains(TEXT("InferredVegetationNotSurveyedTrees")));
+            EvidenceCanopyInstanceCount += Instances ? Instances->GetInstanceCount() : 0;
+            ++EvidenceCanopyActorCount;
+        }
+        Test->TestEqual(TEXT("Pacuare evidence canopy has two tree forms and an understory"), EvidenceCanopyActorCount, 3);
+        Test->TestTrue(
+            TEXT("Pacuare evidence canopy covers the gorge walls"),
+            EvidenceCanopyInstanceCount >= 40000);
+
+        // Rock-mesh shells over the photographed emergent rocks
+        // (huacas_evidence_rock_placement.json, 719 single boulders).
+        int32 EvidenceRockActorCount = 0;
+        int32 EvidenceRockInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimPacuareEvidenceRock")))
+            {
+                continue;
+            }
+            const UHierarchicalInstancedStaticMeshComponent* Instances =
+                (*It)->FindComponentByClass<UHierarchicalInstancedStaticMeshComponent>();
+            Test->TestTrue(
+                TEXT("Pacuare emergent-rock shells are visual only"),
+                Instances && Instances->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+            EvidenceRockInstanceCount += Instances ? Instances->GetInstanceCount() : 0;
+            ++EvidenceRockActorCount;
+        }
+        Test->TestEqual(TEXT("Pacuare emergent-rock shells use six rock variants"), EvidenceRockActorCount, 6);
+        Test->TestTrue(TEXT("Pacuare photographed emergent rocks carry mesh shells"), EvidenceRockInstanceCount >= 700);
+
         return true;
     }
 

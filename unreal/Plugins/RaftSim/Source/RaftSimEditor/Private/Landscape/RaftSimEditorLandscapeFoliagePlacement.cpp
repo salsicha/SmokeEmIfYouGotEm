@@ -223,7 +223,9 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
         GetConditionedWaterWorldZ,
         GetLandscapeHeight,
         GetLandscapeSlopeDegrees,
-        AddGroundedInstance};
+        AddGroundedInstance,
+        PhysicalCenterline.Num() >= 2
+            ? PhysicalCenterline.Last().StationMeters - PhysicalCenterline[0].StationMeters : 0.0f};
 
     int32 RunnableLaunchTalusPlacedCount = 0;
     int32 RunnableLaunchTalusRejectedPlacementCount = 0;
@@ -236,7 +238,9 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     // DEM (emergent rock tops) and in the labelled imagery-located inferred
     // boulders of its solver bed; a procedural scatter would add unmeasured,
     // non-hydraulic rocks, some of them in the channel.
-    const bool bEvidenceRockTerrain = Spec.RiverId == TEXT("colorado_river");
+    // Pacuare Huacas likewise carries orthophoto-located emergent rocks and
+    // whitewater-located inferred boulders in its solver bed.
+    const bool bEvidenceRockTerrain = Spec.RiverId == TEXT("colorado_river") || Spec.RiverId == TEXT("pacuare");
     const int32 BoulderCount = bEvidenceRockTerrain
         ? 0
         : bPhysicalCorridor
@@ -2447,6 +2451,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     const bool bRunnableLaunchEcologyStrataValidated = ZambeziCounts.bRunnableLaunchEcologyStrataValidated;
 
     const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
+        PacuareCounts.EvidenceCanopyPlaced +
         PacuareShorelineGroundCoverPlacedCount +
         PacuareShorelineShrubPlacedCount +
         TemperateNearBankPlacedCount +
@@ -2469,22 +2474,24 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
         OutResult.DressingFoliageInstanceCount == ExpectedFoliageInstanceCount &&
         (!bPacuare ||
          PacuareShorelineRockPlacedCount >=
-             PacuareOrganicShorelineRockMinimumInstanceCount) &&
+             PacuareCounts.RockMinimum) &&
         (!bPacuare ||
          PacuareShorelineGroundCoverPlacedCount >=
-             PacuareOrganicShorelineGroundCoverMinimumInstanceCount) &&
+             PacuareCounts.GroundCoverMinimum) &&
         (!bPacuare ||
          PacuareScannedFernPlacedCount >=
-             PacuareScannedFernMinimumInstanceCount) &&
+             PacuareCounts.FernMinimum) &&
         (!bPacuare ||
          PacuareShorelineShrubPlacedCount >=
-             PacuareOrganicShorelineShrubMinimumInstanceCount) &&
+             PacuareCounts.ShrubMinimum) &&
         (!bPacuare ||
          PacuareForestFloorLeafLitterPlacedCount >=
-             PacuareForestFloorLeafLitterMinimumInstanceCount) &&
+             PacuareCounts.LeafLitterMinimum) &&
         (!bPacuare ||
          PacuareForestFloorWoodyPlacedCount >=
-             PacuareForestFloorWoodyMinimumInstanceCount) &&
+             PacuareCounts.WoodyMinimum) &&
+        PacuareCounts.EvidenceCanopyPlaced == PacuareCounts.EvidenceCanopyExpected &&
+        PacuareCounts.EvidenceRockPlaced == PacuareCounts.EvidenceRockExpected &&
         (!bOpaqueTemperate ||
          TemperateWaterlinePlacedCount >=
              TemperateWaterlineStructureMinimumInstanceCount) &&
@@ -2526,6 +2533,26 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
          DryScarpOutcropMaximumSlopeDegrees <=
              ZambeziDryScarpOutcropSlopeCeilingDegrees + 0.01f) &&
         OutResult.bDressingFoliageMaterialsValidated;
+    if (!OutResult.bDressingValidated)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Dressing checks for %s: boulders %d/%d, foliage %d/%d, pacuare rock %d/%d ground %d/%d fern %d/%d shrub %d/%d litter %d/%d woody %d/%d, "
+                 "evidence canopy %d/%d rocks %d/%d, canopy %d, understory %d, launch strata %d, materials %d.\n"),
+            *Spec.RiverId, OutResult.DressingBoulderInstanceCount,
+            BoulderCount + TemperateWaterlinePlacedCount + ChilkoShorelineGravelPlacedCount + PacuareShorelineRockPlacedCount +
+                RunnableLaunchTalusPlacedCount + DryScarpOutcropPlacedCount,
+            OutResult.DressingFoliageInstanceCount, ExpectedFoliageInstanceCount,
+            PacuareShorelineRockPlacedCount, PacuareCounts.RockMinimum,
+            PacuareShorelineGroundCoverPlacedCount, PacuareCounts.GroundCoverMinimum,
+            PacuareScannedFernPlacedCount, PacuareCounts.FernMinimum,
+            PacuareShorelineShrubPlacedCount, PacuareCounts.ShrubMinimum,
+            PacuareForestFloorLeafLitterPlacedCount, PacuareCounts.LeafLitterMinimum,
+            PacuareForestFloorWoodyPlacedCount, PacuareCounts.WoodyMinimum,
+            PacuareCounts.EvidenceCanopyPlaced, PacuareCounts.EvidenceCanopyExpected,
+            PacuareCounts.EvidenceRockPlaced, PacuareCounts.EvidenceRockExpected,
+            OutResult.DressingCanopyTreeInstanceCount, OutResult.DressingUnderstoryInstanceCount,
+            bRunnableLaunchEcologyStrataValidated ? 1 : 0, OutResult.bDressingFoliageMaterialsValidated ? 1 : 0);
+    }
     OutSummary += FString::Printf(
         TEXT("Landscape biome dressing for %s: %d %s, %d foliage instances (%d canopy, %d understory), %d %s foliage slots; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d understory=%d.\n"),
         *Spec.RiverId,

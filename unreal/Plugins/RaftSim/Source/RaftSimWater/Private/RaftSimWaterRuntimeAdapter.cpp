@@ -1964,10 +1964,11 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
     }
     const FVector2D PositionM(WorldPositionCm.X / 100.0, RiverWorldYSign * WorldPositionCm.Y / 100.0);
     double BestDistanceSquared = TNumericLimits<double>::Max();
+    double BestLateralAbsM = TNumericLimits<double>::Max();
     int32 BestSegment = INDEX_NONE;
     double BestAlpha = 0.0;
     const auto EvaluateSegment =
-        [this, &PositionM, &BestDistanceSquared, &BestSegment, &BestAlpha](
+        [this, &PositionM, &BestDistanceSquared, &BestLateralAbsM, &BestSegment, &BestAlpha](
             int32 SegmentIndex)
     {
         if (SegmentIndex < 0 || SegmentIndex + 1 >= RiverCoordinatePoints.Num())
@@ -2048,9 +2049,25 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
             Alpha = 0.5 * (LowerAlpha + UpperAlpha);
         }
         const double DistanceSquared = ReconstructionDistanceSquared(Alpha);
-        if (DistanceSquared < BestDistanceSquared)
+        if (DistanceSquared == TNumericLimits<double>::Max())
         {
-            BestDistanceSquared = DistanceSquared;
+            return;
+        }
+        // On a tightly meandering reach (Pacuare Huacas: 122 m minimum
+        // radius against the 256 m corridor) several segments' lateral lines
+        // pass through the same point and all reconstruct it exactly; the
+        // candidate order then chose a stretch a kilometre away (the launch
+        // at station 280 resolved to 1392 m, 239.5 m off the centreline).
+        // Among exact reconstructions, keep the one nearest the centreline.
+        const FVector2D Center = FMath::Lerp(PointA.LocalPositionM, PointB.LocalPositionM, Alpha);
+        const FVector2D Left = FMath::Lerp(PointA.LeftNormal, PointB.LeftNormal, Alpha).GetSafeNormal();
+        const double LateralAbsM = FMath::Abs(FVector2D::DotProduct(PositionM - Center, Left));
+        constexpr double ExactToleranceSquaredM2 = 1.0e-4;  // 1 cm
+        if (DistanceSquared + ExactToleranceSquaredM2 < BestDistanceSquared ||
+            (DistanceSquared <= BestDistanceSquared + ExactToleranceSquaredM2 && LateralAbsM < BestLateralAbsM))
+        {
+            BestDistanceSquared = FMath::Min(DistanceSquared, BestDistanceSquared);
+            BestLateralAbsM = LateralAbsM;
             BestSegment = SegmentIndex;
             BestAlpha = Alpha;
         }

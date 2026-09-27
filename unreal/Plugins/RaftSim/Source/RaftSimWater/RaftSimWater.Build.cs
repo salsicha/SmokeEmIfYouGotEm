@@ -72,7 +72,10 @@ public class RaftSimWater : ModuleRules
             // Evidence-based Colorado Hance (L_Hance): cooked field, its
             // render-only presentation baseline and the moving-window manifest.
             "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance_evidence_2021/cooked_flow_fields",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance_evidence_2021/runtime"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance_evidence_2021/runtime",
+            // Evidence-based Pacuare Huacas-Pinball (L_UpperHuacas).
+            "physics/data/real_world/pacuare_river_costa_rica/scenario_huacas_evidence_2017/cooked_flow_fields",
+            "physics/data/real_world/pacuare_river_costa_rica/scenario_huacas_evidence_2017/runtime"
         };
         foreach (string RelativeRoot in RuntimeRoots)
         {
@@ -103,7 +106,8 @@ public class RaftSimWater : ModuleRules
         }
         foreach (string CoordinateMapRelative in new[] {
             "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/river_coordinate_map.json",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_runtime_coordinate_map.json" })
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_runtime_coordinate_map.json",
+            "physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_runtime_coordinate_map.json" })
         {
             string CoordinateMapSource = Path.Combine(RepoRoot, CoordinateMapRelative);
             if (File.Exists(CoordinateMapSource))

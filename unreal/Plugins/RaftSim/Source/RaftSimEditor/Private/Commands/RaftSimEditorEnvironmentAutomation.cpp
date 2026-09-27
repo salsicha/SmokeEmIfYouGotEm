@@ -527,8 +527,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             bUsesColoradoHanceDefaultLitWater ||
             bUsesFutaleufuTerminatorDefaultLitWater ||
             bUsesChilkoLavaCanyonDefaultLitWater;
+        // The evidence-based Pacuare Huacas Landscape takes its colour from the
+        // orthophoto drape; the organic rainforest palette is only built when
+        // that texture is absent (mirrors LoadOrCreateLandscapeCandidateMaterial).
+        const bool bUsesPacuareEvidenceDrape =
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare") &&
+            LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/PacuareRun/Terrain/T_RaftSim_PacuareHuacas_EvidenceDrape."
+                     "T_RaftSim_PacuareHuacas_EvidenceDrape")) != nullptr;
         const bool bUsesPacuareOrganicRainforestSurface =
-            Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare") && !bUsesPacuareEvidenceDrape;
         const bool bUsesSouthForkOrganicFoothillSurface =
             Candidate.PreviewSpec.RiverId == TEXT("american_south_fork");
         // The evidence-based Hance Landscape takes its colour from the 2021
@@ -547,7 +555,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
         const bool bUsesDefaultLitLandscape =
             bUsesSouthForkOrganicFoothillSurface ||
-            bUsesPacuareOrganicRainforestSurface ||
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
             Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
@@ -1010,6 +1018,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? TEXT("south_fork_v1_three_scale_world_space_dry_grass_oak_litter_granitic_soil_and_slope_aware_weathered_granite_response")
                 : (bUsesPacuareOrganicRainforestSurface
                 ? TEXT("pacuare_v1_three_scale_world_space_canopy_soil_moss_leaf_litter_and_slope_aware_wet_rock_response")
+                : bUsesPacuareEvidenceDrape
+                ? TEXT("pacuare_huacas_evidence_2014_2017_orthophoto_drape_sentinel2_fill_albedo_scaled_no_procedural_palette")
                 : (bUsesColoradoEvidenceDrape
                        ? TEXT("colorado_hance_evidence_2021_orthophoto_drape_albedo_scaled_no_procedural_palette")
                        : bUsesColoradoOrganicHanceSurface

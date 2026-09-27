@@ -60,8 +60,12 @@ Scripts (numpy only) in `physics/scripts/`:
 | v3 | + textured reference, corrected outlet | +0.39 / 0.44 m | 52% | 0.95 | 9.1% / 1.2% |
 | v5 (shipped) | two bed calibration steps | **+0.04 / 0.18 m** | **68%** | **0.95** | 10.4% / 1.7% |
 
-v5 conserves discharge (section flows 229.4 m3/s median against 226.5, within
-1.3%) and is settled (p95 surface change 1.6 mm over the last 150 s). The v0
+v5 conveys the target discharge: the solver's exact face flux
+(`solver_face_discharge.py`, measured 2026-09-27) is 226.5 / 226.4 /
+226.2 m3/s at the west / mid / east sections against 226.5. The manifest's
+`discharge_steady_m3s` (229.4-231.6) is the cell-centre h·u sum, which
+overstates transport on wet/dry reaches; see pacuare-huacas-evidence.md. The
+next Hance export should record the face flux. v5 is settled (p95 surface change 1.6 mm over the last 150 s). The v0
 outlet stage came from the clear-water DEM and was 1.6 m low; it drained both
 downstream pools. The waterline pairs put the scour pool at about 750.2 m;
 v5 cooks it at 750.2-750.3 m. Calm-water levels are known only to about
