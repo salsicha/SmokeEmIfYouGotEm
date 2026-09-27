@@ -1042,6 +1042,8 @@ private:
     /** Generic breaking-aeration Froude onset and ramp (config; 0.78 / 1.25 by default). */
     float ResolvedFoamFroudeOnset = 0.78f;
     float ResolvedFoamFroudeRamp = 1.25f;
+    // Observed-whitewater foam gain; 0 unless the config enables it and the field loaded.
+    float ResolvedObservedWhitewaterGain = 0.0f;
     float ResolvedPresentationHydraulicReliefScale = 1.0f;
     float ResolvedRaftLocalFluidWindowMeters = 100.0f;
     float ResolvedRaftLocalFluidHeightfieldStrength = 0.0f;

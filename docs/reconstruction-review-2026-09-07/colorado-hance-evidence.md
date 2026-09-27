@@ -74,9 +74,42 @@ so the residual is structural, not bed calibration.
 
 Whitewater lace and patch floors from 0.12 to 0.30 turned most of the main
 rapid into one white-grey sheet, because the cooked foam field is broad. The
-shipped 0.06 / 0.04 keeps green water between filaments, but underplays the
-imagery's massed white. Concentrating the source foam is the lever, not the
+0.06 / 0.04 floors kept green water between filaments, but underplayed the
+imagery's massed white. Concentrating the source foam was the lever, not the
 material floors.
+
+**Observed whitewater (2026-09-27).** No cooked-field quantity places the
+foam where the photographs show it.
+`physics/scripts/audit_hance_whitewater_indicators.py` scores 32 candidates
+against the imagery foam mask in the rapids (650-1,500 m) at matched area:
+- Froude and the shipped Froude-onset foam reach IoU 0.07, with precision
+  0.13 against a 12% base rate.
+- The best candidates (flow convergence, streamwise deceleration, Froude
+  drop, advected surface slope) reach only IoU 0.13-0.14.
+- The audit is archived as `evidence/whitewater_indicator_audit.json`.
+
+A 2 m field over an inferred bed cannot resolve where individual holes and
+crest caps sit. The photographs were taken at the cooked flow, so their
+whitewater extent is used as **appearance evidence**:
+- `export_hance_observed_whitewater.py` bakes the foam mask onto the cooked
+  station/lateral grid: the fraction of 4 x 4 sub-points per cell, then one
+  smoothing pass.
+- It writes `observed_whitewater_steady_8000cfs_2021.bin` (RSBF v1 layout),
+  recorded in the cooked manifest.
+- At run time (`ARaftSimRiverWaterConfig::ObservedWhitewaterGain`, 0.9 for
+  Hance) it **floors the displayed foam** and the far-field cue.
+
+It is not a foam source. The photo already shows foam after it has drifted
+downstream, and feeding it to the transported foam state smeared the whole
+rapid into one white sheet (about 70% cover against the photo's 14%). It never
+reaches forces, contact or gameplay. With the concentrated source, the generic
+Froude foam returns to its default onset (Fr 0.78, ramp 1.25), and the lace
+and patch floors rise to 0.30 / 0.10. The main and lower rapids now show
+rounded white masses where the photo has them, with green water between.
+
+![Imagery (left), 0.06 lace floor with Froude foam (middle), observed whitewater (right); main rapid at 800 m (top) and lower rapid at 1,320 m (bottom)](colorado-hance-evidence/whitewater-observed-800-1320m-imagery-before-after.png)
+
+![Entering the main rapid at 700 m, chase and side views](colorado-hance-evidence/whitewater-observed-eye-700m.png)
 
 Evidence, validation figures and the calibration file are archived in
 `scenario_hance_evidence_2021/evidence/`.
@@ -107,11 +140,13 @@ Evidence, validation figures and the calibration file are archived in
   hole under the drawn strip, and shows a whitewater cue where the cooked
   speed and Froude are high. It is render only and rebuilds in about 6 ms
   when the strip recentres.
-- Foam calibration against the imagery at the same flow: the generic aeration
-  onset moves from Fr 0.78 (ramp 1.25) to Fr 0.6 (ramp 0.5), with a thin lace
-  floor, via new `ARaftSimRiverWaterConfig` fields. Default values keep every
-  other map unchanged. With the old onset, the main rapid showed 0.3% visible
-  foam against 14% in the imagery.
+- Foam calibration against the imagery at the same flow (first pass,
+  2026-09-26): the generic aeration onset moved from Fr 0.78 (ramp 1.25) to
+  Fr 0.6 (ramp 0.5), with a thin lace floor, via new
+  `ARaftSimRiverWaterConfig` fields. With the old onset, the main rapid showed
+  0.3% visible foam against 14% in the imagery. This pass was superseded by the
+  observed whitewater field (above), which restores the default onset.
+  Default values keep every other map unchanged.
 - Terrain presentation:
   - The drape is scaled to albedo (median 0.11).
   - Under water, the drape uses a darkened continuation of the bank colours
@@ -208,9 +243,12 @@ backdrop is placed and that it does not collide. That test and
 
 ## Limits (open)
 
-- **Whitewater appearance** is well short of the imagery. The foam sits in the
-  right places, but it renders as fine lace over green water rather than the
-  imagery's massed white crests and holes over dark tongues.
+- **Whitewater** now takes its extent from the photographs (appearance
+  evidence), so it is only valid at the photographed flow. The solver does
+  not predict it, and it does not move with the raft's own disturbance. The
+  water between the white masses is paler green than the photo's dark
+  tongues and pools, and the 2 m cooked surface has no hole or crest relief
+  under the white.
 - Rapid bed and boulder heights are inferred; velocities are not measured.
   The bed is 2014 and the surface 2021.
 - The grid has no metric terms: cell lengths are 0.87-1.17 of true on bends.

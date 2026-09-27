@@ -104,6 +104,13 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     float LiveWhitewaterPatchOutsideFloor = -1.0f;
 
+    /** Foam source from the photographed whitewater at the cooked flow
+     * (observed_whitewater_<band>.bin beside the cooked fields; curved maps
+     * only). Render-only appearance evidence: the gain scales the observed
+     * fraction into the live foam and far-field cue. 0 disables. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    float ObservedWhitewaterGain = 0.0f;
+
     /** Full-reach production terrain exists in the map; suppress local bed proxy. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment")
     bool bMapProvidesTerrain = false;

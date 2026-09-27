@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import struct
 import re
 from pathlib import Path
 
@@ -122,6 +123,26 @@ def test_catalog_and_runtime_match_the_exported_terrain() -> None:
     assert "scenario_hance_evidence_2021/cooked_flow_fields" in geometry
     assert 'FName(TEXT("steady_8000cfs_2021"))' in geometry
     assert "constexpr float kColoradoHanceLaunchStationM = 520.0f;" in geometry
+
+
+def test_observed_whitewater_field_is_labelled_appearance_evidence() -> None:
+    manifest = _json(COOKED / "manifest.json")
+    (band,) = manifest["bands"]
+    observed = band["observed_whitewater"]
+    path = COOKED / observed["file"]
+    assert _sha(path) == observed["sha256"]
+    assert "not predicted by the solver" in observed["provenance"] and "never gameplay" in observed["use"]
+    header = path.read_bytes()[:24]
+    magic, version, width, rows = struct.unpack("<IIii", header[:16])
+    grid = manifest["grid"]
+    assert (magic, version, width, rows) == (0x52534246, 1, grid["ny"], grid["nx"])
+    stream = _json(DATA / "scenario_hance_evidence_2021/runtime/moving_water_streaming.json")
+    assert stream["full_reach_transit_seed"]["cooked_fields_manifest_sha256"] == _sha(COOKED / "manifest.json")
+    audit = _json(DATA / "scenario_hance_evidence_2021/evidence/whitewater_indicator_audit.json")
+    best = max(r["iou"] for r in audit["indicators"].values())
+    assert best < 0.2 and audit["indicators"]["froude"]["iou"] < best  # why the photo, not the cook, places it
+    geometry = (EDITOR / "Landscape/RaftSimEditorLandscapeGeometry.cpp").read_text(encoding="utf-8")
+    assert "WaterConfig->ObservedWhitewaterGain = 0.9f;" in geometry
 
 
 def test_launch_station_is_in_deep_cooked_water() -> None:

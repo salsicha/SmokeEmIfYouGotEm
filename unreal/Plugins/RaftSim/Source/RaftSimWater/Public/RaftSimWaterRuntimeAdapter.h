@@ -453,6 +453,17 @@ public:
         FVector2D StationLateralM, FRaftSimWaterSample& OutSample,bool bCacheAtlasStencil=false) const;
 
     /**
+     * Optional render-only observed-whitewater field in station/lateral
+     * space, in the RSBF v1 layout; its energy channel holds the whitewater
+     * fraction (0-1) photographed at the cooked flow. Appearance evidence
+     * only: it never reaches buoyancy, forces, contact or gameplay.
+     */
+    bool LoadObservedWhitewaterFieldFromFile(const FString& AbsolutePath);
+    bool HasObservedWhitewaterField() const { return ObservedWhitewaterField.IsValid(); }
+    /** Observed whitewater fraction; 0 outside the field or its wet mask. */
+    float SampleObservedWhitewaterAtRiverCoordinates(FVector2D StationLateralM) const;
+
+    /**
      * Flow-warped presentation wave clock pushed by the visible water surface
      * each frame. The coupled swell and band phases consume it so they stay
      * paired with the rendered WPO when waves accelerate in fast water.
@@ -663,6 +674,7 @@ private:
     float RaftSupportBreakingStationSpacingMeters = 1.0f;
     FSupportBandField RaftSupportBandField;
     FSupportBandField PresentationBaselineField;
+    FSupportBandField ObservedWhitewaterField;
     float PresentationWaveClockSeconds = -1.0f;
 
 #if RAFTSIM_HAS_LIVE_SOLVER

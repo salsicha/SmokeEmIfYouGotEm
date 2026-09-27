@@ -1115,6 +1115,66 @@ bool URaftSimWaterRuntimeAdapter::LoadPresentationBaselineFieldFromFile(
     return true;
 }
 
+bool URaftSimWaterRuntimeAdapter::LoadObservedWhitewaterFieldFromFile(
+    const FString& AbsolutePath)
+{
+    ObservedWhitewaterField.Reset();
+    TUniquePtr<FArchive> Reader(IFileManager::Get().CreateFileReader(*AbsolutePath));
+    if (!Reader.IsValid())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim observed whitewater: none at %s"), *AbsolutePath);
+        return false;
+    }
+    uint32 Magic = 0;
+    uint32 Version = 0;
+    *Reader << Magic;
+    *Reader << Version;
+    int32 Width = 0;
+    int32 RowCount = 0;
+    if (Magic == 0x52534246u /* 'RSBF' */ && Version == 1u)
+    {
+        *Reader << Width;
+        *Reader << RowCount;
+        *Reader << ObservedWhitewaterField.LateralOriginM;
+        *Reader << ObservedWhitewaterField.LateralSpacingM;
+    }
+    if (Width < 2 || Width > 512 || RowCount < 2 || RowCount > 200000)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim observed whitewater: bad header in %s"), *AbsolutePath);
+        ObservedWhitewaterField.Reset();
+        return false;
+    }
+    ObservedWhitewaterField.Width = Width;
+    *Reader << ObservedWhitewaterField.RowStationsM;
+    *Reader << ObservedWhitewaterField.ElevationAbsM;
+    *Reader << ObservedWhitewaterField.Energy;
+    *Reader << ObservedWhitewaterField.Wet;
+    if (Reader->IsError() || !ObservedWhitewaterField.IsValid() ||
+        ObservedWhitewaterField.RowStationsM.Num() != RowCount)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim observed whitewater: malformed body in %s"), *AbsolutePath);
+        ObservedWhitewaterField.Reset();
+        return false;
+    }
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim observed whitewater: %d rows x %d columns, stations %.0f-%.0f m; render-only appearance evidence"),
+        RowCount, Width, ObservedWhitewaterField.RowStationsM[0], ObservedWhitewaterField.RowStationsM.Last());
+    return true;
+}
+
+float URaftSimWaterRuntimeAdapter::SampleObservedWhitewaterAtRiverCoordinates(
+    FVector2D StationLateralM) const
+{
+    float ElevationAbsM = 0.0f;
+    float Fraction = 0.0f;
+    if (!ObservedWhitewaterField.IsValid() ||
+        !ObservedWhitewaterField.Sample(StationLateralM.X, StationLateralM.Y, ElevationAbsM, Fraction))
+    {
+        return 0.0f;
+    }
+    return FMath::Clamp(Fraction, 0.0f, 1.0f);
+}
+
 bool URaftSimWaterRuntimeAdapter::
     SamplePresentationBaselineFieldAtRiverCoordinates(
         FVector2D StationLateralM,

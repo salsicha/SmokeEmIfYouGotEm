@@ -407,7 +407,12 @@ void ARaftSimWaterSurfaceActor::UpdateCurvedFarFieldWater(float CarrierDrawCover
                 // whitewater cue back from it (a Froude from these derived
                 // depth/speed pairs never exceeds 0.58).
                 const float Energy = FMath::Clamp((Sample.DepthMeters - 0.8f) / 1.6f, 0.0f, 1.0f);
-                const float FoamCue = FoamScale * 0.72f * FMath::SmoothStep(0.7f, 0.95f, Energy);
+                float FoamCue = FoamScale * 0.72f * FMath::SmoothStep(0.7f, 0.95f, Energy);
+                if (ResolvedObservedWhitewaterGain > 0.0f)
+                {
+                    FoamCue = FMath::Max(FoamCue, FoamScale * ResolvedObservedWhitewaterGain *
+                        WaterAdapter->SampleObservedWhitewaterAtRiverCoordinates(P));
+                }
                 Colors[I] = FLinearColor(FoamCue, FMath::Clamp(DepthM[I] / 4.0f, 0.0f, 1.0f),
                     FMath::Clamp(Speed / 8.0f, 0.0f, 1.0f), 1.0f);
             }

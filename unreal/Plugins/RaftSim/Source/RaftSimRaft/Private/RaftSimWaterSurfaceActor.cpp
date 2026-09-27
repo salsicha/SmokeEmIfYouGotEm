@@ -1967,6 +1967,18 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                             *RiverWaterConfig->FlowBand.ToString())));
             WaterAdapter->LoadPresentationBaselineFieldFromFile(
                 BaselineFieldPath);
+            ResolvedObservedWhitewaterGain = 0.0f;
+            if (RiverWaterConfig->ObservedWhitewaterGain > 0.0f &&
+                WaterAdapter->LoadObservedWhitewaterFieldFromFile(
+                    URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(
+                        FPaths::Combine(
+                            RiverWaterConfig->CookedFieldsDir,
+                            FString::Printf(
+                                TEXT("observed_whitewater_%s.bin"),
+                                *RiverWaterConfig->FlowBand.ToString())))))
+            {
+                ResolvedObservedWhitewaterGain = FMath::Clamp(RiverWaterConfig->ObservedWhitewaterGain, 0.0f, 1.0f);
+            }
         }
     }
     BoulderFootprintsSLR.Reset();
@@ -7096,6 +7108,23 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // This is not a conservation, visual-quality or performance gate.
         UE_LOG(LogTemp,Verbose,TEXT("FoamBFECC corrected=%d limited=%d absolute_change=%.9g water_seconds=%.9g"),
             Correction.CorrectedCount,Correction.LimitedCount,Change,NextFoamClock.Last);
+    }
+    // Photographed whitewater at the cooked flow (appearance evidence): the
+    // 2 m cooked field cannot place the holes and crest caps where the photo
+    // shows them. The photo already shows foam after its downstream travel,
+    // so it floors the displayed foam only; feeding it to the transported
+    // state smeared it into one sheet down the rapid.
+    if (ResolvedObservedWhitewaterGain > 0.0f && bUsesCurvedRiverCoordinates &&
+        RiverCoordinatesM.Num() == VertexColors.Num())
+    {
+        for (int32 I = 0; I < VertexColors.Num(); ++I)
+        {
+            if (WetVertexMask[I])
+            {
+                VertexColors[I].R = FMath::Max(VertexColors[I].R, ResolvedObservedWhitewaterGain *
+                    WaterAdapter->SampleObservedWhitewaterAtRiverCoordinates(RiverCoordinatesM[I]));
+            }
+        }
     }
     if(bFoamBFECCReview)FoamFieldWetMask=WetVertexMask;
     FoamField = MoveTemp(NewFoamField);

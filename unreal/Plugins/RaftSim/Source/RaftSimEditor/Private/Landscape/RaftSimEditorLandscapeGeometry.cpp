@@ -1916,10 +1916,16 @@ bool AddLandscapeCandidateRunnableGameplay(
         // with ramp 0.5 gives 6% before downstream foam transport, which in
         // play fills the rapid's working water; a thin lace floor keeps green
         // tongues between white crests (0.3 turned the rapid into one sheet).
-        WaterConfig->LiveFoamFroudeOnset = 0.6f;
-        WaterConfig->LiveFoamFroudeRamp = 0.5f;
-        WaterConfig->LiveWhitewaterLaceFloor = 0.06f;
-        WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.04f;
+        WaterConfig->LiveFoamFroudeOnset = 0.78f;
+        WaterConfig->LiveFoamFroudeRamp = 1.25f;
+        WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
+        WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
+        // No cooked-field indicator places the whitewater where the 2021
+        // imagery shows it (best matched-area IoU 0.14, Froude 0.07;
+        // audit_hance_whitewater_indicators.py). The photographed extent at
+        // the same flow is therefore a foam source of its own (appearance
+        // evidence, export_hance_observed_whitewater.py).
+        WaterConfig->ObservedWhitewaterGain = 0.9f;
     }
     if (bZambezi)
     {

@@ -84,8 +84,11 @@ public class RaftSimWater : ModuleRules
             foreach (string SourceFile in Directory.GetFiles(SourceRoot, "*", SearchOption.AllDirectories))
             {
                 string Extension = Path.GetExtension(SourceFile).ToLowerInvariant();
+                // Render-only .bin fields: the presentation baseline and the
+                // observed-whitewater appearance field (RSBF layout).
                 bool bPresentationBaseline = Extension == ".bin" &&
-                    Path.GetFileName(SourceFile).StartsWith("support_band_field_", StringComparison.OrdinalIgnoreCase);
+                    (Path.GetFileName(SourceFile).StartsWith("support_band_field_", StringComparison.OrdinalIgnoreCase) ||
+                     Path.GetFileName(SourceFile).StartsWith("observed_whitewater_", StringComparison.OrdinalIgnoreCase));
                 if (Extension != ".json" && Extension != ".npy" && !bPresentationBaseline)
                 {
                     continue;
