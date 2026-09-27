@@ -93,6 +93,16 @@ asset, and saves only the existing ground and water-config packages. The current
 rock actor, materials, coordinate maps and runtime solver settings remain intact.
 Native execution, fresh reload and rebuilt normal play are still required.
 
+The native preparation/checker and guarded installer are committed locally as
+`dfe96dd21`. The same live solve's completed 75s checkpoint passes independent
+state and bank audits: all 5,382,400 cells finite/nonnegative, maximum depth
+2.913112 m, maximum speed 8.208481 m/s, and all 86,720 artificial-bank cells
+exactly dry. Maximum step conservation residual is 8.99e-9 m3. Receipts:
+`tmp/troublemaker-envelope75-state-v1-20260927.json` and
+`tmp/troublemaker-envelope75-banks-v1-20260927.json`. These are intermediate
+safety checks, not settling or playable acceptance; retain PID31092/session3804
+and deferred native session25615 until their actual terminal results.
+
 Next inspect this same solve's completion and audits, regional storage/surface
 coverage, then export matching runtime fields. Reuse the already verified new
 ground mesh; do not repeat the unchanged ground-only import. Verify the actual
