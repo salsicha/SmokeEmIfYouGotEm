@@ -131,6 +131,27 @@ def test_visible_carrier_spray_lookup_uses_rendered_triangles_without_physics_qu
     assert 'Sampler(CentreM+Along*D+Across*A,Point)' in footprint
 
 
+def test_south_fork_shifted_emitters_use_own_visible_height_before_emission_gate():
+    # Source wiring guard, NOT the C++ fixture or an engine measurement.
+    vfx = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp').read_text()
+    refresh = vfx.split('void ARaftSimWaterVfxActor::RefreshRapidAerosol()', 1)[1].split(
+        'void ARaftSimWaterVfxActor::RefreshVfx(', 1)[0]
+    placement = refresh.split('FVector Origin = SurfaceOrigin +', 1)[1].split(
+        'const FVector DriftDirection', 1)[0]
+    assert 'bShiftedCartesianAnchors = bSouthForkCrestOwnedSpray && WaterAdapter &&' in placement
+    assert 'WaterAdapter->HasCartesianWaterCoordinates();' in placement
+    assert 'if (bShiftedCartesianAnchors && bWetCrest)' in placement
+    assert 'WorldToRiverCoordinates(World,SL,Tangent,Left)' in placement
+    assert 'SampleVisibleCarrierAtRiverCoordinates(SL,Out)' in placement
+    assert 'bWetCrest = RaftSimSprayEmitterAnchor::Attach(Origin,6.,SampleEmitterCarrier) &&' in placement
+    assert 'RaftSimSprayEmitterAnchor::Attach(RollerOrigin,3.,SampleEmitterCarrier) &&' in placement
+    assert 'RaftSimSprayEmitterAnchor::Attach(CrestSprayOrigin,3.,SampleEmitterCarrier)' in placement
+    assert 'SampleRaftSupport' not in placement and 'LineTrace' not in placement
+    assert refresh.index('RaftSimSprayEmitterAnchor::Attach') < refresh.index('const bool bEnabled =')
+    assert 'SprayEmitterAnchorAudit slot=%d emitter=%s enabled=%d sampled=%d' in refresh
+    assert 'bSampled ? EmitterOrigins[Emitter].Z-Carrier.Z : 0.' in refresh
+
+
 def test_carrier_triangle_lookup_matches_diagonal_and_linear_grade():
     # Both triangles agree on the shared edge, preserve a linear grade and
     # use nonnegative weights, including all four exact grid corners.

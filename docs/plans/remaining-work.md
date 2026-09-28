@@ -1,5 +1,47 @@
 # Remaining requested work
 
+September28 UTC publication capture COMPLETE; same-CSV analysis recovered from
+a stale duplicate-column option without repeating the game or weakening gates.
+Three events are exactly interpolation+recenter; recenter publication25–31ms.
+Timing stillFAILS: p9555.2201ms/max108.504ms/two>100ms. Original dependent spray
+owner stopped before building; ONE verified recovery session9712/wrapper24660
+is now building the same frozen sources and will run six native tests. Original
+failure receipts retained. See [actual attribution and recovery](../reconstruction-review-2026-09-07/publication-reason-instrumentation.md).
+
+September28 UTC1350-to1800 continuation and final audits COMPLETE, session14006
+exit0. All three state/bank checkpoint pairs pass, but Troublemaker8..9km still
+drains (-4.219,-2.192,-0.687m3/s over successive150s intervals);1127/6782bins
+exceed0.25m captured-surface error. No settling acceptance, bed refit or playable
+field promotion. Existing owner4504 has advanced to the isolated8310 publication
+capture; owner15924 waits to build/test the spray repair. No additional cook.
+See [terminal evidence and next action](../reconstruction-review-2026-09-07/envelope1350-to1800.md).
+
+September28 UTC spray capture-log verification is prepared:20 synthetic parser
+tests pass. It checks complete source-site triplets and enabled/sampled6/3/3cm
+clearances at each emitter's own position, not particle landing or appearance.
+Actual engine evidence remains pending behind the existing cook/capture/build
+owners; all six build inputs are unchanged. No duplicate job or playable update.
+See [capture check scope](../reconstruction-review-2026-09-07/spray-shifted-emitter-anchors.md).
+
+September28 UTC one spray-repair follow-through is QUEUED: session71849,
+wrapper15924 (05:10:09UTC), waiting on exact capture4504. It will verify that
+capture's successful terminal receipt and unchanged inputs, then build once
+(single worker) and run six native spray tests. It does NOT run motion, claim
+visual/performance acceptance, package or commit. Six source inputs are frozen;
+do not edit/rebuild them or duplicate its tests while this owner is live. Recipe
+`tmp/follow-spray-emitter-anchor-v1-20260928.ps1`, receipt
+`tmp/spray-emitter-anchor-follow-through-v1-20260928.json`. Cook33552/39708 and
+capture4504 remain unchanged and live. See [validation sequence](../reconstruction-review-2026-09-07/spray-shifted-emitter-anchors.md).
+
+September28 UTC shifted-emitter spray anchor repair is PREPARED/UNBUILT in the
+working tree: normal Cartesian South Fork sources will sample visible water at
+each emitter's shifted XY instead of retaining crest-centre Z.37 source guards
+pass; new native fixture, build, actual motion/cost and package delivery remain
+PENDING. Do not commit it as verified or rebuild while cook33552/39708 and queued
+capture4504/session60320 own the frozen DLL. Removed45 obsolete v5-v13 generated
+container files only, reclaiming27.1GiB; v14/v15r2, captures, source and active
+jobs preserved. See [pending runtime sequence and cleanup receipt](../reconstruction-review-2026-09-07/spray-shifted-emitter-anchors.md).
+
 September28 UTC prescribed-fan auxiliary transport now retains the signed
 exterior factor/difference work, with explicit interior/flux-coordinate work
 and spatial RHS sign.79 exact/reference regressions pass, including independent

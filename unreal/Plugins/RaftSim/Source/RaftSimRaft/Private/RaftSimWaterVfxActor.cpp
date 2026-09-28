@@ -1,5 +1,6 @@
 #include "RaftSimWaterVfxActor.h"
 #include "RaftSimSpraySourceFootprint.h"
+#include "RaftSimSprayEmitterAnchor.h"
 
 #include "Camera/PlayerCameraManager.h"
 #include "Components/InstancedStaticMeshComponent.h"
@@ -3043,8 +3044,35 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                     0.0f,
                     1.0f)
                 : 1.0f;
-            const FVector Origin = SurfaceOrigin +
+            FVector Origin = SurfaceOrigin +
                 Downstream * 35.0f + FVector::UpVector * (bCrestOwnedSpray ? 6.0f : 38.0f);
+            FVector RollerOrigin = SurfaceOrigin +
+                -Downstream * 12.0f + FVector::UpVector * (bCrestOwnedSpray ? 3.0f : 32.0f);
+            const float LateralBias =
+                bCrestOwnedSpray ? 0.12f * FMath::Sin(Site.ShapeSeed)
+                    : ((PoolIndex & 1) == 0 ? -0.12f : 0.12f);
+            FVector CrestSprayOrigin = SurfaceOrigin +
+                -Downstream * 12.0f + Across * (LateralBias * 85.0f) +
+                FVector::UpVector * (bCrestOwnedSpray ? 3.0f : 60.0f);
+            const bool bShiftedCartesianAnchors = bSouthForkCrestOwnedSpray && WaterAdapter &&
+                WaterAdapter->HasCartesianWaterCoordinates();
+            if (bShiftedCartesianAnchors && bWetCrest)
+            {
+                // Cartesian world/river mapping is affine, not a nearest-bend
+                // projection. Leave legacy curved-coordinate placement alone.
+                // The bounded footprint above establishes source eligibility,
+                // but its centre height is not the height at these three
+                // horizontally shifted emitters. Preserve XY and clearances.
+                const auto SampleEmitterCarrier=[&](const FVector& World,FVector& Out)
+                {
+                    FVector2D SL;FVector Tangent,Left;
+                    return WaterAdapter && WaterAdapter->WorldToRiverCoordinates(World,SL,Tangent,Left) &&
+                        BreakingSurface->SampleVisibleCarrierAtRiverCoordinates(SL,Out);
+                };
+                bWetCrest = RaftSimSprayEmitterAnchor::Attach(Origin,6.,SampleEmitterCarrier) &&
+                    RaftSimSprayEmitterAnchor::Attach(RollerOrigin,3.,SampleEmitterCarrier) &&
+                    RaftSimSprayEmitterAnchor::Attach(CrestSprayOrigin,3.,SampleEmitterCarrier);
+            }
             const FVector DriftDirection =
                 (Downstream * 0.86f + FVector::UpVector * 0.28f).GetSafeNormal();
             const bool bEnabled = Intensity > 0.12f && bWetCrest && CrestOwnership > 0.01f;
@@ -3059,9 +3087,26 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 UE_LOG(LogTemp,Display,TEXT("SprayAttachmentAudit slot=%d owned=%d horizontal=%d visible=%d footprint_checked=%d wet_footprint=%d enabled=%d site_z_cm=%.6f visible_z_cm=%.6f origin_z_cm=%.6f aerosol_centre_gap_cm=%.6f roller_centre_gap_cm=%.6f spray_centre_gap_cm=%.6f"),
                     PoolIndex,bSouthForkCrestOwnedSpray,bHorizontalSourcePlane,bVisibleAnchor,bSouthForkCrestOwnedSpray,bWetCrest,bEnabled,
                     Site.WorldPositionCm.Z,VisibleAnchor.Z,SurfaceOrigin.Z,
-                    SurfaceOrigin.Z-VisibleAnchor.Z+(bCrestOwnedSpray?6.f:38.f),
-                    SurfaceOrigin.Z-VisibleAnchor.Z+(bCrestOwnedSpray?3.f:32.f),
-                    SurfaceOrigin.Z-VisibleAnchor.Z+(bCrestOwnedSpray?3.f:60.f));
+                    Origin.Z-VisibleAnchor.Z,
+                    RollerOrigin.Z-VisibleAnchor.Z,
+                    CrestSprayOrigin.Z-VisibleAnchor.Z);
+                if (bShiftedCartesianAnchors)
+                {
+                    const FVector EmitterOrigins[3]={Origin,RollerOrigin,CrestSprayOrigin};
+                    const TCHAR* EmitterNames[3]={TEXT("aerosol"),TEXT("roller"),TEXT("crest")};
+                    for(int32 Emitter=0;Emitter<3;++Emitter)
+                    {
+                        FVector2D SL;FVector Tangent,Left,Carrier=FVector::ZeroVector;
+                        const bool bSampled=WaterAdapter &&
+                            WaterAdapter->WorldToRiverCoordinates(EmitterOrigins[Emitter],SL,Tangent,Left) &&
+                            BreakingSurface->SampleVisibleCarrierAtRiverCoordinates(SL,Carrier);
+                        // Unavailable/disabled records cannot establish clearance.
+                        UE_LOG(LogTemp,Display,TEXT("SprayEmitterAnchorAudit slot=%d emitter=%s enabled=%d sampled=%d x_cm=%.6f y_cm=%.6f z_cm=%.6f carrier_z_cm=%.6f clearance_cm=%.6f"),
+                            PoolIndex,EmitterNames[Emitter],bEnabled,bSampled,
+                            EmitterOrigins[Emitter].X,EmitterOrigins[Emitter].Y,EmitterOrigins[Emitter].Z,
+                            Carrier.Z,bSampled ? EmitterOrigins[Emitter].Z-Carrier.Z : 0.);
+                    }
+                }
                 FVector2D Projected = FVector2D::ZeroVector;
                 FVector Tangent, Left;
                 const bool bProjected = WaterAdapter && WaterAdapter->WorldToRiverCoordinates(
@@ -3082,8 +3127,6 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 FMath::Lerp(18.0f, 52.0f, Intensity) * OwnedDensity, bHorizontalSourcePlane);
             ActiveRapidNiagaraCount += bEnabled ? 1 : 0;
 
-            const FVector RollerOrigin = SurfaceOrigin +
-                -Downstream * 12.0f + FVector::UpVector * (bCrestOwnedSpray ? 3.0f : 32.0f);
             const FVector RollerDirection = ComputeRapidRollerLaunchDirection(
                 Site.WorldVelocityMps);
             SetNiagaraEmission(
@@ -3103,12 +3146,6 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             // aerosol drifts downstream. A deterministic alternating lateral
             // bias avoids six identical vertical fountains without inventing
             // any new hydraulic or collision authority.
-            const float LateralBias =
-                bCrestOwnedSpray ? 0.12f * FMath::Sin(Site.ShapeSeed)
-                    : ((PoolIndex & 1) == 0 ? -0.12f : 0.12f);
-            const FVector CrestSprayOrigin = SurfaceOrigin +
-                -Downstream * 12.0f + Across * (LateralBias * 85.0f) +
-                FVector::UpVector * (bCrestOwnedSpray ? 3.0f : 60.0f);
             const FVector CrestSprayDirection = ComputeRapidCrestSprayLaunchDirection(
                 Site.WorldVelocityMps, LateralBias);
             SetNiagaraEmission(
