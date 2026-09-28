@@ -19,7 +19,45 @@ claim, an indefinite cook or a change to the installed450s water. Compare local
 storage, stage and discharge after terminal audits; do not automatically promote
 the latest state or call continued growth a pass. No new terrain or water is added.
 
-## Verified preparation and live owner
+## Completed continuation: local drainage persists
+
+Session5446 is TERMINAL exit0; native28956 completed at
+2026-09-28T02:10:38.452344Z. Its original wrapper finished every queued audit
+and records `final_audits_completed=true`. Do not restart these owners.
+All1050/1200/1350s snapshots pass finite/nonnegative-state checks across5,382,400
+cells and all86,720 artificial-bank cells remain exactly dry. Maximum per-step
+conservation residual is9.48411e-9m3. Final depth/speed maxima are2.998553m and
+5.003005m/s; no clipping or state repair was introduced.
+
+Troublemaker's nearest-route8..9km storage rates are-7.957974,-7.710275 and
+-6.272571m3/s in900..1050,1050..1200 and1200..1350 respectively. Drainage is now
+easing, but remains substantial. The final interval's common-wet median stage
+change is-0.020748m. Over the full450s interval the band loses3,291.122971m3,
+with common-wet median stage change-0.062744m. These are attribution regions,
+not cross-section fluxes; do not label the band settled or fit its inferred bed
+to this transient stage.
+
+Whole-domain final outflow44.442450m3/s is closer to inflow45.306955m3/s,
+but that aggregate does not eliminate opposing regional storage changes.
+The discharge/bed report retains1,050 of6,782 bins with surface discrepancy
+over0.25m and a0.963627 cooked-wet fraction of the captured mask. Those comparisons
+are not a new measurement of discharge or underwater geometry. No fields are
+promoted: normal v14 still uses the450s v8 bundle.
+
+Reports: `tmp/troublemaker-envelope{1050,1200,1350}-{state,banks}-v1-20260928.json`,
+`tmp/troublemaker-envelope1350-storage-v1-20260928.json`, and
+`tmp/troublemaker-envelope1350-analysis-v1-20260928/report.json`. The durable
+owner receipt below binds each state/bank report by hash. The already-owned
+v14 validator11644 has advanced to normal Boot/menu profiling after the owner
+exited; motion owner32388 remains queued behind validation. No new cook is
+started while these actual-game checks run.
+
+Storage-report SHA256:
+`22f5c4cc87f56e74e2d7cc66970dca055830f24f49181a7c4819ee68e9a496f4`.
+Discharge/bed-report SHA256:
+`3945af928c348cd949b6dc2e6df9e0f0a18ff29b6aa29d4c1e1ed8ab12cf4f20`.
+
+## Verified preparation and original owner
 
 The existing restart preparer copied the original completed900s h/u/v fields
 without resetting or smoothing them. Its source manifest is

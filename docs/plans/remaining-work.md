@@ -1,5 +1,24 @@
 # Remaining requested work
 
+September28 UTC v14 delivery/validation COMPLETE: normal Boot/menu passes the
+current20FPS timing gate (p9548.7699ms/no>100ms frames), but rapid8310 fails
+(63.689ms/five hitches) and11520 fails(52.9986ms/one hitch). All use the same
+rebuilt executable and normal configuration, with zero logged runtime errors.
+Packaged approach capture confirms the corrected plunge default and174m of
+passive traversal; inspected6..80s views still show flat foam/weak breaking.
+No visual, collision, shoreline, settled-field or full-river acceptance. All
+hydraulic, validation and motion owners below are now terminal; do not duplicate
+them. See [v14 results and next work](../reconstruction-review-2026-09-07/v14-playable-review.md).
+
+September28 UTC hydraulic owner5446/33852/28956 COMPLETE exit0 with all final
+audits completed. All1050/1200/1350s states and artificial banks pass; NOT settled.
+Troublemaker8..9km storage rates are-7.958,-7.710,-6.273m3/s: local drainage eases
+but persists. Do not promote fields or restart the completed cook. Normal v14
+retains450s v8 data. Existing validator85971/11644 has now started normal
+Boot/menu profiling after hydraulic completion; motion2149/32388 waits behind
+it. See [completed continuation](../reconstruction-review-2026-09-07/envelope900-to1350.md).
+These current owner states supersede earlier live/waiting descriptions below.
+
 September28 UTC retained-timing follow-through: normal v13 has exactly one
 counted crest update per audited frame. Geometry-changing frames increase from
 about half to70% late in the run, while their crest-update cost increases from

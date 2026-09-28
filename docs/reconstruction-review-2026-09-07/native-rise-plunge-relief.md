@@ -99,6 +99,14 @@ Native snapshots are not promoted, and v13 still uses the450s fields.
 
 ## Playable delivery and next gates
 
+Completion update: package, hydraulic audits, all three isolated timings and
+packaged motion capture are terminal. Normal Boot/menu timing passes;8310 and
+11520 fail. The actual packaged profile confirms the default correction, and
+sampled boat views still fail convincing breaking/roller appearance. See the
+[completed v14 review](v14-playable-review.md) for exact gates, clocks, hashes
+and inspected views. This supersedes the live/waiting owner descriptions below;
+do not restart those recipes.
+
 Update: v14 package82230 COMPLETE exit0, end01:41:33.1043673Z;
 BuildCookRun619.77s, frozen inputs unchanged. Inner executable SHA256
 `a10b03e6821373e16c22caaddd97def834c012639b234f4cf101a89f958cba6b`.
