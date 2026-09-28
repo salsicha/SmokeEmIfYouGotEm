@@ -1,5 +1,12 @@
 # Remaining requested work
 
+September28 UTC prescribed-pressure auxiliary connections now retain explicit
+flux-coordinate work and fixed-flux geometry rates;67 reference tests pass,
+including both original pressure poles. This is NOT the advective exterior
+closure, coupled force/time step or playable breaking solver. Nonlinear
+gameplay stays OFF. Cook33552/39708 and queued attribution4504 remain the sole
+owners; their inputs are untouched. See [derivation, evidence and missing law](../reconstruction-review-2026-09-07/prescribed-auxiliary-connections.md).
+
 September28 UTC publication/recenter instrumentation BUILT (163.22s),36 parser
 tests pass. No scheduling, geometry, physics or visual change. One follow-through
 owner60320/wrapper4504 waits for existing hydraulic owner33552/39708 AND its
