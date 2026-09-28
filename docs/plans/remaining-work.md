@@ -1,5 +1,14 @@
 # Remaining requested work
 
+September28 UTC retained v15r2 event analysis narrows the next performance
+work: all three8310>100ms hitches follow its three double-crest-update frames;
+11520's sole double-update frame precedes its97.1394ms maximum. Expensive
+Refresh work accompanies these events, but per-branch attribution is absent.
+Most recurring selection instead follows XY/profile/coarse changes, not detail
+window changes. Preserve history before considering publication coalescing;
+do not reduce coverage or accuracy.27 parser regressions pass; no runtime or
+acceptance change. See [event evidence and next implementation constraints](../reconstruction-review-2026-09-07/v15r2-publication-events.md).
+
 September28 UTC ONE1350-to1800s hydraulic continuation is LIVE: session14006,
 wrapper33552/native39708. The original1350s state and geometry are preserved;
 native frame-zero restart passes5,382,400 bit-exact cells, zero added water.
