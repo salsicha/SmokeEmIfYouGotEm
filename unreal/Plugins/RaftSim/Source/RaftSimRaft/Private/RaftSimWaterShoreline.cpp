@@ -1,6 +1,7 @@
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimWaterVertexCopy.h"
 #include "RaftSimWaterBankContour.h"
+#include "RaftSimAdjacentBankContour.h"
 #include "RaftSimShorelineValidationAudit.h"
 #include "Misc/AutomationTest.h"
 #include "Async/ParallelFor.h"
@@ -62,10 +63,25 @@ int32 CurvedDryCorner(const int32 (&Ids)[4],TConstArrayView<FProcMeshVertex> Ver
     const FVector Y=Vertices[Ids[2]].Position-Vertices[Ids[0]].Position;
     return FMath::Abs(X.X*Y.Y-X.Y*Y.X)>1.e-8 ? Dry : INDEX_NONE;
 }
-bool WriteCurve(RaftSimWaterShoreline::FCurvedBank& Bank,TArray<FProcMeshVertex>& V,
-    TConstArrayView<float> H,TConstArrayView<float> Bed,bool First)
+int32 CurveMode(const int32 (&Ids)[4],TConstArrayView<FProcMeshVertex> V,TConstArrayView<uint8> Wet,
+    TConstArrayView<float> H,TConstArrayView<float> Bed)
 {
-    bool Changed=First;
+    const int32 Dry=CurvedDryCorner(Ids,V,Wet,H,Bed);
+    if(Dry!=INDEX_NONE)return Dry+1;
+    int32 Count=0;double B[4],D[4];
+    for(int32 I=0;I<4;++I){Count+=bool(Wet[Ids[I]]);B[I]=Bed[Ids[I]];D[I]=H[Ids[I]];}
+    if(Count!=2)return 0;
+    const int32 Side=RaftSimAdjacentBankContour::Eligible(B,D);
+    if(Side==INDEX_NONE)return 0;
+    const FVector X=V[Ids[1]].Position-V[Ids[0]].Position,Y=V[Ids[2]].Position-V[Ids[0]].Position;
+    if(FMath::Abs(X.X*Y.Y-X.Y*Y.X)<=1.e-8)return 0;
+    // Include fan-anchor direction in cache identity, not just eligibility.
+    return Side+5+(RaftSimAdjacentBankContour::Make(B,D,Side).K>0. ? 8 : 0);
+}
+bool PrepareCurve(RaftSimWaterShoreline::FCurvedBank& Bank,const TArray<FProcMeshVertex>& V,
+    TConstArrayView<float> H,TConstArrayView<float> Bed,bool First,bool& Changed)
+{
+    Changed=First;
     for(int32 I=0;I<4;++I)
     {
         Changed|=Bank.Bed[I]!=Bed[Bank.Source[I]] || Bank.Depth[I]!=H[Bank.Source[I]];
@@ -77,12 +93,37 @@ bool WriteCurve(RaftSimWaterShoreline::FCurvedBank& Bank,TArray<FProcMeshVertex>
     const auto Local=[&](const FVector& Q)
     {const FVector D=Q-P;const double Det=X.X*Y.Y-X.Y*Y.X;return FVector2D((D.X*Y.Y-D.Y*Y.X)/Det,(X.X*D.Y-X.Y*D.X)/Det);};
     const FVector2D Start=Local(A.Position),End=Local(B.Position);
-    for(int32 I=1;I<Bank.Segments;++I)
+    if(Changed && Bank.PairSide!=INDEX_NONE)
     {
-        const double T=double(I)/Bank.Segments;
-        if(Changed)Bank.Points[I-1]=RaftSimWaterBankContour::Point(Bank.Bed,Bank.Depth,Bank.Dry,Start,End,T);
-        const FVector2D XY=Bank.Points[I-1];
-        auto& Out=V[Bank.FirstNode+I-1];Out=A;
+        TArray<FVector2D> Points;
+        const double AcrossCm=Bank.PairSide%2 ? FVector2D(X.X,X.Y).Size() : FVector2D(Y.X,Y.Y).Size();
+        if(!RaftSimAdjacentBankContour::Build(
+            RaftSimAdjacentBankContour::Make(Bank.Bed,Bank.Depth,Bank.PairSide),AcrossCm,Points))return false;
+        const double StartU=RaftSimAdjacentBankContour::Along(Bank.PairSide,Start);
+        const double EndU=RaftSimAdjacentBankContour::Along(Bank.PairSide,End);
+        if(StartU==EndU)return false;
+        Bank.PairPoints.SetNum(Points.Num());Bank.PairFractions.SetNum(Points.Num());
+        for(int32 I=0;I<Points.Num();++I)
+        {
+            const FVector2D Q=Points[StartU<EndU ? I : Points.Num()-1-I];
+            Bank.PairPoints[I]=RaftSimAdjacentBankContour::Local(Bank.PairSide,Q);
+            Bank.PairFractions[I]=(Q.X-StartU)/(EndU-StartU);
+        }
+    }
+    else if(Changed)for(int32 I=1;I<Bank.Segments;++I)
+        Bank.Points[I-1]=RaftSimWaterBankContour::Point(Bank.Bed,Bank.Depth,Bank.Dry,Start,End,double(I)/Bank.Segments);
+    return true;
+}
+void WriteCurve(const RaftSimWaterShoreline::FCurvedBank& Bank,TArray<FProcMeshVertex>& V)
+{
+    const auto& A=V[Bank.StartNode];const auto& B=V[Bank.EndNode];
+    const FVector P=V[Bank.Source[0]].Position;
+    const FVector X=V[Bank.Source[1]].Position-P,Y=V[Bank.Source[2]].Position-P;
+    for(int32 I=0;I<Bank.IntermediateCount();++I)
+    {
+        const double T=Bank.Fraction(I);
+        const FVector2D XY=Bank.Point(I);
+        auto& Out=V[Bank.FirstNode+I];Out=A;
         Out.Position=P+X*XY.X+Y*XY.Y;Out.Position.Z=FMath::Lerp(A.Position.Z,B.Position.Z,T);
         Out.Normal=FMath::Lerp(A.Normal,B.Normal,T).GetSafeNormal();
         Out.Color=FMath::Lerp(A.Color.ReinterpretAsLinear(),B.Color.ReinterpretAsLinear(),float(T)).ToFColor(false);
@@ -91,7 +132,6 @@ bool WriteCurve(RaftSimWaterShoreline::FCurvedBank& Bank,TArray<FProcMeshVertex>
         Out.UV1=FMath::Lerp(A.UV1,B.UV1,T);Out.UV2=FMath::Lerp(A.UV2,B.UV2,T);Out.UV3=FMath::Lerp(A.UV3,B.UV3,T);
         Out.Tangent=FProcMeshTangent(FMath::Lerp(A.Tangent.TangentX,B.Tangent.TangentX,T).GetSafeNormal(),A.Tangent.bFlipTangentY);
     }
-    return Changed;
 }
 }
 
@@ -218,24 +258,43 @@ static bool BuildClipped(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
                 for(int32 I=0;I<5;++I)Polygon[I]=Rotated[I];
             }
             const int32 Ids[4]={A,B,C,D};
-            const int32 Dry=bCurvedHighBanks && N==5 ? CurvedDryCorner(Ids,OutVertices,Wet,DepthM,BedM) : INDEX_NONE;
-            if(Dry!=INDEX_NONE)
+            const int32 Mode=bCurvedHighBanks && (N==4 || N==5) ? CurveMode(Ids,OutVertices,Wet,DepthM,BedM) : 0;
+            if(Mode)
             {
                 int32 Start=0;
                 while(Start<N && !(Polygon[Start]>=uint32(Count) && Polygon[(Start+1)%N]>=uint32(Count)))++Start;
                 check(Start<N);
                 RaftSimWaterShoreline::FCurvedBank Bank{};
                 for(int32 I=0;I<4;++I)Bank.Source[I]=Ids[I];
-                Bank.Dry=Dry;Bank.StartNode=Polygon[Start];Bank.EndNode=Polygon[(Start+1)%N];
-                Bank.FirstNode=OutVertices.AddDefaulted(Bank.Segments-1);
-                WriteCurve(Bank,OutVertices,DepthM,BedM,true);
-                uint32 Curved[32];int32 NewN=0;
+                Bank.Dry=Mode<=4 ? Mode-1 : INDEX_NONE;
+                Bank.PairSide=Mode>4 ? (Mode-5)%4 : INDEX_NONE;
+                Bank.StartNode=Polygon[Start];Bank.EndNode=Polygon[(Start+1)%N];
+                bool Changed=false;
+                if(!PrepareCurve(Bank,OutVertices,DepthM,BedM,true,Changed))return false;
+                Bank.FirstNode=OutVertices.Num();OutVertices.AddDefaulted(Bank.IntermediateCount());
+                WriteCurve(Bank,OutVertices);
+                TArray<uint32,TInlineAllocator<32>> Curved;Curved.SetNumUninitialized(N+Bank.IntermediateCount());int32 NewN=0;
                 for(int32 I=0;I<N;++I)
                 {
                     Curved[NewN++]=Polygon[I];
-                    if(I==Start)for(int32 J=0;J<Bank.Segments-1;++J)Curved[NewN++]=Bank.FirstNode+J;
+                    if(I==Start)for(int32 J=0;J<Bank.IntermediateCount();++J)Curved[NewN++]=Bank.FirstNode+J;
                 }
                 if(OutCurvedBanks)OutCurvedBanks->Add(Bank);
+                if(Bank.PairSide!=INDEX_NONE)
+                {
+                    // The rational boundary and its conservative envelope are
+                    // monotone. Fan from the wet base corner at the HIGHER
+                    // boundary end: every fan edge stays beneath the envelope.
+                    // No unmatched subdivisions of the shared wet edge.
+                    const auto Curve=RaftSimAdjacentBankContour::Make(Bank.Bed,Bank.Depth,Bank.PairSide);
+                    const uint32 Anchor=Bank.Source[RaftSimAdjacentBankContour::Corner(Bank.PairSide,Curve.K>0. ? 1 : 0)];
+                    int32 Offset=0;while(Offset<NewN && Curved[Offset]!=Anchor)++Offset;
+                    check(Offset<NewN);
+                    TArray<uint32,TInlineAllocator<32>> Ordered;Ordered.Reserve(NewN);
+                    for(int32 I=0;I<NewN;++I)Ordered.Add(Curved[(Offset+I)%NewN]);
+                    Emit(Ordered.GetData(),NewN);
+                    continue;
+                }
                 // A curved bank can make this polygon concave. Do not fan
                 // diagonals across its dry notch: triangulate actual ears.
                 double Area=0.;
@@ -263,7 +322,7 @@ static bool BuildClipped(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
                     }
                     if(!Found)return false;
                 }
-                Emit(Curved,3);
+                Emit(Curved.GetData(),3);
             }
             else Emit(Polygon,N);
         }
@@ -300,6 +359,7 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
     bool& bTopologyRebuilt, bool bCompactEdges, bool bOppositeDryFan,bool bCurvedHighBanks)
 {
     bTopologyRebuilt=false;
+    int32 CurveNodeCount=0;for(const auto& Bank:CurvedBanks)CurveNodeCount+=Bank.IntermediateCount();
     // Exact actual-input pairs qualify the independent batches in both call
     // orders. Keep serial fusion and the original two-pass path as controls.
     static const bool Parallel=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialShorelineValidation"));
@@ -310,7 +370,7 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
                    : ValidInput(Nx,Ny,Source,Wet,Available,DepthM,BedM)))return false;
         const int32 Count=Nx*Ny;
         Reuse=CachedNx==Nx && CachedNy==Ny && XY.Num()==Count && bCachedCompactEdges==bCompactEdges && bCachedOppositeDryFan==bOppositeDryFan && bCachedCurvedHighBanks==bCurvedHighBanks &&
-            Vertices.Num()==Count+(bCompactEdges ? Edges.Num() : (Nx-1)*Ny+Nx*(Ny-1))+CurvedBanks.Num()*(FCurvedBank::Segments-1) && Indices.Num()==CachedIndexCount &&
+            Vertices.Num()==Count+(bCompactEdges ? Edges.Num() : (Nx-1)*Ny+Nx*(Ny-1))+CurveNodeCount && Indices.Num()==CachedIndexCount &&
             CellOffsets.Num()==(Nx-1)*(Ny-1)+1;
         if(Fused && Parallel)
         {
@@ -356,17 +416,17 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
     const auto IsCurved=[&](int32 A)
     {
         const int32 Ids[4]={A,A+1,A+Nx,A+Nx+1};
-        for(int32 I:Ids)if(!Available[I])return false;
-        return CurvedDryCorner(Ids,Source,Wet,DepthM,BedM)!=INDEX_NONE;
+        for(int32 I:Ids)if(!Available[I])return 0;
+        return CurveMode(Ids,Source,Wet,DepthM,BedM);
     };
     if(bReuse && bCurvedHighBanks)
     {
         // The validated wet/availability masks already establish candidate
-        // membership. Only those three-wet-corner cells can change eligibility
-        // as depths/stages evolve; do not rescan the entire lattice per frame.
+        // membership. Only adjacent-pair/three-wet-corner candidates can
+        // change mode as depths/stages evolve; do not rescan the full lattice.
         bReuse=CurveEligibility.Num()==CurveCandidates.Num();
         for(int32 I=0;bReuse && I<CurveCandidates.Num();++I)
-            bReuse=bool(CurveEligibility[I])==IsCurved(CurveCandidates[I]);
+            bReuse=CurveEligibility[I]==IsCurved(CurveCandidates[I]);
     }
     if (bReuse)
     {
@@ -381,8 +441,14 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
             Edge.Crossing=NewCrossing;
             WriteEdge(Edge,Vertices);
         }
-        for(auto& Bank:CurvedBanks)bCrossingChanged|=WriteCurve(Bank,Vertices,DepthM,BedM,false);
-        if (bCrossingChanged) for (const auto& Triangle : BankTriangles)
+        for(auto& Bank:CurvedBanks)
+        {
+            const int32 Before=Bank.IntermediateCount();bool Changed=false;
+            if(!PrepareCurve(Bank,Vertices,DepthM,BedM,false,Changed))return false;
+            if(Before!=Bank.IntermediateCount()){bReuse=false;break;}
+            WriteCurve(Bank,Vertices);bCrossingChanged|=Changed;
+        }
+        if (bReuse && bCrossingChanged) for (const auto& Triangle : BankTriangles)
             if (Triangle.Orientation!=TriangleOrientation(Triangle.A,Triangle.B,Triangle.C,Vertices))
             { bReuse=false; break; }
         if (bReuse)
@@ -407,7 +473,7 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
             const int32 A=Y*Nx+X,Ids[4]={A,A+1,A+Nx,A+Nx+1};
             int32 WetCount=0;bool AllAvailable=true;
             for(int32 I:Ids){WetCount+=bool(Wet[I]);AllAvailable&=bool(Available[I]);}
-            if(AllAvailable && WetCount==3){CurveCandidates.Add(A);CurveEligibility.Add(IsCurved(A));}
+            if(AllAvailable && (WetCount==2 || WetCount==3)){CurveCandidates.Add(A);CurveEligibility.Add(IsCurved(A));}
         }
     }
     XY.SetNumUninitialized(Count); WetMask.SetNumUninitialized(Count); AvailableMask.SetNumUninitialized(Count);

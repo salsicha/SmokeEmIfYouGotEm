@@ -27,11 +27,11 @@ struct FRaftSimShorelineCrestWeights
         }
         for(const auto& E:Edges)
         { Coarse[E.Node]=Coarse[E.WetVertex]; Shore[E.Node]=Shore[E.WetVertex]; }
-        for(const auto& B:Banks)for(int32 I=1;I<B.Segments;++I)
+        for(const auto& B:Banks)for(int32 I=0;I<B.IntermediateCount();++I)
         {
-            const float T=float(I)/B.Segments;
-            Coarse[B.FirstNode+I-1]=FMath::Lerp(Coarse[B.StartNode],Coarse[B.EndNode],T);
-            Shore[B.FirstNode+I-1]=FMath::Lerp(Shore[B.StartNode],Shore[B.EndNode],T);
+            const float T=float(B.Fraction(I));
+            Coarse[B.FirstNode+I]=FMath::Lerp(Coarse[B.StartNode],Coarse[B.EndNode],T);
+            Shore[B.FirstNode+I]=FMath::Lerp(Shore[B.StartNode],Shore[B.EndNode],T);
         }
     }
 };

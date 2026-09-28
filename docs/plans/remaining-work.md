@@ -1,5 +1,19 @@
 # Remaining requested work
 
+September28 UTC adjacent-pair high-bank repair is implemented in the NORMAL
+shoreline path. Editor build and10 rendered native regressions PASS;12 frozen
+inputs unchanged. All three v22/v23 retained pair probes are excluded, with
+continuous wet-side triangle certificates and adaptive1mm boundary accuracy.
+This is native correctness, NOT yet visible delivery or FPS acceptance.
+ONE v24 package98175/wrapper37452 is RUNNING; follow its existing receipt,
+do not duplicate or edit its18 frozen inputs. After successful terminal/closure
+checks run tmp/validate-adjacent-bank-v24-motion-20260928.ps1, then decode and
+inspect actual motion/contact. The original physical replay33152 remains LIVE.
+Old-stage lossless compression completed with3591 before/after hashes unchanged,
+no deletion, restoring15,928,033,280 free bytes before staging. v21 timing control
+and v23 baseline were untouched. Keep South Fork open; no move to Colorado.
+See [implementation and exact owners](../reconstruction-review-2026-09-07/adjacent-bank-envelope-design.md#production-implementation-and-native-verification).
+
 September28 UTC v23 ray-spacing correction now has COMPLETE normal package,
 Boot/menu and174.055m actual motion checks,13 frozen inputs unchanged.
 Video fully decodes2481frames/82.667s; inspected views retain flat foam/weak

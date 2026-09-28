@@ -21,6 +21,14 @@ struct FCurvedBank
     int32 Source[4],Dry,StartNode,EndNode,FirstNode;
     double Bed[4],Depth[4];
     FVector2D Points[Segments-1];
+    // Adjacent high banks use a variable-size conservative envelope. Existing
+    // three-wet-corner banks retain their unchanged fixed radial topology.
+    int32 PairSide=INDEX_NONE;
+    TArray<FVector2D> PairPoints;
+    TArray<double> PairFractions;
+    int32 IntermediateCount() const {return PairSide==INDEX_NONE ? Segments-1 : PairPoints.Num();}
+    FVector2D Point(int32 I) const {return PairSide==INDEX_NONE ? Points[I] : PairPoints[I];}
+    double Fraction(int32 I) const {return PairSide==INDEX_NONE ? double(I+1)/Segments : PairFractions[I];}
 };
 // Clip the Cartesian lattice in two dimensions. Original vertices plus one
 // shared node per horizontal/vertical edge keep storage below 3N;

@@ -1,4 +1,4 @@
-# Adjacent high-bank contour — design evidence, not delivery
+# Adjacent high-bank contour - native verified, playable validation pending
 
 September28 UTC. The second v22 exposed raw-dry probe has two adjacent wet
 corners, so the three-wet-corner ray correction does not apply. The existing
@@ -102,3 +102,90 @@ decreasing f. Supporting-tangent envelopes inherit the derivative sign.
 This avoids adding unmatched subdivisions to the shared fully wet base edge.
 This is a design argument only; implement and test actual polygon coverage,
 winding, attributes and cache evolution before using it in normal play.
+
+## Production implementation and native verification
+
+September28 UTC: the preceding design-only status is historical. The normal
+RaftSimWaterShoreline constructor now uses RaftSimAdjacentBankContour for exactly
+two adjacent positive-depth corners with exactly zero depth at both high dry
+corners. Positive films and low advancing banks retain the existing path;
+linear contours retain their already-exact common-edge chord. No solver,
+hydraulic wet threshold, source capture, bed or cooked field changed.
+
+The production branch is ADAPTIVE, not the fixed16 prototype above. Its maximum
+transverse geometric error is0.1cm (1mm); this is not a depth floor. Convex cells
+use supporting-tangent intersections, concave cells use inscribed chords. For
+each parameter interval[u,v], the convex intersection error is exactly
+abs(d*k)*(v-u)^2/(2*D(u)*D(v)*(D(u)+D(v))); the concave curvature bound is
+abs(d*k)*(v-u)^2/(4*min(D(u),D(v))^3). Subdivide until the bound times the actual
+world transverse edge length is at most0.1cm. Nonfinite/unrepresentable bounds
+fail the build rather than silently coarsen. Stable tangent intersection height
+is(H(u)+H(v))/(D(u)+D(v)), avoiding slope cancellation.
+
+The monotone polygon fans from the higher-boundary wet base corner, retaining
+the existing common-edge endpoint nodes and adding no nodes on shared wet base
+edges. Height, flow channels and coarse-crest/shore weights use actual along-edge
+fractions, not adaptive node ordinals. Cache identity includes pair side and
+fan direction; changing adaptive node count triggers a fresh topology build.
+The existing three-wet-corner radial path remains unchanged, including its
+known finite-chord limitations.
+
+Native recipe: tmp/verify-adjacent-bank-v2-20260928.ps1.
+Receipt: tmp/adjacent-bank-v2-20260928-process.json.
+Session28923 and native39448 ended0; editor build20.11s, all10 requested rendered
+D3D12 native tests passed without failed/skipped/in-process tests, all12 frozen
+inputs unchanged. Completion2026-09-28T10:40:16.3574457Z. Protected user water-test
+SHA256 remains d9abdd3643882d192e41af879eef023ed1e58f12a39d26698e42cb0f0773e8f3.
+The v1 failure receipt/log remain: a test's unqualified FEdge collided with an
+engine type and a local C shadowed the cell index. Both compiler errors were
+fixed before v2; no test or geometry gate was relaxed.
+
+New RaftSim.M4.AdjacentBankContour coverage:
+
+- Three retained pair cases, four bank sides, compact/reserved nodes, mirrored
+  world axes and rotated cells:96 geometry variants, each built old/new. Each old
+  chord includes its captured dry probe; each new contour excludes it.
+- Whole submitted triangle edges have nonnegative bilinear depth within1e-9m
+  numerical roundoff, including interior quadratic minima; a bilinear saddle
+  has no strict interior minimum. Winding, point sampling and actual-coordinate
+  height/crest attributes also pass.
+-256 deterministic varied metric cells certify continuous conservative segment
+  depth and the maximum entire-interval1mm geometric error, not only samples.
+- Exact-linear and both near-linear curvature signs are representable.
+-32 cache frames match fresh construction in topology, ownership and every
+  submitted attribute, including actual adaptive node-count changes, fan-sign
+  changes, tiny positive films and low banks. Unchanged topology reuses cache.
+
+Existing nine endpoint/curved-bank/crest/cache tests also pass; the curved-bank
+suite includes all16 wet masks. These are native correctness checks, not a
+whole-reach collision/shoreline/performance or visual acceptance.
+
+## Preserved storage and the one pending playable owner
+
+Lossless LZX compression completed for unused v4-v20 packaged executables/Engine
+files and v22 runtime data/symbols.3591 before/after file hashes match, zero files
+deleted. Captured data, current v23 baseline and v21 timing-control package are
+untouched. Receipts:
+
+- tmp/old-stage-executables-compression-v1-20260928.json:528 files, session31628,
+  wrapper25240, completed2026-09-28T10:39:58.4243443Z, terminal0.
+- tmp/v22-staged-data-compression-v1-20260928.json:3063 files, session86686,
+  wrapper40232, completed2026-09-28T10:41:13.4656987Z, terminal0.
+
+Free space after the second completion was15,928,033,280bytes. This is a live
+disk reading, not a compression-only savings measurement while builds ran.
+The unchanged14GiB staging gate passed.
+
+ONE normal v24 BuildCookRun is live: session98175/wrapper37452, started
+2026-09-28T10:41:40.7066662Z. Recipe tmp/package-adjacent-bank-v24-20260928.ps1;
+receipt tmp/adjacent-bank-v24-package-20260928.json; stage
+tmp/south-fork-playable-v24-20260928. Follow this owner; do not duplicate or
+change its frozen inputs. On terminal0 independently verify completed receipt,
+unchanged hashes and staged closure, then run the prepared
+tmp/validate-adjacent-bank-v24-motion-20260928.ps1. Decode/review the new video
+and contact report before claiming visible delivery, stability or motion.
+
+The original prescribed physical replay33152 remains live(index0 checked,
+index1 started); it was neither restarted nor edited. Any concurrent game
+checks are NON-TIMING. No isolated20FPS result, river acceptance, nonlinear
+solver activation or move to Colorado is justified by this implementation.
