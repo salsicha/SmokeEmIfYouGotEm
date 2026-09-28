@@ -9415,6 +9415,70 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
                 Probe->SetBoolField(TEXT("support_wet"),Available && Support.bWet);
                 Probe->SetBoolField(TEXT("raw_available"),RawAvailable);
                 Probe->SetBoolField(TEXT("raw_wet"),RawAvailable && Raw.bWet);
+                if (RawAvailable)
+                {
+                    Probe->SetNumberField(TEXT("raw_depth_m"),Raw.DepthMeters);
+                    Probe->SetNumberField(TEXT("raw_bed_m"),Raw.BedHeightMeters);
+                    Probe->SetNumberField(TEXT("raw_surface_m"),Raw.SurfaceHeightMeters);
+                }
+                // Keep the actual triangle and same-call source lattice for a
+                // non-occluded dry discrepancy. A later shape export is not the
+                // same hydraulic/presentation epoch and cannot explain it.
+                if (RawAvailable && !Raw.bWet && GroundHit && WaterZCm>GroundZCm)
+                {
+                    TArray<TSharedPtr<FJsonValue>> Corners;
+                    for (int32 Corner=0;Corner<3;++Corner)
+                    {
+                        const uint32 VertexId=Indices[3*T+Corner];
+                        const FVector& V=Drawn[VertexId].Position;
+                        auto Item=MakeShared<FJsonObject>();
+                        Item->SetNumberField(TEXT("vertex_id"),VertexId);
+                        Item->SetNumberField(TEXT("x_cm"),V.X);
+                        Item->SetNumberField(TEXT("y_cm"),V.Y);
+                        Item->SetNumberField(TEXT("carrier_z_cm"),V.Z);
+                        Corners.Add(MakeShared<FJsonValueObject>(Item));
+                    }
+                    Probe->SetArrayField(TEXT("triangle_vertices"),Corners);
+                    FVector2D Field; FVector Tangent,Left;
+                    if (WaterAdapter->WorldToRiverCoordinates(P,Field,Tangent,Left) &&
+                        GridStationN>1 && GridLateralN>1 && RiverCoordinatesM.Num()==N)
+                    {
+                        const double Dx=RiverCoordinatesM[1].X-RiverCoordinatesM[0].X;
+                        const double Dy=RiverCoordinatesM[GridStationN].Y-RiverCoordinatesM[0].Y;
+                        const int32 X=Dx!=0. ? FMath::FloorToInt((Field.X-RiverCoordinatesM[0].X)/Dx) : -1;
+                        const int32 Y=Dy!=0. ? FMath::FloorToInt((Field.Y-RiverCoordinatesM[0].Y)/Dy) : -1;
+                        if (X>=0 && X<GridStationN-1 && Y>=0 && Y<GridLateralN-1)
+                        {
+                            TArray<TSharedPtr<FJsonValue>> Lattice;
+                            const int32 Base=Y*GridStationN+X;
+                            const int32 Ids[4]={Base,Base+1,Base+GridStationN,Base+GridStationN+1};
+                            for (int32 Id:Ids)
+                            {
+                                auto Item=MakeShared<FJsonObject>();
+                                const FVector2D XY=RiverCoordinatesM[Id];
+                                Item->SetNumberField(TEXT("source_id"),Id);
+                                Item->SetNumberField(TEXT("field_x_m"),XY.X);
+                                Item->SetNumberField(TEXT("field_y_m"),XY.Y);
+                                Item->SetNumberField(TEXT("cached_bed_m"),CartesianShoreBedM[Id]);
+                                Item->SetNumberField(TEXT("cached_depth_m"),CartesianShoreDepthM[Id]);
+                                Item->SetBoolField(TEXT("clipping_wet"),CartesianShoreWet[Id]!=0);
+                                FVector Query;
+                                FRaftSimWaterSample Current;
+                                const bool Valid=WaterAdapter->RiverToWorldPosition(XY,0.f,Query) &&
+                                    WaterAdapter->SampleWaterAtWorldPosition(Query,Current);
+                                Item->SetBoolField(TEXT("current_available"),Valid);
+                                if (Valid)
+                                {
+                                    Item->SetBoolField(TEXT("current_wet"),Current.bWet);
+                                    Item->SetNumberField(TEXT("current_bed_m"),Current.BedHeightMeters);
+                                    Item->SetNumberField(TEXT("current_depth_m"),Current.DepthMeters);
+                                }
+                                Lattice.Add(MakeShared<FJsonValueObject>(Item));
+                            }
+                            Probe->SetArrayField(TEXT("source_cell"),Lattice);
+                        }
+                    }
+                }
                 GroundProbes.Add(MakeShared<FJsonValueObject>(Probe));
                 if (GroundHit && WaterZCm<=GroundZCm)
                 {

@@ -1,5 +1,15 @@
 # Remaining requested work
 
+September28 UTC dry-carrier provenance capture COMPLETE, no live owner.
+Rebuilt diagnostic v18 reproduces the v17 point: submitted water33.04cm above
+registered ground but18.07cm BELOW hydraulic bed, raw depth0. Same-call corner
+wet masks agree; maximum depth age difference4.83micrometres. This localizes
+a spatial three-wet-corner shoreline/bed mismatch, not a reason to make dry
+support wet.35 diagnostic/source tests pass. No visible repair, performance
+gain or acceptance; normal solver/fields unchanged. Next implement a consistent
+boundary using the retained case, not another unchanged capture. See
+[exact evidence and repair constraints](../reconstruction-review-2026-09-07/carrier-dry-corner-provenance.md).
+
 September28 UTC v17 unused water-history snapshot removal is DELIVERED in the
 normal rebuilt game;24 source guards/3 rendered native tests pass. Package,
 closure, menu/rapid timing and174m motion review COMPLETE; no live owner.
