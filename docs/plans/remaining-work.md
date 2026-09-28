@@ -1,5 +1,15 @@
 # Remaining requested work
 
+September28 UTC retained-timing follow-through: normal v13 has exactly one
+counted crest update per audited frame. Geometry-changing frames increase from
+about half to70% late in the run, while their crest-update cost increases from
+about10ms to14.60ms; unchanged-target history stays near2ms. This narrows the
+performance investigation without another game run. New strict cadence analysis
+and existing CSV tests pass26/26. Supporting diagnostics only, no playable or
+performance acceptance. Compare categories in the already-owned v14 validation
+after hydraulics complete; do not duplicate it. See the crest-cadence section in
+[v13 review](../reconstruction-review-2026-09-07/v13-playable-review.md).
+
 September28 UTC v14 package COMPLETE exit0: BuildCookRun619.77s, all frozen
 inputs unchanged. New inner executable SHA256
 `a10b03e6821373e16c22caaddd97def834c012639b234f4cf101a89f958cba6b`.

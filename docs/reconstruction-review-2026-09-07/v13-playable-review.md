@@ -176,3 +176,40 @@ clock/timing metrics. The normal capture requires no exception. Report SHA256:
 - rapid11520-on-a: `0746d0427c64e6578265b1f0a626c9e8210b59a78d6efb25c0d312fcd18a479d`
 - rapid11520-on-b: `8474b56bea0125ee99ff6f978ee045e77ab7aabfd80348b04415b41b9460a049`
 - rapid11520-off-b: `e09cee90015413d8c823cbb4214399569d81f54d510b7a70d86cb63d99ccd2ad`
+
+## Crest cadence follow-through: more costly geometry updates, not more calls
+
+The retained normal-menu CSV has exactly one counted crest update per audited
+frame. The late slowdown is therefore not an increase in crest calls per frame.
+Same-row change flags separate geometry-changing updates from unchanged-target
+history updates. Inclusive CPU scope means are shown below; surface Tick includes
+crest work, so these columns must never be added.
+
+| Rows inclusive | Geometry-changing frames | Crest ms, geometry changed | Crest ms, targets unchanged | Surface Tick ms, geometry changed | Surface Tick ms, targets unchanged |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 30..299 | 134/270 | 10.436 | 2.041 | 15.067 | 28.744 |
+| 300..599 | 148/300 | 9.754 | 2.160 | 14.576 | 28.589 |
+| 600..899 | 149/300 | 9.994 | 1.993 | 14.584 | 27.825 |
+| 900..1169 | 189/270 | 14.602 | 2.069 | 37.559 | 28.282 |
+
+Two effects coexist: geometry-changing frames rise from about half to70%, and
+their mean crest-update cost rises from about10ms to14.60ms. The unchanged-target
+crest cost stays near2ms. No profile-change events occur. XY changes occur on all
+geometry-changing rows; occasional index/detail-window changes also occur earlier.
+This is conditional timing evidence, not a normalized cost per vertex, proof of
+redundant reconstruction, or thermal/OS diagnosis. Moving shoreline coordinates
+are legitimate inputs; do not suppress necessary geometry updates to pass timing.
+
+Next, compare these categories in the already-owned isolated v14 captures before
+proposing a runtime optimization. A candidate must preserve changing shoreline
+geometry, history interpolation and actual shared-surface contact. Increasing
+frame duration can alter refresh cadence; these same-row correlations do not
+establish frame-time causality or explain all parent-surface work.
+
+Reproduction: `physics/scripts/audit_crest_update_cadence.py` with intervals
+`30 299`, `300 599`, `600 899`, `900 1169`. Report:
+`tmp/sf-v13-normal-crest-cadence-20260928.json`. Input CSV SHA256:
+`08712ec5812946289534c40f4163e4d6de29d7dcfa55994bd8e2a35a9073153c`.
+The analyzer reuses completed-CSV validation, rejects missing/ambiguous counters,
+and keeps multiple-call rows unresolved. Missing early values are not zeros.
+This is supporting diagnostic work, not a playable change or acceptance.
