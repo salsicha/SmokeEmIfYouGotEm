@@ -182,3 +182,86 @@ contours, variable attributes and ear-connectivity cache identity remain
 separate follow-on integration. Never cook into the immutable linked v25/v26
 stages. No solver activation, source replacement, deletion, push or river
 acceptance occurred. All native/runtime/decode owners are terminal.
+
+## v27 normal playable delivery
+
+September 28 UTC: the common whole-grid GPU frame is now the NORMAL path.
+RaftSimLegacyShorelineCoordinates is an explicit diagnostic override; no
+RaftSimRebasedShoreline opt-in is needed. Both actual packaged launch logs
+confirm WATER_RENDER_FRAME_MODE rebased=1 legacy_override=0.
+This supersedes the candidate-only status above, not its limits or failures.
+
+The normal configuration passes all 20 native tests without an opt-in, plus
+15 audit rejection controls and all five exact stored-contour cases.
+tmp/water-render-frame-v2-20260928-process.json is terminal. CPU geometry,
+source data, support, bed, collision and the solver are unchanged. The certified
+full bank contour still is NOT integrated by this precision-only delivery.
+
+The standalone build succeeded in 135.51s. The fresh stage is
+tmp/south-fork-playable-v27-20260928/Windows; binary SHA256
+82e139184dbd93c46ebf7c0419e49da850db003d0aab4071ac35bba5dd65bcd0.
+tmp/water-render-frame-v27-20260928-package.json records 36 frozen inputs,
+3,106 immutable dependencies linked from verified v26, independent executable,
+PDB, manifests and Saved outputs. Runtime closure verifies 2,405 files,
+917,995,570 bytes, with no external fallback. This was a code-only build,
+not a cook or a reduction of the full-copy disk-space gate. Never cook into
+the linked v25/v26/v27 stages or overwrite inherited dependencies.
+
+Normal Boot/main-menu/FullReach travel and post-travel capture ordering pass.
+The rapid's 80 motion samples cover 8313.432 to 8484.122m (170.690m).
+Both logs are free of runtime Error/Fatal lines. The support snapshot contains
+1,859 wet probes and 155 ground-occluded dry probes, zero unavailable probes,
+zero ground-occluded wet probes, and maximum support/carrier difference
+0.0000476705340588524cm. All 18 emitter anchors pass. These remain bounded
+CPU support/source-anchor checks, not GPU sampler readback, particle landing
+or complete swept-collision acceptance.
+
+The actual engine clip contains 2,483 frames over 82.733333s at 1280x720,
+with 36 exact adjacent duplicates. All seven requested stills were decoded;
+6/20/80s views were inspected. Raft and water remain visibly aligned from
+rapid to calm water. Broad flat foam, weak breaking relief, angular banks
+and crew fit are still present. No new macroscopic breaking shape, full
+shoreline stability or geographic acceptance is claimed.
+
+- Runtime: tmp/water-render-frame-v27-motion-20260928.json.
+- Video: tmp/south-fork-playable-v27-20260928/Windows/SmokeEmIfYouGotEm/Saved/VideoCaptures/RaftSim_20260928-075600.mp4.
+- Video SHA256:85dbba622f2b16cd5c4f58600d278a856dd336524a32b70305254ab083f51b3d.
+- Decode: tmp/sf-v27-motion-decoded-20260928/report.json.
+- Isolated profile owner: tmp/water-render-frame-v27-profile-20260928.json,
+  terminal 15:01:56Z. No other game, build, cook, source replay or decoder.
+- Per-run frame receipts: unreal/Saved/RaftSimValidation/sf-v27-isolated-{menu,8310,11520}-20260928-frame-audit.json.
+- Strict scopes/clock: tmp/sf-v27-isolated-{menu,8310,11520}-20260928-scopes-and-clock.json.
+- Final scoped delivery/integrity: tmp/water-render-frame-v27-final-review-20260928.json.
+
+All timing runs use 1,200 actual frames and audit rows 30..1169, with the
+unchanged 20 FPS / p95<=50ms / zero individual frames>100ms requirements.
+Timing mode and default render-frame mode are confirmed in each engine log;
+no record/audit/candidate flag or quality/solver override is used.
+
+| Normal setting/start | Mean ms | p95 ms | Max ms | Frames >100ms | Timing gate |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Boot/menu | 37.9089 | 44.8092 | 59.1377 | 0 | Pass for this sample |
+| 8310 rapid | 44.4600 | 62.6842 | 181.8656 | 8 | FAIL |
+| 11520 rapid | 65.9468 | 87.4577 | 182.9282 | 4 | FAIL |
+
+At 8310, bridge backlog is 0.8810 to 0.015554s, with 178 four-tick rows.
+At 11520 it is 0.9309 to 0.7768s, peaking at 5.5403s; 1,100 of 1,140 rows
+consume four ticks. Neither is simulation-capacity acceptance. No elapsed
+water time was discarded or fixed step increased.
+
+The heavy run remains CPU-bound: mean game thread64.0552ms vs GPU19.8361ms.
+Surface Tick40.0050 includes CartesianPublish23.3943, SetMesh22.0563,
+crest Update14.2755 (Selection8.4221), and topology6.3454ms. These are nested,
+not additive. Solver StepWater14.3298ms is separate. Deferred RenderPacket
+averages0.40175ms across all rows,1.99128ms on positive rows (p952.7675ms);
+at8310 it averages0.11388ms,0.78684ms on positive rows. These are actual
+normal-build costs, not same-input reference/candidate deltas. Cross-run
+trajectory/timing variation prevents claiming a causal FPS improvement.
+
+This completes the bounded normal-path precision delivery, not South Fork.
+Next integrate shared certified crossings and variable full contours with
+correct attributes/crest weights/ear-connectivity cache identity, qualify
+reuse cost, and continue physical breaking/recirculation and publication-cost
+work. Hardware ray tracing remains disabled by normal project settings:
+the common transform is wired/native-tested, not hardware-exercised here.
+Preserve the rejected solver state and all retained evidence; no push.

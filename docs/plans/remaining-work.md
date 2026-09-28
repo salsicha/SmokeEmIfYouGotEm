@@ -1,5 +1,23 @@
 # Remaining requested work
 
+September28 UTC v27 common render-frame precision improvement is DELIVERED in
+the normal rebuilt game, no candidate opt-in.20 native tests,15 audit controls,
+five exact contour cases, Boot/menu launch and170.690m actual motion pass their
+bounded checks.82.733s video decoded,6/20/80s inspected; water/raft alignment
+retained, flat foam/weak breaking/coarse banks/crew fit still unresolved.
+Isolated1200-frame samples: menu44.8092ms p95/0 hitches PASS;8310
+62.6842ms/8 FAIL;11520 87.4577ms/4 FAIL. Heavy bridge backlog peaks5.5403s,
+ends0.7768s;1100/1140 audited rows are four-tick saturated. No capacity or
+20FPS acceptance, no causal FPS improvement claimed. Next integrate the
+certified shared edges/full bank contours with variable attributes/ear-cache
+identity and qualified construction reuse; address measured publication/crest
+cost and missing physical breaking/recirculation. No move to the next river.
+Fresh code-only build135.51s;3106 dependencies linked from verified v26,
+2405 runtime-data files verified with no fallback;36 frozen inputs. Never
+cook into v25/v26/v27 linked stages. All native, build, motion, decode and
+profile owners terminal; no duplicate work needed. No rejected solver or push.
+See [v27 normal delivery, actual views and failed gates](../reconstruction-review-2026-09-07/stored-bank-render-coordinates.md#v27-normal-playable-delivery).
+
 September28 UTC common render-frame candidate now passes20 native tests,
 15 independent audit controls and five exact stored-contour cases. Actual
 rebuilt editor-game Boot/menu travel and174.001m of rapid motion also pass

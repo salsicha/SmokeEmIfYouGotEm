@@ -52,8 +52,16 @@ void PrepareStartupWaterShaders(URaftSimShorelineMeshComponent* Component)
 
 FVector SelectWaterRenderOrigin(const FVector& GridOrigin)
 {
-    // Candidate remains explicit until real scene and motion verification.
-    static const bool Rebased=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRebasedShoreline"));
+    // One whole-grid GPU frame is the normal path after native and actual
+    // motion qualification. CPU geometry and support never change frames.
+    static const bool Legacy=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyShorelineCoordinates"));
+    static const bool Rebased=!Legacy;
+    static bool Logged=false;
+    if(!Logged)
+    {
+        UE_LOG(LogTemp,Display,TEXT("WATER_RENDER_FRAME_MODE rebased=%d legacy_override=%d"),Rebased,Legacy);
+        Logged=true;
+    }
     return Rebased ? FVector(GridOrigin.X,GridOrigin.Y,0.) : FVector::ZeroVector;
 }
 
@@ -664,6 +672,10 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimShorelineRenderFrameTest,"RaftSim.M4.Sh
     EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FRaftSimShorelineRenderFrameTest::RunTest(const FString&)
 {
+    const FVector ModeProbe(-551000.,-348600.,123.);
+    const bool Legacy=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyShorelineCoordinates"));
+    TestTrue(TEXT("normal frame enabled without candidate flag; legacy override explicit"),
+        SelectWaterRenderOrigin(ModeProbe)==(Legacy ? FVector::ZeroVector : FVector(ModeProbe.X,ModeProbe.Y,0.)));
     TArray<FProcMeshVertex> Source;TArray<uint32> Indices,Mapping;
     for(int32 I=0;I<1025;++I)
     {
