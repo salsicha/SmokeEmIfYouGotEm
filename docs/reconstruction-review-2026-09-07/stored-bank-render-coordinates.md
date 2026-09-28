@@ -104,3 +104,81 @@ hundreds of banks every frame on the strength of these passes.
    into the hard-linked v25/v26 stages. Verify Boot/menu, real motion/contact,
    shoreline continuity, raster/ray consistency and isolated20FPS/bridge-clock
    gates. No diagnostic pass here supplies any of those acceptance results.
+
+## Common render-frame candidate and actual engine review
+
+September28 UTC: a production-component implementation is now tested behind
+-RaftSimRebasedShoreline. It is NOT enabled by default or delivered in a new
+package. The CPU source mesh, support queries, collision and hydraulic field
+coordinates remain unchanged. Only the GPU position buffer is translated by
+one published whole-grid XY origin, not independently per bank.
+
+The render-thread upload owns the origin and vertex payload together.
+Raster primitive uniforms, local/pre-skinned bounds and ray-instance transforms
+use the same helper. World bounds and actor position remain physical. Because
+the vertex factory has only the current position stream, both current and
+previous component matrices undo the CURRENT packet origin: substituting the
+previous grid origin would introduce false motion when the grid moves.
+Color, normal, tangent, four UV channels and index order remain unchanged.
+The zero-origin reference retains its old conversion and matrix path.
+
+Native qualification is terminal in
+tmp/water-render-frame-v1-20260928-process.json:
+
+- Editor build152.47s, exit0;20 native tests PASS, no warnings/failures/skips.
+- The new test covers three origins, reflected/scaled/rotated component
+  transforms, serial/parallel packet identity, all non-position attribute
+  bits, dry packets and shifted local bounds.
+- The earlier five complete stored-contour proofs and15 rejection controls
+  still pass. All32 frozen inputs rehash unchanged, including the user-owned
+  surface test. This does not integrate the conservative contours yet.
+
+The actual editor -game run, using the same Boot/menu launch hierarchy, then
+captured the8310 rapid with the candidate flag and a bounded upload audit.
+tmp/water-render-frame-live-v1-20260928.json is terminal at14:43:01Z.
+Boot/main-menu/FullReach/post-travel600-frame capture ordering passes;
+both launch and motion logs contain zero runtime Error/Fatal lines.
+The80 station samples move8312.897 to8486.898m (174.001m).
+
+Across64 actual compact upload packets, maximum restored XY storage error is
+0.001074810243205717cm, versus0.03491352909829735cm for direct world-to-float
+conversion of those SAME source vertices. This is a CPU audit of the actual
+submitted buffer values, not a numerical GPU transform readback, physical
+survey accuracy claim or proof of wet containment for existing legacy contours.
+At the near-origin menu start, rebasing need not improve direct-float error;
+the measured candidate still satisfies the0.005cm storage guard.
+
+One paired-detail support snapshot has1854 wet probes,160 ground-occluded dry
+probes, zero unavailable probes and zero ground-occluded wet probes. Recomputed
+probe classifications agree with every summary count. Maximum CPU support
+versus submitted carrier error is0.000047670437652413966cm (guard0.001cm).
+All18 emitter anchors pass their6/3/3cm clearances. Neither check establishes
+particle landing, complete collision traversal or GPU detail sampler parity.
+The actual log explicitly says hardware ray tracing is disabled by project
+setting r.RayTracing=0: the common ray transform is wired and native-tested,
+NOT exercised in this capture. No setting was changed just to claim coverage.
+
+Original engine video:
+unreal/Saved/VideoCaptures/RaftSim_20260928-074132.mp4,
+SHA256ea30e03b04d9f2af27e10911425543ec12c3d199ec7354ed8e8053263e14a665.
+Decode: tmp/sf-render-frame-live-v1-decoded-20260928/report.json,
+2493 frames,0..83.066667s,1280x720,40 exact adjacent duplicates.
+All seven requested stills exist;6/20/80s were inspected, with the prior v26
+20s view as context, not a synchronized pixel comparison. Water remains
+visibly aligned with raft/banks during rapid-to-calm travel. Broad flat foam,
+weak breaking relief, coarse banks and crew fit remain unresolved. These
+views cannot prove every shoreline edge or sub-millimetre rendering alignment.
+Final review: tmp/water-render-frame-live-v1-review-20260928.json.
+
+No isolated timing run was performed: recording and per-vertex auditing add
+work, and encoded video rate is not gameplay FPS. The unchanged20FPS,
+p95<=50ms, zero frames>100ms and bridge-clock gates remain open. v26 remains
+the last normal package; its rapid gates still fail.
+
+Next qualify this bounded render-frame change's actual publication cost and
+normal-path configuration, then promote it into a fresh normal build once safe;
+do not wait for the entire river to be perfect. Shared certified edges/full
+contours, variable attributes and ear-connectivity cache identity remain
+separate follow-on integration. Never cook into the immutable linked v25/v26
+stages. No solver activation, source replacement, deletion, push or river
+acceptance occurred. All native/runtime/decode owners are terminal.

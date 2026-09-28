@@ -1,5 +1,21 @@
 # Remaining requested work
 
+September28 UTC common render-frame candidate now passes20 native tests,
+15 independent audit controls and five exact stored-contour cases. Actual
+rebuilt editor-game Boot/menu travel and174.001m of rapid motion also pass
+their bounded checks.64 actual upload packets reduce maximum XY storage error
+from0.03491353cm to0.00107481cm; CPU support/bed/collision are unchanged.
+The83.067s capture was decoded and6/20/80s inspected: no gross water/raft
+displacement, but flat foam, weak breaking and coarse shore geometry remain.
+Hardware ray tracing was disabled by normal project settings, so its wired
+transform is native-tested only. No new normal package or FPS acceptance:
+the flag remains candidate-only; v26 is still delivered. Next qualify the
+render-frame cost and promote this bounded improvement into a fresh normal
+build when safe, without waiting for every contour/river issue to be finished.
+Then integrate certified variable contours/attributes/cache identity. All
+32 frozen inputs unchanged; runtime and decode owners terminal; no push.
+See [render-frame implementation and actual review](../reconstruction-review-2026-09-07/stored-bank-render-coordinates.md#common-render-frame-candidate-and-actual-engine-review).
+
 September28 UTC full stored-coordinate bank candidate now has native AND exact
 whole-polygon proof:17 native tests,15 audit controls, five physical/storage
 frames, including the captured WHOLE-GRID origin. That frame needs70 triangles;

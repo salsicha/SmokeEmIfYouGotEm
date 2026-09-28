@@ -1,5 +1,6 @@
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterSourceBounds.h"
+#include "RaftSimWaterRenderFrame.h"
 #include "DynamicMeshBuilder.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialRenderProxy.h"
@@ -49,10 +50,17 @@ void PrepareStartupWaterShaders(URaftSimShorelineMeshComponent* Component)
 #endif
 }
 
-FDynamicMeshVertex RenderVertex(const FProcMeshVertex& V)
+FVector SelectWaterRenderOrigin(const FVector& GridOrigin)
+{
+    // Candidate remains explicit until real scene and motion verification.
+    static const bool Rebased=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRebasedShoreline"));
+    return Rebased ? FVector(GridOrigin.X,GridOrigin.Y,0.) : FVector::ZeroVector;
+}
+
+FDynamicMeshVertex RenderVertex(const FProcMeshVertex& V,const FVector& RenderOrigin=FVector::ZeroVector)
 {
     FDynamicMeshVertex Out;
-    Out.Position = FVector3f(V.Position);
+    Out.Position = FRaftSimWaterRenderFrame{RenderOrigin}.Store(V.Position);
     Out.Color = V.Color;
     Out.TextureCoordinate[0] = FVector2f(V.UV0);
     Out.TextureCoordinate[1] = FVector2f(V.UV1);
@@ -66,16 +74,19 @@ FDynamicMeshVertex RenderVertex(const FProcMeshVertex& V)
 
 struct FShorelineRenderPacket
 {
+    FVector RenderOrigin=FVector::ZeroVector;
     TArray<FDynamicMeshVertex> Vertices;
     TArray<uint32> Indices;
 };
 
 FShorelineRenderPacket MakeRenderPacket(const TArray<FProcMeshVertex>& Source,
     const TArray<uint32>& SourceIndices,bool bIncludeIndices,
-    TArray<uint32>* DenseSources=nullptr,bool bReuseMapping=false,bool bParallelValues=false)
+    TArray<uint32>* DenseSources=nullptr,bool bReuseMapping=false,bool bParallelValues=false,
+    const FVector& RenderOrigin=FVector::ZeroVector)
 {
     CSV_SCOPED_TIMING_STAT(RaftSimShoreline,RenderPacket);
     FShorelineRenderPacket Packet;
+    Packet.RenderOrigin=RenderOrigin;
     if (bReuseMapping)
     {
         check(DenseSources && !bIncludeIndices);
@@ -89,12 +100,12 @@ FShorelineRenderPacket MakeRenderPacket(const TArray<FProcMeshVertex>& Source,
             {
                 const int32 End=FMath::Min((Batch+1)*BatchSize,DenseSources->Num());
                 for (int32 I=Batch*BatchSize;I<End;++I)
-                    Packet.Vertices[I]=RenderVertex(Source[(*DenseSources)[I]]);
+                    Packet.Vertices[I]=RenderVertex(Source[(*DenseSources)[I]],RenderOrigin);
             });
             return Packet;
         }
         Packet.Vertices.Reserve(DenseSources->Num());
-        for (uint32 I:*DenseSources) Packet.Vertices.Add(RenderVertex(Source[I]));
+        for (uint32 I:*DenseSources) Packet.Vertices.Add(RenderVertex(Source[I],RenderOrigin));
         return Packet;
     }
     if (DenseSources) DenseSources->Reset();
@@ -106,7 +117,7 @@ FShorelineRenderPacket MakeRenderPacket(const TArray<FProcMeshVertex>& Source,
         int32& Dense=Remap[I];
         if (Dense==INDEX_NONE)
         {
-            Dense=Packet.Vertices.Add(RenderVertex(Source[I]));
+            Dense=Packet.Vertices.Add(RenderVertex(Source[I],RenderOrigin));
             if (DenseSources) DenseSources->Add(I);
         }
         if (bIncludeIndices) Packet.Indices.Add(uint32(Dense));
@@ -118,7 +129,7 @@ FShorelineRenderPacket MakeRenderPacket(const TArray<FProcMeshVertex>& Source,
 
 bool SameRenderPacket(const FShorelineRenderPacket& A,const FShorelineRenderPacket& B)
 {
-    if (A.Indices!=B.Indices || A.Vertices.Num()!=B.Vertices.Num()) return false;
+    if (A.RenderOrigin!=B.RenderOrigin || A.Indices!=B.Indices || A.Vertices.Num()!=B.Vertices.Num()) return false;
     for (int32 I=0;I<A.Vertices.Num();++I)
     {
         const auto& X=A.Vertices[I];const auto& Y=B.Vertices[I];
@@ -139,17 +150,21 @@ public:
         , Material(Component->GetMaterial(0))
         , MaterialRelevance(Component->GetMaterialRelevance(GetScene().GetShaderPlatform()))
         , ActiveIndices(Component->GetWaterIndices().Num())
+        , RenderFrame{Component->GetWaterRenderOrigin()}
         , bStartupRenderAudit(FParse::Param(FCommandLine::Get(),TEXT("RaftSimStartupRenderAudit")))
     {
         if (!Material) Material = UMaterial::GetDefaultMaterial(MD_Surface);
         if (bStartupRenderAudit && GFrameCounter<8)
             UE_LOG(LogTemp,Display,TEXT("STARTUP_WATER_PROXY game_frame=%llu indices=%d visible=%d material=%s bounds=%s"),
                 GFrameCounter,ActiveIndices,Component->IsVisible(),*Material->GetPathName(),*Component->Bounds.ToString());
-        const auto Packet=MakeRenderPacket(Component->GetWaterVertices(),Component->GetWaterIndices(),true);
+        const auto Packet=MakeRenderPacket(Component->GetWaterVertices(),Component->GetWaterIndices(),true,nullptr,false,false,RenderFrame.Origin);
+        if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimRenderFrameAudit")))
+            UE_LOG(LogTemp,Display,TEXT("WATER_RENDER_FRAME_PROXY origin=(%.17g,%.17g,%.17g) vertices=%d indices=%d"),
+                RenderFrame.Origin.X,RenderFrame.Origin.Y,RenderFrame.Origin.Z,Packet.Vertices.Num(),Packet.Indices.Num());
         TArray<FDynamicMeshVertex> Vertices;
         // Retain worst-case allocation and dry/rewet proxy stability, but draw
         // and subsequently upload only the exact referenced dense prefix.
-        Vertices.Init(RenderVertex(Component->GetWaterVertices()[0]),Component->GetWaterVertices().Num());
+        Vertices.Init(RenderVertex(Component->GetWaterVertices()[0],RenderFrame.Origin),Component->GetWaterVertices().Num());
         for (int32 I=0; I<Packet.Vertices.Num(); ++I) Vertices[I]=Packet.Vertices[I];
         // Isolated precision control, never inferred from a diagnostic pass.
         if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimEphemeralProfile")) &&
@@ -192,11 +207,14 @@ public:
     bool CanBeOccluded() const override { return !MaterialRelevance.bDisableDepthTest; }
 
     void Update(FRHICommandListBase& RHICmdList, const TArray<FDynamicMeshVertex>& Vertices,
-        const TArray<uint32>& Indices, bool bIndicesChanged)
+        const TArray<uint32>& Indices, bool bIndicesChanged,const FVector& RenderOrigin)
     {
         check(IsInRenderingThread());
         check(uint32(Vertices.Num()) <= Buffers.PositionVertexBuffer.GetNumVertices());
         check(Indices.Num() <= IndexBuffer.Indices.Num());
+        // The render-thread command owns both the new coordinate frame and
+        // vertex payload. No draw can observe a frame from another packet.
+        RenderFrame.Origin=RenderOrigin;
         for (int32 I=0; I<Vertices.Num(); ++I)
         {
             const FDynamicMeshVertex& V = Vertices[I];
@@ -270,6 +288,20 @@ public:
         auto& Uniform = Collector.template AllocateOneFrameResource<FDynamicPrimitiveUniformBuffer>();
         FPrimitiveUniformShaderParametersBuilder Builder;
         BuildUniformShaderParameters(Builder);
+        // This vertex factory has ONE current position stream, not a separate
+        // previous-position buffer. Undo the CURRENT storage origin in both
+        // matrices; using last packet's origin would invent velocity on rebase.
+        if(RenderFrame.Origin!=FVector::ZeroVector)
+        {
+            FMatrix Previous;
+            if(!GetScene().GetPreviousLocalToWorld(GetPrimitiveSceneInfo(),Previous))Previous=GetLocalToWorld();
+            FBoxSphereBounds PreSkinned;
+            GetPreSkinnedLocalBounds(PreSkinned);
+            Builder.LocalToWorld(RenderFrame.Transform(GetLocalToWorld()))
+                .PreviousLocalToWorld(RenderFrame.Transform(Previous))
+                .LocalBounds(RenderFrame.Bounds(GetLocalBounds()))
+                .PreSkinnedLocalBounds(RenderFrame.Bounds(PreSkinned));
+        }
         Uniform.Set(Collector.GetRHICommandList(), Builder);
         Element.PrimitiveUniformBufferResource = &Uniform.UniformBuffer;
     }
@@ -317,7 +349,7 @@ public:
         if (!Mask) return;
         FRayTracingInstance Instance;
         Instance.Geometry = &RayTracingGeometry;
-        Instance.InstanceTransforms.Add(GetLocalToWorld());
+        Instance.InstanceTransforms.Add(RenderFrame.Transform(GetLocalToWorld()));
         FMeshBatch Batch;
         MakeBatch(Batch, Collector);
         Batch.SegmentIndex = 0;
@@ -354,6 +386,7 @@ private:
     UMaterialInterface* Material;
     FMaterialRelevance MaterialRelevance;
     int32 ActiveIndices;
+    FRaftSimWaterRenderFrame RenderFrame;
     bool bStartupRenderAudit;
 };
 }
@@ -381,6 +414,7 @@ bool URaftSimShorelineMeshComponent::SetWaterMesh(TArray<FProcMeshVertex>&& Vert
     if (WaterVertices.IsEmpty()) PrepareStartupWaterShaders(this);
     const bool bShapeChanged = WaterVertices.Num()!=Vertices.Num() || WaterIndexCapacity!=IndexCapacity;
     WaterVertices = MoveTemp(Vertices);
+    WaterRenderOrigin=SelectWaterRenderOrigin(WaterVertices[0].Position);
     WaterIndices = MoveTemp(Indices);
     WaterIndexCapacity = IndexCapacity;
     TopologyCache.Reset();
@@ -549,6 +583,7 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
     else SourceBounds=bParallelBounds ? RaftSimWaterSourceBounds::Parallel(BoundsSource)
         : RaftSimWaterSourceBounds::Reference(BoundsSource);
     WaterBounds=SourceBounds.ExpandBy(500.0);
+    WaterRenderOrigin=SelectWaterRenderOrigin(BaseVertices[0].Position);
     bPendingIndexUpdate|=bTopologyRebuilt;
     UpdateBounds();
     MarkRenderTransformDirty();
@@ -589,26 +624,99 @@ void URaftSimShorelineMeshComponent::SendRenderDynamicData_Concurrent()
                 const int32 Kind=(Order+int32(GFrameCounter%2))%2;
                 auto Mapping=RenderVertexSources;
                 const double Start=FPlatformTime::Seconds();
-                P[Kind]=MakeRenderPacket(WaterVertices,WaterIndices,bIndicesChanged,&Mapping,bReuse,Kind==1);
+                P[Kind]=MakeRenderPacket(WaterVertices,WaterIndices,bIndicesChanged,&Mapping,bReuse,Kind==1,WaterRenderOrigin);
                 Seconds[Kind]=FPlatformTime::Seconds()-Start;
             }
             UE_LOG(LogTemp,Display,TEXT("RENDER_VALUES_PAIR frame=%llu original_first=%d reuse=%d vertices=%d exact=%d original_ms=%.9f candidate_ms=%.9f"),
                 GFrameCounter,GFrameCounter%2==0,bReuse,P[0].Vertices.Num(),SameRenderPacket(P[0],P[1]),Seconds[0]*1000.,Seconds[1]*1000.);
         }
         auto Packet=MakeRenderPacket(WaterVertices,WaterIndices,bIndicesChanged,
-            &RenderVertexSources,bReuse,bParallelValues);
+            &RenderVertexSources,bReuse,bParallelValues,WaterRenderOrigin);
+        static const bool bFrameAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRenderFrameAudit"));
+        if(bFrameAudit && GFrameCounter>=120 && GFrameCounter<184)
+        {
+            FRaftSimWaterRenderFrame Frame{Packet.RenderOrigin};double Error=0.,OriginalError=0.;
+            for(int32 I=0;I<Packet.Vertices.Num();++I)
+            {
+                const auto& Source=WaterVertices[RenderVertexSources[I]].Position;
+                const FVector Restored=Frame.Restore(Packet.Vertices[I].Position);
+                const FVector Direct=FVector(FVector3f(Source));
+                Error=FMath::Max(Error,FVector2D(Restored-Source).Size());
+                OriginalError=FMath::Max(OriginalError,FVector2D(Direct-Source).Size());
+            }
+            UE_LOG(LogTemp,Display,TEXT("WATER_RENDER_FRAME_PACKET frame=%llu vertices=%d origin=(%.17g,%.17g,%.17g) xy_error_cm=%.17g direct_error_cm=%.17g"),
+                GFrameCounter,Packet.Vertices.Num(),Frame.Origin.X,Frame.Origin.Y,Frame.Origin.Z,Error,OriginalError);
+            if(Error>.005)UE_LOG(LogTemp,Error,TEXT("Rebased water buffer XY error exceeds0.005cm; candidate not accepted"));
+        }
         bHasRenderVertexSources=true;
         static const bool bTiming=FParse::Param(FCommandLine::Get(),TEXT("RaftSimWaterStageTimings"));
         if (bTiming) UE_LOG(LogTemp,Display,TEXT("WaterUpload frame=%llu source_vertices=%d upload_vertices=%d indices=%d index_update=%d"),
             GFrameCounter,WaterVertices.Num(),Packet.Vertices.Num(),WaterIndices.Num(),bIndicesChanged ? 1 : 0);
         ENQUEUE_RENDER_COMMAND(RaftSimUpdateShoreline)(
-            [Proxy, Vertices=MoveTemp(Packet.Vertices), Indices=MoveTemp(Packet.Indices), bIndicesChanged](FRHICommandListImmediate& RHICmdList)
-            { Proxy->Update(RHICmdList, Vertices, Indices, bIndicesChanged); });
+            [Proxy, Vertices=MoveTemp(Packet.Vertices), Indices=MoveTemp(Packet.Indices), bIndicesChanged, Origin=Packet.RenderOrigin](FRHICommandListImmediate& RHICmdList)
+            { Proxy->Update(RHICmdList, Vertices, Indices, bIndicesChanged,Origin); });
         bPendingIndexUpdate=false;
     }
 }
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimShorelineRenderFrameTest,"RaftSim.M4.ShorelineRenderFrame",
+    EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FRaftSimShorelineRenderFrameTest::RunTest(const FString&)
+{
+    TArray<FProcMeshVertex> Source;TArray<uint32> Indices,Mapping;
+    for(int32 I=0;I<1025;++I)
+    {
+        FProcMeshVertex V;V.Position=FVector(-551000.+(I%33)*100.+.01234567,-348600.-(I/33)*100.-.02345678,812.345+I*.001);
+        V.Normal=FVector(.2,.3,1.).GetSafeNormal();V.Color=FColor(I%251,83,147,217);
+        V.Tangent=FProcMeshTangent(FVector(1.,.2,.1).GetSafeNormal(),I%2!=0);
+        V.UV0=FVector2D(I*.007,1.);V.UV1=FVector2D(-2.7,3.1);V.UV2=FVector2D(.17,.91);V.UV3=FVector2D(.35,-.6);
+        Source.Add(V);Indices.Add(I);if(I%7==0)Indices.Add(I);
+    }
+    const auto Original=MakeRenderPacket(Source,Indices,true,&Mapping);
+    const FVector Origins[]={FVector(-551000.,-348600.,0.),FVector(-549976.,-349624.,0.),FVector(-550000.,-350000.,0.)};
+    const FMatrix Transforms[]={FMatrix::Identity,
+        FTransform(FRotator(0.,37.,0.),FVector(412345.,-271000.,15.),FVector(1.2,-.8,1.)).ToMatrixWithScale()};
+    double Worst=0.,DirectWorst=0.;
+    for(const auto& Origin:Origins)
+    {
+        const FRaftSimWaterRenderFrame Frame{Origin};
+        const auto First=MakeRenderPacket(Source,Indices,true,nullptr,false,false,Origin);
+        TestTrue(TEXT("rebasing preserves all index order"),First.Indices==Original.Indices);
+        const auto Serial=MakeRenderPacket(Source,Indices,false,&Mapping,true,false,Origin);
+        const auto Parallel=MakeRenderPacket(Source,Indices,false,&Mapping,true,true,Origin);
+        TestTrue(TEXT("frame and packed attributes identical across scheduling"),SameRenderPacket(Serial,Parallel));
+        for(int32 I=0;I<First.Vertices.Num();++I)
+        {
+            auto A=First.Vertices[I],B=Original.Vertices[I];
+            const auto& P=Source[Mapping[I]].Position;const FVector Restored=Frame.Restore(A.Position);
+            Worst=FMath::Max(Worst,FVector2D(Restored-P).Size());
+            DirectWorst=FMath::Max(DirectWorst,FVector2D(FVector(B.Position)-P).Size());
+            B.Position=A.Position;
+            FShorelineRenderPacket PA,PB;PA.Vertices.Add(A);PB.Vertices.Add(B);
+            if(!TestTrue(TEXT("rebasing changes no color, UV, tangent or normal bits"),SameRenderPacket(PA,PB)))return false;
+            for(const auto& Transform:Transforms)
+            {
+                const FVector GPU=Frame.Transform(Transform).TransformPosition(FVector(A.Position));
+                TestTrue(TEXT("raster/ray transform restores the original component frame"),GPU.Equals(Transform.TransformPosition(Restored),1.e-7));
+                // Both previous and current matrices consume the same current
+                // vertex stream, even when its storage origin changed.
+                TestTrue(TEXT("origin change cannot invent component motion"),GPU.Equals(Transform.TransformPosition(P),.005));
+            }
+        }
+        const FBoxSphereBounds Bounds(FVector(-550000.,-350000.,850.),FVector(3000.,3000.,100.),4300.);
+        const auto Local=Frame.Bounds(Bounds);
+        TestTrue(TEXT("local bounds are shifted without changing the world extent"),
+            Local.Origin+Origin==Bounds.Origin && Local.BoxExtent==Bounds.BoxExtent && Local.SphereRadius==Bounds.SphereRadius);
+        const auto Dry=MakeRenderPacket(Source,{},true,nullptr,false,false,Origin);
+        TestTrue(TEXT("dry packets retain their frame but no stale geometry"),Dry.RenderOrigin==Origin && Dry.Vertices.IsEmpty() && Dry.Indices.IsEmpty());
+    }
+    TestTrue(TEXT("rebased buffer precision bound"),Worst<.005);
+    TestTrue(TEXT("actual loss of precision reduced"),Worst<DirectWorst*.1);
+    AddInfo(FString::Printf(TEXT("WaterRenderFrame max_xy_error_cm=%.17g direct_error_cm=%.17g"),Worst,DirectWorst));
+    return !HasAnyErrors();
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimShorelineParallelValuesTest,"RaftSim.M4.ShorelineParallelValues",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FRaftSimShorelineParallelValuesTest::RunTest(const FString&)

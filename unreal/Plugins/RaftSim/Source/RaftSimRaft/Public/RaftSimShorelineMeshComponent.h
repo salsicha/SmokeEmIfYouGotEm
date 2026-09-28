@@ -26,6 +26,7 @@ public:
     const TArray<FProcMeshVertex>& GetWaterVertices() const { return WaterVertices; }
     const TArray<uint32>& GetWaterIndices() const { return WaterIndices; }
     int32 GetIndexCapacity() const { return WaterIndexCapacity; }
+    FVector GetWaterRenderOrigin() const { return WaterRenderOrigin; }
     const TArray<int32>& GetCellOffsets() const { return CellOffsets; }
     uint64 GetTopologyRebuildCount() const { return TopologyCache.GetRebuildCount(); }
     uint64 GetTopologyReuseCount() const { return TopologyCache.GetReuseCount(); }
@@ -44,6 +45,7 @@ public:
     virtual void SendRenderDynamicData_Concurrent() override;
 private:
     TArray<FProcMeshVertex> WaterVertices;
+    FVector WaterRenderOrigin=FVector::ZeroVector;
     TArray<uint32> WaterIndices;
     int32 WaterIndexCapacity = 0;
     FBox WaterBounds = FBox(ForceInit);
