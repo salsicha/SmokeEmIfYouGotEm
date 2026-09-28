@@ -1,5 +1,15 @@
 # Remaining requested work
 
+September28 UTC playable shape correction: the normal Cartesian physical-crest
+path now omits the legacy fixed-size plunge HEIGHT layer that was cancelling
+part of the resolved downstream rise. Same-build A/B restored about11.86cm at
+the selected downstream sample without materially changing native stage; the
+rebuilt no-override default reproduces it. Three native crest regressions pass.
+Actual boat views still have flat foam and weak breaking: NOT realism acceptance.
+Fresh v14 packaging is the next delivery step; existing450s fields and captured
+geometry are unchanged. See
+[change, normal-scene evidence and remaining delivery gates](../reconstruction-review-2026-09-07/native-rise-plunge-relief.md).
+
 September28 UTC profile follow-through: corrected a double-datum subtraction
 in a NEW read-only selected-site observer (not in gameplay water). Schema-v2
 regressions, editor build and actual normal-scene capture PASS; obsolete v1

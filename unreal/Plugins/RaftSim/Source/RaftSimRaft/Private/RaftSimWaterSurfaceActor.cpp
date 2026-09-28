@@ -221,6 +221,13 @@ TAutoConsoleVariable<int32> CVarRaftSimDownstreamBoilMicrorelief(
     TEXT("Default 1; set 0 only for matched visual diagnostics."),
     ECVF_Default);
 
+TAutoConsoleVariable<int32> CVarRaftSimLegacyPlungeRelief(
+    TEXT("RaftSim.Water.LegacyPlungeRelief"),
+    0,
+    TEXT("Retain legacy fixed-size plunge displacement on Cartesian physical crests. ")
+    TEXT("Default 0: native drop/rise plus shared crest own the shape. Set 1 only for legacy comparison; foam and native hydraulics are unchanged."),
+    ECVF_Default);
+
 
 float ComputeStationEdgeCoverage(
     int32 StationIndex,
@@ -6551,6 +6558,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     const bool bUseHydraulicFoamBudget = bCartesianFlow && bCrestLocalizedFoam &&
         CVarRaftSimChilkoHydraulicCrestScale.GetValueOnGameThread()!=0;
     const bool bPhysicalCrestFoam=CVarRaftSimChilkoHydraulicCrestScale.GetValueOnGameThread()!=0;
+    const bool bApplyLegacyPlungeRelief = !bCartesianFlow || !bSharedBreakingReliefEnabled ||
+        !bPhysicalCrestFoam || CVarRaftSimLegacyPlungeRelief.GetValueOnGameThread()!=0;
     static const bool bSerialBreakingVertices=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialBreakingVertices"));
     FString BreakingVertexAuditPath;
 #if !UE_BUILD_SHIPPING
@@ -6602,8 +6611,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     RelativeRiverPosition.X,
                     RelativeRiverPosition.Y,
                     Site.Intensity);
-            CombinedPocketDisplacementMeters +=
-                Pocket.X * LocalWeight;
+            // The Cartesian hydraulic field already carries the resolved drop
+            // and rise. The legacy fixed-meter pocket is an independent authored
+            // height layer, not a native hole. Isolate its effect without changing
+            // source foam, transport, native water or the shared contact sampler.
+            if(bApplyLegacyPlungeRelief)
+                CombinedPocketDisplacementMeters += Pocket.X * LocalWeight;
             PocketFoam = FMath::Max(
                 PocketFoam, Pocket.Y * FoamSourceWeight);
 
@@ -9560,6 +9573,7 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             Report->SetNumberField(TEXT("world_seconds"),GetWorld()->GetTimeSeconds());
             Report->SetNumberField(TEXT("committed_water_seconds"),WaterAdapter->GetCommittedStepSeconds());
             Report->SetBoolField(TEXT("presented_detail_available"),bool(Detail));
+            Report->SetBoolField(TEXT("legacy_plunge_relief_requested"),CVarRaftSimLegacyPlungeRelief.GetValueOnGameThread()!=0);
             if(Detail)
             {
                 Report->SetNumberField(TEXT("presented_detail_sequence"),double(Detail->Sequence));
