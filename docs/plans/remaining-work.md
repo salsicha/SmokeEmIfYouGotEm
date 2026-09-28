@@ -1,5 +1,16 @@
 # Remaining requested work
 
+September28 UTC v15r2 delivery and review COMPLETE: retry5066 and its sole
+follow-through57198 are terminal exit0. The hydraulic-normal repair is in the
+rebuilt normal game; staged2,405-file closure and actual Boot/menu launch pass.
+Normal-menu timing passes20FPS (p9546.916ms), but8310 (54.2271ms/three>100ms
+frames) and11520 (52.4001ms) FAIL. Packaged80-sample approach covers173.520m;
+decoded and inspected views still show flat foam/weak breaking. No river,
+collision, shoreline, settling or visual acceptance. Do not restart these
+completed jobs. See [terminal results and next work](../reconstruction-review-2026-09-07/v15r2-playable-review.md).
+This supersedes all live/waiting owner descriptions below. South Fork remains
+first; later rivers are not yet eligible. No push was made.
+
 September28 UTC v15 packaging hit a verified transient disk-pressure failure:
 Zen logged1.86GiB free below its2GiB floor, despite12GB after cook exit. Original
 package98074 and follow-through28345 are terminal failures; no tests ran. Removed

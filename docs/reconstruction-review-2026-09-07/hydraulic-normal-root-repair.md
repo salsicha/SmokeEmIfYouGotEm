@@ -68,7 +68,17 @@ lighting input with its displacement input, not a new fluid or breaking model.
 
 ## Packaged delivery status
 
-### Current: storage failure diagnosed; one larger-headroom retry
+### Current: retry and playable review complete
+
+Package5066 and sequential follow-through57198 are terminal exit0. The repaired
+material reached the normal rebuilt game. Staged closure and normal Boot/menu
+launch pass;20FPS timing passes at normal-menu but fails at both rapid probes.
+Actual80-sample approach and complete video decoding are finished; inspected
+views still retain flat foam and weak breaking. No full visual/physical/river
+acceptance. See [v15r2 measured results and evidence](v15r2-playable-review.md).
+Do not restart the completed owners. All live descriptions below are historical.
+
+### Historical storage failure and larger-headroom retry
 
 Initial package98074/wrapper39604 is TERMINAL failure (UAT25, cook4 errors).
 Follow-through28345/wrapper26912 also terminated; no validation or motion ran.
