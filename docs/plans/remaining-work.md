@@ -1,5 +1,16 @@
 # Remaining requested work
 
+September28 UTC delivery owner: ONE v14 package is LIVE, session82230,
+wrapper32192 (UAT/UBT observed35032/16348), source5f05b136d. Recipe
+`tmp/package-south-fork-v14-20260928.ps1`; durable receipt/log
+`tmp/south-fork-v14-package-20260928.{json,log}`; fresh stage
+`tmp/south-fork-playable-v14-20260928`. Frozen source, geometry and450s-field
+hashes are recorded. Do not duplicate the package or change its inputs.
+Existing hydraulic wrapper33852/native28956 also remains live (observed1116.5s).
+No concurrent FPS validation. After both owners/audits finish, verify staged
+closure and packaged Boot/menu launch, motion and isolated cost. Successful
+build or source-level default alone is not packaged delivery/river acceptance.
+
 September28 UTC playable shape correction: the normal Cartesian physical-crest
 path now omits the legacy fixed-size plunge HEIGHT layer that was cancelling
 part of the resolved downstream rise. Same-build A/B restored about11.86cm at

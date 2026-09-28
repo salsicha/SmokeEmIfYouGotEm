@@ -100,7 +100,10 @@ Native snapshots are not promoted, and v13 still uses the450s fields.
 ## Playable delivery and next gates
 
 Fresh v14 recipe: `tmp/package-south-fork-v14-20260928.ps1`; package receipt and
-log will use `tmp/south-fork-v14-package-20260928.{json,log}`. Preserve v13.
+log use `tmp/south-fork-v14-package-20260928.{json,log}`. Preserve v13.
+Package82230/wrapper32192 is LIVE from01:31:09.0827426Z, source5f05b136d,
+UAT/UBT observed35032/16348. Frozen input hashes are in the receipt; no duplicate
+build. This live-owner note is not successful packaging or installed delivery.
 Measured prior stage5,360,205,592 bytes; reserve two full copies plus4GiB scratch
 before launch (15,015,378,480 bytes), including ongoing native snapshots. This
 replaces an unmeasured20GiB staging guard, not a quality/performance gate.
