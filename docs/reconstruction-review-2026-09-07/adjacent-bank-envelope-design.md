@@ -247,3 +247,62 @@ full river queue, actual water realism and isolated20FPS gates open. Latest
 free space10,548,801,536bytes does not meet the14GiB next-package gate; no data or
 old package was deleted. Further space recovery must preserve captured evidence
 and valid timing-control packages, not lower the gate.
+
+## v24 isolated normal-settings performance and clock
+
+September28 UTC: source replay33152 and independent reload16732 are now terminal0.
+The reload verifies631 protected current hashes,22 implementation hashes and18
+historical tools; all11 supported records retain exact component kinetic ledgers
+and nonzero uncanceled power. Unsupported2/7 remain untouched. See
+[source completion and limits](prescribed-physical-transport.md#original-source-replay-terminal-completion-and-independent-reload).
+This supersedes the live-owner statements above. No competing engine, build,
+hydraulic cook or Python audit was present before these sequential game runs.
+
+All three runs use the existing v24 cooked standalone binary, unchanged SHA256
+727819bb18d829477ed274eef8096cd495db909c2490e19a3b161c63d8159484,
+1280x720/D3D12, normal selective edges, no quality/solver/legacy overrides.
+The first confirms default Boot -> real main menu -> FullReach -> post-travel CSV.
+The other two start at review stations in the same normal FullReach map: they
+are diagnostic placement, not additional normal-menu launch claims. Every run
+ended0 with zero runtime errors,1200 captured frames,1140 audited rows30..1169.
+Unchanged gates: p95<=50ms AND no individual frame>100ms. End samples remain in
+the original CSV; the existing warmed-window convention is not changed here.
+
+| Launch | Mean ms | p95 ms | Max ms | Frames >100ms | Result |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Boot/menu | 43.3862 | 82.4436 | 148.7179 | 28 | FAIL |
+| Review8310 | 50.9610 | 77.3050 | 199.1925 | 20 | FAIL |
+| Review11520 | 80.7444 | 92.3504 | 225.6344 | 8 | FAIL |
+
+Receipts: `unreal/Saved/RaftSimValidation/sf-v24-isolated-{menu,8310,11520}-20260928-frame-audit.json`.
+Corresponding logs are in `unreal/Saved/Logs/`. Independent strict CSV parsing,
+clock and scope audits are `tmp/sf-v24-isolated-{menu,8310,11520}-20260928-scopes-and-clock.json`.
+CSV SHA256s in the same order:
+
+- 40df05c4d2b89db8dd0882d3893d5cceaceec18d3ffe728eef88c1c188fb0fab
+- 08a7d7fa1a1137f0974d22dcaf1fc28f0b43e386382acd96e3a6ece04ebdbab6
+- 102a1ae4ef6acf6b8754dcd943b6a3146df74321f179772f63a0d38922585ef5
+
+The game bridge clock, not merely detail-water backlog, is material. Menu debt
+grows2.037406s to2.0449s. At8310 it falls from1.3357s to0.006002s after reaching
+2.4619s; this is not a full capacity qualification. At11520 it grows16.0289s,
+from1.0004s to17.0293s, with four fixed ticks on every audited row. Requested time
+advances91.9622s but committed time only75.9333s. No elapsed time was discarded,
+no dt increased, no tolerance added. All clock acceptance flags remain false.
+
+The dominant observed cost is CPU-side: at11520 mean game thread78.466ms versus
+GPU23.234ms. Surface Tick averages53.318ms; nested CartesianPublish31.682ms,
+SetMesh30.320ms, crest Update20.362ms (Selection13.220ms), Topology8.352ms.
+These nested timers MUST NOT be added. StepWater separately averages14.909ms.
+The normal menu and8310 also show substantial surface/mesh cost. These are
+workload observations, not causal proof of a specific regression versus v21:
+trajectories, frame-time history and machine conditions differ. The new native
+three-wet candidate is NOT enabled in this binary and cannot explain this cost.
+
+Next measure/reduce repeated publication, crest selection and shoreline topology
+work while preserving same-input output and clock conservation; the prepared
+same-binary ordered controls can distinguish specific algorithm costs. Do not
+blindly integrate a several-ms-per-bank candidate or reduce visual/physical
+quality to make this report pass. Prior v24 motion/contact evidence remains
+separate; these runs add no new visual delivery, full collision/shoreline or
+physical acceptance. All profile owners are terminal; no push or data deletion.

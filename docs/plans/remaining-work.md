@@ -1,5 +1,20 @@
 # Remaining requested work
 
+September28 UTC original source replay AND independent reload are COMPLETE,
+exit0:631 current protected hashes,22 implementation hashes,18 historical tools;
+11 supported records checked, unsupported2/7 unchanged. Exact component ledgers
+pass but all11 retain uncanceled geometry/port power: no complete solver claim.
+The first isolated v24 normal-settings packaged baseline is now COMPLETE:
+Boot/menu p9582.4436ms,8310 p9577.3050ms,11520 p9592.3504ms; all FAIL unchanged
+20FPS gates, with28/20/8 individual frames over100ms respectively. Runtime errors0,
+same binary unchanged. At11520 bridge backlog grows16.0289s to17.0293s; CPU surface
+and mesh/crest costs dominate the observed timings. Do not drop elapsed water
+time, increase dt or weaken gates. Next reduce actual publication/crest/topology
+cost with same-input geometry and clock checks; integrate the three-wet candidate
+only after shared-edge/world-rounding and cost qualification. No new visible
+delivery this run, no solver activation, no move to Colorado, no live workload.
+See [isolated v24 timing and clock evidence](../reconstruction-review-2026-09-07/adjacent-bank-envelope-design.md#v24-isolated-normal-settings-performance-and-clock).
+
 September28 UTC three-wet native candidate now passes11 rendered engine tests
 and independent exact checks of ALL stored triangles in four cases. A real
 endpoint rounding defect was caught and repaired without a depth tolerance.
@@ -10,7 +25,8 @@ does NOT yet use this kernel: next integrate shared-edge/world rounding,
 variable metadata/attributes and ear-aware cache identity, measuring real cost
 before enablement. Normal v24 remains unchanged and South Fork unaccepted.
 Original source replay33152 completed exit0 at12:03:19UTC. Its independent
-provenance/ledger reload16732 is live; isolated game timing awaits that closure.
+provenance/ledger reload16732 subsequently completed exit0; timing results above
+supersede the earlier pending state. Older dated progress entries below are historical.
 See [native proof, cost and integration limits](../reconstruction-review-2026-09-07/three-wet-bank-envelope.md#native-candidate-and-independent-stored-coordinate-proof).
 
 September28 UTC remaining three-wet finite-chord repair now has an exact
