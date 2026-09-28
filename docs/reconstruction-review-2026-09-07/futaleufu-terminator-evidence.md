@@ -20,15 +20,20 @@ The GLO-30 tiles were already in `terrain/source`.
 
 | source | what it measures | epoch |
 | --- | --- | --- |
-| Sentinel-2 L2A (10 m; B, G, R, NIR) | wetted extent, whitewater, colour | 2020-02-20, 2024-02-19, 2026-01-04; flows unknown |
+| Sentinel-2 L2A (10 m; B, G, R, NIR) | wetted extent, whitewater, colour | 2020-02-20 (163 m³/s at La Frontera), 2024-02-19, 2026-01-04 (flows not yet retrieved) |
 | Copernicus GLO-30 (1 arc-second DSM, EGM2008) | terrain (canopy included); edited water surface | TanDEM-X 2011-2015 |
 | OSM relation 9751030 | chainage, rapid nodes (El Trono) | 2026 |
 
 - **No open imagery or elevation finer than 10 m exists** for the run. SAF
   sells aerial photography.
-- **No gauge record was downloaded.** DGA stations 10702002-0 and 10704002-1
-  would give the image-date flows; downloading them needs the user's
-  permission.
+- **Gauge records (added 2026-09-28, with permission):** DGA daily flows for
+  10702002 (La Frontera, at the Argentine border, upstream of the reach) and
+  10704002 (ante junta Río Malito), from the CR2 Explorador Climático copy of
+  the DGA record, in `hydrometric/dga_daily_flows_cr2.json`. That copy ends
+  in June 2020, so it gives only the first image date: **163.4 m³/s at La
+  Frontera on 2020-02-20**. The reach adds unmeasured tributaries (Río
+  Espolón and smaller). The 2024-02-19 and 2026-01-04 flows need the DGA BNA
+  portal, whose search needs a reCAPTCHA that the user must complete.
 - **Licence:** Copernicus data (Sentinel-2, GLO-30) require attribution. OSM
   is ODbL.
 
@@ -133,8 +138,10 @@ Final cook (48,000 steps at 400 m³/s; `evidence/cook_compare.json`):
   - The observed-whitewater floor shows the photographed extent.
   - The smooth inferred bed and the 30 m surface cannot form the
     Terminator's holes and waves.
-- **The flow is unknown on every image date and on the GLO-30 epoch.**
-  400 m³/s is a planning band. The calibrated bed absorbs any difference.
+- **The flow is known on one image date only:** 163 m³/s at La Frontera on
+  2020-02-20, plus unmeasured tributaries. The other dates and the GLO-30
+  epoch are unknown. 400 m³/s is a planning band, well above that image-day
+  flow, and the calibrated bed absorbs any difference.
 
 ## Validation
 
@@ -181,5 +188,6 @@ running:
 - **The lower and main rapids are too mild** hydraulically (see Results).
 - **The canopy positions, species and heights are inferred.** Only forest
   cover is measured.
-- **Finer data would need purchase** (SAF aerial photography) or
-  **permission to download** (DGA gauge records).
+- **Finer data would need purchase** (SAF aerial photography). The
+  2024-2026 gauge records need the DGA portal's reCAPTCHA, completed by the
+  user.
