@@ -1,5 +1,23 @@
 # Remaining requested work
 
+September28 UTC consistent near-axis GPU row/column proposals now repair the
+original source33168/frame186 capture: complete native builder/cache/attribute
+checks and nine independent exact stored-contour cases pass. Final axis-v4:
+20 regressions,15 audit controls,nine exact exports; all frozen inputs intact.
+Longer ACTUAL axis-live-v1 replay FAILED:275 accepted/37 rejected updates,
+40 motion samples/44.288m. A changed source33168 segment is dry despite wet
+endpoints; source23259 reverses order on a constant GPU row farther from the
+axis. Both original changed-state captures are retained as explicitly negative
+native regressions, NOT accepted geometry. Video1309 frames/43.6s decoded;
+6/20/30/42s inspected: forward motion/gross alignment, but flat foam, weak
+breaking, coarse shore geometry and crew fit remain. Median diagnostic
+topology44.895899ms,39/275 calls over50ms; NOT isolated FPS/clock acceptance.
+Next repair full endcap segments and general constant-row ordering across
+current-depth changes, then actual motion/contact/shoreline and cost before
+normal promotion. Candidate OFF by default; v27 unchanged. No new cook,
+package, solver, source deletion, acceptance or push. All owners terminal.
+See [near-axis repair, failed longer replay and exact evidence](../reconstruction-review-2026-09-07/certified-bank-axis-repair.md).
+
 September28 UTC bounded root proposals reduce complete stored-contour fixture
 construction cost, but an expanded actual replay finds ANOTHER unresolved
 GPU-storage failure. Do NOT promote the candidate. The proposal-only stopping

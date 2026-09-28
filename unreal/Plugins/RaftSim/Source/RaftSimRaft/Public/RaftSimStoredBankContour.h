@@ -106,6 +106,39 @@ struct FStorage
         }
         if(T>0. && T<1.)
         {
+            FVector2D Preferred=Proposal.XY;
+            // Near a canonical axis, one off-axis float step may be much
+            // larger than the proposed coordinate. Search on that ACTUAL
+            // stored row/column instead of retaining a now-dry radial root.
+            // This is proposal generation only; every stored segment, wet
+            // triangle, dry fan, partition and 1mm width still must certify.
+            const int32 Fixed=T<=.5 ? 1 : 0,Free=1-Fixed;
+            const double FixedStep=FMath::Abs(double(std::nextafter(float(Origin[Fixed]),
+                End[Fixed]>Origin[Fixed] ? std::numeric_limits<float>::infinity() :
+                    -std::numeric_limits<float>::infinity()))-Origin[Fixed]);
+            if(FMath::Abs(Stored[Fixed]-Origin[Fixed])<=2.*FixedStep)
+            {
+                FVector2D P=Local(Stored).XY;double Low=0.,High=1.;
+                for(int32 I=0;I<56;++I)
+                {
+                    P[Free]=(Low+High)*.5;
+                    if(Curve.Value(FPoint(P)).Lo>=0.)High=P[Free];else Low=P[Free];
+                    if(Up(High-Low)<=Down(RootWidth/16.))break;
+                }
+                P[Free]=FMath::Min(1.,High+RootWidth*.75);
+                const bool Increasing=End[Free]>Origin[Free];
+                const FBound Mapped=FBound(Origin[Free])+(FBound(End[Free])-FBound(Origin[Free]))*FBound(P[Free]);
+                const double Bound=Increasing ? Mapped.Hi : Mapped.Lo;float V=float(Bound);
+                if(Increasing ? double(V)<Bound : double(V)>Bound)
+                    V=std::nextafter(V,Increasing ? std::numeric_limits<float>::infinity() : -std::numeric_limits<float>::infinity());
+                Stored[Free]=double(V);Candidates[Free][0]=double(V);
+                Candidates[Free][1]=double(std::nextafter(V,Increasing ? -std::numeric_limits<float>::infinity() : std::numeric_limits<float>::infinity()));
+                Candidates[Free][2]=double(std::nextafter(V,Increasing ? std::numeric_limits<float>::infinity() : -std::numeric_limits<float>::infinity()));
+                // All proposals landing on the same near-axis GPU row must
+                // select the same point. Mixing radial and fixed-row roots
+                // reverses angular order as X grows while stored Y is fixed.
+                Preferred=Local(Stored).XY;
+            }
             // Rounding both axes outward can consume the entire geometric
             // band in a direction unlike the contour normal. Select among
             // neighboring representable pairs only when BOTH the stored point
@@ -121,7 +154,7 @@ struct FStorage
                 const FVector2D W(Candidates[0][X],Candidates[1][Y]);const FPoint P=Local(W);
                 if(P.X.Lo<=0. || P.X.Hi>=1. || P.Y.Lo<=0. || P.Y.Hi>=1. ||
                     Curve.Value(P).Lo<0. || Curve.Value(Inner(P,Width)).Hi>0.)continue;
-                const double Distance=FMath::Abs(P.XY.X-Proposal.XY.X)+FMath::Abs(P.XY.Y-Proposal.XY.Y);
+                const double Distance=FMath::Abs(P.XY.X-Preferred.X)+FMath::Abs(P.XY.Y-Preferred.Y);
                 if(Distance<Best){Best=Distance;Choice=W;Found=true;}
             }
             if(Found)Stored=Choice;

@@ -110,17 +110,17 @@ def audit_case(item):
                 exact_maximum_band_cm=str(maximum_band), whole_gpu_geometry_certified=True)
 
 
-def captured_rejection(path, expected_hash, frame):
+def captured_rejection(path, expected_hash, frame, source=31556, dry_corner=0):
     raw = Path(path).read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     if digest != expected_hash:
-        raise ValueError("Original source31556 rejection log changed")
-    pattern = (rf"\[\s*{frame}\]LogTemp: Display: CERTIFIED_BANK_REJECT source=31556 dry=0 "
+        raise ValueError(f"Original source{source} rejection log changed")
+    pattern = (rf"\[\s*{frame}\]LogTemp: Display: CERTIFIED_BANK_REJECT source={source} dry={dry_corner} "
                r"reason=certificate stage=1 dry_xy=\(([^)]*)\) wetx_xy=\(([^)]*)\) "
                r"wety_xy=\(([^)]*)\) origin=\(([^)]*)\) bed=\(([^)]*)\) depth=\(([^)]*)\)")
     matches = re.findall(pattern, raw.decode("utf-8-sig"))
     if len(matches) != 1:
-        raise ValueError(f"Missing unique original frame{frame}/source31556 donors")
+        raise ValueError(f"Missing unique original frame{frame}/source{source} donors")
     dry, wetx, wety, origin, bed, depth = (tuple(map(number, s.split(','))) for s in matches[0])
     if len(bed) != 4 or len(depth) != 4 or any(len(p) != 2 for p in (dry, wetx, wety, origin)):
         raise ValueError("Incomplete captured rejection")
@@ -129,7 +129,7 @@ def captured_rejection(path, expected_hash, frame):
     return bed, depth, (dry, (wetx[0], wety[1]), origin), digest
 
 
-def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_path, latest_rejection_path):
+def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_path, latest_rejection_path, transition_rejection_path):
     raw = Path(path).read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     if digest != expected_sha256:
@@ -159,11 +159,13 @@ def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_p
         later_rejection_path, "709e34f3bd58baab49850200e2e2c0fe8c6d6aaddda186a116163c3ad6dcff88", 66)
     latest_bed, latest_depth, latest_map, latest_hash = captured_rejection(
         latest_rejection_path, "6293eed8a9114af3889ed27ed2113f96627285e782dc08c447ff5f80416dde89", 80)
+    transition_bed, transition_depth, transition_map, transition_hash = captured_rejection(
+        transition_rejection_path, "1d4d2429e1a4d7597abced20939c6a930a34361a8819b015e6781a895113fbfe", 186, 33168, 1)
     maps = (((-542600, -360200), (-542700, -360300), (-542600, -360200)),
             ((0, 0), (100, 100), (0, 0)),
             ((-542600, -360200), (-542500, -360300), (-542600, -360200)),
             ((361100, -543000), (361000, -542900), (361100, -543000)),
-            ((-542600, -360200), (-542700, -360300), (-551000, -348600)), captured_map, later_map, latest_map)
+            ((-542600, -360200), (-542700, -360300), (-551000, -348600)), captured_map, later_map, latest_map, transition_map)
     nx = cell[3]["source_id"]-cell[1]["source_id"]
     row, column = divmod(cell[1]["source_id"], nx)
     grid_origin = (F(cell[1]["field_x_m"])*100-column*100,
@@ -174,7 +176,8 @@ def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_p
         raise ValueError("Missing mapped cases")
     results = []
     for index, (item, coordinates) in enumerate(zip(data["cases"], maps)):
-        expected_bed, expected_depth = ((latest_bed, latest_depth) if index == 7 else
+        expected_bed, expected_depth = ((transition_bed, transition_depth) if index == 8 else
+                                        (latest_bed, latest_depth) if index == 7 else
                                         (later_bed, later_depth) if index == 6 else
                                         (captured_bed, captured_depth) if index == 5 else (bed, depth))
         if item["case"] != index or tuple(map(number, item["bed"])) != expected_bed or tuple(map(number, item["depth"])) != expected_depth:
@@ -189,7 +192,8 @@ def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_p
         result.update(case=index, construction_ms=item["construction_ms"])
         results.append(result)
     return dict(native_sha256=digest, contact_sha256=contact_hash, rejection_log_sha256=rejection_hash,
-                later_rejection_log_sha256=later_hash, latest_rejection_log_sha256=latest_hash, cases=results,
+                later_rejection_log_sha256=later_hash, latest_rejection_log_sha256=latest_hash,
+                transition_rejection_log_sha256=transition_hash, cases=results,
                 normal_renderer_integrated=False, gameplay_accepted=False,
                 performance_accepted=False)
 
@@ -202,6 +206,7 @@ if __name__ == "__main__":
     parser.add_argument("--rejection-log", required=True)
     parser.add_argument("--later-rejection-log", required=True)
     parser.add_argument("--latest-rejection-log", required=True)
+    parser.add_argument("--transition-rejection-log", required=True)
     args = parser.parse_args()
     print(json.dumps(audit(args.native, args.sha256, args.contact, args.rejection_log,
-                           args.later_rejection_log, args.latest_rejection_log), indent=2))
+                           args.later_rejection_log, args.latest_rejection_log, args.transition_rejection_log), indent=2))
