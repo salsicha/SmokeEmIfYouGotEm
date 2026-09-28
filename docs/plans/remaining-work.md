@@ -1,5 +1,17 @@
 # Remaining requested work
 
+September28 UTC v22 height-key package and actual Boot/menu/rapid motion checks
+COMPLETE. Staged closure2405files/917995570bytes;12 frozen inputs unchanged.
+Normal launch has zero runtime errors;80 samples cover174.237m. Full video
+decodes2482frames/82.7s. This delivers the cache repair in a rebuilt playable
+scene, not an FPS/visual improvement. Source replay33152 was concurrent and
+remains live; these are explicitly NON-TIMING runs. Wet support agrees, but
+two non-ground-occluded raw-dry rendered samples remain; flat foam/weak breaking
+and crew-fit problems persist. No river acceptance or move to Colorado.
+Next use the retained dry-probe geometry for a bounded shoreline repair;
+isolated20FPS measurements must await the SAME replay's terminal/hash check.
+See [v22 delivery and retained failures](../reconstruction-review-2026-09-07/breaking-height-cache-key.md#v22-playable-delivery-and-retained-failures).
+
 September28 UTC normal-scene height-only crest cache identity implemented;
 editor build and8 rendered native checks PASS with exact geometry/history and
 changing foam. Synthetic12-frame case rebuilds2 rather than12 times; NO real

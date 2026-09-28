@@ -88,3 +88,71 @@ Do not claim synthetic avoided work as measured FPS, or reuse old v21 footage
 as proof of the new executable. Retain all failed20FPS/hitch results and the
 unresolved flat foam, weak breaking, shoreline, terrain and crew shortcomings.
 South Fork stays first; Colorado/Pacuare/Futaleufu remain queued.
+
+## v22 playable delivery and retained failures
+
+The pending-package paragraph above is historical. The SAME package49561
+completed successfully: BuildCookRun450.57s, exit0, closure2405files/
+917995570bytes, no external fallback, all12 frozen inputs unchanged.
+Receipt completed2026-09-28T09:42:32.3186942Z. No second cook was launched.
+
+One follow-through16700/wrapper37892 completed09:49:56.6231640Z, exit0:
+tmp/validate-height-key-v22-motion-20260928.ps1, receipt
+tmp/height-key-v22-motion-20260928.json. Actual staged default Boot -> main
+menu -> FullReach -> post-travel600-frame capture ordering passed; exactly
+one of each required event, zero runtime error/fatal entries, actual normal
+selective-edge mode confirmed. The600-frame CSV is an automatic smoke-test
+stop, NOT isolated timing evidence. Original Python33152 remained live
+throughout; no profiler isolation guard was changed or bypassed, and no FPS
+statistics/acceptance are reported from this concurrent run.
+
+Separate actual rapid review starts at8310 in that SAME normal-scene binary.
+80 telemetry samples advance8313.076 ->8487.313m,174.237m total, no runtime
+errors. All18 spray source centres pass unchanged6/3/3cm checks; this does
+not validate particle trajectories or realistic breaking. Contact evidence
+samples1897 wet points with max support/carrier error0.00004764635cm;
+128 raw-dry points,126 ground-occluded, zero occluded wet and zero unavailable.
+These are independent submitted-triangle support probes, not a full collision
+or temporal shoreline test.
+
+Two raw-dry probes have rendered water above registered ground and remain
+failures, not silently removed or treated as wet:
+
+- XY(-542609.867033,-360212.234553)cm: water870.852992cm,
+  ground868.137817cm, raw depth0, hydraulic bed8.666412m.
+  Source cell has three wet corners and one dry corner.
+- XY(-539440.000000,-360243.409684)cm: water960.875862cm,
+  ground958.122681cm, raw depth0, hydraulic bed9.612991m.
+  Source cell has two wet corners and two dry corners.
+
+Full triangle vertices and same-call cached/current source cells are retained
+in tmp/sf-v22-motion-20260928-contact.json. Changed time/triangulation changes
+the sampling set; this is NOT proof the cache repair introduced the failures,
+nor does it resolve the older positive-film point. Next reproduce these exact
+points/triangles against the shoreline construction before changing geometry.
+Do not lower the wet threshold, weaken support gates or hide dry probes.
+
+The original engine video fully decodes2482frames, monotone PTS0..82.7s,
+44 exact adjacent duplicates,1280x720. Seven retained samples include6/20/80s
+views inspected here: raft moves through rapid into calmer water; broad flat
+white foam, weak breaking, coarse banks and crew fit remain. No full temporal
+continuity, collision, animation or visual acceptance is claimed. Recording
+frame rate is not engine frame rate. Decoder61554 completed exit0; output
+tmp/sf-v22-motion-decoded-20260928/report.json.
+
+Binary SHA256:
+65a222ed55bf0825eee7bdcb53600d7f8bd6410e4254c31b86eafe1319533521.
+Video SHA256:
+689985dfec4d3f8a39cb75a04d3ff546c966a710df19dba77d4b10da5e584eee.
+Contact SHA256:
+bff4c53b8ad86c0003b40036862ae8c0e8e6aeb3a2e238e5e70ab0ff4dd2b74f.
+All12 source inputs and executable still match after runtime. Protected user
+test unchanged. No captured data deletion, solver/field/material edit or push.
+
+No package/game/decode owner remains live. Source replay33152 alone remains
+at index1 after index0 passed; keep its existing owner and frozen inputs.
+Its uncompleted report is not acceptance. After terminal provenance checks,
+run isolated normal menu/8310/11520 timing at the unchanged20FPS target
+(p95<=50ms, zero frames>100ms); retain failures. No new cook is queued.
+This is playable integration verification of the narrow cache optimization,
+not a demonstrated visible or performance improvement or South Fork completion.
