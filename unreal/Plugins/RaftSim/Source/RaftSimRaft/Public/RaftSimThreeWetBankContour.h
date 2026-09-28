@@ -308,7 +308,8 @@ inline bool BuildStored(const FCurve& C,double Width,FResult& Out,const FStore& 
         // A storage policy can perturb ray ordering. Certify the partition,
         // not just depth signs on an accidentally reversed or overlapping span.
         if(!SamePoint(P,Q) && (Cross(Origin,P,Q).Lo<=0. || Cross(P,Q,B).Lo<0. || Cross(P,B,A).Lo<0.))return false;
-        return Certificate(C,P,Q,Q,true,Out.Stats) && Certificate(C,Origin,A,B,false,Out.Stats);
+        return Certificate(C,P,Q,Q,true,Out.Stats) &&
+            Certificate(C,Origin,A,B,false,Out.Stats);
     };
     const auto MakePoint=[&](double T){if(T>0. && T<1.)++Out.Stats.RootSolves;return Store(Point(C,T,RootWidth,&Out.Stats,BoundedProposal),T);};
     struct FSpan{double A,B;int32 Level;FPoint P,Q;};TArray<FSpan,TInlineAllocator<32>> Stack;

@@ -129,7 +129,7 @@ def captured_rejection(path, expected_hash, frame, source=31556, dry_corner=0):
     return bed, depth, (dry, (wetx[0], wety[1]), origin), digest
 
 
-def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_path, latest_rejection_path, transition_rejection_path):
+def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_path, latest_rejection_path, transition_rejection_path, axis_rejection_path):
     raw = Path(path).read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     if digest != expected_sha256:
@@ -161,11 +161,15 @@ def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_p
         latest_rejection_path, "6293eed8a9114af3889ed27ed2113f96627285e782dc08c447ff5f80416dde89", 80)
     transition_bed, transition_depth, transition_map, transition_hash = captured_rejection(
         transition_rejection_path, "1d4d2429e1a4d7597abced20939c6a930a34361a8819b015e6781a895113fbfe", 186, 33168, 1)
+    changed_bed, changed_depth, changed_map, axis_hash = captured_rejection(
+        axis_rejection_path, "57820e57efb0f813f7a0058f4563bf162db1d8403fc0f3b96e35be82d9a36322", 183, 33168, 1)
+    row_bed, row_depth, row_map, _ = captured_rejection(
+        axis_rejection_path, "57820e57efb0f813f7a0058f4563bf162db1d8403fc0f3b96e35be82d9a36322", 292, 23259, 0)
     maps = (((-542600, -360200), (-542700, -360300), (-542600, -360200)),
             ((0, 0), (100, 100), (0, 0)),
             ((-542600, -360200), (-542500, -360300), (-542600, -360200)),
             ((361100, -543000), (361000, -542900), (361100, -543000)),
-            ((-542600, -360200), (-542700, -360300), (-551000, -348600)), captured_map, later_map, latest_map, transition_map)
+            ((-542600, -360200), (-542700, -360300), (-551000, -348600)), captured_map, later_map, latest_map, transition_map, changed_map, row_map)
     nx = cell[3]["source_id"]-cell[1]["source_id"]
     row, column = divmod(cell[1]["source_id"], nx)
     grid_origin = (F(cell[1]["field_x_m"])*100-column*100,
@@ -176,7 +180,9 @@ def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_p
         raise ValueError("Missing mapped cases")
     results = []
     for index, (item, coordinates) in enumerate(zip(data["cases"], maps)):
-        expected_bed, expected_depth = ((transition_bed, transition_depth) if index == 8 else
+        expected_bed, expected_depth = ((row_bed, row_depth) if index == 10 else
+                                        (changed_bed, changed_depth) if index == 9 else
+                                        (transition_bed, transition_depth) if index == 8 else
                                         (latest_bed, latest_depth) if index == 7 else
                                         (later_bed, later_depth) if index == 6 else
                                         (captured_bed, captured_depth) if index == 5 else (bed, depth))
@@ -193,7 +199,7 @@ def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_p
         results.append(result)
     return dict(native_sha256=digest, contact_sha256=contact_hash, rejection_log_sha256=rejection_hash,
                 later_rejection_log_sha256=later_hash, latest_rejection_log_sha256=latest_hash,
-                transition_rejection_log_sha256=transition_hash, cases=results,
+                transition_rejection_log_sha256=transition_hash, axis_rejection_log_sha256=axis_hash, cases=results,
                 normal_renderer_integrated=False, gameplay_accepted=False,
                 performance_accepted=False)
 
@@ -207,6 +213,7 @@ if __name__ == "__main__":
     parser.add_argument("--later-rejection-log", required=True)
     parser.add_argument("--latest-rejection-log", required=True)
     parser.add_argument("--transition-rejection-log", required=True)
+    parser.add_argument("--axis-rejection-log", required=True)
     args = parser.parse_args()
     print(json.dumps(audit(args.native, args.sha256, args.contact, args.rejection_log,
-                           args.later_rejection_log, args.latest_rejection_log, args.transition_rejection_log), indent=2))
+                           args.later_rejection_log, args.latest_rejection_log, args.transition_rejection_log, args.axis_rejection_log), indent=2))

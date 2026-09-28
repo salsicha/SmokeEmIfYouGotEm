@@ -1,5 +1,21 @@
 # Remaining requested work
 
+September28 UTC whole-endcap and signed-neighbor correction now certifies all
+11 retained GPU geometry captures:20 native regressions,15 audit controls,
+11 independent exact cases, frozen inputs unchanged (partition-v3). Proposed
+sorting was unnecessary and removed; final geometry gates are unchanged.
+Actual partition-live-v2 replay still FAILED:294 accepted/19 rejected updates,
+40 samples/44.783m. New changed-depth sources33168 and33610 are retained;
+the first rejected connection is exactly dry between two wet endpoints.
+1306-frame video decoded and6/20/30/42s inspected; flat foam/weak breaking,
+coarse banks/rocks and crew fit remain. Diagnostic topology median45.4756ms,
+39/294 calls over50ms is NOT isolated FPS acceptance. Candidate stays OFF;
+normal v27 binary unchanged. Next reconstruct the near-corner endcap using
+representable interior nodes, certify both cells, then actual motion/contact/
+shoreline and isolated cost before normal promotion. No new cook, package,
+solver, source deletion, acceptance or push; all owners terminal.
+See [qualified captured-state repair and failed replay](../reconstruction-review-2026-09-07/certified-bank-partition-repair.md).
+
 September28 UTC consistent near-axis GPU row/column proposals now repair the
 original source33168/frame186 capture: complete native builder/cache/attribute
 checks and nine independent exact stored-contour cases pass. Final axis-v4:

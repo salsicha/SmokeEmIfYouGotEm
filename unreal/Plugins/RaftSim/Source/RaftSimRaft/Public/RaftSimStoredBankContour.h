@@ -13,6 +13,7 @@ struct FStorage
     FVector2D Crossings[2];
     double Width=0.,RootWidth=0.;
     bool Valid=false;
+    mutable int32 SignedNeighborFallbacks=0;
     static bool ExactDifference(double A,double B,double& D)
     {
         // Error-free TwoDiff, with explicit rounding points. Do not pretend
@@ -28,7 +29,7 @@ struct FStorage
     bool Init(const FCurve& C,const FVector2D& Dry,const FVector2D& WetX,const FVector2D& WetY,double WidthCm,
         FVector2D RequestedRenderOrigin=FVector2D::ZeroVector)
     {
-        const FScopedIEEE Scope;Valid=false;
+        const FScopedIEEE Scope;Valid=false;SignedNeighborFallbacks=0;
         if(!C.Valid || !FMath::IsFinite(WidthCm) || WidthCm<=0. || Dry.ContainsNaN() ||
             WetX.ContainsNaN() || WetY.ContainsNaN() || Dry.Y!=WetX.Y || Dry.X!=WetY.X ||
             Dry.X==WetX.X || Dry.Y==WetY.Y)return false;
@@ -116,8 +117,20 @@ struct FStorage
             const double FixedStep=FMath::Abs(double(std::nextafter(float(Origin[Fixed]),
                 End[Fixed]>Origin[Fixed] ? std::numeric_limits<float>::infinity() :
                     -std::numeric_limits<float>::infinity()))-Origin[Fixed]);
-            if(FMath::Abs(Stored[Fixed]-Origin[Fixed])<=2.*FixedStep)
+            const bool NearAxis=FMath::Abs(Stored[Fixed]-Origin[Fixed])<=2.*FixedStep;
+            bool HasSignedNeighbor=false;
+            for(int32 X=0;X<3;++X)for(int32 Y=0;Y<3;++Y)
             {
+                const FPoint Neighbor=Local(FVector2D(Candidates[0][X],Candidates[1][Y]));
+                if(Neighbor.X.Lo>0. && Neighbor.X.Hi<1. && Neighbor.Y.Lo>0. && Neighbor.Y.Hi<1. &&
+                    Curve.Value(Neighbor).Lo>=0. && Curve.Value(Inner(Neighbor,Width)).Hi<=0.)HasSignedNeighbor=true;
+            }
+            // Quantization can also move a shallow, far-from-axis radial
+            // proposal beyond all nine signed neighbors. Re-solve on its
+            // actual stored row; final segment/partition proofs remain mandatory.
+            if(NearAxis || !HasSignedNeighbor)
+            {
+                if(!NearAxis)++SignedNeighborFallbacks;
                 FVector2D P=Local(Stored).XY;double Low=0.,High=1.;
                 for(int32 I=0;I<56;++I)
                 {
@@ -125,8 +138,28 @@ struct FStorage
                     if(Curve.Value(FPoint(P)).Lo>=0.)High=P[Free];else Low=P[Free];
                     if(Up(High-Low)<=Down(RootWidth/16.))break;
                 }
-                P[Free]=FMath::Min(1.,High+RootWidth*.75);
                 const bool Increasing=End[Free]>Origin[Free];
+                // Wet endpoints alone do not prove the connection to the
+                // shared crossing. Choose an actual fixed-row endpoint by
+                // certifying that complete segment, with a dry inner point.
+                // The fixed coordinate is never moved to another row here.
+                const FPoint Edge=Local(Crossings[Free]);
+                FStats EndcapStats;
+                for(double Reserve:{.5,.625,.75,.875,.375,.25})
+                {
+                    if(!NearAxis)break; // Only an endcap is connected directly to the axis.
+                    P[Free]=FMath::Min(1.,High+RootWidth*Reserve);
+                    const FBound TrialMap=FBound(Origin[Free])+(FBound(End[Free])-FBound(Origin[Free]))*FBound(P[Free]);
+                    const double TrialBound=Increasing ? TrialMap.Hi : TrialMap.Lo;
+                    float Trial=float(TrialBound);
+                    if(Increasing ? double(Trial)<TrialBound : double(Trial)>TrialBound)
+                        Trial=std::nextafter(Trial,Increasing ? std::numeric_limits<float>::infinity() : -std::numeric_limits<float>::infinity());
+                    FVector2D W=Stored;W[Free]=double(Trial);const FPoint Candidate=Local(W);
+                    if(Candidate.X.Lo<=0. || Candidate.X.Hi>=1. || Candidate.Y.Lo<=0. || Candidate.Y.Hi>=1. ||
+                        Curve.Value(Candidate).Lo<0. || Curve.Value(Inner(Candidate,Width)).Hi>0.)continue;
+                    if(Certificate(Curve,Edge,Candidate,Candidate,true,EndcapStats))return Candidate;
+                }
+                P[Free]=FMath::Min(1.,High+RootWidth*.75);
                 const FBound Mapped=FBound(Origin[Free])+(FBound(End[Free])-FBound(Origin[Free]))*FBound(P[Free]);
                 const double Bound=Increasing ? Mapped.Hi : Mapped.Lo;float V=float(Bound);
                 if(Increasing ? double(V)<Bound : double(V)>Bound)
