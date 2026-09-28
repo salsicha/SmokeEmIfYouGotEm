@@ -1,5 +1,16 @@
 # Remaining requested work
 
+September28 UTC shared-edge rounding prerequisite advanced, NOT new playable
+delivery: RaftSimSharedBankCrossing candidate proves the ACTUAL binary32 GPU
+coordinate wet, with at most1mm geometric retreat and unchanged donor depth.
+16 native regressions PASS; independent exact rational reload certifies all48
+exported coordinate/donor cases;12 audit rejection tests PASS. It rejects edges
+whose float spacing cannot meet the band. No normal-path switch, cook or package;
+v26 remains last delivered. Next wire common edges AND full rounded contours,
+variable metadata/ear identity, then measure cost before normal integration.
+No source/collision/solver change and no river acceptance. All native owners
+terminal; see [crossing proof and limits](../reconstruction-review-2026-09-07/three-wet-bank-envelope.md#shared-gpu-coordinate-crossing-prerequisite).
+
 September28 UTC v26 parallel crest emission is now delivered in the NORMAL
 rebuilt game:15 native tests before/after integration,128 exact live pairs,
 whole adaptive-build savings in BOTH orders at8310 and11520, Boot/menu launch,

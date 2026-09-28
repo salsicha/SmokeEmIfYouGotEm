@@ -1,5 +1,10 @@
 # Three-wet conservative envelope reference - September 28 UTC
 
+Latest checkpoint: v26 is the last delivered game, not v24. Source replay and
+reload are terminal; historical pending/LIVE notes below are superseded by
+remaining-work.md. The shared GPU-coordinate crossing prerequisite is now
+qualified below. Full conservative contour integration is still unfinished.
+
 Status: exact geometry construction, capture-bound proof and a verified native
 candidate kernel; **not normal-renderer integration or playable delivery**.
 Normal v24 is unchanged. The known
@@ -195,3 +200,63 @@ terminal/hash/ledger reload16732 is live (session56370); do not duplicate it.
 the original receipt confirms terminal success, then checks all13 records,
 unchanged unsupported branches, provenance and exact saved kinetic ledgers
 without rerunning the expensive source solves. Normal v24 remains unchanged.
+
+## Shared GPU-coordinate crossing prerequisite
+
+The normal render packet explicitly casts each CPU FVector position to
+FVector3f in RaftSimShorelineMeshComponent.cpp. Therefore proving only a local
+binary64 root, or even its CPU world mapping, does not prove the position that
+will actually be rendered. The final binary32 conversion must be included.
+
+RaftSimSharedBankCrossing.h implements a bounded candidate for one varying
+coordinate of a Cartesian shared edge. Its inputs are semantic wet/dry
+endpoints, so neighboring cell winding cannot select a different rounding
+direction. Source endpoints must already be exactly representable as binary32.
+It brackets the original donor-stage/bed intersection with outward binary64
+intervals, chooses a binary32 coordinate on the wet side, then independently
+certifies that stored point's physical numerator nonnegative and its distance
+from the exact root no more than0.1cm. Attribute interpolation derives from
+that same stored coordinate. It never changes the supplied physical depth.
+
+Unsupported non-Cartesian mappings are NOT silently treated as certified.
+The caller must establish the axis-aligned edge and preserve the other
+coordinate identically. Invalid/nonfinite inputs, non-binary32 source positions,
+zero-depth donors, advancing fronts, and insufficient coordinate resolution
+fail closed. In particular a tested edge around10,000,000cm cannot represent
+its crossing inside the1mm band; the candidate rejects it rather than enlarging
+the band. This is a representability test, not evidence that the current South
+Fork scene uses that coordinate or currently fails for that particular reason.
+
+Native evidence: tmp/shared-bank-crossing-v1-20260928-process.json, terminal
+2026-09-28T13:54:29.1485426Z. Editor build86.68s, exit0;16 native tests PASS,
+zero warnings/failures/skips/in-process tests. All23 frozen inputs unchanged,
+including the protected user water-surface test. The new test covers48 cases:
+four coordinate origins, both directions, and six donor pairs including the
+original v22/v18 binary32 inputs, thin positive water and near-submerged banks.
+Its opposite-order check proves identical semantic inputs give bit-identical
+outputs; it is NOT an actual neighboring-cell renderer integration test.
+
+Independent physics/scripts/audit_shared_bank_crossing.py reloads17-digit
+strings as exact rationals and independently checks donor identity, all48
+cases, binary32 representability, nonnegative physical depth, geometric retreat
+and attribute fraction. No negative-depth epsilon or native success flag is
+used. The exact audit passes all48 exported cases. Twelve audit tests pass,
+including dry points, double-only positions, excess retreat, false bounds,
+attribute mismatch, NaN, zero water and GPU overflow. The initial test run had
+one error-message classification mismatch for overflow-to-infinity; this was
+corrected without changing acceptance predicates, and all12 reran successfully.
+
+- Native export: tmp/shared-bank-crossing-v1-20260928-crossings.json;
+  SHA2561cd624e28c7d5390e1544acd73715bab935b66e80fcce188f8e9a9324e9ab7fa.
+- Exact reload: tmp/shared-bank-crossing-v1-20260928-exact-audit.json;
+  SHA25609bd7c4a88912a8aff40922d9c07fc2677e8e2070056cb7ade0bfc19d88aad1e.
+
+This candidate is deliberately not included/called by the normal renderer yet.
+No production source, bed, terrain, collision, solver, material, package or
+existing capture changed. No game was launched or new FPS/animation acceptance
+claimed. Next integrate canonical edges with the same rounded full-contour
+certificate (including every interior rendered vertex), account for general
+transforms or explicitly reject them, preserve variable bank attributes and
+ear-connectivity-aware caching, and qualify whole-update cost. Then rebuild
+and validate the normal playable scene. A correct edge alone cannot repair
+the known finite-chord defect or justify enabling the expensive full kernel.
