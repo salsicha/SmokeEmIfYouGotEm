@@ -1,0 +1,140 @@
+diff --git a/unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp b/unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp
+index cf15362cf..2df4b7dac 100644
+--- a/unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp
++++ b/unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp
+@@ -12,6 +12,7 @@
+ #include "RaftSimRaftActor.h"
+ #include "RaftSimWaterSurfaceActor.h"
+ #include "RaftSimWaterRuntimeAdapter.h"
++#include "RaftSimBreakingTransitionAnchor.h"
+ #include "Tests/AutomationCommon.h"
+ 
+ #if WITH_AUTOMATION_TESTS
+@@ -241,6 +242,49 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimSpatialBreakingLocalityTest,
+     "RaftSim.P2.SpatialBreakingLocality",
+     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+ 
++IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimBreakingTransitionAnchorTest,
++    "RaftSim.P2.BreakingTransitionAnchor",
++    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
++
++bool FRaftSimBreakingTransitionAnchorTest::RunTest(const FString&)
++{
++    using FAdapter = URaftSimWaterRuntimeAdapter;
++    const TArray<FVector2D> Points = {FVector2D(-5428,3607), FVector2D(-5430,3606)};
++    TestEqual(TEXT("reference keeps upstream origin"),
++        RaftSimBreakingTransitionAnchor::Select(false,0,1),0);
++    TestEqual(TEXT("trial selects downstream regardless of world axis"),
++        RaftSimBreakingTransitionAnchor::Select(true,0,1),1);
++    TestEqual(TEXT("reverse ordering does not assume downstream index is larger"),
++        RaftSimBreakingTransitionAnchor::Select(true,9,3),3);
++    const auto Dimensions = FAdapter::ComputeHydraulicCrestDimensionsMeters(.2507f,1.6658f,.3593f);
++    FAdapter::FSupportBreakingSite Site;
++    Site.RiverCoordinatesMeters=Points[RaftSimBreakingTransitionAnchor::Select(true,0,1)];
++    Site.FlowDirection=FVector2D(-.99658737651946,.08254453926251);
++    Site.PhysicalCrestHeightMeters=Dimensions.X;
++    Site.PhysicalCrestLengthMeters=Dimensions.Y;
++    Site.SpillingFraction=.9811393f;
++    Site.bLocalEnvelopeCap=true;
++    TArray<FAdapter::FSupportBreakingSite> Sites={Site};
++    float Foam=0.f;
++    const float AtAnchor=FAdapter::ComputeCoupledBreakingReliefMeters(
++        Points[1],Sites,.22f,1.f,&Foam);
++    TestTrue(TEXT("trial does not amplify the existing residual"),
++        Dimensions.X>.04 && Dimensions.X<.05 && AtAnchor<=Dimensions.X && AtAnchor>.98f*Dimensions.X);
++    TestTrue(TEXT("foam source moves with shared support crest"),Foam>.8f);
++    float UpFoam=1.f;
++    FAdapter::ComputeCoupledBreakingReliefMeters(Points[0],Sites,.22f,1.f,&UpFoam);
++    TestEqual(TEXT("upstream shooting water is not the new crest foam source"),UpFoam,0.f);
++    // Translation changes neither dimensions nor the continuous height/foam
++    // profile. These tests are representation contracts, not physical evidence.
++    const FVector2D Shift(1100.,-2100.);
++    Sites[0].RiverCoordinatesMeters+=Shift;
++    float ShiftedFoam=0.f;
++    TestTrue(TEXT("translated support and source share the same anchor"),FMath::IsNearlyEqual(
++        FAdapter::ComputeCoupledBreakingReliefMeters(Points[1]+Shift,Sites,.22f,1.f,&ShiftedFoam),AtAnchor,1.e-6f));
++    TestTrue(TEXT("translation preserves foam"),FMath::IsNearlyEqual(Foam,ShiftedFoam,1.e-6f));
++    return true;
++}
++
+ bool FRaftSimSpatialBreakingLocalityTest::RunTest(const FString&)
+ {
+     using FAdapter = URaftSimWaterRuntimeAdapter;
+diff --git a/unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp b/unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp
+index 18dd81ab0..dd15c08bc 100644
+--- a/unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp
++++ b/unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp
+@@ -5,6 +5,7 @@
+ #include "RaftSimBreakingTileAudit.h"
+ #include "RaftSimBreakingCandidateGate.h"
+ #include "RaftSimMetricBreakingSearch.h"
++#include "RaftSimBreakingTransitionAnchor.h"
+ #include "RaftSimWetEdgeAudit.h"
+ #include "RaftSimGroundSourceRegistry.h"
+ #include "RaftSimTerrainProbeSources.h"
+@@ -160,6 +161,10 @@ static TAutoConsoleVariable<int32> CVarRaftSimFlatWaterNormals(
+     TEXT("raftsim.FlatWaterNormals"), 0,
+     TEXT("Review bisect: 1 replaces the live water vertex normals with straight up."));
+ 
++static TAutoConsoleVariable<int32> CVarRaftSimTransitionCrestAnchor(
++    TEXT("raftsim.TransitionCrestAnchor"), 0,
++    TEXT("South Fork placement-only trial: anchor shared crest/support/foam at the detected downstream transition. Height budget and solver are unchanged. Requires motion qualification before default promotion."));
++
+ static TAutoConsoleVariable<int32> CVarRaftSimLogLatticeEdgeRows(
+     TEXT("raftsim.LogLatticeEdgeRows"), 0,
+     TEXT("Log wet extents and coverage of the lattice rows at a corridor end (review probe)."));
+@@ -5769,6 +5774,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
+     const bool bMetricBreakingSearch=!bLegacyBreakingSearch && bCartesianFlow &&
+         bSingleLiveWaterSurfaceEnabled && GetWorld() &&
+         GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
++    const bool bTransitionCrestAnchor = bCartesianFlow && bSingleLiveWaterSurfaceEnabled &&
++        bSharedBreakingReliefEnabled && GetWorld() &&
++        GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
++        CVarRaftSimTransitionCrestAnchor.GetValueOnGameThread() != 0;
+ #if !UE_BUILD_SHIPPING
+     static const bool bGateAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimBreakingGateAudit"));
+     static int32 GateAuditCalls=0;
+@@ -6028,7 +6037,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
+             }
+ 
+             FBreakingSite Site;
+-            Site.WorldPositionCm = Vertices[UpstreamIndex];
++            // The height budget subtracts the resolved downstream rise. Test
++            // placing its residual at that transition rather than upstream of
++            // the rise. Keep upstream flow/depth, dimensions and all wet/shore
++            // gates unchanged; the persistent registry eases the chosen origin.
++            const int32 CrestAnchorIndex = RaftSimBreakingTransitionAnchor::Select(
++                bTransitionCrestAnchor, UpstreamIndex, Index);
++            Site.WorldPositionCm = Vertices[CrestAnchorIndex];
+             Site.WorldVelocityMps = WaterSamples[UpstreamIndex].VelocityMetersPerSecond;
+             Site.FlowDirection = FlowDirectionFor(WaterSamples[UpstreamIndex]);
+             if (bUsesCurvedRiverCoordinates)
+@@ -6041,7 +6056,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
+                     FVector2D(Tangent.X, Tangent.Y), WaterAdapter->GetRiverWorldYSign());
+                 Site.WorldVelocityMps = FVector(WorldVelocity.X, WorldVelocity.Y, 0.);
+             }
+-            Site.RiverCoordinatesMeters = RiverCoordinatesM[UpstreamIndex];
++            Site.RiverCoordinatesMeters = RiverCoordinatesM[CrestAnchorIndex];
+             Site.Intensity = Intensity;
+             Site.HydraulicCrestDimensionsMeters =
+                 URaftSimWaterRuntimeAdapter::ComputeHydraulicCrestDimensionsMeters(
+diff --git a/unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimBreakingTransitionAnchor.h b/unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimBreakingTransitionAnchor.h
+new file mode 100644
+--- /dev/null
++++ b/unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimBreakingTransitionAnchor.h
+@@ -0,0 +1,15 @@
++#pragma once
++#include "CoreMinimal.h"
++
++namespace RaftSimBreakingTransitionAnchor
++{
++// Placement-only trial. Upstream depth/Froude still determine dimensions;
++// rendering, support and foam must all receive the SAME selected origin.
++// Always select one endpoint, independent of rise sign, to avoid switching
++// origins when a small surface-rise measurement crosses zero. This is an
++// inferred representation of the transition, not surveyed crest position.
++inline int32 Select(bool bDownstreamTrial, int32 UpstreamIndex, int32 DownstreamIndex)
++{
++    return bDownstreamTrial ? DownstreamIndex : UpstreamIndex;
++}
++}

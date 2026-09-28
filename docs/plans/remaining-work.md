@@ -1,5 +1,14 @@
 # Remaining requested work
 
+September28 UTC placement follow-through: a downstream crest-anchor trial was
+compiled and tested in paired normal-scene boat-camera recordings. Three native
+tests passed and submitted crest error remained below1cm, but the inspected
+water retained flat faces/white sheets. NOT promoted: runtime trial removed,
+reproduction patch and recordings retained. This rules out simple relocation of
+the same static profile as a sufficient realism fix. See
+[trial, actual observations and restoration](../reconstruction-review-2026-09-07/transition-anchor-rejected.md).
+Packaged v13 and450s fields remain unchanged. No later-river advance.
+
 ## Current checkpoint: v13 review and 900-second audits complete
 
 Clock follow-through (same retained captures, no new game run): normal-launch
