@@ -559,8 +559,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                      "T_RaftSim_FutaleufuTerminator_EvidenceDrape")) != nullptr;
         const bool bUsesFutaleufuOrganicTemperateSurface =
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") && !bUsesFutaleufuEvidenceDrape;
+        // The evidence-based Chilko Lava Canyon Landscape takes its colour
+        // from the Sentinel-2 drape likewise.
+        const bool bUsesChilkoEvidenceDrape =
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") &&
+            LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/ChilkoRun/Terrain/T_RaftSim_ChilkoLavaCanyon_EvidenceDrape."
+                     "T_RaftSim_ChilkoLavaCanyon_EvidenceDrape")) != nullptr;
         const bool bUsesChilkoOrganicLavaCanyonSurface =
-            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") && !bUsesChilkoEvidenceDrape;
         const bool bUsesDefaultLitLandscape =
             bUsesSouthForkOrganicFoothillSurface ||
             Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
@@ -1034,6 +1041,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("colorado_hance_v1_four_scale_world_space_sandy_bench_weathered_iron_cliff_dark_rock_talus_and_fine_grain_response")
                        : bUsesFutaleufuEvidenceDrape
                        ? TEXT("futaleufu_terminator_evidence_sentinel2_10m_drape_albedo_scaled_no_procedural_palette")
+                       : bUsesChilkoEvidenceDrape
+                       ? TEXT("chilko_lava_canyon_evidence_sentinel2_10m_drape_albedo_scaled_no_procedural_palette")
                        : (bUsesFutaleufuOrganicTemperateSurface
                        ? TEXT("futaleufu_v1_three_scale_world_space_forest_floor_moss_leaf_litter_and_slope_aware_wet_granite_response")
                        : (bUsesChilkoOrganicLavaCanyonSurface

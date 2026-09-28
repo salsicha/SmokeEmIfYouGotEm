@@ -25,6 +25,12 @@ constexpr float PacuareProgress(float StationM) { return StationM / kPacuareHuac
 constexpr float kFutaleufuTerminatorLaunchStationM = 750.0f;
 constexpr float kFutaleufuTerminatorReachStationM = 2392.0f;
 constexpr float FutaleufuProgress(float StationM) { return StationM / kFutaleufuTerminatorReachStationM; }
+// Evidence-based Chilko Lava Canyon reach (scenario stations, 2 m grid).
+// Launch 200 m above Bidwell Rapid, whose Sentinel-2 whitewater and 4.7 m
+// LiDAR surface drop sit at stations 750-1000 (inside the launch window).
+constexpr float kChilkoLavaCanyonLaunchStationM = 600.0f;
+constexpr float kChilkoLavaCanyonReachStationM = 3978.0f;
+constexpr float ChilkoProgress(float StationM) { return StationM / kChilkoLavaCanyonReachStationM; }
 }
 
 FString GetLandscapeCandidateCaptureRelativePath(
@@ -1790,16 +1796,21 @@ bool AddLandscapeCandidateRunnableGameplay(
     }
     else if (bChilkoLavaCanyon)
     {
+        // Evidence-based Lava Canyon reach (LidarBC 2023 1 m terrain and
+        // flight-day water surface, Sentinel-2 whitewater, HYDAT flows;
+        // inferred bed calibrated to the LiDAR surface, run at the 93 m3/s
+        // lake-outlet flow of the drape image); see
+        // docs/reconstruction-review-2026-09-07/chilko-lava-canyon-evidence.md.
         RuntimeConfigLabel = TEXT("RaftSim_ChilkoLavaCanyon_RuntimeWaterConfig");
         CookedFieldsDir =
-            TEXT("physics/data/real_world/chilko_river_lava_canyon/"
-                 "scenario_lava_canyon/cooked_flow_fields");
-        FlowBand = FName(TEXT("median_runnable"));
-        WindowCenterM = FVector2D(300.0f, 0.0f);
-        WindowExtentM = 700.0f;
+            TEXT("physics/data/real_world/chilko_river_bc/"
+                 "scenario_lava_canyon_evidence_2023/cooked_flow_fields");
+        FlowBand = FName(TEXT("summer_runnable_93cms"));
+        WindowCenterM = FVector2D(kChilkoLavaCanyonLaunchStationM, 0.0f);
+        WindowExtentM = 480.0f;
         CoordinateMapPath =
-            TEXT("physics/data/real_world/chilko_river_lava_canyon/terrain/"
-                 "lava_canyon_visual/lava_canyon_runtime_coordinate_map.json");
+            TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/"
+                 "lava_canyon_evidence_2023_runtime_coordinate_map.json");
         RunTag = FName(TEXT("RaftSimChilkoLavaCanyonRun"));
         PlayerRaftLabel = TEXT("RaftSim_ChilkoLavaCanyon_PlayerRaft");
         DisplayName = TEXT("Chilko Lava Canyon");
@@ -1863,9 +1874,10 @@ bool AddLandscapeCandidateRunnableGameplay(
         : bFutaleufuTerminator
         ? FMath::Clamp(kFutaleufuTerminatorLaunchStationM /
               FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f)
-        : (bChilkoLavaCanyon
-               ? 0.38f
-               : (bReachLocalRun ? 0.04f : 0.0025f));
+        : bChilkoLavaCanyon
+        ? FMath::Clamp(kChilkoLavaCanyonLaunchStationM /
+              FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f)
+        : (bReachLocalRun ? 0.04f : 0.0025f);
     FVector2D StartTangent2D(1.0f, 0.0f);
     const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
         Candidate,
@@ -1920,7 +1932,7 @@ bool AddLandscapeCandidateRunnableGameplay(
     // The 30 km Zambezi run cannot simulate its whole 5999 x 25 cell corridor
     // every 1/60 s tick (~20 ms per step never keeps real time). Crop the same
     // cooked field around the raft and re-centre it every 80 m instead.
-    WaterConfig->bEnableMovingWindowStreaming = bZambezi || bColoradoHance || bPacuare || bFutaleufuTerminator;
+    WaterConfig->bEnableMovingWindowStreaming = bZambezi || bColoradoHance || bPacuare || bFutaleufuTerminator || bChilkoLavaCanyon;
     if (bColoradoHance)
     {
         // 2.5 km x 160 m at 2 m is 101,817 cells; crop 480 m of it around
@@ -1963,6 +1975,26 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->bEnableCookedFarFieldWater = true;
         // As at Hance: the orthophoto whitewater floors the displayed foam
         // (the 2 m cooked field under-places it), Froude onset at default.
+        WaterConfig->LiveFoamFroudeOnset = 0.78f;
+        WaterConfig->LiveFoamFroudeRamp = 1.25f;
+        WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
+        WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
+        WaterConfig->ObservedWhitewaterGain = 0.9f;
+    }
+    if (bChilkoLavaCanyon)
+    {
+        // 3.98 km x 56 m at 2 m: crop 480 m around the raft and draw the
+        // whole cooked lateral span, with the cooked far field beyond it. The
+        // Sentinel-2 whitewater (10 m, four dates) floors the displayed foam.
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/chilko_river_bc/"
+                 "scenario_lava_canyon_evidence_2023/runtime/moving_water_streaming.json");
+        WaterConfig->WindowCenterM = FVector2D(kChilkoLavaCanyonLaunchStationM, 0.0f);
+        WaterConfig->MovingWindowStationExtentM = 480.0f;
+        WaterConfig->MovingWindowLateralExtentM = 56.0f;
+        WaterConfig->MovingWindowAdvanceM = 80.0f;
+        WaterConfig->LivePresentationWidthM = 56.0f;
+        WaterConfig->bEnableCookedFarFieldWater = true;
         WaterConfig->LiveFoamFroudeOnset = 0.78f;
         WaterConfig->LiveFoamFroudeRamp = 1.25f;
         WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
@@ -2348,7 +2380,7 @@ bool AddLandscapeCandidateRunnableGameplay(
     // The geographic Hance strip spans the whole 160 m cooked lateral range;
     // at 1 m its 38,801-vertex refresh cost 19 ms mean (41 ms p95) of game
     // thread. 1.5 m (17k vertices) still samples each 2 m solver cell.
-    WaterConfig->LiveRapidSurfaceSubdivision = (bColoradoHance || bPacuare || bFutaleufuTerminator) ? 2 : 6;
+    WaterConfig->LiveRapidSurfaceSubdivision = (bColoradoHance || bPacuare || bFutaleufuTerminator || bChilkoLavaCanyon) ? 2 : 6;
     WaterConfig->bEnableLiveRaftLocalFluidHeightfield = true;
     WaterConfig->LiveRaftLocalFluidWindowMeters = 100.0f;
     WaterConfig->LiveRaftLocalFluidHeightfieldStrength = 0.65f;
@@ -2430,78 +2462,6 @@ bool AddLandscapeCandidateRunnableGameplay(
             TEXT("Could not position the player start for %s.\n"),
             *Candidate.PreviewSpec.RiverId);
         return false;
-    }
-
-    if (bChilkoLavaCanyon)
-    {
-        // These four D4 contacts mirror three manifest-recorded broach rocks
-        // plus the first fixed-seed boulder in the interpreted C3 bed. Their
-        // placement is deliberately review-gated: it enables wrap/pin physics
-        // without presenting the coarse feature-tag interpretation as survey.
-        struct FInterpretedRockSpec
-        {
-            float StationM;
-            float LateralM;
-            float RadiusM;
-            float CrestBelowSurfaceM;
-            float Friction;
-            const TCHAR* Label;
-        };
-        const FInterpretedRockSpec InterpretedRocks[] = {
-            {250.0f, 3.5f, 2.4f, 1.1f, 0.76f, TEXT("BroachRockUpper")},
-            {300.0f, -4.0f, 2.4f, 1.1f, 0.78f, TEXT("BroachRockCenter")},
-            {392.0f, 2.0f, 2.4f, 1.1f, 0.74f, TEXT("BroachRockLower")},
-            {405.8667f, 10.6160f, 1.9816f, 1.0270f, 0.72f, TEXT("SeededBoulder01")},
-        };
-        int32 SpawnedRockCount = 0;
-        for (const FInterpretedRockSpec& RockSpec : InterpretedRocks)
-        {
-            const float Progress = RockSpec.StationM /
-                FMath::Max(Points.Last().StationMeters, 1.0f);
-            FVector2D Tangent2D(1.0f, 0.0f);
-            FVector2D RockXY = SampleLandscapeCandidateCenterlineWorld(
-                Candidate,
-                Points,
-                Progress,
-                &Tangent2D);
-            const FVector2D RiverLeftNormal(-Tangent2D.Y, Tangent2D.X);
-            RockXY += RiverLeftNormal * RockSpec.LateralM * 100.0f;
-            float RockSurfaceZ = 0.0f;
-            if (!SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
-                    Candidate,
-                    Points,
-                    Progress,
-                    RockSurfaceZ))
-            {
-                OutSummary += TEXT("Could not align a Lava Canyon D4 rock to water.\n");
-                return false;
-            }
-            const float RockCenterZ = RockSurfaceZ -
-                (RockSpec.CrestBelowSurfaceM + RockSpec.RadiusM) * 100.0f;
-            ARaftSimRockObstacleActor* Rock =
-                World->SpawnActor<ARaftSimRockObstacleActor>(
-                    ARaftSimRockObstacleActor::StaticClass(),
-                    FTransform(FVector(RockXY.X, RockXY.Y, RockCenterZ)));
-            if (!Rock)
-            {
-                OutSummary += TEXT("Could not spawn a Lava Canyon D4 rock.\n");
-                return false;
-            }
-            Rock->ConfigureContact(RockSpec.RadiusM, RockSpec.Friction);
-            Rock->SetActorLabel(FString::Printf(
-                TEXT("RaftSim_ChilkoLavaCanyon_D4_%s"), RockSpec.Label));
-            Rock->Tags.AddUnique(RunTag);
-            Rock->Tags.AddUnique(TEXT("RaftSimInterpretedC3Obstacle"));
-            Rock->Tags.AddUnique(TEXT("RaftSimReviewGatedGeometry"));
-            ++SpawnedRockCount;
-        }
-        if (SpawnedRockCount != UE_ARRAY_COUNT(InterpretedRocks))
-        {
-            return false;
-        }
-        OutSummary += TEXT(
-            "Added four review-gated D4 contacts from Lava Canyon interpreted "
-            "broach-rock and fixed-seed boulder geometry.\n");
     }
 
     if (bSolverOwnedRuntimeWater)
@@ -2606,7 +2566,13 @@ void RepositionLandscapeCandidatePhysicalCameras(
             return;
         }
     };
-    if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+    if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        // Above Bidwell Rapid looking into its entry (station metres).
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), ChilkoProgress(620.0f), ChilkoProgress(620.0f + 120.0f), 300.0f, 105.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), ChilkoProgress(620.0f + 40.0f), ChilkoProgress(620.0f + 160.0f), 170.0f, 85.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
     {
         // Above the Terminator looking into its entry (station metres).
         SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), FutaleufuProgress(900.0f), FutaleufuProgress(900.0f + 120.0f), 300.0f, 105.0f);

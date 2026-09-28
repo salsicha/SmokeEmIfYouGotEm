@@ -574,6 +574,37 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     OutResult.DressingTemperateWaterlineMaximumSlopeDegrees =
         TemperateWaterlineMaximumSlopeDegrees;
 
+    // Logical X is not a station: ResolveLogicalRiverPoint maps -2500..25400
+    // logical cm onto the whole centreline (progress 0..1) and clamps beyond.
+    // The shoreline layers' 2.5-597.5 m range was authored for the 600 m
+    // scene and clamps its upper half onto the reach end, so on the
+    // geographic evidence reach (3.98 km) they span stations 100 m to 20 m
+    // before the end, converted to logical cm, with the same targets.
+    const bool bChilkoGeographicReach = bChilko && Queries.CenterlineLengthM > 1000.0f;
+    auto StationToLogicalCm = [&Queries](float StationM)
+    {
+        return StationM / FMath::Max(Queries.CenterlineLengthM, 1.0f) * 27900.0f - 2500.0f;
+    };
+    const float ChilkoShorelineStartCm =
+        bChilkoGeographicReach ? StationToLogicalCm(100.0f) : ChilkoOrganicShorelineStartStationCm;
+    const float ChilkoShorelineEndCm =
+        bChilkoGeographicReach ? StationToLogicalCm(Queries.CenterlineLengthM - 20.0f) : ChilkoOrganicShorelineEndStationCm;
+    // The measured canyon has gentle banks and bars only in places (basalt
+    // walls elsewhere). On the geographic reach half of each target's
+    // candidates search +-1,500 logical cm (5 % of the reach) and half the
+    // whole reach, with a score penalty for distance from the target's own
+    // slot: a patch stays near its slot where the ground allows and moves
+    // to a real bench where it does not. Targets and minimums are unchanged;
+    // the 600 m scenes keep their original search.
+    const int32 ChilkoShorelineCandidateCount = bChilkoGeographicReach ? 384 : 48;
+    auto ChilkoAlongRangeCm = [bChilkoGeographicReach](int32 CandidateIndex, int32 CandidateCount, float LocalRangeCm)
+    {
+        return (bChilkoGeographicReach && CandidateIndex >= CandidateCount / 2) ? 14000.0f : LocalRangeCm;
+    };
+    auto ChilkoAlongPenalty = [bChilkoGeographicReach](float CandidateLogicalX, float BaseLogicalX)
+    {
+        return bChilkoGeographicReach ? 0.30f * FMath::Abs(CandidateLogicalX - BaseLogicalX) / 14000.0f : 0.0f;
+    };
     int32 ChilkoShorelineGravelPlacedCount = 0;
     int32 ChilkoShorelineGravelRejectedPlacementCount = 0;
     float ChilkoShorelineGravelMinimumCenterlineDistanceCm =
@@ -606,8 +637,8 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
                 static_cast<float>(InstancesPerSide);
             const float BaseLogicalX =
                 FMath::Lerp(
-                    ChilkoOrganicShorelineStartStationCm,
-                    ChilkoOrganicShorelineEndStationCm,
+                    ChilkoShorelineStartCm,
+                    ChilkoShorelineEndCm,
                     AlongT) +
                 72.0f * FMath::Sin(
                     static_cast<float>(GravelIndex) * 0.7548777f);
@@ -617,12 +648,14 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             float BestSlopeDegrees = TNumericLimits<float>::Max();
             float BestCenterlineDistanceCm = 0.0f;
             float BestScore = TNumericLimits<float>::Max();
-            for (int32 CandidateIndex = 0; CandidateIndex < 48;
+            for (int32 CandidateIndex = 0; CandidateIndex < ChilkoShorelineCandidateCount;
                  ++CandidateIndex)
             {
+                const float GravelAlongRangeCm = ChilkoAlongRangeCm(
+                    CandidateIndex, ChilkoShorelineCandidateCount, bChilkoGeographicReach ? 1500.0f : 105.0f);
                 const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
-                    -105.0f,
-                    105.0f,
+                    -GravelAlongRangeCm,
+                    GravelAlongRangeCm,
                     ZambeziVegetationUnitRandom(
                         GravelIndex * 53 + CandidateIndex,
                         10313));
@@ -663,7 +696,8 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
                         HeightAboveWaterCm - TargetDryHeightCm) / 650.0f +
                     0.29f * AdditionalOffset / 2400.0f +
                     0.13f * SlopeDegrees /
-                        ChilkoOrganicShorelineGravelSlopeCeilingDegrees;
+                        ChilkoOrganicShorelineGravelSlopeCeilingDegrees +
+                    ChilkoAlongPenalty(CandidateLogicalX, BaseLogicalX);
                 if (Score < BestScore)
                 {
                     BestScore = Score;
@@ -812,8 +846,8 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
                 static_cast<float>(InstancesPerSide);
             const float BaseLogicalX =
                 FMath::Lerp(
-                    ChilkoOrganicShorelineStartStationCm,
-                    ChilkoOrganicShorelineEndStationCm,
+                    ChilkoShorelineStartCm,
+                    ChilkoShorelineEndCm,
                     AlongT) +
                 88.0f * FMath::Sin(
                     static_cast<float>(CoverIndex) * 0.618034f);
@@ -824,12 +858,14 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             float BestSlopeDegrees = TNumericLimits<float>::Max();
             float BestCenterlineDistanceCm = 0.0f;
             float BestScore = TNumericLimits<float>::Max();
-            for (int32 CandidateIndex = 0; CandidateIndex < 48;
+            for (int32 CandidateIndex = 0; CandidateIndex < ChilkoShorelineCandidateCount;
                  ++CandidateIndex)
             {
+                const float CoverAlongRangeCm = ChilkoAlongRangeCm(
+                    CandidateIndex, ChilkoShorelineCandidateCount, bChilkoGeographicReach ? 1500.0f : 130.0f);
                 const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
-                    -130.0f,
-                    130.0f,
+                    -CoverAlongRangeCm,
+                    CoverAlongRangeCm,
                     ZambeziVegetationUnitRandom(
                         CoverIndex * 61 + CandidateIndex,
                         10411));
@@ -870,7 +906,8 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
                         HeightAboveWaterCm - TargetDryHeightCm) / 1100.0f +
                     0.28f * AdditionalOffset / 4200.0f +
                     0.14f * SlopeDegrees /
-                        ChilkoOrganicShorelineGroundCoverSlopeCeilingDegrees;
+                        ChilkoOrganicShorelineGroundCoverSlopeCeilingDegrees +
+                    ChilkoAlongPenalty(CandidateLogicalX, BaseLogicalX);
                 if (Score < BestScore)
                 {
                     BestScore = Score;
@@ -1670,6 +1707,19 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             TEXT("RaftSim_FutaleufuEvidence"), TEXT("RaftSimFutaleufuEvidenceCanopy"),
             TEXT("inferred lattice inside Sentinel-2 10 m vegetation cover"));
     }
+    // Evidence canopy over the Chilko Lava Canyon Landscape
+    // (physics/scripts/build_chilko_evidence_dressing.py): counts, species
+    // and heights from the BC Vegetation Resources Inventory polygons,
+    // positions sampled by Sentinel-2 darkness inside them (inferred).
+    FEvidenceCanopyCounts ChilkoEvidenceCanopy;
+    if (bChilko && bPhysicalCorridor)
+    {
+        ChilkoEvidenceCanopy = AddEvidenceCanopy(
+            Context, Queries, TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023"),
+            TEXT("lava_canyon_evidence_2023_canopy_placement.json"), TEXT("raftsim.chilko.lava_canyon_evidence_canopy.v1"),
+            TEXT("RaftSim_ChilkoEvidence"), TEXT("RaftSimChilkoEvidenceCanopy"),
+            TEXT("VRI inventory counts, species and heights; positions by Sentinel-2 darkness"));
+    }
     const int32 PacuareShorelineRockPlacedCount = PacuareCounts.PacuareShorelineRockPlacedCount;
     const int32 PacuareShorelineGroundCoverPlacedCount = PacuareCounts.PacuareShorelineGroundCoverPlacedCount;
     const int32 PacuareScannedFernPlacedCount = PacuareCounts.PacuareScannedFernPlacedCount;
@@ -1699,8 +1749,14 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
         // along the bank, instead of lowering the minimum. The 600 m
         // reach-local scenes keep their original search.
         const bool bGeographicReach = Queries.CenterlineLengthM > 1000.0f;
-        const int32 NearBankCandidateCount = bGeographicReach ? 192 : 64;
-        const float NearBankAlongJitterCm = bGeographicReach ? 450.0f : 150.0f;
+        // Lava Canyon's measured banks are basalt walls for long stretches:
+        // on the LiDAR terrain only about half of evenly spaced bank slots
+        // (4 % at 2.0-2.5 km) have ground under 38 degrees within 36 m of
+        // the visible edge. There the patches use the shoreline layers'
+        // local-plus-reach-wide search (ChilkoAlongRangeCm) so they gather on
+        // the benches that exist rather than being dropped at the walls.
+        const int32 NearBankCandidateCount = bChilkoGeographicReach ? 512 : (bGeographicReach ? 192 : 64);
+        const float NearBankAlongJitterCm = bChilkoGeographicReach ? 1500.0f : (bGeographicReach ? 450.0f : 150.0f);
         const TArray<UStaticMesh*> NearBankMeshes = {
             UnderstoryMesh,
             TemperateUnderstoryMeshB,
@@ -1734,9 +1790,11 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             for (int32 CandidateIndex = 0; CandidateIndex < NearBankCandidateCount;
                  ++CandidateIndex)
             {
+                const float NearBankAlongRangeCm = ChilkoAlongRangeCm(
+                    CandidateIndex, NearBankCandidateCount, NearBankAlongJitterCm);
                 const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
-                    -NearBankAlongJitterCm,
-                    NearBankAlongJitterCm,
+                    -NearBankAlongRangeCm,
+                    NearBankAlongRangeCm,
                     ZambeziVegetationUnitRandom(
                         PatchIndex * 67 + CandidateIndex,
                         10223));
@@ -1776,7 +1834,8 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
                         1600.0f +
                     0.25f * AdditionalOffset / 3600.0f +
                     0.15f * SlopeDegrees /
-                        TemperateNearBankEcologySlopeCeilingDegrees;
+                        TemperateNearBankEcologySlopeCeilingDegrees +
+                    ChilkoAlongPenalty(CandidateLogicalX, BaseLogicalX);
                 if (Score < BestScore)
                 {
                     BestScore = Score;
@@ -2473,6 +2532,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
         PacuareCounts.EvidenceCanopyPlaced +
         FutaleufuEvidenceCanopy.Placed +
+        ChilkoEvidenceCanopy.Placed +
         PacuareShorelineGroundCoverPlacedCount +
         PacuareShorelineShrubPlacedCount +
         TemperateNearBankPlacedCount +
@@ -2514,6 +2574,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
         PacuareCounts.EvidenceCanopyPlaced == PacuareCounts.EvidenceCanopyExpected &&
         PacuareCounts.EvidenceRockPlaced == PacuareCounts.EvidenceRockExpected &&
         FutaleufuEvidenceCanopy.Placed == FutaleufuEvidenceCanopy.Expected &&
+        ChilkoEvidenceCanopy.Placed == ChilkoEvidenceCanopy.Expected &&
         (!bOpaqueTemperate ||
          TemperateWaterlinePlacedCount >=
              TemperateWaterlineStructureMinimumInstanceCount) &&
@@ -2559,7 +2620,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     {
         OutSummary += FString::Printf(
             TEXT("Dressing checks for %s: boulders %d/%d, foliage %d/%d, pacuare rock %d/%d ground %d/%d fern %d/%d shrub %d/%d litter %d/%d woody %d/%d, "
-                 "evidence canopy %d/%d rocks %d/%d, futaleufu canopy %d/%d, temperate waterline %d/%d near-bank %d/%d scanned %d/1200, "
+                 "evidence canopy %d/%d rocks %d/%d, futaleufu canopy %d/%d, chilko canopy %d/%d, temperate waterline %d/%d near-bank %d/%d scanned %d/1200, "
                  "canopy %d, understory %d, launch strata %d, materials %d.\n"),
             *Spec.RiverId, OutResult.DressingBoulderInstanceCount,
             BoulderCount + TemperateWaterlinePlacedCount + ChilkoShorelineGravelPlacedCount + PacuareShorelineRockPlacedCount +
@@ -2574,6 +2635,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             PacuareCounts.EvidenceCanopyPlaced, PacuareCounts.EvidenceCanopyExpected,
             PacuareCounts.EvidenceRockPlaced, PacuareCounts.EvidenceRockExpected,
             FutaleufuEvidenceCanopy.Placed, FutaleufuEvidenceCanopy.Expected,
+            ChilkoEvidenceCanopy.Placed, ChilkoEvidenceCanopy.Expected,
             TemperateWaterlinePlacedCount, TemperateWaterlineStructureMinimumInstanceCount,
             TemperateNearBankPlacedCount, TemperateNearBankEcologyMinimumInstanceCount,
             FutaleufuScannedUnderstoryPlacedCount,

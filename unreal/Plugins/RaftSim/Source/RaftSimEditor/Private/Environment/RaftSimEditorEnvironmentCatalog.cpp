@@ -1410,41 +1410,36 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         }
         else if (PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
         {
+            // Evidence-based Lava Canyon reach, Bidwell Rapid to White Mile
+            // (LidarBC 2023 1 m DEM terrain and flight-day water surface,
+            // Sentinel-2 whitewater, HYDAT flows, VRI canopy; see
+            // chilko-lava-canyon-evidence.md): 2017^2 over the 3,464 x
+            // 3,150 m UTM 10N evidence window, anchored at X = 0 and centred
+            // in Y (Unreal +Y south).
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/chilko_river_lava_canyon/terrain/"
-                     "lava_canyon_visual/lava_canyon_conditioned_heightfield_1009.png");
+                TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_heightfield_2017.png");
             Candidate.HeightfieldManifestRelativePath =
-                TEXT("physics/data/real_world/chilko_river_lava_canyon/terrain/"
-                     "lava_canyon_visual/lava_canyon_visual_terrain_manifest.json");
+                TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_terrain_manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("physics/data/real_world/chilko_river_lava_canyon/terrain/"
-                     "lava_canyon_visual/lava_canyon_visual_terrain_manifest.json");
+                TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_terrain_manifest.json");
             Candidate.LocalCenterlineRelativePath =
-                TEXT("physics/data/real_world/chilko_river_lava_canyon/terrain/"
-                     "lava_canyon_visual/lava_canyon_local_centerline.json");
+                TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_local_centerline.json");
             Candidate.MapPackagePath =
                 TEXT("/Game/RaftSim/Maps/L_LavaCanyon");
-            Candidate.LandscapeSize = 1009;
-            Candidate.HorizontalSpanXCm = 60000.0f;
-            Candidate.HorizontalSpanYCm = 60000.0f;
-            Candidate.TargetReliefCm = 7062.1819f;
-            Candidate.WorldVerticalOffsetCm = -496.4160f;
+            Candidate.LandscapeSize = 2017;
+            Candidate.HorizontalSpanXCm = 346400.0f;
+            Candidate.HorizontalSpanYCm = 315000.0f;
+            Candidate.TargetReliefCm = 25816.875494f;
+            Candidate.WorldVerticalOffsetCm = 916.486322f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
-            Candidate.bUseSolverVisualizationFields = true;
-            Candidate.SolverVisualizationFieldRelativePath =
-                TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
-                     "chilko_lava_canyon_median_depth_speed_froude_surface_v1.png");
-            Candidate.SolverVisualizationDepthCapM = 5.0f;
-            Candidate.SolverVisualizationSpeedCapMps = 8.0f;
-            Candidate.SolverVisualizationFroudeCap = 4.5f;
-            Candidate.SolverVisualizationSurfaceReliefCapM = 1.5f;
-            Candidate.SolverVisualizationLateralMinM = -39.0f;
-            Candidate.SolverVisualizationLateralMaxM = 39.0f;
+            // The live solver owns the water; the old reach-local solver
+            // visualization field does not apply to the geographic reach.
+            Candidate.bUseSolverVisualizationFields = false;
             Candidate.bPhysicalScaleSourceCorridor = true;
             Candidate.bUseDensePhysicalTerrainRenderSurface = false;
             Candidate.bEnableLandscapeNanite = true;
-            Candidate.PreviewSpec.RiverHalfWidthCm = 1800.0f;
-            Candidate.PreviewSpec.BankWidthCm = 5200.0f;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 1500.0f;
+            Candidate.PreviewSpec.BankWidthCm = 4000.0f;
             Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
         }
         else

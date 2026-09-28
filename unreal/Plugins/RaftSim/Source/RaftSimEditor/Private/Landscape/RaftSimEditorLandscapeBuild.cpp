@@ -75,6 +75,18 @@ bool AddFutaleufuTerminatorTerrainBackdrop(UWorld* World, FString& OutSummary)
         FutaleufuBackdropTranslationCm, TEXT("RaftSim_FutaleufuTerminator_GLO30Backdrop"),
         TEXT("RaftSimFutaleufuTerminatorGLO30Backdrop"), OutSummary);
 }
+
+bool AddChilkoLavaCanyonTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    // LidarBC 1 m bare earth as 20 m block means, 3 km around the Landscape
+    // (lava_canyon_evidence_2023_terrain_manifest.json).
+    const FVector ChilkoBackdropTranslationCm(-300700.0, -456900.0, 0.0);
+    return AddEvidenceTerrainBackdrop(World,
+        TEXT("/Game/RaftSim/Environment/ChilkoRun/Terrain/SM_RaftSim_ChilkoLavaCanyon_LidarBackdrop."
+             "SM_RaftSim_ChilkoLavaCanyon_LidarBackdrop"),
+        ChilkoBackdropTranslationCm, TEXT("RaftSim_ChilkoLavaCanyon_LidarBackdrop"),
+        TEXT("RaftSimChilkoLavaCanyonLidarBackdrop"), OutSummary);
+}
 } // namespace
 
 bool BuildLandscapeImportCandidateMap(
@@ -473,7 +485,8 @@ bool BuildLandscapeImportCandidateMap(
     AddPreviewLightRig(World, Candidate.PreviewSpec);
     if ((Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !AddColoradoHanceTerrainBackdrop(World, OutSummary)) ||
         (Candidate.PreviewSpec.RiverId == TEXT("pacuare") && !AddPacuareHuacasTerrainBackdrop(World, OutSummary)) ||
-        (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") && !AddFutaleufuTerminatorTerrainBackdrop(World, OutSummary)))
+        (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") && !AddFutaleufuTerminatorTerrainBackdrop(World, OutSummary)) ||
+        (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") && !AddChilkoLavaCanyonTerrainBackdrop(World, OutSummary)))
     {
         return false;
     }

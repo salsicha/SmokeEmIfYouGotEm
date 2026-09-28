@@ -1,0 +1,1 @@
+https://openmaps.gov.bc.ca/geo/pub/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=pub:WHSE_FOREST_VEGETATION.VEG_COMP_LYR_R1_POLY&outputFormat=application/json&srsName=EPSG:4326&bbox=51.915,-123.815,51.975,-123.735,urn:ogc:def:crs:EPSG::4326

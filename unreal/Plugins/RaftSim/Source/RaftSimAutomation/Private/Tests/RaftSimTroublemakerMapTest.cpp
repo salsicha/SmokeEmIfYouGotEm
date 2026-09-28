@@ -236,14 +236,16 @@ bool FRaftSimAssertRiverMapCommand::Update()
     // The geographic Hance reach draws its whole 160 m cooked lateral span
     // (LivePresentationWidthM) on a 1.5 m lattice: 161 x 108 vertices; the
     // geographic Pacuare Huacas and Futaleufu Terminator reaches their 96 m
-    // spans: 161 x 65.
+    // spans: 161 x 65; the geographic Chilko Lava Canyon reach its 56 m span:
+    // 161 x 38.
     const bool bNinetySixMetreGeographicRun = bPacuareReferenceRun || bFutaleufuTerminatorReferenceRun;
-    const float ExpectedPresentationSpacingM = (bZambeziReferenceRun || bColoradoHanceReferenceRun || bNinetySixMetreGeographicRun)
+    const float ExpectedPresentationSpacingM =
+        (bZambeziReferenceRun || bColoradoHanceReferenceRun || bNinetySixMetreGeographicRun || bChilkoLavaCanyonReferenceRun)
         ? 1.5f : (bUsesOneMetreReferencePresentation ? 1.0f : 0.5f);
     const int32 ExpectedPresentationVertices = (bZambeziReferenceRun || bNinetySixMetreGeographicRun)
-        ? 10465 : (bColoradoHanceReferenceRun ? 17388 : (bUsesOneMetreReferencePresentation ? 23377 : 92833));
+        ? 10465 : (bChilkoLavaCanyonReferenceRun ? 6118 : (bColoradoHanceReferenceRun ? 17388 : (bUsesOneMetreReferencePresentation ? 23377 : 92833)));
     const int32 ExpectedPresentationTriangles = (bZambeziReferenceRun || bNinetySixMetreGeographicRun)
-        ? 20480 : (bColoradoHanceReferenceRun ? 34240 : (bUsesOneMetreReferencePresentation ? 46080 : 184320));
+        ? 20480 : (bChilkoLavaCanyonReferenceRun ? 11840 : (bColoradoHanceReferenceRun ? 34240 : (bUsesOneMetreReferencePresentation ? 46080 : 184320)));
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
     {
@@ -2332,23 +2334,31 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 continue;
             }
             Test->TestEqual(
-                TEXT("Chilko loads the Lava Canyon cooked package"),
+                TEXT("Chilko loads the evidence Lava Canyon cooked package"),
                 (*It)->CookedFieldsDir,
-                FString(TEXT("physics/data/real_world/chilko_river_lava_canyon/"
-                             "scenario_lava_canyon/cooked_flow_fields")));
+                FString(TEXT("physics/data/real_world/chilko_river_bc/"
+                             "scenario_lava_canyon_evidence_2023/cooked_flow_fields")));
             Test->TestEqual(
-                TEXT("Chilko loads the median runnable band"),
+                TEXT("Chilko loads the 93 m3/s summer runnable band"),
                 (*It)->FlowBand,
-                FName(TEXT("median_runnable")));
+                FName(TEXT("summer_runnable_93cms")));
+            Test->TestTrue(
+                TEXT("Chilko streams a moving window over the 4 km reach"),
+                (*It)->bEnableMovingWindowStreaming && (*It)->bEnableCookedFarFieldWater &&
+                    FMath::IsNearlyEqual((*It)->MovingWindowStationExtentM, 480.0f) &&
+                    FMath::IsNearlyEqual((*It)->LivePresentationWidthM, 56.0f));
+            Test->TestTrue(
+                TEXT("Chilko floors the displayed foam with the Sentinel-2 whitewater"),
+                FMath::IsNearlyEqual((*It)->ObservedWhitewaterGain, 0.9f));
             Test->TestFalse(
                 TEXT("Chilko preserves source station/lateral coordinates"),
                 (*It)->bRecenterHydraulicCrux);
             Test->TestEqual(
                 TEXT("Chilko binds the local-world vertical datum map"),
                 (*It)->CoordinateMapPath,
-                FString(TEXT("physics/data/real_world/chilko_river_lava_canyon/"
-                             "terrain/lava_canyon_visual/"
-                             "lava_canyon_runtime_coordinate_map.json")));
+                FString(TEXT("physics/data/real_world/chilko_river_bc/"
+                             "terrain/lava_canyon_evidence_2023/"
+                             "lava_canyon_evidence_2023_runtime_coordinate_map.json")));
             Test->TestTrue(
                 TEXT("Chilko Landscape owns runtime terrain"),
                 (*It)->bMapProvidesTerrain);
@@ -2391,14 +2401,17 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Chilko live sky reflection stays restrained"),
                 FMath::IsNearlyEqual(
                     (*It)->LiveSkyReflectionStrength, 0.05f, 0.001f));
+            // The evidence map is regenerated, so it carries the generator's
+            // turbulent Lava Canyon bracket rather than the old map's
+            // serialized 0.55 / 0.68 baseline.
             Test->TestTrue(
-                TEXT("versioned Chilko config retains its serialized ripple baseline"),
+                TEXT("regenerated Chilko config uses its turbulent ripple bracket"),
                 FMath::IsNearlyEqual(
-                    (*It)->LiveRippleStrength, 0.55f, 0.001f));
+                    (*It)->LiveRippleStrength, 0.72f, 0.001f));
             Test->TestTrue(
-                TEXT("versioned Chilko config retains its serialized roughness baseline"),
+                TEXT("regenerated Chilko config uses its turbulent roughness bracket"),
                 FMath::IsNearlyEqual(
-                    (*It)->LiveSurfaceRoughness, 0.68f, 0.001f));
+                    (*It)->LiveSurfaceRoughness, 0.42f, 0.001f));
             Test->TestTrue(
                 TEXT("Chilko live carrier retains a physical dielectric response"),
                 FMath::IsNearlyEqual(
@@ -2486,10 +2499,14 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     StrongestSite.PresentationCoverage,
                     StrongestSite.PresentationEdgeClearanceMeters,
                     BreakingSites.Num()));
+                // Bidwell Rapid on the LiDAR water surface: steeper than 1 %
+                // from 625 to 950 m against 0.3-0.5 % on the approach; the
+                // main drop (up to 4 %) and the Sentinel-2 whitewater sit at
+                // 775-880 m.
                 Test->TestTrue(
-                    TEXT("Chilko strongest launch-window jump is in the interpreted Lava Canyon crux"),
-                    StrongestSite.RiverCoordinatesMeters.X >= 285.0f &&
-                        StrongestSite.RiverCoordinatesMeters.X <= 365.0f);
+                    TEXT("Chilko strongest launch-window jump is in Bidwell Rapid (LiDAR surface steeper than 1 %, stations 625-950)"),
+                    StrongestSite.RiverCoordinatesMeters.X >= 625.0f &&
+                        StrongestSite.RiverCoordinatesMeters.X <= 950.0f);
                 // Single-surface rivers accept a solver jump inside the organic
                 // bank feather (coverage >= 0.55, clearance >= max(lattice, 3 m);
                 // RaftSimWaterSurfaceActor.cpp, the rule that keeps the measured
@@ -2553,15 +2570,49 @@ bool FRaftSimAssertRiverMapCommand::Update()
             }
             ++CaptureOnlyWaterCount;
         }
+        // The geographic reach keeps one capture-only water surface; its
+        // whitewater is the live foam floored by the observed (Sentinel-2)
+        // field, not a baked solver-visualization foam surface.
         Test->TestEqual(
-            TEXT("Chilko has capture-only static water and foam surfaces"),
+            TEXT("Chilko has one capture-only static water surface"),
             CaptureOnlyWaterCount,
-            2);
-        Test->TestEqual(
-            TEXT("Chilko has one cooked-field-derived capture foam surface"),
-            SolverFieldFoamCount,
             1);
+        Test->TestEqual(
+            TEXT("Chilko has no baked solver-visualization foam surface"),
+            SolverFieldFoamCount,
+            0);
 
+        int32 BackdropCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            BackdropCount += (*It)->Tags.Contains(TEXT("RaftSimChilkoLavaCanyonLidarBackdrop")) ? 1 : 0;
+        }
+        Test->TestEqual(TEXT("Chilko places one LiDAR terrain backdrop"), BackdropCount, 1);
+
+        // Evidence canopy (build_chilko_evidence_dressing.py): VRI inventory
+        // counts, species and heights, positions by Sentinel-2 darkness.
+        int32 EvidenceCanopyActorCount = 0;
+        int32 EvidenceCanopyInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimChilkoEvidenceCanopy")))
+            {
+                continue;
+            }
+            const UHierarchicalInstancedStaticMeshComponent* Instances =
+                (*It)->FindComponentByClass<UHierarchicalInstancedStaticMeshComponent>();
+            Test->TestTrue(
+                TEXT("Chilko evidence canopy is visual-only, labelled inferred vegetation"),
+                Instances && Instances->GetCollisionEnabled() == ECollisionEnabled::NoCollision &&
+                    (*It)->Tags.Contains(TEXT("InferredVegetationNotSurveyedTrees")));
+            EvidenceCanopyInstanceCount += Instances ? Instances->GetInstanceCount() : 0;
+            ++EvidenceCanopyActorCount;
+        }
+        Test->TestEqual(TEXT("Chilko evidence canopy has two tree forms and an understory"), EvidenceCanopyActorCount, 3);
+        Test->TestTrue(TEXT("Chilko evidence canopy covers the inventory's treed polygons"), EvidenceCanopyInstanceCount >= 60000);
+
+        // The evidence bed carries its own inferred boulders; the interpreted
+        // broach-rock contacts of the old reach-local scene are gone.
         int32 InterpretedD4RockCount = 0;
         for (TActorIterator<ARaftSimRockObstacleActor> It(World); It; ++It)
         {
@@ -2573,9 +2624,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
             }
         }
         Test->TestEqual(
-            TEXT("Chilko retains four review-gated interpreted D4 contacts"),
+            TEXT("Chilko has no interpreted D4 contact on the evidence reach"),
             InterpretedD4RockCount,
-            4);
+            0);
         return true;
     }
 

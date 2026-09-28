@@ -78,7 +78,10 @@ public class RaftSimWater : ModuleRules
             "physics/data/real_world/pacuare_river_costa_rica/scenario_huacas_evidence_2017/runtime",
             // Evidence-based Futaleufu Terminator (L_Terminator).
             "physics/data/real_world/futaleufu_river_chile/scenario_terminator_evidence_2026/cooked_flow_fields",
-            "physics/data/real_world/futaleufu_river_chile/scenario_terminator_evidence_2026/runtime"
+            "physics/data/real_world/futaleufu_river_chile/scenario_terminator_evidence_2026/runtime",
+            // Evidence-based Chilko Lava Canyon (L_LavaCanyon).
+            "physics/data/real_world/chilko_river_bc/scenario_lava_canyon_evidence_2023/cooked_flow_fields",
+            "physics/data/real_world/chilko_river_bc/scenario_lava_canyon_evidence_2023/runtime"
         };
         foreach (string RelativeRoot in RuntimeRoots)
         {
@@ -111,7 +114,8 @@ public class RaftSimWater : ModuleRules
             "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/river_coordinate_map.json",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_runtime_coordinate_map.json",
             "physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_runtime_coordinate_map.json",
-            "physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_runtime_coordinate_map.json" })
+            "physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_runtime_coordinate_map.json",
+            "physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_runtime_coordinate_map.json" })
         {
             string CoordinateMapSource = Path.Combine(RepoRoot, CoordinateMapRelative);
             if (File.Exists(CoordinateMapSource))
