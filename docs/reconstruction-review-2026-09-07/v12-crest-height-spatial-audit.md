@@ -1,5 +1,10 @@
 # V12 crest height: amplitude versus spatial placement
 
+Current follow-through: the v13 capture and spatial review are complete. See
+[paired endpoints, selected site and actual frame findings](v13-playable-review.md).
+The live/queued and missing-v13-capture statements below are historical.
+Spatial data is now available, but no height formula change or acceptance follows.
+
 V13 build6197 subsequently completed exit0 (BuildCookRun798.77s), with frozen
 inputs unchanged. Its cooked executable SHA256 is
 `efe039224bc328d5b335705fc34aa7c925a3c44ab716922982386b87398d7652`.

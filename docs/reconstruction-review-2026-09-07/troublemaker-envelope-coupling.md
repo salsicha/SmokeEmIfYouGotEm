@@ -1,5 +1,11 @@
 # Troublemaker inferred-envelope coupling - September 27
 
+Current follow-through: the exact450->900s continuation and final audits completed.
+The later Troublemaker storage loss increases to6.45027m3/s, so the earlier600s
+improvement does NOT establish settling. No900s field promotion. See
+[final900s evidence and current playable review](v13-playable-review.md).
+The live-continuation instructions below are historical; do not restart that job.
+
 Follow-through: [v12 bank control](v12-bank-control.md) records the completed
 passive trajectory past8404m (the earlier capture held AllForward without
 steering), source-field context, and live exact450->900s continuation99863.

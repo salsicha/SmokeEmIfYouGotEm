@@ -1,5 +1,27 @@
 # Remaining requested work
 
+## Current checkpoint: v13 review and 900-second audits complete
+
+Supersedes the live/queued owner notes below. The existing hydraulic continuation,
+its final audits, v13 packaging, all five timing runs and the passive motion
+capture have completed. No duplicate cook, build, timing run or capture is needed.
+Receipts end on September28 UTC (September27 local); use receipt timestamps, not
+the automation trigger time, to identify these artifacts.
+
+All five v13 timing runs FAIL the current20FPS/50ms p95 and hitch gates. Normal
+Boot/menu p95 is97.2677ms with50 frames over100ms; both buffer-reuse runs also
+fail. The candidate remains OFF. The900s state is finite and artificial banks
+remain dry, but Troublemaker storage reverses from accumulation to increasing
+loss: NOT settled, NOT promoted. Normal play retains the450s v8 fields.
+Actual boat-camera frames retain broad flat foam and separated spray. No visual,
+collision, shoreline, physical or performance acceptance is claimed.
+
+See [completed v13 review, evidence and next gates](../reconstruction-review-2026-09-07/v13-playable-review.md).
+This checkpoint delivers validation findings, not a new appearance/physics fix.
+South Fork remains first unfinished; Colorado, Pacuare and Futaleufu remain queued.
+
+## Historical checkpoint log (newest first)
+
 September27 v13 packaging6197 COMPLETE exit0: BuildCookRun798.77s; all frozen
 input hashes unchanged. New cooked executable SHA256
 `efe039224bc328d5b335705fc34aa7c925a3c44ab716922982386b87398d7652`.
