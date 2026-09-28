@@ -99,11 +99,47 @@ Native snapshots are not promoted, and v13 still uses the450s fields.
 
 ## Playable delivery and next gates
 
+Update: v14 package82230 COMPLETE exit0, end01:41:33.1043673Z;
+BuildCookRun619.77s, frozen inputs unchanged. Inner executable SHA256
+`a10b03e6821373e16c22caaddd97def834c012639b234f4cf101a89f958cba6b`.
+Staged closure `tmp/south-fork-v14-staged-payload-20260928.json` PASSES all2,405
+files/917,995,570 bytes with no external-source fallback. This is rebuilt-game
+delivery preparation, not successful packaged launch, realism or timing.
+
+Validation85971/wrapper11644 is live and has reached
+`waiting_for_owned_hydraulics_and_audits`. Recipe
+`tmp/validate-sf-v14-v2-20260928.ps1`; receipt
+`tmp/south-fork-v14-validation-process-v2-20260928.json`. It queues normal
+Boot/menu,8310 and11520,1200 frames each, no quality/solver/crest override.
+Each gets runtime-health checks plus independent frame, inclusive CPU-scope
+and simulation-clock analysis over rows30..N-31,20FPS/50ms p95/no100ms hitch.
+Failed timing is retained as failed, not promoted; failed runtime health stops
+the chain. These are a new build's checks, not another reuse ON/OFF experiment.
+
+Motion2149/wrapper32388 waits behind validation, recipe
+`tmp/capture-sf-v14-spatial-approach-v2-20260928.ps1`, receipt
+`tmp/sf-v14-spatial-approach-20260928-process-v2.json`. It requires the normally
+launched executable's exact SHA, records the passive8310m approach for80 samples,
+and verifies the actual packaged profile has legacy plunge relief false. It
+retains the original video, profile, crest and spatial-height evidence; actual
+view review and collision/shoreline acceptance remain separate pending work.
+
+Preflight history: waiting validation8263/wrapper27012 and motion77141/wrapper30820
+were stopped before any game/test was launched. The strict CSV parser rejects
+an ignored-duplicate exception if that column is not actually duplicated.
+The first queue incorrectly supplied that exception unconditionally. Replacement
+helper `tmp/v14-frame-audit-arguments-20260928.ps1` only supplies the explicitly
+unmeasured `NumInstanceTransformUpdates` exception when the completed header
+duplicates it; other ambiguity remains an error. Both retained v13 normal and
+busy-duplicate CSVs pass exact-argument preflight. No new FPS run was used to
+repair this orchestration error. Package and hydraulic owners were untouched.
+All three replacement scripts parsed successfully before launch. Superseded
+receipts explicitly record cancellation; do not restart those old recipes.
+
 Fresh v14 recipe: `tmp/package-south-fork-v14-20260928.ps1`; package receipt and
 log use `tmp/south-fork-v14-package-20260928.{json,log}`. Preserve v13.
-Package82230/wrapper32192 is LIVE from01:31:09.0827426Z, source5f05b136d,
-UAT/UBT observed35032/16348. Frozen input hashes are in the receipt; no duplicate
-build. This live-owner note is not successful packaging or installed delivery.
+Package82230/wrapper32192 ran from01:31:09.0827426Z, source5f05b136d,
+UAT/UBT35032/16348. Frozen input hashes are in the receipt; no duplicate build.
 Measured prior stage5,360,205,592 bytes; reserve two full copies plus4GiB scratch
 before launch (15,015,378,480 bytes), including ongoing native snapshots. This
 replaces an unmeasured20GiB staging guard, not a quality/performance gate.

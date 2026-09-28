@@ -1,5 +1,27 @@
 # Remaining requested work
 
+September28 UTC v14 package COMPLETE exit0: BuildCookRun619.77s, all frozen
+inputs unchanged. New inner executable SHA256
+`a10b03e6821373e16c22caaddd97def834c012639b234f4cf101a89f958cba6b`.
+Staged v8 closure PASS:2,405 files/917,995,570 bytes, no external-source fallback.
+This contains the normal plunge-height correction but is NOT yet a packaged
+launch/motion/performance pass. One validation owner is LIVE: session85971,
+wrapper11644, `tmp/validate-sf-v14-v2-20260928.ps1`, receipt
+`tmp/south-fork-v14-validation-process-v2-20260928.json`. It waits for the SAME
+hydraulic wrapper33852/native28956 and final audits (observed1179.5s), then runs
+normal Boot/menu,8310 and11520 at1200 frames each, with unchanged20FPS gates,
+native clock and inclusive scope analysis. No reuse-candidate retest/override.
+One motion owner is LIVE behind it: session2149/wrapper32388, recipe
+`tmp/capture-sf-v14-spatial-approach-v2-20260928.ps1`, receipt
+`tmp/sf-v14-spatial-approach-20260928-process-v2.json`. It checks the same
+normally launched executable, captures80 seconds of the passive8310 approach,
+and requires the packaged profile to confirm the normal plunge default.
+Do not duplicate these jobs or infer acceptance from their queued state.
+Two earlier waiting wrappers were stopped BEFORE any game/test ran after
+preflight found an unconditional duplicate-header exception. Replacement
+arguments passed strict checks on retained normal and duplicate-header CSVs.
+See [delivery status and remaining gates](../reconstruction-review-2026-09-07/native-rise-plunge-relief.md).
+
 September28 UTC delivery owner: ONE v14 package is LIVE, session82230,
 wrapper32192 (UAT/UBT observed35032/16348), source5f05b136d. Recipe
 `tmp/package-south-fork-v14-20260928.ps1`; durable receipt/log
