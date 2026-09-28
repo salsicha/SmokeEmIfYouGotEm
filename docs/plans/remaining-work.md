@@ -1,5 +1,48 @@
 # Remaining requested work
 
+September28 UTC v16 packaged validation/motion COMPLETE, follow-through80167
+exit0. Normal menu passes20FPS;8310 p9556.8952ms/max111.217ms and11520
+p9587.1912ms/max144.3344ms FAIL.11520 water backlog reaches7.8s. Actual packaged
+18emitter-centre samples pass6/3/3cm and174m approach video fully decodes, but
+inspected views retain flat foam, weak breaking and detached-looking spray.
+Narrow source-position fix delivered; no full visual/collision/physics acceptance.
+No live cook/build/capture remains in this chain. See [terminal v16 review and next work](../reconstruction-review-2026-09-07/v16-playable-review.md).
+
+September28 UTC v16 actual packaged Boot/menu/FullReach launch PASSES health
+and its20FPS start-area gate:1200frames, p9547.6728ms, max60.1784ms, zero>100ms,
+zero runtime errors. Existing validation40292 is now at8310; follow-through25420
+will retain rapid results and capture motion. This is not rapid/full-reach or
+appearance acceptance. See [v16 actual result](../reconstruction-review-2026-09-07/v16-playable-review.md).
+
+September28 UTC v16 package COMPLETE exit0,365.77s; frozen inputs unchanged.
+Staged closure PASS2405files/917995570bytes/no fallback. ONE existing follow-
+through80167/wrapper25420 now runs validation40292; packaged menu game32804
+is live, then8310/11520 timing and actual approach/anchor capture are queued.
+No new motion or appearance acceptance yet. See [v16 candidate and gates](../reconstruction-review-2026-09-07/v16-playable-review.md).
+
+September28 UTC v16 validation follow-through QUEUED: session80167/wrapper25420,
+start05:44:45.0437460UTC, waiting on exact package33204. It will verify staged
+closure, isolated packaged menu/8310/11520 timing, then80-sample actual approach
+and source-centre anchors. Decode/visual review remain required. Receipt:
+tmp/south-fork-v16-follow-through-20260928.json. Do not duplicate these jobs or
+modify frozen package inputs. No timing or appearance acceptance implied.
+
+September28 UTC editor Boot/menu28166 FAILED Concert initialization-test
+health errors; motion never started. No engine/plugin/log-gate exemption made.
+ONE native-tested spray v16 Windows package is LIVE: session45681/wrapper33204,
+start05:39:13.9842062UTC, unchanged450s v8 fields/material. Next verify package,
+staged closure, packaged normal launch/rapid timing and actual motion/anchors.
+Failed editor receipt: tmp/sf-spray-anchor-motion-v1-20260928-process.json.
+Package receipt: tmp/south-fork-v16-package-20260928.json. This supersedes the
+live editor-capture notes below. No new video or visual acceptance exists.
+
+September28 UTC spray-anchor editor build and six native tests PASS; recovery
+session9712 exited0. ONE runtime validation owner is now live: session28166,
+wrapper36828, Boot/menu1200-frame profile then80-sample8310 approach recording
+and actual source-centre clearance check. Decode/appearance, rapid cost and
+normal packaged delivery remain pending; no visual acceptance or runtime commit.
+See [build receipts and live capture](../reconstruction-review-2026-09-07/spray-shifted-emitter-anchors.md).
+
 September28 UTC publication capture COMPLETE; same-CSV analysis recovered from
 a stale duplicate-column option without repeating the game or weakening gates.
 Three events are exactly interpolation+recenter; recenter publication25–31ms.

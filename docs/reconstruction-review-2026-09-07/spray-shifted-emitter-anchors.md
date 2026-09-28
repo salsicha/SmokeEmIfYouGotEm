@@ -1,4 +1,50 @@
-# Shifted spray-emitter height repair: SOURCE ONLY, validation pending
+# Shifted spray-emitter height repair: BUILT, motion/delivery pending
+
+## Current state: editor capture failed; v16 package building
+
+Editor validation28166/wrapper36828 FAILED before motion. Boot/menu reached
+FullReach, but two Concert timestamp initialization-test errors failed runtime
+health. Timing also failed: p9571.8622ms, max105.8524ms, one>100ms. No new
+video/anchor result exists. Installed ConcertMessageData.h assigns
+CreationTimeInTicks from FDateTime::Now(), without the neighboring GUID's
+IgnoreForMemberInitializationTest metadata; CoreUObject Class.cpp documents
+the nondeterministic-field exception. This supports an engine-side test
+mismatch, not an uninitialized spray value. No engine, plugin or health gate
+was changed; the failed launch receipt is preserved, not excluded or accepted.
+
+ONE normal Windows v16 package is now building: session45681/wrapper33204,
+start05:39:13.9842062UTC. Recipe `tmp/package-south-fork-v16-20260928.ps1`;
+receipt/log `tmp/south-fork-v16-package-20260928.{json,log}`; stage
+`tmp/south-fork-playable-v16-20260928`. Native-tested sources and the normal
+material/450s v8 manifest remain unchanged; v14/v15r2 retained. Initial
+read-only space preflight failed on PowerShell long paths before build or
+stage creation; extended-length paths fixed it without deleting anything.
+The14GiB reserve remains. Package completion, closure, actual packaged
+launch/timing and motion/anchor review are NEXT, not accepted results.
+
+HEAD advanced to existing13affd0d3 (`progress`); preserve that snapshot and
+do not mistake its tracked runtime/parser files for visual acceptance.
+This state supersedes live capture/build descriptions below. No push made.
+
+September28 UTC recovery session9712/wrapper24660 is COMPLETE exit0.
+Single-worker Editor Development build succeeded in114.34s; all six exact
+native tests passed with zero warnings/errors/not-run/in-process. Native report
+`tmp/spray-emitter-anchor-native-v2-20260928/index.json`, SHA256
+`38a37fae49d3383f8563da38fb7ab8a870cc1eaafff344fa88b30fd82025fd93`.
+Built Raft DLL SHA256
+`a4554653a3389d64e49b92dac9c1da837a7423da33ac1abb3e038d03b821fb1c`.
+The six frozen source hashes, including the user's separate EOL-only test,
+were preserved. This is a compiled runtime change, not a visual acceptance.
+
+ONE follow-through is now live: session28166/wrapper36828, receipt start
+05:35:21.5447503UTC, recipe `tmp/capture-spray-anchor-v1-20260928.ps1`, receipt
+`tmp/sf-spray-anchor-motion-v1-20260928-process.json`. It first runs the ordinary
+Boot/menu1200-frame profile on this same DLL, then one80-sample8310 approach
+using normal camera/default rendering plus source audit logging. It validates
+source-centre logs and retains the actual recording for decode/visual review.
+No simultaneous timing/capture or physics cook; no automatic visual acceptance,
+packaging or runtime commit. Existing v15r2 packaged game remains unchanged.
+This terminal build/new capture state supersedes the historical notes below.
 
 September28 UTC owner update: original session71849/wrapper15924 exited1
 BEFORE building because publication owner4504's post-capture parser used a
