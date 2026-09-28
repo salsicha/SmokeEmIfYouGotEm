@@ -27,6 +27,9 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
     const double ChangedDepth[]={0.,0.17724543809890747,0.21227142214775085,0.34732389450073242};
     const double RowBed[]={8.0471343994140625,8.0450592041015625,7.95037841796875,8.0014495849609375};
     const double RowDepth[]={0.,0.001626607496291399,0.0067639793269336224,0.01633489690721035};
+    const double CornerDepth[]={0.,.17728912830352783,.21232075989246368,.34736922383308411};
+    const double SecondCornerBed[]={8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875};
+    const double SecondCornerDepth[]={0.,.16613596677780151,.10671740770339966,.28282999992370605};
     FCurve C;if(!TestTrue(TEXT("original v22 donors"),C.Init(Bed,H)))return false;
     struct FMap{FVector2D O,Step,RenderOrigin;};
     const FMap Maps[]={
@@ -47,7 +50,10 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
         {FVector2D(-544900.,-363300.),FVector2D(-100.,-100.),FVector2D(-554200.,-348600.)},
         // Axis-live-v1 frames183/source33168 and292/source23259.
         {FVector2D(-544900.,-363300.),FVector2D(-100.,-100.),FVector2D(-554200.,-348600.)},
-        {FVector2D(-545800.,-358900.),FVector2D(100.,-100.),FVector2D(-554200.,-348600.)}
+        {FVector2D(-545800.,-358900.),FVector2D(100.,-100.),FVector2D(-554200.,-348600.)},
+        // Partition-live-v2 frame189/source33168 and214/source33610.
+        {FVector2D(-544900.,-363300.),FVector2D(-100.,-100.),FVector2D(-554200.,-348600.)},
+        {FVector2D(-545700.,-363500.),FVector2D(100.,100.),FVector2D(-554200.,-348600.)}
     };
     TArray<TSharedPtr<FJsonValue>> Cases;
     const auto Pair=[](const FVector2D& P)
@@ -58,8 +64,8 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
     };
     for(int32 K=0;K<UE_ARRAY_COUNT(Maps);++K)
     {
-        const auto& CaseBed=K==10 ? RowBed : K>=8 ? TransitionBed : K>=5 ? CapturedBed : BaselineBed;
-        const auto& CaseDepth=K==10 ? RowDepth : K==9 ? ChangedDepth : K==8 ? TransitionDepth : K==7 ? LatestDepth : K==6 ? LaterDepth : K==5 ? CapturedDepth : BaselineDepth;
+        const auto& CaseBed=K==12 ? SecondCornerBed : K==10 ? RowBed : K>=8 ? TransitionBed : K>=5 ? CapturedBed : BaselineBed;
+        const auto& CaseDepth=K==12 ? SecondCornerDepth : K==11 ? CornerDepth : K==10 ? RowDepth : K==9 ? ChangedDepth : K==8 ? TransitionDepth : K==7 ? LatestDepth : K==6 ? LaterDepth : K==5 ? CapturedDepth : BaselineDepth;
         FCurve CaseCurve;if(!TestTrue(TEXT("unchanged case donors"),CaseCurve.Init(CaseBed,CaseDepth)))return false;
         const auto& M=Maps[K];RaftSimStoredBankContour::FStorage Storage;
         if(!TestTrue(TEXT("Cartesian GPU storage map valid"),Storage.Init(CaseCurve,M.O,
@@ -360,6 +366,59 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
             TestTrue(TEXT("changed-state geometry has complete positive proof"),LiveGood);
         }
     }
+    // Every original rejected update from partition-live-v2, not just a
+    // selected first/last snapshot. These are simulation captures, not surveys.
+    {
+        struct FCapture{double Bed[4],Depth[4];FVector2D Dry,Step;};
+        const FCapture Captures[]={
+            {{8.5975189208984375,8.420166015625,8.374542236328125,8.2484893798828125},{0,0.17728912830352783,0.21232075989246368,0.34736922383308411},{-544900,-363300},{-100,-100}},
+            {{8.5975189208984375,8.420166015625,8.374542236328125,8.2484893798828125},{0,0.17729640007019043,0.21232900023460388,0.34737679362297058},{-544900,-363300},{-100,-100}},
+            {{8.5975189208984375,8.420166015625,8.374542236328125,8.2484893798828125},{0,0.17730365693569183,0.21233722567558289,0.34738436341285706},{-544900,-363300},{-100,-100}},
+            {{8.5975189208984375,8.420166015625,8.374542236328125,8.2484893798828125},{0,0.17731092870235443,0.21234548091888428,0.34739193320274353},{-544900,-363300},{-100,-100}},
+            {{8.5975189208984375,8.420166015625,8.374542236328125,8.2484893798828125},{0,0.17731821537017822,0.21235372126102448,0.34739947319030762},{-544900,-363300},{-100,-100}},
+            {{8.5975189208984375,8.420166015625,8.374542236328125,8.2484893798828125},{0,0.17732550203800201,0.21236197650432587,0.34740704298019409},{-544900,-363300},{-100,-100}},
+            {{8.5975189208984375,8.420166015625,8.374542236328125,8.2484893798828125},{0,0.177332803606987,0.21237024664878845,0.34741461277008057},{-544900,-363300},{-100,-100}},
+            {{8.5975189208984375,8.420166015625,8.374542236328125,8.2484893798828125},{0,0.17734012007713318,0.21237851679325104,0.34742218255996704},{-544900,-363300},{-100,-100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.16605490446090698,0.10665461421012878,0.28275790810585022},{-545700,-363500},{100,100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.1660630851984024,0.10666102170944214,0.28276520967483521},{-545700,-363500},{100,100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.16607125103473663,0.10666739195585251,0.2827724814414978},{-545700,-363500},{100,100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.16607938706874847,0.10667373985052109,0.2827797532081604},{-545700,-363500},{100,100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.16608752310276031,0.10668005049228668,0.28278696537017822},{-545700,-363500},{100,100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.16609562933444977,0.10668633878231049,0.28279417753219604},{-545700,-363500},{100,100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.16610373556613922,0.1066926047205925,0.28280138969421387},{-545700,-363500},{100,100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.16611181199550629,0.10669884085655212,0.2828085720539093},{-545700,-363500},{100,100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.16611987352371216,0.10670505464076996,0.28281572461128235},{-545700,-363500},{100,100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.16612792015075684,0.106711246073246,0.2828228771686554},{-545700,-363500},{100,100}},
+            {{8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875},{0,0.16613596677780151,0.10671740770339966,0.28282999992370605},{-545700,-363500},{100,100}},
+        };
+        for(const FCapture& Capture:Captures)
+        {
+            FCurve Curve;RaftSimStoredBankContour::FStorage Storage;FResult Result;
+            if(!TestTrue(TEXT("original partition-replay donors"),Curve.Init(Capture.Bed,Capture.Depth)) ||
+                !TestTrue(TEXT("original partition-replay map"),Storage.Init(Curve,Capture.Dry,
+                    Capture.Dry+FVector2D(Capture.Step.X,0.),Capture.Dry+FVector2D(0.,Capture.Step.Y),.1,{-554200.,-348600.})) ||
+                !TestTrue(TEXT("all original rejected updates now certify"),RaftSimStoredBankContour::Build(Curve,Storage,Result)))return false;
+        }
+        AddInfo(TEXT("StoredBank original_partition_rejections=19 fully_certified=19"));
+    }
+    // Synthetic near-corner approach in BOTH captured cells. These are
+    // additional changing-depth probes, not continuous-state or field proof.
+    for(int32 Cell=11;Cell<=12;++Cell)for(int32 Step=0;Step<=128;++Step)
+    {
+        const auto& B=Cell==11 ? TransitionBed : SecondCornerBed;
+        const auto& H0=Cell==11 ? CornerDepth : SecondCornerDepth;
+        double Margin=1.;for(int32 I=1;I<4;++I)Margin=FMath::Min(Margin,B[0]-B[I]-H0[I]);
+        double H1[4]={0.};for(int32 I=1;I<4;++I)H1[I]=double(float(H0[I]+.95*Margin*double(Step)/128.));
+        FCurve Curve;RaftSimStoredBankContour::FStorage Storage;FResult Result;const auto& M=Maps[Cell];
+        if(!TestTrue(TEXT("synthetic corner-approach donors"),Curve.Init(B,H1)) ||
+            !TestTrue(TEXT("synthetic corner-approach map"),Storage.Init(Curve,M.O,
+                M.O+FVector2D(M.Step.X,0.),M.O+FVector2D(0.,M.Step.Y),.1,M.RenderOrigin)) ||
+            !TestTrue(TEXT("synthetic corner-approach complete certificate"),RaftSimStoredBankContour::Build(Curve,Storage,Result)))
+        {
+            AddInfo(FString::Printf(TEXT("StoredBank corner_sweep cell=%d step=%d stage=%d"),Cell,Step,Result.Stats.FailedStage));return false;
+        }
+    }
+    AddInfo(TEXT("StoredBank synthetic_corner_approach=258 fully_certified=258"));
     RaftSimStoredBankContour::FStorage Bad;FResult R;
     RaftSimStoredBankContour::FStorage Unrebased;
     TestTrue(TEXT("unrebased captured map initializes"),Unrebased.Init(C,Maps[0].O,

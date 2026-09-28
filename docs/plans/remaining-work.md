@@ -1,5 +1,20 @@
 # Remaining requested work
 
+September28 UTC canonical shared-edge reserve repairs all19 prior captured
+rejections within the unchanged1mm band:20 native regressions,258 added synthetic
+near-corner probes,13 exact stored contours,48 exact crossings,15 audit controls
+pass (shared-reserve-v1). Longer90-sample actual replay still FAILED:
+452 accepted/62 rejected updates,88.965m. One physical cell (source23259,
+reindexed19466 after render-origin change) shows both true row-order reversal
+and a genuinely dry shallow endcap; sorting alone cannot fix both.
+2890 video frames decoded;6/30/60/90s inspected, realism remains unaccepted.
+Diagnostic topology median56.5788505ms is NOT isolated FPS; profiling was not
+run after runtime failure. Candidate OFF, normal v27 unchanged. Next build a
+general stored contour/band construction with all exact wet/dry/width/partition
+gates, then actual motion/contact and isolated cost before normal promotion.
+No cook, package, solver activation, data deletion, push or river acceptance.
+See [shared-edge repair and longer failed replay](../reconstruction-review-2026-09-07/certified-bank-shared-reserve-repair.md).
+
 September28 UTC whole-endcap and signed-neighbor correction now certifies all
 11 retained GPU geometry captures:20 native regressions,15 audit controls,
 11 independent exact cases, frozen inputs unchanged (partition-v3). Proposed

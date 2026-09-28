@@ -34,7 +34,17 @@ inline bool Build(double W,double D,double Bw,double Bd,double H,double WidthCm,
     const FBound Root=FBound(W)+(FBound(D)-FBound(W))*T;
     if(!FMath::IsFinite(Root.Lo) || !FMath::IsFinite(Root.Hi))return false;
     const bool Increasing=D>W;
-    const double Bound=Increasing ? Root.Lo : Root.Hi;
+    double Bound=Increasing ? Root.Lo : Root.Hi;
+    // A nearest-wet root can leave no representable interior endcap when
+    // the dry root approaches a corner. Reserve half of the SAME geometric
+    // band toward the wet endpoint, after allowing for a full GPU step.
+    // This is a shared-edge policy (only W,D and their original donors),
+    // never a cell-specific offset, depth floor or enlarged error bound.
+    double Spacing=0.;
+    for(double Endpoint:{W,D})for(float Direction:{-std::numeric_limits<float>::infinity(),std::numeric_limits<float>::infinity()})
+        Spacing=FMath::Max(Spacing,FMath::Abs(double(std::nextafter(float(Endpoint),Direction))-Endpoint));
+    const double Reserve=WidthCm>Spacing ? Down((WidthCm-Spacing)*.5) : 0.;
+    Bound=Increasing ? FMath::Max(W,Down(Bound-Reserve)) : FMath::Min(W,Up(Bound+Reserve));
     float Stored=float(Bound);
     if(Increasing ? double(Stored)>Bound : double(Stored)<Bound)
         Stored=std::nextafter(Stored,Increasing ? -std::numeric_limits<float>::infinity() : std::numeric_limits<float>::infinity());

@@ -52,7 +52,7 @@ struct FStorage
         {
             RaftSimSharedBankCrossing::FResult R;
             if(!RaftSimSharedBankCrossing::Build(End[Axis],Origin[Axis],C.Bed[Axis ? 2 : 1],C.Bed[0],
-                C.Depth[Axis ? 2 : 1],Width*FMath::Abs(Delta[Axis]),R))return false;
+                C.Depth[Axis ? 2 : 1],WidthCm,R))return false;
             Crossings[Axis]=Origin;Crossings[Axis][Axis]=R.Position;
             double Step=0.;
             for(double V:{Origin[Axis],End[Axis]})for(float Direction:{-std::numeric_limits<float>::infinity(),std::numeric_limits<float>::infinity()})
