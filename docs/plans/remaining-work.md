@@ -1,5 +1,13 @@
 # Remaining requested work
 
+September28 UTC prescribed-fan auxiliary transport now retains the signed
+exterior factor/difference work, with explicit interior/flux-coordinate work
+and spatial RHS sign.79 exact/reference regressions pass, including independent
+face quadrature and both pressure poles. This is NOT a coupled momentum law,
+inflow/radiation condition, timestep or playable improvement. Nonlinear gameplay
+stays OFF. Cook33552/39708 is still live near1628s; queued capture4504 and all
+five frozen inputs are unchanged. See [construction and remaining physical gates](../reconstruction-review-2026-09-07/prescribed-auxiliary-advection.md).
+
 September28 UTC prescribed-pressure auxiliary connections now retain explicit
 flux-coordinate work and fixed-flux geometry rates;67 reference tests pass,
 including both original pressure poles. This is NOT the advective exterior
