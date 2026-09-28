@@ -1,5 +1,16 @@
 # Remaining requested work
 
+September28 UTC remaining three-wet finite-chord repair now has an exact
+conservative envelope reference:16 tests PASS and original v22 capture binding
+PASS, seven frozen hashes unchanged. Whole wet/dry triangle certificates bound
+omitted positive water to a1mm geometric band without changing physical depths.
+Captured candidate needs67 segments (69 before certified simplification), versus
+normal v24's16; native rounding, cache/attribute integration and cost are NEXT,
+not accepted. This is supporting geometry, NOT new playable delivery. Normal v24
+and nonlinear-OFF status remain unchanged; SAME source replay33152 is still live.
+Keep South Fork open; no move to Colorado. See
+[construction, proof and native requirements](../reconstruction-review-2026-09-07/three-wet-bank-envelope.md).
+
 September28 UTC conservative prescribed mass/pressure component now has75
 passing regression tests (zero errors/failures/skips), ten frozen hashes
 rechecked after terminal completion. It preserves original fan mass flux and
