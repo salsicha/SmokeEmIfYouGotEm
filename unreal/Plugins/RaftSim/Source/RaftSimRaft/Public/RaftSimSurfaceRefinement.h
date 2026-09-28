@@ -9,6 +9,7 @@
 #include "RaftSimIndexedEdgeMap.h"
 #include "RaftSimBoundCoordinateMemo.h"
 #include "RaftSimCrestRangeMemo.h"
+#include "RaftSimParallelCrestEmission.h"
 
 // Conforming red/green triangle refinement. Midpoints retain parent indices so
 // every render attribute uses the same piecewise-linear hydraulic authority;
@@ -57,6 +58,8 @@ struct FRaftSimSurfaceRefinement
     bool bStrongEdgeHash=false; // Candidate until exact actual-input timing qualifies it.
     bool bIndexedEdges=false; // Shoreline enables the qualified indexed lookup.
     bool bRetainTopologyStorage=false; // Reuse capacity, never stale selection/profile values.
+    bool bParallelTriangleEmission=false; // Diagnostic until exact live cost qualification.
+    uint64 ParallelEmissionLevels=0;
     bool bLevelLocalMemos=false; // Candidate: retain coordinate slots separately per level.
     bool bInlineSelection=false; // Candidate: typed predicate, identical evaluations.
     bool bBoundCoordinateMemo=false; // Candidate: exact per-triangle lookup bindings.
@@ -476,7 +479,13 @@ private:
                 int32 Origin=0;
                 const auto Add=[&](int32 A,int32 B,int32 C)
                 { Next.Add(A);Next.Add(B);Next.Add(C);NextOrigins.Add(Origin); };
-                for (int32 I=0;I<Triangles.Num();I+=3)
+                if(bParallelTriangleEmission && Triangles.Num()/3>=2048)
+                {
+                    RaftSimParallelCrestEmission::Build(Triangles,TriangleOrigins,Midpoints,
+                        bShortGreenDiagonals,AlternateGreen,Next,NextOrigins,Cached.GreenVertices,Cached.GreenAlternate);
+                    ++ParallelEmissionLevels;
+                }
+                else for (int32 I=0;I<Triangles.Num();I+=3)
                 {
                     Origin=TriangleOrigins[I/3];
                     int32 V[]={Triangles[I],Triangles[I+1],Triangles[I+2]};int32 M[3],Count=0;

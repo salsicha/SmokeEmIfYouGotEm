@@ -23,6 +23,7 @@
 #include "RaftSimCrestAdjacentRangeAudit.h"
 #include "RaftSimCrestIntervalAudit.h"
 #include "RaftSimCrestCornerRangeAudit.h"
+#include "RaftSimParallelCrestEmissionAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
@@ -145,6 +146,11 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
             Refinement.bIndexedEdges=bIndexedEdges;
             static const bool bRetainStorage=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRetainCrestTopologyStorage"));
             Refinement.bRetainTopologyStorage=bRetainStorage;
+            // Two64-pair actual-input histories preserve complete topology
+            // and improve whole adaptive-build time in both execution orders.
+            // Only emission is parallel; midpoint IDs/child order stay exact.
+            static const bool bParallelEmission=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialCrestEmission"));
+            Refinement.bParallelTriangleEmission=bParallelEmission;
             static const bool bLevelLocalMemos=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLevelLocalCrestMemos"));
             Refinement.bLevelLocalMemos=bLevelLocalMemos;
             static const bool bBoundMemo=FParse::Param(FCommandLine::Get(),TEXT("RaftSimBoundCrestMemo"));
@@ -201,6 +207,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         });
         CachedXY=MoveTemp(XY); CachedIndices=SourceIndices; CachedProfile=Input.ProfileKey;
         CachedDetailWindowCm=Input.DetailWindowCm;CachedDetailSpanCm=Input.DetailSpanCm;
+        RaftSimParallelCrestEmissionAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestLookupAudit::Run(CachedXY,Triangles,Input);
         RaftSimCrestContextAudit::Run(CachedXY,Triangles,Input);
         RaftSimCrestCornerAudit::Run(CachedXY,Triangles,Input);

@@ -1,5 +1,25 @@
 # Remaining requested work
 
+September28 UTC v26 parallel crest emission is now delivered in the NORMAL
+rebuilt game:15 native tests before/after integration,128 exact live pairs,
+whole adaptive-build savings in BOTH orders at8310 and11520, Boot/menu launch,
+174.320m motion/contact verification and reviewed actual video. No new physical
+breaking shape is claimed. Isolated p95: menu46.4228ms/0 hitches PASS;
+8310 66.6790ms/6 FAIL;11520 86.3125ms/3 FAIL. Heavy bridge backlog ends0.391s
+but peaks4.6046s and remains four-tick saturated: no capacity/20FPS acceptance.
+All25 frozen inputs unchanged. Code-only v26 reuses3106 verified immutable
+dependencies as hard links to v25; binaries/Saved outputs are independent.
+NEVER cook into either linked stage or overwrite inherited files; future cooks
+must use fresh stages. No deletion; both stages rehashed unchanged after play.
+Extended-path and UTC-reparse staging failures were repaired without rebuilding
+or discarding evidence. Terminal package receipt is
+tmp/parallel-crest-v26-20260928-package-recovery2.json (earlier failures preserved).
+All owners terminal; no live workload. Next coherent three-wet shore integration,
+physical breaking/recirculation and remaining measured publication cost, not
+more unchanged diagnostics. Keep South Fork open; no solver activation or push.
+See [v26 proof, actual delivery and remaining failures](../reconstruction-review-2026-09-07/parallel-crest-emission.md).
+Earlier pending/LIVE entries below are historical and superseded.
+
 September28 UTC v25 normal-path package and runtime validation are COMPLETE:
 Boot/menu launch,174.053m rapid motion, contact and18 emitter anchors pass their
 bounded checks;22 frozen inputs unchanged. Actual video2481frames/82.667s was
