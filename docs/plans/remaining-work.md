@@ -1,5 +1,14 @@
 # Remaining requested work
 
+September28 UTC ONE1350-to1800s hydraulic continuation is LIVE: session14006,
+wrapper33552/native39708. The original1350s state and geometry are preserved;
+native frame-zero restart passes5,382,400 bit-exact cells, zero added water.
+The same owner queues1500/1650/1800s state/bank audits and regional storage
+analysis; no duplicate cook or simultaneous game timing. This tests whether
+Troublemaker's still-substantial local drainage continues to ease, NOT a visual
+change or a settled-flow pass. Normal v15r2 retains450s v8 fields. See
+[purpose, owner and next checks](../reconstruction-review-2026-09-07/envelope1350-to1800.md).
+
 September28 UTC v15r2 delivery and review COMPLETE: retry5066 and its sole
 follow-through57198 are terminal exit0. The hydraulic-normal repair is in the
 rebuilt normal game; staged2,405-file closure and actual Boot/menu launch pass.
