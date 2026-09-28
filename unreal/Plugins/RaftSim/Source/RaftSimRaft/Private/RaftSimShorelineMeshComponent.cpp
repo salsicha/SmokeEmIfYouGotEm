@@ -19,6 +19,7 @@
 #include "Engine/World.h"
 #include "ProfilingDebugging/CsvProfiler.h"
 #include "Async/ParallelFor.h"
+#include "RaftSimParallelBankAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimShoreline,true);
 
@@ -417,6 +418,8 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
         // Qualified captured-cell and actual-contact correction for South Fork.
         // Other scenarios remain explicit until their own scene verification.
         const bool bOppositeDryFan=!bOriginalBankFan && (bReviewedSouthFork || bForceOppositeDryFan);
+        if(!RaftSimParallelBankAudit::Run(Nx,Ny,Source,Wet,Available,DepthM,BedM,
+            Crests!=nullptr,bOppositeDryFan,bReviewedSouthFork))return false;
         if (!TopologyCache.Update(Nx,Ny,MoveTemp(Source),Wet,Available,DepthM,BedM,
             BaseVertices,BaseIndices,BaseOffsets,bTopologyRebuilt,Crests!=nullptr,bOppositeDryFan,bReviewedSouthFork)) return false;
     }

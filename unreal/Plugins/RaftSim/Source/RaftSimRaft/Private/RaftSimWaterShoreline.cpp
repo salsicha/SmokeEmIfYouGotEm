@@ -142,8 +142,11 @@ static bool BuildClipped(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
     TArray<RaftSimWaterShoreline::FEdge>* OutEdges, bool bPreserveUnusedNodes, bool bCompactEdges,
     TArray<RaftSimWaterShoreline::FBankTriangle>* OutBankTriangles = nullptr,
     bool bOppositeDryFan = false,bool bCurvedHighBanks=false,
-    TArray<RaftSimWaterShoreline::FCurvedBank>* OutCurvedBanks=nullptr)
+    TArray<RaftSimWaterShoreline::FCurvedBank>* OutCurvedBanks=nullptr,
+    TArray<RaftSimWaterShoreline::FCurvedBank>* PreparedCurves=nullptr,
+    const TArray<FVector2D>* PreparedEndpoints=nullptr,int32* PreparedReuseCount=nullptr)
 {
+    int32 PreparedIndex=0;
     // Both public entry points validate before any output/cache mutation.
     // Do not scan the entire source grid again on a cache miss.
     const int32 Count=Nx*Ny;
@@ -269,8 +272,32 @@ static bool BuildClipped(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
                 Bank.Dry=Mode<=4 ? Mode-1 : INDEX_NONE;
                 Bank.PairSide=Mode>4 ? (Mode-5)%4 : INDEX_NONE;
                 Bank.StartNode=Polygon[Start];Bank.EndNode=Polygon[(Start+1)%N];
+                // A node-count/winding change requires new topology, not a
+                // second solve of an already current local contour. The
+                // handoff lives only inside THIS Update call. Remap node IDs
+                // and verify actual shared-edge coordinates before adoption.
+                bool Adopt=PreparedCurves && PreparedEndpoints && PreparedCurves->IsValidIndex(PreparedIndex) &&
+                    PreparedEndpoints->IsValidIndex(2*PreparedIndex+1);
+                if(Adopt)
+                {
+                    const auto& Ready=(*PreparedCurves)[PreparedIndex];
+                    Adopt=Ready.Dry==Bank.Dry && Ready.PairSide==Bank.PairSide &&
+                        (*PreparedEndpoints)[2*PreparedIndex]==FVector2D(OutVertices[Bank.StartNode].Position) &&
+                        (*PreparedEndpoints)[2*PreparedIndex+1]==FVector2D(OutVertices[Bank.EndNode].Position);
+                    for(int32 I=0;Adopt && I<4;++I)
+                        Adopt=Ready.Source[I]==Bank.Source[I] && Ready.Bed[I]==BedM[Bank.Source[I]] && Ready.Depth[I]==DepthM[Bank.Source[I]];
+                    if(Adopt)
+                    {
+                        auto& ReadyMutable=(*PreparedCurves)[PreparedIndex];
+                        for(int32 I=0;I<4;++I){Bank.Bed[I]=Ready.Bed[I];Bank.Depth[I]=Ready.Depth[I];}
+                        for(int32 I=0;I<Bank.Segments-1;++I)Bank.Points[I]=Ready.Points[I];
+                        Bank.PairPoints=MoveTemp(ReadyMutable.PairPoints);Bank.PairFractions=MoveTemp(ReadyMutable.PairFractions);
+                        if(PreparedReuseCount)++*PreparedReuseCount;
+                    }
+                }
+                ++PreparedIndex;
                 bool Changed=false;
-                if(!PrepareCurve(Bank,OutVertices,DepthM,BedM,true,Changed))return false;
+                if(!Adopt && !PrepareCurve(Bank,OutVertices,DepthM,BedM,true,Changed))return false;
                 Bank.FirstNode=OutVertices.Num();OutVertices.AddDefaulted(Bank.IntermediateCount());
                 WriteCurve(Bank,OutVertices);
                 TArray<uint32,TInlineAllocator<32>> Curved;Curved.SetNumUninitialized(N+Bank.IntermediateCount());int32 NewN=0;
@@ -345,6 +372,7 @@ bool RaftSimWaterShoreline::Build(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& 
 
 void RaftSimWaterShoreline::FTopologyCache::Reset()
 {
+    PreparedCurveReuseCount=0;
     CachedNx=CachedNy=CachedIndexCount=0;
     bCachedCompactEdges=false;
     bCachedOppositeDryFan=false;
@@ -356,9 +384,12 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
     TArray<FProcMeshVertex>&& Source, TConstArrayView<uint8> Wet, TConstArrayView<uint8> Available,
     TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
     TArray<FProcMeshVertex>& Vertices, TArray<uint32>& Indices, TArray<int32>& CellOffsets,
-    bool& bTopologyRebuilt, bool bCompactEdges, bool bOppositeDryFan,bool bCurvedHighBanks)
+    bool& bTopologyRebuilt, bool bCompactEdges, bool bOppositeDryFan,bool bCurvedHighBanks,
+    bool bParallelCurves)
 {
     bTopologyRebuilt=false;
+    PreparedCurveReuseCount=0;
+    bool PreparedAllCurves=false;
     int32 CurveNodeCount=0;for(const auto& Bank:CurvedBanks)CurveNodeCount+=Bank.IntermediateCount();
     // Exact actual-input pairs qualify the independent batches in both call
     // orders. Keep serial fusion and the original two-pass path as controls.
@@ -441,7 +472,41 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
             Edge.Crossing=NewCrossing;
             WriteEdge(Edge,Vertices);
         }
-        for(auto& Bank:CurvedBanks)
+        // Banks read only original source vertices and completed shared-edge
+        // nodes. Each owns its metadata and a disjoint interior-node range.
+        // A changed node count does NOT write into the old range: it forces
+        // the same complete rebuild below. Join before testing triangles.
+        static const bool SerialCurves=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialBankCurves"));
+        // Eight batches amortize scheduling; the small live bank set did not
+        // qualify for parallel work in both execution orders.
+        if(bParallelCurves && !SerialCurves && CurvedBanks.Num()>=128)
+        {
+            constexpr int32 BatchSize=16;
+            const int32 Batches=FMath::DivideAndRoundUp(CurvedBanks.Num(),BatchSize);
+            TArray<uint8,TInlineAllocator<128>> Results;Results.SetNumUninitialized(Batches);
+            ParallelFor(TEXT("RaftSimBankCurves"),Batches,1,[&](int32 Batch)
+            {
+                uint8 Result=1;
+                for(int32 I=Batch*BatchSize;I<FMath::Min((Batch+1)*BatchSize,CurvedBanks.Num());++I)
+                {
+                    auto& Bank=CurvedBanks[I];
+                    const int32 Before=Bank.IntermediateCount();bool Changed=false;
+                    if(!PrepareCurve(Bank,Vertices,DepthM,BedM,false,Changed)){Result=0;break;}
+                    if(Before!=Bank.IntermediateCount())Result|=2;
+                    else WriteCurve(Bank,Vertices);
+                    if(Changed)Result|=4;
+                }
+                Results[Batch]=Result;
+            },EParallelForFlags::Unbalanced);
+            for(uint8 Result:Results)
+            {
+                if(!(Result&1))return false;
+                if(Result&2)bReuse=false;
+                bCrossingChanged|=bool(Result&4);
+            }
+            PreparedAllCurves=true;
+        }
+        else for(auto& Bank:CurvedBanks)
         {
             const int32 Before=Bank.IntermediateCount();bool Changed=false;
             if(!PrepareCurve(Bank,Vertices,DepthM,BedM,false,Changed))return false;
@@ -459,8 +524,21 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
     }
     const bool bInitializedReserve=CachedNx==Nx && CachedNy==Ny &&
         Vertices.Num()==Count+(Nx-1)*Ny+Nx*(Ny-1);
+    TArray<FCurvedBank> PreparedCurves;
+    TArray<FVector2D> PreparedEndpoints;
+    if(PreparedAllCurves)
+    {
+        PreparedEndpoints.Reserve(CurvedBanks.Num()*2);
+        for(const auto& Bank:CurvedBanks)
+        {
+            PreparedEndpoints.Add(FVector2D(Vertices[Bank.StartNode].Position));
+            PreparedEndpoints.Add(FVector2D(Vertices[Bank.EndNode].Position));
+        }
+        PreparedCurves=MoveTemp(CurvedBanks);
+    }
     if (!BuildClipped(Nx,Ny,MoveTemp(Source),Wet,Available,DepthM,BedM,
-        Vertices,Indices,&CellOffsets,&Edges,bInitializedReserve,bCompactEdges,&BankTriangles,bOppositeDryFan,bCurvedHighBanks,&CurvedBanks)) return false;
+        Vertices,Indices,&CellOffsets,&Edges,bInitializedReserve,bCompactEdges,&BankTriangles,bOppositeDryFan,bCurvedHighBanks,&CurvedBanks,
+        PreparedAllCurves ? &PreparedCurves : nullptr,PreparedAllCurves ? &PreparedEndpoints : nullptr,&PreparedCurveReuseCount)) return false;
     CachedNx=Nx; CachedNy=Ny; CachedIndexCount=Indices.Num();
     bCachedCompactEdges=bCompactEdges;
     bCachedOppositeDryFan=bOppositeDryFan;

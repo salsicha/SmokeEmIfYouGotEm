@@ -1,5 +1,22 @@
 # Remaining requested work
 
+September28 UTC duplicate bank work now has a qualified normal-path candidate:
+12 native tests PASS and128 exact live serial/candidate pairs; whole shoreline
+update cost improves in both orders at both captured locations. Independent
+bank batches retain all geometry/attributes, and13,179 already-current curves
+are reused during SAME-call rebuilds at11520. Small bank sets remain serial.
+Initial scheduling-only small-bank regression and v2 missing-coverage failure
+are retained; neither was silently accepted. Native/live owners all terminal0,
+all17 frozen hashes unchanged. Next normal v25 package, Boot/menu, actual motion/
+contact and isolated20FPS/clock validation; v24 is still last delivered and
+still fails. ONE v25 package49968/wrapper18052 is LIVE,22 frozen inputs: follow
+tmp/parallel-bank-v25-package-20260928.json, do not duplicate or edit its inputs.
+Lossless compression preserves30 old package/diagnostic files, zero deletions;
+15,261,855,744 free bytes passed the unchanged14GiB gate. After package/closure,
+run tmp/validate-prepared-bank-v25-motion-20260928.ps1 and inspect actual motion,
+then isolated timing/clock. This is not new visible delivery or acceptance yet.
+See [implementation, exact live evidence and delivery gate](../reconstruction-review-2026-09-07/prepared-bank-refresh.md).
+
 September28 UTC original source replay AND independent reload are COMPLETE,
 exit0:631 current protected hashes,22 implementation hashes,18 historical tools;
 11 supported records checked, unsupported2/7 unchanged. Exact component ledgers

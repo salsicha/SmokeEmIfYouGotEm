@@ -57,10 +57,12 @@ public:
         TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
         TArray<FProcMeshVertex>& Vertices, TArray<uint32>& Indices,
         TArray<int32>& CellOffsets, bool& bTopologyRebuilt, bool bCompactEdges = false,
-        bool bOppositeDryFan = false, bool bCurvedHighBanks = false);
+        bool bOppositeDryFan = false, bool bCurvedHighBanks = false,
+        bool bParallelCurves = true);
     void Reset();
     uint64 GetRebuildCount() const { return RebuildCount; }
     uint64 GetReuseCount() const { return ReuseCount; }
+    int32 GetPreparedCurveReuseCount() const { return PreparedCurveReuseCount; }
     const TArray<FEdge>& GetEdges() const { return Edges; }
     const TArray<FCurvedBank>& GetCurvedBanks() const { return CurvedBanks; }
 private:
@@ -76,5 +78,6 @@ private:
     TArray<uint8> CurveEligibility;
     TArray<int32> CurveCandidates;
     uint64 RebuildCount=0, ReuseCount=0;
+    int32 PreparedCurveReuseCount=0;
 };
 }
