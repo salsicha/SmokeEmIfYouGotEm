@@ -1,5 +1,16 @@
 # Remaining requested work
 
+September28 UTC conservative prescribed mass/pressure component now has75
+passing regression tests (zero errors/failures/skips), ten frozen hashes
+rechecked after terminal completion. It preserves original fan mass flux and
+explicit boundary/profile work through the original two-pole adjoint. This is
+supporting physics ONLY: no complete force/energy law, evolving reconstruction,
+new playable waves or FPS acceptance. Normal v24 remains delivered and unchanged;
+nonlinear gameplay stays OFF. SAME source replay33152 remains live at index1;
+do not duplicate or edit its inputs. Keep South Fork open and address the
+retained three-wet shoreline deficit plus missing coupled physical evolution.
+See [mass/pressure construction and limits](../reconstruction-review-2026-09-07/prescribed-mass-pressure.md).
+
 September28 UTC adjacent-bank v24 is now delivered in the NORMAL rebuilt game.
 Package, staged closure2405files/917995570bytes, Boot/menu and170.857m rapid
 motion verification COMPLETE. All18 frozen inputs remain unchanged. The contact
