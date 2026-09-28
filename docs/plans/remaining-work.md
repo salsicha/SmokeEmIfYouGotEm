@@ -1,5 +1,13 @@
 # Remaining requested work
 
+September28 UTC publication/recenter instrumentation BUILT (163.22s),36 parser
+tests pass. No scheduling, geometry, physics or visual change. One follow-through
+owner60320/wrapper4504 waits for existing hydraulic owner33552/39708 AND its
+final audits, then records one isolated8310 capture with actual caller counts
+and recenter/history CPU scopes. No duplicate launch or concurrent game timing.
+Actual branch attribution remains pending; v15r2 package is unchanged. See
+[instrumentation, scope and owner](../reconstruction-review-2026-09-07/publication-reason-instrumentation.md).
+
 September28 UTC retained v15r2 event analysis narrows the next performance
 work: all three8310>100ms hitches follow its three double-crest-update frames;
 11520's sole double-update frame precedes its97.1394ms maximum. Expensive

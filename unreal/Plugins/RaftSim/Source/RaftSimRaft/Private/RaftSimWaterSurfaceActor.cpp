@@ -3367,6 +3367,8 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
         return;
     }
     // Preserve the global presentation lattice when the moving mesh recentres.
+    CSV_SCOPED_TIMING_STAT(RaftSimSurface,RecenterWork);
+    CSV_CUSTOM_STAT(RaftSimSurface,RecenterWorkCalls,1,ECsvCustomStatOp::Accumulate);
     // Using the raft's arbitrary fractional station as the new origin changed
     // every shoreline sample phase by up to one cell; shallow bank triangles
     // then appeared or disappeared even across the large overlapping region.
@@ -3431,6 +3433,7 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
     if ((ShiftCells != 0 || ShiftNorth != 0) &&
         FMath::Abs(ShiftCellsExact - ShiftCells) < 0.01f && FMath::Abs(ShiftNorthExact - ShiftNorth) < 0.01f)
     {
+        CSV_SCOPED_TIMING_STAT(RaftSimSurface,RecenterStateHistory);
         const auto ShiftStationIndexedFloats =
             [this, ShiftCells, ShiftNorth](TArray<float>& Values, float FillValue)
         {
@@ -3513,6 +3516,8 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
 
 void ARaftSimWaterSurfaceActor::CarryRenderedGridHistory(int32 ShiftX, int32 ShiftY)
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimSurface,CarryRenderedHistory);
+    CSV_CUSTOM_STAT(RaftSimSurface,CarryRenderedHistoryCalls,1,ECsvCustomStatOp::Accumulate);
     const auto Carry = [this, ShiftX, ShiftY](auto& History, const auto& Targets)
     {
         check(History.Num() == GridStationN * GridLateralN && Targets.Num() == History.Num());
@@ -3627,6 +3632,8 @@ void ARaftSimWaterSurfaceActor::ClampCurvedGridCenter()
 
 void ARaftSimWaterSurfaceActor::UpdateCurvedGridPlanarGeometry()
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimSurface,PlanarGeometry);
+    CSV_CUSTOM_STAT(RaftSimSurface,PlanarGeometryCalls,1,ECsvCustomStatOp::Accumulate);
     for (int32 LateralIndex = 0; LateralIndex < GridLateralN; ++LateralIndex)
     {
         for (int32 StationIndex = 0; StationIndex < GridStationN; ++StationIndex)
@@ -8505,6 +8512,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 bLiveVolumeCoreInterpolationActive = true;
                 if (bRecentreCarryApplied)
                 {
+                    CSV_SCOPED_TIMING_STAT(RaftSimSurface,RecenterPublication);
+                    CSV_CUSTOM_STAT(RaftSimSurface,PublishRecenter,1,ECsvCustomStatOp::Accumulate);
                     // Same world-space geometry the previous frame drew, but
                     // every index now maps to a shifted station. Push the
                     // carried state together with the recentred UVs so the
@@ -8525,8 +8534,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // re-wet — is vertex motion on this one immortal section.
                 LogWaterRenderStateEvent(
                     GetWorld(), TEXT("core_create_hard_section_missing"));
-                PublishLiveVolumeCore(LiveVolumeCoreVertices, LiveVolumeCoreNormals,
-                    LiveVolumeCoreVertexColors, FlowVelocityMetersPerSecond, BoatWakePresentationData, true);
+                {
+                    CSV_SCOPED_TIMING_STAT(RaftSimSurface,CreatePublication);
+                    CSV_CUSTOM_STAT(RaftSimSurface,PublishCreate,1,ECsvCustomStatOp::Accumulate);
+                    PublishLiveVolumeCore(LiveVolumeCoreVertices, LiveVolumeCoreNormals,
+                        LiveVolumeCoreVertexColors, FlowVelocityMetersPerSecond, BoatWakePresentationData, true);
+                }
                 RenderedLiveVolumeCoreVertices = LiveVolumeCoreVertices;
                 RenderedLiveVolumeCoreNormals = LiveVolumeCoreNormals;
                 RenderedLiveVolumeCoreVertexColors =
@@ -8538,8 +8551,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
             else
             {
-                PublishLiveVolumeCore(LiveVolumeCoreVertices, LiveVolumeCoreNormals,
-                    LiveVolumeCoreVertexColors, FlowVelocityMetersPerSecond, BoatWakePresentationData, false);
+                {
+                    CSV_SCOPED_TIMING_STAT(RaftSimSurface,HardSwapPublication);
+                    CSV_CUSTOM_STAT(RaftSimSurface,PublishHardSwap,1,ECsvCustomStatOp::Accumulate);
+                    PublishLiveVolumeCore(LiveVolumeCoreVertices, LiveVolumeCoreNormals,
+                        LiveVolumeCoreVertexColors, FlowVelocityMetersPerSecond, BoatWakePresentationData, false);
+                }
                 RenderedLiveVolumeCoreVertices = LiveVolumeCoreVertices;
                 RenderedLiveVolumeCoreNormals = LiveVolumeCoreNormals;
                 RenderedLiveVolumeCoreVertexColors =
@@ -9296,6 +9313,9 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
     const TArray<FVector>& VertexNormals, const TArray<FLinearColor>& Colors,
     const TArray<FVector2D>& Flow, const TArray<FVector2D>& Wake, bool bCreate,float CrestBlendAlpha)
 {
+    // Counts publication attempts, including a rejected payload; not successful
+    // GPU submissions. Caller reasons must partition these calls exactly.
+    CSV_CUSTOM_STAT(RaftSimSurface,PublishCalls,1,ECsvCustomStatOp::Accumulate);
     if (WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates())
     {
         FWaterSurfacePerf Perf(TEXT("cartesian_publish"));
@@ -9769,9 +9789,13 @@ void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
     // Preserve the numeric channels on every refresh/recentre/interpolation:
     // otherwise e.g. 0.05 foam becomes ~0.25 after the first update, driving
     // both exaggerated whitening and different local-fluid displacement.
-    PublishLiveVolumeCore(RenderedLiveVolumeCoreVertices, RenderedLiveVolumeCoreNormals,
-        RenderedLiveVolumeCoreVertexColors, RenderedLiveVolumeCoreFlowVelocity,
-        RenderedLiveVolumeCoreWakeData, false,Alpha);
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimSurface,InterpolationPublication);
+        CSV_CUSTOM_STAT(RaftSimSurface,PublishInterpolation,1,ECsvCustomStatOp::Accumulate);
+        PublishLiveVolumeCore(RenderedLiveVolumeCoreVertices, RenderedLiveVolumeCoreNormals,
+            RenderedLiveVolumeCoreVertexColors, RenderedLiveVolumeCoreFlowVelocity,
+            RenderedLiveVolumeCoreWakeData, false,Alpha);
+    }
     // The chase never "completes": it keeps easing toward the latest
     // refresh targets every frame until a hard swap or grid teardown
     // deactivates it.
@@ -9781,6 +9805,16 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
 {
     CSV_SCOPED_TIMING_STAT(RaftSimSurface,Tick);
     Super::Tick(DeltaSeconds);
+    // Seed inactive reason columns without clearing calls from initialization
+    // or another actor in the same CSV frame. Zero time is not a call count.
+    CSV_CUSTOM_STAT(RaftSimSurface,PublishCalls,0,ECsvCustomStatOp::Accumulate);
+    CSV_CUSTOM_STAT(RaftSimSurface,PublishInterpolation,0,ECsvCustomStatOp::Accumulate);
+    CSV_CUSTOM_STAT(RaftSimSurface,PublishRecenter,0,ECsvCustomStatOp::Accumulate);
+    CSV_CUSTOM_STAT(RaftSimSurface,PublishCreate,0,ECsvCustomStatOp::Accumulate);
+    CSV_CUSTOM_STAT(RaftSimSurface,PublishHardSwap,0,ECsvCustomStatOp::Accumulate);
+    CSV_CUSTOM_STAT(RaftSimSurface,RecenterWorkCalls,0,ECsvCustomStatOp::Accumulate);
+    CSV_CUSTOM_STAT(RaftSimSurface,CarryRenderedHistoryCalls,0,ECsvCustomStatOp::Accumulate);
+    CSV_CUSTOM_STAT(RaftSimSurface,PlanarGeometryCalls,0,ECsvCustomStatOp::Accumulate);
     if (!TryInitializeRuntimeSurface()) return;
     if (MovingDetail) MovingDetail->CommitCompletedFrame();
     FWaterSurfacePerf Perf(TEXT("tick"));
