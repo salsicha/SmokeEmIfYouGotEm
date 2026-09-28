@@ -166,7 +166,12 @@ struct FCurve
         return R;
     }
 };
-struct FStats{int32 CoefficientTests=0,InitialSegments=0,RootSolves=0;};
+struct FStats
+{
+    int32 CoefficientTests=0,InitialSegments=0,RootSolves=0;
+    int32 FailedStage=0;
+    FVector2D FailedA=FVector2D::ZeroVector,FailedB=FVector2D::ZeroVector;
+};
 inline bool Certificate(const FCurve& C,const FPoint& A,const FPoint& B,const FPoint& D,
     bool Wet,FStats& Stats,int32 Remaining=9)
 {
@@ -225,7 +230,9 @@ inline FPoint Inner(const FPoint& P,double Width)
 {
     // Leave an explicitly geometric machine-rounding reserve; final band
     // distance is itself interval checked against the unchanged width.
-    const double W=FMath::Max(0.,Width-128.*std::numeric_limits<double>::epsilon());
+    const double StorageError=FMath::Max(FMath::Abs(P.X.Lo-P.XY.X),FMath::Abs(P.X.Hi-P.XY.X))+
+        FMath::Max(FMath::Abs(P.Y.Lo-P.XY.Y),FMath::Abs(P.Y.Hi-P.XY.Y));
+    const double W=FMath::Max(0.,Width-128.*std::numeric_limits<double>::epsilon()-2.*StorageError);
     const double Factor=FMath::Max(0.,1.-W/(P.XY.X+P.XY.Y));
     return FPoint(P.XY*Factor,Factor==0.);
 }
@@ -237,17 +244,29 @@ struct FResult
     TArray<FIntVector> Triangles;
     FStats Stats;
 };
-inline bool Build(const FCurve& C,double Width,FResult& Out,bool ReuseRoots=true)
+// Store supplies the ACTUAL stored coordinates and enclosing inverse-map
+// bounds. Certificates never silently switch back to ideal proposal points.
+// RootWidth reserves part of the same geometric band for storage quantization.
+template<typename FStore>
+inline bool BuildStored(const FCurve& C,double Width,FResult& Out,const FStore& Store,
+    double RootWidth,bool ReuseRoots=true)
 {
     const FScopedIEEE FloatingPointScope;
 #if !PLATFORM_CPU_X86_FAMILY
     return false; // Other floating-point control implementations are unverified.
 #endif
-    Out={};if(!C.Valid || !FMath::IsFinite(Width) || Width<=256.*std::numeric_limits<double>::epsilon() || Width>=1.)return false;
+    Out={};if(!C.Valid || !FMath::IsFinite(Width) || Width<=256.*std::numeric_limits<double>::epsilon() || Width>=1. ||
+        !FMath::IsFinite(RootWidth) || RootWidth<0. || RootWidth>Width)return false;
     const FPoint Origin(FVector2D(0.,0.),true);
     const auto Interval=[&](const FPoint& P,const FPoint& Q)
-    {return Certificate(C,P,Q,Q,true,Out.Stats) && Certificate(C,Origin,Inner(P,Width),Inner(Q,Width),false,Out.Stats);};
-    const auto MakePoint=[&](double T){if(T>0. && T<1.)++Out.Stats.RootSolves;return Point(C,T,Width);};
+    {
+        const FPoint A=Inner(P,Width),B=Inner(Q,Width);
+        // A storage policy can perturb ray ordering. Certify the partition,
+        // not just depth signs on an accidentally reversed or overlapping span.
+        if(!SamePoint(P,Q) && (Cross(Origin,P,Q).Lo<=0. || Cross(P,Q,B).Lo<0. || Cross(P,B,A).Lo<0.))return false;
+        return Certificate(C,P,Q,Q,true,Out.Stats) && Certificate(C,Origin,A,B,false,Out.Stats);
+    };
+    const auto MakePoint=[&](double T){if(T>0. && T<1.)++Out.Stats.RootSolves;return Store(Point(C,T,RootWidth),T);};
     struct FSpan{double A,B;int32 Level;FPoint P,Q;};TArray<FSpan,TInlineAllocator<32>> Stack;
     const FPoint First=MakePoint(0.),Last=MakePoint(1.);Stack.Add({0.,1.,0,First,Last});
     Out.Boundary.Add(First);
@@ -255,8 +274,9 @@ inline bool Build(const FCurve& C,double Width,FResult& Out,bool ReuseRoots=true
     {
         const FSpan S=Stack.Pop(EAllowShrinking::No);
         const FPoint P=ReuseRoots ? S.P : MakePoint(S.A),Q=ReuseRoots ? S.Q : MakePoint(S.B);
-        if(Interval(P,Q)){Out.Boundary.Add(Q);continue;}
-        if(S.Level>=16 || Out.Stats.CoefficientTests>200000)return false;
+        if(Interval(P,Q)){if(!SamePoint(Out.Boundary.Last(),Q))Out.Boundary.Add(Q);continue;}
+        if(S.Level>=16 || Out.Stats.CoefficientTests>200000)
+        {Out.Stats.FailedStage=1;Out.Stats.FailedA=P.XY;Out.Stats.FailedB=Q.XY;return false;}
         const double M=(S.A+S.B)*.5;
         const FPoint Middle=ReuseRoots ? MakePoint(M) : FPoint(FVector2D::ZeroVector);
         Stack.Add({M,S.B,S.Level+1,Middle,Q});Stack.Add({S.A,M,S.Level+1,P,Middle});
@@ -274,11 +294,11 @@ inline bool Build(const FCurve& C,double Width,FResult& Out,bool ReuseRoots=true
         const FPoint Q=Inner(P,Width);
         const FBound DX=P.X-Q.X,DY=P.Y-Q.Y;
         const double Bound=Up(FMath::Max(FMath::Abs(DX.Lo),FMath::Abs(DX.Hi))+FMath::Max(FMath::Abs(DY.Lo),FMath::Abs(DY.Hi)));
-        if(Bound>Width)return false;
+        if(Bound>Width){Out.Stats.FailedStage=2;Out.Stats.FailedA=P.XY;Out.Stats.FailedB=Q.XY;return false;}
         Out.InnerBoundary.Add(Q);
     }
-    Out.Polygon.Add(FPoint(FVector2D(1.,1.)));Out.Polygon.Add(FPoint(FVector2D(1.,0.)));
-    Out.Polygon.Append(Out.Boundary);Out.Polygon.Add(FPoint(FVector2D(0.,1.)));
+    Out.Polygon.Add(Store(FPoint(FVector2D(1.,1.)),-1.));Out.Polygon.Add(Store(FPoint(FVector2D(1.,0.)),-1.));
+    Out.Polygon.Append(Out.Boundary);Out.Polygon.Add(Store(FPoint(FVector2D(0.,1.)),-1.));
     TArray<int32> Live;for(int32 I=0;I<Out.Polygon.Num();++I)Live.Add(I);
     while(Live.Num()>3)
     {
@@ -297,9 +317,13 @@ inline bool Build(const FCurve& C,double Width,FResult& Out,bool ReuseRoots=true
             if(Contains || !Certificate(C,A,B,D,true,Out.Stats))continue;
             Out.Triangles.Add(FIntVector(Live[Before],Live[I],Live[After]));Live.RemoveAt(I,1,EAllowShrinking::No);Found=true;
         }
-        if(!Found)return false;
+        if(!Found){Out.Stats.FailedStage=3;return false;}
     }
     if(!Certificate(C,Out.Polygon[Live[0]],Out.Polygon[Live[1]],Out.Polygon[Live[2]],true,Out.Stats))return false;
     Out.Triangles.Add(FIntVector(Live[0],Live[1],Live[2]));return true;
+}
+inline bool Build(const FCurve& C,double Width,FResult& Out,bool ReuseRoots=true)
+{
+    return BuildStored(C,Width,Out,[](const FPoint& P,double){return P;},Width,ReuseRoots);
 }
 }

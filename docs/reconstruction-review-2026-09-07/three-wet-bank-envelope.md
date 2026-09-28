@@ -3,7 +3,10 @@
 Latest checkpoint: v26 is the last delivered game, not v24. Source replay and
 reload are terminal; historical pending/LIVE notes below are superseded by
 remaining-work.md. The shared GPU-coordinate crossing prerequisite is now
-qualified below. Full conservative contour integration is still unfinished.
+qualified below. The subsequent full stored-coordinate candidate passes five
+native/exact frame cases, including one common whole-grid render origin; see
+[stored-coordinate proof](stored-bank-render-coordinates.md). Its direct-world
+control remains rejected. Normal conservative contour integration is unfinished.
 
 Status: exact geometry construction, capture-bound proof and a verified native
 candidate kernel; **not normal-renderer integration or playable delivery**.

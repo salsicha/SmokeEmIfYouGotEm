@@ -1,5 +1,17 @@
 # Remaining requested work
 
+September28 UTC full stored-coordinate bank candidate now has native AND exact
+whole-polygon proof:17 native tests,15 audit controls, five physical/storage
+frames, including the captured WHOLE-GRID origin. That frame needs70 triangles;
+every GPU-buffer triangle and the1mm dry-side band pass. Direct-world storage
+still fails and is retained as a rejected control; no normal renderer enabled.
+v7 native/exact receipt terminal14:23:26Z, all30 frozen inputs unchanged. Next
+common raster/ray render-origin integration, variable attributes/ear-cache
+identity and qualified construction reuse: fixture cost remains milliseconds
+per bank, NOT an accepted river frame budget. No new package/playable delivery;
+v26 remains current. All owners terminal, no push. See
+[stored contour proof and integration requirements](../reconstruction-review-2026-09-07/stored-bank-render-coordinates.md).
+
 September28 UTC shared-edge rounding prerequisite advanced, NOT new playable
 delivery: RaftSimSharedBankCrossing candidate proves the ACTUAL binary32 GPU
 coordinate wet, with at most1mm geometric retreat and unchanged donor depth.
