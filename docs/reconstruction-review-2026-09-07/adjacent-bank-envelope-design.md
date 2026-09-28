@@ -1,4 +1,4 @@
-# Adjacent high-bank contour - native verified, playable validation pending
+# Adjacent high-bank contour - delivered in v24, river acceptance open
 
 September28 UTC. The second v22 exposed raw-dry probe has two adjacent wet
 corners, so the three-wet-corner ray correction does not apply. The existing
@@ -189,3 +189,61 @@ The original prescribed physical replay33152 remains live(index0 checked,
 index1 started); it was neither restarted nor edited. Any concurrent game
 checks are NON-TIMING. No isolated20FPS result, river acceptance, nonlinear
 solver activation or move to Colorado is justified by this implementation.
+
+## v24 normal playable delivery and remaining limits
+
+The pending-owner section above is historical. Package98175/wrapper37452 ended0;
+BuildCookRun434.72s. Completed receipt
+tmp/adjacent-bank-v24-package-20260928.json records
+2026-09-28T10:49:37 completion, all18 frozen inputs unchanged. Staged closure
+tmp/adjacent-bank-v24-staged-closure-20260928.json passes2405files/917995570bytes
+with no external-source fallback. Known missing MetaHuman face dependencies
+remain release issues: a successful cook is not a clean release qualification.
+
+Normal runtime session52530/wrapper32320 ended0. Receipt
+tmp/adjacent-bank-v24-motion-20260928.json completed
+2026-09-28T10:52:11.6253744Z. Default Boot -> actual main menu -> FullReach ->
+600 post-travel captured frames passed exact ordering, normal selective-mode
+and zero-error checks. The separate rapid recording retained80 motion samples,
+8313.076->8483.933m (170.857m). All18 emitter centres pass6/3/3cm placement.
+Both launches were concurrent with the original source replay33152: no isolated
+FPS statistics or20FPS acceptance; no isolation guard was bypassed.
+
+Contact evidence: tmp/sf-v24-motion-20260928-contact.json.1859 wet support points,
+maximum support/carrier error0.000047554025cm.155 raw-dry points are all classified
+as ground-occluded by the registered ground sampler; zero exposed raw-dry,
+unavailable or ground-occluded-wet points in THIS sample. It is one early-frame
+sample with geometry-dependent triangle stride. The changed sample locations
+do not establish that every earlier probe, shoreline segment or collision is
+fixed. The three exact retained adjacent-pair cases are independently covered
+by the native regression. Existing three-wet finite-chord discrepancies remain
+outside this repair; terrain-source/occlusion and whole-traversal checks remain
+required. Do not make dry hydraulic support wet to conceal a mismatch.
+
+Decoder13271 ended0. All2482 original1280x720 frames decode with increasing
+PTS0..82.7s;56 exact adjacent duplicates. Report/frames:
+tmp/sf-v24-motion-decoded-20260928/report.json. Engine views at6/20/80s were
+inspected: the raft traverses the rapid and reaches calmer water; broad flat
+foam ribbons, weak breaking geometry, coarse rock/bank forms and crew/paddle-fit
+problems remain. This is narrow shoreline delivery, not a broad water realism,
+continuous-animation, full collision or surface-continuity acceptance. Encoded
+frame rate is not measured game FPS. No cinematic enhancement or substitute
+water layer was used.
+
+Binary SHA256:
+727819bb18d829477ed274eef8096cd495db909c2490e19a3b161c63d8159484.
+Video SHA256:
+d60f4bc4d8972cc2f876572db636c07abd13509015a91b030e55da588f5e0041.
+Contact SHA256:
+86219d95126c617e53b8977601e68f54a09cbb4818e57affb369a6dd103283fa.
+After runtime/decode the18 frozen input hashes and the original video/contact
+hashes were independently rechecked. Implementation commit a62f136d5 is local;
+no push. No package/game/decode process remains live in this chain.
+
+The SAME physical replay33152 remains live, CPU6351.75s at the last check,
+index0 checked/index1 started. Preserve its sources; do not restart it or claim
+that source-text/native tests complete the physical breaking model. Keep the
+full river queue, actual water realism and isolated20FPS gates open. Latest
+free space10,548,801,536bytes does not meet the14GiB next-package gate; no data or
+old package was deleted. Further space recovery must preserve captured evidence
+and valid timing-control packages, not lower the gate.

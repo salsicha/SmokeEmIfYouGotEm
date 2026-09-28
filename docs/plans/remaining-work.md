@@ -1,5 +1,20 @@
 # Remaining requested work
 
+September28 UTC adjacent-bank v24 is now delivered in the NORMAL rebuilt game.
+Package, staged closure2405files/917995570bytes, Boot/menu and170.857m rapid
+motion verification COMPLETE. All18 frozen inputs remain unchanged. The contact
+sample has1859 wet points, max support error0.000047554025cm,155 raw-dry points
+all classified as ground-occluded, no exposed raw-dry/unavailable/occluded-wet
+points. Changed sample locations do NOT prove all historical/full-reach cases.
+Original video fully decodes2482frames/82.7s;6/20/80s views still show flat broad
+foam, weak breaking, coarse banks and crew-fit problems. No whole-shoreline,
+animation, physical or isolated20FPS acceptance; source replay33152 is live.
+No v24 package/game/decode owner remains. Next address the retained three-wet
+finite-chord deficit and physical breaking/recirculation; preserve normal v24
+delivery and do not rerun unchanged captures. Follow the SAME source replay
+to terminal/hash validation before isolated menu/8310/11520 cost checks.
+See [v24 terminal evidence and limits](../reconstruction-review-2026-09-07/adjacent-bank-envelope-design.md#v24-normal-playable-delivery-and-remaining-limits).
+
 September28 UTC adjacent-pair high-bank repair is implemented in the NORMAL
 shoreline path. Editor build and10 rendered native regressions PASS;12 frozen
 inputs unchanged. All three v22/v23 retained pair probes are excluded, with
