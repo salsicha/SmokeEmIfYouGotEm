@@ -1,5 +1,14 @@
 # Remaining requested work
 
+September28 UTC hydraulic follow-through: ONE bounded900-to1350s continuation
+is now LIVE (session5446, wrapper33852/native28956), with state/bank checks for
+each new150s snapshot and final regional-storage analysis queued by its owner.
+Native restart independently verifies all5,382,400 h/u/v cells bit-exact,
+zero added water/context, unchanged bed/roughness/boundaries. This is not a
+settled-state or visual pass. Normal play remains v13/450s. Do not duplicate the
+cook or run FPS measurements concurrently. See
+[continuation rationale and owner](../reconstruction-review-2026-09-07/envelope900-to1350.md).
+
 September28 UTC placement follow-through: a downstream crest-anchor trial was
 compiled and tested in paired normal-scene boat-camera recordings. Three native
 tests passed and submitted crest error remained below1cm, but the inspected
