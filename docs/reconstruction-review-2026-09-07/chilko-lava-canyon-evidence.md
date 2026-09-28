@@ -212,3 +212,34 @@ and in the settled field it is 5.5 m/s.
 - **In-game survey** at 600-3,800 m every 400 m: every station is wet, 1.7-4.3
   m deep, with no ground contact. The only anomaly is a 0.78 m lateral surface
   tilt over 12 m at 3,800 m, in the steep water at the head of the White Mile.
+
+## Performance
+
+`profile_reference_map_ps5.ps1`, 1,200 frames per station. The desktop app's
+git scans held 35-48 % CPU during the runs, which can only have raised these
+times:
+
+| station | p95 | max | frames over 100 ms |
+| --- | --- | --- | --- |
+| 600 m (launch) | 19.2 ms | 25.5 ms | 0 |
+| 850 m (Bidwell Rapid) | 21.1 ms | 33.3 ms | 0 |
+| 2,200 m (canyon) | 19.3 ms | 32.4 ms | 0 |
+
+## Limits (why this is not accepted)
+
+- **No bathymetry.** The bed is inferred, calibrated to the measured LiDAR
+  water surface at about 45 m³/s. The 93 m³/s band extrapolates from that
+  calibration, and nothing measured checks its widths or stages (Sentinel-2
+  cannot resolve width here).
+- **The flow at the reach is the lake outflow plus unmeasured tributaries,**
+  and the LiDAR flight date of each part of the reach is not in the DEM (57
+  to 33 m³/s over the flights).
+- **Colour is 10 m Sentinel-2.** Bank detail and rock texture come from the
+  1.7 m Landscape and the procedural shoreline layers, not from imagery; the
+  bed colour under the water is invented. The water reads deep blue, not the
+  Chilko's glacial turquoise (appearance follow-up).
+- **Tree positions, individual heights and crowns are inferred** within the
+  inventory's polygons; the VRI itself is photo-interpreted (reference year
+  2013).
+- **Rocks and holes below the surface are not resolved.** Bidwell's two
+  inferred boulders come from its whitewater patch.

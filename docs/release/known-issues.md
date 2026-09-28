@@ -35,9 +35,10 @@ Editor-hosted Development build on the development host; no packaged-build resul
   emitter threshold. On 2026-09-27 all nine start-apron breaking sites (55-96 m
   from the camera, station 160 m) read intensity 0.00 against the 0.12
   threshold; the test now logs each site. The fix is evidence-based Zambezi
-  hydraulics, not a lower threshold. The repository holds GLO-30 and only a
-  rendered Sentinel-2 route image, so the Futaleufu method would need the
-  Sentinel-2 bands downloaded (permission required).
+  hydraulics, not a lower threshold. The Sentinel-2 bands (four dates at
+  203-2,794 m³/s Victoria Falls flows) and the ZRA daily flows are now
+  archived (2026-09-28); a whitewater audit places Stairway to Heaven, Midnight
+  Diner and Commercial Suicide within 250 m of their digitised stations.
 - South Fork busy-rapid frame time is borderline against the 20 FPS goal (50 ms
   p95); earlier rapid-station runs ranged 42-51 ms.
 - Several editor-context suites need explicit inputs or GPU fixtures
@@ -79,3 +80,14 @@ Editor-hosted Development build on the development host; no packaged-build resul
   - The rapid is hydraulically milder than its whitewater.
 
   See the [review](../reconstruction-review-2026-09-07/futaleufu-terminator-evidence.md).
+  Chilko Lava Canyon is now an evidence-based 4.0 km geographic reach from
+  above Bidwell Rapid to the White Mile. Its terrain and the flight-day water
+  surface are measured by LidarBC 2023 1 m LiDAR, the bed is calibrated to that
+  surface (anchors -0.14 to +0.45 m), the canopy follows the BC forest
+  inventory, and it runs p95 19-21 ms with no hitches. It is not accepted:
+  - The bed is inferred, and the 93 m³/s runtime band extrapolates from the
+    45 m³/s calibration without a width or stage check.
+  - The imagery is 10 m and the water reads deep blue rather than turquoise.
+  - Tree positions and sizes are inferred within the inventory polygons.
+
+  See the [review](../reconstruction-review-2026-09-07/chilko-lava-canyon-evidence.md).
