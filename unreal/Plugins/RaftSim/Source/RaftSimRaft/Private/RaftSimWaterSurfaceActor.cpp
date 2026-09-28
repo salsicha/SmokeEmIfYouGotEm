@@ -9533,6 +9533,116 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             UE_LOG(LogTemp,Display,TEXT("Cartesian fine crest audit: samples=%d target_error_cm=%.9g tracking_cm=%.9g source_change_cm=%.9g saved=%d"),
                 SampleCount,MaxTargetErrorCm,MaxCorrectionTrackingCm,MaxSourceChangeCm,Saved);
         }
+#if !UE_BUILD_SHIPPING
+        // Observe the complete submitted shape, not only the small analytic
+        // crest residual. One immutable presented-detail frame is held for all
+        // probes; do not commit a newer GPU frame or change the surface here.
+        static const FString BreakingProfilePath=[]()
+        {
+            FString Path;
+            FParse::Value(FCommandLine::Get(),TEXT("RaftSimBreakingProfileAudit="),Path);
+            return Path;
+        }();
+        if (!BreakingProfilePath.IsEmpty() && GetWorld() && WaterAdapter &&
+            GetWorld()->GetTimeSeconds()>=10.f && !FPaths::FileExists(BreakingProfilePath))
+        {
+            const auto& Drawn=CartesianShorelineMesh->GetWaterVertices();
+            const auto& DrawnIndices=CartesianShorelineMesh->GetWaterIndices();
+            const auto& Offsets=CartesianShorelineMesh->GetCellOffsets();
+            const auto Detail=MovingDetail ? MovingDetail->GetPresentedFrame() : nullptr;
+            const float Sign=WaterAdapter->GetRiverWorldYSign();
+            auto Report=MakeShared<FJsonObject>();
+            Report->SetStringField(TEXT("schema"),TEXT("raftsim.breaking_surface_profiles.v2"));
+            Report->SetStringField(TEXT("raw_height_frame"),TEXT("datum_relative_world_z_m"));
+            Report->SetNumberField(TEXT("river_vertical_datum_m"),WaterAdapter->GetRiverVerticalDatumM());
+            Report->SetStringField(TEXT("map"),GetWorld()->GetMapName());
+            Report->SetStringField(TEXT("scope"),TEXT("Straight flow-aligned transects, not streamlines. Raw hydraulic samples, submitted CPU triangles and one immutable presented GPU detail frame. Excludes other shader displacement, rock occlusion and reference calibration; not visual/performance acceptance."));
+            Report->SetNumberField(TEXT("world_seconds"),GetWorld()->GetTimeSeconds());
+            Report->SetNumberField(TEXT("committed_water_seconds"),WaterAdapter->GetCommittedStepSeconds());
+            Report->SetBoolField(TEXT("presented_detail_available"),bool(Detail));
+            if(Detail)
+            {
+                Report->SetNumberField(TEXT("presented_detail_sequence"),double(Detail->Sequence));
+                Report->SetNumberField(TEXT("presented_detail_simulation_seconds"),Detail->SimulationSeconds);
+                Report->SetNumberField(TEXT("presented_detail_elapsed_seconds"),Detail->ElapsedSeconds);
+            }
+            TArray<TSharedPtr<FJsonValue>> SiteRecords;
+            for (const FBreakingSite& Site:BreakingSites)
+            {
+                auto SiteRecord=MakeShared<FJsonObject>();
+                SiteRecord->SetNumberField(TEXT("east_m"),Site.RiverCoordinatesMeters.X);
+                SiteRecord->SetNumberField(TEXT("north_m"),Site.RiverCoordinatesMeters.Y);
+                SiteRecord->SetNumberField(TEXT("direction_east"),Site.FlowDirection.X);
+                SiteRecord->SetNumberField(TEXT("direction_north"),Site.FlowDirection.Y);
+                SiteRecord->SetNumberField(TEXT("additional_crest_m"),Site.HydraulicCrestDimensionsMeters.X);
+                SiteRecord->SetNumberField(TEXT("spilling_fraction"),Site.HydraulicSpillingFraction);
+                SiteRecord->SetNumberField(TEXT("presentation_weight"),Site.PresentationWeight);
+                TArray<TSharedPtr<FJsonValue>> Samples;
+                for (float Across:{-2.f,0.f,2.f}) for (int32 Step=-48;Step<=48;++Step)
+                {
+                    const float Along=Step*.25f;
+                    const FVector2D P=Site.RiverCoordinatesMeters+
+                        RaftSimWaterFlowFrame::ToField(FVector2D(Along,Across),Site.FlowDirection);
+                    auto Row=MakeShared<FJsonObject>();
+                    Row->SetNumberField(TEXT("along_m"),Along);Row->SetNumberField(TEXT("across_m"),Across);
+                    Row->SetNumberField(TEXT("east_m"),P.X);Row->SetNumberField(TEXT("north_m"),P.Y);
+                    FRaftSimWaterSample Raw;
+                    const bool RawValid=WaterAdapter->SampleWaterFieldAtRiverCoordinates(P,Raw);
+                    Row->SetBoolField(TEXT("raw_available"),RawValid);
+                    Row->SetBoolField(TEXT("raw_wet"),RawValid && Raw.bWet);
+                    if(RawValid)
+                    {
+                        // The adapter sample ALREADY subtracts RiverVerticalDatumM.
+                        // RiverToWorldPosition expects absolute elevation and would
+                        // subtract it a second time. In this Cartesian path the
+                        // sample height is directly world Z in meters.
+                        Row->SetNumberField(TEXT("raw_surface_world_m"),Raw.SurfaceHeightMeters);
+                        Row->SetNumberField(TEXT("raw_bed_world_m"),Raw.BedHeightMeters);
+                        Row->SetNumberField(TEXT("raw_surface_absolute_m"),double(Raw.SurfaceHeightMeters)+WaterAdapter->GetRiverVerticalDatumM());
+                        Row->SetNumberField(TEXT("raw_bed_absolute_m"),double(Raw.BedHeightMeters)+WaterAdapter->GetRiverVerticalDatumM());
+                        Row->SetNumberField(TEXT("raw_depth_m"),Raw.DepthMeters);
+                        Row->SetNumberField(TEXT("raw_velocity_east_mps"),Raw.VelocityMetersPerSecond.X);
+                        Row->SetNumberField(TEXT("raw_velocity_north_mps"),Raw.VelocityMetersPerSecond.Y);
+                    }
+                    const FVector2D Grid=(P-RiverCoordinatesM[0])/ResolvedVertexSpacingMeters;
+                    bool CarrierWet=false;
+                    FVector QueryWorld=FVector::ZeroVector,Position=FVector::ZeroVector,Weights=FVector::ZeroVector;
+                    FIntVector Corners=FIntVector::ZeroValue;
+                    if(Grid.X>=0 && Grid.Y>=0 && Grid.X<=GridStationN-1 && Grid.Y<=GridLateralN-1 &&
+                        WaterAdapter->RiverToWorldPosition(P,0.f,QueryWorld))
+                    {
+                        const int32 X=FMath::Min(FMath::FloorToInt(Grid.X),GridStationN-2);
+                        const int32 Y=FMath::Min(FMath::FloorToInt(Grid.Y),GridLateralN-2);
+                        const int32 Cell=Y*(GridStationN-1)+X;
+                        if(Offsets.IsValidIndex(Cell+1))CarrierWet=RaftSimWaterShoreline::Sample(
+                            FVector2D(QueryWorld.X,QueryWorld.Y),Offsets[Cell],Offsets[Cell+1],
+                            Drawn,DrawnIndices,Position,&Corners,&Weights);
+                    }
+                    Row->SetBoolField(TEXT("carrier_wet"),CarrierWet);
+                    if(CarrierWet)
+                    {
+                        const double Macro=(Position.Z-GetResolvedLiveSurfaceRenderLiftCm())*.01;
+                        Row->SetNumberField(TEXT("carrier_macro_world_m"),Macro);
+                        if(Detail)
+                        {
+                            const double Displacement=(Weights.X*Detail->DisplacementCm(Drawn[Corners.X].Position,Sign)+
+                                Weights.Y*Detail->DisplacementCm(Drawn[Corners.Y].Position,Sign)+
+                                Weights.Z*Detail->DisplacementCm(Drawn[Corners.Z].Position,Sign))*.01;
+                            Row->SetNumberField(TEXT("presented_detail_m"),Displacement);
+                            Row->SetNumberField(TEXT("carrier_with_detail_world_m"),Macro+Displacement);
+                        }
+                    }
+                    Samples.Add(MakeShared<FJsonValueObject>(Row));
+                }
+                SiteRecord->SetArrayField(TEXT("samples"),Samples);
+                SiteRecords.Add(MakeShared<FJsonValueObject>(SiteRecord));
+            }
+            Report->SetArrayField(TEXT("sites"),SiteRecords);
+            FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
+            const bool Saved=FFileHelper::SaveStringToFile(Json,*BreakingProfilePath);
+            UE_LOG(LogTemp,Display,TEXT("BreakingProfileAudit sites=%d saved=%d path=%s"),BreakingSites.Num(),Saved,*BreakingProfilePath);
+        }
+#endif
         return;
     }
     const TArray<FVector2D> Empty;

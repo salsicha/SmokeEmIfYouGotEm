@@ -1,5 +1,15 @@
 # Remaining requested work
 
+September28 UTC profile follow-through: corrected a double-datum subtraction
+in a NEW read-only selected-site observer (not in gameplay water). Schema-v2
+regressions, editor build and actual normal-scene capture PASS; obsolete v1
+absolute-height comparisons are rejected. Raw and submitted downstream rise
+both exist; the actual boat views still retain flat white patches/separated
+spray. Diagnostic progress only, no appearance/physics/FPS acceptance or v13
+package change. Existing hydraulic continuation33852/28956 remains live; no
+duplicate cook or concurrent FPS test. See
+[datum correction, full profiles and retained actual views](../reconstruction-review-2026-09-07/breaking-profile-datum-and-shape.md).
+
 September28 UTC hydraulic follow-through: ONE bounded900-to1350s continuation
 is now LIVE (session5446, wrapper33852/native28956), with state/bank checks for
 each new150s snapshot and final regional-storage analysis queued by its owner.
