@@ -1,8 +1,9 @@
 # Bank endpoint ray spacing — September28 UTC
 
-Status: normal South Fork source correction and nine rendered native tests
-complete. One v23 package owner is waiting for existing lossless old-stage
-compression. NOT packaged delivery, visual acceptance or a20FPS pass yet.
+Status: normal South Fork source correction, nine rendered native tests,
+v23 package and actual menu/rapid motion checks COMPLETE. Isolated timing,
+remaining shoreline failures and realistic breaking remain open. No river
+acceptance. The historical pending-owner details below are retained.
 
 ## Reproduced defect
 
@@ -88,3 +89,71 @@ and inspect the new video. Isolated20FPS timing still requires the existing
 replay to finish and pass full provenance/report checks. Keep flat foam,
 weak breaking, two-wet-corner and finite-chord failures open. South Fork
 remains first; no Colorado/Pacuare/Futaleufu advancement or push.
+
+## Compression completed; same package advancing
+
+Compression32261 is terminal exit0, completed10:07:04.0183689Z.
+All15,279 before/after file hashes match across10 targets; no deletion.
+Independent compact-log totals give4,677,486,460 data bytes saved.
+Free space after was15,802,245,120bytes, above the unchanged14GiB package gate.
+The same package47138/wrapper40972 is now building/cooking, not waiting for
+compression; no duplicate owner. Known missing MetaHuman baked-face dependency
+warnings remain release work, even if the package succeeds.
+
+While package inputs are frozen, an exact-rational construction for the
+separate two-wet-corner leak was checked without changing engine/physics
+sources. See [conservative adjacent-bank design and limits](adjacent-bank-envelope-design.md).
+It is next implementation evidence, not a delivered fix or acceptance.
+
+## v23 actual playable verification complete
+
+Package47138 is terminal exit0: BuildCookRun372.89s, closure PASS2405files/
+917995570bytes, no external fallback,13 frozen inputs unchanged. Receipt
+completed10:13:58.3153550Z. Actual game follow-through95806/wrapper38792
+completed10:16:34.4242887Z, exit0:
+tmp/validate-bank-endpoint-v23-motion-20260928.ps1 and
+tmp/bank-endpoint-v23-motion-20260928.json.
+
+Default Boot -> real main menu -> FullReach -> post-travel600-frame capture
+passed ordering, health and normal selective mode checks. Separate rapid
+motion retained80 samples from8313.254 to8487.309m (174.055m), zero runtime
+errors. All18 emitter centres pass6/3/3cm. These launches were concurrent
+with source replay33152: NO isolated frame-time statistics or20FPS acceptance
+are claimed; the profiler isolation gate was not bypassed.
+
+Contact export has1900 wet probes, max support/carrier error0.000047672707cm;
+133 raw-dry points,131 ground-occluded, zero unavailable/occluded wet.
+Two exposed raw-dry points remain, both adjacent-wet pairs:
+
+- Right-edge wet pair at XY(-540205.571313,-357415)cm: water954.025937cm,
+  ground952.862061cm, raw depth0, hydraulic bed9.540939m.
+- Bottom-edge wet pair at XY(-544875,-362923.153609)cm: water859.801257cm,
+  ground856.877258cm, raw depth0, hydraulic bed8.607498m.
+
+Same-call cells/triangles are in tmp/sf-v23-motion-20260928-contact.json.
+These reinforce the adjacent-bank next action; different samples/time do not
+prove every older probe is fixed. The exact v22 three-wet-corner exclusion is
+proved by the native captured-cell regression, not absence from this sample.
+No full collision or shoreline-continuity acceptance follows from wet agreement.
+
+Decoder98687 is terminal exit0. Original1280x720 video fully decodes2481frames
+with strictly increasing PTS0..82.666667s and50 exact adjacent duplicates.
+Seven retained frames are in tmp/sf-v23-motion-decoded-20260928;6/20/80s
+engine views were inspected. Raft travels through the rapid into calmer water;
+flat broad foam, weak breaking, coarse banks and crew-fit issues remain.
+No visible broad realism improvement, animation acceptance or recording-FPS
+substitution is claimed. This delivers the narrow normal-scene ray correction,
+not a finished shoreline or river reconstruction.
+
+Binary SHA256:
+9dec9d0720beffe2700fbe12c80b49c36999615e228dcf48fa260653ccdb6585.
+Video SHA256:
+1845078c27ae6a99c4b22f95217270aaa4161d1b98d101b14b845f1394de9173.
+Contact SHA256:
+b2d4a544721bb3c911b09110e9efdc6472935154c4771fc6488a8edbb721c3c8.
+All13 package inputs and executable still match after runtime.
+No compression/package/game/decode job remains live in this chain. Source
+replay33152 remains the SAME live index1 owner; preserve its inputs and do not
+duplicate it. Next integrate/verify the adjacent-bank construction and keep
+the three-wet finite-chord and visible breaking deficiencies open. Isolated
+normal menu/8310/11520 performance remains required after replay completion.

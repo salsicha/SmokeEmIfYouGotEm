@@ -1,5 +1,18 @@
 # Remaining requested work
 
+September28 UTC v23 ray-spacing correction now has COMPLETE normal package,
+Boot/menu and174.055m actual motion checks,13 frozen inputs unchanged.
+Video fully decodes2481frames/82.667s; inspected views retain flat foam/weak
+breaking and crew-fit issues. Two exposed raw-dry adjacent-pair probes remain.
+No FPS acceptance: source replay33152 was concurrent and is still live.
+Compression32261 completed,15,279 hashes preserved and4,677,486,460 data bytes
+saved; no deletion. No package/game/decode owner remains live.
+Next implement the conservative adjacent-bank design (exact4112 segment
+certificates, NOT yet engine-integrated), using all three retained pair cases.
+Keep finite-chord, visual realism and isolated20FPS gates open; do not advance
+to Colorado. See [v23 terminal review](../reconstruction-review-2026-09-07/bank-endpoint-ray-spacing.md#v23-actual-playable-verification-complete)
+and [adjacent-bank implementation requirements](../reconstruction-review-2026-09-07/adjacent-bank-envelope-design.md).
+
 September28 UTC the v22 three-wet-corner dry leak is reproduced and its
 unequal-endpoint ray-spacing defect corrected in the normal shoreline helper.
 Editor build and9 rendered native tests PASS, seven frozen inputs unchanged.
