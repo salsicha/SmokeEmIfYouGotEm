@@ -125,3 +125,54 @@ Reports and SHA256:
    continuation must be separate from FPS/motion validation, not a duplicate cook.
 4. Preserve captured geometry, provenance and all failures. No later-river advance
    until actual geometry, collision, shoreline, animation and performance pass.
+
+## Clock-capacity follow-through: retained captures expose actual simulation lag
+
+The existing `physics/scripts/audit_unreal_frame_csv.py` now reports requested,
+committed, native, adapter and backlog counters as seconds/counts, never as
+millisecond timing scopes. Missing counters remain unavailable, partial counters
+are rejected, and no diagnostic result grants simulation-capacity acceptance.
+All21 unit regressions pass, including four new clock tests covering lag despite
+passing frame time, missing/partial data, invalid counters, failures and native
+origin changes. No game rebuild or unchanged timing replay was needed.
+
+| Same audited rows30..1169 | First backlog s | Maximum backlog s | Last backlog s | Fixed ticks |
+| --- | ---: | ---: | ---: | ---: |
+| Normal Boot/menu | 0.010613 | 3.3244 | 3.3244 | 2859 |
+| Busy OFF A | 0.8460 | 4.8891 | 0.001383 | 4109 |
+| Busy ON A | 0.7633 | 0.9583 | 0.016059 | 3206 |
+| Busy ON B | 0.4417 | 0.4417 | 0.005237 | 3136 |
+| Busy OFF B | 0.5928 | 10.8995 | 8.9365 | 4329 |
+
+Zero failed-step flags do not mean real-time motion. Normal-menu native, adapter
+and committed clocks match at printed precision; queue residual is at most
+0.0001001s after independent CSV rounding. At the last audited row the requested
+clock is57.2077s but only53.8833s has been committed. The busy starts retain an
+approximately0.0667s native origin offset; its range is only0.0001001s at printed
+precision. This is reported, not mislabeled as a dropped physical tick.
+
+The bridge preserves elapsed debt, advancing at most four fixed water/raft ticks
+per render frame. Normal rows30..899 stay below0.016667s debt; the last block
+grows to3.3244s. Its solver aggregate cost per completed tick rises from about
+3.48-3.53ms to5.31ms, while mean surface Tick increases from21.25-21.96ms to
+34.78ms. More ticks per frame alone therefore do not explain the slowdown.
+This is evidence of capacity loss, not a proven thermal/OS or solver root cause.
+Do not hide it with timestep inflation, dropped elapsed time or a higher work cap.
+
+Different accumulated debt and total committed work further disqualify attributing
+whole-run OFF/ON means to the one sparse buffer-pack event. The next performance
+investigation should separate per-tick cost from per-frame surface work, retaining
+the existing clock contract and all failed rows. Water shape/recirculation still
+needs the spatial model correction and actual playable verification described above.
+
+Reports `tmp/sf-v13-<case>-20260927-clock-capacity.json` retain source CSV hashes,
+full timing failures and clock summaries. The four busy files contain duplicate
+unmeasured `NumInstanceTransformUpdates` headers; the existing explicit exception
+records their indices without combining/dropping columns or permitting ambiguous
+clock/timing metrics. The normal capture requires no exception. Report SHA256:
+
+- normal-menu: `5e1528ad0672fdd7f2c09000226753d1ef3954509e94af5bb0d22b2f58b4d7dc`
+- rapid11520-off-a: `9ff2fa5c3759426fa2a9deba8ee31149d980d3aca84394bafb83d11925f6b39b`
+- rapid11520-on-a: `0746d0427c64e6578265b1f0a626c9e8210b59a78d6efb25c0d312fcd18a479d`
+- rapid11520-on-b: `8474b56bea0125ee99ff6f978ee045e77ab7aabfd80348b04415b41b9460a049`
+- rapid11520-off-b: `e09cee90015413d8c823cbb4214399569d81f54d510b7a70d86cb63d99ccd2ad`

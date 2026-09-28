@@ -2,6 +2,13 @@
 
 ## Current checkpoint: v13 review and 900-second audits complete
 
+Clock follow-through (same retained captures, no new game run): normal-launch
+simulation debt grows to3.3244s; busy OFF B ends8.9365s behind. This is failed
+real-time capacity despite zero reported step failures. The existing CSV auditor
+now records bridge/native clock counters separately from frame milliseconds;
+21 regressions pass. See the clock-capacity section of the v13 review below.
+No ticks discarded, timestep enlarged, candidate enabled or appearance fix claimed.
+
 Supersedes the live/queued owner notes below. The existing hydraulic continuation,
 its final audits, v13 packaging, all five timing runs and the passive motion
 capture have completed. No duplicate cook, build, timing run or capture is needed.

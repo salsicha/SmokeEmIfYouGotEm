@@ -1,12 +1,55 @@
 import io
 import unittest
 from audit_unreal_frame_csv import parse_capture, summarize, summarize_water_workload, WATER_SCOPES, PUBLISH_SCOPES, SMOOTHING_SCOPES, BREAKING_SCOPES, FOAM_SCOPES, GROUND_SCOPES, RELIEF_SCOPES
+from audit_unreal_frame_csv import CLOCK_COUNTERS, summarize_water_clock
 
 HEADER = "FrameTime,GameThreadTime,RenderThreadTime,RHIThreadTime,GPUTime\n"
 FOOTER = HEADER + "[HasHeaderRowAtEnd],1\n"
 
 
 class UnrealFrameCsvTest(unittest.TestCase):
+    def clock_capture(self, counters):
+        header = HEADER.rstrip() + ',' + ','.join(CLOCK_COUNTERS) + '\n'
+        rows = ''.join('20,18,4,2,5,' + ','.join(map(str, row)) + '\n' for row in counters)
+        return parse_capture(io.StringIO(header + rows + header + '[HasHeaderRowAtEnd],1\n'))[0]
+
+    def test_clock_debt_is_not_hidden_by_passing_frame_times(self):
+        samples = self.clock_capture([(1, .8, .2, 4, 0, .7, .8), (1.1, .8667, .2333, 4, 0, .7667, .8667)])
+        result = summarize_water_clock(samples, 0, 1)
+        self.assertTrue(summarize(samples, 0, 1)['frame_p95_within_target_budget'])
+        self.assertGreater(result['backlog_seconds_growth'], .03)
+        self.assertEqual(result['fixed_ticks_total'], 8)
+        self.assertAlmostEqual(result['native_origin_offset_seconds_first'], .1)
+        self.assertLess(result['native_origin_offset_range_seconds'], 1e-12)
+        self.assertFalse(result['simulation_capacity_accepted'])
+        self.assertNotIn(CLOCK_COUNTERS[0], summarize(samples, 0, 1))  # seconds are not ms scopes
+
+    def test_clock_missing_and_partial_are_not_zero_capacity_cost(self):
+        samples, _ = parse_capture(io.StringIO(HEADER + '20,18,4,2,5\n' + FOOTER))
+        self.assertFalse(summarize_water_clock(samples, 0, 0)['available'])
+        samples[0][CLOCK_COUNTERS[0]] = 1
+        with self.assertRaises(ValueError):
+            summarize_water_clock(samples, 0, 0)
+
+    def test_clock_rejects_invalid_counts_regression_and_intervals(self):
+        samples = self.clock_capture([(1, .8, .2, 4, 0, .7, .8), (1.1, .8667, .2333, 4, 0, .7667, .8667)])
+        for name, value in [('FixedTicks', 1.5), ('Failed', 2), ('RequestedSeconds', .5), ('BacklogSeconds', float('nan'))]:
+            changed = [dict(row) for row in samples]
+            changed[1]['RaftSimClock/' + name] = value
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                summarize_water_clock(changed, 0, 1)
+        for first, last in [(-1, 1), (1, 0), (0, 2)]:
+            with self.assertRaises(ValueError):
+                summarize_water_clock(samples, first, last)
+
+    def test_clock_failures_and_native_handoff_offsets_are_reported(self):
+        samples = self.clock_capture([(1, .8, .2, 4, 0, .7, .8), (1.1, .8, .3, 0, 1, .1, .8)])
+        result = summarize_water_clock(samples, 0, 1)
+        self.assertEqual(result['failed_frames'], 1)
+        self.assertAlmostEqual(result['native_origin_offset_range_seconds'], .6)
+        self.assertEqual(result['fixed_ticks_histogram'], {0: 1, 4: 1})
+        self.assertFalse(result['simulation_capacity_accepted'])
+
     def test_full_hull_scopes_are_optional_and_do_not_replace_frame_budget(self):
         for name in GROUND_SCOPES[1:]:
             with self.subTest(scope=name):

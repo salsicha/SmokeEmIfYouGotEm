@@ -26,12 +26,15 @@ FOAM_SCOPES = ("RaftSimSurface/GameThread/FoamTransport",)
 GROUND_SCOPES = ("RaftSimGround/GameThread/Sample", "RaftSimGround/GameThread/SurfaceSweep",
                  "RaftSimHull/GameThread/Prepare", "RaftSimHull/GameThread/Render")
 RELIEF_SCOPES = ("RaftSimSurface/GameThread/HydraulicRelief",)
+CLOCK_COUNTERS = tuple('RaftSimClock/' + name for name in (
+    'RequestedSeconds', 'CommittedSeconds', 'BacklogSeconds', 'FixedTicks',
+    'Failed', 'NativeFieldSeconds', 'WaterCommittedSeconds'))
 METADATA = {"config", "engineversion", "deviceprofile", "rhiname", "raytracing",
             "systemresolution.resx", "systemresolution.resy", "targetframerate"}
 
 
 def parse_capture(stream, require_water_scopes=False, ignore_duplicate_unmeasured_headers=()):
-    measured = METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES + RELIEF_SCOPES
+    measured = METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES + RELIEF_SCOPES + CLOCK_COUNTERS
     ignored = set(ignore_duplicate_unmeasured_headers)
     if ignored.intersection(measured) or any(not name or name.startswith('[') or name == 'EVENTS' for name in ignored):
         raise ValueError('only explicitly named unmeasured counters may be ignored')
@@ -127,6 +130,55 @@ def summarize(samples, first, last, target_fps=20.0):
     return result
 
 
+def summarize_water_clock(samples, first, last):
+    """Audit clock capacity separately from ms timings and visual acceptance.
+
+    These are same-row cumulative counters, not elapsed FrameTime scopes. No
+    temporal offset is selected by correlation. Native time may have an origin
+    offset after initialization/handoff; report it rather than demanding zero.
+    """
+    if not (0 <= first <= last < len(samples)):
+        raise ValueError('Clock interval is outside captured samples')
+    selected = samples[first:last + 1]
+    present = [set(row).intersection(CLOCK_COUNTERS) for row in selected]
+    if not any(present):
+        return dict(available=False, simulation_capacity_accepted=False,
+                    reason='Clock counters absent; frame timing cannot establish simulation capacity')
+    if any(keys != set(CLOCK_COUNTERS) for keys in present):
+        raise ValueError('Partial clock counters; missing values are not zero')
+    values = {name.rsplit('/', 1)[-1]: [row[name] for row in selected] for name in CLOCK_COUNTERS}
+    if any(not math.isfinite(v) or v < 0 for series in values.values() for v in series):
+        raise ValueError('Invalid clock counter')
+    if any(v != int(v) for v in values['FixedTicks']) or any(v not in (0, 1) for v in values['Failed']):
+        raise ValueError('Invalid fixed-tick count or failure flag')
+    for name in ('RequestedSeconds', 'CommittedSeconds', 'WaterCommittedSeconds'):
+        if any(b < a for a, b in zip(values[name], values[name][1:])):
+            raise ValueError('Committed/requested clock went backwards')
+    # Each CSV column is independently rounded. Preserve residuals rather than
+    # claiming exact double-precision native equivalence from printed counters.
+    residual = [r - c - b for r, c, b in zip(values['RequestedSeconds'],
+                values['CommittedSeconds'], values['BacklogSeconds'])]
+    native_offsets = [w - n for w, n in zip(values['WaterCommittedSeconds'], values['NativeFieldSeconds'])]
+    adapter_errors = [w - c for w, c in zip(values['WaterCommittedSeconds'], values['CommittedSeconds'])]
+    counts = Counter(int(v) for v in values['FixedTicks'])
+    return dict(available=True, sample_indices_inclusive=[first, last],
+        requested_seconds_first=values['RequestedSeconds'][0], requested_seconds_last=values['RequestedSeconds'][-1],
+        committed_seconds_first=values['CommittedSeconds'][0], committed_seconds_last=values['CommittedSeconds'][-1],
+        backlog_seconds_first=values['BacklogSeconds'][0], backlog_seconds_last=values['BacklogSeconds'][-1],
+        backlog_seconds_max=max(values['BacklogSeconds']),
+        backlog_seconds_growth=values['BacklogSeconds'][-1] - values['BacklogSeconds'][0],
+        fixed_ticks_total=sum(count * number for number, count in counts.items()),
+        fixed_ticks_histogram=dict(sorted(counts.items())), failed_frames=sum(values['Failed']),
+        maximum_printed_queue_residual_seconds=max(abs(v) for v in residual),
+        maximum_adapter_commit_difference_seconds=max(abs(v) for v in adapter_errors),
+        native_origin_offset_seconds_first=native_offsets[0],
+        native_origin_offset_seconds_last=native_offsets[-1],
+        native_origin_offset_range_seconds=max(native_offsets) - min(native_offsets),
+        simulation_capacity_accepted=False,
+        scope='Counter evidence only, not a new lag tolerance or acceptance. A zero detail-water backlog '
+              'does not clear bridge debt. Do not discard elapsed time or increase the fixed step to hide lag.')
+
+
 def summarize_water_workload(samples, first, last, scope_offset, target_fps=20.0):
     """Associate elapsed intervals with explicitly phase-selected water scopes.
 
@@ -203,6 +255,7 @@ def main():
                      "total_samples": len(samples), "metadata": metadata,
                      "sample_indices_inclusive": [args.first_sample, args.last_sample],
                      "metrics": summarize(samples, args.first_sample, args.last_sample, args.target_fps)})
+        runs[-1]['water_clock'] = summarize_water_clock(samples, args.first_sample, args.last_sample)
         if args.frame_time_scope_offset is not None:
             runs[-1]['water_workload'] = summarize_water_workload(samples, args.first_sample,
                 args.last_sample, args.frame_time_scope_offset, args.target_fps)
