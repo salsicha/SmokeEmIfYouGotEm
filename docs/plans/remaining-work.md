@@ -1,5 +1,13 @@
 # Remaining requested work
 
+September28 UTC bounded assembly follow-through: a distinct batched-coordinate
+candidate preserved all64 actual-input pairs but slowed assembly in both orders.
+Removed candidate source and fixture; no gameplay default or package change.
+Restored-source build passed268.45s and both focused native regressions pass;
+all owners are terminal. See [rejection and evidence](../reconstruction-review-2026-09-07/crest-assembly-coordinates-rejected.md).
+The v14 rapid performance, breaking appearance and full reconstruction gates
+remain open. Do not repeat this candidate or the completed stage localization.
+
 September28 UTC v14 delivery/validation COMPLETE: normal Boot/menu passes the
 current20FPS timing gate (p9548.7699ms/no>100ms frames), but rapid8310 fails
 (63.689ms/five hitches) and11520 fails(52.9986ms/one hitch). All use the same

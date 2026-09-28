@@ -108,3 +108,33 @@ inferred bed to the still-draining1350s field.
 South Fork remains unfinished. Breaking/roller realism, ground collision,
 shoreline/surface continuity, rapid performance and settling remain open.
 Colorado, Pacuare, Futaleufu and the rest of the full objective remain queued.
+
+## Bounded rapid11520 stage localization
+
+One additional instrumented300-frame run of the SAME packaged executable
+completed exit0 with no logged runtime error. Engine/build/cook inventory was
+empty before launch; no build, cook, field promotion or runtime edit occurred.
+Recipe: `tmp/capture-v14-rapid11520-stages-v1.ps1`; report:
+`tmp/sf-v14-rapid11520-stages-v1.json`. Original log SHA256:
+`c1ddfc9b354e527f09c932b336bd5a185999145bceac6b88c8327050223468d6`.
+The binary hash was checked before and after. This diagnostic starts at11520
+in the playable FullReach and enables only existing stage logging; it is not
+a new normal-menu FPS, motion, collision or appearance qualification.
+
+The strict parser retains all181 frames60..240, with exactly181 crest calls:
+97 rebuilds and84 retained calls. Mean rebuilt Update is19.2611ms versus
+1.8008ms retained. Within rebuilt Update, adaptive selection including assembly
+costs12.3571ms: sample/selection work5.7884ms, assembly5.6685ms and input0.2641ms.
+Targets cost3.0454ms and normals1.9288ms. These are nested stages, not additional
+frame costs. Midpoint attributes average0.3136ms on mapped-history calls;
+repeating their scheduling experiments is not the indicated next target.
+
+This narrows the current rapid investigation: assembly is approximately as
+expensive as profile sampling, so treating the whole12.36ms selection scope as
+height-evaluator cost would misdirect the next change. Inspect exact changed-
+selection topology assembly, while preserving ordered parents/triangles,
+current profile epochs, boundary classification and the0.5cm selector. Check
+the existing rejected edge/root/direct-emission experiments before choosing
+a new candidate. Do not skip frame interpolation on refresh frames: ordinary
+non-recenter refresh sets targets and does not replace that publication.
+Do not rerun this unchanged localization. All previously failed gates remain.
