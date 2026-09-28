@@ -1,7 +1,7 @@
 # Crest-height identity without foam-only invalidation
 
 September28 UTC. Native implementation and correctness checks complete;
-v22 packaging is pending. Not a delivered FPS gain, breaking-water visual
+v22 packaging is running. Local commit dbb6961b1; no push. Not a delivered FPS gain, breaking-water visual
 improvement, complete physics law or South Fork acceptance.
 
 ## Normal-scene change
@@ -64,8 +64,9 @@ index1 started, no error output; do not duplicate or alter its frozen inputs.
 
 Session49561/wrapper17344 runs
 `tmp/package-breaking-height-key-v22-20260928.ps1`; receipt
-`tmp/breaking-height-key-v22-package-20260928.json`. It waits for existing
-compression96592/wrapper37212, then requires verified preservation,14GiB free,
+`tmp/breaking-height-key-v22-package-20260928.json`, start09:30:09.0845466Z.
+Compression96592/wrapper37212 is COMPLETE; this same owner is now packaging.
+It requires verified preservation,14GiB free,
 no competing native build, successful eight-test evidence, and12 frozen input
 hashes before packaging the normal game into a fresh
 `tmp/south-fork-playable-v22-20260928/Windows`. It verifies staged payload
@@ -75,6 +76,10 @@ Compression is limited to old v8-v13 staged runtime-data copies and PDBs,
 stopping at15GiB free or the end of that list. Every file is hashed before
 and after. No source/capture/package deletion or hardlink alias is permitted.
 Receipt: `tmp/v8-to-v13-staged-data-compression-20260928.json`.
+Completed09:34:14.5182922Z with18,378 before/after file hashes unchanged,
+zero files deleted. Independent compact-log totals give5,612,225,724 data
+bytes saved. Free space after was16,502,554,624 bytes, above the unchanged
+14GiB packaging gate. Compression is reversible; all six stages remain.
 
 Next inspect these SAME owners. After successful package/closure and source
 replay completion, verify the normal Boot/menu path, actual rapid motion,

@@ -3,9 +3,10 @@
 September28 UTC normal-scene height-only crest cache identity implemented;
 editor build and8 rendered native checks PASS with exact geometry/history and
 changing foam. Synthetic12-frame case rebuilds2 rather than12 times; NO real
-FPS or appearance improvement claimed. One v22 package owner49561/wrapper17344
-waits for bounded old-stage compression96592/wrapper37212, preserving14GiB
-headroom and source/capture bytes. Original physical replay33152 remains live;
+FPS or appearance improvement claimed. Local commit dbb6961b1; no push.
+Old-stage compression96592 is COMPLETE:18,378 file hashes unchanged,
+5,612,225,724 bytes saved, no deletion. One v22 package owner49561/wrapper17344
+is now RUNNING with the unchanged14GiB headroom gate. Physical replay33152 remains live;
 no isolated game timing yet. See [repair, receipts and pending delivery](../reconstruction-review-2026-09-07/breaking-height-cache-key.md).
 
 September28 UTC same-build v21 detail-edge control is now supported by the
