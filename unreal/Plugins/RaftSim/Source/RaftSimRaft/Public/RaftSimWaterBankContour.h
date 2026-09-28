@@ -30,7 +30,15 @@ inline FVector2D Point(const double (&B)[4],const double (&H)[4],int32 Dry,
     const FVector2D& A,const FVector2D& C,double Fraction)
 {
     const FVector2D Origin(Dry%2,Dry/2);
-    const FVector2D Direction=FMath::Lerp(A,C,Fraction)-Origin;
+    // Sweep directions, not shoreline radii. A barely submerged edge can put
+    // one endpoint arbitrarily near the dry corner. Interpolating the raw
+    // endpoints then collapses almost every ray towards the longer endpoint,
+    // leaving one large chord across dry terrain. No small-vector threshold:
+    // a positive film/short edge must retain its actual direction.
+    const FVector2D DA=A-Origin,DC=C-Origin;
+    const double LA=DA.Size(),LC=DC.Size();
+    if(LA<=0. || LC<=0.)return Origin;
+    const FVector2D Direction=FMath::Lerp(DA/LA,DC/LC,Fraction);
     const double Extent=FMath::Max(FMath::Abs(Direction.X),FMath::Abs(Direction.Y));
     if(Extent<=0.)return Origin;
     const FVector2D Ray=Direction/Extent;

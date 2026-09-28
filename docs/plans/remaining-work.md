@@ -1,5 +1,16 @@
 # Remaining requested work
 
+September28 UTC the v22 three-wet-corner dry leak is reproduced and its
+unequal-endpoint ray-spacing defect corrected in the normal shoreline helper.
+Editor build and9 rendered native tests PASS, seven frozen inputs unchanged.
+This excludes the exact retained point without increasing16-segment geometry
+or changing physics. Other finite-chord and two-wet-corner errors remain.
+ONE v23 package47138/wrapper40972 waits on lossless old-stage compression
+32261/wrapper34608 and the unchanged14GiB gate; no runtime acceptance yet.
+Source replay33152 remains live, no duplicate or frozen-input edits.
+Next follow these SAME owners, validate v23 actual play, then address remaining
+shoreline and breaking-water realism. See [repair, limits and live owners](../reconstruction-review-2026-09-07/bank-endpoint-ray-spacing.md).
+
 September28 UTC v22 height-key package and actual Boot/menu/rapid motion checks
 COMPLETE. Staged closure2405files/917995570bytes;12 frozen inputs unchanged.
 Normal launch has zero runtime errors;80 samples cover174.237m. Full video
