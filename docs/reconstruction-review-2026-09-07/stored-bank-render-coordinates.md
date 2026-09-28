@@ -335,3 +335,73 @@ actual post-crest stored geometry, long-motion/contact/shoreline stability and
 isolated frame/bridge-clock cost before normal delivery. Do not recook or
 overwrite the immutable linked v25/v26/v27 stages. No known broken solver was
 enabled. No source data was removed, no river accepted and no push performed.
+
+## Partition-bound repair and bounded engine replay
+
+September28 UTC, superseding the previous unresolved-negative-control status.
+The failed reversed quantized spans were real and correctly rejected, but
+further isolation found that they arose after excessive subdivision driven by
+false partition bounds. Two defects were reproduced: independently rounded
+inner points could sit across their outer ray, and Cross(P,origin,origin) lost
+the exact repeated-vertex dependency during interval multiplication.
+
+The repair selects an actual binary64 inner point conservatively against the
+same partition expression, with correction computed from the interval deficit.
+Cross returns exact zero only when two vertices have identical singleton
+coordinate bounds. Uncertain overlapping bounds do not qualify. No epsilon,
+donor change, coefficient clamp, ordering bypass, enlarged band or removed
+wet/dry/partition proof is used. The failed midpoint-search and sorting trials
+were removed, not silently shipped. Both original and failed-trial logs remain.
+
+Progressive native/replay trials matter: v5 proved the original frame34 state
+but live-v1 rejected at frame66; v6 proved that later state but live-v2 rejected
+at frame80. v7 sorting still failed native case7. Only v8 includes the exact
+repeated-origin repair and passes all20 native regressions,15 independent audit
+controls and eight exact whole stored-coordinate cases. Cases5/6/7 bind original
+donors to immutable source31556 raw logs at frames34/66/80, respectively:
+
+- tmp/certified-bank-smoke-v3-20260928.log:
+  dd457420acec052138fcc7cd50ca656e59c8ed99eb0fbcd0702d2b3f2166273a
+- tmp/certified-bank-ordering-live-v1-20260928.log:
+  709e34f3bd58baab49850200e2e2c0fe8c6d6aaddda186a116163c3ad6dcff88
+- tmp/certified-bank-ordering-live-v2-20260928.log:
+  6293eed8a9114af3889ed27ed2113f96627285e782dc08c447ff5f80416dde89
+
+Each captured case now has five boundary segments/seven GPU triangles, with
+native real-builder/cache/attribute comparison and independent exact wet/dry,
+partition, float-coordinate, shared-edge and maximum1mm-band certification.
+65 additional float32 synthetic depth samples between the first/last capture
+pass native full certificates. They are not measured intermediate hydraulics
+or a proof of the continuous range. Prior20 orientation/depth updates remain;
+same-size changing-ear dynamic coverage is still outstanding.
+Native receipt: tmp/certified-bank-ordering-v8-20260928-process.json.
+Stored export SHA256 c33026993b8a3f3fbacdf13525dd903ca90d0487e0fd23da4ff2a1b8b9887995;
+exact audit SHA256 be2a30c166ab962601d1273e3482231b328a640e62621eaa07a556649cd26dae.
+All frozen inputs, including the protected automation test, are unchanged.
+
+One fresh actual FullReach8310 replay, ordering-live-v3, exercised the candidate
+with the normal rebased render frame and no solver override. It exited zero,
+reported180 accepted updates and zero rejected updates/runtime errors, and
+recorded20 motion samples from8312.359 to8335.768m (23.409m). First/last actual
+1280x720 engine screenshots were inspected: gross water/raft alignment remains,
+while broad flat foam, weak breaking, coarse banks/rocks and crew fit remain
+unaccepted. This is a short still-series motion run, NOT continuous animation,
+long traversal or full shoreline-stability acceptance. Screenshots:
+unreal/Saved/Screenshots/certified-bank-ordering-live-v3-20260928_000.png and
+_019.png. Runtime receipt: tmp/certified-bank-ordering-live-v3-20260928-process.json;
+log SHA256 c95c2d053ae9f16532dae068fcc261a05b811a457bea2e9832b6fcf650eedc6b.
+At world10.09126s the independent submitted-triangle contact audit reports1870
+wet points,143 ground-occluded dry points,zero unavailable/ground-occluded wet,
+maximum support/carrier error4.7664964768e-5cm. GPU upload parity is separate
+and was not requested by this run.
+
+The180 diagnostic topology calls have median48.838949ms, mean60.6665015ms,
+range3.631998..334.412698ms;58 exceed50ms. Startup, near/far components, audit
+and screenshots are included. These are NOT isolated full-frame timings or a
+causal speedup comparison. Construction/publication cost still prevents safe
+promotion; previous v27 rapid20FPS/bridge-clock failures remain unresolved.
+Candidate flag stays OFF by default; v27 remains the delivered normal game.
+No cook, package, solver activation, data deletion, river acceptance or push.
+Native and engine owners are terminal. Next qualify cheaper construction/reuse
+without relaxing proofs, cache/ear changes and actual post-crest geometry,
+then longer motion/contact/rendered shoreline and isolated frame/clock cost.

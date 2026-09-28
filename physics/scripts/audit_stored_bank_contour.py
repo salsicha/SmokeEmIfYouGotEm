@@ -4,6 +4,7 @@ from fractions import Fraction as F
 import hashlib
 import json
 from pathlib import Path
+import re
 import struct
 from audit_shared_bank_crossing import number
 from three_wet_bank_envelope import certificate, value
@@ -109,7 +110,26 @@ def audit_case(item):
                 exact_maximum_band_cm=str(maximum_band), whole_gpu_geometry_certified=True)
 
 
-def audit(path, expected_sha256, contact_path):
+def captured_rejection(path, expected_hash, frame):
+    raw = Path(path).read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if digest != expected_hash:
+        raise ValueError("Original source31556 rejection log changed")
+    pattern = (rf"\[\s*{frame}\]LogTemp: Display: CERTIFIED_BANK_REJECT source=31556 dry=0 "
+               r"reason=certificate stage=1 dry_xy=\(([^)]*)\) wetx_xy=\(([^)]*)\) "
+               r"wety_xy=\(([^)]*)\) origin=\(([^)]*)\) bed=\(([^)]*)\) depth=\(([^)]*)\)")
+    matches = re.findall(pattern, raw.decode("utf-8-sig"))
+    if len(matches) != 1:
+        raise ValueError(f"Missing unique original frame{frame}/source31556 donors")
+    dry, wetx, wety, origin, bed, depth = (tuple(map(number, s.split(','))) for s in matches[0])
+    if len(bed) != 4 or len(depth) != 4 or any(len(p) != 2 for p in (dry, wetx, wety, origin)):
+        raise ValueError("Incomplete captured rejection")
+    if dry[1] != wetx[1] or dry[0] != wety[0]:
+        raise ValueError("Captured rejection is not Cartesian")
+    return bed, depth, (dry, (wetx[0], wety[1]), origin), digest
+
+
+def audit(path, expected_sha256, contact_path, rejection_path, later_rejection_path, latest_rejection_path):
     raw = Path(path).read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     if digest != expected_sha256:
@@ -133,11 +153,17 @@ def audit(path, expected_sha256, contact_path):
     data = json.loads(raw)
     if data["normal_renderer_integrated"] is not False or data["gameplay_accepted"] is not False:
         raise ValueError("Candidate proof cannot claim playable acceptance")
+    captured_bed, captured_depth, captured_map, rejection_hash = captured_rejection(
+        rejection_path, "dd457420acec052138fcc7cd50ca656e59c8ed99eb0fbcd0702d2b3f2166273a", 34)
+    later_bed, later_depth, later_map, later_hash = captured_rejection(
+        later_rejection_path, "709e34f3bd58baab49850200e2e2c0fe8c6d6aaddda186a116163c3ad6dcff88", 66)
+    latest_bed, latest_depth, latest_map, latest_hash = captured_rejection(
+        latest_rejection_path, "6293eed8a9114af3889ed27ed2113f96627285e782dc08c447ff5f80416dde89", 80)
     maps = (((-542600, -360200), (-542700, -360300), (-542600, -360200)),
             ((0, 0), (100, 100), (0, 0)),
             ((-542600, -360200), (-542500, -360300), (-542600, -360200)),
             ((361100, -543000), (361000, -542900), (361100, -543000)),
-            ((-542600, -360200), (-542700, -360300), (-551000, -348600)))
+            ((-542600, -360200), (-542700, -360300), (-551000, -348600)), captured_map, later_map, latest_map)
     nx = cell[3]["source_id"]-cell[1]["source_id"]
     row, column = divmod(cell[1]["source_id"], nx)
     grid_origin = (F(cell[1]["field_x_m"])*100-column*100,
@@ -148,7 +174,10 @@ def audit(path, expected_sha256, contact_path):
         raise ValueError("Missing mapped cases")
     results = []
     for index, (item, coordinates) in enumerate(zip(data["cases"], maps)):
-        if item["case"] != index or tuple(map(number, item["bed"])) != bed or tuple(map(number, item["depth"])) != depth:
+        expected_bed, expected_depth = ((latest_bed, latest_depth) if index == 7 else
+                                        (later_bed, later_depth) if index == 6 else
+                                        (captured_bed, captured_depth) if index == 5 else (bed, depth))
+        if item["case"] != index or tuple(map(number, item["bed"])) != expected_bed or tuple(map(number, item["depth"])) != expected_depth:
             raise ValueError("Original same-call hydraulic donors changed")
         if tuple(map(number, item["origin_cm"])) != coordinates[0] or tuple(map(number, item["end_cm"])) != coordinates[1]:
             raise ValueError("Native world-coordinate test identity changed")
@@ -159,7 +188,8 @@ def audit(path, expected_sha256, contact_path):
         result = audit_case(item)
         result.update(case=index, construction_ms=item["construction_ms"])
         results.append(result)
-    return dict(native_sha256=digest, contact_sha256=contact_hash, cases=results,
+    return dict(native_sha256=digest, contact_sha256=contact_hash, rejection_log_sha256=rejection_hash,
+                later_rejection_log_sha256=later_hash, latest_rejection_log_sha256=latest_hash, cases=results,
                 normal_renderer_integrated=False, gameplay_accepted=False,
                 performance_accepted=False)
 
@@ -169,5 +199,9 @@ if __name__ == "__main__":
     parser.add_argument("--native", required=True)
     parser.add_argument("--sha256", required=True)
     parser.add_argument("--contact", required=True)
+    parser.add_argument("--rejection-log", required=True)
+    parser.add_argument("--later-rejection-log", required=True)
+    parser.add_argument("--latest-rejection-log", required=True)
     args = parser.parse_args()
-    print(json.dumps(audit(args.native, args.sha256, args.contact), indent=2))
+    print(json.dumps(audit(args.native, args.sha256, args.contact, args.rejection_log,
+                           args.later_rejection_log, args.latest_rejection_log), indent=2))

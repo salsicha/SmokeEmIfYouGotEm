@@ -1,5 +1,50 @@
 # Remaining requested work
 
+September28 UTC bounded root proposals reduce complete stored-contour fixture
+construction cost, but an expanded actual replay finds ANOTHER unresolved
+GPU-storage failure. Do NOT promote the candidate. The proposal-only stopping
+bound uses1/16 of the existing reserved band; all wet/dry/partition/width
+certificates remain unchanged. Same-binary ABBA tests across eight cases use
+about73% fewer root evaluations and12..32% less median full construction time.
+These are fixture results, not isolated game FPS or identical geometry.
+proposal-v1 passes20 native tests/15 audit controls/eight exact exports, yet
+proposal-live-v1 rejects3 updates after188 successes at source33168/frame186.
+Both shorter and original56-step searches reproduce the rejection natively;
+the proposed full-search fallback failed and was REMOVED. Exact arithmetic
+proves the captured stored point genuinely dry, so no sign epsilon may fix it.
+The new regression is explicitly NEGATIVE, not playable acceptance; see
+[source33168 evidence](../reconstruction-review-2026-09-07/certified-bank-rejection-33168.json).
+Next repair near-axis contour storage against actual float spacing, certify
+the entire retained/omitted partition, and replay current geometry before
+continuing cost qualification and normal delivery. v27 remains delivered.
+Final proposal-v3:20 native tests,15 controls,eight exact exports pass; the
+source33168 test is intentionally negative and is NOT geometry acceptance.
+All frozen inputs unchanged, all owners terminal. See [cost and failure details](../reconstruction-review-2026-09-07/certified-bank-proposal-cost.md).
+No cook, package, solver activation, data deletion or push.
+
+September28 UTC certified-bank rejection repair passes bounded ACTUAL engine
+replay, but remains candidate-only and is NOT a new normal delivery. Native
+ordering-v8:20 regressions,15 independent audit controls,eight exact stored
+contours (including three original rejected hydraulic snapshots), plus65
+synthetic depth samples. Whole wet/dry/partition/1mm gates are unchanged.
+The earlier reversed stored spans were downstream of excessive subdivision:
+rounded inner points and interval dependency at exactly repeated origins
+falsely failed partition bounds. Conservative inner-point selection and an
+exact repeated-vertex determinant identity fix the reproduced cases; failed
+midpoint/sorting trials were removed and their evidence retained.
+Actual ordering-live-v3 at8310:180 accepted updates,zero rejected updates,
+20 samples/23.409m forward motion,zero runtime errors. First/last engine views
+inspected; coarse banks, flat foam/weak breaking and crew fit remain. Contact
+snapshot:1870 wet,143 ground-occluded dry,zero unavailable/occluded wet;
+maximum support/carrier error4.7664965e-5cm. Not full traversal or GPU parity.
+Diagnostic topology median48.838949ms,58/180 calls over50ms, maximum334.412698ms;
+capture/startup included, NOT isolated frame-time acceptance or a speedup.
+v27 remains normal; no cook, solver change, package, source deletion or push.
+Next reduce/qualify candidate construction and publication cost, extend dynamic
+ear-cache/post-crest/contact/shoreline verification, then safely integrate the
+bounded improvement into a fresh normal build. South Fork stays unfinished.
+All native/replay owners terminal. See [repair and actual replay](../reconstruction-review-2026-09-07/stored-bank-render-coordinates.md#partition-bound-repair-and-bounded-engine-replay).
+
 September28 UTC certified-bank integration now reaches the actual builder/cache
 behind RaftSimCertifiedBankContours, but MUST NOT be enabled normally yet.
 Write access recovered and the test compilation error was fixed. Native v5:

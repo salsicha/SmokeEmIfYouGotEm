@@ -17,6 +17,11 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
     using namespace RaftSimThreeWetBankContour;
     const double Bed[]={8.711944580078125,8.45587158203125,8.5344696044921875,8.3977813720703125};
     const double H[]={0.,double(.061720576137304306f),double(.17600621283054352f),double(.16925844550132751f)};
+    const auto& BaselineBed=Bed;const auto& BaselineDepth=H;
+    const double CapturedBed[]={8.5700531005859375,8.471832275390625,8.05267333984375,8.407135009765625};
+    const double CapturedDepth[]={0.,0.096230357885360718,0.51686644554138184,0.15903805196285248};
+    const double LaterDepth[]={0.,0.096459932625293732,0.51710975170135498,0.15926313400268555};
+    const double LatestDepth[]={0.,0.096567489206790924,0.51723241806030273,0.15936948359012604};
     FCurve C;if(!TestTrue(TEXT("original v22 donors"),C.Init(Bed,H)))return false;
     struct FMap{FVector2D O,Step,RenderOrigin;};
     const FMap Maps[]={
@@ -26,7 +31,13 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
         {FVector2D(361100.,-543000.),FVector2D(-100.,100.),FVector2D(361100.,-543000.)},
         // Original source_id26184 = row116,col84 in the225-wide captured
         // grid. ONE grid origin (not one origin per bank) preserves edges.
-        {FVector2D(-542600.,-360200.),FVector2D(-100.,-100.),FVector2D(-551000.,-348600.)}
+        {FVector2D(-542600.,-360200.),FVector2D(-100.,-100.),FVector2D(-551000.,-348600.)},
+        // Actual frame34/source31556 from the retained engine rejection log.
+        {FVector2D(-545400.,-362600.),FVector2D(100.,-100.),FVector2D(-551000.,-348600.)},
+        // Later frame66 of the same cell, with a much smaller inner radius.
+        {FVector2D(-545400.,-362600.),FVector2D(100.,-100.),FVector2D(-551000.,-348600.)},
+        // Frame80: both inner vertices can collapse exactly to the origin.
+        {FVector2D(-545400.,-362600.),FVector2D(100.,-100.),FVector2D(-551000.,-348600.)}
     };
     TArray<TSharedPtr<FJsonValue>> Cases;
     const auto Pair=[](const FVector2D& P)
@@ -37,12 +48,32 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
     };
     for(int32 K=0;K<UE_ARRAY_COUNT(Maps);++K)
     {
+        const auto& CaseBed=K>=5 ? CapturedBed : BaselineBed;
+        const auto& CaseDepth=K==7 ? LatestDepth : K==6 ? LaterDepth : K==5 ? CapturedDepth : BaselineDepth;
+        FCurve CaseCurve;if(!TestTrue(TEXT("unchanged case donors"),CaseCurve.Init(CaseBed,CaseDepth)))return false;
         const auto& M=Maps[K];RaftSimStoredBankContour::FStorage Storage;
-        if(!TestTrue(TEXT("Cartesian GPU storage map valid"),Storage.Init(C,M.O,
+        if(!TestTrue(TEXT("Cartesian GPU storage map valid"),Storage.Init(CaseCurve,M.O,
             M.O+FVector2D(M.Step.X,0.),M.O+FVector2D(0.,M.Step.Y),.1,M.RenderOrigin)))return false;
         FResult R;const uint32 Control=VectorGetControlRegister();const double Begin=FPlatformTime::Seconds();
-        const bool Good=RaftSimStoredBankContour::Build(C,Storage,R);
+        const bool Good=RaftSimStoredBankContour::Build(CaseCurve,Storage,R);
         const double Ms=1000.*(FPlatformTime::Seconds()-Begin);
+        FResult Reference;
+        if(!TestTrue(TEXT("full-search reference retains complete certificate"),
+            BuildStored(CaseCurve,Storage.Width,Reference,Storage,Storage.RootWidth,true,false)))return false;
+        TestTrue(TEXT("bounded proposal reduces actual root evaluations"),R.Stats.RootEvaluations<Reference.Stats.RootEvaluations);
+        TArray<double> BoundedTimes,ReferenceTimes;
+        for(int32 Repeat=0;Repeat<3;++Repeat)for(bool Bounded:{true,false,false,true})
+        {
+            FResult Trial;const double TrialBegin=FPlatformTime::Seconds();
+            const bool TrialGood=Bounded ? RaftSimStoredBankContour::Build(CaseCurve,Storage,Trial) :
+                BuildStored(CaseCurve,Storage.Width,Trial,Storage,Storage.RootWidth,true,false);
+            const double TrialMs=1000.*(FPlatformTime::Seconds()-TrialBegin);
+            if(!TestTrue(TEXT("both proposal policies require complete stored certificates"),TrialGood))return false;
+            (Bounded ? BoundedTimes : ReferenceTimes).Add(TrialMs);
+        }
+        BoundedTimes.Sort();ReferenceTimes.Sort();
+        AddInfo(FString::Printf(TEXT("StoredBank proposal case=%d bounded_evaluations=%d reference_evaluations=%d bounded_median_ms=%.6f reference_median_ms=%.6f; not game FPS or identical geometry"),
+            K,R.Stats.RootEvaluations,Reference.Stats.RootEvaluations,(BoundedTimes[2]+BoundedTimes[3])*.5,(ReferenceTimes[2]+ReferenceTimes[3])*.5));
         AddInfo(FString::Printf(TEXT("StoredBank case=%d built=%d boundary=%d triangles=%d coefficient_tests=%d construction_ms=%.6f"),
             K,int32(Good),R.Boundary.Num(),R.Triangles.Num(),R.Stats.CoefficientTests,Ms));
         if(!Good)AddInfo(FString::Printf(TEXT("StoredBank failure_stage=%d A=(%.17g,%.17g) B=(%.17g,%.17g)"),
@@ -64,12 +95,12 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
         for(int32 I=0;I<4;++I)
         {
             FProcMeshVertex V;
-            V.Position=FVector(M.O.X+(I%2)*M.Step.X,M.O.Y+(I/2)*M.Step.Y,100.*(Bed[I]+H[I]));
+            V.Position=FVector(M.O.X+(I%2)*M.Step.X,M.O.Y+(I/2)*M.Step.Y,100.*(CaseBed[I]+CaseDepth[I]));
             V.Normal=FVector::UpVector;V.UV0=FVector2D(I%2,I/2);
             V.UV1=FVector2D(I+.25,2.*I);V.UV2=FVector2D(.3*I,.7*I);
             V.UV3=FVector2D(.9*I,.1*I);V.Color=FColor(30*I,50*I,70*I,255);
             V.Tangent=FProcMeshTangent(FVector::ForwardVector,false);
-            Source.Add(V);MeshBed.Add(float(Bed[I]));MeshDepth.Add(float(H[I]));Wet.Add(I!=0);Available.Add(1);
+            Source.Add(V);MeshBed.Add(float(CaseBed[I]));MeshDepth.Add(float(CaseDepth[I]));Wet.Add(I!=0);Available.Add(1);
         }
         TArray<FProcMeshVertex> Mesh;TArray<uint32> MeshIndices;TArray<int32> CellOffsets;
         RaftSimWaterShoreline::FTopologyCache Cache;bool Rebuilt=false;
@@ -137,8 +168,8 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
         TArray<TSharedPtr<FJsonValue>> BValues,HValues,Boundary,Inner,Polygon,Triangles;
         for(int32 I=0;I<4;++I)
         {
-            BValues.Add(MakeShared<FJsonValueString>(FString::Printf(TEXT("%.17g"),Bed[I])));
-            HValues.Add(MakeShared<FJsonValueString>(FString::Printf(TEXT("%.17g"),H[I])));
+            BValues.Add(MakeShared<FJsonValueString>(FString::Printf(TEXT("%.17g"),CaseBed[I])));
+            HValues.Add(MakeShared<FJsonValueString>(FString::Printf(TEXT("%.17g"),CaseDepth[I])));
         }
         for(const auto& P:R.Boundary)Boundary.Add(MakeShared<FJsonValueArray>(Pair(Storage.BufferPosition(P))));
         // Inner dry proof is mathematical geometry, not another submitted surface.
@@ -227,19 +258,68 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
         DynamicUpdates,NodeCountChanges,SameSizeEarChanges));
     TestEqual(TEXT("all changing-depth/dry-corner cases executed"),DynamicUpdates,20);
     TestTrue(TEXT("node-count rebuild exercised"),NodeCountChanges>0);
-    // Unresolved actual engine rejection, NOT an acceptance fixture. Preserve
-    // the original frame34/source31556 inputs until storage ordering is repaired.
-    // A future repair must replace this negative control with a full positive
-    // certificate and independent exact audit, not simply remove the assertion.
-    const double RejectedBed[]={8.5700531005859375,8.471832275390625,8.05267333984375,8.407135009765625};
-    const double RejectedDepth[]={0.,0.096230357885360718,0.51686644554138184,0.15903805196285248};
+    // Original frame34/source31556 rejection must become a full certificate,
+    // not disappear through a widened band or disabled partition predicate.
+    const auto& RejectedBed=CapturedBed;const auto& RejectedDepth=CapturedDepth;
     FCurve RejectedCurve;RaftSimStoredBankContour::FStorage RejectedStorage;FResult RejectedResult;
     if(!TestTrue(TEXT("captured rejection curve initializes"),RejectedCurve.Init(RejectedBed,RejectedDepth)))return false;
     if(!TestTrue(TEXT("captured rejection storage initializes"),RejectedStorage.Init(RejectedCurve,
         {-545400.,-362600.},{-545300.,-362600.},{-545400.,-362700.},.1,{-551000.,-348600.})))return false;
-    TestFalse(TEXT("known live rejection retained; candidate NOT ready for normal play"),
-        RaftSimStoredBankContour::Build(RejectedCurve,RejectedStorage,RejectedResult));
-    TestEqual(TEXT("captured rejection reproduced at boundary construction"),RejectedResult.Stats.FailedStage,1);
+    const bool Repaired=RaftSimStoredBankContour::Build(RejectedCurve,RejectedStorage,RejectedResult);
+    AddInfo(FString::Printf(TEXT("StoredBank captured_repair=%d stage=%d coefficient_tests=%d A=(%.17g,%.17g) B=(%.17g,%.17g)"),
+        Repaired,RejectedResult.Stats.FailedStage,RejectedResult.Stats.CoefficientTests,
+        RejectedResult.Stats.FailedA.X,RejectedResult.Stats.FailedA.Y,RejectedResult.Stats.FailedB.X,RejectedResult.Stats.FailedB.Y));
+    TestTrue(TEXT("captured live rejection repaired with complete stored certificate"),Repaired);
+    for(int32 Step=0;Step<=64;++Step)
+    {
+        // Synthetic coverage between two original snapshots, not measured
+        // intermediate hydraulics and not a proof of the continuous interval.
+        double SweepDepth[4];
+        for(int32 I=0;I<4;++I)SweepDepth[I]=double(float(CapturedDepth[I]+(LatestDepth[I]-CapturedDepth[I])*double(Step)/64.));
+        FCurve SweepCurve;RaftSimStoredBankContour::FStorage SweepStorage;FResult SweepResult;
+        if(!TestTrue(TEXT("captured-range synthetic curve"),SweepCurve.Init(CapturedBed,SweepDepth)) ||
+            !TestTrue(TEXT("captured-range synthetic storage"),SweepStorage.Init(SweepCurve,
+                {-545400.,-362600.},{-545300.,-362600.},{-545400.,-362700.},.1,{-551000.,-348600.})) ||
+            !TestTrue(TEXT("captured-range synthetic contour fully certified"),RaftSimStoredBankContour::Build(SweepCurve,SweepStorage,SweepResult)))return false;
+    }
+    {
+        const FScopedIEEE Scope;
+        const FPoint P=RejectedStorage.Local({5600.00048828125,-14000.1494140625});
+        const FPoint Q=RejectedStorage.Local({5600.,-14000.099609375});
+        const FPoint A=Inner(P,RejectedStorage.Width),B=Inner(Q,RejectedStorage.Width),O(FVector2D::ZeroVector,true);
+        TestTrue(TEXT("exact repeated origin has zero cross in every slot"),
+            Cross(P,O,O).Zero() && Cross(O,P,O).Zero() && Cross(O,O,P).Zero());
+        const FPoint Uncertain(FVector2D::ZeroVector,FBound(-1.e-20,1.e-20),FBound(-1.e-20,1.e-20));
+        TestFalse(TEXT("overlapping uncertain coordinates are not exact repeated vertices"),Cross(P,O,Uncertain).Zero());
+        FStats Stats;
+        AddInfo(FString::Printf(TEXT("StoredBank terminal_span order_lo=%.17g outer_lo=%.17g inner_lo=%.17g wet=%d dry=%d inner_a=(%.17g,%.17g) inner_b=(%.17g,%.17g)"),
+            Cross(O,P,Q).Lo,Cross(P,Q,B).Lo,Cross(P,B,A).Lo,
+            Certificate(RejectedCurve,P,Q,Q,true,Stats),Certificate(RejectedCurve,O,A,B,false,Stats),A.XY.X,A.XY.Y,B.XY.X,B.XY.Y));
+        TestTrue(TEXT("collapsed terminal inner fan retains certified partition"),Cross(P,B,A).Lo>=0.);
+    }
+    {
+        // Actual proposal-live-v1 frame186/source33168, canonical dry corner1.
+        // This is simulation evidence, not a surveyed terrain measurement.
+        const double TransitionBed[]={8.5975189208984375,8.420166015625,8.374542236328125,8.2484893798828125};
+        const double TransitionDepth[]={0.,0.17726732790470123,0.21229608356952667,0.34734654426574707};
+        FCurve Transition;RaftSimStoredBankContour::FStorage Storage;FResult Short,Full,Selected;
+        if(!TestTrue(TEXT("captured transition donors"),Transition.Init(TransitionBed,TransitionDepth)) ||
+            !TestTrue(TEXT("captured transition storage"),Storage.Init(Transition,{-544900.,-363300.},
+                {-545000.,-363300.},{-544900.,-363400.},.1,{-554200.,-348600.})))return false;
+        const bool ShortGood=BuildStored(Transition,Storage.Width,Short,Storage,Storage.RootWidth,true,true);
+        const bool FullGood=BuildStored(Transition,Storage.Width,Full,Storage,Storage.RootWidth,true,false);
+        const bool SelectedGood=RaftSimStoredBankContour::Build(Transition,Storage,Selected);
+        AddInfo(FString::Printf(TEXT("StoredBank KNOWN_UNRESOLVED transition short=%d full=%d selected=%d short_stage=%d full_stage=%d; NOT normal-play acceptance"),
+            ShortGood,FullGood,SelectedGood,Short.Stats.FailedStage,Full.Stats.FailedStage));
+        // A positive repair must replace these explicit negative controls
+        // with complete native AND independent exact geometry certificates.
+        TestFalse(TEXT("known transition rejects shorter search"),ShortGood);
+        TestFalse(TEXT("known transition also rejects reference search"),FullGood);
+        TestFalse(TEXT("known transition cannot publish a partial polygon"),SelectedGood);
+        const FScopedIEEE Scope;
+        const FPoint StoredDry=Storage.Local({9299.9013671875,-14700.0009765625});
+        TestTrue(TEXT("captured rounded point is genuinely dry, not an epsilon defect"),Transition.Value(StoredDry).Hi<0.);
+    }
     RaftSimStoredBankContour::FStorage Bad;FResult R;
     RaftSimStoredBankContour::FStorage Unrebased;
     TestTrue(TEXT("unrebased captured map initializes"),Unrebased.Init(C,Maps[0].O,

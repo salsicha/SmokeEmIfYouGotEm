@@ -168,7 +168,7 @@ struct FCurve
 };
 struct FStats
 {
-    int32 CoefficientTests=0,InitialSegments=0,RootSolves=0;
+    int32 CoefficientTests=0,InitialSegments=0,RootSolves=0,RootEvaluations=0;
     int32 FailedStage=0;
     FVector2D FailedA=FVector2D::ZeroVector,FailedB=FVector2D::ZeroVector;
 };
@@ -209,7 +209,7 @@ inline FPoint EdgeRoot(const FCurve& C,int32 Axis)
     // than pretending that a rounded approximation is analytically zero.
     return FPoint(Axis ? FVector2D(0.,V) : FVector2D(V,0.));
 }
-inline FPoint Point(const FCurve& C,double T,double Width)
+inline FPoint Point(const FCurve& C,double T,double Width,FStats* Stats=nullptr,bool BoundedProposal=true)
 {
     if(T==0.)return EdgeRoot(C,0);if(T==1.)return EdgeRoot(C,1);
     const FVector2D Direction(1.-T,T),Ray=Direction/FMath::Max(Direction.X,Direction.Y);
@@ -217,10 +217,17 @@ inline FPoint Point(const FCurve& C,double T,double Width)
     for(int32 I=0;I<56;++I)
     {
         const double M=(Low+High)*.5;
+        if(Stats)++Stats->RootEvaluations;
         const FBound V=C.Value(FPoint(Ray*M));
         if(V.Lo>=0.)High=M;else Low=M;
         // An ambiguous midpoint is only a search proposal, NOT certified dry.
         // High stays proved wet; whole wet/dry band tests below decide safety.
+        // Limit proposal work using the existing geometric reserve. This is
+        // not a depth/sign tolerance: all stored wet triangles, omitted dry
+        // fans and band distances must still pass the complete proofs below.
+        // Zero width keeps the reference search; bracket rounding is outward.
+        if(BoundedProposal && Width>0. &&
+            Up(Up(High-Low)*Up(Ray.X+Ray.Y))<=Down(Width/16.))break;
     }
     const FVector2D R=Ray*High;
     const double Advance=FMath::Min(Width*.5,FMath::Min((1.-R.X)/(2.*Direction.X),(1.-R.Y)/(2.*Direction.Y)));
@@ -234,10 +241,47 @@ inline FPoint Inner(const FPoint& P,double Width)
         FMath::Max(FMath::Abs(P.Y.Lo-P.XY.Y),FMath::Abs(P.Y.Hi-P.XY.Y));
     const double W=FMath::Max(0.,Width-128.*std::numeric_limits<double>::epsilon()-2.*StorageError);
     const double Factor=FMath::Max(0.,1.-W/(P.XY.X+P.XY.Y));
-    return FPoint(P.XY*Factor,Factor==0.);
+    if(Factor==0.)return FPoint(FVector2D::ZeroVector,true);
+    // At the end of a band, the next inner vertex can be the exact origin.
+    // Then the partition requires this inner point to be on (or clockwise
+    // of) its outer ray. Independent nearest rounding can put it across that
+    // ray by one ulp. Select the actual binary64 inner point conservatively
+    // against the whole outer-coordinate enclosure; do not clamp a cross
+    // product or pretend rounded coordinates are analytically collinear.
+    double X=P.X.Zero() ? 0. : Up(P.X.Hi*Factor);
+    double Y=P.Y.Zero() ? 0. : FMath::Max(0.,Down(P.Y.Lo*Factor));
+    // Use the SAME interval expression as Cross(P, origin, inner), whose
+    // dependency enclosure is wider than the algebraically reduced product.
+    const auto PartitionSide=[&]()
+    {return (-P.X)*(FBound(Y)-P.Y)-(-P.Y)*(FBound(X)-P.X);};
+    for(int32 I=0;I<4;++I)
+    {
+        const FBound Side=PartitionSide();
+        if(Side.Lo>=0. || P.Y.Lo<=0.)break;
+        // As the inner radius approaches zero, a fixed number of inner
+        // ulps cannot cover the outer-coordinate enclosure. Compute the
+        // required absolute X correction from that actual enclosure instead.
+        const double Shift=DividePositive(FBound(-Side.Lo),FBound(P.Y.Lo)).Hi;
+        X=Up(X+Up(2.*Shift));
+    }
+    // The unchanged dry-sign, partition and geometric-width proofs below
+    // still validate this point, including failure if the reserve runs out.
+    return FPoint(FVector2D(X,Y));
 }
 inline FBound Cross(const FPoint& A,const FPoint& B,const FPoint& C)
-{return (B.X-A.X)*(C.Y-A.Y)-(B.Y-A.Y)*(C.X-A.X);}
+{
+    const auto ExactSame=[](const FPoint& P,const FPoint& Q)
+    {
+        return P.X.Lo==P.X.Hi && P.Y.Lo==P.Y.Hi &&
+            P.X.Lo==Q.X.Lo && P.X.Hi==Q.X.Hi && P.Y.Lo==Q.Y.Lo && P.Y.Hi==Q.Y.Hi;
+    };
+    // Two identical EXACT vertices make a zero-area triangle. Ordinary
+    // interval multiplication loses this dependency (especially two origins
+    // in a collapsed inner band). This identity is not an epsilon and does
+    // not apply to uncertain, merely overlapping coordinate enclosures.
+    if(ExactSame(A,B) || ExactSame(A,C) || ExactSame(B,C))return FBound(0.);
+    return (B.X-A.X)*(C.Y-A.Y)-(B.Y-A.Y)*(C.X-A.X);
+}
 struct FResult
 {
     TArray<FPoint> Boundary,InnerBoundary,Polygon;
@@ -249,7 +293,7 @@ struct FResult
 // RootWidth reserves part of the same geometric band for storage quantization.
 template<typename FStore>
 inline bool BuildStored(const FCurve& C,double Width,FResult& Out,const FStore& Store,
-    double RootWidth,bool ReuseRoots=true)
+    double RootWidth,bool ReuseRoots=true,bool BoundedProposal=true)
 {
     const FScopedIEEE FloatingPointScope;
 #if !PLATFORM_CPU_X86_FAMILY
@@ -266,7 +310,7 @@ inline bool BuildStored(const FCurve& C,double Width,FResult& Out,const FStore& 
         if(!SamePoint(P,Q) && (Cross(Origin,P,Q).Lo<=0. || Cross(P,Q,B).Lo<0. || Cross(P,B,A).Lo<0.))return false;
         return Certificate(C,P,Q,Q,true,Out.Stats) && Certificate(C,Origin,A,B,false,Out.Stats);
     };
-    const auto MakePoint=[&](double T){if(T>0. && T<1.)++Out.Stats.RootSolves;return Store(Point(C,T,RootWidth),T);};
+    const auto MakePoint=[&](double T){if(T>0. && T<1.)++Out.Stats.RootSolves;return Store(Point(C,T,RootWidth,&Out.Stats,BoundedProposal),T);};
     struct FSpan{double A,B;int32 Level;FPoint P,Q;};TArray<FSpan,TInlineAllocator<32>> Stack;
     const FPoint First=MakePoint(0.),Last=MakePoint(1.);Stack.Add({0.,1.,0,First,Last});
     Out.Boundary.Add(First);
