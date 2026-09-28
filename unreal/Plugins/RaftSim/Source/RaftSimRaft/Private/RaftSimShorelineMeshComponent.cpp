@@ -409,13 +409,13 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
     auto& BaseVertices=Crests ? ClippedVertices : WaterVertices;
     auto& BaseIndices=Crests ? ClippedIndices : WaterIndices;
     auto& BaseOffsets=Crests ? ClippedCellOffsets : CellOffsets;
+    const bool bReviewedSouthFork=GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
     {
         CSV_SCOPED_TIMING_STAT(RaftSimShoreline,Topology);
         static const bool bForceOppositeDryFan=FParse::Param(FCommandLine::Get(),TEXT("RaftSimOppositeDryBankFan"));
         static const bool bOriginalBankFan=FParse::Param(FCommandLine::Get(),TEXT("RaftSimOriginalBankFan"));
         // Qualified captured-cell and actual-contact correction for South Fork.
         // Other scenarios remain explicit until their own scene verification.
-        const bool bReviewedSouthFork=GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
         const bool bOppositeDryFan=!bOriginalBankFan && (bReviewedSouthFork || bForceOppositeDryFan);
         if (!TopologyCache.Update(Nx,Ny,MoveTemp(Source),Wet,Available,DepthM,BedM,
             BaseVertices,BaseIndices,BaseOffsets,bTopologyRebuilt,Crests!=nullptr,bOppositeDryFan,bReviewedSouthFork)) return false;
@@ -437,6 +437,9 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
         const bool CompactSource=!ReferenceSource && (ForceCompactSource ||
             (GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"))));
         static const bool AuditSource=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCompactCrestSourceAudit"));
+        static const bool LegacyDetailEdges=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyDetailEdges"));
+        const bool SelectiveDetail=bReviewedSouthFork && !LegacyDetailEdges;
+        if(!BeforeVertices)UE_LOG(LogTemp,Display,TEXT("Crest selective detail edges: enabled=%d legacy_override=%d; original shoreline points, profile tolerance and physics retained"),int32(SelectiveDetail),int32(LegacyDetailEdges));
         if(!BeforeVertices)UE_LOG(LogTemp,Display,TEXT("Crest source publication: compact=%d reference_override=%d"),int32(CompactSource),int32(ReferenceSource));
         const auto UpdateCrests=[&](bool Compact,FRaftSimShorelineCrests& State,
             TArray<FProcMeshVertex>& Out,TArray<uint32>& OutIndices,TArray<int32>& Offsets)
@@ -449,10 +452,10 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
                 }
                 return State.Update(ReferencedCrestSource.Vertices,ReferencedCrestSource.Indices,
                     BaseOffsets,ReferencedCrestSource.Coarse,ReferencedCrestSource.Shore,*Crests,
-                    Out,OutIndices,Offsets);
+                    Out,OutIndices,Offsets,SelectiveDetail);
             }
             return State.Update(BaseVertices,BaseIndices,BaseOffsets,Coarse,Shore,*Crests,
-                Out,OutIndices,Offsets);
+                Out,OutIndices,Offsets,SelectiveDetail);
         };
         if(AuditSource)
         {

@@ -36,7 +36,8 @@ public:
     bool Update(const TArray<FProcMeshVertex>& Source,const TArray<uint32>& SourceIndices,
         const TArray<int32>& SourceCellOffsets,const TArray<float>& CoarseCrestCm,
         const TArray<float>& Shore,const FRaftSimShorelineCrestInput& Input,
-        TArray<FProcMeshVertex>& Vertices,TArray<uint32>& Indices,TArray<int32>& CellOffsets);
+        TArray<FProcMeshVertex>& Vertices,TArray<uint32>& Indices,TArray<int32>& CellOffsets,
+        bool bSelectiveDetailEdges=false);
     void Reset();
     void PrefetchProfile(const FRaftSimShorelineCrestInput& Input);
     const TArray<float>& GetTargetCorrectionsCm() const { return TargetCorrectionsCm; }

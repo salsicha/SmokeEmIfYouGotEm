@@ -1,5 +1,15 @@
 # Remaining requested work
 
+September28 UTC selective-detail-edge v21 is rebuilt in normal South Fork;
+package/runtime/174m motion review COMPLETE, no live owner.10 rendered native
+tests and35 provenance/presentation tests PASS;14 frozen inputs unchanged.
+Menu p9546.91ms PASS;8310/11520 p9569.02/72.40ms still FAIL20FPS. Timings are
+lower than v20 but not a causal same-build A/B. Flat foam/weak breaking persist;
+changed contact sampling does not resolve the earlier positive-film point.
+Strict size/cache failures from v1/v2 are fixed and retained. Next reduce actual
+rapid/crest cost and resolve shoreline/visible realism; no acceptance or advance
+to Colorado. See [candidate, terminal results and next work](../reconstruction-review-2026-09-07/selective-detail-edges.md).
+
 September28 UTC curved high-bank v19 normal package and173m motion checks
 COMPLETE. Six rendered native tests and35 source/provenance checks pass;
 retained false-wet fixture is excluded without solver/dry-support changes.

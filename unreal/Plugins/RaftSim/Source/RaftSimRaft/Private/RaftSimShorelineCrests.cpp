@@ -74,7 +74,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     const TArray<uint32>& SourceIndices,const TArray<int32>& SourceCellOffsets,
     const TArray<float>& CoarseCrestCm,const TArray<float>& Shore,
     const FRaftSimShorelineCrestInput& Input,TArray<FProcMeshVertex>& Vertices,
-    TArray<uint32>& Indices,TArray<int32>& CellOffsets)
+    TArray<uint32>& Indices,TArray<int32>& CellOffsets,bool bSelectiveDetailEdges)
 {
     CSV_SCOPED_TIMING_STAT(RaftSimCrests,Update);
     if (Source.Num()!=CoarseCrestCm.Num() || Source.Num()!=Shore.Num() ||
@@ -97,7 +97,9 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     bool SameXY=CachedXY.Num()==Source.Num();
     for (int32 I=0; SameXY && I<Source.Num(); ++I)
         SameXY=CachedXY[I]==FVector2D(Source[I].Position.X,Source[I].Position.Y);
-    const bool SameGeometry=SameXY && SameIndices && SameProfile && SameDetail;
+    const bool SelectiveDetail=bSelectiveDetailEdges && Input.DetailSpanCm>0 && Input.DetailWindowCm.bIsValid;
+    const bool SameGeometry=SameXY && SameIndices && SameProfile && SameDetail &&
+        Refinement.bSelectiveDetailEdges==SelectiveDetail;
     const bool SameTargets=SameGeometry && SameCoarse && SameShore;
     if(SameGeometry)RaftSimCrestBatchAudit::Unchanged();
     if(SameGeometry)RaftSimCrestRegionAudit::Unchanged();
@@ -127,6 +129,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         {
             CSV_SCOPED_TIMING_STAT(RaftSimCrests,Selection);
             Refinement.bMeasureStages=bTiming;
+            Refinement.bSelectiveDetailEdges=SelectiveDetail;
             static const bool bIndexedRegions=FParse::Param(FCommandLine::Get(),TEXT("RaftSimIndexedCrestRegions"));
             Refinement.bIndexedRegions=bIndexedRegions;
             static const bool bFlatMemo=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFlatCrestMemo"));

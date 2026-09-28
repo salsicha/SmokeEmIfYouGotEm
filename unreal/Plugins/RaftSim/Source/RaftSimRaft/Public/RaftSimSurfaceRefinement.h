@@ -60,6 +60,9 @@ struct FRaftSimSurfaceRefinement
     bool bLevelLocalMemos=false; // Candidate: retain coordinate slots separately per level.
     bool bInlineSelection=false; // Candidate: typed predicate, identical evaluations.
     bool bBoundCoordinateMemo=false; // Candidate: exact per-triangle lookup bindings.
+    // Experimental geometric selection: preserve short detail edges while
+    // still splitting all edges for a sampled macro-profile error.
+    bool bSelectiveDetailEdges=false;
     // Optional conservative width of a range containing the current profile
     // on a box. Only skips selection when every error test is provably below
     // the SAME tolerance. It never changes a sampled or published height.
@@ -186,20 +189,40 @@ struct FRaftSimSurfaceRefinement
             if (const float* Found=Values.Find(P)) return *Found;
             const float V=HeightCm(P); Values.Add(P,V); return V;
         };
-        const auto Select=[&](const FVector2D& A,const FVector2D& B,const FVector2D& C,int32,int32 Context,int32 Triangle)
+        const auto Select=[&](const FVector2D& A,const FVector2D& B,const FVector2D& C,int32,int32 Context,int32 Triangle)->uint8
             {
                 // A dynamic displacement field needs geometric samples even
                 // where the immutable macro crest is flat. This selection
                 // changes topology only, never invents profile heights.
                 FBox2D Bounds(ForceInit); Bounds+=A; Bounds+=B; Bounds+=C;
+                uint8 DetailMask=0;
                 if (DetailWindow && DetailSpanCm>0 && Bounds.Intersect(*DetailWindow) &&
-                    FMath::Max(Bounds.GetSize().X,Bounds.GetSize().Y)>DetailSpanCm) return true;
+                    FMath::Max(Bounds.GetSize().X,Bounds.GetSize().Y)>DetailSpanCm)
+                {
+                    if(!bSelectiveDetailEdges)return 7;
+                    const FVector2D Edges[3]={B-A,C-B,A-C};
+                    for(int32 E=0;E<3;++E)
+                        if(FMath::Max(FMath::Abs(Edges[E].X),FMath::Abs(Edges[E].Y))>DetailSpanCm)DetailMask|=1<<E;
+                    if(DetailMask==3 || DetailMask==5 || DetailMask==6)
+                    {
+                        const FVector2D V[3]={A,B,C};
+                        const int32 Start=DetailMask==3 ? 0 : DetailMask==6 ? 1 : 2;
+                        const FVector2D L=V[Start],M=V[(Start+1)%3],R=V[(Start+2)%3];
+                        const auto Span=[](const FVector2D& D){return FMath::Max(FMath::Abs(D.X),FMath::Abs(D.Y));};
+                        // A green diagonal can be longer than half its parent.
+                        // Require the same per-level size bound as red splitting;
+                        // otherwise retain the original all-edge subdivision.
+                        const double Limit=FMath::Max(double(DetailSpanCm),FMath::Max(Bounds.GetSize().X,Bounds.GetSize().Y)*.5);
+                        if(FMath::Min(Span((L+M)*.5-R),Span(L-(M+R)*.5))>Limit)DetailMask=7;
+                    }
+                    if(DetailMask==7)return 7;
+                }
                 if (!NonzeroRegions.IsEmpty())
                 {
                     bool Intersects=false;
                     if(RegionIndex)Intersects=RegionIndex->Intersects(Bounds);
                     else for (const auto& Region:NonzeroRegions) if (Bounds.Intersect(Region)) { Intersects=true; break; }
-                    if (!Intersects) return false; // The supplied profile is exactly zero here.
+                    if (!Intersects) return DetailMask; // The supplied profile is exactly zero here.
                 }
                 const int32 BindingBase=bBoundCoordinateMemo ? (MemoLevel*ParallelBatchSize+Triangle%ParallelBatchSize)*15 : 0;
                 float VA=0.f,VB=0.f,VC=0.f;
@@ -233,7 +256,7 @@ struct FRaftSimSurfaceRefinement
                     // All quarter-triangle weights are nonnegative and sum
                     // to one. Profile values and their interpolation stay in
                     // the same range, hence their difference is <= its width.
-                    if(FMath::IsFinite(Width) && Width>=0.f && Width<=ToleranceCm)return false;
+                    if(FMath::IsFinite(Width) && Width>=0.f && Width<=ToleranceCm)return DetailMask;
                 }
                 // Each level keeps distinct triangle bindings, but exact
                 // coordinate samples share ONE bounded table per worker.
@@ -245,9 +268,9 @@ struct FRaftSimSurfaceRefinement
                     if ((U==0 && V==0) || U==4 || V==4) continue;
                     const double BWeight=U*.25, CWeight=V*.25, AWeight=1.-BWeight-CWeight;
                     if (FMath::Abs(Value(A*AWeight+B*BWeight+C*CWeight,Context,SampleBinding++)-
-                        (VA*AWeight+VB*BWeight+VC*CWeight))>ToleranceCm) return true;
+                        (VA*AWeight+VB*BWeight+VC*CWeight))>ToleranceCm) return 7;
                 }
-                return false;
+                return DetailMask;
             };
         const TFunction<void(int32)> PrepareParallel=[&](int32 Contexts)
             {
@@ -295,10 +318,12 @@ struct FRaftSimSurfaceRefinement
                 SharedCornerSamples=Corners.SampleCount;SharedCornerReads=Corners.ReadCount;
             };
         if(bInlineSelection)
-            return BuildSelected(Coordinates,SourceTriangles,Levels,Select,bParallel,PrepareParallel,PrepareLevel);
+            return BuildSelected(Coordinates,SourceTriangles,Levels,Select,bParallel,PrepareParallel,PrepareLevel,true,
+                bSelectiveDetailEdges && DetailWindow && DetailSpanCm>0);
         // Retain the original erased-call path for independent same-build A/B.
-        using FPredicate=TFunctionRef<bool(const FVector2D&,const FVector2D&,const FVector2D&,int32,int32,int32)>;
-        return BuildSelected<FPredicate>(Coordinates,SourceTriangles,Levels,Select,bParallel,PrepareParallel,PrepareLevel);
+        using FPredicate=TFunctionRef<uint8(const FVector2D&,const FVector2D&,const FVector2D&,int32,int32,int32)>;
+        return BuildSelected<FPredicate>(Coordinates,SourceTriangles,Levels,Select,bParallel,PrepareParallel,PrepareLevel,true,
+            bSelectiveDetailEdges && DetailWindow && DetailSpanCm>0);
     }
 
 private:
@@ -316,16 +341,20 @@ private:
         TArray<uint8> WorkingSelection;
         TArray<FIntPoint> Parents;
         TArray<int32> Triangles,Origins;
+        TArray<FIntVector> GreenVertices;
+        TArray<uint8> GreenAlternate;
     };
     TArray<int32> CachedRootTriangles;
     TArray<FTopologyLevel> CachedLevels;
     int32 CachedRootPointCount=0;
+    bool CachedRootSelective=false;
 
     template<typename TSelect>
     bool BuildSelected(const TArray<FVector2D>& Coordinates,const TArray<int32>& SourceTriangles,
         int32 Levels,TSelect Select,
         bool bParallel=false,TFunction<void(int32)> PrepareParallel={},
-        TFunction<void(const TArray<FVector2D>&,const TArray<int32>&)> PrepareLevel={})
+        TFunction<void(const TArray<FVector2D>&,const TArray<int32>&)> PrepareLevel={},bool bEdgeMasks=false,
+        bool bShortGreenDiagonals=false)
     {
         InputSeconds=SelectionSeconds=AssemblySeconds=0;
         const double InputStarted=bMeasureStages ? FPlatformTime::Seconds() : 0.;
@@ -333,17 +362,24 @@ private:
         if (Coordinates.IsEmpty() || SourceTriangles.Num()%3 || Levels<0 || Levels>3 ||
             ParallelBatchSize<1 || ParallelBatchSize>4096)return false;
         for (int32 I:SourceTriangles)if (!Coordinates.IsValidIndex(I))return false;
-        bool SamePrefix=CachedRootPointCount==Coordinates.Num() && CachedRootTriangles==SourceTriangles;
+        bool SamePrefix=CachedRootPointCount==Coordinates.Num() && CachedRootTriangles==SourceTriangles &&
+            CachedRootSelective==bShortGreenDiagonals;
         // A changed root still makes SamePrefix false for EVERY visited level.
         // Keeping allocation capacity must never authorize cached topology.
         if (!SamePrefix && !bRetainTopologyStorage) CachedLevels.Reset();
         CachedRootTriangles=SourceTriangles; CachedRootPointCount=Coordinates.Num();
+        CachedRootSelective=bShortGreenDiagonals;
         CachedLevels.SetNum(Levels);
         TArray<FVector2D> LocalPoints;
         auto& Points=bRetainTopologyStorage ? RetainedPoints : LocalPoints;
         Points=Coordinates;Triangles=SourceTriangles;
         for (int32 I=0; I<SourceTriangles.Num()/3; ++I) TriangleOrigins.Add(I);
         const auto Key=[](int32 A,int32 B) { return (uint64(FMath::Min(A,B))<<32)|uint32(FMath::Max(A,B)); };
+        const auto AlternateGreen=[&](int32 A,int32 B,int32 C)
+        {
+            const auto Span=[](const FVector2D& D){return FMath::Max(FMath::Abs(D.X),FMath::Abs(D.Y));};
+            return Span(Points[A]-(Points[B]+Points[C])*.5)<Span((Points[A]+Points[B])*.5-Points[C]);
+        };
         if(bMeasureStages)InputSeconds=FPlatformTime::Seconds()-InputStarted;
         for (int32 Level=0;Level<Levels;++Level)
         {
@@ -353,6 +389,12 @@ private:
             TArray<uint8> LocalSelection;
             auto& Selection=bRetainTopologyStorage ? Cached.WorkingSelection : LocalSelection;
             Selection.SetNumUninitialized(Triangles.Num()/3);
+            const auto Decision=[&](int32 T,int32 Context)->uint8
+            {
+                const uint8 Mask=Select(Points[Triangles[T*3]],Points[Triangles[T*3+1]],
+                    Points[Triangles[T*3+2]],Level,Context,T);
+                return bEdgeMasks ? Mask : uint8(Mask ? 7 : 0);
+            };
             if (bParallel)
             {
                 const int32 BatchSize=ParallelBatchSize;
@@ -365,16 +407,23 @@ private:
                 {
                     const int32 End=FMath::Min((Batch+1)*BatchSize,Selection.Num());
                     for (int32 T=Batch*BatchSize; T<End; ++T)
-                        Selection[T]=Select(Points[Triangles[T*3]],Points[Triangles[T*3+1]],
-                            Points[Triangles[T*3+2]],Level,Batch,T) ? 1 : 0;
+                        Selection[T]=Decision(T,Batch);
                 },EParallelForFlags::Unbalanced);
             }
             else for (int32 T=0;T<Selection.Num();++T)
-                Selection[T]=Select(Points[Triangles[T*3]],Points[Triangles[T*3+1]],
-                    Points[Triangles[T*3+2]],Level,0,T) ? 1 : 0;
+                Selection[T]=Decision(T,0);
             const double AssemblyStarted=bMeasureStages ? FPlatformTime::Seconds() : 0.;
             if(bMeasureStages)SelectionSeconds+=AssemblyStarted-SelectionStarted;
             SamePrefix=SamePrefix && Cached.Selection==Selection;
+            // Selective green diagonals depend on CURRENT geometry, unlike
+            // the reference's fixed diagonal. Identical edge masks alone do
+            // not authorize reuse after shoreline coordinates move.
+            if(SamePrefix && bShortGreenDiagonals)
+                for(int32 I=0;SamePrefix && I<Cached.GreenVertices.Num();++I)
+                {
+                    const auto V=Cached.GreenVertices[I];
+                    SamePrefix=bool(Cached.GreenAlternate[I])==AlternateGreen(V.X,V.Y,V.Z);
+                }
             if (SamePrefix)
             {
                 // Parent indices depend only on the root topology and exact
@@ -392,6 +441,7 @@ private:
             ++TopologyBuildCount;
             if(bRetainTopologyStorage)Swap(Cached.Selection,Selection);
             else Cached.Selection=MoveTemp(Selection);
+            Cached.GreenVertices.Reset();Cached.GreenAlternate.Reset();
             const auto Assemble=[&](auto& Midpoints)
             {
                 for (int32 I=0;I<Triangles.Num();I+=3)
@@ -401,6 +451,7 @@ private:
                     const int32 Corners[]={A,B,C};
                     for (int32 E=0;E<3;++E)
                     {
+                        if(!(Cached.Selection[I/3]&(1<<E)))continue;
                         const int32 L=Corners[E],R=Corners[(E+1)%3];const uint64 K=Key(L,R);
                         if (!Midpoints.Contains(K))
                         {
@@ -445,7 +496,19 @@ private:
                     else while (M[Start]==INDEX_NONE || M[(Start+1)%3]==INDEX_NONE)++Start;
                     const int32 A=V[Start],B=V[(Start+1)%3],C=V[(Start+2)%3],AB=M[Start];
                     if (Count==1) { Add(A,AB,C);Add(AB,B,C); }
-                    else { const int32 BC=M[(Start+1)%3];Add(B,BC,AB);Add(A,AB,C);Add(AB,BC,C); }
+                    else
+                    {
+                        const int32 BC=M[(Start+1)%3];Add(B,BC,AB);
+                        // Candidate only: choose the shorter green diagonal.
+                        // This also covers a neighbour splitting a short edge
+                        // beside our sole requested long edge. Never flip winding.
+                        const bool Alternate=bShortGreenDiagonals && AlternateGreen(A,B,C);
+                        if(bShortGreenDiagonals)
+                        {Cached.GreenVertices.Emplace(A,B,C);Cached.GreenAlternate.Add(Alternate);}
+                        if(Alternate)
+                        {Add(A,AB,BC);Add(A,BC,C);}
+                        else {Add(A,AB,C);Add(AB,BC,C);}
+                    }
                 }
                 if(bRetainTopologyStorage){Swap(Triangles,Next);Swap(TriangleOrigins,NextOrigins);}
                 else {Triangles=MoveTemp(Next);TriangleOrigins=MoveTemp(NextOrigins);}
@@ -471,7 +534,8 @@ public:
         uint64 Bytes=CachedRootTriangles.GetAllocatedSize()+CachedLevels.GetAllocatedSize()+
             RetainedPoints.GetAllocatedSize()+RetainedNextTriangles.GetAllocatedSize()+RetainedNextOrigins.GetAllocatedSize();
         for(const auto& L:CachedLevels)Bytes+=L.Selection.GetAllocatedSize()+L.WorkingSelection.GetAllocatedSize()+
-            L.Parents.GetAllocatedSize()+L.Triangles.GetAllocatedSize()+L.Origins.GetAllocatedSize();
+            L.Parents.GetAllocatedSize()+L.Triangles.GetAllocatedSize()+L.Origins.GetAllocatedSize()+
+            L.GreenVertices.GetAllocatedSize()+L.GreenAlternate.GetAllocatedSize();
         return Bytes;
     }
     template<class T> void Expand(const TArray<T>& Source,TArray<T>& Output) const
