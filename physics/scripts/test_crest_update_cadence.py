@@ -9,7 +9,7 @@ def row(calls=1, changed=None, cost=2.):
     r[PREFIX + 'UpdateCalls'] = calls
     if changed:
         r[PREFIX + changed] = 1.
-    r.update({SCOPES[0]: cost, SCOPES[1]: cost + 3.})
+    r.update({SCOPES[0]: cost, SCOPES[1]: cost + 3., SCOPES[2]: 0., SCOPES[3]: 0.})
     return r
 
 
@@ -28,6 +28,17 @@ class Cadence(unittest.TestCase):
         for n in ('XYChanged', 'IndicesChanged', 'ProfileChanged', 'DetailWindowChanged'):
             self.assertEqual(classify(row(changed=n)), 'single_geometry_changed')
         self.assertEqual(classify(row(changed='DenseHistoryUpdates')), 'single_targets_unchanged')
+
+    def test_refresh_cooccurrence_does_not_change_call_categories(self):
+        first = row(changed='XYChanged')
+        second = row(changed='XYChanged', cost=5.)
+        second[SCOPES[2]] = 1.
+        result = summarize([first, second], 0, 1)
+        self.assertEqual(result['categories']['single_geometry_changed']['frames'], 2)
+        joint = result['joint_refresh_categories']
+        self.assertEqual(joint['single_geometry_changed__refresh_measured']['frames'], 1)
+        self.assertEqual(joint['single_geometry_changed__no_refresh_measured']['frames'], 1)
+        self.assertEqual(result['aggregate']['cpu'][SCOPES[0]]['total_ms'], 7.)
 
     def test_invalid_counts_scopes_and_intervals_rejected(self):
         for key, value in ((PREFIX+'UpdateCalls', .5), (PREFIX+'XYChanged', 2),

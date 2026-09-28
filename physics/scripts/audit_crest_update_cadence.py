@@ -13,7 +13,8 @@ PREFIX = 'RaftSimCrests/'
 COUNTERS = ('UpdateCalls', 'XYChanged', 'IndicesChanged', 'ProfileChanged',
             'DetailWindowChanged', 'CoarseChanged', 'ShoreChanged', 'DenseHistoryUpdates')
 GEOMETRY = ('XYChanged', 'IndicesChanged', 'ProfileChanged', 'DetailWindowChanged')
-SCOPES = ('RaftSimCrests/GameThread/Update', 'RaftSimSurface/GameThread/Tick')
+SCOPES = ('RaftSimCrests/GameThread/Update', 'RaftSimSurface/GameThread/Tick',
+          'RaftSimSurface/GameThread/Refresh', 'RaftSimCrests/GameThread/Selection')
 
 
 def check(value, message):
@@ -67,9 +68,12 @@ def summarize(rows, first, last):
     check(0 <= first <= last < len(rows), 'Absent sample interval')
     selected = rows[first:last + 1]
     groups = {}
+    joint = {}
     for row in selected:
         category = classify(row)
         groups.setdefault(category, []).append(row)
+        refresh = 'refresh_measured' if row[SCOPES[2]] > 0 else 'no_refresh_measured'
+        joint.setdefault(category + '__' + refresh, []).append(row)
 
     def aggregate(samples):
         calls = sum(r[PREFIX + 'UpdateCalls'] for r in samples)
@@ -82,7 +86,8 @@ def summarize(rows, first, last):
                                                      if calls and n == SCOPES[0] else None))
                  for n in SCOPES})
     return dict(sample_indices_inclusive=[first, last], aggregate=aggregate(selected),
-                categories={n: aggregate(v) for n, v in sorted(groups.items())})
+                categories={n: aggregate(v) for n, v in sorted(groups.items())},
+                joint_refresh_categories={n: aggregate(v) for n, v in sorted(joint.items())})
 
 
 def main():
@@ -94,9 +99,9 @@ def main():
     a = p.parse_args()
     raw = a.capture.read_bytes()
     rows, metadata = read_capture(raw, a.ignore_duplicate_unmeasured_header)
-    report = dict(schema='raftsim.crest_update_cadence.v1', source=str(a.capture.resolve()),
+    report = dict(schema='raftsim.crest_update_cadence.v2', source=str(a.capture.resolve()),
         source_sha256=hashlib.sha256(raw).hexdigest(), metadata=metadata,
-        scope='Same-row counted calls/change flags and inclusive CPU scopes. Multiple calls cannot be individually classified. Parent surface Tick includes crest work; never sum them. No frame-time causal attribution, geometry-size normalization, speedup or acceptance.',
+        scope='Same-row counted calls/change flags and inclusive CPU scopes. Positive Refresh scope means measured refresh work, not a refresh-call count. Multiple crest calls cannot be individually classified. Parent surface Tick includes crest and refresh work; never sum them. No frame-time causal attribution, geometry-size normalization, speedup or acceptance.',
         performance_accepted=False, intervals=[summarize(rows, *v) for v in a.interval])
     with a.report.open('x', encoding='utf-8') as output:
         json.dump(report, output, indent=2)

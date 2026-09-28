@@ -213,3 +213,30 @@ Reproduction: `physics/scripts/audit_crest_update_cadence.py` with intervals
 The analyzer reuses completed-CSV validation, rejects missing/ambiguous counters,
 and keeps multiple-call rows unresolved. Missing early values are not zeros.
 This is supporting diagnostic work, not a playable change or acceptance.
+
+### Refresh co-occurrence identifies the late expensive population
+
+The v2 cadence report additionally splits each category by positive same-row
+Refresh scope (measured work, not a refresh-call count). In rows600..899, all149
+geometry-changing updates have zero measured Refresh work: crest9.994ms,
+surface Tick14.584ms. In rows900..1169,81 such no-refresh updates remain close
+to that cost: crest10.481ms, surface15.092ms. The other108 geometry-changing
+rows also contain Refresh work and are much more expensive: crest17.692ms,
+selection6.470ms, Refresh30.342ms, surface Tick54.409ms. These nested scopes
+are not additive. The81 late unchanged-target refresh rows remain near earlier
+costs: crest2.069ms, Refresh21.296ms, surface28.282ms.
+
+Thus the pooled geometry-changing slowdown must not be mistaken for uniform
+cost growth. The expensive joint population is the next comparison target.
+The current Tick publishes/interpolates before its15Hz refresh check; that
+ordering can separate refreshed geometry from the publication frame. No source
+edit, dropped refresh, added simulation debt or quality reduction is justified
+by this correlation alone. Preserve the same-row scope identities; elapsed
+FrameTime has its separately verified one-row association and is not used here.
+
+Report `tmp/sf-v13-normal-crest-refresh-cadence-v2-20260928.json` retains the same
+source hash above. Six cadence tests and21 existing CSV tests pass27/27, including
+joint-category separation without changing total crest cost or call categories.
+The existing v14 hydraulic/validation/motion owners remain untouched. Retained
+default boat views at11s and20s still show broad flat foam; neither this timing
+analysis nor sparse image review establishes breaking, collision or motion acceptance.

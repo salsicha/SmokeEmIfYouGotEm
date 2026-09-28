@@ -9,6 +9,10 @@ and existing CSV tests pass26/26. Supporting diagnostics only, no playable or
 performance acceptance. Compare categories in the already-owned v14 validation
 after hydraulics complete; do not duplicate it. See the crest-cadence section in
 [v13 review](../reconstruction-review-2026-09-07/v13-playable-review.md).
+Further same-row separation:108 late geometry-changing frames also contain
+Refresh work (mean surface Tick54.409ms);81 without Refresh remain15.092ms.
+Do not treat pooled cost growth as uniform geometry cost. The v2 analyzer has
+27 passing regressions with the existing CSV suite; runtime is unchanged.
 
 September28 UTC v14 package COMPLETE exit0: BuildCookRun619.77s, all frozen
 inputs unchanged. New inner executable SHA256
