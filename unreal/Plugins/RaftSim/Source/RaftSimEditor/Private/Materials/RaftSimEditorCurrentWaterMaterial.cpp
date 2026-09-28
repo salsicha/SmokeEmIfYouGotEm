@@ -381,12 +381,24 @@ UMaterial* LoadOrCreateCurrentGradientWaterParent(
         FAssetRegistryModule::AssetCreated(Material);
     }
     UMaterialExpressionCustom* Detail = nullptr;
+    UMaterialExpressionCustom* RegisteredDetailNormal = nullptr;
     UMaterialExpressionVectorParameter* Origin = nullptr;
     UMaterialExpressionCollectionParameter* Current = nullptr;
     for (UMaterialExpression* Expression : Material->GetExpressions())
     {
         if (auto* Candidate = Cast<UMaterialExpressionCustom>(Expression))
+        {
             if (Candidate->Desc == NormalMarker) Detail = Candidate;
+            if (RiverLabel == TEXT("SouthFork") && Candidate->Desc == TEXT("SouthForkMovingDetailNormalV1"))
+            {
+                if (RegisteredDetailNormal)
+                {
+                    Summary += TEXT("Duplicate South Fork hydraulic normal composition; refusing refresh.\n");
+                    return nullptr;
+                }
+                RegisteredDetailNormal = Candidate;
+            }
+        }
         if (auto* Parameter = Cast<UMaterialExpressionVectorParameter>(Expression))
             if (Parameter->ParameterName == TEXT("RaftSimWaterUVOrigin")) Origin = Parameter;
         if (auto* Parameter = Cast<UMaterialExpressionCollectionParameter>(Expression))
@@ -552,7 +564,24 @@ return normalize(float3(-slope, 1.0));
             if (Input.InputName == TEXT("Flow"))
                 if (auto* UV = Cast<UMaterialExpressionTextureCoordinate>(Input.Input.Expression)) UV->CoordinateIndex = 3;
     }
-    Material->GetEditorOnlyData()->Normal.Connect(0, Detail);
+    // Refresh only the optical base. Registered parents already compose its
+    // slopes with the SAME presented detail sampled by WPO; connecting Detail
+    // directly silently drops that hydraulic normal while leaving displacement
+    // active. Legacy parents without the wrapper retain the direct base.
+    if (RegisteredDetailNormal)
+    {
+        const FCustomInput* Base = RegisteredDetailNormal->Inputs.FindByPredicate(
+            [](const FCustomInput& Input) { return Input.InputName == TEXT("Base"); });
+        const FCustomInput* Hydraulic = RegisteredDetailNormal->Inputs.FindByPredicate(
+            [](const FCustomInput& Input) { return Input.InputName == TEXT("Detail"); });
+        if (!Base || Base->Input.Expression != Detail || !Hydraulic || !Hydraulic->Input.Expression)
+        {
+            Summary += TEXT("Unrecognized South Fork hydraulic normal inputs; refusing refresh.\n");
+            return nullptr;
+        }
+        Material->GetEditorOnlyData()->Normal.Connect(0, RegisteredDetailNormal);
+    }
+    else Material->GetEditorOnlyData()->Normal.Connect(0, Detail);
     if (RiverLabel == TEXT("Chilko") && !ConfigureChilkoDensityFoam(Material, AerationSignal))
     {
         Summary += TEXT("Chilko density foam could not locate the existing advected foam colour branch.\n");

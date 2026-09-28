@@ -1,5 +1,34 @@
 # Remaining requested work
 
+September28 UTC v15 packaging hit a verified transient disk-pressure failure:
+Zen logged1.86GiB free below its2GiB floor, despite12GB after cook exit. Original
+package98074 and follow-through28345 are terminal failures; no tests ran. Removed
+only obsolete v4 generated cooked containers (2.90GB); captures/logs/source and
+v14 retained. ONE same-input v15r2 retry5066/wrapper35132 is LIVE with14GiB
+preflight; follow-through57198/wrapper39640 waits on that exact build, then runs
+closure, isolated menu/rapid timing and motion. Do not duplicate jobs. See the
+[current storage diagnosis and owner checkpoint](../reconstruction-review-2026-09-07/hydraulic-normal-root-repair.md).
+
+September28 UTC hydraulic-normal regression repaired: the ordinary saved
+material's live-detail slope wrapper existed but the author refresh bypassed
+it, leaving ripple-only lighting over displaced water. The rebuilt author now
+preserves that wrapper; two refreshes and a fresh saved-graph audit pass with
+all existing nodes and seven non-normal output graphs unchanged. Actual normal
+scene motion captured; flat foam/weak breaking still unresolved. One fresh v15
+package is LIVE (session98074/wrapper39604); no duplicate build. Its single
+follow-through owner28345/wrapper26912 waits on that exact build handle, then
+runs staged closure, isolated menu/two-rapid timing and80-second packaged motion.
+Do not duplicate these queued tests; inspect their terminal receipts and views. See
+[repair, evidence and delivery gates](../reconstruction-review-2026-09-07/hydraulic-normal-root-repair.md).
+
+September28 UTC foam-edge trial COMPLETE, not promoted: guarded installation
+and fresh saved-graph audit pass, but twelve-sample actual-play captures do not
+establish a useful improvement to the flat foam. Original material hash and
+author source restored; candidate sources/asset/captures retained locally.
+No new package, geometry/physics change or performance acceptance. See
+[trial and restoration](../reconstruction-review-2026-09-07/froth-edge-normal-trial.md).
+Do not repeat this exact edge-only optical trial. v14 remains the packaged baseline.
+
 September28 UTC bounded assembly follow-through: a distinct batched-coordinate
 candidate preserved all64 actual-input pairs but slowed assembly in both orders.
 Removed candidate source and fixture; no gameplay default or package change.
