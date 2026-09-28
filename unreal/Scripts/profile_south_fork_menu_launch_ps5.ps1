@@ -22,7 +22,9 @@ param(
     # (';'-separated). Recorded in the receipt; never a normal-launch result.
     [ValidatePattern('^[a-zA-Z0-9_. ;-]*$')][string]$DiagnosticExecCmds = '',
     # Same-build reference only; receipt explicitly identifies the non-default search.
-    [switch]$LegacyBreakingSearch
+    [switch]$LegacyBreakingSearch,
+    # Same v21+ binary, original all-edge detail refinement. Never normal play.
+    [switch]$LegacyDetailEdges
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -51,6 +53,25 @@ function Get-RaftSimRuntimeErrors([string]$LogText) {
     @([regex]::Matches($LogText, '(?m)^.*\bLog\w+: (?:Error|Fatal):[^\r\n]*') |
         ForEach-Object { $_.Value })
 }
+function Get-RaftSimDetailEdgeMode([string]$LogText, [bool]$Legacy) {
+    # Require actual runtime confirmation, not a command-line echo. Retain
+    # every report so conflicting components cannot masquerade as one mode.
+    $prefix = '(?m)^.*\bLogTemp: Display: Crest selective detail edges: '
+    $lines = @([regex]::Matches($LogText, $prefix + '[^\r\n]*'))
+    if (-not $lines.Count) { throw 'Detail-edge runtime mode missing; use a v21+ binary' }
+    $expected = if ($Legacy) { 'enabled=0 legacy_override=1;' } else { 'enabled=1 legacy_override=0;' }
+    foreach ($line in $lines) {
+        if ($line.Value -notmatch ($prefix + [regex]::Escape($expected))) {
+            throw 'Missing, malformed or conflicting detail-edge runtime mode'
+        }
+    }
+    @{ selective_enabled = (-not $Legacy); legacy_override = $Legacy; confirmed_reports = $lines.Count }
+}
+function Test-RaftSimProfileWorkload($Process) {
+    $Process.Name -match '^(UnrealEditor|UnrealBuildTool|SmokeEm|raftsim_cartesian_cook)' -or
+    ($Process.Name -in @('dotnet.exe','cmd.exe') -and $Process.CommandLine -match 'UnrealBuildTool|Build\.bat|RunUAT|AutomationTool') -or
+    ($Process.Name -match '^python(w)?(\.exe)?$' -and $Process.CommandLine -match 'audit_south_fork[^\s]*')
+}
 if (Test-Path -LiteralPath $logFile) { throw "Log already exists: $logFile" }
 $started = Get-Date
 $review = $ReviewStationM -ge 0
@@ -65,6 +86,7 @@ $gameArgs += @(
     '-RaftSimScenario=south_fork_full_descent', '-csvCompression=0', "`"-abslog=$logFile`"",
     '-ExitAfterCsvProfiling')
 if ($LegacyBreakingSearch) { $gameArgs += '-RaftSimLegacyBreakingSearch' }
+if ($LegacyDetailEdges) { $gameArgs += '-RaftSimLegacyDetailEdges' }
 if ($review) {
     $gameArgs += @("-RaftSimWaterReviewStation=$ReviewStationM",
         "`"-ExecCmds=$csvCommands,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames`"")
@@ -73,10 +95,9 @@ if ($review) {
         "`"-ExecCmds=RaftSim.MenuScreen main start=south_fork_full_descent,$csvCommands`"")
 }
 $busy = @(Get-CimInstance Win32_Process | Where-Object {
-    $_.Name -match '^(UnrealEditor|UnrealBuildTool|SmokeEm|raftsim_cartesian_cook)' -or
-    ($_.Name -in @('dotnet.exe','cmd.exe') -and $_.CommandLine -match 'UnrealBuildTool|Build\.bat|RunUAT|AutomationTool')
+    Test-RaftSimProfileWorkload $_
 })
-if ($busy.Count) { throw 'Isolated profiling requires no other game, engine, build or hydraulic cook' }
+if ($busy.Count) { throw 'Isolated profiling requires no other game, engine, build, hydraulic cook or South Fork source audit' }
 $binaryHash = (Get-FileHash -LiteralPath $gameBinary -Algorithm SHA256).Hash.ToLower()
 $game = Start-Process -FilePath $gameBinary -ArgumentList $gameArgs -WorkingDirectory $gameWorkingDirectory -WindowStyle Hidden -PassThru
 if (-not $game.WaitForExit($TimeoutS * 1000)) {
@@ -88,6 +109,7 @@ if ($game.ExitCode -ne 0) { throw "Game failed with exit code $($game.ExitCode)"
 if ((Get-FileHash -LiteralPath $gameBinary -Algorithm SHA256).Hash.ToLower() -ne $binaryHash) { throw 'Game binary changed during profiling' }
 $log = Get-Content -LiteralPath $logFile -Raw -Encoding UTF8
 $runtimeErrors = @(Get-RaftSimRuntimeErrors $log)
+$detailEdgeMode = Get-RaftSimDetailEdgeMode $log ([bool]$LegacyDetailEdges)
 $csvEnded = 'LogCsvProfiler: Display: Capture Ended\. Writing CSV to file : [^\r\n]*[/\\]([^/\\\r\n]+\.csv)\s*$'
 $patterns = if ($review) { @(
     'LogLoad: LoadMap: /Game/RaftSim/Maps/L_SouthForkAmerican_FullReach(?:\?|\s|$)', $csvEnded)
@@ -138,7 +160,9 @@ $result = [ordered]@{
     game_binary = $gameBinary; game_binary_sha256 = $binaryHash
     diagnostic_exec_cmds = $DiagnosticExecCmds
     diagnostic_legacy_breaking_search = [bool]$LegacyBreakingSearch
-    normal_configuration = ($DiagnosticExecCmds -eq '' -and -not $LegacyBreakingSearch)
+    diagnostic_legacy_detail_edges = [bool]$LegacyDetailEdges
+    detail_edge_mode = $detailEdgeMode
+    normal_configuration = ($DiagnosticExecCmds -eq '' -and -not $LegacyBreakingSearch -and -not $LegacyDetailEdges)
     game_exit_code = $game.ExitCode; csv = $csv; csv_sha256 = (Get-FileHash -LiteralPath $csv -Algorithm SHA256).Hash.ToLower()
     frames_total = $times.Count; audited_rows = "30..$($times.Count - 31)"; audited_frames = $window.Count
     mean_ms = [Math]::Round($mean, 4); p95_ms = [Math]::Round($p95, 4); max_ms = [Math]::Round($max, 4)

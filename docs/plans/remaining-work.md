@@ -1,5 +1,24 @@
 # Remaining requested work
 
+September28 UTC normal-scene height-only crest cache identity implemented;
+editor build and8 rendered native checks PASS with exact geometry/history and
+changing foam. Synthetic12-frame case rebuilds2 rather than12 times; NO real
+FPS or appearance improvement claimed. One v22 package owner49561/wrapper17344
+waits for bounded old-stage compression96592/wrapper37212, preserving14GiB
+headroom and source/capture bytes. Original physical replay33152 remains live;
+no isolated game timing yet. See [repair, receipts and pending delivery](../reconstruction-review-2026-09-07/breaking-height-cache-key.md).
+
+September28 UTC same-build v21 detail-edge control is now supported by the
+packaged profiler, with mandatory runtime-mode confirmation, explicit diagnostic
+classification and exclusion of competing South Fork Python source audits.
+Four profiler regression scripts pass; the retained menu/8310/11520 logs each
+confirm normal selective mode. This is validation tooling only, not new game
+delivery or better timing. Source replay33152 remains LIVE (index0 complete,
+index1 started); no duplicate replay, game or cook launched. After its terminal
+hash check, run ordered normal/legacy and legacy/normal controls in the SAME
+v21 package to attribute crest cost; never call legacy runs normal play. See
+[control preparation](../reconstruction-review-2026-09-07/selective-detail-edges.md#same-build-control-preparation).
+
 September28 UTC physical-coordinate transport contribution implemented with
 original two-pole weights, direct exterior adjoints and explicit uncanceled
 geometry/port power.54 physics +6 provenance tests PASS; not a complete

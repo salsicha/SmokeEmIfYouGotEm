@@ -122,3 +122,36 @@ so neither was deduplicated. Compression is reversible with Windows compact.
 Receipts: `tmp/old-staged-data-compression-20260928.json` and
 `tmp/older-staged-data-compression-20260928.json`. The14 GiB package headroom
 gate was preserved, not lowered.
+
+## Same-build control preparation
+
+September28 UTC: `unreal/Scripts/profile_south_fork_menu_launch_ps5.ps1`
+now accepts `-LegacyDetailEdges` for the existing v21 binary's reference
+refinement. Both modes require actual `LogTemp: Display` runtime confirmation;
+missing, malformed, wrong-mode or conflicting reports fail closed. The receipt
+retains observed mode/count and marks the legacy run non-normal. This updated
+profiler requires v21+ runtime mode evidence; older captures remain retained,
+not silently reclassified. No game/default/quality/solver behavior changes.
+
+The isolation check now also blocks live South Fork Python source audits.
+Existing Python33152 remains the only replay owner; index0 completed and
+index1 started, error log empty. No concurrent engine timing was launched.
+Do not terminate or duplicate that replay to obtain a benchmark.
+
+`test_profile_detail_edges.ps1` exercises the real parsed production helpers,
+mode mismatch/absence/conflict, competing process detection, argument branch
+and normal-versus-diagnostic receipt expression. It and the existing runtime
+health, packaged-menu and menu-launch regressions pass. The new helper also
+accepts all three retained v21 menu/8310/11520 logs, each with one confirmed
+normal-mode report. Initial test failed due to PowerShell array concatenation
+grouping; the added argument test also needed its argument array initialized
+inside its child scriptblock scope. Both test-harness repairs leave runtime
+validation unchanged. Source/math files and captured data untouched.
+
+Next perform a bounded same-package comparison only after the existing source
+replay exits and its complete report/hashes are checked. Use order normal then
+legacy, then legacy then normal at8310, with the same1200 frames and unchanged
+20FPS/hitch gates; retain all failed runs. Compare crest scopes and water clock
+as well as total frames, without summing nested timers or calling lower fixture
+triangle counts a measured FPS gain. No comparison is queued or claimed here.
+This is supporting validation work, not a visible update or river acceptance.

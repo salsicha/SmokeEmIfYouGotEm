@@ -4,6 +4,7 @@
 #include "RaftSimCartesianHydraulicRelief.h"
 #include "RaftSimBreakingTileAudit.h"
 #include "RaftSimBreakingCandidateGate.h"
+#include "RaftSimBreakingHeightKey.h"
 #include "RaftSimMetricBreakingSearch.h"
 #include "RaftSimWetEdgeAudit.h"
 #include "RaftSimGroundSourceRegistry.h"
@@ -6205,13 +6206,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         const float Lift=BreakingCrestLiftMeters, Spacing=ResolvedVertexSpacingMeters;
         const float Scale=ResolvedPresentationHydraulicReliefScale;
         const float Sign=WaterAdapter->GetRiverWorldYSign();
-        CartesianCrestInput.ProfileKey={Lift,Spacing,Scale,Sign};
+        CartesianCrestInput.ProfileKey=RaftSimBreakingHeightKey::Build(SupportSites,Lift,Spacing,Scale,Sign);
         CartesianCrestInput.NonzeroRegionsCm.Reset();
         for (const auto& Site:SupportSites)
         {
-            CartesianCrestInput.ProfileKey.Append({Site.RiverCoordinatesMeters.X,Site.RiverCoordinatesMeters.Y,
-                Site.PhysicalCrestHeightMeters,Site.PhysicalCrestLengthMeters,Site.Intensity,
-                Site.SpillingFraction,Site.FlowDirection.X,Site.FlowDirection.Y,Site.bLocalEnvelopeCap ? 1. : 0.});
             const bool Physical=Site.PhysicalCrestHeightMeters>=0.f;
             const float Length=FMath::Clamp(Site.PhysicalCrestLengthMeters,2.f,7.f);
             const float SafeSpacing=FMath::Max(Spacing,.05f);
