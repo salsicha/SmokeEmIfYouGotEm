@@ -1,5 +1,57 @@
 # South Fork: bounded 1350-to-1800-second continuation
 
+## Terminal result (supersedes live-owner notes below)
+
+September28 UTC: session14006 exited0. Native39708 finished at05:25:13.601689UTC
+after5704.7672 wall seconds; wrapper33552 completed the final audits and exited.
+Receipt `completed=true`, `native_exit_code=0`, `final_audits_completed=true`.
+All six checkpoint report hashes were independently rechecked against the
+receipt:1500/1650/1800s state checks PASS on5,382,400cells; all86,720 artificial
+bank-face cells remain exactly dry at each checkpoint. Final maximum depth
+3.0417565m, speed5.0040558m/s; maximum step conservation residual
+1.19599215e-8m3. These are numerical state/boundary checks, not realism acceptance.
+
+Troublemaker's nearest-route8..9km band continues to lose storage, but more
+slowly. These are regional storage rates, NOT cross-section discharge:
+
+| Interval (s) | Storage rate (m3/s) | Common-wet median stage change (m) |
+| --- | ---: | ---: |
+| 1350–1500 | -4.219076 | -0.016841 |
+| 1500–1650 | -2.191877 | -0.010761 |
+| 1650–1800 | -0.686734 | -0.005067 |
+
+The whole domain gains769.980558m3 over450s, matching integrated exterior
+volume within3.41e-13m3 in the storage audit. Last-interval whole-domain storage
+gain is2.541457m3/s; instantaneous final inflow45.306955 versus outflow42.147057
+m3/s. Local drainage easing does not demonstrate whole-reach equilibrium.
+
+Captured-mask comparison covers1,632,290cells,96.3350% wet coverage, signed
+median surface error+0.021535m and median absolute error0.089235m. However,
+1127/6782station bins exceed0.25m surface error (previous1350s report:1050),
+and only3534bins satisfy the existing0.85–1.25 discharge-ratio diagnostic.
+Largest listed bin8348 has approximately0.66m error despite0.96ratio. Do not
+fit inferred bathymetry to these still-changing stages or promote on aggregate
+median error. No source capture, bed, boundary, rendered or collision geometry
+was changed by this continuation. Generated `bias.npz` is diagnostic only.
+
+Authoritative receipts (SHA256):
+
+- Owner `tmp/troublemaker-envelope1350to1800-process-v1-20260928.json`:
+  `3d59d7c7b4b1a0843c9ed469b63f8639ffced56f3a2f4c7937d4c9e772a32233`.
+- Storage `tmp/troublemaker-envelope1800-storage-v1-20260928.json`:
+  `dcacfea24f95fcb4649ba6001befc7c627a33b553c69581f7530ee46b715f643`.
+- Comparison `tmp/troublemaker-envelope1800-analysis-v1-20260928/report.json`:
+  `0219f60e192284608c60f2440f838691cacd0188af5fa47646d17fe6e6ded920`.
+
+No further cook was launched. Normal v15r2 retains450s v8 fields. The existing
+publication owner4504/session60320 has advanced to `isolated_8310_capture`;
+spray-build owner15924/session71849 still waits for that capture. Do not overlap
+new hydraulic work with its timing. Next inspect publication attribution and
+the queued spray native result, then actual motion/cost and normal playable
+delivery. Settling, geometry consistency and realistic breaking remain open.
+
+## Historical launch record
+
 September28 UTC. Hydraulic work in progress, NOT a new playable or visual
 delivery. The preceding goal turn completed v15r2 packaging, normal launch,
 motion review and isolated timing; both rapid timing gates still fail. That
