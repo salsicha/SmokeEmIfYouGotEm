@@ -1,5 +1,23 @@
 # Remaining requested work
 
+September28 UTC certified-bank integration now reaches the actual builder/cache
+behind RaftSimCertifiedBankContours, but MUST NOT be enabled normally yet.
+Write access recovered and the test compilation error was fixed. Native v5:
+20 regressions,15 audit controls,five exact contour cases pass;20 changing-depth
+updates cover all four dry corners and16 node-count rebuilds. A captured live
+failure is deliberately retained as a NEGATIVE regression, not acceptance.
+Instrumented8310 engine smoke rejects44 of78 updates starting at frame34:
+source31556 has quantized contour points with reversed radial order. Previous
+mesh retention hid this in the earlier smoke; diagnostic v2/v3 supersede its
+limited success. Successful topology calls alone have54.435702ms median
+(34 calls,31 over50ms; startup/capture/audit included), NOT isolated FPS evidence.
+No normal package, solver change, cook or push. v27 remains delivered.
+Next repair stored-point ordering from the exact captured donors, certify the
+result without loosening gates, then qualify construction reuse/publication
+cost and full motion/contact/shoreline/rendered-crest behavior. Native and
+engine owners are terminal. See
+[integrated candidate and real-grid rejection](../reconstruction-review-2026-09-07/stored-bank-render-coordinates.md#integrated-candidate-and-real-grid-rejection).
+
 September28 UTC v27 common render-frame precision improvement is DELIVERED in
 the normal rebuilt game, no candidate opt-in.20 native tests,15 audit controls,
 five exact contour cases, Boot/menu launch and170.690m actual motion pass their

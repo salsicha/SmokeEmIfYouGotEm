@@ -460,10 +460,25 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
         // Qualified captured-cell and actual-contact correction for South Fork.
         // Other scenarios remain explicit until their own scene verification.
         const bool bOppositeDryFan=!bOriginalBankFan && (bReviewedSouthFork || bForceOppositeDryFan);
+        static const bool bCertifiedRequested=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCertifiedBankContours"));
+        const bool bCertified=bReviewedSouthFork && bCertifiedRequested;
+        if(bCertified && (Source.IsEmpty() ||
+            FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyShorelineCoordinates"))))return false;
+        const FVector2D CertifiedOrigin=bCertified ? FVector2D(SelectWaterRenderOrigin(Source[0].Position)) : FVector2D::ZeroVector;
+        if(!BeforeVertices)UE_LOG(LogTemp,Display,TEXT("CERTIFIED_BANK_MODE enabled=%d candidate_only=1"),bCertified);
         if(!RaftSimParallelBankAudit::Run(Nx,Ny,Source,Wet,Available,DepthM,BedM,
             Crests!=nullptr,bOppositeDryFan,bReviewedSouthFork))return false;
-        if (!TopologyCache.Update(Nx,Ny,MoveTemp(Source),Wet,Available,DepthM,BedM,
-            BaseVertices,BaseIndices,BaseOffsets,bTopologyRebuilt,Crests!=nullptr,bOppositeDryFan,bReviewedSouthFork)) return false;
+        const double CertifiedBegin=bCertified ? FPlatformTime::Seconds() : 0.;
+        const bool Updated=TopologyCache.Update(Nx,Ny,MoveTemp(Source),Wet,Available,DepthM,BedM,
+            BaseVertices,BaseIndices,BaseOffsets,bTopologyRebuilt,Crests!=nullptr,bOppositeDryFan,bReviewedSouthFork,
+            true,bCertified ? &CertifiedOrigin : nullptr);
+        if(bCertified && !Updated)
+            UE_LOG(LogTemp,Error,TEXT("CERTIFIED_BANK_UPDATE rejected; previous mesh retained, candidate NOT accepted"));
+        if(bCertified && FParse::Param(FCommandLine::Get(),TEXT("RaftSimCertifiedBankAudit")))
+            UE_LOG(LogTemp,Display,TEXT("CERTIFIED_BANK_UPDATE accepted=%d topology_ms=%.6f banks=%d rebuilt=%d vertices=%d triangles=%d"),
+                Updated,1000.*(FPlatformTime::Seconds()-CertifiedBegin),TopologyCache.GetCurvedBanks().Num(),
+                bTopologyRebuilt,BaseVertices.Num(),BaseIndices.Num()/3);
+        if(!Updated)return false;
     }
     if (Crests)
     {

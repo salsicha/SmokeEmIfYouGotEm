@@ -265,3 +265,73 @@ reuse cost, and continue physical breaking/recirculation and publication-cost
 work. Hardware ray tracing remains disabled by normal project settings:
 the common transform is wired/native-tested, not hardware-exercised here.
 Preserve the rejected solver state and all retained evidence; no push.
+
+## Integrated candidate and real-grid rejection
+
+September28 UTC: common certified edge coordinates and complete variable-size
+three-wet bank contours now feed the real shoreline builder/cache behind
+RaftSimCertifiedBankContours. This is NOT enabled by default and is NOT a new
+normal playable delivery. v27 remains the normal packaged game.
+
+The integration preserves original donors, shared lattice edge identity and
+the certified triangulation itself. Variable contour fractions transport UVs
+and crest weights; changed node counts or triangle connectivity rebuild the
+cache. Candidate updates are transactional: rejected geometry leaves the
+previous successful mesh/cache intact. Full-cache/mesh copying is deliberately
+candidate-only and still requires cost reduction before promotion. Neither
+retention of old geometry nor process exit zero constitutes acceptance.
+
+The initial native build failed on a float3-to-double2 test conversion. After
+write access recovered, that conversion was fixed. Preserved receipts v2..v5
+are terminal. The latest is
+tmp/certified-bank-integration-v5-20260928-process.json:20 native tests,
+15 independent audit controls and five exact stored-coordinate proofs pass.
+Native comparisons bind actual submitted base-bank XY and every triangle to
+the independent certificate; unchanged input reuse and rejected-frame rollback
+are tested.20 additional depth/orientation updates cover all four dry corners,
+16 node-count rebuilds and equality against fresh builds. Zero same-size ear
+changes occurred, so that specific dynamic coverage remains outstanding.
+The captured live rejection below is intentionally a negative regression;
+its passing test does NOT mean the candidate is safe to ship.
+
+Three bounded engine runs used actual South Fork FullReach at8310, the normal
+rebased render frame, six motion samples and no solver override. The first
+run (tmp/certified-bank-smoke-v1-20260928-process.json) exited successfully
+and moved8311.820..8316.895m. Its first/last screenshots were inspected:
+water/raft alignment remained visible, while weak breaking, coarse geometry
+and crew fit remained unresolved. That run lacked per-publication acceptance
+telemetry, so it could not detect stale mesh retention and is superseded by
+the instrumented failures below. It must not be cited as continuity acceptance.
+
+Component diagnostics now emit an error on rejected candidate publication,
+with optional RaftSimCertifiedBankAudit construction cost and exact failing
+cell data. The v2/v3 engine runs both failed their runtime health checks,
+despite process exit zero. Latest log:
+tmp/certified-bank-smoke-v3-20260928.log, SHA256
+dd457420acec052138fcc7cd50ca656e59c8ed99eb0fbcd0702d2b3f2166273a.
+All frozen implementation inputs were unchanged during each run.
+
+In v3,34 updates succeeded and44 rejected; the first rejection is frame34,
+source31556, dry corner0, certificate boundary-construction stage1. Exact
+bed/depth/coordinate values are retained in
+[the captured rejection fixture](certified-bank-rejection-31556.json).
+The failed local endpoints are approximately(0.0000048828125,0.001494140625)
+and(0.0000048828125,0.001484375). Equal quantized X and decreasing Y reverse
+their order around the dry corner; the strict partition predicate correctly
+rejects that span. This identifies a storage-selection defect, not permission
+to remove ordering checks or widen the1mm geometric band. These captured values
+are simulation inputs, not newly surveyed bathymetry.
+
+The34 successful topology calls have median54.435702ms, range17.676..454.876602ms;
+31 exceed50ms. These include startup, near/far components, capture and audit,
+and are NOT isolated full-frame timings or a causal comparison with v27.
+They rule out treating this candidate as performance-qualified. No physics
+time is dropped and no quality/performance gate is relaxed.
+
+Next fix stored-point selection/order using the reproduced cell, then replace
+the negative control with full positive native and independent exact proofs.
+Qualify construction reuse and transaction cost, same-size ear-change coverage,
+actual post-crest stored geometry, long-motion/contact/shoreline stability and
+isolated frame/bridge-clock cost before normal delivery. Do not recook or
+overwrite the immutable linked v25/v26/v27 stages. No known broken solver was
+enabled. No source data was removed, no river accepted and no push performed.

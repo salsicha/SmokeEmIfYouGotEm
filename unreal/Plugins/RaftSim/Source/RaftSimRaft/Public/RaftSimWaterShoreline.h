@@ -9,6 +9,8 @@ struct FEdge
 {
     int32 WetVertex, DryVertex, Node;
     double Crossing;
+    bool bStored=false;
+    FVector2D StoredPosition=FVector2D::ZeroVector;
 };
 struct FBankTriangle
 {
@@ -21,14 +23,19 @@ struct FCurvedBank
     int32 Source[4],Dry,StartNode,EndNode,FirstNode;
     double Bed[4],Depth[4];
     FVector2D Points[Segments-1];
-    // Adjacent high banks use a variable-size conservative envelope. Existing
-    // three-wet-corner banks retain their unchanged fixed radial topology.
+    // Adjacent high banks and certified three-wet candidates use variable
+    // envelopes. Legacy three-wet banks retain the fixed radial topology.
     int32 PairSide=INDEX_NONE;
     TArray<FVector2D> PairPoints;
     TArray<double> PairFractions;
-    int32 IntermediateCount() const {return PairSide==INDEX_NONE ? Segments-1 : PairPoints.Num();}
-    FVector2D Point(int32 I) const {return PairSide==INDEX_NONE ? Points[I] : PairPoints[I];}
-    double Fraction(int32 I) const {return PairSide==INDEX_NONE ? double(I+1)/Segments : PairFractions[I];}
+    bool bCertified=false,bCertifiedForward=false,bConnectivityChanged=false;
+    FVector2D RenderOrigin=FVector2D::ZeroVector;
+    TArray<FVector2D> StoredPositions;
+    TArray<FIntVector> CertifiedTriangles;
+    bool Variable()const{return PairSide!=INDEX_NONE || bCertified;}
+    int32 IntermediateCount() const {return Variable() ? PairPoints.Num() : Segments-1;}
+    FVector2D Point(int32 I) const {return Variable() ? PairPoints[I] : Points[I];}
+    double Fraction(int32 I) const {return Variable() ? PairFractions[I] : double(I+1)/Segments;}
 };
 // Clip the Cartesian lattice in two dimensions. Original vertices plus one
 // shared node per horizontal/vertical edge keep storage below 3N;
@@ -40,7 +47,8 @@ RAFTSIMRAFT_API bool Build(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
     TArray<FProcMeshVertex>& OutVertices, TArray<uint32>& OutIndices,
     TArray<int32>* OutCellOffsets = nullptr, TArray<FEdge>* OutEdges = nullptr,
     bool bCompactEdges = false, bool bOppositeDryFan = false,
-    bool bCurvedHighBanks = false, TArray<FCurvedBank>* OutCurvedBanks = nullptr);
+    bool bCurvedHighBanks = false, TArray<FCurvedBank>* OutCurvedBanks = nullptr,
+    const FVector2D* CertifiedRenderOrigin = nullptr);
 RAFTSIMRAFT_API bool Sample(const FVector2D& PositionXY, int32 Begin, int32 End,
     TConstArrayView<FProcMeshVertex> Vertices, TConstArrayView<uint32> Indices, FVector& Position,
     FIntVector* Corners=nullptr,FVector* Weights=nullptr);
@@ -58,7 +66,7 @@ public:
         TArray<FProcMeshVertex>& Vertices, TArray<uint32>& Indices,
         TArray<int32>& CellOffsets, bool& bTopologyRebuilt, bool bCompactEdges = false,
         bool bOppositeDryFan = false, bool bCurvedHighBanks = false,
-        bool bParallelCurves = true);
+        bool bParallelCurves = true,const FVector2D* CertifiedRenderOrigin = nullptr);
     void Reset();
     uint64 GetRebuildCount() const { return RebuildCount; }
     uint64 GetReuseCount() const { return ReuseCount; }
@@ -66,10 +74,18 @@ public:
     const TArray<FEdge>& GetEdges() const { return Edges; }
     const TArray<FCurvedBank>& GetCurvedBanks() const { return CurvedBanks; }
 private:
+    bool UpdateImpl(int32 Nx,int32 Ny,TArray<FProcMeshVertex>&& Source,
+        TConstArrayView<uint8> Wet,TConstArrayView<uint8> Available,
+        TConstArrayView<float> DepthM,TConstArrayView<float> BedM,
+        TArray<FProcMeshVertex>& Vertices,TArray<uint32>& Indices,TArray<int32>& CellOffsets,
+        bool& bTopologyRebuilt,bool bCompactEdges,bool bOppositeDryFan,bool bCurvedHighBanks,
+        bool bParallelCurves,const FVector2D* CertifiedRenderOrigin);
     int32 CachedNx=0, CachedNy=0, CachedIndexCount=0;
     bool bCachedCompactEdges=false;
     bool bCachedOppositeDryFan=false;
     bool bCachedCurvedHighBanks=false;
+    bool bCachedCertified=false;
+    FVector2D CachedRenderOrigin=FVector2D::ZeroVector;
     TArray<FVector2D> XY;
     TArray<uint8> WetMask, AvailableMask;
     TArray<FEdge> Edges;

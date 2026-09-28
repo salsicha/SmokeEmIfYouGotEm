@@ -1,4 +1,7 @@
 #include "RaftSimStoredBankContour.h"
+#include "RaftSimWaterShoreline.h"
+#include "RaftSimWaterRenderFrame.h"
+#include "RaftSimShorelineCrestWeights.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/FileHelper.h"
 #include "Dom/JsonObject.h"
@@ -56,6 +59,76 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
         }
         TestTrue(TEXT("canonical shared crossings retained exactly"),
             Storage.BufferPosition(R.Boundary[0])==Storage.Crossings[0] && Storage.BufferPosition(R.Boundary.Last())==Storage.Crossings[1]);
+        TArray<FProcMeshVertex> Source;
+        TArray<float> MeshBed,MeshDepth;TArray<uint8> Wet,Available;
+        for(int32 I=0;I<4;++I)
+        {
+            FProcMeshVertex V;
+            V.Position=FVector(M.O.X+(I%2)*M.Step.X,M.O.Y+(I/2)*M.Step.Y,100.*(Bed[I]+H[I]));
+            V.Normal=FVector::UpVector;V.UV0=FVector2D(I%2,I/2);
+            V.UV1=FVector2D(I+.25,2.*I);V.UV2=FVector2D(.3*I,.7*I);
+            V.UV3=FVector2D(.9*I,.1*I);V.Color=FColor(30*I,50*I,70*I,255);
+            V.Tangent=FProcMeshTangent(FVector::ForwardVector,false);
+            Source.Add(V);MeshBed.Add(float(Bed[I]));MeshDepth.Add(float(H[I]));Wet.Add(I!=0);Available.Add(1);
+        }
+        TArray<FProcMeshVertex> Mesh;TArray<uint32> MeshIndices;TArray<int32> CellOffsets;
+        RaftSimWaterShoreline::FTopologyCache Cache;bool Rebuilt=false;
+        for(int32 Pass=0;Pass<2;++Pass)
+        {
+            auto Input=Source;
+            if(!TestTrue(TEXT("actual certified builder/cache accepts stored fixture"),
+                Cache.Update(2,2,MoveTemp(Input),Wet,Available,MeshDepth,MeshBed,Mesh,MeshIndices,CellOffsets,
+                    Rebuilt,true,true,true,true,&M.RenderOrigin)))return false;
+            TestEqual(TEXT("identical donors reuse certified connectivity"),Rebuilt,Pass==0);
+            if(!TestEqual(TEXT("actual triangles retain every certified ear"),MeshIndices.Num(),3*R.Triangles.Num()))return false;
+            TArray<int32> ToProof;ToProof.Init(INDEX_NONE,Mesh.Num());
+            const FRaftSimWaterRenderFrame Frame{FVector(M.RenderOrigin.X,M.RenderOrigin.Y,0.)};
+            for(uint32 I:MeshIndices)
+            {
+                const FVector3f Stored=Frame.Store(Mesh[I].Position);
+                const FVector2D Buffer(double(Stored.X),double(Stored.Y));
+                for(int32 J=0;J<R.Polygon.Num();++J)if(Buffer==Storage.BufferPosition(R.Polygon[J])){ToProof[I]=J;break;}
+                if(!TestTrue(TEXT("actual submitted XY is an independently certified stored point"),ToProof[I]!=INDEX_NONE))return false;
+            }
+            for(int32 I=0;I<R.Triangles.Num();++I)
+            {
+                const FIntVector Actual(ToProof[MeshIndices[3*I]],ToProof[MeshIndices[3*I+1]],ToProof[MeshIndices[3*I+2]]);
+                const auto& E=R.Triangles[I];
+                if(!TestTrue(TEXT("builder preserves certified ears except required world winding"),
+                    Actual==E || Actual==FIntVector(E.X,E.Z,E.Y)))return false;
+            }
+            const auto& Banks=Cache.GetCurvedBanks();
+            if(!TestEqual(TEXT("one certified bank"),Banks.Num(),1))return false;
+            TestTrue(TEXT("variable contour metadata retained"),Banks[0].bCertified && Banks[0].IntermediateCount()==R.Boundary.Num()-2);
+            const TArray<float> Coarse={0.f,1.f,2.f,3.f},Shore={0.f,.2f,.4f,.6f};
+            FRaftSimShorelineCrestWeights Weights;Weights.Update(Mesh.Num(),Coarse,Shore,Cache.GetEdges(),Banks);
+            double Previous=0.;
+            for(int32 I=0;I<Banks[0].IntermediateCount();++I)
+            {
+                const auto& B=Banks[0];const double T=B.Fraction(I);const auto& V=Mesh[B.FirstNode+I];
+                TestTrue(TEXT("variable attributes preserve strictly ordered physical ray fraction"),T>Previous && T<1.);Previous=T;
+                TestTrue(TEXT("UV0 follows actual source-cell position"),V.UV0.Equals(B.Point(I),1.e-12));
+                TestTrue(TEXT("all transported UV payloads use the same contour fraction"),
+                    V.UV1==FMath::Lerp(Mesh[B.StartNode].UV1,Mesh[B.EndNode].UV1,T) &&
+                    V.UV2==FMath::Lerp(Mesh[B.StartNode].UV2,Mesh[B.EndNode].UV2,T) &&
+                    V.UV3==FMath::Lerp(Mesh[B.StartNode].UV3,Mesh[B.EndNode].UV3,T));
+                TestEqual(TEXT("crest weight writes variable contour node"),Weights.Coarse[B.FirstNode+I],
+                    FMath::Lerp(Weights.Coarse[B.StartNode],Weights.Coarse[B.EndNode],float(T)));
+            }
+        }
+        const auto SavedMesh=Mesh;const auto SavedIndices=MeshIndices;const auto SavedOffsets=CellOffsets;
+        const uint64 SavedRebuilds=Cache.GetRebuildCount(),SavedReuses=Cache.GetReuseCount();
+        auto InvalidInput=Source;const FVector2D InvalidOrigin(1.e100,1.e100);
+        TestFalse(TEXT("inexact frame rejects actual cache publication"),Cache.Update(2,2,MoveTemp(InvalidInput),
+            Wet,Available,MeshDepth,MeshBed,Mesh,MeshIndices,CellOffsets,Rebuilt,true,true,true,true,&InvalidOrigin));
+        TestTrue(TEXT("proof failure preserves the previous successful frame and cache"),
+            !Rebuilt && Mesh.Num()==SavedMesh.Num() && FMemory::Memcmp(Mesh.GetData(),SavedMesh.GetData(),
+                SIZE_T(Mesh.Num())*sizeof(FProcMeshVertex))==0 && MeshIndices==SavedIndices && CellOffsets==SavedOffsets &&
+                Cache.GetRebuildCount()==SavedRebuilds && Cache.GetReuseCount()==SavedReuses);
+        auto Retry=Source;
+        TestTrue(TEXT("previous certificate remains reusable after rejected frame"),
+            Cache.Update(2,2,MoveTemp(Retry),Wet,Available,MeshDepth,MeshBed,Mesh,MeshIndices,CellOffsets,
+                Rebuilt,true,true,true,true,&M.RenderOrigin) && !Rebuilt);
         auto Item=MakeShared<FJsonObject>();Item->SetNumberField(TEXT("case"),K);
         Item->SetNumberField(TEXT("construction_ms"),Ms);Item->SetNumberField(TEXT("coefficient_tests"),R.Stats.CoefficientTests);
         Item->SetArrayField(TEXT("origin_cm"),Pair(M.O));Item->SetArrayField(TEXT("end_cm"),Pair(M.O+M.Step));
@@ -82,6 +155,91 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
         Item->SetArrayField(TEXT("polygon_buffer_cm"),Polygon);Item->SetArrayField(TEXT("triangles"),Triangles);
         Cases.Add(MakeShared<FJsonValueObject>(Item));
     }
+    // Changing depths must bind fresh certificates, including all four dry
+    // corners. Compare cache updates to both a fresh builder and the proof's
+    // actual stored polygon, not only to a source-text topology predicate.
+    int32 DynamicUpdates=0,NodeCountChanges=0,SameSizeEarChanges=0;
+    for(int32 Dry=0;Dry<4;++Dry)
+    {
+        const auto& M=Maps[4];
+        RaftSimWaterShoreline::FTopologyCache Cache;
+        TArray<FProcMeshVertex> Mesh;TArray<uint32> Indices;TArray<int32> Offsets;
+        int32 PreviousCount=INDEX_NONE;TArray<FIntVector> PreviousEars;
+        for(double Scale:{1.,.8,.9,.999,1.})
+        {
+            TArray<FProcMeshVertex> Source;
+            TArray<float> Depth,Beds;TArray<uint8> Wet,Available;
+            double CanonicalDepth[4];
+            for(int32 I=0;I<4;++I)CanonicalDepth[I]=double(float(H[I]*Scale));
+            for(int32 I=0;I<4;++I)
+            {
+                FProcMeshVertex V;
+                V.Position=FVector(M.O.X+(I%2)*M.Step.X,M.O.Y+(I/2)*M.Step.Y,
+                    100.*(Bed[I^Dry]+CanonicalDepth[I^Dry]));
+                V.Normal=FVector::UpVector;V.UV0=FVector2D(I%2,I/2);
+                Source.Add(V);Depth.Add(float(CanonicalDepth[I^Dry]));Beds.Add(float(Bed[I^Dry]));
+                Wet.Add(I!=Dry);Available.Add(1);
+            }
+            FCurve Curve;RaftSimStoredBankContour::FStorage Storage;FResult Proof;
+            if(!TestTrue(TEXT("dynamic canonical curve"),Curve.Init(Bed,CanonicalDepth)))return false;
+            if(!TestTrue(TEXT("dynamic canonical storage"),Storage.Init(Curve,FVector2D(Source[Dry].Position),
+                FVector2D(Source[Dry^1].Position),FVector2D(Source[Dry^2].Position),.1,M.RenderOrigin)))return false;
+            if(!TestTrue(TEXT("dynamic independent stored certificate"),RaftSimStoredBankContour::Build(Curve,Storage,Proof)))return false;
+            auto Input=Source;bool Rebuilt=false;
+            if(!TestTrue(TEXT("dynamic cache accepts certified donors"),Cache.Update(2,2,MoveTemp(Input),Wet,Available,Depth,Beds,
+                Mesh,Indices,Offsets,Rebuilt,true,true,true,true,&M.RenderOrigin)))return false;
+            TArray<FProcMeshVertex> Fresh;TArray<uint32> FreshIndices;TArray<int32> FreshOffsets;
+            if(!TestTrue(TEXT("dynamic fresh builder"),RaftSimWaterShoreline::Build(2,2,MoveTemp(Source),Wet,Available,Depth,Beds,
+                Fresh,FreshIndices,&FreshOffsets,nullptr,true,true,true,nullptr,&M.RenderOrigin)))return false;
+            if(!TestTrue(TEXT("dynamic cache connectivity equals fresh builder"),
+                Indices==FreshIndices && Offsets==FreshOffsets && Mesh.Num()==Fresh.Num()))return false;
+            for(int32 I=0;I<Mesh.Num();++I)
+                if(!TestTrue(TEXT("dynamic cache positions and UVs equal fresh builder"),
+                    Mesh[I].Position==Fresh[I].Position && Mesh[I].UV0==Fresh[I].UV0))return false;
+            if(!TestEqual(TEXT("dynamic complete certified triangulation"),Indices.Num(),3*Proof.Triangles.Num()))return false;
+            TArray<int32> ToProof;ToProof.Init(INDEX_NONE,Mesh.Num());
+            const FRaftSimWaterRenderFrame Frame{FVector(M.RenderOrigin.X,M.RenderOrigin.Y,0.)};
+            for(uint32 I:Indices)
+            {
+                const FVector3f Stored=Frame.Store(Mesh[I].Position);
+                for(int32 J=0;J<Proof.Polygon.Num();++J)
+                    if(FVector2D(double(Stored.X),double(Stored.Y))==Storage.BufferPosition(Proof.Polygon[J])){ToProof[I]=J;break;}
+                if(!TestTrue(TEXT("dynamic stored vertex belongs to current certificate"),ToProof[I]!=INDEX_NONE))return false;
+            }
+            for(int32 I=0;I<Proof.Triangles.Num();++I)
+            {
+                const FIntVector Actual(ToProof[Indices[3*I]],ToProof[Indices[3*I+1]],ToProof[Indices[3*I+2]]);
+                const auto& E=Proof.Triangles[I];
+                if(!TestTrue(TEXT("dynamic ears bind current proof for every dry corner"),
+                    Actual==E || Actual==FIntVector(E.X,E.Z,E.Y)))return false;
+            }
+            if(PreviousCount!=INDEX_NONE)
+            {
+                const bool CountChanged=PreviousCount!=Mesh.Num();
+                const bool EarsChanged=PreviousEars!=Proof.Triangles;
+                NodeCountChanges+=CountChanged;SameSizeEarChanges+=!CountChanged && EarsChanged;
+                if(CountChanged || EarsChanged)TestTrue(TEXT("changed certificate connectivity forces rebuild"),Rebuilt);
+            }
+            PreviousCount=Mesh.Num();PreviousEars=Proof.Triangles;++DynamicUpdates;
+        }
+    }
+    AddInfo(FString::Printf(TEXT("StoredBank dynamic_updates=%d node_count_changes=%d same_size_ear_changes=%d dry_corners=4"),
+        DynamicUpdates,NodeCountChanges,SameSizeEarChanges));
+    TestEqual(TEXT("all changing-depth/dry-corner cases executed"),DynamicUpdates,20);
+    TestTrue(TEXT("node-count rebuild exercised"),NodeCountChanges>0);
+    // Unresolved actual engine rejection, NOT an acceptance fixture. Preserve
+    // the original frame34/source31556 inputs until storage ordering is repaired.
+    // A future repair must replace this negative control with a full positive
+    // certificate and independent exact audit, not simply remove the assertion.
+    const double RejectedBed[]={8.5700531005859375,8.471832275390625,8.05267333984375,8.407135009765625};
+    const double RejectedDepth[]={0.,0.096230357885360718,0.51686644554138184,0.15903805196285248};
+    FCurve RejectedCurve;RaftSimStoredBankContour::FStorage RejectedStorage;FResult RejectedResult;
+    if(!TestTrue(TEXT("captured rejection curve initializes"),RejectedCurve.Init(RejectedBed,RejectedDepth)))return false;
+    if(!TestTrue(TEXT("captured rejection storage initializes"),RejectedStorage.Init(RejectedCurve,
+        {-545400.,-362600.},{-545300.,-362600.},{-545400.,-362700.},.1,{-551000.,-348600.})))return false;
+    TestFalse(TEXT("known live rejection retained; candidate NOT ready for normal play"),
+        RaftSimStoredBankContour::Build(RejectedCurve,RejectedStorage,RejectedResult));
+    TestEqual(TEXT("captured rejection reproduced at boundary construction"),RejectedResult.Stats.FailedStage,1);
     RaftSimStoredBankContour::FStorage Bad;FResult R;
     RaftSimStoredBankContour::FStorage Unrebased;
     TestTrue(TEXT("unrebased captured map initializes"),Unrebased.Init(C,Maps[0].O,
