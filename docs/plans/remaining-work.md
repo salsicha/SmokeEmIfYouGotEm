@@ -1,5 +1,15 @@
 # Remaining requested work
 
+September28 UTC v17 unused water-history snapshot removal is DELIVERED in the
+normal rebuilt game;24 source guards/3 rendered native tests pass. Package,
+closure, menu/rapid timing and174m motion review COMPLETE; no live owner.
+Five unused full-grid copies removed, history/physics preserved. Menu p9545.70ms
+passes;8310 p9554.93ms/max112.55ms and11520 p9551.58ms stillFAIL. Flat foam,
+weak breaking and detached-looking spray remain. Carrier contact export now
+exists, with one non-ground-occluded raw-dry triangle probe retained for review.
+No causal FPS/appearance gain or river acceptance. See
+[terminal v17 results and next work](../reconstruction-review-2026-09-07/water-history-snapshot-removal.md).
+
 September28 UTC v16 packaged validation/motion COMPLETE, follow-through80167
 exit0. Normal menu passes20FPS;8310 p9556.8952ms/max111.217ms and11520
 p9587.1912ms/max144.3344ms FAIL.11520 water backlog reaches7.8s. Actual packaged

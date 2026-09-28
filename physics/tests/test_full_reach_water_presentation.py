@@ -7,6 +7,25 @@ ROOT = Path(__file__).resolve().parents[2]
 ENV = ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment"
 
 
+def test_exponential_water_chase_uses_live_history_without_retired_snapshots():
+    base = ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft'
+    source = (base / 'Private/RaftSimWaterSurfaceActor.cpp').read_text()
+    header = (base / 'Public/RaftSimWaterSurfaceActor.h').read_text()
+    assert 'LiveVolumeCoreInterpolationStart' not in source + header
+    chase = source.split('void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(', 1)[1].split(
+        'void ARaftSimWaterSurfaceActor::Tick(', 1)[0]
+    guard = chase.split('// Continuous exponential chase', 1)[0]
+    for channel in ('Vertices', 'Normals', 'VertexColors', 'FlowVelocity', 'WakeData'):
+        assert f'RenderedLiveVolumeCore{channel}.Num() !=' in guard
+    assert 'RaftSimWaterInterpolation::Advance(' in chase
+    # Retain both publications in their original order: the first also advances
+    # fine-crest history. Removing dead snapshots must not coalesce these calls.
+    tick = source.split('void ARaftSimWaterSurfaceActor::Tick(', 1)[1]
+    assert tick.index('UpdateLiveVolumeCoreInterpolation(DeltaSeconds)') < tick.index('RefreshSurface()')
+    assert 'CSV_SCOPED_TIMING_STAT(RaftSimSurface,RecenterPublication)' in source
+    assert 'CarryRenderedGridHistory(ShiftCells, ShiftNorth)' in source
+
+
 def test_bank_terrain_probes_skip_blockers_without_expanding_the_ray_budget():
     source = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp').read_text()
     helper = source.split('bool ARaftSimWaterSurfaceActor::TraceTerrainSurface', 1)[1].split(

@@ -8493,21 +8493,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 bRenderedStateShapeMatches;
             if (bCanInterpolate)
             {
-                // Preserve the exact currently rendered state as the start of
-                // the next interval. Vertex positions, vertex normals, and
-                // optical/foam channels then advance every rendered frame;
-                // replacing these targets outright at 15 Hz made specular
-                // reflections appear to jump even with one visible surface.
-                LiveVolumeCoreInterpolationStartVertices =
-                    RenderedLiveVolumeCoreVertices;
-                LiveVolumeCoreInterpolationStartNormals =
-                    RenderedLiveVolumeCoreNormals;
-                LiveVolumeCoreInterpolationStartVertexColors =
-                    RenderedLiveVolumeCoreVertexColors;
-                LiveVolumeCoreInterpolationStartFlowVelocity =
-                    RenderedLiveVolumeCoreFlowVelocity;
-                LiveVolumeCoreInterpolationStartWakeData =
-                    RenderedLiveVolumeCoreWakeData;
+                // Exponential chase advances the rendered arrays in place.
+                // Retargeting must leave that history intact; snapshots from
+                // the retired interval lerp are neither read nor needed.
                 LiveVolumeCoreInterpolationElapsedSeconds = 0.0f;
                 bLiveVolumeCoreInterpolationActive = true;
                 if (bRecentreCarryApplied)
@@ -9702,15 +9690,15 @@ void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
         !LiveVolumeCoreMesh ||
         !bMeshShapeValid ||
         LiveVolumeCoreVertices.Num() == 0 ||
-        LiveVolumeCoreInterpolationStartVertices.Num() !=
+        RenderedLiveVolumeCoreVertices.Num() !=
             LiveVolumeCoreVertices.Num() ||
-        LiveVolumeCoreInterpolationStartNormals.Num() !=
+        RenderedLiveVolumeCoreNormals.Num() !=
             LiveVolumeCoreNormals.Num() ||
-        LiveVolumeCoreInterpolationStartVertexColors.Num() !=
+        RenderedLiveVolumeCoreVertexColors.Num() !=
             LiveVolumeCoreVertexColors.Num() ||
-        LiveVolumeCoreInterpolationStartFlowVelocity.Num() !=
+        RenderedLiveVolumeCoreFlowVelocity.Num() !=
             FlowVelocityMetersPerSecond.Num() ||
-        LiveVolumeCoreInterpolationStartWakeData.Num() !=
+        RenderedLiveVolumeCoreWakeData.Num() !=
             BoatWakePresentationData.Num())
     {
         return;

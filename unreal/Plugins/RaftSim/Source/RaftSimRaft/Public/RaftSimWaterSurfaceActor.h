@@ -839,9 +839,6 @@ private:
     TArray<FVector> LiveVolumeCoreVertices;
     TArray<FVector> LiveVolumeCoreNormals;
     TArray<FLinearColor> LiveVolumeCoreVertexColors;
-    TArray<FVector> LiveVolumeCoreInterpolationStartVertices;
-    TArray<FVector> LiveVolumeCoreInterpolationStartNormals;
-    TArray<FLinearColor> LiveVolumeCoreInterpolationStartVertexColors;
     TArray<FVector> RenderedLiveVolumeCoreVertices;
     // Last refresh's live-and-visible, at-least-10-cm-deep source eligibility.
     TArray<uint8> SprayWetCarrierMask;
@@ -851,9 +848,7 @@ private:
      * They previously stepped to fresh values at the 15 Hz refresh; UV1
      * drives the ripple-normal advection phase, so those steps read as
      * specular/reflection jitter on the moving surface. */
-    TArray<FVector2D> LiveVolumeCoreInterpolationStartFlowVelocity;
     TArray<FVector2D> RenderedLiveVolumeCoreFlowVelocity;
-    TArray<FVector2D> LiveVolumeCoreInterpolationStartWakeData;
     TArray<FVector2D> RenderedLiveVolumeCoreWakeData;
     /** Slow per-vertex surface-height reference for the shoreline. The
      * visible waterline is the surface/terrain intersection: on a flat bank
