@@ -1,5 +1,13 @@
 # Remaining requested work
 
+September28 UTC physical-coordinate transport contribution implemented with
+original two-pole weights, direct exterior adjoints and explicit uncanceled
+geometry/port power.54 physics +6 provenance tests PASS; not a complete
+momentum/energy law or playable breaking improvement. One original-source
+replay84030/wrapper22524/Python33152 is LIVE; preserve loaded inputs and do not
+duplicate. v21 normal game unchanged, nonlinear gameplay OFF. See
+[construction, limits and owner](../reconstruction-review-2026-09-07/prescribed-physical-transport.md).
+
 September28 UTC selective-detail-edge v21 is rebuilt in normal South Fork;
 package/runtime/174m motion review COMPLETE, no live owner.10 rendered native
 tests and35 provenance/presentation tests PASS;14 frozen inputs unchanged.
