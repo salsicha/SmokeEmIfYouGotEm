@@ -1,7 +1,8 @@
 # Three-wet conservative envelope reference - September 28 UTC
 
-Status: exact geometry construction and capture-bound proof, **not native
-integration or playable delivery**. Normal v24 is unchanged. The known
+Status: exact geometry construction, capture-bound proof and a verified native
+candidate kernel; **not normal-renderer integration or playable delivery**.
+Normal v24 is unchanged. The known
 three-wet finite-chord deficit, water realism and 20 FPS gates remain open.
 
 ## Defect and an unsafe shortcut
@@ -104,3 +105,93 @@ No new engine build, package or game launched in this reference step. Free
 disk space remains about10.5GB, below the unchanged14GiB next-package gate;
 safe additional headroom is needed before staging. This does not block the
 native implementation work itself. South Fork remains first in the queue.
+
+## Native candidate and independent stored-coordinate proof
+
+`RaftSimThreeWetBankContour.h` now implements the candidate using outward-rounded
+binary64 intervals. It restores the calling thread's floating-point state;
+the tested x86 path disables FTZ/DAZ while proving geometry. Other architecture
+control implementations are explicitly unverified. The normal shoreline
+builder does NOT include/call this header yet. No game command-line opt-in was
+added, and no incomplete solver was enabled.
+
+The first native run compiled but correctly failed its new test. Degenerate
+segment triangles repeat one endpoint; all coefficients supported solely on
+that exact point need the corresponding polynomial identity. The missing
+identity was added, including positive/negative controls. Ten existing native
+regressions passed even in the first failed run. The failed v1 receipt remains.
+
+The v2 native suite passed, but the independent Fraction audit found that a
+rounded shared endpoint in the v22 case was microscopically dry. Its ideal
+rational position was valid; its stored binary64 position was not certified.
+No negative-depth tolerance was added. The candidate now rounds the endpoint
+toward water above an outward-rounded root bound, and uses the factored edge
+polynomial to prove the stored coordinate. This rounding rule MUST be shared
+by every neighboring cell when integrating with canonical production edges.
+
+The v3 and optimized v4 native suites both pass eleven tests with zero warnings,
+failures, not-run or in-process tests. The independent
+`physics/scripts/audit_native_three_wet_bank.py` reloads17-digit coordinate
+strings as exact binary64 rationals, verifies edge incidence, complete polygon
+area, every wet triangle, dry band triangles and the geometric band width. It
+reports ideal endpoint and actual stored-coordinate certification separately.
+All FOUR v3/v4 cases now pass strict stored-coordinate wet certification:
+
+| Case | Boundary segments | Wet triangles |
+| --- | ---: | ---: |
+| Original v22 bank | 67 | 69 |
+| Original v18 bank | 35 | 37 |
+| Symmetric high bank | 16 | 18 |
+| Thin positive donor | 33 | 35 |
+
+The auditor's twelve synthetic rejection tests pass1.37s, covering changed
+hashes, missing/duplicated triangles, bad indices, nonfinite vertices,
+inconsistent boundaries, shifted endpoints, oversized bands, reordered case
+identity and false playable-acceptance flags. These are audit tests, not extra
+captured-source cases. The earlier sixteen exact-reference tests remain valid.
+
+## Native cost and remaining integration work
+
+The v4 implementation carries already-computed endpoint roots down the
+subdivision stack and reuses invariant root bounds and coefficient identities.
+All exported boundary/inner/polygon coordinates and triangle indices are
+bit-identical to v3 in all four cases. Same-binary A/B/B/A controls also compare
+every node/bound and triangle index, not just a checksum or sample point.
+
+For the difficult v22 cell, actual root solves fall256 ->68. Eight samples per
+policy give median3.621750ms with reuse versus6.452300ms with repeated solves.
+These are native kernel times concurrent with the original source replay, NOT
+isolated game FPS or a river-wide cost acceptance. A few milliseconds PER BANK
+still makes construction frequency and real bank counts important. Do not
+enable this kernel wholesale and claim the performance problem solved.
+
+Current authoritative native receipts:
+
+- Recipe: `tmp/verify-three-wet-native-v4-20260928.ps1`.
+- Receipt: `tmp/three-wet-native-v4-20260928-process.json`.
+- Engine report/log: `tmp/three-wet-native-v4-20260928-native/index.json` and
+  `tmp/three-wet-native-v4-20260928-native.log`.
+- Editor build11.92s, terminal exit0; native exit0,11 tests passed. Completed
+  `2026-09-28T11:57:11.6791163Z`. All14 frozen input hashes independently match.
+- Native export: `tmp/three-wet-native-v4-20260928-geometry.json`, SHA256
+  `7763b4e6ded3ffdbc56c104569b9038fe7cd2c8b6ecdf34b582095a376edb404`.
+- Exact reload: `tmp/three-wet-native-v4-20260928-exact-audit.json`, SHA256
+  `3e707b4641977da2e239dcfa112151bf780806076c86873b2297d9bafef36e3a`.
+- Rejection tests: `tmp/native-three-wet-audit-v1-20260928.xml`.
+
+Next integrate canonical shared-edge wet rounding and account for world-space
+transform rounding, then variable bank metadata, transported attributes/crest
+weights and topology-cache identity. Changes to certified ears, not merely
+node count or winding, must invalidate cached connectivity. Measure real
+construction frequency/cost before normal enablement; then package and verify
+actual normal launch, motion, contact, shoreline continuity and performance.
+Native Entry-map tests are NOT actual river views or animation validation.
+
+The original physical source replay33152 completed terminal exit0 at
+2026-09-28T12:03:19.7417947Z after checking all11 supported records. Its report
+is130,803,564bytes; unsupported2/7 remain outside that tested set. Its independent
+terminal/hash/ledger reload16732 is live (session56370); do not duplicate it.
+`tmp/verify-prescribed-physical-reload-20260928.py` refuses to run until
+the original receipt confirms terminal success, then checks all13 records,
+unchanged unsupported branches, provenance and exact saved kinetic ledgers
+without rerunning the expensive source solves. Normal v24 remains unchanged.

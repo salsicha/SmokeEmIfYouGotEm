@@ -1,5 +1,18 @@
 # Remaining requested work
 
+September28 UTC three-wet native candidate now passes11 rendered engine tests
+and independent exact checks of ALL stored triangles in four cases. A real
+endpoint rounding defect was caught and repaired without a depth tolerance.
+Same-binary root reuse preserves every coordinate/index and reduces solves
+256 ->68 (median3.62ms vs6.45ms per difficult bank, NOT game FPS). Twelve audit
+rejection tests pass. All14 native frozen hashes unchanged. The normal renderer
+does NOT yet use this kernel: next integrate shared-edge/world rounding,
+variable metadata/attributes and ear-aware cache identity, measuring real cost
+before enablement. Normal v24 remains unchanged and South Fork unaccepted.
+Original source replay33152 completed exit0 at12:03:19UTC. Its independent
+provenance/ledger reload16732 is live; isolated game timing awaits that closure.
+See [native proof, cost and integration limits](../reconstruction-review-2026-09-07/three-wet-bank-envelope.md#native-candidate-and-independent-stored-coordinate-proof).
+
 September28 UTC remaining three-wet finite-chord repair now has an exact
 conservative envelope reference:16 tests PASS and original v22 capture binding
 PASS, seven frozen hashes unchanged. Whole wet/dry triangle certificates bound
