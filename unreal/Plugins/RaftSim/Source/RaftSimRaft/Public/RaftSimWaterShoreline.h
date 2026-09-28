@@ -15,6 +15,13 @@ struct FBankTriangle
     uint32 A, B, C;
     int8 Orientation;
 };
+struct FCurvedBank
+{
+    static constexpr int32 Segments=16;
+    int32 Source[4],Dry,StartNode,EndNode,FirstNode;
+    double Bed[4],Depth[4];
+    FVector2D Points[Segments-1];
+};
 // Clip the Cartesian lattice in two dimensions. Original vertices plus one
 // shared node per horizontal/vertical edge keep storage below 3N;
 // adjacent cells cannot independently round their shared waterline. Dry islands
@@ -24,7 +31,8 @@ RAFTSIMRAFT_API bool Build(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
     TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
     TArray<FProcMeshVertex>& OutVertices, TArray<uint32>& OutIndices,
     TArray<int32>* OutCellOffsets = nullptr, TArray<FEdge>* OutEdges = nullptr,
-    bool bCompactEdges = false, bool bOppositeDryFan = false);
+    bool bCompactEdges = false, bool bOppositeDryFan = false,
+    bool bCurvedHighBanks = false, TArray<FCurvedBank>* OutCurvedBanks = nullptr);
 RAFTSIMRAFT_API bool Sample(const FVector2D& PositionXY, int32 Begin, int32 End,
     TConstArrayView<FProcMeshVertex> Vertices, TConstArrayView<uint32> Indices, FVector& Position,
     FIntVector* Corners=nullptr,FVector* Weights=nullptr);
@@ -41,19 +49,24 @@ public:
         TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
         TArray<FProcMeshVertex>& Vertices, TArray<uint32>& Indices,
         TArray<int32>& CellOffsets, bool& bTopologyRebuilt, bool bCompactEdges = false,
-        bool bOppositeDryFan = false);
+        bool bOppositeDryFan = false, bool bCurvedHighBanks = false);
     void Reset();
     uint64 GetRebuildCount() const { return RebuildCount; }
     uint64 GetReuseCount() const { return ReuseCount; }
     const TArray<FEdge>& GetEdges() const { return Edges; }
+    const TArray<FCurvedBank>& GetCurvedBanks() const { return CurvedBanks; }
 private:
     int32 CachedNx=0, CachedNy=0, CachedIndexCount=0;
     bool bCachedCompactEdges=false;
     bool bCachedOppositeDryFan=false;
+    bool bCachedCurvedHighBanks=false;
     TArray<FVector2D> XY;
     TArray<uint8> WetMask, AvailableMask;
     TArray<FEdge> Edges;
     TArray<FBankTriangle> BankTriangles;
+    TArray<FCurvedBank> CurvedBanks;
+    TArray<uint8> CurveEligibility;
+    TArray<int32> CurveCandidates;
     uint64 RebuildCount=0, ReuseCount=0;
 };
 }

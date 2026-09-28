@@ -1,5 +1,19 @@
 # Remaining requested work
 
+September28 UTC curved high-bank v19 normal package and173m motion checks
+COMPLETE. Six rendered native tests and35 source/provenance checks pass;
+retained false-wet fixture is excluded without solver/dry-support changes.
+Menu/8310/11520 p95=51.30/84.49/81.42ms: ALL FAIL20FPS. Flat foam and weak
+breaking persist; a different positive-film raw-dry contact probe remains.
+v20 preserves16 segments while optimizing radial roots/candidate eligibility;
+editor, six native tests, package and174m motion review COMPLETE, no live owner.
+Menu p9542.73ms PASS;8310/11520 p9586.85/84.01ms FAIL. Topology average falls
+4.42->2.24ms at8310, but whole rapid timing does not improve. Ten inputs unchanged;
+positive-film dry probe, flat foam/weak breaking and finite-segment residuals
+remain. Next reduce actual rapid/crest cost without weakened physics/geometry;
+this candidate is not accepted or a reason to advance to Colorado. See
+[candidate, failures and verification owner](../reconstruction-review-2026-09-07/curved-high-bank-shoreline.md).
+
 September28 UTC dry-carrier provenance capture COMPLETE, no live owner.
 Rebuilt diagnostic v18 reproduces the v17 point: submitted water33.04cm above
 registered ground but18.07cm BELOW hydraulic bed, raw depth0. Same-call corner

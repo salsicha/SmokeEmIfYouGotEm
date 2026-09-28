@@ -418,7 +418,7 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
         const bool bReviewedSouthFork=GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
         const bool bOppositeDryFan=!bOriginalBankFan && (bReviewedSouthFork || bForceOppositeDryFan);
         if (!TopologyCache.Update(Nx,Ny,MoveTemp(Source),Wet,Available,DepthM,BedM,
-            BaseVertices,BaseIndices,BaseOffsets,bTopologyRebuilt,Crests!=nullptr,bOppositeDryFan)) return false;
+            BaseVertices,BaseIndices,BaseOffsets,bTopologyRebuilt,Crests!=nullptr,bOppositeDryFan,bReviewedSouthFork)) return false;
     }
     if (Crests)
     {
@@ -427,7 +427,7 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
         {
             CSV_SCOPED_TIMING_STAT(RaftSimShoreline,CrestInput);
             CrestWeights.Update(BaseVertices.Num(),Crests->SourceCrestCm,
-                Crests->SourceShoreWeight,TopologyCache.GetEdges());
+                Crests->SourceShoreWeight,TopologyCache.GetEdges(),TopologyCache.GetCurvedBanks());
         }
         TArray<uint32> NewIndices;
         static const bool ForceCompactSource=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCompactCrestSource"));

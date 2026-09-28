@@ -8,7 +8,8 @@ struct FRaftSimShorelineCrestWeights
     TArray<float> Coarse, Shore;
     void Update(int32 VertexCount, TConstArrayView<float> SourceCoarse,
         TConstArrayView<float> SourceShore,
-        TConstArrayView<RaftSimWaterShoreline::FEdge> Edges)
+        TConstArrayView<RaftSimWaterShoreline::FEdge> Edges,
+        TConstArrayView<RaftSimWaterShoreline::FCurvedBank> Banks={})
     {
         const int32 Count=SourceCoarse.Num();
         check(SourceShore.Num()==Count && VertexCount>=Count);
@@ -26,5 +27,11 @@ struct FRaftSimShorelineCrestWeights
         }
         for(const auto& E:Edges)
         { Coarse[E.Node]=Coarse[E.WetVertex]; Shore[E.Node]=Shore[E.WetVertex]; }
+        for(const auto& B:Banks)for(int32 I=1;I<B.Segments;++I)
+        {
+            const float T=float(I)/B.Segments;
+            Coarse[B.FirstNode+I-1]=FMath::Lerp(Coarse[B.StartNode],Coarse[B.EndNode],T);
+            Shore[B.FirstNode+I-1]=FMath::Lerp(Shore[B.StartNode],Shore[B.EndNode],T);
+        }
     }
 };
