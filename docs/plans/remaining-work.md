@@ -1,5 +1,21 @@
 # Remaining requested work
 
+September28 UTC v25 normal-path package and runtime validation are COMPLETE:
+Boot/menu launch,174.053m rapid motion, contact and18 emitter anchors pass their
+bounded checks;22 frozen inputs unchanged. Actual video2481frames/82.667s was
+decoded and6/20/80s views inspected. This delivers the shoreline CPU optimization,
+NOT new breaking-water geometry or full visual/collision/animation acceptance.
+Isolated1200-frame runs: menu p9546.1802ms/0 hitches PASS the20FPS timing gate;
+8310 p9566.6051ms/6 hitches FAIL;11520 p95102.1761ms/74 hitches FAIL. At11520
+bridge backlog grows15.3877s to16.7611s; its tail latency is worse than v24's
+sample. No general performance acceptance or causal cross-run speedup claim.
+All package/runtime/decode/profile owners terminal0; no live workload remains.
+Next reduce measured mesh/crest publication cost without geometry/time loss,
+then qualify the three-wet shared-edge/world-rounding repair and physical wave
+evolution. Preserve v24 and v25 evidence; no solver activation, no push, no move
+to Colorado. See [v25 actual delivery and failed gates](../reconstruction-review-2026-09-07/prepared-bank-refresh.md#v25-terminal-playable-validation).
+Older LIVE/pending entries below are historical and superseded by this receipt.
+
 September28 UTC duplicate bank work now has a qualified normal-path candidate:
 12 native tests PASS and128 exact live serial/candidate pairs; whole shoreline
 update cost improves in both orders at both captured locations. Independent

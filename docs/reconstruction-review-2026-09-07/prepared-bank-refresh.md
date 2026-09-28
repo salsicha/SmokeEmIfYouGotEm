@@ -102,3 +102,77 @@ edit frozen source/assets. On terminal0 independently verify receipt,22 hashes
 and staged closure. Then run `tmp/validate-prepared-bank-v25-motion-20260928.ps1`,
 decode and inspect the actual video/contact evidence, and measure isolated
 menu/8310/11520 frames AND bridge-clock debt. No source replay remains live.
+
+## v25 terminal playable validation
+
+The preceding LIVE/pending state is superseded. The same package owner completed
+exit0 at12:51:44.9495493Z, BuildCookRun452.62s. Staged closure verifies2405 files,
+917995570bytes, with no external-source fallback. All22 frozen source/asset
+hashes were independently rechecked unchanged. Normal staged executable SHA256:
+`422cd9748a285ea29cbfc94586c1b79db6945ebb24eb4c9043271915fe87ef94`.
+
+`tmp/parallel-bank-v25-motion-20260928.json` completed at12:54:11.3545565Z,
+both game processes exit0 and zero runtime Error/Fatal entries. Default Boot ->
+real main menu -> FullReach ->600 post-travel frames is verified in order.
+The separate normal-settings8310 rapid placement recorded80 motion samples from
+8313.254 to8487.307m (174.053m). It is not a claim that a normal menu spawns there.
+
+The contact sample has1859 wet probes, maximum support/carrier error
+0.000047669091372881667cm,155 raw-dry probes all counted ground-occluded,
+zero unavailable or ground-occluded-wet probes. This stride-based sample does
+not prove every historical bank location, collision clearance or full reach.
+All18 sampled/enabled emitter centres pass6/3/3cm anchor clearances; this is
+not whole-particle landing or breaking-wave acceptance.
+
+Original video `tmp/south-fork-playable-v25-20260928/Windows/SmokeEmIfYouGotEm/Saved/VideoCaptures/RaftSim_20260928-055245.mp4`
+has SHA256 `0c6cc61ae2b8b369ff306d6deb57324b22a625f80ddaec646810db1fd311dbe2`.
+Full decode:2481 frames,82.666667s,1280x720,41 exact adjacent duplicates;
+all seven requested review frames are present in `tmp/sf-v25-motion-decoded-20260928`.
+The6/20/80s engine views show a moving raft from the rapid to quieter water,
+but broad flat foam, weak breaking, coarse boulders/banks and crew/paddle fit
+remain unacceptable. This optimization intentionally preserves existing shapes;
+it is delivered CPU work, not a new visible hydraulic reconstruction. Encoded
+video rate never establishes game FPS, and sampled stills do not clear animation.
+
+After every build/game/decode/source workload ended, three isolated1200-frame
+same-binary runs used normal graphics/solver settings;1140 rows30..1169 were
+audited in each. Review stations are diagnostic placements, not menu launches.
+All exit0, runtime errors0, binary unchanged. No quality/legacy overrides.
+
+| Launch | Mean ms | p95 ms | Maximum ms | Frames >100ms |20FPS timing gate|
+| --- | ---: | ---: | ---: | ---: | --- |
+|Boot/menu|38.6400|46.1802|51.7660|0|PASS for this sample|
+|8310|45.1303|66.6051|183.5665|6|FAIL|
+|11520|80.1968|102.1761|195.4715|74|FAIL|
+
+Receipts: `unreal/Saved/RaftSimValidation/sf-v25-isolated-{menu,8310,11520}-20260928-frame-audit.json`.
+Strict independent parser/scope/clock reports:
+`tmp/sf-v25-isolated-{menu,8310,11520}-20260928-scopes-and-clock.json`.
+Actual logs confirm `csv.UseLegacyFrameTime=false`; offset1 aligns preceding
+logical-frame timing with scope work. No measured duplicate columns are waived.
+CSV SHA256 respectively:
+
+- menu: `bfac92318f2a4e30a866f60a530b821e4e3d7381e03d6acf405ce834962bf9aa`
+-8310: `12531bf7954d75e4caeb51ae1ed97a49d0070bc1acb821aad4b3d17562b6913c`
+-11520: `1f2cd362b5ff7b3ce9143bfcaec51696551fb42c686e29e4c3d0b9d4ce11400c`
+
+Menu bridge backlog is0.009097->0.012405s, max0.016659s. At8310 it falls
+0.902600->0.012258s, max0.937800s. These bounded observations are not sustained
+simulation-capacity acceptance. At11520 backlog grows1.3734->16.7611s
+(+15.3877s), max16.8551s, with all1140 rows hitting four fixed ticks.
+Requested clock advances91.3210s while committed clock advances75.9333s.
+Do not hide this shortfall by dropping elapsed time, increasing dt or weakening
+the unchanged50ms p95/zero >100ms gates. All capacity-acceptance flags stay false.
+
+At11520 mean GameThread77.9160ms versus GPU23.4117ms; surface Tick52.5313ms
+contains publication31.5919ms, SetMesh30.1994ms, crest Update20.2595ms,
+Selection13.0492ms and topology8.2997ms. StepWater15.0310ms is separate.
+Nested scopes must NOT be summed. These remain CPU publication/crest targets.
+The11520 tail worsens versus v24 (p9592.3504ms/8 hitches); separate trajectories
+and captures do not establish causation or a controlled overall speedup.
+The exact paired component proof does not override this failed playable gate.
+
+No package, runtime, decoder, profile or source owner remains live. Preserve
+both packages and evidence. South Fork stays open; three-wet contour integration,
+coherent physical breaking/recirculation, complete collision/animation and
+sustained timing/clock validation remain. No known-broken solver enabled; no push.
