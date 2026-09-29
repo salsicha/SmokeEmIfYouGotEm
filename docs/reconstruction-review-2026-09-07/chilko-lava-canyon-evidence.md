@@ -238,6 +238,16 @@ times:
   1.7 m Landscape and the procedural shoreline layers, not from imagery; the
   bed colour under the water is invented. The water reads deep blue, not the
   Chilko's glacial turquoise (appearance follow-up).
+  - **Measured target (2026-09-29):** `measure_chilko_water_colour.py`
+    samples Sentinel-2 water on the route centreline (whitewater, ponds and
+    forest-mixed pixels excluded). On all four image dates (70-167 m³/s) the
+    water is green-dominant: R/G 0.61-0.67 and B/G 0.82-0.89. The 93 m³/s
+    image reads R, G, B 0.028, 0.046, 0.038 along the route. Report:
+    `evidence/sentinel2_water_colour.json`.
+  - The live-water optics are blue-dominant instead: the shallow colour has
+    R/G 0.16 and B/G 1.4, and absorption is lowest in blue. Changing them to
+    the measured ratios is the fix; it has not yet been made or checked
+    against a rendered capture.
 - **Tree positions, individual heights and crowns are inferred** within the
   inventory's polygons; the VRI itself is photo-interpreted (reference year
   2013).
