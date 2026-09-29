@@ -1,4 +1,5 @@
 #include "RaftSimStoredBankContour.h"
+#include "RaftSimStoredBankSearchReference.h"
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimWaterRenderFrame.h"
 #include "Misc/AutomationTest.h"
@@ -92,6 +93,8 @@ bool FRaftSimStoredBankReplayTest::RunTest(const FString&)
         // like a successful stage0 result after the bounded builder fails.
         const bool BoundedGood=RaftSimStoredBankContour::Build(C,Storage,Proof);
         const bool FullGood=BuildStored(C,Storage.Width,Full,Storage,Storage.RootWidth,true,false);
+        if(!TestTrue(TEXT("captured neighbor reuse preserves exact geometry and proof counters"),
+            RaftSimStoredBankSearchReference::Equivalent(C,Storage,Proof,Full)))continue;
         if(!BoundedGood || !FullGood)
         {
             AddError(FString::Printf(TEXT("CapturedBank frame=%d source=%d short_stage=%d full_stage=%d A=(%.17g,%.17g) B=(%.17g,%.17g)"),

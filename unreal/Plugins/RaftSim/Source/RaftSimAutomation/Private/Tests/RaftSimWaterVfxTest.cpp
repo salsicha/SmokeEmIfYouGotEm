@@ -111,6 +111,52 @@ bool FRaftSimWaterVfxClassifierTest::RunTest(const FString&)
     return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimRaftSprayOwnershipTest,
+    "RaftSim.M4.RaftSpraySourceOwnership",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimRaftSprayOwnershipTest::RunTest(const FString&)
+{
+    FRaftSimWaterSample Water;
+    Water.bWet=true;Water.DepthMeters=.75f;
+    Water.VelocityMetersPerSecond=FVector(6.8f,.4f,0.f);
+    const auto CoMoving=ARaftSimWaterVfxActor::EvaluatePresentation(
+        Water,Water.VelocityMetersPerSecond,0,0.f,true,true);
+    TestEqual(TEXT("co-moving raft is not another river spray source"),CoMoving.Spray,0.f);
+    TestEqual(TEXT("ambient river mist is not emitted from raft centre"),CoMoving.Mist,0.f);
+    TestEqual(TEXT("no contact/slip means no raft droplets"),CoMoving.Droplets,0.f);
+    TestEqual(TEXT("no contact/slip means no impact sheet"),CoMoving.ImpactSheet,0.f);
+    TestEqual(TEXT("underwater state remains independent"),CoMoving.Underwater,1.f);
+    const auto Legacy=ARaftSimWaterVfxActor::EvaluatePresentation(
+        Water,Water.VelocityMetersPerSecond,0,0.f,false);
+    TestTrue(TEXT("regression exercises formerly active ambient raft emission"),
+        Legacy.Spray>.7f && Legacy.Mist>.8f && Legacy.Droplets>.5f);
+    const auto Contact=ARaftSimWaterVfxActor::EvaluatePresentation(
+        Water,FVector(2,0,0),4,.16f,false,true);
+    const auto OriginalContact=ARaftSimWaterVfxActor::EvaluatePresentation(
+        Water,FVector(2,0,0),4,.16f,false,false);
+    TestEqual(TEXT("full contact spray retained"),Contact.Spray,OriginalContact.Spray);
+    TestEqual(TEXT("full contact mist retained"),Contact.Mist,OriginalContact.Mist);
+    TestEqual(TEXT("full contact droplets retained"),Contact.Droplets,OriginalContact.Droplets);
+    TestEqual(TEXT("impact sheet retained"),Contact.ImpactSheet,OriginalContact.ImpactSheet);
+    float PreviousSpray=0.f;
+    for(float Slip:{.01f,.1f,1.f,3.f,6.5f})
+    {
+        const auto Impact=ARaftSimWaterVfxActor::EvaluatePresentation(
+            Water,Water.VelocityMetersPerSecond-FVector(Slip,0,0),0,0.f,false,true);
+        TestTrue(TEXT("relative impacts still produce bounded increasing spray"),
+            Impact.Spray>PreviousSpray && Impact.Spray<=1.f && Impact.Droplets>0.f);
+        PreviousSpray=Impact.Spray;
+    }
+    Water.bWet=false;
+    const auto Dry=ARaftSimWaterVfxActor::EvaluatePresentation(Water,FVector::ZeroVector,8,.22f,true,true);
+    TestEqual(TEXT("dry ground cannot emit spray"),Dry.Spray,0.f);
+    TestEqual(TEXT("dry ground cannot emit mist"),Dry.Mist,0.f);
+    TestEqual(TEXT("dry ground cannot emit droplets"),Dry.Droplets,0.f);
+    TestEqual(TEXT("dry probe preserves underwater flag"),Dry.Underwater,1.f);
+    return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FRaftSimWaterVfxRuntimePoolTest,
     "RaftSim.M4.WaterVfxRuntimePoolSpawnsWithRaft",

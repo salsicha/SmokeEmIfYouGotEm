@@ -60,7 +60,8 @@ public:
         const FVector& RaftVelocityMps,
         int32 ContactCount,
         float MaximumIndentationM,
-        bool bCameraUnderwater);
+        bool bCameraUnderwater,
+        bool bRiverOwnsAmbientAeration = false);
 
     /** Ballistic roller fragments rise while travelling against the current,
      * matching the upstream return on a hydraulic jump. */
@@ -372,4 +373,5 @@ private:
     bool bDepthBearingContactWaterV10Review = false;
     bool bProductionNiagaraReady = false;
     bool bLoggedSouthForkSprayReview = false;
+    bool bLoggedRaftSprayOwnership = false;
 };

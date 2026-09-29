@@ -46,6 +46,7 @@ void FRaftSimShorelineCrests::Reset()
 {
     ProfilePrefetch.Reset();
     CachedXY.Reset(); CachedIndices.Reset(); CachedProfile.Reset();
+    RebuildXY.Reset(); RebuildExpandedXY.Reset(); RebuildTriangles.Reset();
     CachedCoarse.Reset(); CachedShore.Reset(); CorrectionHistory.Reset();
     ParallelCorrectionHistory.Reset(); ParallelHistoryRendered.Reset();
     CandidateCorrectionHistory.Reset();
@@ -118,9 +119,12 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         const bool Prefetched=ProfilePrefetch.AdoptIfReady(Input.ProfileKey,Refinement,
             bPrefetchAudit ? &Input.HeightAtWorldXYCm : nullptr);
         CSV_CUSTOM_STAT(RaftSimCrests,PrefetchedProfiles,int32(Prefetched),ECsvCustomStatOp::Accumulate);
-        TArray<FVector2D> XY; XY.Reserve(Source.Num());
+        TArray<FVector2D> LocalXY; TArray<int32> LocalTriangles;
+        auto& XY=bRetainRebuildScratch ? RebuildXY : LocalXY;
+        auto& Triangles=bRetainRebuildScratch ? RebuildTriangles : LocalTriangles;
+        XY.Reset(); XY.Reserve(Source.Num());
         for (const auto& V:Source) XY.Emplace(V.Position.X,V.Position.Y);
-        TArray<int32> Triangles; Triangles.Reserve(SourceIndices.Num());
+        Triangles.Reset(); Triangles.Reserve(SourceIndices.Num());
         for (uint32 I:SourceIndices) Triangles.Add(int32(I));
         // Half-centimeter selection leaves margin for the unchanged 2 cm
         // independent interior-sampling gate; three levels reach 12.5 cm.
@@ -184,7 +188,9 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         }
         const double Selected=bTiming ? FPlatformTime::Seconds() : 0.;
         SelectionMs=(Selected-Started)*1000.;
-        TArray<FVector2D> ExpandedXY; Refinement.Expand(XY,ExpandedXY);
+        TArray<FVector2D> LocalExpandedXY;
+        auto& ExpandedXY=bRetainRebuildScratch ? RebuildExpandedXY : LocalExpandedXY;
+        Refinement.Expand(XY,ExpandedXY);
         if (PreviousTopologyBuilds!=Refinement.TopologyBuildCount)
         {
             // Boundary membership is combinatorial too. Reusing ALL levels
@@ -205,7 +211,9 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
             const int32 Node=Source.Num()+I;
             if (!BoundaryMidpoints[I])FineProfileCm[Node]=Input.HeightAtWorldXYCm(ExpandedXY[Node]);
         });
-        CachedXY=MoveTemp(XY); CachedIndices=SourceIndices; CachedProfile=Input.ProfileKey;
+        if(bRetainRebuildScratch)Swap(CachedXY,XY);
+        else CachedXY=MoveTemp(XY);
+        CachedIndices=SourceIndices; CachedProfile=Input.ProfileKey;
         CachedDetailWindowCm=Input.DetailWindowCm;CachedDetailSpanCm=Input.DetailSpanCm;
         RaftSimParallelCrestEmissionAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestLookupAudit::Run(CachedXY,Triangles,Input);

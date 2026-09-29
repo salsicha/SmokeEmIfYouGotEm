@@ -1187,7 +1187,8 @@ FRaftSimWaterVfxState ARaftSimWaterVfxActor::EvaluatePresentation(
     const FVector& RaftVelocityMps,
     int32 ContactCount,
     float MaximumIndentationM,
-    bool bCameraUnderwater)
+    bool bCameraUnderwater,
+    bool bRiverOwnsAmbientAeration)
 {
     FRaftSimWaterVfxState Result;
     if (!Sample.bWet)
@@ -1199,13 +1200,20 @@ FRaftSimWaterVfxState ARaftSimWaterVfxActor::EvaluatePresentation(
     const float DepthM = FMath::Max(Sample.DepthMeters, 0.05f);
     const float WaterSpeedMps = Sample.VelocityMetersPerSecond.Size2D();
     const float Froude = WaterSpeedMps / FMath::Sqrt(GravityMps2 * DepthM);
-    const float HydraulicAeration = FMath::Clamp((Froude - 0.72f) / 1.05f, 0.0f, 1.0f);
+    const float AmbientAeration = FMath::Clamp((Froude - 0.72f) / 1.05f, 0.0f, 1.0f);
     const float RelativeImpact = FMath::Clamp(
         (Sample.VelocityMetersPerSecond - RaftVelocityMps).Size() / 6.5f,
         0.0f, 1.0f);
     const float Contact = FMath::Clamp(
         static_cast<float>(ContactCount) / 5.0f + MaximumIndentationM / 0.22f,
         0.0f, 1.0f);
+
+    // A co-moving raft is not a second hydraulic jump. Where the river's
+    // persistent breaking sites own ambient spray, aeration can amplify a
+    // local impact but cannot create a source at the raft centre by itself.
+    // Preserve full-contact response and the direct relative-impact terms.
+    const float HydraulicAeration = AmbientAeration * (bRiverOwnsAmbientAeration
+        ? FMath::Clamp(RelativeImpact + Contact, 0.0f, 1.0f) : 1.0f);
 
     Result.Spray = FMath::Clamp(
         HydraulicAeration * 0.72f + RelativeImpact * 0.42f + Contact * 0.66f,
@@ -3232,12 +3240,16 @@ void ARaftSimWaterVfxActor::RefreshVfx(float DeltaSeconds)
         return;
     }
     const bool bCameraUnderwater = SampleCameraUnderwater();
+    const bool bRiverOwnsAmbientAeration = GetWorld() && bProductionNiagaraReady &&
+        BreakingSurface.IsValid() && IsSouthForkSprayReviewMap(GetWorld()->GetMapName()) &&
+        CVarSouthForkCrestSpray.GetValueOnGameThread() != 0;
     LastPresentationState = EvaluatePresentation(
         Sample,
         TrackedRaft->GetRaftVelocity(),
         TrackedRaft->GetActiveWaterContactCount(),
         TrackedRaft->GetMaximumWaterContactIndentationM(),
-        bCameraUnderwater);
+        bCameraUnderwater,
+        bRiverOwnsAmbientAeration);
     UnderwaterPostProcess->BlendWeight = FMath::FInterpTo(
         UnderwaterPostProcess->BlendWeight,
         LastPresentationState.Underwater,
@@ -3323,6 +3335,22 @@ void ARaftSimWaterVfxActor::RefreshVfx(float DeltaSeconds)
         SurfaceZCm);
     const FVector ContactPatchCenter = SurfaceCenter +
         ContactOutward * OutwardPresentationOffsetCm;
+#if !UE_BUILD_SHIPPING
+    if (!bLoggedRaftSprayOwnership && GetWorld() && GetWorld()->GetTimeSeconds() >= 10.f &&
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimRaftSprayAudit")))
+    {
+        bLoggedRaftSprayOwnership = true;
+        const auto Legacy = EvaluatePresentation(Sample, TrackedRaft->GetRaftVelocity(),
+            TrackedRaft->GetActiveWaterContactCount(),TrackedRaft->GetMaximumWaterContactIndentationM(),
+            bCameraUnderwater,false);
+        UE_LOG(LogTemp,Display,TEXT("RaftSprayOwnershipAudit world_s=%.6f river_owned=%d contact=%d sampled=%d relative_speed_mps=%.6f old_spray=%.6f new_spray=%.6f old_mist=%.6f new_mist=%.6f old_droplets=%.6f new_droplets=%.6f raft_x_cm=%.6f raft_y_cm=%.6f source_x_cm=%.6f source_y_cm=%.6f rapid_aerosol=%d rapid_roller=%d rapid_crest=%d"),
+            GetWorld()->GetTimeSeconds(),bRiverOwnsAmbientAeration,bHasDominantContact,bContactSampled,
+            (Sample.VelocityMetersPerSecond-TrackedRaft->GetRaftVelocity()).Size(),
+            Legacy.Spray,LastPresentationState.Spray,Legacy.Mist,LastPresentationState.Mist,
+            Legacy.Droplets,LastPresentationState.Droplets,RaftLocationCm.X,RaftLocationCm.Y,
+            SurfaceCenter.X,SurfaceCenter.Y,ActiveRapidNiagaraCount,ActiveRapidRollerNiagaraCount,ActiveRapidCrestSprayNiagaraCount);
+    }
+#endif
     FVector ImpactDirection =
         (ContactOutward * 0.28f - FlowDirection * 0.72f).GetSafeNormal2D();
     if (ImpactDirection.IsNearlyZero())

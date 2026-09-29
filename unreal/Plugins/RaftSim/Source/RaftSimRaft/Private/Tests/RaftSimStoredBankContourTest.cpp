@@ -1,4 +1,5 @@
 #include "RaftSimStoredBankContour.h"
+#include "RaftSimStoredBankSearchReference.h"
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimWaterRenderFrame.h"
 #include "RaftSimShorelineCrestWeights.h"
@@ -95,6 +96,8 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
                 Certificate(CaseCurve,P,Q,Q,true,Diagnostic),Certificate(CaseCurve,O,A,B,false,Diagnostic),CaseCurve.Value(P).Lo,CaseCurve.Value(Q).Lo));
         }
         if(!TestTrue(TEXT("full-search reference retains complete certificate"),ReferenceGood))return false;
+        if(!TestTrue(TEXT("neighbor reuse preserves exact geometry, bounds, triangles and proof counters"),
+            RaftSimStoredBankSearchReference::Equivalent(CaseCurve,Storage,R,Reference)))return false;
         TestTrue(TEXT("bounded proposal reduces radial root evaluations"),R.Stats.RootEvaluations<Reference.Stats.RootEvaluations);
         TArray<double> BoundedTimes,ReferenceTimes;
         for(int32 Repeat=0;Repeat<3;++Repeat)for(bool Bounded:{true,false,false,true})

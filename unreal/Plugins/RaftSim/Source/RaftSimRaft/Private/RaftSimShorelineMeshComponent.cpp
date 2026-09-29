@@ -517,7 +517,41 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
             return State.Update(BaseVertices,BaseIndices,BaseOffsets,Coarse,Shore,*Crests,
                 Out,OutIndices,Offsets,SelectiveDetail);
         };
-        if(AuditSource)
+        static const bool AuditScratch=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrestRebuildScratchAudit"));
+        static const bool RetainScratch=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRetainCrestRebuildScratch"));
+        CrestRefinement.bRetainRebuildScratch=RetainScratch;
+        if(AuditScratch && !AuditSource)
+        {
+            // Both histories see every publication, including startup, with
+            // identical source compaction and immutable profile inputs.
+            AuditCrestRefinement.bRetainRebuildScratch=!RetainScratch;
+            double Times[2]={};bool Valid=true;
+            const auto Run=[&](bool Retain)
+            {
+                const bool Selected=Retain==RetainScratch;
+                const double Begin=FPlatformTime::Seconds();
+                Valid &= UpdateCrests(CompactSource,Selected ? CrestRefinement : AuditCrestRefinement,
+                    Selected ? WaterVertices : AuditCrestVertices,
+                    Selected ? NewIndices : AuditCrestIndices,Selected ? CellOffsets : AuditCrestOffsets);
+                Times[int32(Retain)]=(FPlatformTime::Seconds()-Begin)*1000.;
+            };
+            const bool CandidateFirst=(GFrameCounter/2)%2!=0;
+            Run(CandidateFirst);Run(!CandidateFirst);
+            bool Exact=Valid && NewIndices==AuditCrestIndices && CellOffsets==AuditCrestOffsets &&
+                WaterVertices.Num()==AuditCrestVertices.Num() &&
+                CrestRefinement.GetBuildCount()==AuditCrestRefinement.GetBuildCount() &&
+                CrestRefinement.GetTargetCorrectionsCm()==AuditCrestRefinement.GetTargetCorrectionsCm() &&
+                CrestRefinement.GetRenderedCorrectionsCm()==AuditCrestRefinement.GetRenderedCorrectionsCm() &&
+                CrestRefinement.GetExpandedCoarseCrestCm()==AuditCrestRefinement.GetExpandedCoarseCrestCm() &&
+                CrestRefinement.GetExpandedShore()==AuditCrestRefinement.GetExpandedShore();
+            for(int32 I=0;Exact && I<WaterVertices.Num();++I)
+                Exact=FRaftSimCrestMidpointExpansion::EqualAttributes(WaterVertices[I],AuditCrestVertices[I]);
+            if(!Exact){UE_LOG(LogTemp,Error,TEXT("CrestRebuildScratch mismatch frame=%llu"),GFrameCounter);return false;}
+            if(GFrameCounter>=120 && GFrameCounter<184)
+                UE_LOG(LogTemp,Display,TEXT("CrestRebuildScratchPair frame=%llu exact=%d candidate_first=%d vertices=%d reference_ms=%.9f candidate_ms=%.9f"),
+                    GFrameCounter,int32(Exact),int32(CandidateFirst),WaterVertices.Num(),Times[0],Times[1]);
+        }
+        else if(AuditSource)
         {
             double Times[2]={};bool Valid=true;
             const auto Run=[&](bool Compact)

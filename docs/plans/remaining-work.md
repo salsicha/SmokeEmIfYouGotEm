@@ -1,5 +1,122 @@
 # Remaining requested work
 
+LATEST September29 scratch-capacity trial REJECTED: editor build229.50s,
+3/3 native tests and65 exact actual-input pairs; savings only0.037–0.066ms
+on24.5–27.6ms crest updates. No normal-play/package improvement claimed.
+All owned trial processes terminal0. Three source diffs remain DISABLED and
+their removal is blocked by patch-engine write failure despite successful
+approved Windows write-handle checks. Exact restoration patch is prepared;
+new test is archived out of active source. Do not rerun this tiny optimization
+or claim it was removed. Read crest-rebuild-scratch-rejection.md in the review
+folder for the exact paths, evidence and fresh-session recovery step. v28 intact.
+
+LATEST September29 v28 NORMAL standalone spray improvement VERIFIED; owned
+sessions2433(motion),48402(decode),78359(profile suite) all terminal0.
+Boot/menu launch passed;80 motion samples8313.432->8487.418m,1867 wet support
+probes with zero unavailable/ground-occluded wet points. Viewed10/20/21/40/60/78s
+frames: recurring interior plume absent, river-site spray retained; flat white
+foam, weak breaking and crew poses remain unresolved. No full visual acceptance.
+Performance1200frames each/1140audited,normal config,zero runtime errors and
+zero competing workloads in19/29/35 polls respectively:
+menu mean33.2413/p9547.836ms/zero>100ms PASS;
+8310m mean60.5919/p9598.2354ms/55>100ms FAIL;
+11520m mean71.4376/p9591.9015ms/14>100ms FAIL.
+11520 bridge debt1.1397->6.5558s,max10.6779s; do not hide this with timestep or
+elapsed-time changes. Frozen inputs/binary unchanged. The heavier runs are
+worse than historical v27, but different trajectories/runs do not establish
+the spray correction as the cause. No performance improvement claimed.
+Receipts:tmp/raft-spray-v28-motion-20260929.json and
+tmp/raft-spray-v28-profile-20260929.json; detailed source review:
+docs/reconstruction-review-2026-09-07/south-fork-raft-spray-source-audit.md.
+Next: heavy-section CPU surface/crest-update cost and simulation debt; repair
+flat foam/breaking in normal play without enabling the failing shoreline
+candidate. South Fork remains first unfinished; no advance to Colorado or push.
+
+LATEST September29 v28 standalone build COMPLETE: package session20419 exited0;
+3106 verified immutable assets linked from v27, independent new executable
+SHA25648c93073f02dd3131d57e3a7e9de8c9778a2af66bb73ad90fbc074970f6bd762.
+Runtime closure passed2405 files/917995570 bytes, no external fallback;
+sources and baseline unchanged. This is packaging evidence, not acceptance.
+Validation session2433/wrapper26860 completed the normal Boot/menu
+then80-sample motion/contact/spray audit; results above. Old package and
+captured data remain preserved; no cook into any hard-linked stage.
+
+LATEST September29 spray correction native/normal-editor motion VERIFIED:
+session9429 terminal0,4/4 VFX native tests,45 samples8312.897->8423.062m,
+unchanged frozen inputs/binaries,no runtime errors,candidate shorelineOFF.
+Same-frame world10.034226s audit:no contact,relative speed0.298178m/s;
+raft spray0.384697->0.036031,mist0.417154->0.023548,droplets0.294805->0.036791.
+Six each river aerosol/roller/crest emitters remain active. Reviewed10/20/21/40s
+engine frames show the recurring interior plume absent,river spray retained;
+flat foam/weak breaking still fail realism. Video3fffc46badcecb370935f3efaff62b165299d3893573accbea5b813c7f3182d0.
+LIVE package session20419/wrapper12708: package-raft-spray-v28-20260929.ps1
+builds independent new game exe,then verifies and links immutable v27 assets.
+No cook into linked stages;old v27 remains unchanged. Do not duplicate this job.
+Prepared validate-raft-spray-v28-motion-20260929.ps1 has NOT run: requires
+finished package/closure,normal Boot/menu and80-sample actual motion with
+carrier support and spray-source checks. Packaged performance still pending.
+
+LATEST September29 raft-spray ownership correction IMPLEMENTED, not qualified:
+normal South Fork with its ready crest-owned Niagara path now uses ambient
+aeration only to amplify raft-relative/contact impact,not create raft-centre
+spray by itself. River-site emitters and other rivers' classifier behavior are
+unchanged. Added RaftSpraySourceOwnership regression(co-moving,slip,full-contact,
+dry/underwater) and an opt-in same-frame old/new diagnostic; no solver changes.
+LIVE session9429/wrapper9960 runs qualify-sf-raft-spray-v1-20260929.ps1,waiting
+for120s stable native sources and no other engine/build before one build,four
+native tests,and45-sample normal8310 motion capture. Other-owner Lava Canyon
+engine23988 was observed live; do not duplicate the pending job or stop it.
+Source candidate only until evidence completes;normal v27 package unchanged.
+
+LATEST September29 bounded appearance diagnosis: found a reachable raft-centred
+spray source even for co-moving supercritical water with no contact: classifier
+Spray0.72/Mist0.8128,emitterXY=raftcentre. River-site aerosol is separately owned
+and must be retained. See south-fork-raft-spray-source-audit.md in the September7
+review folder for exact source hash,equations,missing regression cases and
+normal-play verification requirements. Actual recorded plume attribution is
+still unproven; no appearance repair or package change claimed. Other-owner
+Lava Canyon27824 exited; no duplicate engine/cook was started.
+
+LATEST September29 v10 measurement COMPLETE, still FAILS20FPS: session60104
+terminal0;1200frames/1140audited,mean52.555ms,p9571.0396ms,max358.8225ms,
+one frame>100ms. Prior v9 had mean62.796ms,p95102.2014ms,67frames>100ms.
+These are separate isolated runs, not paired same-state causal speedup proof.
+No competing workload in34polls,zero runtime errors/rejected banks,all frozen
+source/binary checks passed. Bridge debt0.8566->0.006494s,max0.8566s; capacity
+acceptance remains false. Topology mean15.494ms,p9536.9391ms,max256.1735ms
+is still a major hotspot; nested scope times must not be summed.
+Receipt: unreal/Saved/RaftSimValidation/sf-certified-endcap-v10-menu-20260929-frame-audit.json.
+Review: docs/reconstruction-review-2026-09-07/south-fork-v10-validation.md.
+All owned v10 jobs are terminal. Candidate remainsOFF in normal play; no new
+packaged delivery,water appearance acceptance,river completion or push.
+Next: reduce remaining topology/update cost without weakening geometry gates;
+address observed flat foam and smoke-like spray in normal playable water.
+Existing selected-site profile findings are in breaking-profile-datum-and-shape.md;
+do not repeat them as a new diagnosis or assume absent hydraulic rise.
+
+LATEST September29 v10 native and actual replay PASS: qualification session19957
+terminal0,21/21 native,62 captured states,15 exact polygons,48 shared crossings.
+The neighbor-scan optimization preserves exact reference outputs in these tests.
+Replay session8420 terminal0:90 motion samples,8312.000->8411.484m,586 accepted
+bank updates,unchanged inputs/binaries and paired contact gates passed. Receipt:
+tmp/certified-bank-endcap-transition-live-v4-20260929-process.json.
+Initial timing attempts did NOT start: the isolation guard found other-owner
+Lava Canyon game31800 then PIE25068. Both exited. The updated one-shot
+await-v10-menu-20260929.ps1 required60s quiet and then passed all source/binary
+and workload guards. Isolated profile session60104/game19336 started
+06:28:39UTC: sf-certified-endcap-v10-menu-20260929,1200frames,real Boot/menu.
+It is now terminal; see the measured failure and review above. No visual
+acceptance; candidateOFF in normal play.
+
+LATEST September29 access RESTORED after session restart: apply_patch now modifies
+the previously blocked existing shoreline header. Implemented candidate-only
+reuse of the signed-neighbor selection scan and omission of its unused near-axis
+pre-scan. Added old-policy comparisons of exact bounds, boundary/inner/polygon,
+triangles, proof statistics and fallback counts for all15 mapped cases and62
+captured states. Fresh v10 qualification is next; no performance win, normal-play
+delivery or acceptance claimed. v9 timing below remains the last measured result.
+Keep candidateOFF in normal play and preserve all geometric/physics/20FPS gates.
+
 LATEST September29 v9 COMPLETE, performance FAIL: session56716 terminal0.
 Current source qualified21/21 native,62 captured states,15 exact polygons and
 48 crossings; live-v3 replay passed90 samples/81.638m and470 accepted updates

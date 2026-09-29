@@ -230,6 +230,11 @@ struct FStorage
         Cap.Limit=High/(P.XY[Free]+High);Cap.Active=true;
     }
     FPoint operator()(const FPoint& Proposal,double T)const
+    {return Store<true>(Proposal,T);}
+    // The unoptimized specialization is retained for native equivalence tests.
+    // This is not a runtime mode or a relaxation of any certificate.
+    template<bool ReuseSignedNeighborSearch>
+    FPoint Store(const FPoint& Proposal,double T)const
     {
         if(T==0.)return Local(Crossings[0]);if(T==1.)return Local(Crossings[1]);
         if(T>0. && T<1.)for(int32 Free=0;Free<2;++Free)
@@ -279,12 +284,29 @@ struct FStorage
             // band even when the consecutive-row partition is certified.
             const bool FirstRow=FMath::Abs(Stored[Fixed]-Origin[Fixed])==FixedStep;
             bool HasSignedNeighbor=false;
+            double NeighborBest=std::numeric_limits<double>::infinity();
+            FVector2D NeighborChoice=Stored;
+            // NearAxis always re-solves its row, so its first scan is unused.
+            // Otherwise choose the same nearest signed neighbor here as the
+            // final scan would: same X/Y order, strict tie break and bounds.
+            if(!ReuseSignedNeighborSearch || !NearAxis)
             for(int32 X=0;X<3;++X)for(int32 Y=0;Y<3;++Y)
             {
-                const FPoint Neighbor=Local(FVector2D(Candidates[0][X],Candidates[1][Y]));
+                const FVector2D W(Candidates[0][X],Candidates[1][Y]);
+                const FPoint Neighbor=Local(W);
                 if(Neighbor.X.Lo>0. && Neighbor.X.Hi<1. && Neighbor.Y.Lo>0. && Neighbor.Y.Hi<1. &&
-                    Curve.Value(Neighbor).Lo>=0. && Curve.Value(Inner(Neighbor,Width)).Hi<=0.)HasSignedNeighbor=true;
+                    Curve.Value(Neighbor).Lo>=0. && Curve.Value(Inner(Neighbor,Width)).Hi<=0.)
+                {
+                    HasSignedNeighbor=true;
+                    if constexpr(ReuseSignedNeighborSearch)
+                    {
+                        const double Distance=FMath::Abs(Neighbor.XY.X-Preferred.X)+FMath::Abs(Neighbor.XY.Y-Preferred.Y);
+                        if(Distance<NeighborBest){NeighborBest=Distance;NeighborChoice=W;}
+                    }
+                }
             }
+            if constexpr(ReuseSignedNeighborSearch)
+                if(!NearAxis && HasSignedNeighbor)return Local(NeighborChoice);
             // Quantization can also move a shallow, far-from-axis radial
             // proposal beyond all nine signed neighbors. Re-solve on its
             // actual stored row; final segment/partition proofs remain mandatory.

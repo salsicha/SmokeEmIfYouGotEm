@@ -33,6 +33,8 @@ struct FRaftSimShorelineCrestInput
 class RAFTSIMRAFT_API FRaftSimShorelineCrests
 {
 public:
+    // Capacity only, never cached values. Candidate until paired live timing.
+    bool bRetainRebuildScratch=false;
     bool Update(const TArray<FProcMeshVertex>& Source,const TArray<uint32>& SourceIndices,
         const TArray<int32>& SourceCellOffsets,const TArray<float>& CoarseCrestCm,
         const TArray<float>& Shore,const FRaftSimShorelineCrestInput& Input,
@@ -49,6 +51,8 @@ private:
     FRaftSimSurfaceRefinement Refinement;
     FRaftSimCrestProfilePrefetch ProfilePrefetch;
     TArray<FVector2D> CachedXY;
+    TArray<FVector2D> RebuildXY,RebuildExpandedXY;
+    TArray<int32> RebuildTriangles;
     TArray<uint32> CachedIndices;
     TArray<double> CachedProfile;
     TArray<float> CachedCoarse,CachedShore;
