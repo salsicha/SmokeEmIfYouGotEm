@@ -89,7 +89,12 @@ Editor-hosted Development build on the development host; no packaged-build resul
   inventory, and it runs p95 19-21 ms with no hitches. It is not accepted:
   - The bed is inferred, and the 93 m³/s runtime band extrapolates from the
     45 m³/s calibration without a width or stage check.
-  - The imagery is 10 m and the water reads deep blue rather than turquoise.
+  - The imagery is 10 m. The water hue was fitted to Sentinel-2 on
+    2026-09-29 (it had read deep blue); its brightness is unmeasured.
+  - Since 2026-09-29 `RaftSim.P4.RiverMapLoads.L_LavaCanyon` fails its
+    breaking-site check: the launch-window jump at 678 m now sits 16 m
+    off the centreline with no carrier coverage (11.5 m and full coverage
+    when committed). The data and map are unchanged; not yet diagnosed.
   - Tree positions and sizes are inferred within the inventory polygons.
 
   See the [review](../reconstruction-review-2026-09-07/chilko-lava-canyon-evidence.md).

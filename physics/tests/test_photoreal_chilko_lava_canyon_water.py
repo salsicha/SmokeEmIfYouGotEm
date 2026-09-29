@@ -286,9 +286,14 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "LiveOpticalDepthResponseExponent = 0.25f",
         "LiveDeepWaterOpacity = 0.84f",
         "LiveFoamWaterOpacity = 0.86f",
-        "FLinearColor(0.00004f, 0.00009f, 0.00014f, 0.0f)",
-        "FLinearColor(0.0110f, 0.0065f, 0.0045f, 0.0f)",
-        "FLinearColor(0.060f, 0.080f, 0.095f, 0.0f)",
+        # Optics fitted 2026-09-29 to the Sentinel-2 water hue (R/G 0.61-0.67,
+        # B/G 0.82-0.89; evidence/sentinel2_water_colour.json): an overhead
+        # capture reads R/G 0.65, B/G 0.85.
+        "FLinearColor(0.069f, 0.075f, 0.080f, 1.0f)",
+        "FLinearColor(0.012f, 0.020f, 0.021f, 1.0f)",
+        "FLinearColor(0.00015f, 0.00016f, 0.00018f, 0.0f)",
+        "FLinearColor(0.0080f, 0.0040f, 0.0045f, 0.0f)",
+        "FLinearColor(0.088f, 0.085f, 0.086f, 0.0f)",
         "FLinearColor(0.025f, 0.050f, 0.075f, 1.0f)",
         "LoadOrCreateChilkoLavaCanyonLiveWaterInstance",
         "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal",

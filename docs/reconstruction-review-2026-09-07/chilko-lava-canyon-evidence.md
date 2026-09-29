@@ -192,6 +192,14 @@ and in the settled field it is 5.5 m/s.
   the photographed whitewater sit at 775-880 m. The check uses that measured
   extent. The regenerated map carries the generator's Lava Canyon ripple and
   roughness (0.72 / 0.42), not the old map's serialized 0.55 / 0.68.
+  - **Regression (2026-09-29):** the check that the launch window
+    activates an interior breaking site now fails. The strongest jump is at
+    678.1 m but 16.0 m off the centreline, with carrier coverage 0 (it was
+    at -11.5 m with coverage 1.0 when committed). It fails identically with
+    the committed map, so the colour change below is not the cause; the
+    cooked data are unchanged. The runtime built at the time also carried
+    uncommitted shoreline and bank-contour work from a concurrent session.
+    Not yet diagnosed.
 - `RaftSim.M9.FChilko*` pass. The terrain test now requires the Sentinel-2
   drape and no procedural palette.
 - **Dressing on measured banks.** The old scene's shoreline gravel, meadow
@@ -236,18 +244,25 @@ times:
   to 33 m³/s over the flights).
 - **Colour is 10 m Sentinel-2.** Bank detail and rock texture come from the
   1.7 m Landscape and the procedural shoreline layers, not from imagery; the
-  bed colour under the water is invented. The water reads deep blue, not the
-  Chilko's glacial turquoise (appearance follow-up).
+  bed colour under the water is invented. Until 2026-09-29 the water read
+  deep blue, not the Chilko's glacial green.
   - **Measured target (2026-09-29):** `measure_chilko_water_colour.py`
     samples Sentinel-2 water on the route centreline (whitewater, ponds and
     forest-mixed pixels excluded). On all four image dates (70-167 m³/s) the
     water is green-dominant: R/G 0.61-0.67 and B/G 0.82-0.89. The 93 m³/s
     image reads R, G, B 0.028, 0.046, 0.038 along the route. Report:
     `evidence/sentinel2_water_colour.json`.
-  - The live-water optics are blue-dominant instead: the shallow colour has
-    R/G 0.16 and B/G 1.4, and absorption is lowest in blue. Changing them to
-    the measured ratios is the fix; it has not yet been made or checked
-    against a rendered capture.
+  - **Fit to it (2026-09-29):** the live-water optics were blue-dominant (a
+    shallow colour of R/G 0.16 and B/G 1.4, absorption lowest in blue). An
+    overhead capture 60 m above station 600 m measured the rendered water at
+    R/G 0.00 and B/G 1.64 (linear light, median over the same water pixels).
+    Three render iterations set the shallow, deep, scattering, absorption and
+    riverbed terms so that the capture reads **R/G 0.65, B/G 0.85**, inside
+    the measured ranges. The terms are render-only; hydraulics are untouched.
+  - The measurement fixes the hue, not the brightness: the 10 m pixels mix
+    bank and shadow, and a screenshot's exposure is not a reflectance. From
+    the river the water now reads a muted grey-green teal. It has not been
+    compared with ground photographs.
 - **Tree positions, individual heights and crowns are inferred** within the
   inventory's polygons; the VRI itself is photo-interpreted (reference year
   2013).

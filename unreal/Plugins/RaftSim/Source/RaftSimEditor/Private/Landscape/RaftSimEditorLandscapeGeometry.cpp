@@ -2321,18 +2321,24 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
         WaterConfig->bEnableLivePresentationBankNaturalism = true;
         WaterConfig->LivePresentationBankNaturalismAmplitudeMeters = 0.90f;
+        // Glacial-flour water: Sentinel-2 on the route centreline reads
+        // green-dominant on every image date, R/G 0.61-0.67 and B/G 0.82-0.89
+        // (evidence/sentinel2_water_colour.json). These terms were fitted in
+        // three render iterations until an overhead capture of the live water
+        // (60 m above station 600 m) read R/G 0.65, B/G 0.85 in linear light;
+        // absorption is highest in red and lowest in green. Render-only.
         WaterConfig->LiveShallowSurfaceColor =
-            FLinearColor(0.012f, 0.075f, 0.105f, 1.0f);
+            FLinearColor(0.069f, 0.075f, 0.080f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =
-            FLinearColor(0.002f, 0.018f, 0.032f, 1.0f);
+            FLinearColor(0.012f, 0.020f, 0.021f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
             FLinearColor(0.025f, 0.050f, 0.075f, 1.0f);
         WaterConfig->LiveWaterScattering =
-            FLinearColor(0.00004f, 0.00009f, 0.00014f, 0.0f);
+            FLinearColor(0.00015f, 0.00016f, 0.00018f, 0.0f);
         WaterConfig->LiveWaterAbsorption =
-            FLinearColor(0.0110f, 0.0065f, 0.0045f, 0.0f);
+            FLinearColor(0.0080f, 0.0040f, 0.0045f, 0.0f);
         WaterConfig->LiveRiverbedColorScale =
-            FLinearColor(0.060f, 0.080f, 0.095f, 0.0f);
+            FLinearColor(0.088f, 0.085f, 0.086f, 0.0f);
         WaterConfig->LiveShallowWaterOpacity = 0.36f;
         WaterConfig->LiveOpticalDepthResponseExponent = 0.25f;
         WaterConfig->LiveDeepWaterOpacity = 0.84f;
