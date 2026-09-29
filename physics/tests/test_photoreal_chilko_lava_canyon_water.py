@@ -185,8 +185,12 @@ def test_chilko_rapid_approach_launch_frames_an_interior_solver_jump(
 ) -> None:
     geometry = GEOMETRY_SOURCE.read_text(encoding="utf-8")
 
+    # The 2026-09-28 LiDAR evidence rebuild replaced the 600 m reach-local
+    # scene (launch progress 0.38) with the 4.0 km geographic reach, which
+    # launches at a station (test_chilko_lava_canyon_evidence.py). The jump
+    # analysis below stays on the retired reach's archived cooked fields.
     assert "bChilkoLavaCanyon" in geometry
-    assert "? 0.38f" in geometry
+    assert "FMath::Clamp(kChilkoLavaCanyonLaunchStationM /" in geometry
     assert "RaftSimChilkoRapidApproachLaunchV1" in geometry
     sites = _launch_window_breaking_sites(band_id)
     assert sites, band_id
@@ -423,7 +427,12 @@ def test_chilko_manifest_records_native_capture_water() -> None:
     assert candidate["water_solver_depth_color_weight"] == 0.0
     assert candidate["water_solver_field_roughness_weight"] == 0.0
     assert candidate["water_solver_froude_aeration_weight"] == 0.0
-    assert candidate["water_solver_visualization_field_texture_count"] == 1
+    # The evidence rebuild leaves the retired 600 m reach's cooked-field
+    # visualization unbound: it does not match the geographic reach.
+    assert candidate["water_solver_visualization_field_texture_count"] == 0
+    assert candidate["water_solver_visualization_field_status"] == (
+        "disabled_for_physical_corridor_until_solver_grid_georeferencing_is_validated"
+    )
     assert candidate["water_base_color_scale"] == 0.94
     assert candidate["water_vertex_tint_weight"] == 0.78
     assert candidate["water_emissive_fill_scale"] == 0.06

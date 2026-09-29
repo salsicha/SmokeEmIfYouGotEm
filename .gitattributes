@@ -2,6 +2,7 @@
 # These historical evidence files are byte-hash locked; preserve original LF.
 unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorSouthForkMaterial.cpp text eol=lf
 unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorSouthForkOrganicTerrainTest.cpp text eol=lf
+unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorChilkoMaterial.cpp text eol=lf
 *.mov filter=lfs diff=lfs merge=lfs -text
 *.m4v filter=lfs diff=lfs merge=lfs -text
 *.webm filter=lfs diff=lfs merge=lfs -text

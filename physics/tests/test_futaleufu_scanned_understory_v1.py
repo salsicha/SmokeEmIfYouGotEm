@@ -80,16 +80,19 @@ def test_saved_manifest_records_mixed_understory_and_preserved_canopy() -> None:
         "source_grounded_near_bank_review_candidate"
     )
     assert candidate["landscape_dressing_futaleufu_scanned_understory_mesh_count"] == 7
+    # Counts measured on the 2.4 km evidence reach (2026-09-27 rebuild; the
+    # 600 m scene had 1440 / 1800 / 8000 / 4650 / 3350). Scanned understory
+    # and near-bank stay above their 1200 and 1600 minimums.
     assert (
         candidate["landscape_dressing_futaleufu_scanned_understory_instance_count"]
-        == 1440
+        == 1336
     )
     assert candidate["landscape_dressing_futaleufu_medium_fir_canopy_excluded"] is True
     assert candidate["landscape_dressing_futaleufu_project_owned_canopy_preserved"] is True
-    assert candidate["landscape_dressing_temperate_near_bank_instance_count"] == 1800
-    assert candidate["landscape_dressing_foliage_instance_count"] == 8000
-    assert candidate["landscape_dressing_canopy_tree_instance_count"] == 4650
-    assert candidate["landscape_dressing_understory_instance_count"] == 3350
+    assert candidate["landscape_dressing_temperate_near_bank_instance_count"] == 1668
+    assert candidate["landscape_dressing_foliage_instance_count"] == 63193
+    assert candidate["landscape_dressing_canopy_tree_instance_count"] == 46616
+    assert candidate["landscape_dressing_understory_instance_count"] == 16577
 
 
 def test_scanned_understory_review_is_hash_locked_and_fail_closed() -> None:

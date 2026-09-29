@@ -25,6 +25,7 @@ UNREAL_REVIEW_ROOT = (
     REPO_ROOT
     / "docs/environment-captures/photoreal_river_previews/landscape_candidates"
 )
+EVIDENCE_LANDSCAPE_SIZE = 2017
 
 
 def _read_json(path: Path) -> dict[str, object]:
@@ -133,14 +134,16 @@ def test_unreal_candidate_is_reference_runnable_with_nanite_but_not_promoted() -
     assert contract["authority"]["changes_solver_state"] is False
     assert contract["authority"]["changes_collision_or_raft_forces"] is False
     assert contract["production_promoted"] is False
+    # Since the 2026-09-28 rebuild L_LavaCanyon is built from the 2017^2
+    # LiDAR evidence heightfield, not from this corridor's 1009^2 contract.
     assert candidate["river_id"] == "chilko_river_lava_canyon"
-    assert candidate["heightfield_width_px"] == UNREAL_LANDSCAPE_SIZE
-    assert candidate["component_count_total"] == 64
-    assert candidate["material_bound_component_count"] == 64
+    assert candidate["heightfield_width_px"] == EVIDENCE_LANDSCAPE_SIZE
+    assert candidate["component_count_total"] == 256
+    assert candidate["material_bound_component_count"] == 256
     assert candidate["material_binding_status"] == "all_source_components_bound"
     assert candidate["nanite_enabled"] is True
-    assert candidate["nanite_component_count"] == 1
-    assert candidate["nanite_material_bound_slot_count"] == 64
+    assert candidate["nanite_component_count"] == 4
+    assert candidate["nanite_material_bound_slot_count"] == 256
     assert candidate["nanite_material_audit_error_count"] == 0
     assert candidate["nanite_representation_status"] == "enabled_and_built_up_to_date"
     assert candidate["runnable_gameplay_status"] == (
@@ -164,11 +167,10 @@ def test_unreal_command_supports_an_isolated_chilko_build() -> None:
 
     assert 'TEXT("chilko_river_lava_canyon")' in source
     assert 'TEXT("/Game/RaftSim/Maps/L_LavaCanyon")' in source
-    assert "lava_canyon_conditioned_heightfield_1009.png" in source
-    assert "lava_canyon_runtime_coordinate_map.json" in source
-    assert "chilko_lava_canyon_median_depth_speed_froude_surface_v1.png" in source
-    assert 'FlowBand = FName(TEXT("median_runnable"))' in source
+    assert "lava_canyon_evidence_2023_heightfield_2017.png" in source
+    assert "lava_canyon_evidence_2023_runtime_coordinate_map.json" in source
+    assert 'FlowBand = FName(TEXT("summer_runnable_93cms"))' in source
     assert "const FString& RiverIdFilter" in source
     assert "Candidates.FilterByPredicate" in source
-    assert "Candidate.LandscapeSize = 1009" in source
+    assert "Candidate.LandscapeSize = 2017" in source
     assert "Candidate.bEnableLandscapeNanite = true" in source

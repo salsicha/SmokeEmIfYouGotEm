@@ -73,18 +73,13 @@ def test_chilko_generated_manifest_records_shading_and_authority_separation() ->
 
     assert candidate["river_id"] == "chilko_river_lava_canyon"
     assert candidate["landscape_material_shading_model"] == "DefaultLit"
-    assert candidate["landscape_material_organic_surface_status"].startswith(
-        "chilko_v2_dual_projection_seven_scale_world_space"
+    # The 2026-09-28 evidence rebuild shades the Landscape with the measured
+    # Sentinel-2 drape instead of the seven-scale procedural palette, which
+    # the material source (checked above) keeps for the retired scene.
+    assert candidate["landscape_material_organic_surface_status"] == (
+        "chilko_lava_canyon_evidence_sentinel2_10m_drape_albedo_scaled_no_procedural_palette"
     )
-    assert candidate["landscape_material_organic_world_noise_scales_per_cm"] == [
-        0.00016,
-        0.00059,
-        0.0027,
-        0.0079,
-        0.00091,
-        0.00347,
-        0.0157,
-    ]
+    assert candidate["landscape_material_organic_world_noise_scales_per_cm"] == []
     assert candidate["landscape_material_geometry_authority_status"] == (
         "shade_only_no_world_position_offset_no_collision_or_solver_change"
     )

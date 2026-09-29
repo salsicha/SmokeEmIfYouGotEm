@@ -70,16 +70,19 @@ def test_build_futaleufu_terminator_visual_terrain(tmp_path: Path) -> None:
 def test_unreal_binds_terminator_reach_local_landscape_and_runtime_water() -> None:
     source = read_raftsim_editor_source(REPO_ROOT)
 
+    # Since the 2026-09-27 rebuild L_Terminator binds the evidence reach
+    # (test_futaleufu_terminator_evidence.py); this test's builder output
+    # above is the retired 600 m reach-local terrain.
     assert 'TEXT("/Game/RaftSim/Maps/L_Terminator")' in source
-    assert "terminator_conditioned_heightfield_1009.png" in source
-    assert "terminator_visual_terrain_manifest.json" in source
-    assert "terminator_local_centerline.json" in source
-    assert "terminator_runtime_coordinate_map.json" in source
-    assert "futaleufu_terminator_median_depth_speed_froude_surface_v1.png" in source
-    assert 'FlowBand = FName(TEXT("median_runnable"))' in source
+    assert "terminator_evidence_heightfield_2017.png" in source
+    assert "terminator_evidence_terrain_manifest.json" in source
+    assert "terminator_evidence_local_centerline.json" in source
+    assert "terminator_evidence_runtime_coordinate_map.json" in source
+    assert 'FlowBand = FName(TEXT("high_runnable_400cms"))' in source
     assert 'TEXT("RaftSim_FutaleufuTerminator_PlayerRaft")' in source
     assert 'TEXT("RaftSimFutaleufuTerminatorSolverVisualization")' in source
-    assert 'TEXT("RaftSim_FutaleufuTerminator_D4_EntryMarkerBoulder")' in source
+    # The 600 m scene's D4 entry-marker boulder has no place on the real reach.
+    assert 'TEXT("RaftSim_FutaleufuTerminator_D4_EntryMarkerBoulder")' not in source
 
 
 def test_shared_temperate_canopy_breaks_repeated_geometry_and_placement() -> None:

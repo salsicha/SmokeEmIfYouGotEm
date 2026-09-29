@@ -360,11 +360,11 @@ static const FRiverMapSpec GRiverMaps[] = {
      TEXT("physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields"),
      TEXT("median_runnable"), -60.0f},
     {TEXT("L_Terminator"),
-     TEXT("physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields"),
-     TEXT("median_runnable"), -60.0f},
+     TEXT("physics/data/real_world/futaleufu_river_chile/scenario_terminator_evidence_2026/cooked_flow_fields"),
+     TEXT("high_runnable_400cms"), 750.0f},
     {TEXT("L_LavaCanyon"),
-     TEXT("physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields"),
-     TEXT("median_runnable"), -60.0f},
+     TEXT("physics/data/real_world/chilko_river_bc/scenario_lava_canyon_evidence_2023/cooked_flow_fields"),
+     TEXT("summer_runnable_93cms"), 600.0f},
 };
 
 static bool BuildRiverMap(const FRiverMapSpec& Spec)
@@ -375,6 +375,8 @@ static bool BuildRiverMap(const FRiverMapSpec& Spec)
     const TCHAR* LandscapeRiverId =
         FCString::Strcmp(Spec.MapName, TEXT("L_UpperHuacas")) == 0 ? TEXT("pacuare")
         : FCString::Strcmp(Spec.MapName, TEXT("L_Hance")) == 0 ? TEXT("colorado_river")
+        : FCString::Strcmp(Spec.MapName, TEXT("L_Terminator")) == 0 ? TEXT("futaleufu_terminator")
+        : FCString::Strcmp(Spec.MapName, TEXT("L_LavaCanyon")) == 0 ? TEXT("chilko_river_lava_canyon")
         : nullptr;
     if (LandscapeRiverId)
     {
