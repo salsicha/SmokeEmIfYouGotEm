@@ -15,6 +15,9 @@ Pacuare canopy method without its crown detection:
   inventory);
 * understory: one sub-canopy shrub beside each tree within
   --understory-reach-m of the water (INFERRED structure).
+* nothing stands in the cooked water: cells wet in the runtime atlas
+  (h > 2 cm) join the channel clearance, because the cook's water is wider
+  than the Sentinel-2 low-water extent on the gentle inferred banks.
 
 Output: upper_gorge_evidence_2025_canopy_placement.json (Pacuare canopy layout,
 schema raftsim.zambezi.upper_gorge_evidence_canopy.v1) and a review PNG,
@@ -45,6 +48,30 @@ def rel(path):
     return path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path)
 
 
+def cook_wet_mask(atlas_manifest, nx, ny, y_top, centre_n, wet_m=0.02):
+    """Cells of the 1 m evidence window that are wet in the runtime atlas.
+
+    Atlas tile origins are the first cell centres in local metres (east of
+    the west edge, north of centre_n), 2 m cells, rows northward."""
+    atlas = json.loads(Path(atlas_manifest).read_text(encoding='utf-8'))
+    t = atlas['tile_shape'][0]; d = atlas['grid_spacing_m']
+    h = np.load(Path(atlas_manifest).parent / atlas['arrays']['h']['file'])
+    wet = np.zeros((ny, nx), bool)
+    x = np.arange(nx) + 0.5
+    for k, tile in enumerate(atlas['tiles']):
+        ox, oy = tile['origin_m']
+        c0 = max(int(np.floor(ox - d / 2)), 0); c1 = min(int(np.ceil(ox + (t - 0.5) * d)), nx)
+        n_lo, n_hi = oy - d / 2, oy + (t - 0.5) * d
+        r0 = max(int(np.floor(y_top - centre_n - n_hi)), 0); r1 = min(int(np.ceil(y_top - centre_n - n_lo)), ny)
+        if c0 >= c1 or r0 >= r1:
+            continue
+        cols = np.clip(np.floor((x[c0:c1] - (ox - d / 2)) / d).astype(int), 0, t - 1)
+        north = (y_top - (np.arange(r0, r1) + 0.5)) - centre_n
+        rows = np.clip(np.floor((north - (oy - d / 2)) / d).astype(int), 0, t - 1)
+        wet[r0:r1, c0:c1] |= h[k * t:(k + 1) * t][rows][:, cols] > wet_m
+    return wet
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('evidence', type=Path, help='build_zambezi_evidence_grid.py output folder')
@@ -56,6 +83,10 @@ def main():
     ap.add_argument('--channel-clearance-m', type=int, default=4)
     ap.add_argument('--spacing-m', type=float, default=10.0)
     ap.add_argument('--max-slope-deg', type=float, default=62.0)
+    ap.add_argument('--runtime-atlas', type=Path,
+                    default=ROOT / 'physics/data/real_world/zambezi_batoka_gorge/scenario_upper_gorge_evidence_2025/'
+                                   'cartesian_runtime/atlas/manifest.json',
+                    help='runtime atlas whose wet cells are kept clear of vegetation')
     ap.add_argument('--understory-reach-m', type=float, default=120.0)
     args = ap.parse_args()
     out = args.out_dir.resolve() / 'upper_gorge_evidence_2025_canopy_placement.json'
@@ -84,7 +115,12 @@ def main():
     forest = box_mean(forest.astype(np.float32), 15) > 0.5
     gy, gx = np.gradient(dem)
     slope = np.degrees(np.arctan(np.hypot(gx, gy)))
-    allowed = forest & ~dilate(river, args.channel_clearance_m) & (slope <= args.max_slope_deg)
+    # The cook's water is wider than the Sentinel-2 low-water extent where the
+    # inferred banks are gentle (surface ~0.5 m high), so trees on "dry" image
+    # pixels stood in the river; keep them out of the cooked water too.
+    cook_wet = cook_wet_mask(args.runtime_atlas, NX, NY, Y1, centre_n)
+    allowed = (forest & ~dilate(river | cook_wet, args.channel_clearance_m) &
+               (slope <= args.max_slope_deg))
 
     rng = np.random.default_rng(SEED)
     s = args.spacing_m
@@ -123,11 +159,13 @@ def main():
         forms={'0': 'the broadleaf canopy form (dry woodland and riverine trees; species INFERRED)'},
         inputs=dict(evidence_manifest=rel(args.evidence / 'manifest.json'), evidence_grid_sha256=sha(args.evidence / 'evidence_grid.npz'),
                     sentinel2=args.sentinel2, sentinel2_sha256=item['npz_sha256'],
-                    terrain_manifest=rel(args.terrain_manifest), terrain_manifest_sha256=sha(args.terrain_manifest)),
+                    terrain_manifest=rel(args.terrain_manifest), terrain_manifest_sha256=sha(args.terrain_manifest),
+                    runtime_atlas=rel(args.runtime_atlas), runtime_atlas_sha256=sha(args.runtime_atlas)),
         parameters=dict(ndvi_min=args.ndvi_min, green_max=args.green_max, majority_window_m=31, channel_clearance_m=args.channel_clearance_m,
                         spacing_m=args.spacing_m, max_slope_deg=args.max_slope_deg, understory_reach_m=args.understory_reach_m,
                         crown_radius='0.7 x nearest-neighbour distance, 2.5-6 m', height='2.2 x crown radius + U(0, 3) m, 6-18 m', seed=SEED),
         statistics=dict(forest_share=float(forest.mean()), allowed_share=float(allowed.mean()), instance_count=int(len(pts)),
+                        cook_wet_share=float(cook_wet.mean()), cook_wet_outside_sentinel2_share=float((cook_wet & ~river).mean()),
                         understory_count=int(len(upts)),
                         crown_radius_m_p10_p50_p90=[float(v) for v in np.percentile(radius, [10, 50, 90])],
                         height_m_p10_p50_p90=[float(v) for v in np.percentile(height, [10, 50, 90])]),

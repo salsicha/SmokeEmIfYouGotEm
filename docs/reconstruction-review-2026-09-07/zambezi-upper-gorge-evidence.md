@@ -51,9 +51,21 @@ Scripts are numpy only. The frame is WGS 84 / UTM 35S (EPSG:32735); heights
 are EGM2008. The runtime datum is 700 m.
 
 1. **Evidence grid** (`build_zambezi_evidence_grid.py`, 1 m, 1,985 x 1,549 m):
+   - **Station and offset:** each cell takes the station of the nearest point
+     on the 2 m Sentinel-2 midline, with each segment's foot clamped to its
+     ends.
+     - The first build projected cells only onto segment interiors. That left
+       a wedge with no station outside every vertex, widest at the hairpins,
+       and at a hairpin a cell beside one limb could take the other limb's
+       station about 200 m away.
+     - Those cells had no water surface, so they kept raw GLO-30 heights (up
+       to 70 m above the water). They stood as grey cones in the river, with
+       collision, which the first reach survey found.
+     - Cells more than 3 m above the neighbouring water surface with at least
+       7 wet neighbours: 739 in the first grid, 0 now.
    - **Wetted extent (measured):** Sentinel-2 water on the dates at or below
      300 m³/s, connected to the channel. The median wetted width is 30.5 m
-     (p10 18.5, p90 62 m).
+     (p10 18.5, p90 66.5 m).
    - **Whitewater (measured appearance):** bright, neutral water pixels on
      the dates at or below 1000 m³/s.
    - **Water-surface anchors (measured, ±2 m):** the median of GLO-30 over the
@@ -67,7 +79,7 @@ are EGM2008. The runtime datum is 700 m.
        dam it.
    - **Gorge walls (inferred):** the 30 m radar DEM smears the walls into
      gentle slopes that flood. The walls rise 6 m over the first 6 m beyond the
-     wet edge and hold that height out to 60 m (269,602 cells). Without this the
+     wet edge and hold that height out to 60 m (313,990 cells). Without this the
      first cook ran +1.4 m high with a wet IoU of 0.35.
 2. **Cook package** (`prepare_zambezi_cartesian_cook.py`):
    - 2 m cells in 64-cell tiles (91 tiles).
@@ -89,38 +101,54 @@ are EGM2008. The runtime datum is 700 m.
    - Froude against the photographed whitewater.
 5. **Calibration:** two passes of `calibrate_river_bed.py` (relax 0.8, 50 m
    smoothing, at most 2 m per pass), each warm-started from the previous cook.
+   They ran on the first grid. The corrected grid reuses the pass-2
+   correction, archived as `evidence/bed_correction.npz` (SHA-256
+   `1e19a102…`). The evidence manifest records the scratch path the build read
+   that same file from.
+6. **Corrected-grid cook:** 42,000 steps (2,100 s), warm-started in two
+   stages from the committed first-grid atlas.
 
 ## Results
 
-The final cook (w2) is 60,000 steps (3,000 s), warm-started:
+The final cook, on the corrected grid:
 
 | measure | value |
 | --- | --- |
-| surface anchors (cook - GLO-30) | -0.24 to +1.00 m (9 anchors) |
-| per-station surface error | median +0.52 m, p90 abs 1.02 m |
-| wet IoU against Sentinel-2 at 203/283 m³/s | 0.77 (8,022 false-wet, 638 missed cells) |
-| outflow face flux | 283.55 m³/s (+0.2 %) |
-| settling, last 6,000 steps | p95 abs dh 0.009 m (max 0.12 m) |
-| mass conservation residual | 1.5e-10 m³ |
-| depth | p50 4.1 m, p95 7.2 m, max 7.7 m |
-| speed | p50 1.25 m/s, p95 3.8 m/s, max 6.7 m/s |
-| Froude | p50 0.20, p95 0.68, share > 1 0.9 % |
+| surface anchors (cook - GLO-30) | -1.14 to +0.52 m (11 anchors) |
+| per-station surface error | median +0.01 m, p90 abs 0.86 m |
+| wet IoU against Sentinel-2 at 203/283 m³/s | 0.968 (1,059 false-wet, 76 missed cells) |
+| outflow face flux | 281.0 m³/s (-0.7 %) |
+| settling, last 6,000 steps | p95 abs dh 0.016 m (max 0.063 m) |
+| mass conservation residual | 6.6e-10 m³ |
+| depth | p50 4.0 m, p95 6.5 m, max 7.2 m |
+| speed | p50 1.56 m/s, p95 4.0 m/s, max 6.8 m/s |
+| Froude | p50 0.25, p95 0.72, share > 1 1.7 % |
 
 - **Calibration history:**
   - Uncalibrated (walls, cold start): +1.74 m median, IoU 0.71, outflow
     279.2 m³/s.
   - Pass 1: +0.84 m and IoU 0.75, but it had not settled (outflow 302).
-  - Pass 2 is the table above.
+  - Pass 2 (first grid): anchors -0.24 to +1.00 m, IoU 0.77, outflow
+    283.55 m³/s. It was committed with the cones described in Method.
+  - The corrected grid is the table above. Its extra wetted cells account for
+    the IoU gain: the first grid's wedges could not be wet.
 - **Depth cap:** calibration can only lower the bed where the 6.5 m cap
-  allows. 9,873 cells are capped after pass 2. The highest remaining anchors
-  (+0.8 to +1.0 m at stations 2025, 2425 and 3025) are where it binds.
-- **Whitewater is not where the photographs show it.**
-  - Per 250 m of station, the photographed whitewater share is 28 % at
-    2,750 m (Stairway to Heaven), 9.5 % at 1,500 m and 7 % at the Boiling Pot
-    outflow.
-  - The cooked Froude > 0.8 share is instead highest at 750 m (12 %) and
-    2,250 m (10 %), and only 1.7 % at 2,750 m.
-  - As at Hance, an inferred bed cannot place the rapids.
+  allows. 8,620 cells are capped.
+- **Whitewater, per 250 m of station:**
+
+  | station | photographed white | cooked Froude > 0.8 |
+  | --- | --- | --- |
+  | 0 m (Boiling Pot outflow) | 6.5 % | 5.9 % |
+  | 750-1,000 m | 0 % | 9-10 % |
+  | 1,500 m | 9.6 % | 0.2 % |
+  | 2,500 m | 10.6 % | 0 % |
+  | 2,750 m (Stairway to Heaven) | 28.1 % | 25.5 % |
+
+  - The corrected grid places Stairway to Heaven: its hairpin was where the
+    wedges were widest.
+  - The whitewater at 1.5 and 2.5 km is still missing, and 750-1,000 m is
+    fast with no photographed white. As at Hance, an inferred bed cannot
+    place every rapid.
 
 ## Runtime integration
 
@@ -142,21 +170,32 @@ The final cook (w2) is 60,000 steps (3,000 s), warm-started:
   - exists because the 2 m midline turns one hairpin at a ~6 m radius at a
     vertex, and the loader's ±256 m corridor check rejected it (40 m edge
     step; now 12 m against the 16 m limit).
-- **the launch:** station 294.7 m (5.5 m deep, 2.0 m/s). This is the slowest
-  valid point in the first 500 m. It lies within a live window's reach of a
-  valid rectangle and is wet within 6 m. The finish is station 3,382 m.
+- **the launch:** station 212.7 m (3.1 m deep, 0.55 m/s). This is the
+  slowest valid point in the first 500 m. It lies within a live window's reach
+  of a valid rectangle and is wet within 6 m. The finish is station 3,382 m.
+  (On the first grid the launch was 294.7 m.)
 
 `terrain/upper_gorge_evidence_2025/` holds:
-- a 2017² heightfield (relief 146.4 m);
+- a 2017² heightfield (relief 146.1 m);
 - the Sentinel-2 drape of 2025-10-03, with albedo median 0.10 and the water
   replaced by a darkened bank-colour continuation (an invented bed colour);
 - a 20 m GLO-30 backdrop 3 km around the Landscape (287,436 triangles, no
   collision);
 - the local centreline;
-- 8,853 evidence canopy trees and 2,534 understory shrubs. These sit on an
+- 8,883 evidence canopy trees and 2,811 understory shrubs. These sit on an
   inferred 10 m lattice inside the NDVI > 0.5 cover of the 2025-05-28 image
   (29.5 % of the window). They are broadleaf, and their heights (6-18 m) are
   inferred.
+  - A 4 m clearance keeps them off both the Sentinel-2 water and the cooked
+    water.
+  - The cooked water covers 4.6 % of the window. Only 0.15 % of the window is
+    cooked water that the image shows dry; on the first grid that was 1.1 %
+    (the gentle inferred banks), where the first reach survey found shrubs
+    standing in the river.
+- No generic dressing: as at Hance and Pacuare, the map places no generic
+  rocks (its inferred boulders are in the cooked bed) and no generic foliage
+  clusters. Those clusters judge "water" by a fixed 24 m half-width, and the
+  gorge's pools reach 31 m.
 
 The editor builds the map as the landscape candidate `zambezi_upper_gorge`:
 - **Shared Zambezi assets, load-only:** it uses the Zambezi look settings,
@@ -185,17 +224,26 @@ The editor builds the map as the landscape candidate `zambezi_upper_gorge`:
   - the launch;
   - that the terrain export, editor catalog, gameplay constants, frontend
     scenario and staging match.
-- `RaftSim.P4.RiverMapLoads.L_ZambeziUpperGorge` passes:
+- `RaftSim.P4.RiverMapLoads.L_ZambeziUpperGorge` passes on the rebuilt map:
   - the Cartesian map binds, and the first window handoff is at the launch
-    (1409, 302 m);
+    (1480.8, 340.7 m);
   - the run manager holds the progress map (3,441 points);
   - the live carrier carries solver velocity;
   - the cooked far field is visible beyond the live window;
-  - one GLO-30 backdrop and all 11,387 canopy rows are placed;
+  - one GLO-30 backdrop and all 11,694 canopy rows are placed;
   - the raft is upright with no swimmers;
   - the presentation is 1.0 m spacing, 50,625 vertices and 100,352 triangles.
 - The build re-saved no tracked asset: `L_Zambezi` and its materials, textures
   and vegetation are untouched.
+- **Reach surveys** (`RaftSim.SurveyReach`, 2026-09-29, rebuilt map):
+  - 200-3,000 m every 400 m, and 300-3,100 m every 400 m (the first
+    survey's stations): every station is wet, 2.4-7.1 m deep, with no ground
+    contact, no floating or drowned obstacles and no generic rocks.
+  - At 1,500 m the first survey's chase camera showed a field of grey cones
+    in the river. The same view is now clear.
+  - A sharp boundary between green and dark water at 2,200 m is the gorge
+    wall's shadow: sunlit water reads green, shaded water dark.
+  - 3,400 m lies beyond the outflow cut and is dry (see Limits).
 
 ## Performance
 
@@ -204,21 +252,22 @@ build, Blender or cook job live:
 
 | station | p95 | max | frames over 100 ms | game thread mean | GPU mean |
 | --- | --- | --- | --- | --- | --- |
-| 294.7 m (launch) | 34.3 ms | 66.7 ms | 0 | 21.5 ms | 8.3 ms |
-| 1,494 m (whitewater at 1.5 km) | 36.4 ms | 78.7 ms | 0 | 21.9 ms | 8.1 ms |
-| 2,762 m (Stairway to Heaven) | 45.6 ms | 68.5 ms | 0 | 20.8 ms | 8.1 ms |
+| 212.7 m (launch) | 35.0 ms | 57.8 ms | 0 | 21.1 ms | 7.7 ms |
+| 1,494 m (whitewater at 1.5 km) | 32.8 ms | 67.9 ms | 0 | 19.7 ms | 8.1 ms |
+| 2,762 m (Stairway to Heaven) | 44.8 ms | 68.7 ms | 0 | 21.4 ms | 8.1 ms |
 
-All three meet the 20 FPS goal (50 ms p95, no frame over 100 ms). The
-Stairway station is the closest, at 4.4 ms under the budget.
+These are the rebuilt map (2026-09-29). All three meet the 20 FPS goal (50 ms
+p95, no frame over 100 ms). The Stairway station is the closest, at 5.2 ms
+under the budget. The first map measured 34.3, 36.4 and 45.6 ms.
 
 `RaftSim.SurveyReach` first failed on this map: it needed a curved
 hydraulic map and logged "no river coordinate map bound". It now converts
 stations through the scenario's run axis (`RaftSimReviewCoordinates`: the run
 manager's progress map on a Cartesian map), and samples water on the
-hydraulic adapter. The downstream runs walked the raft there through 15 and
-30 Cartesian window handoffs. The final handoffs lie 0.1 m from the midline
-at stations 1,494 and 2,762 m. Two earlier runs, before this change, only
-re-measured the launch; they are not reported.
+hydraulic adapter. The downstream runs walked the raft there through 16 and
+31 Cartesian window handoffs. The final handoffs lie on the midline (0.04 and
+0.44 m off it) at stations 1,486 and 2,756 m. Two earlier runs, before this
+change, only re-measured the launch; they are not reported.
 
 ## Limits (why this is not accepted)
 
@@ -231,13 +280,16 @@ re-measured the launch; they are not reported.
   fixed 6 m wall profile replaces them near the water.
 - **The surface reference is coarse:** GLO-30's edited water is good to about
   ±2 m, and the anchors are only that good.
-- **Whitewater placement fails** (see Results). The rapids' real hydraulics,
-  including Stairway to Heaven's, are not reproduced.
+- **Whitewater placement is partial** (see Results). Stairway to Heaven's
+  share is placed, but the whitewater at 1.5 and 2.5 km is missing. No
+  individual hole or wave is reproduced.
+- **The channel ends dry.** Below the outflow cut (E 378,460) and above the
+  inflow cut there is no cooked water, so from the finish (3,382 m) the river
+  ahead looks like a dry bed.
 - **Far-field presentation:** other South Fork-only presentation paths stay
   South Fork-only on this map. They include foam sources, atlas stencil
   caching, the metric breaking search and shoreline fan topology.
 - **Not yet done:**
-  - a full screenshot reach survey;
   - review against photographs. The two landscape captures show the
     capture-only ribbon on the straight run at 430-590 m, not the live water.
   - The review start (`-RaftSimWaterReviewStation`) is still South

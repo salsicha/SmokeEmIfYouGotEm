@@ -240,7 +240,12 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     // non-hydraulic rocks, some of them in the channel.
     // Pacuare Huacas likewise carries orthophoto-located emergent rocks and
     // whitewater-located inferred boulders in its solver bed.
-    const bool bEvidenceRockTerrain = Spec.RiverId == TEXT("colorado_river") || Spec.RiverId == TEXT("pacuare");
+    // The Zambezi upper gorge carries its inferred boulders in the cooked bed
+    // too; generic rocks (every ninth in the channel) would sit where the
+    // hydraulics have none.
+    const bool bZambeziUpperGorge = IsZambeziUpperGorgeRiverId(Spec.RiverId);
+    const bool bEvidenceRockTerrain =
+        Spec.RiverId == TEXT("colorado_river") || Spec.RiverId == TEXT("pacuare") || bZambeziUpperGorge;
     const int32 BoulderCount = bEvidenceRockTerrain
         ? 0
         : bPhysicalCorridor
@@ -1354,7 +1359,10 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             DryScarpOutcropMaximumSlopeDegrees);
     }
 
-    const int32 FoliageClusterCount = bColoradoHance
+    // The Zambezi upper gorge's vegetation is its Sentinel-2 evidence canopy:
+    // the generic clusters test "water" by a fixed half-width (24 m), and the
+    // gorge's pools reach 31 m, so they stood shrubs in the river.
+    const int32 FoliageClusterCount = (bColoradoHance || bZambeziUpperGorge)
         ? 0
         : bPhysicalCorridor
         ? (bZambeziWoodland

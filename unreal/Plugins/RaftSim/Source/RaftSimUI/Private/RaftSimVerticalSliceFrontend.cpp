@@ -102,7 +102,7 @@ TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenario
             TEXT("Evidence-based low-water upper Batoka Gorge (283 m3/s, the 2025-10-03 Sentinel-2 day): "
                  "banks, whitewater and terrain are measured; the bed and gorge walls are inferred."),
             TEXT("/Game/RaftSim/Maps/L_ZambeziUpperGorge"),
-            ERaftSimLicenseTier::ExpeditionGuide, 16, 294.7f, 3382.0f)
+            ERaftSimLicenseTier::ExpeditionGuide, 16, 212.7f, 3382.0f)
     };
 }
 

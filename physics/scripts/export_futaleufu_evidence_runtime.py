@@ -86,6 +86,8 @@ def main():
     ap.add_argument('--frame-interval', type=int, required=True)
     ap.add_argument('--window-station-extent-m', type=float, default=480.0)
     ap.add_argument('--window-advance-m', type=float, default=80.0)
+    ap.add_argument('--bed-correction-file', type=Path, default=None,
+                    help='where the bed correction named by the evidence manifest now lives (checked by its sha256)')
     args = ap.parse_args()
     scen_out = DATA / 'scenario_terminator_evidence_2026'; terr_out = DATA / 'terrain/terminator_evidence_2026'
     assert not scen_out.exists() and not terr_out.exists(), 'fresh output folders required'
@@ -214,7 +216,8 @@ def main():
     corr = evm.get('parameters', {}).get('bed_correction')
     if corr:
         # repo-relative, or relative to physics/scripts (where the builder may run)
-        cp = next(c for c in (Path(corr), ROOT / corr, (ROOT / 'physics/scripts' / corr).resolve()) if c.is_absolute() and c.exists())
+        cp = next(c for c in ((args.bed_correction_file.resolve() if args.bed_correction_file else None), Path(corr), ROOT / corr,
+                              (ROOT / 'physics/scripts' / corr).resolve()) if c is not None and c.is_absolute() and c.exists())
         assert sha(cp) == evm['parameters']['bed_correction_sha256']
         shutil.copyfile(cp, scen_out / 'evidence' / 'bed_correction.npz')
     (scen_out / 'runtime').mkdir()

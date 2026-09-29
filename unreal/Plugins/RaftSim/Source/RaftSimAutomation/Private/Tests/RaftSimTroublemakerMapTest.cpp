@@ -2759,8 +2759,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
             }
         }
         Test->TestEqual(TEXT("Zambezi upper gorge places one GLO-30 terrain backdrop"), BackdropCount, 1);
-        Test->TestEqual(TEXT("Zambezi upper gorge evidence canopy places every row (8,853 trees, 2,534 shrubs)"),
-            EvidenceCanopyInstanceCount, 11387);
+        Test->TestEqual(TEXT("Zambezi upper gorge evidence canopy places every row (8,883 trees, 2,811 shrubs)"),
+            EvidenceCanopyInstanceCount, 11694);
         return true;
     }
 

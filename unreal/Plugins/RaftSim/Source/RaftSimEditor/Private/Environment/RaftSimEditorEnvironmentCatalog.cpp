@@ -1400,8 +1400,8 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
             Candidate.LandscapeSize = 2017;
             Candidate.HorizontalSpanXCm = 242200.0f;
             Candidate.HorizontalSpanYCm = 177700.0f;
-            Candidate.TargetReliefCm = 73518.011539f;
-            Candidate.WorldVerticalOffsetCm = -1400.006168f;
+            Candidate.TargetReliefCm = 73569.308505f;
+            Candidate.WorldVerticalOffsetCm = -1451.303133f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
             // The live solver owns the water; the old reach-local solver
             // visualization field does not apply to the geographic reach.
@@ -1493,8 +1493,8 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         Candidate.LandscapeSize = 2017;
         Candidate.HorizontalSpanXCm = 198500.0f;
         Candidate.HorizontalSpanYCm = 154900.0f;
-        Candidate.TargetReliefCm = 14639.462013f;
-        Candidate.WorldVerticalOffsetCm = 5861.487517f;
+        Candidate.TargetReliefCm = 14613.022162f;
+        Candidate.WorldVerticalOffsetCm = 5887.927369f;
         Candidate.bApplyPreviewAnalyticChannelBurn = false;
         Candidate.bUseSolverVisualizationFields = false;
         Candidate.bPhysicalScaleSourceCorridor = true;

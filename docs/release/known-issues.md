@@ -72,12 +72,14 @@ Editor-hosted Development build on the development host; no packaged-build resul
   Futaleufu Terminator is now an evidence-based 2.4 km geographic reach. It
   uses Sentinel-2 10 m wetted extent and whitewater, Copernicus GLO-30
   terrain and surface anchors, and a Terminator located by persistent
-  whitewater at its chainage. It runs p95 25-38 ms with no hitches. It is not
+  whitewater at its chainage. It runs p95 23-28 ms with no hitches. It is not
   accepted:
   - The imagery is 10 m and the elevation 30 m, so rocks, holes and banks are
     unresolved.
   - The bed and flow are inferred.
-  - The rapid is hydraulically milder than its whitewater.
+  - The main and lower rapids reach about their photographed Froude shares
+    since the 2026-09-29 station-projection fix, but the smaller whitewater
+    at 1.5 and 2.0 km is missing.
 
   See the [review](../reconstruction-review-2026-09-07/futaleufu-terminator-evidence.md).
   Chilko Lava Canyon is now an evidence-based 4.0 km geographic reach from
@@ -94,17 +96,20 @@ Editor-hosted Development build on the development host; no packaged-build resul
   The Zambezi upper gorge (`L_ZambeziUpperGorge`, Boiling Pot to below
   Stairway to Heaven) is a new evidence-based 3.5 km map beside the 30 km
   `L_Zambezi`. Its water is a map-aligned Cartesian cook at the 283 m³/s
-  flow of the 2025-10-03 Sentinel-2 image. After two bed calibrations the
-  GLO-30 surface anchors are -0.24 to +1.00 m and the wet IoU is 0.77. It is
-  not accepted:
+  flow of the 2025-10-03 Sentinel-2 image. The GLO-30 surface anchors are
+  -1.14 to +0.52 m and the wet IoU is 0.97. The first build left grey cones
+  of raw DEM standing in the river at the hairpins; a station-projection fix
+  on 2026-09-29 removed them. It is not accepted:
   - There is no bathymetry: depth is inferred and capped at 6.5 m by the
     runtime's 10 m gate.
   - The gorge walls are inferred below GLO-30's 30 m resolution.
-  - The cooked field does not place the photographed rapids: Stairway to
-    Heaven is 28 % white in the image but only 1.7 % of its cells exceed
-    Froude 0.8.
-  - It runs p95 34.3, 36.4 and 45.6 ms with no hitches at the launch, the
-    1.5 km whitewater and Stairway to Heaven. The last is 4.4 ms under the
+  - The cooked field places Stairway to Heaven (28 % white in the image,
+    25.5 % of cells above Froude 0.8) but misses the whitewater at 1.5 and
+    2.5 km.
+  - It runs p95 35.0, 32.8 and 44.8 ms with no hitches at the launch, the
+    1.5 km whitewater and Stairway to Heaven. The last is 5.2 ms under the
     budget.
+  - Beyond the cooked cuts the channel is dry, so the river ahead of the
+    finish looks like a dry bed.
 
   See the [review](../reconstruction-review-2026-09-07/zambezi-upper-gorge-evidence.md).

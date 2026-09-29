@@ -86,6 +86,8 @@ def main():
     ap.add_argument('--context-cells', type=int, default=3)
     ap.add_argument('--raft-margin-m', type=float, default=8.0)
     ap.add_argument('--centre-step-m', type=float, default=4.0)
+    ap.add_argument('--bed-correction-file', type=Path, default=None,
+                    help='where the bed correction named by the evidence manifest now lives (checked by its sha256)')
     args = ap.parse_args()
     scen = DATA / f'scenario_{SECTION}'; terr = DATA / f'terrain/{SECTION}'
     assert not scen.exists() and not terr.exists(), 'fresh output folders required'
@@ -315,7 +317,8 @@ def main():
         shutil.copyfile(ev / png, scen / 'evidence' / ('evidence_' + png))
     corr = evm.get('parameters', {}).get('bed_correction')
     if corr:
-        cp = next(c for c in (Path(corr), ROOT / corr) if c.is_absolute() and c.exists())
+        cp = next(c for c in ((args.bed_correction_file.resolve() if args.bed_correction_file else None), Path(corr), ROOT / corr)
+                  if c is not None and c.is_absolute() and c.exists())
         assert sha(cp) == evm['parameters']['bed_correction_sha256']
         shutil.copyfile(cp, scen / 'evidence' / 'bed_correction.npz')
 

@@ -190,22 +190,35 @@ def main():
     CE, CN = np.meshgrid(xc, yc)
     st_grid = np.full((NY, NX), np.nan); lat_grid = np.full((NY, NX), np.nan)
     LMAX = 250.0
+    # Nearest point on the midline, with each segment's foot clamped to its
+    # ends. Projecting only onto segment interiors left a wedge with no
+    # station outside every vertex (widest at the hairpins); those cells had
+    # no water surface, kept raw GLO-30 heights and stood as pinnacles in the
+    # river, and at hairpins a cell beside one limb took the other limb's
+    # station 200 m away. The clamped foot (the vertex itself) covers the
+    # wedge, and comparing true distances keeps each cell on its nearest limb.
+    WEDGE_MARGIN = 60
     for i in range(M - 1):
         pts = np.array([[mxs[i] + a * mLX[i], mys[i] + a * mLY[i]] for a in (-LMAX, LMAX)] +
                        [[mxs[i + 1] + a * mLX[i + 1], mys[i + 1] + a * mLY[i + 1]] for a in (LMAX, -LMAX)])
-        c0 = max(int(np.floor(pts[:, 0].min() - X0)), 0); c1 = min(int(np.ceil(pts[:, 0].max() - X0)), NX)
-        r0 = max(int(np.floor(Y1 - pts[:, 1].max())), 0); r1 = min(int(np.ceil(Y1 - pts[:, 1].min())), NY)
+        c0 = max(int(np.floor(pts[:, 0].min() - X0)) - WEDGE_MARGIN, 0)
+        c1 = min(int(np.ceil(pts[:, 0].max() - X0)) + WEDGE_MARGIN, NX)
+        r0 = max(int(np.floor(Y1 - pts[:, 1].max())) - WEDGE_MARGIN, 0)
+        r1 = min(int(np.ceil(Y1 - pts[:, 1].min())) + WEDGE_MARGIN, NY)
         if c1 <= c0 or r1 <= r0:
             continue
         ex = CE[r0:r1, c0:c1]; ey = CN[r0:r1, c0:c1]
         a_ = (ex - mxs[i]) * mtx[i] / mtn[i] + (ey - mys[i]) * mty[i] / mtn[i]
         seglen = np.hypot(mxs[i + 1] - mxs[i], mys[i + 1] - mys[i])
         lat_ = (ex - mxs[i]) * mLX[i] + (ey - mys[i]) * mLY[i]
-        inq = (a_ >= 0) & (a_ < seglen) & (np.abs(lat_) <= LMAX)
+        a_c = np.clip(a_, 0.0, seglen)
+        dist = np.hypot(ex - mxs[i] - a_c * mtx[i] / mtn[i], ey - mys[i] - a_c * mty[i] / mtn[i])
+        lat_c = np.where(lat_ >= 0.0, dist, -dist)
+        inq = dist <= LMAX
         sub_s = st_grid[r0:r1, c0:c1]; sub_l = lat_grid[r0:r1, c0:c1]
-        closer = inq & (~np.isfinite(sub_l) | (np.abs(lat_) < np.abs(sub_l)))
-        sub_s[closer] = mS_osm[i] + a_[closer] * (mS_osm[i + 1] - mS_osm[i]) / max(seglen, 1e-9)
-        sub_l[closer] = lat_[closer]
+        closer = inq & (~np.isfinite(sub_l) | (dist < np.abs(sub_l)))
+        sub_s[closer] = mS_osm[i] + a_c[closer] * (mS_osm[i + 1] - mS_osm[i]) / max(seglen, 1e-9)
+        sub_l[closer] = lat_c[closer]
     del CE, CN
 
     # ---------------- river: wetted cells connected to the midline
@@ -385,6 +398,7 @@ def main():
                         margin_m=args.margin_m, boulder_crest_below_ws_m=args.boulder_crest_below_ws_m,
                         max_depth_m=args.max_depth_m, depth_capped_cells=capped,
                         min_half_width_m=args.min_half_width_m, widened_cells=widened_cells,
+                        station_projection='nearest point on the midline (segment feet clamped to their ends)',
                         wall_rise_m=args.wall_rise_m, wall_width_m=args.wall_width_m, wall_reach_m=args.wall_reach_m, walled_cells=walled_cells,
                         bed_correction=None if corr is None else args.bed_correction.resolve().relative_to(ROOT).as_posix(),
                         bed_correction_sha256=None if corr is None else sha(args.bed_correction)),

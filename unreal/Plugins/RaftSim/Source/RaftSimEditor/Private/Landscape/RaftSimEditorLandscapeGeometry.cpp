@@ -37,7 +37,7 @@ constexpr float ChilkoProgress(float StationM) { return StationM / kChilkoLavaCa
 // low-water midline (the local centreline and the run-progress map share
 // them). The launch is the export's checked start (calm, >= 1 m deep, inside
 // a valid Cartesian live-window rectangle; terrain manifest `launch`).
-constexpr float kZambeziUpperGorgeLaunchStationM = 294.7f;
+constexpr float kZambeziUpperGorgeLaunchStationM = 212.7f;
 constexpr float kZambeziUpperGorgeFinishStationM = 3382.0f;
 float CenterlineProgress(const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points, float StationM)
 {

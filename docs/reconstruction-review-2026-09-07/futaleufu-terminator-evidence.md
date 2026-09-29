@@ -66,6 +66,17 @@ EGM2008.
      averaged over the dates.
    - **Midline:** the middle of the wetted run along OSM normals, smoothed.
      OSM only orders it.
+   - **Station and offset (corrected 2026-09-29):** each cell takes the
+     station of the nearest point on the 2 m midline, with each segment's foot
+     clamped to its ends.
+     - The first build projected cells only onto segment interiors, which left
+       a wedge with no station outside every vertex. Those cells had no water
+       surface, kept raw GLO-30 heights and could stand as cones in the river.
+       The same fault in the Zambezi upper gorge builder, which was copied from
+       this one, put visible cones in that river.
+     - Cells more than 3 m above the neighbouring water surface with at least
+       7 wet neighbours: 162 in the first grid, 0 now.
+     - The rapids' hydraulics changed with the correction (see Results).
    - **Surface anchors (measured with editing).** GLO-30 edits water bodies
      flat and monotonic. The median of channel-interior GLO-30 heights per
      50 m, forced non-increasing, gives an anchor every 200 m. Their epoch
@@ -89,7 +100,8 @@ EGM2008.
 4. **Bed calibration:** two step-limited passes of `calibrate_river_bed.py`
    (relax 0.8, 50 m smoothing, at most 2 m per pass). They lower the
    inferred bed by station towards the reference surface. The uncalibrated
-   cook ran 1.4 m high.
+   cook ran 1.4 m high. The corrected grid reuses the pass-2 correction
+   (`evidence/bed_correction.npz`) and was re-cooked for 48,000 steps.
 
 ## Runtime integration
 
@@ -103,12 +115,12 @@ EGM2008.
 - a 2,048² Sentinel-2 drape, albedo-scaled like the Pacuare drape;
 - a GLO-30 backdrop mesh (20 m, 3 km around the Landscape).
 
-Terrain against the solver bed in wet cells: p5/p50/p95 -0.09/0.00/+0.08 m.
+Terrain against the solver bed in wet cells: p5/p50/p95 -0.03/0.00/+0.02 m.
 
 `build_futaleufu_evidence_dressing.py` places the canopy:
-- 41,966 trees on a 9 m lattice inside Sentinel-2 forest cover (NDVI > 0.6
+- 41,973 trees on a 9 m lattice inside Sentinel-2 forest cover (NDVI > 0.6
   and green reflectance below 0.062; pasture is brighter);
-- 13,359 understory shrubs within 200 m of the water.
+- 13,435 understory shrubs within 200 m of the water.
 
 At 10 m no crowns are resolved, so the positions, sizes, heights and species
 are inferred; only the forest extent is measured. The shared editor helper
@@ -121,23 +133,39 @@ gone, because the inferred boulders are in the bed.
 
 ## Results
 
-Final cook (48,000 steps at 400 m³/s; `evidence/cook_compare.json`):
+Final cook on the corrected grid (48,000 steps at 400 m³/s;
+`evidence/cook_compare.json`):
 
 | check | value |
 | --- | --- |
-| GLO-30 surface anchors (11, every 200 m) | -0.34 to +1.14 m (median +0.36 m) |
-| reference surface (partly inferred), median | +0.23 m |
-| wet extent against the Sentinel-2 extent, IoU | 0.90 (3,014 cells wet beyond it, 28 missed) |
-| discharge, exact face flux | 399.6-400.0 m³/s |
-| settling, p95 depth change over the last 150 s | 3.6 mm |
-| depth p50 / p95; speed p50 / p95 | 3.5 / 6.7 m; 2.3 / 4.0 m/s |
+| GLO-30 surface anchors (12, every 200 m) | -1.16 to +0.82 m (median +0.21 m) |
+| reference surface (partly inferred), median | +0.11 m |
+| wet extent against the Sentinel-2 extent, IoU | 0.94 (1,659 cells wet beyond it, 32 missed) |
+| discharge, exact face flux | 399.5-400.0 m³/s |
+| settling, p95 depth change over the last 150 s | 2.5 mm |
+| depth p50 / p95; speed p50 / p95 | 3.4 / 7.2 m; 2.3 / 4.2 m/s |
 
-- **The rapid is hydraulically milder than its whitewater.** From 1,000 to
-  1,250 m the imagery shows 25 % whitewater, but only 5 % of wet cells
-  exceed Froude 0.8. From 1,750 to 2,000 m it is 19 % against 4 %.
+The first grid gave anchors -0.34 to +1.14 m and an IoU of 0.90.
+
+- **Whitewater against Froude > 0.8, per 250 m of station:**
+
+  | station | photographed white | first grid | corrected grid |
+  | --- | --- | --- | --- |
+  | 1,000 m (the Terminator) | 24.7 % | 5.1 % | 28.5 % |
+  | 1,250 m | 22.1 % | 12.3 % | 17.4 % |
+  | 1,500 m | 3.4 % | 0.6 % | 0.6 % |
+  | 1,750 m | 18.8 % | 4.4 % | 17.2 % |
+  | 2,000 m | 4.9 % | 0.4 % | 0.2 % |
+
+  - The corrected grid places the main rapid and the lower rapid at about
+    their photographed shares. The first grid's unstationed wedges were both
+    missing from the whitewater weighting that spreads each drop and left
+    raw-DSM cones in the channel; which of the two moved the rapids has not
+    been separated.
+  - The smaller whitewater at 1,500 and 2,000 m is still missing.
   - The observed-whitewater floor shows the photographed extent.
   - The smooth inferred bed and the 30 m surface cannot form the
-    Terminator's holes and waves.
+    Terminator's individual holes and waves.
 - **The flow is known on one image date only:** 163 m³/s at La Frontera on
   2020-02-20, plus unmeasured tributaries. The other dates and the GLO-30
   epoch are unknown. 400 m³/s is a planning band, well above that image-day
@@ -164,6 +192,11 @@ Final cook (48,000 steps at 400 m³/s; `evidence/cook_compare.json`):
   lowered.
 - **In-game survey** at 750, 1,100, 1,450, 1,800 and 2,150 m: every station
   is wet, 3.0-6.7 m deep, with no ground contact.
+- **After the station-projection fix (2026-09-29):** the map was rebuilt, and
+  P4 `L_Terminator` and both `RaftSim.M9.FFutaleufu*` tests pass. The survey
+  at the same stations finds every station wet, 2.6-8.9 m deep, with no
+  ground contact and no obstacles. The chase cameras show whitewater at 1,100
+  and 1,800 m and no cones.
 
 ## Performance
 
@@ -172,9 +205,12 @@ running:
 
 | station | p95 | max | frames over 100 ms |
 | --- | --- | --- | --- |
-| 750 m | 25.2 ms | 32.2 ms | 0 |
-| 1,250 m (in the rapid) | 38.1 ms | 51.5 ms | 0 |
-| 1,900 m | 26.6 ms | 46.5 ms | 0 |
+| 750 m | 23.5 ms | 33.9 ms | 0 |
+| 1,250 m (in the rapid) | 27.9 ms | 43.6 ms | 0 |
+| 1,900 m | 27.7 ms | 54.3 ms | 0 |
+
+These are the rebuilt map (2026-09-29). The first map measured 25.2, 38.1 and
+26.6 ms.
 
 ## Limits (why this is not accepted)
 
@@ -185,7 +221,10 @@ running:
   to an edited DSM surface of unknown epoch flow (about ±2 m).
 - **GLO-30 is a surface model**, so tree canopy is part of the terrain
   heights on the valley walls.
-- **The lower and main rapids are too mild** hydraulically (see Results).
+- **Rapids are placed only by share.** The main and lower rapids now reach
+  about their photographed Froude shares, but the smaller whitewater at 1,500
+  and 2,000 m is missing, and no individual hole or wave is resolved (see
+  Results).
 - **The canopy positions, species and heights are inferred.** Only forest
   cover is measured.
 - **Finer data would need purchase** (SAF aerial photography). The
