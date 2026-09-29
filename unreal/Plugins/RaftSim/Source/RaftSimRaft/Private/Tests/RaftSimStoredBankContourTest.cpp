@@ -27,6 +27,8 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
     const double ChangedDepth[]={0.,0.17724543809890747,0.21227142214775085,0.34732389450073242};
     const double RowBed[]={8.0471343994140625,8.0450592041015625,7.95037841796875,8.0014495849609375};
     const double RowDepth[]={0.,0.001626607496291399,0.0067639793269336224,0.01633489690721035};
+    const double ReversedRowDepth[]={0.,0.0018043745076283813,0.0071192341856658459,0.016551967710256577};
+    const double ShallowEndcapDepth[]={0.,0.0020726395305246115,0.0076036825776100159,0.016833245754241943};
     const double CornerDepth[]={0.,.17728912830352783,.21232075989246368,.34736922383308411};
     const double SecondCornerBed[]={8.5865020751953125,8.4203643798828125,8.4630279541015625,8.2987060546875};
     const double SecondCornerDepth[]={0.,.16613596677780151,.10671740770339966,.28282999992370605};
@@ -53,7 +55,11 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
         {FVector2D(-545800.,-358900.),FVector2D(100.,-100.),FVector2D(-554200.,-348600.)},
         // Partition-live-v2 frame189/source33168 and214/source33610.
         {FVector2D(-544900.,-363300.),FVector2D(-100.,-100.),FVector2D(-554200.,-348600.)},
-        {FVector2D(-545700.,-363500.),FVector2D(100.,100.),FVector2D(-554200.,-348600.)}
+        {FVector2D(-545700.,-363500.),FVector2D(100.,100.),FVector2D(-554200.,-348600.)},
+        // Shared-reserve live frame342/source23259 and414/source19466:
+        // the same physical cell before/after the render-origin shift.
+        {FVector2D(-545800.,-358900.),FVector2D(100.,-100.),FVector2D(-554200.,-348600.)},
+        {FVector2D(-545800.,-358900.),FVector2D(100.,-100.),FVector2D(-557400.,-350300.)}
     };
     TArray<TSharedPtr<FJsonValue>> Cases;
     const auto Pair=[](const FVector2D& P)
@@ -64,8 +70,8 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
     };
     for(int32 K=0;K<UE_ARRAY_COUNT(Maps);++K)
     {
-        const auto& CaseBed=K==12 ? SecondCornerBed : K==10 ? RowBed : K>=8 ? TransitionBed : K>=5 ? CapturedBed : BaselineBed;
-        const auto& CaseDepth=K==12 ? SecondCornerDepth : K==11 ? CornerDepth : K==10 ? RowDepth : K==9 ? ChangedDepth : K==8 ? TransitionDepth : K==7 ? LatestDepth : K==6 ? LaterDepth : K==5 ? CapturedDepth : BaselineDepth;
+        const auto& CaseBed=K>=13 ? RowBed : K==12 ? SecondCornerBed : K==10 ? RowBed : K>=8 ? TransitionBed : K>=5 ? CapturedBed : BaselineBed;
+        const auto& CaseDepth=K==14 ? ShallowEndcapDepth : K==13 ? ReversedRowDepth : K==12 ? SecondCornerDepth : K==11 ? CornerDepth : K==10 ? RowDepth : K==9 ? ChangedDepth : K==8 ? TransitionDepth : K==7 ? LatestDepth : K==6 ? LaterDepth : K==5 ? CapturedDepth : BaselineDepth;
         FCurve CaseCurve;if(!TestTrue(TEXT("unchanged case donors"),CaseCurve.Init(CaseBed,CaseDepth)))return false;
         const auto& M=Maps[K];RaftSimStoredBankContour::FStorage Storage;
         if(!TestTrue(TEXT("Cartesian GPU storage map valid"),Storage.Init(CaseCurve,M.O,
@@ -83,9 +89,9 @@ bool FRaftSimStoredBankContourTest::RunTest(const FString&)
             const FScopedIEEE Scope;FStats Diagnostic;
             const FPoint P=Storage.Local(Storage.BufferPosition(FPoint(Reference.Stats.FailedA)));
             const FPoint Q=Storage.Local(Storage.BufferPosition(FPoint(Reference.Stats.FailedB)));
-            const FPoint A=Inner(P,Storage.Width),B=Inner(Q,Storage.Width),O(FVector2D::ZeroVector,true);
-            AddInfo(FString::Printf(TEXT("StoredBank diagnosis order=%.17g outer=%.17g inner=%.17g wet=%d dry=%d p_value=%.17g q_value=%.17g"),
-                Cross(O,P,Q).Lo,Cross(P,Q,B).Lo,Cross(P,B,A).Lo,
+            const FPoint A=Storage.InnerPoint(P,Storage.Width),B=Storage.InnerPoint(Q,Storage.Width),O(FVector2D::ZeroVector,true);
+            AddInfo(FString::Printf(TEXT("StoredBank diagnosis order=%.17g outer=%.17g inner=%.17g dry_order=%.17g wet=%d dry=%d p_value=%.17g q_value=%.17g"),
+                Cross(O,P,Q).Lo,Cross(P,Q,B).Lo,Cross(P,B,A).Lo,Cross(O,A,B).Lo,
                 Certificate(CaseCurve,P,Q,Q,true,Diagnostic),Certificate(CaseCurve,O,A,B,false,Diagnostic),CaseCurve.Value(P).Lo,CaseCurve.Value(Q).Lo));
         }
         if(!TestTrue(TEXT("full-search reference retains complete certificate"),ReferenceGood))return false;

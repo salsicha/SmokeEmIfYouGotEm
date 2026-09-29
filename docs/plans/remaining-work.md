@@ -1,5 +1,292 @@
 # Remaining requested work
 
+LATEST September29 v9 COMPLETE, performance FAIL: session56716 terminal0.
+Current source qualified21/21 native,62 captured states,15 exact polygons and
+48 crossings; live-v3 replay passed90 samples/81.638m and470 accepted updates
+with zero rejects and unchanged sources/binaries. Paired GPU detail42 matches
+4226 probes (maxRGBA1.49e-8);1912 wet CPU probes,zero unavailable/ground-wet.
+Then isolated real Boot/menu candidate profile1200frames (rows30..1169) FAILED
+20FPS: mean62.796ms,p95102.2014ms,max442.031ms,67frames>100ms. No runtime errors
+or competing workloads; sources/binaries unchanged. Receipt:
+unreal/Saved/RaftSimValidation/sf-certified-endcap-v9-menu-20260929-frame-audit.json.
+CSV SHA2567d610cb1babee70e79d445d55dfa9ca355318392b4af4fcb4fb25f6c002cbb37.
+Bridge debt2.5343->2.0145s,max5.7572s;945/1140frames at4ticks. Do not hide debt.
+Measured inclusive scopes: surfaceTick mean40.179ms,SetMesh26.677ms,Topology
+21.144ms(p9552.508ms),StepWater11.795ms; these nest/overlap, do NOT sum them.
+Next work is reducing certified contour/update cost while preserving exact
+wet/dry/storage/width/partition gates, then repeat isolated tests and actual
+visual review. Do not repeat unchanged v9 or enable candidate in normal play.
+No live owned job remains. Previous ownership blocker cleared for THIS run;
+normal v27 unchanged, candidateOFF, no performance/realism acceptance or push.
+
+LATEST September29 05:10UTC external-state change: concurrent work was committed
+at a8933516d and no engine/build/cook was active. One fresh guarded chain is
+LIVE under session56716: stable-source v9 qualification, live-v3-20260929
+replay, then sf-certified-endcap-v9-menu-20260929 isolated timing. Each step
+requires prior success and retains source/binary/ownership gates. Do not
+duplicate the chain. Earlier ownership blocker below is historical pending
+this current-state attempt; no playable update or acceptance is claimed.
+
+LATEST validation ownership blocker: session77378 TERMINAL1. v8 replay engine
+exited0 and saved video RaftSim_20260928-200526.mp4, but the post-run source
+gate found concurrent LandscapeFoliagePlacement.cpp edits. Replay is NOT
+qualified and menu profiling never launched. No live scheduler/replay/profile
+remains from this work. Preserve the other editor changes; do not repeat
+qualification unchanged while the same checkout is being edited externally.
+Source drift has now invalidated v5, v6, v7's attempted timing, and v8 replay
+across successive goal turns. Existing native/replay evidence stays scoped to
+its tested state. A stable exclusive validation window or isolated checkout
+is required next. There is only one Git worktree, no managed attached worktree,
+and about90.1GB free; do not blindly duplicate captured/LFS assets given the
+user's disk-space constraint. Normal v27/candidate-OFF unchanged; no push.
+
+LATEST v8 qualification PASSED (21/21,62/62,15 polygons,48 crossings,unchanged
+inputs), but session53422 terminated1 at the replay's competing-owner guard
+BEFORE replay launch. New confirmed Zambezi survey42100 was live. Session77378
+now waits on that exact survey and resumes ONLY live-v2-20260929 replay then
+sf-certified-endcap-v8-menu-20260929 profiling. Do not rebuild v8 or duplicate
+this wait. Normal v27 unchanged; no visual/performance acceptance or commit.
+
+LATEST after-v7: actual replay remains valid for its tested state, but isolated
+menu profiling stopped BEFORE launch because concurrent SurveyCommand.cpp
+edits changed survey/run-axis mapping. Preserve them. Video decoded2970frames
+over98.9667s (269 adjacent duplicates; encoded rate is NOT gameFPS). Inspected
+20/60/80s views show downstream motion but broad flat foam, weak breaking
+relief and coarse boulders remain; no visual acceptance or normal delivery.
+LIVE session53422 now runs one stable-source v8 qualification, then (only on
+success) fresh live-v2-20260929 replay, then sf-certified-endcap-v8-menu-20260929
+isolated timing. Recipes accept validated evidence names, retain all gates,
+and bind the replay to the exact qualification-receipt hash. Do not duplicate
+the chain. Current v7 wrappers99335 and87210 are terminal0. No commit/push.
+
+LATEST v7 actual candidate replay PASS (session87210 terminal exit0):90 motion
+samples from8311.820 to8396.886m,491 accepted nonempty bank updates,zero rejects,
+unchanged qualified sources/binaries. Paired detail frame43 matches GPU across
+4226 queries (maxRGBAerror1.49e-8);1909 wet CPU support probes,zero unavailable
+or ground-occluded wet points,max support/carrier error4.7593e-5cm. This is ONE
+contact snapshot, not swept collision/full traversal. Receipt:
+tmp/certified-bank-endcap-transition-live-v1-20260928-process.json. Video
+unreal/Saved/VideoCaptures/RaftSim_20260928-195320.mp4 (SHA256
+1311615be19dff2ac726ca8dad2d5ad81c871a8e3add0503bd88c3c0f9aa9b0f).
+Visual review and isolated menu/8310/11520 timing remain pending; diagnostic
+audit/replay cost is NOT a benchmark. Normal v27 unchanged, candidate OFF.
+
+LATEST v7 qualification PASS: session99335 terminal exit0, editor build6.04s,
+21/21 native tests, all62 captured states,15 exact stored polygons,48 exact
+shared crossings and unchanged frozen inputs. Receipt:
+tmp/certified-bank-endcap-transition-v7-20260929-process.json. Prepared live
+replay/profile now bind v7. This qualifies candidate correctness only; actual
+replay, GPU contact, appearance and20FPS checks remain required. Candidate
+still OFF in normal play; v27 unchanged, no commit or push.
+
+LATEST v6 terminal: session26468 exited1. Build6.06s and21/21 native tests
+passed, including all62 captured failures, but concurrent edits changed
+RaftSimWater.Build.cs (Zambezi runtime packaging) and LandscapeFoliage.cpp.
+Do not bypass frozen-input checks or repeatedly build during source churn.
+The new await-stable-bank-v7-20260929.ps1 scheduling wrapper waits for120s of
+unchanged plugin sources AND no competing engine/build/cook, then invokes the
+original guarded v7 qualification once. This quiet interval is not acceptance;
+the original source/binary gates remain. Candidate OFF; normal v27 unchanged.
+LIVE owner: exec session99335. Prior session92443 is TERMINAL -1: only its
+verified idle scheduler10380 (no child, no v7 receipt) was stopped to correct
+the scheduling timer. Source stability now accrues during other workloads;
+launch still requires120s unchanged source and no competing process. This
+avoids requiring a needless120s engine-idle gap between Zambezi jobs. All
+qualification gates are unchanged. Do not start a second wait or v7 run.
+
+LATEST v5 terminal: session37181 exited1 after a successful88.78s build and
+21/21 native tests (all62 captured states certified). Qualification correctly
+failed because Landscape/RaftSimEditorLandscapeGeometry.cpp changed during
+the run: concurrent Zambezi work repaired protected-property access. Preserve
+that fix. No exact audit or live replay is accepted from v5. The subsequent
+Zambezi map job14128 has exited; one fresh guarded v6 qualification is started
+with stem certified-bank-endcap-transition-v6-20260929. Earlier wait notes below
+are historical. Normal v27 remains unchanged; no commit or push.
+
+LATEST retry: the separate Zambezi w2 cook41272 completed60000/60000 steps.
+Session47600 is TERMINAL exit1 at the competing-owner guard, BEFORE v5 build
+or receipt creation: another confirmed SmokeEmIfYouGotEmEditor build41024 is
+still running. Preserve it. Session37181 now waits on that exact build process
+before invoking the guarded v5 qualification once. Do not duplicate either
+build; no replay, normal playable change, commit or push has occurred. Source
+writes succeeded; the current wait is shared-workspace ownership, not access.
+
+LATEST after-v4 source drift: v4's21/21 and62/62 results remain valid for its
+tested binary, but THREE editor sources changed afterward (MaterialsBase.cpp,
+EnvironmentInternal.h, EnvironmentCatalog.cpp; Zambezi upper-gorge support).
+The17 compiled binaries still match v4. Preserve those other-owner edits;
+do not bypass the frozen-source gate or treat v4 as current-tree qualification.
+Stopped ONLY our obsolete replay wait wrapper40824; session19321 TERMINAL -1.
+No candidate replay launched. Zambezi w2 cook41272 remains live and advancing.
+Session47600 now waits on that exact cook before ONE guarded current-tree v5
+build/native/exact run, using the v3 recipe with EvidenceName
+certified-bank-endcap-transition-v5-20260929. Do not duplicate that session.
+Replay/profile still bind v4 and must be rebound only after v5 passes. No
+normal playable update, performance acceptance, commit or push. The earlier
+live replay queue19321 below is superseded, not a remaining wait.
+
+LATEST September29 v4 native/exact qualification PASSED: build198.33s,
+21/21 native tests with no warnings, all62 original captured rejections now
+certify in bounded/full searches and publish/cache matching clockwise GPU
+geometry. Exact audits pass15 stored polygons,48 shared crossings and17 audit
+controls. Frozen inputs unchanged. Session14008 is TERMINAL exit0; no native
+wait remains. Evidence: tmp/certified-bank-endcap-transition-v4-20260929-process.json.
+This is candidate correctness ONLY, not normal playable delivery or20FPS.
+The live replay and profiling recipes now bind that qualified v4 receipt.
+Confirmed new separate Zambezi w2 cook PID41272 (60000steps) must be preserved.
+Session19321 waits on that exact cook, then runs one guarded90-sample candidate
+replay/video/contact capture. Do not duplicate it. Profile remains UNRUN and
+requires successful replay; source/binary hash gates remain mandatory.
+Candidate OFF in normal play, v27 unchanged, no commit or push. Earlier
+pending-v4/session14008/write-blocker notes below are historical.
+
+LATEST user-requested retry: source writes now succeed. The proposed witness-only
+endcap change is applied to RaftSimStoredBankContour.h: retain the proved close
+inner witness when First==Last, emit no outer strip, and retain all final gates.
+Four supporting shallow-endcap tests pass; native qualification is NOT YET RUN.
+The new exact frame399 regression proves both local spans with the rounded
+close witness and inward-rotated next witness, positive partition orientation,
+whole wet/dry signs, representable outer coordinates and the unchanged1mm bound.
+Negative controls reject the extra vertical row, old reversed inner fan and
+naive radial next witness. This is partial construction, not native acceptance.
+The first v4 invocation stopped at its competing-owner guard before building.
+Confirmed live PID42800 is the separately owned Zambezi w1 cook (36000 steps).
+Session14008 now waits for that exact process, then invokes the guarded recipe
+once with evidence stem certified-bank-endcap-transition-v4-20260929. Do not
+duplicate it. Recipe is the v3 script with a validated EvidenceName parameter;
+old v3 evidence is preserved. Candidate remains OFF; normal v27 unchanged.
+No new playable delivery, performance acceptance, commit or push is claimed.
+The earlier write blocker and cook38964 notes below are superseded.
+
+LATEST September29 00:40 UTC: first-row-only v3 builds (44.08s) and improves
+original capture coverage43->53/62, but native qualification still FAILS20/21.
+Remaining frames399..407/source19466 fail both bounded/full searches atstage1:
+wet=1,dry=1,outer order/band triangles positive,inner fan negative; both endcaps
+inactive. All728 frozen inputs match. Session43131 TERMINAL exit1; native40128
+exited255. No remaining v3 wait; do NOT repeat it unchanged. Candidate OFF.
+The next proposed fix retains the close proved endcap witness when no extra
+GPU row fits, emitting no outer strip and retaining every final proof. It
+FAILED TO WRITE twice through scoped apply_patch, including absolute path.
+Header is not read-only and icacls lists Modify/Full grants, no visible deny;
+do not change ACLs or claim permanent access repaired. No v4 recipe/build was
+created. New separately owned cook38964 is Zambezi w0,60000steps; preserve it.
+No live replay, profile, normal package, commit or push occurred. Earlier
+ACTIVE/session43131 notes immediately below are historical and superseded.
+
+ACTIVE: first-row-only axis connection correction applied to the opt-in stored
+contour after expanded v2 failure. Exact arithmetic proves all19 failed outer
+spans are wet; frame389's first-to-second-row path also has a valid dry fan,
+partition and unchanged1mm band, while direct axis-to-second-row connection
+fails. Only the FIRST representable row now requests an axis chord; other
+near-axis rows retain row-root proposals and all final proof gates.3 partial
+span tests pass, NOT native/runtime acceptance. Captured-replay test now runs
+bounded and full searches independently and prints failed proof predicates.
+LIVE session43131 waits on confirmed separate cook6808 (Zambezi v1,36000steps)
+then invokes verify-certified-bank-endcap-transition-v3-20260928.ps1 once.
+Do not duplicate that session or stop the other owner's cook. v3 is unrun;
+candidate OFF and normal v27 unchanged. Existing prepared live/profile scripts
+still bind the failed v2 receipt; only rebind after a new qualification passes.
+
+September29 00:16 UTC expanded native validation FAILED:20/21 tests pass;
+43/62 original captured states certify and publish clockwise GPU geometry,
+but19 states (frames389..407/source19466) fail contour construction at stage1.
+The general endcap fix is therefore incomplete despite passing the earlier
+15-case suite. All728 frozen inputs and17 compiled binary hashes match.
+Session34149 is TERMINAL (exit1); cook4460 exited before the successful build,
+and native444 exited255. No live wait remains. Do not rerun v2 unchanged or
+launch candidate replay/profiling; repair the changing-depth transition first.
+The printed full_stage=0 is unexecuted due to short-circuiting, NOT a full-search
+pass. Candidate stays OFF; normal v27 and protected WaterSurfaceTest unchanged.
+See [expanded capture failure](../reconstruction-review-2026-09-07/certified-bank-endcap-all-captures-failure.md).
+
+Prepared (NOT RUN) tmp/profile-certified-bank-endcap-transition-20260928.ps1
+now gates on the expanded21-test/62-capture/15-polygon receipt and successful
+actual replay. It binds compiled plugin hashes before/after, rejects old cooked
+stages, samples competing workloads during capture, and retains physics clock
+debt through the existing independent CSV auditor. Its21 Python regression
+tests pass and the wrapper parses; this is diagnostic preparation only, not
+new gameplay, FPS, shoreline or simulation-capacity acceptance. Its gates now
+correctly prevent profiling because the expanded native qualification failed.
+
+Historical dependency wait (now finished): session34149 waited for cook4460
+and invoked verify-certified-bank-endcap-transition-v2-20260928.ps1 once.
+Preserve its failed results; the following waiting notes are historical.
+
+September28 waiting follow-up: cook PID4460 remains live and its Zambezi
+progress advances; do not duplicate or terminate it. The unrun v2 native gate
+now freezes compiled plugin DLL/module hashes and requires an explicit62/62
+execution report. Prepared tmp/validate-certified-bank-endcap-transition-live-v1-20260928.ps1
+requires that21-test/15-polygon qualification, unchanged sources/binaries,
+accepted nonempty bank updates and zero rejected updates before reporting
+bounded smoke completion. Both scripts pass syntax parsing only; neither v2
+native validation nor the new live replay has launched. Candidate remains OFF.
+
+September28 23:34 UTC GENERAL endcap transition is implemented in the opt-in
+stored-contour builder. endcap-transition-v1 passes20 native tests,15 exact
+stored polygons,48 exact shared crossings and17 whole-polygon audit controls;
+all frozen inputs unchanged. Cases13 and14 both construct with bounded/full
+searches and publish matching cache geometry. Original19 earlier rejections,
+258 synthetic near-corner cases and20 changing-depth updates pass. This is
+NOT normal playable delivery or cost/visual acceptance. A separate native test
+now retains ALL62 original extended-replay failures with original donors and
+checks actual cache/buffer/ear publication. It is NEW AND UNRUN: the expanded
+21-test recipe tmp/verify-certified-bank-endcap-transition-v2-20260928.ps1
+is prepared but waiting behind separately owned cook PID4460, confirmed live.
+Do not rerun the old replay or promote before the expanded native/exact gate.
+Then qualify actual motion/contact/shoreline and isolated cost, including
+the new endcap preparation cost in FStorage::Init. Candidate remains OFF.
+See [general transition qualification and pending capture coverage](../reconstruction-review-2026-09-07/certified-bank-inward-rotation-attempt.md).
+
+September28 follow-up: exact captured-state construction establishes a possible
+case14 endcap transition, NOT a full-cell fix. Two new tests in
+physics/tests/test_shallow_endcap_transition.py pass: the original canonical
+edge to first-row endcap plus a vertical same-X transition can share a dry
+witness within1mm, while deleting the endcap and joining directly to the
+original next row fails the whole-wet proof. Increasing the shared root reserve
+was investigated and not adopted. Next generate this transition generically
+with coordinated inner witnesses, validate the complete native polygon/cache
+and all62 original captured failures, then exact audit and live replay. Current
+native case14 still fails; candidate OFF and normal v27 unchanged. These two
+partial-span controls do not replace the17 existing whole-polygon controls.
+
+September28 23:16 UTC bounded inward-rotation repair is APPLIED and built.
+The prior three-line radial-neighbor correction also landed (normal-band-v3):
+it cleared case10 but failed case13. The new inward-rotation-v1 now constructs
+cases0..13 with both bounded and full searches, including original frame342.
+It still FAILS case14 (original frame414/source19466 shallow endcap) at stage1:
+whole wet/dry signs prove, but the band and inner fan reverse orientation.
+19/20 native tests pass; all726 frozen inputs are unchanged. No full15-case
+export or independent exact audit was reached. Do not rerun unchanged or
+promote the candidate. Next repair the long shallow endcap together with its
+neighboring inner-boundary correspondence; retain all original proof gates.
+Scoped elevation allowed these specific source/build writes; permanent repo
+access is not established. Normal v27 and protected WaterSurfaceTest hashes
+are unchanged. No new cook, package, live replay, performance acceptance,
+solver activation, commit or push. Earlier write-block notes are historical.
+See [inward-rotation result and remaining shallow endcap](../reconstruction-review-2026-09-07/certified-bank-inward-rotation-attempt.md).
+
+September28 UTC resumed radial-preference correction and15-capture auditor
+binding are now APPLIED through scoped elevation. Native v2 builds and clears
+case0, with cases0..9 constructed, but still FAILS at case10 where radial and
+nonradial witnesses mix.19/20 tests pass;17 Python controls pass; no full export
+or scene acceptance. Next restore radial qualification in general neighbor
+selection before requalifying the special shallow endcap. That follow-up write
+was denied again and DID NOT land. Do not rerun v2 unchanged. One unrelated
+frozen test changed and an editor is now live; preserve shared work. Candidate
+OFF, normal v27 hash unchanged, no cook/push. Earlier write-block notes below
+are historical. See [partial repair and exact remaining failure](../reconstruction-review-2026-09-07/certified-bank-radial-preference-attempt.md).
+
+September28 UTC nonradial-band WIP compiled but FAILED native qualification:
+19/20 regressions pass; stored-coordinate case0 rejects an inner-fan ordering
+problem before the two newly added original replay fixtures are reached.
+17 independent audit controls pass; no new exact export or live acceptance.
+The corrective radial-preference header edit and15-capture auditor extension
+could not be written through scoped elevated apply_patch; no ACL changes.
+Do not repeat this unchanged build or enable the candidate. Restore scoped
+source write access, retain already-proven radial witnesses, and qualify the
+full partition again. v27 remains the normal delivered game; no cook/push.
+See [failed native attempt and precise write blocker](../reconstruction-review-2026-09-07/certified-bank-normal-band-attempt.md).
+
 September28 UTC canonical shared-edge reserve repairs all19 prior captured
 rejections within the unchanged1mm band:20 native regressions,258 added synthetic
 near-corner probes,13 exact stored contours,48 exact crossings,15 audit controls

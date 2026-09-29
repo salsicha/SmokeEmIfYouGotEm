@@ -14,6 +14,14 @@ struct FStorage
     double Width=0.,RootWidth=0.;
     bool Valid=false;
     mutable int32 SignedNeighborFallbacks=0;
+    struct FEndcap
+    {
+        bool Active=false;
+        double Limit=0.;
+        FVector2D First=FVector2D::ZeroVector,Last=FVector2D::ZeroVector;
+        FPoint Inner{FVector2D::ZeroVector};
+    };
+    FEndcap Endcaps[2];
     static bool ExactDifference(double A,double B,double& D)
     {
         // Error-free TwoDiff, with explicit rounding points. Do not pretend
@@ -30,6 +38,7 @@ struct FStorage
         FVector2D RequestedRenderOrigin=FVector2D::ZeroVector)
     {
         const FScopedIEEE Scope;Valid=false;SignedNeighborFallbacks=0;
+        Endcaps[0]=FEndcap{};Endcaps[1]=FEndcap{};
         if(!C.Valid || !FMath::IsFinite(WidthCm) || WidthCm<=0. || Dry.ContainsNaN() ||
             WetX.ContainsNaN() || WetY.ContainsNaN() || Dry.Y!=WetX.Y || Dry.X!=WetY.X ||
             Dry.X==WetX.X || Dry.Y==WetY.Y)return false;
@@ -62,7 +71,9 @@ struct FStorage
         // Root proposals leave space for the final outward float conversion.
         // This never increases Width; lack of representable room fails closed.
         RootWidth=Down(Width-Quantization);
-        Valid=RootWidth>0.;return Valid;
+        Valid=RootWidth>0.;
+        if(Valid){PrepareEndcap(0);PrepareEndcap(1);}
+        return Valid;
     }
     FBound Coordinate(double P,int32 Axis)const
     {
@@ -85,9 +96,153 @@ struct FStorage
         return FVector2D(double(float(Origin.X+(End.X-Origin.X)*P.XY.X)),
             double(float(Origin.Y+(End.Y-Origin.Y)*P.XY.Y)));
     }
+    FPoint InnerPoint(const FPoint& P,double InWidth)const
+    {
+        if(InWidth==Width)for(int32 Free=0;Free<2;++Free)
+        {
+            const FEndcap& Cap=Endcaps[Free];if(!Cap.Active)continue;
+            const FVector2D W=BufferPosition(P);const int32 Fixed=1-Free;
+            if(W[Free]==Cap.First[Free] && W[Fixed]>=FMath::Min(Cap.First[Fixed],Cap.Last[Fixed]) &&
+                W[Fixed]<=FMath::Max(Cap.First[Fixed],Cap.Last[Fixed]))return Cap.Inner;
+        }
+        const FPoint Radial=Inner(P,InWidth);
+        if(P.X.Zero() || P.Y.Zero())return Radial;
+        // Preserve the ordered radial fan whenever its dry witness proves.
+        // Nearest-normal witnesses can reverse the inner fan at a fold.
+        if(Curve.Value(Radial).Hi<=0.)return Radial;
+        const double X=P.XY.X,Y=P.XY.Y;
+        const double W0=(1.-X)*(1.-Y);
+        const double W[]={W0,X*(1.-Y),(1.-X)*Y,X*Y};
+        const double DX[]={-(1.-Y),1.-Y,-Y,Y},DY[]={-(1.-X),-X,1.-X,X};
+        double Drop=0.,GX=0.,GY=0.,DropX=0.,DropY=0.;
+        for(int32 I=1;I<4;++I)
+        {
+            const double D=Curve.Bed[0]-Curve.Bed[I];Drop+=W[I]*D;
+            GX+=DX[I]*Curve.Depth[I];GY+=DY[I]*Curve.Depth[I];
+            DropX+=DX[I]*D;DropY+=DY[I]*D;
+        }
+        GX-=DX[0]*Drop+W0*DropX;GY-=DY[0]*Drop+W0*DropY;
+        const double Size=FMath::Abs(GX)+FMath::Abs(GY);
+        if(!FMath::IsFinite(Size) || Size<=0.)return Radial;
+        const double Error=FMath::Max(FMath::Abs(P.X.Lo-X),FMath::Abs(P.X.Hi-X))+
+            FMath::Max(FMath::Abs(P.Y.Lo-Y),FMath::Abs(P.Y.Hi-Y));
+        const double Distance=FMath::Max(0.,InWidth-128.*std::numeric_limits<double>::epsilon()-2.*Error);
+        // A shallow contour can require only a small rotation of the radial
+        // retreat. Jumping directly to its normal can reverse the inner fan.
+        // Try componentwise inward proposals nearest the radial direction
+        // first; the complete adjacent partition still decides acceptance.
+        const double Radius=X+Y;
+        const int32 Small=X<=Y ? 0 : 1;
+        for(int32 Axis:{Small,1-Small})for(double Scale:{.875,.75,.625,.5,.25,0.})
+        {
+            FVector2D Direction=P.XY/Radius;
+            Direction[Axis]*=Scale;Direction[1-Axis]=1.-Direction[Axis];
+            const FVector2D V(FMath::Max(0.,X-Distance*Direction.X),FMath::Max(0.,Y-Distance*Direction.Y));
+            const FPoint Rotated(V,V==FVector2D::ZeroVector);
+            if(Curve.Value(Rotated).Hi<=0.)return Rotated;
+        }
+        const FVector2D Q(FMath::Clamp(X-Distance*(GX/Size),0.,1.),FMath::Clamp(Y-Distance*(GY/Size),0.,1.));
+        const FPoint Candidate(Q,Q==FVector2D::ZeroVector);
+        // Gradient direction is only a geometric proposal. Its actual dry
+        // sign, full fan, orientation, partition and unchanged width must prove.
+        return Curve.Value(Candidate).Hi<=0. ? Candidate : Radial;
+    }
+    double MapCoordinate(double V,int32 Axis,bool Away)const
+    {
+        const bool Increasing=End[Axis]>Origin[Axis];
+        const FBound M=FBound(Origin[Axis])+(FBound(End[Axis])-FBound(Origin[Axis]))*FBound(V);
+        const bool Upward=Increasing==Away;
+        const double Bound=Upward ? M.Hi : M.Lo;float W=float(Bound);
+        if(Upward ? double(W)<Bound : double(W)>Bound)
+            W=std::nextafter(W,Upward ? std::numeric_limits<float>::infinity() : -std::numeric_limits<float>::infinity());
+        return FMath::Clamp(double(W),FMath::Min(Origin[Axis],End[Axis]),FMath::Max(Origin[Axis],End[Axis]));
+    }
+    void PrepareEndcap(int32 Free)
+    {
+        // A first representable row can require a long tangential endcap.
+        // Route back to the contour on that same stored free coordinate,
+        // sharing one proved dry witness across the resulting vertical strip.
+        // Every value below comes from this cell's original donors and GPU
+        // spacing; no captured case or coordinate is special-cased.
+        const int32 Fixed=1-Free;FStats Stats;
+        const FPoint O(FVector2D::ZeroVector,true),Edge=Local(Crossings[Free]);
+        const FPoint EdgeInner=Inner(Edge,Width);
+        FVector2D Row=Origin;
+        Row[Fixed]=double(std::nextafter(float(Origin[Fixed]),End[Fixed]>Origin[Fixed] ?
+            std::numeric_limits<float>::infinity() : -std::numeric_limits<float>::infinity()));
+        const auto OnRow=[&](double V){FVector2D W=Row;W[Free]=MapCoordinate(V,Free,true);return Local(W);};
+        double Low=0.,High=1.;FPoint P=OnRow(High);
+        if(!Certificate(Curve,Edge,P,P,true,Stats))return;
+        for(int32 I=0;I<56;++I)
+        {
+            const double Mid=(Low+High)*.5;const FPoint Trial=OnRow(Mid);
+            if(SamePoint(Trial,P))break;
+            if(Certificate(Curve,Edge,Trial,Trial,true,Stats)){High=Mid;P=Trial;}else Low=Mid;
+        }
+        const FPoint Radial=Inner(P,Width);
+        if(Curve.Value(Radial).Hi<=0.)return; // Existing radial path needs no bridge.
+        const FPoint Alternative=InnerPoint(P,Width);
+        const auto Proves=[&](const FPoint& A)
+        {
+            if(Curve.Value(A).Hi>0.)return false;
+            if(Free==0)
+            {
+                if(Cross(O,Edge,P).Lo<=0. || Cross(Edge,P,A).Lo<0. ||
+                    Cross(Edge,A,EdgeInner).Lo<0. || Cross(O,EdgeInner,A).Lo<0.)return false;
+            }
+            else if(Cross(O,P,Edge).Lo<=0. || Cross(P,Edge,EdgeInner).Lo<0. ||
+                Cross(P,EdgeInner,A).Lo<0. || Cross(O,A,EdgeInner).Lo<0.)return false;
+            return Certificate(Curve,O,EdgeInner,A,false,Stats);
+        };
+        if(!Proves(Alternative))return;
+        // Find a close dry witness; a full normal retreat can reverse the
+        // subsequent fan even though it has a valid pointwise dry sign.
+        double Left=0.,Right=1.;FPoint A=Alternative;
+        for(int32 I=0;I<56;++I)
+        {
+            const double Mid=(Left+Right)*.5;
+            const FPoint Trial(Radial.XY+(Alternative.XY-Radial.XY)*Mid);
+            if(Proves(Trial)){Right=Mid;A=Trial;}else Left=Mid;
+            if((Alternative.XY-Radial.XY).GetAbs().X*(Right-Left)+
+                (Alternative.XY-Radial.XY).GetAbs().Y*(Right-Left)<=RootWidth/65536.)break;
+        }
+        const FVector2D Start=BufferPosition(P);
+        const auto OnLine=[&](double V){FVector2D W=Start;W[Fixed]=MapCoordinate(V,Fixed,false);return Local(W);};
+        Low=P.XY[Fixed];High=FMath::Min(1.,FMath::Max(Low,A.XY[Fixed])+Width);
+        FPoint Last=P;
+        for(int32 I=0;I<56;++I)
+        {
+            const double Mid=(Low+High)*.5;const FPoint Trial=OnLine(Mid);
+            if(SamePoint(Trial,Last))break;
+            if(Certificate(Curve,P,Trial,Trial,true,Stats)){Low=Mid;Last=Trial;}else High=Mid;
+        }
+        if(!Proves(A))return;
+        for(const FPoint* V:{&P,&Last})
+        {
+            const FBound DX=V->X-A.X,DY=V->Y-A.Y;
+            if(Up(FMath::Max(FMath::Abs(DX.Lo),FMath::Abs(DX.Hi))+
+                FMath::Max(FMath::Abs(DY.Lo),FMath::Abs(DY.Hi)))>Width)return;
+        }
+        // Preserve a proved one-point witness without emitting a new strip.
+        // Every neighboring partition and depth certificate remains required.
+        if(!SamePoint(P,Last) && (Free==0 ? Cross(P,Last,A).Lo<0. : Cross(Last,P,A).Lo<0.))return;
+        FEndcap& Cap=Endcaps[Free];Cap.First=Start;Cap.Last=BufferPosition(Last);Cap.Inner=A;
+        Cap.Limit=High/(P.XY[Free]+High);Cap.Active=true;
+    }
     FPoint operator()(const FPoint& Proposal,double T)const
     {
         if(T==0.)return Local(Crossings[0]);if(T==1.)return Local(Crossings[1]);
+        if(T>0. && T<1.)for(int32 Free=0;Free<2;++Free)
+        {
+            const FEndcap& Cap=Endcaps[Free];const double Along=Free==0 ? T : 1.-T;
+            if(!Cap.Active || Along>Cap.Limit)continue;
+            if(Cap.First==Cap.Last)continue; // Witness only; no outer strip.
+            const int32 Fixed=1-Free;const FPoint First=Local(Cap.First),Last=Local(Cap.Last);
+            const double V=FMath::Clamp(First.XY[Free]*Along/(1.-Along),First.XY[Fixed],Last.XY[Fixed]);
+            FVector2D W=Cap.First;W[Fixed]=FMath::Clamp(MapCoordinate(V,Fixed,false),
+                FMath::Min(Cap.First[Fixed],Cap.Last[Fixed]),FMath::Max(Cap.First[Fixed],Cap.Last[Fixed]));
+            return Local(W);
+        }
         FVector2D Stored;
         double Candidates[2][3];
         for(int32 Axis=0;Axis<2;++Axis)
@@ -118,6 +273,11 @@ struct FStorage
                 End[Fixed]>Origin[Fixed] ? std::numeric_limits<float>::infinity() :
                     -std::numeric_limits<float>::infinity()))-Origin[Fixed]);
             const bool NearAxis=FMath::Abs(Stored[Fixed]-Origin[Fixed])<=2.*FixedStep;
+            // Only the first off-axis row closes against the shared edge.
+            // Later rows connect through that endcap/bridge. Requiring their
+            // direct edge chords to be wet can push them past the dry witness
+            // band even when the consecutive-row partition is certified.
+            const bool FirstRow=FMath::Abs(Stored[Fixed]-Origin[Fixed])==FixedStep;
             bool HasSignedNeighbor=false;
             for(int32 X=0;X<3;++X)for(int32 Y=0;Y<3;++Y)
             {
@@ -147,7 +307,7 @@ struct FStorage
                 FStats EndcapStats;
                 for(double Reserve:{.5,.625,.75,.875,.375,.25})
                 {
-                    if(!NearAxis)break; // Only an endcap is connected directly to the axis.
+                    if(!FirstRow)break; // Later rows connect through the first endcap.
                     P[Free]=FMath::Min(1.,High+RootWidth*Reserve);
                     const FBound TrialMap=FBound(Origin[Free])+(FBound(End[Free])-FBound(Origin[Free]))*FBound(P[Free]);
                     const double TrialBound=Increasing ? TrialMap.Hi : TrialMap.Lo;
@@ -158,6 +318,33 @@ struct FStorage
                     if(Candidate.X.Lo<=0. || Candidate.X.Hi>=1. || Candidate.Y.Lo<=0. || Candidate.Y.Hi>=1. ||
                         Curve.Value(Candidate).Lo<0. || Curve.Value(Inner(Candidate,Width)).Hi>0.)continue;
                     if(Certificate(Curve,Edge,Candidate,Candidate,true,EndcapStats))return Candidate;
+                }
+                if(FirstRow)
+                {
+                    const auto RowPoint=[&](double Coordinate)
+                    {
+                        const FBound M=FBound(Origin[Free])+(FBound(End[Free])-FBound(Origin[Free]))*FBound(Coordinate);
+                        const double Bound=Increasing ? M.Hi : M.Lo;float V=float(Bound);
+                        if(Increasing ? double(V)<Bound : double(V)>Bound)
+                            V=std::nextafter(V,Increasing ? std::numeric_limits<float>::infinity() : -std::numeric_limits<float>::infinity());
+                        FVector2D W=Stored;W[Free]=FMath::Clamp(double(V),FMath::Min(Origin[Free],End[Free]),FMath::Max(Origin[Free],End[Free]));
+                        return Local(W);
+                    };
+                    double Left=High,Right=1.;FPoint Best=RowPoint(Right);
+                    if(Certificate(Curve,Edge,Best,Best,true,EndcapStats))
+                    {
+                        // Find a whole-wet connection on this actual GPU row.
+                        // A long tangential step is allowed only when the
+                        // independently certified dry witness stays within1mm.
+                        for(int32 I=0;I<56;++I)
+                        {
+                            const double Mid=(Left+Right)*.5;const FPoint Trial=RowPoint(Mid);
+                            if(SamePoint(Trial,Best))break;
+                            if(Certificate(Curve,Edge,Trial,Trial,true,EndcapStats)){Right=Mid;Best=Trial;}
+                            else Left=Mid;
+                        }
+                        if(Curve.Value(InnerPoint(Best,Width)).Hi<=0.)return Best;
+                    }
                 }
                 P[Free]=FMath::Min(1.,High+RootWidth*.75);
                 const FBound Mapped=FBound(Origin[Free])+(FBound(End[Free])-FBound(Origin[Free]))*FBound(P[Free]);

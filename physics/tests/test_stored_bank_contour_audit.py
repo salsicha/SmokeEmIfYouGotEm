@@ -35,6 +35,20 @@ class StoredBankContourAuditTests(unittest.TestCase):
                 p[0] = str(-float(p[0]))
         self.assertTrue(audit_case(c)["whole_gpu_geometry_certified"])
 
+    def test_nonradial_witness_still_requires_complete_partition(self):
+        c = self.case()
+        c["boundary_buffer_cm"].insert(1, ["0.0625", "0.0625"])
+        c["polygon_buffer_cm"].insert(3, ["0.0625", "0.0625"])
+        c["inner_local"].insert(1, ["0.1", "0.3"])
+        c["triangles"] = [[0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 5]]
+        self.assertTrue(audit_case(c)["whole_gpu_geometry_certified"])
+
+    def test_inner_boundary_must_close_on_cell_axes(self):
+        c = self.case()
+        c["inner_local"][0][1] = "0.01"
+        with self.assertRaisesRegex(ValueError, "Inner boundary"):
+            audit_case(c)
+
     def test_exact_render_translation(self):
         c = self.case()
         c["origin_cm"] = ["10000000", "-10000000"]

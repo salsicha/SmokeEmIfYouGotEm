@@ -169,7 +169,7 @@ struct FCurve
 struct FStats
 {
     int32 CoefficientTests=0,InitialSegments=0,RootSolves=0,RootEvaluations=0;
-    int32 FailedStage=0;
+    int32 FailedStage=0,ReorderedProposalSpans=0;
     FVector2D FailedA=FVector2D::ZeroVector,FailedB=FVector2D::ZeroVector;
 };
 inline bool Certificate(const FCurve& C,const FPoint& A,const FPoint& B,const FPoint& D,
@@ -292,6 +292,13 @@ struct FResult
 // bounds. Certificates never silently switch back to ideal proposal points.
 // RootWidth reserves part of the same geometric band for storage quantization.
 template<typename FStore>
+inline auto InnerForStorage(const FStore& Store,const FPoint& P,double Width,int)
+    -> decltype(Store.InnerPoint(P,Width))
+{return Store.InnerPoint(P,Width);}
+template<typename FStore>
+inline FPoint InnerForStorage(const FStore&,const FPoint& P,double Width,long)
+{return Inner(P,Width);}
+template<typename FStore>
 inline bool BuildStored(const FCurve& C,double Width,FResult& Out,const FStore& Store,
     double RootWidth,bool ReuseRoots=true,bool BoundedProposal=true)
 {
@@ -302,12 +309,17 @@ inline bool BuildStored(const FCurve& C,double Width,FResult& Out,const FStore& 
     Out={};if(!C.Valid || !FMath::IsFinite(Width) || Width<=256.*std::numeric_limits<double>::epsilon() || Width>=1. ||
         !FMath::IsFinite(RootWidth) || RootWidth<0. || RootWidth>Width)return false;
     const FPoint Origin(FVector2D(0.,0.),true);
+    const auto Witness=[&](const FPoint& P){return InnerForStorage(Store,P,Width,0);};
+    const auto DepthInterval=[&](const FPoint& P,const FPoint& Q)
+    {return Certificate(C,P,Q,Q,true,Out.Stats) &&
+        Certificate(C,Origin,Witness(P),Witness(Q),false,Out.Stats);};
     const auto Interval=[&](const FPoint& P,const FPoint& Q)
     {
-        const FPoint A=Inner(P,Width),B=Inner(Q,Width);
+        const FPoint A=Witness(P),B=Witness(Q);
         // A storage policy can perturb ray ordering. Certify the partition,
         // not just depth signs on an accidentally reversed or overlapping span.
         if(!SamePoint(P,Q) && (Cross(Origin,P,Q).Lo<=0. || Cross(P,Q,B).Lo<0. || Cross(P,B,A).Lo<0.))return false;
+        if(Cross(Origin,A,B).Lo<0.)return false;
         return Certificate(C,P,Q,Q,true,Out.Stats) &&
             Certificate(C,Origin,A,B,false,Out.Stats);
     };
@@ -320,6 +332,14 @@ inline bool BuildStored(const FCurve& C,double Width,FResult& Out,const FStore& 
         const FSpan S=Stack.Pop(EAllowShrinking::No);
         const FPoint P=ReuseRoots ? S.P : MakePoint(S.A),Q=ReuseRoots ? S.Q : MakePoint(S.B);
         if(Interval(P,Q)){if(!SamePoint(Out.Boundary.Last(),Q))Out.Boundary.Add(Q);continue;}
+        // Reversed float-row samples are proposals, not accepted geometry.
+        // Sorting is followed by ALL unchanged final segment/partition gates.
+        if(Cross(Origin,P,Q).Lo<=0. && DepthInterval(P,Q))
+        {
+            ++Out.Stats.ReorderedProposalSpans;
+            if(!SamePoint(Out.Boundary.Last(),Q))Out.Boundary.Add(Q);
+            continue;
+        }
         if(S.Level>=16 || Out.Stats.CoefficientTests>200000)
         {Out.Stats.FailedStage=1;Out.Stats.FailedA=P.XY;Out.Stats.FailedB=Q.XY;return false;}
         const double M=(S.A+S.B)*.5;
@@ -327,21 +347,41 @@ inline bool BuildStored(const FCurve& C,double Width,FResult& Out,const FStore& 
         Stack.Add({M,S.B,S.Level+1,Middle,Q});Stack.Add({S.A,M,S.Level+1,P,Middle});
     }
     Out.Stats.InitialSegments=Out.Boundary.Num()-1;
+    if(Out.Stats.ReorderedProposalSpans)
+    {
+        for(const FPoint& P:Out.Boundary)
+            if(!FMath::IsFinite(P.XY.X) || !FMath::IsFinite(P.XY.Y) || P.XY.X+P.XY.Y<=0.)return false;
+        Out.Boundary.Sort([](const FPoint& A,const FPoint& B)
+        {
+            const double TA=A.XY.Y/(A.XY.X+A.XY.Y),TB=B.XY.Y/(B.XY.X+B.XY.Y);
+            return TA!=TB ? TA<TB : A.XY.X!=B.XY.X ? A.XY.X<B.XY.X : A.XY.Y<B.XY.Y;
+        });
+        for(int32 I=1;I<Out.Boundary.Num();)
+            if(SamePoint(Out.Boundary[I-1],Out.Boundary[I]))Out.Boundary.RemoveAt(I,1,EAllowShrinking::No);else ++I;
+        if(!SamePoint(Out.Boundary[0],First) || !SamePoint(Out.Boundary.Last(),Last))return false;
+    }
     for(int32 I=1;I<Out.Boundary.Num()-1;)
     {
         if(Interval(Out.Boundary[I-1],Out.Boundary[I+1])){Out.Boundary.RemoveAt(I,1,EAllowShrinking::No);I=FMath::Max(1,I-1);}
         else ++I;
         if(Out.Stats.CoefficientTests>200000)return false;
     }
+    if(Out.Stats.ReorderedProposalSpans)for(int32 I=1;I<Out.Boundary.Num();++I)
+        if(!Interval(Out.Boundary[I-1],Out.Boundary[I]))
+        {Out.Stats.FailedStage=4;Out.Stats.FailedA=Out.Boundary[I-1].XY;Out.Stats.FailedB=Out.Boundary[I].XY;return false;}
     for(const auto& P:Out.Boundary)
     {
         if(P.X.Lo<0. || P.X.Hi>1. || P.Y.Lo<0. || P.Y.Hi>1.)return false;
-        const FPoint Q=Inner(P,Width);
+        const FPoint Q=Witness(P);
+        if(Q.X.Lo<0. || Q.X.Hi>1. || Q.Y.Lo<0. || Q.Y.Hi>1.)return false;
         const FBound DX=P.X-Q.X,DY=P.Y-Q.Y;
         const double Bound=Up(FMath::Max(FMath::Abs(DX.Lo),FMath::Abs(DX.Hi))+FMath::Max(FMath::Abs(DY.Lo),FMath::Abs(DY.Hi)));
         if(Bound>Width){Out.Stats.FailedStage=2;Out.Stats.FailedA=P.XY;Out.Stats.FailedB=Q.XY;return false;}
         Out.InnerBoundary.Add(Q);
     }
+    // These axis identities close the combined wet/dry/band partition on
+    // the original cell boundary even when an interior witness is nonradial.
+    if(!Out.InnerBoundary[0].Y.Zero() || !Out.InnerBoundary.Last().X.Zero())return false;
     Out.Polygon.Add(Store(FPoint(FVector2D(1.,1.)),-1.));Out.Polygon.Add(Store(FPoint(FVector2D(1.,0.)),-1.));
     Out.Polygon.Append(Out.Boundary);Out.Polygon.Add(Store(FPoint(FVector2D(0.,1.)),-1.));
     TArray<int32> Live;for(int32 I=0;I<Out.Polygon.Num();++I)Live.Add(I);
