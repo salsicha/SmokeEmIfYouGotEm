@@ -1720,6 +1720,19 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             TEXT("RaftSim_ChilkoEvidence"), TEXT("RaftSimChilkoEvidenceCanopy"),
             TEXT("VRI inventory counts, species and heights; positions by Sentinel-2 darkness"));
     }
+    // Evidence canopy over the Zambezi upper-gorge Landscape
+    // (physics/scripts/build_zambezi_evidence_dressing.py): Sentinel-2 May
+    // vegetation cover at 10 m, where crowns are not resolved, so positions
+    // are an inferred lattice inside the measured cover.
+    FEvidenceCanopyCounts ZambeziUpperGorgeEvidenceCanopy;
+    if (IsZambeziUpperGorgeRiverId(Spec.RiverId) && bPhysicalCorridor)
+    {
+        ZambeziUpperGorgeEvidenceCanopy = AddEvidenceCanopy(
+            Context, Queries, TEXT("physics/data/real_world/zambezi_batoka_gorge/terrain/upper_gorge_evidence_2025"),
+            TEXT("upper_gorge_evidence_2025_canopy_placement.json"), TEXT("raftsim.zambezi.upper_gorge_evidence_canopy.v1"),
+            TEXT("RaftSim_ZambeziUpperGorgeEvidence"), TEXT("RaftSimZambeziUpperGorgeEvidenceCanopy"),
+            TEXT("inferred lattice inside Sentinel-2 10 m vegetation cover"));
+    }
     const int32 PacuareShorelineRockPlacedCount = PacuareCounts.PacuareShorelineRockPlacedCount;
     const int32 PacuareShorelineGroundCoverPlacedCount = PacuareCounts.PacuareShorelineGroundCoverPlacedCount;
     const int32 PacuareScannedFernPlacedCount = PacuareCounts.PacuareScannedFernPlacedCount;
@@ -2533,6 +2546,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
         PacuareCounts.EvidenceCanopyPlaced +
         FutaleufuEvidenceCanopy.Placed +
         ChilkoEvidenceCanopy.Placed +
+        ZambeziUpperGorgeEvidenceCanopy.Placed +
         PacuareShorelineGroundCoverPlacedCount +
         PacuareShorelineShrubPlacedCount +
         TemperateNearBankPlacedCount +
@@ -2575,6 +2589,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
         PacuareCounts.EvidenceRockPlaced == PacuareCounts.EvidenceRockExpected &&
         FutaleufuEvidenceCanopy.Placed == FutaleufuEvidenceCanopy.Expected &&
         ChilkoEvidenceCanopy.Placed == ChilkoEvidenceCanopy.Expected &&
+        ZambeziUpperGorgeEvidenceCanopy.Placed == ZambeziUpperGorgeEvidenceCanopy.Expected &&
         (!bOpaqueTemperate ||
          TemperateWaterlinePlacedCount >=
              TemperateWaterlineStructureMinimumInstanceCount) &&
@@ -2620,7 +2635,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     {
         OutSummary += FString::Printf(
             TEXT("Dressing checks for %s: boulders %d/%d, foliage %d/%d, pacuare rock %d/%d ground %d/%d fern %d/%d shrub %d/%d litter %d/%d woody %d/%d, "
-                 "evidence canopy %d/%d rocks %d/%d, futaleufu canopy %d/%d, chilko canopy %d/%d, temperate waterline %d/%d near-bank %d/%d scanned %d/1200, "
+                 "evidence canopy %d/%d rocks %d/%d, futaleufu canopy %d/%d, chilko canopy %d/%d, zambezi upper gorge canopy %d/%d, temperate waterline %d/%d near-bank %d/%d scanned %d/1200, "
                  "canopy %d, understory %d, launch strata %d, materials %d.\n"),
             *Spec.RiverId, OutResult.DressingBoulderInstanceCount,
             BoulderCount + TemperateWaterlinePlacedCount + ChilkoShorelineGravelPlacedCount + PacuareShorelineRockPlacedCount +
@@ -2636,6 +2651,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             PacuareCounts.EvidenceRockPlaced, PacuareCounts.EvidenceRockExpected,
             FutaleufuEvidenceCanopy.Placed, FutaleufuEvidenceCanopy.Expected,
             ChilkoEvidenceCanopy.Placed, ChilkoEvidenceCanopy.Expected,
+            ZambeziUpperGorgeEvidenceCanopy.Placed, ZambeziUpperGorgeEvidenceCanopy.Expected,
             TemperateWaterlinePlacedCount, TemperateWaterlineStructureMinimumInstanceCount,
             TemperateNearBankPlacedCount, TemperateNearBankEcologyMinimumInstanceCount,
             FutaleufuScannedUnderstoryPlacedCount,

@@ -811,6 +811,25 @@ inline constexpr int32 FutaleufuCoigueAttachedLeavesPerBranchlet =
     FutaleufuCoigueMainLeavesPerBranchlet +
     FutaleufuCoigueTertiaryBranchesPerBranchlet * FutaleufuCoigueLeavesPerTertiaryBranch;
 
+// The Zambezi upper-gorge evidence reach (Boiling Pot to Stairway to Heaven,
+// Cartesian live water; L_ZambeziUpperGorge) is a separate candidate beside
+// the 30 km L_Zambezi. It owns its generated assets (names derive from this
+// id) but reuses the Zambezi look settings, textures and materials, which it
+// only loads.
+inline const TCHAR* const ZambeziUpperGorgeRiverId = TEXT("zambezi_upper_gorge");
+
+inline bool IsZambeziUpperGorgeRiverId(const FString& RiverId)
+{
+    return RiverId == ZambeziUpperGorgeRiverId;
+}
+
+// River id whose per-river look settings (water, capture, foliage, material)
+// apply: the upper gorge uses the Zambezi ones.
+inline FString ResolveLookSettingsRiverId(const FString& RiverId)
+{
+    return IsZambeziUpperGorgeRiverId(RiverId) ? FString(TEXT("zambezi_batoka_gorge")) : RiverId;
+}
+
 FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const FString& RiverId);
 
 FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString& RiverId);

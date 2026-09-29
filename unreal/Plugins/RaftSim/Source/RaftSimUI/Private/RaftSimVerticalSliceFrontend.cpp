@@ -94,7 +94,15 @@ TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenario
                  "pending guide and rapid-specific hydraulic review; Rapid 9 is a mandatory "
                  "portage."),
             TEXT("/Game/RaftSim/Maps/L_Zambezi"),
-            ERaftSimLicenseTier::ExpeditionGuide, 15, 0.0f, 27358.848f)
+            ERaftSimLicenseTier::ExpeditionGuide, 15, 0.0f, 27358.848f),
+        // Stations are the upper-gorge progress map's (Sentinel-2 midline);
+        // they match the map's run manager and the export's checked launch.
+        MakeScenario(
+            TEXT("zambezi_upper_gorge_challenge"), TEXT("Zambezi: Boiling Pot to Stairway to Heaven"),
+            TEXT("Evidence-based low-water upper Batoka Gorge (283 m3/s, the 2025-10-03 Sentinel-2 day): "
+                 "banks, whitewater and terrain are measured; the bed and gorge walls are inferred."),
+            TEXT("/Game/RaftSim/Maps/L_ZambeziUpperGorge"),
+            ERaftSimLicenseTier::ExpeditionGuide, 16, 294.7f, 3382.0f)
     };
 }
 

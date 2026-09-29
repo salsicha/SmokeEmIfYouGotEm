@@ -171,8 +171,11 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     {
         RiverAssetName = TEXT("Pacuare");
     }
-    else if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+    else if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge") ||
+             IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId))
     {
+        // The upper gorge loads the Zambezi textures (its drape replaces the
+        // macro albedo below); its material name comes from its own id.
         RiverAssetName = TEXT("Zambezi");
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
@@ -224,7 +227,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         TEXT("/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures"),
         TEXT("SourceConditionedMaterialZones"));
     FString DetailAssetName = RiverAssetName;
-    if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+    if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge") ||
+        IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId))
     {
         DetailAssetName = TEXT("ColoradoRiver");
     }
@@ -267,9 +271,13 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     // - Pacuare Huacas: the 2014-2017 IGN orthophoto with Sentinel-2 colour
     //   outside its footprint, 2048 x 2048 (unreal/Scripts/install_evidence_drape.py);
     // - Futaleufu Terminator: Sentinel-2 10 m colour, 2048 x 2048 (same script);
-    // - Chilko Lava Canyon: Sentinel-2 10 m colour, 2048 x 2048 (same script).
+    // - Chilko Lava Canyon: Sentinel-2 10 m colour, 2048 x 2048 (same script);
+    // - Zambezi upper gorge: Sentinel-2 10 m colour, 2048 x 2048 (same script).
     const TCHAR* EvidenceDrapePath =
-        Candidate.PreviewSpec.RiverId == TEXT("colorado_river")
+        IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId)
+            ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Terrain/T_RaftSim_ZambeziUpperGorge_EvidenceDrape."
+                   "T_RaftSim_ZambeziUpperGorge_EvidenceDrape")
+        : Candidate.PreviewSpec.RiverId == TEXT("colorado_river")
             ? TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/T_RaftSim_ColoradoHance_EvidenceDrape."
                    "T_RaftSim_ColoradoHance_EvidenceDrape")
         : Candidate.PreviewSpec.RiverId == TEXT("pacuare")
@@ -369,7 +377,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
         Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
-        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") ||
+        IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
     Material->SetShadingModel(
         bUsesDefaultLitLandscape ? MSM_DefaultLit : MSM_Unlit);
     Material->BlendMode = BLEND_Opaque;
@@ -2456,6 +2465,11 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     {
         RiverAssetName = TEXT("Chilko");
     }
+    else if (IsZambeziUpperGorgeRiverId(Spec.RiverId))
+    {
+        // Own capture-ribbon instance; L_Zambezi's stays untouched.
+        RiverAssetName = TEXT("ZambeziUpperGorge");
+    }
     if (RiverAssetName.IsEmpty())
     {
         OutSummary += FString::Printf(
@@ -2472,8 +2486,14 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     // contract while preserving geometry, collision, and solver authority.
     const bool bUseSingleLayerWater = false;
     const bool bUseIsolatedZambeziParent =
-        Spec.RiverId == TEXT("zambezi_batoka_gorge");
-    UMaterial* Parent = Spec.RiverId == TEXT("pacuare")
+        Spec.RiverId == TEXT("zambezi_batoka_gorge") || IsZambeziUpperGorgeRiverId(Spec.RiverId);
+    // The upper gorge only loads L_Zambezi's Default Lit parent: rebuilding
+    // it here would re-save that map's material.
+    UMaterial* Parent = IsZambeziUpperGorgeRiverId(Spec.RiverId)
+        ? LoadObject<UMaterial>(nullptr,
+              TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_DefaultLitWater."
+                   "M_RaftSim_Zambezi_DefaultLitWater"))
+        : Spec.RiverId == TEXT("pacuare")
         ? LoadOrCreatePacuareRainforestWaterParent(OutSummary)
         : (Spec.RiverId == TEXT("colorado_river")
                ? LoadOrCreateColoradoHanceWaterParent(OutSummary)
@@ -2490,7 +2510,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         return nullptr;
     }
     FString WaterNormalAssetName = RiverAssetName;
-    if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+    if (Spec.RiverId == TEXT("zambezi_batoka_gorge") || IsZambeziUpperGorgeRiverId(Spec.RiverId))
     {
         WaterNormalAssetName = TEXT("ColoradoRiver");
     }
@@ -2601,7 +2621,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     if (bDisableSolverVisualizationFields &&
         (Spec.RiverId == TEXT("colorado_river") ||
          Spec.RiverId == TEXT("futaleufu_terminator") ||
-         Spec.RiverId == TEXT("chilko_river_lava_canyon")))
+         Spec.RiverId == TEXT("chilko_river_lava_canyon") ||
+         IsZambeziUpperGorgeRiverId(Spec.RiverId)))
     {
         // Hance, Terminator, and Chilko each sample their packed field once
         // while the CPU builds ribbon geometry and vertex colours. Do not

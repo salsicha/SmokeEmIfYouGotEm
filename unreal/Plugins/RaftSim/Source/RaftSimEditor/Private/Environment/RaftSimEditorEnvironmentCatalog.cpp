@@ -64,8 +64,9 @@ float GetPreviewRiverCenterY(const FRaftSimEnvironmentPreviewSpec& Spec, float X
                                                                                  
   
 
-FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const FString& RiverId)
+FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const FString& InRiverId)
 {
+    const FString RiverId = ResolveLookSettingsRiverId(InRiverId);
     FRaftSimLandscapeCandidateWaterSettings Settings;
     if (RiverId == TEXT("colorado_river"))
     {
@@ -273,8 +274,9 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
                                                               
   
 
-FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString& RiverId)
+FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString& InRiverId)
 {
+    const FString RiverId = ResolveLookSettingsRiverId(InRiverId);
     FRaftSimPhotographicCaptureSettings Settings;
     if (RiverId == TEXT("colorado_river"))
     {
@@ -354,8 +356,9 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
   
 
 FRaftSimLandscapeCandidateFoliageSettings GetLandscapeCandidateFoliageSettings(
-    const FString& RiverId)
+    const FString& InRiverId)
 {
+    const FString RiverId = ResolveLookSettingsRiverId(InRiverId);
     FRaftSimLandscapeCandidateFoliageSettings Settings;
     if (RiverId == TEXT("colorado_river"))
     {
@@ -411,8 +414,9 @@ FRaftSimLandscapeCandidateFoliageSettings GetLandscapeCandidateFoliageSettings(
     return Settings;
 }
 
-FRaftSimPreviewWaterMaterialResponse GetPreviewWaterMaterialResponse(const FString& RiverId)
+FRaftSimPreviewWaterMaterialResponse GetPreviewWaterMaterialResponse(const FString& InRiverId)
 {
+    const FString RiverId = ResolveLookSettingsRiverId(InRiverId);
     FRaftSimPreviewWaterMaterialResponse Response;
     if (RiverId == TEXT("colorado_river"))
     {
@@ -875,7 +879,8 @@ float GetLandscapeCandidateWorldMinX(
         Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
         Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
-        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") ||
+        IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
     return bReachLocalSolverWindow &&
             !Candidate.LocalCenterlineRelativePath.IsEmpty()
         ? 0.0f
@@ -1450,11 +1455,63 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         Candidate.PreviewSpec.MapPackagePath = Candidate.MapPackagePath;
         Candidates.Add(MoveTemp(Candidate));
     }
+    // Evidence-based Zambezi upper gorge, Boiling Pot to below Stairway to
+    // Heaven (Sentinel-2 10 m low-water extent and whitewater, Copernicus
+    // GLO-30 terrain and edited water surface, ZRA flows; inferred bed and
+    // gorge walls; see zambezi-upper-gorge-evidence.md): 2017^2 over the
+    // 1,985 x 1,549 m UTM 35S evidence window, anchored at X = 0 and centred
+    // in Y (Unreal +Y south). Its water is the map-aligned Cartesian cook, so
+    // it is a separate map beside the 30 km L_Zambezi and owns its assets.
+    for (const FRaftSimEnvironmentPreviewSpec& PreviewSpec : GetEnvironmentPreviewSpecs())
+    {
+        if (PreviewSpec.RiverId != TEXT("zambezi_batoka_gorge"))
+        {
+            continue;
+        }
+        FRaftSimLandscapeImportCandidateSpec Candidate;
+        Candidate.PreviewSpec = PreviewSpec;
+        Candidate.PreviewSpec.RiverId = ZambeziUpperGorgeRiverId;
+        Candidate.PreviewSpec.DisplayName = TEXT("Zambezi Upper Batoka Gorge");
+        Candidate.PreviewSpec.SourceManifest =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/zambezi_sources_2026_09/manifest.json");
+        Candidate.PreviewSpec.SourceDrapeDescription =
+            TEXT("Sentinel-2 L2A 10 m colour of 2025-10-03 (283 m3/s) over Copernicus GLO-30 terrain for the Boiling "
+                 "Pot to Stairway to Heaven reach; the bed, submerged boulders and gorge-wall steepening are inferred.");
+        Candidate.PreviewSpec.FlowBandId = TEXT("low_water_283cms");
+        Candidate.PreviewSpec.FlowBandDisplayName = TEXT("Low Water 283 m3/s (2025-10-03)");
+        Candidate.PreviewSpec.FlowBandSource =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/zambezi_sources_2026_09/hydrometric/"
+                 "zra_victoria_falls_daily_flows.json");
+        Candidate.HeightfieldRelativePath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/terrain/upper_gorge_evidence_2025/upper_gorge_evidence_2025_heightfield_2017.png");
+        Candidate.HeightfieldManifestRelativePath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/terrain/upper_gorge_evidence_2025/upper_gorge_evidence_2025_terrain_manifest.json");
+        Candidate.ImportContractRelativePath = Candidate.HeightfieldManifestRelativePath;
+        Candidate.LocalCenterlineRelativePath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/terrain/upper_gorge_evidence_2025/upper_gorge_evidence_2025_local_centerline.json");
+        Candidate.MapPackagePath = TEXT("/Game/RaftSim/Maps/L_ZambeziUpperGorge");
+        Candidate.LandscapeSize = 2017;
+        Candidate.HorizontalSpanXCm = 198500.0f;
+        Candidate.HorizontalSpanYCm = 154900.0f;
+        Candidate.TargetReliefCm = 14639.462013f;
+        Candidate.WorldVerticalOffsetCm = 5861.487517f;
+        Candidate.bApplyPreviewAnalyticChannelBurn = false;
+        Candidate.bUseSolverVisualizationFields = false;
+        Candidate.bPhysicalScaleSourceCorridor = true;
+        Candidate.bUseDensePhysicalTerrainRenderSurface = false;
+        Candidate.bEnableLandscapeNanite = true;
+        Candidate.PreviewSpec.RiverHalfWidthCm = 2000.0f;
+        Candidate.PreviewSpec.BankWidthCm = 4000.0f;
+        Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
+        Candidate.PreviewSpec.MapPackagePath = Candidate.MapPackagePath;
+        Candidates.Add(MoveTemp(Candidate));
+    }
     return Candidates;
 }
 
-FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings(const FString& RiverId)
+FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings(const FString& InRiverId)
 {
+    const FString RiverId = ResolveLookSettingsRiverId(InRiverId);
     FRaftSimLandscapeMaterialCandidateSettings Settings;
     if (RiverId == TEXT("american_south_fork"))
     {

@@ -91,3 +91,20 @@ Editor-hosted Development build on the development host; no packaged-build resul
   - Tree positions and sizes are inferred within the inventory polygons.
 
   See the [review](../reconstruction-review-2026-09-07/chilko-lava-canyon-evidence.md).
+  The Zambezi upper gorge (`L_ZambeziUpperGorge`, Boiling Pot to below
+  Stairway to Heaven) is a new evidence-based 3.5 km map beside the 30 km
+  `L_Zambezi`. Its water is a map-aligned Cartesian cook at the 283 m³/s
+  flow of the 2025-10-03 Sentinel-2 image. After two bed calibrations the
+  GLO-30 surface anchors are -0.24 to +1.00 m and the wet IoU is 0.77. It is
+  not accepted:
+  - There is no bathymetry: depth is inferred and capped at 6.5 m by the
+    runtime's 10 m gate.
+  - The gorge walls are inferred below GLO-30's 30 m resolution.
+  - The cooked field does not place the photographed rapids: Stairway to
+    Heaven is 28 % white in the image but only 1.7 % of its cells exceed
+    Froude 0.8.
+  - It runs p95 34.3 ms with no hitches at the launch. Downstream stations
+    are untimed, because `RaftSim.SurveyReach` and the review start do not
+    yet support Cartesian maps other than South Fork.
+
+  See the [review](../reconstruction-review-2026-09-07/zambezi-upper-gorge-evidence.md).

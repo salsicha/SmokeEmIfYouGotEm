@@ -87,6 +87,18 @@ bool AddChilkoLavaCanyonTerrainBackdrop(UWorld* World, FString& OutSummary)
         ChilkoBackdropTranslationCm, TEXT("RaftSim_ChilkoLavaCanyon_LidarBackdrop"),
         TEXT("RaftSimChilkoLavaCanyonLidarBackdrop"), OutSummary);
 }
+
+bool AddZambeziUpperGorgeTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    // Copernicus GLO-30 at 20 m, 3 km around the Landscape
+    // (upper_gorge_evidence_2025_terrain_manifest.json).
+    const FVector ZambeziBackdropTranslationCm(-299300.0, -378050.0, 0.0);
+    return AddEvidenceTerrainBackdrop(World,
+        TEXT("/Game/RaftSim/Environment/ZambeziRun/Terrain/SM_RaftSim_ZambeziUpperGorge_GLO30Backdrop."
+             "SM_RaftSim_ZambeziUpperGorge_GLO30Backdrop"),
+        ZambeziBackdropTranslationCm, TEXT("RaftSim_ZambeziUpperGorge_GLO30Backdrop"),
+        TEXT("RaftSimZambeziUpperGorgeGLO30Backdrop"), OutSummary);
+}
 } // namespace
 
 bool BuildLandscapeImportCandidateMap(
@@ -486,7 +498,8 @@ bool BuildLandscapeImportCandidateMap(
     if ((Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !AddColoradoHanceTerrainBackdrop(World, OutSummary)) ||
         (Candidate.PreviewSpec.RiverId == TEXT("pacuare") && !AddPacuareHuacasTerrainBackdrop(World, OutSummary)) ||
         (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") && !AddFutaleufuTerminatorTerrainBackdrop(World, OutSummary)) ||
-        (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") && !AddChilkoLavaCanyonTerrainBackdrop(World, OutSummary)))
+        (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") && !AddChilkoLavaCanyonTerrainBackdrop(World, OutSummary)) ||
+        (IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId) && !AddZambeziUpperGorgeTerrainBackdrop(World, OutSummary)))
     {
         return false;
     }

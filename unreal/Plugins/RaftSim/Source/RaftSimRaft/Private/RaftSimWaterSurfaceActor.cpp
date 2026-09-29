@@ -2266,8 +2266,12 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     LiveVolumeCoreMesh->SetVisibility(false, true);
     CartesianShorelineMesh->SetVisibility(false);
     HideCartesianFarFieldWater();
+    // South Fork always draws its cooked Cartesian far field; other Cartesian
+    // maps (the Zambezi upper gorge) opt in through their config.
     bCartesianFarFieldScene = GetWorld() &&
-        GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
+        (GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) ||
+         (RiverWaterConfig && RiverWaterConfig->bEnableCookedFarFieldWater &&
+          WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates()));
     bCurvedFarFieldScene = RiverWaterConfig && RiverWaterConfig->bEnableCookedFarFieldWater &&
         !(WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates());
     if (LiveVolumeCoreMaterial != nullptr)

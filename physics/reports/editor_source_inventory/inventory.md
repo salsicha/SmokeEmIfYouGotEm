@@ -1,7 +1,7 @@
 # RaftSim Editor Source Inventory
 
 Implementation files: **182**.
-Implementation lines: **110512**.
+Implementation lines: **110862**.
 Registered console commands: **37**.
 
 ## Source Files
@@ -11,13 +11,13 @@ Registered console commands: **37**.
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorEnvironmentCaptures.cpp` | 2409 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorFutaleufuDiagnostics.cpp` | 1589 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorPhotorealCaptureDirector.cpp` | 437 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp` | 1454 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp` | 1468 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp` | 525 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorAtmosphereAndFoliage.cpp` | 1602 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentBridge.cpp` | 385 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp` | 1696 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h` | 2821 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorNearFieldAndLighting.cpp` | 2068 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp` | 1753 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h` | 2840 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorNearFieldAndLighting.cpp` | 2070 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkBankMicrorelief.cpp` | 111 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkBoulderMaterial.cpp` | 369 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkBoulderPresentation.cpp` | 101 |
@@ -50,15 +50,15 @@ Registered console commands: **37**.
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorPveAuthoringInternal.h` | 208 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorPveEvaluation.cpp` | 4900 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Geometry/RaftSimEditorMeshPrimitives.cpp` | 569 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeBuild.cpp` | 1352 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp` | 2551 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliageAssets.cpp` | 2552 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeBuild.cpp` | 1365 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp` | 2567 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliageAssets.cpp` | 2584 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliageEvidence.cpp` | 155 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliageInternal.h` | 450 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliageInternal.h` | 460 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliagePacuare.cpp` | 750 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliagePlacement.cpp` | 2665 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliagePlacement.cpp` | 2681 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliageZambezi.cpp` | 731 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp` | 2656 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp` | 2806 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimAffineTransfer.h` | 173 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimCompatibleAdvection.h` | 36 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimCompatibleProjection.h` | 300 |
@@ -85,7 +85,7 @@ Registered console commands: **37**.
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorLiquidTerrainSource.cpp` | 252 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialInstances.cpp` | 612 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialTextures.cpp` | 2373 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp` | 2768 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp` | 2789 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorNiagaraWaterVfx.cpp` | 828 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorOfflineMetaHumanMaterial.cpp` | 475 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorOfflineMetaHumanMaterial.h` | 21 |
@@ -243,6 +243,7 @@ Registered console commands: **37**.
 | `zambezi_batoka_gorge` | `L_Zambezi` | yes |
 | `futaleufu_terminator` | `L_Terminator` | yes |
 | `chilko_river_lava_canyon` | `L_LavaCanyon` | yes |
+| `zambezi_upper_gorge` | `L_ZambeziUpperGorge` | yes |
 
 ## Startup Flags
 

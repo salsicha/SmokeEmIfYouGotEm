@@ -20,6 +20,7 @@
 #include "RaftSimRaftActor.h"
 #include "RaftSimRockObstacleActor.h"
 #include "RaftSimRiverWaterConfig.h"
+#include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "RaftSimWaterVfxActor.h"
@@ -50,6 +51,7 @@ const TCHAR* GRiverMapPaths[] = {
     TEXT("/Game/RaftSim/Maps/L_Terminator"),
     TEXT("/Game/RaftSim/Maps/L_LavaCanyon"),
     TEXT("/Game/RaftSim/Maps/L_Zambezi"),
+    TEXT("/Game/RaftSim/Maps/L_ZambeziUpperGorge"),
 };
 
 UWorld* GetRiverTestWorld()
@@ -140,6 +142,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
     bool bColoradoHanceReferenceRun = false;
     bool bChilkoLavaCanyonReferenceRun = false;
     bool bFutaleufuTerminatorReferenceRun = false;
+    bool bZambeziUpperGorgeReferenceRun = false;
     ARaftSimRaftActor* PlayerRaft = nullptr;
     if (TActorIterator<ARaftSimRaftActor> It(World); It)
     {
@@ -154,6 +157,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("RaftSim_ChilkoLavaCanyon_PlayerRaft");
         bFutaleufuTerminatorReferenceRun = PlayerRaft->GetActorLabelView() ==
             TEXT("RaftSim_FutaleufuTerminator_PlayerRaft");
+        bZambeziUpperGorgeReferenceRun = PlayerRaft->GetActorLabelView() ==
+            TEXT("RaftSim_ZambeziUpperGorge_PlayerRaft");
         // Sanity envelope against falling through the world or launching
         // skyward. Rivers ride their real-world vertical datum, so the bound
         // must admit legitimate elevations: South Fork rests near z=32155
@@ -222,7 +227,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
 
     const bool bUsesSolverOwnedVisibleRiver =
         bZambeziReferenceRun || bPacuareReferenceRun || bColoradoHanceReferenceRun ||
-        bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
+        bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun ||
+        bZambeziUpperGorgeReferenceRun;
     // The migrated volume-core reference runs (Colorado, Pacuare, Futaleufu,
     // Chilko) present their 240 x 96 m windows on a 1 m lattice: at 0.5 m they
     // had 92,833 CPU-updated vertices, and 1 m keeps several vertices per
@@ -239,12 +245,16 @@ bool FRaftSimAssertRiverMapCommand::Update()
     // spans: 161 x 65; the geographic Chilko Lava Canyon reach its 56 m span:
     // 161 x 38.
     const bool bNinetySixMetreGeographicRun = bPacuareReferenceRun || bFutaleufuTerminatorReferenceRun;
-    const float ExpectedPresentationSpacingM =
-        (bZambeziReferenceRun || bColoradoHanceReferenceRun || bNinetySixMetreGeographicRun || bChilkoLavaCanyonReferenceRun)
+    // The Cartesian Zambezi upper gorge draws one 224 m square carrier (the
+    // South Fork Cartesian pattern) at its 2 m solver cells.
+    const float ExpectedPresentationSpacingM = bZambeziUpperGorgeReferenceRun ? 1.0f
+        : (bZambeziReferenceRun || bColoradoHanceReferenceRun || bNinetySixMetreGeographicRun || bChilkoLavaCanyonReferenceRun)
         ? 1.5f : (bUsesOneMetreReferencePresentation ? 1.0f : 0.5f);
-    const int32 ExpectedPresentationVertices = (bZambeziReferenceRun || bNinetySixMetreGeographicRun)
+    const int32 ExpectedPresentationVertices = bZambeziUpperGorgeReferenceRun ? 50625
+        : (bZambeziReferenceRun || bNinetySixMetreGeographicRun)
         ? 10465 : (bChilkoLavaCanyonReferenceRun ? 6118 : (bColoradoHanceReferenceRun ? 17388 : (bUsesOneMetreReferencePresentation ? 23377 : 92833)));
-    const int32 ExpectedPresentationTriangles = (bZambeziReferenceRun || bNinetySixMetreGeographicRun)
+    const int32 ExpectedPresentationTriangles = bZambeziUpperGorgeReferenceRun ? 100352
+        : (bZambeziReferenceRun || bNinetySixMetreGeographicRun)
         ? 20480 : (bChilkoLavaCanyonReferenceRun ? 11840 : (bColoradoHanceReferenceRun ? 34240 : (bUsesOneMetreReferencePresentation ? 46080 : 184320)));
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
@@ -315,7 +325,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
             if (bZambeziReferenceRun || bPacuareReferenceRun ||
                 bColoradoHanceReferenceRun ||
                 bChilkoLavaCanyonReferenceRun ||
-                bFutaleufuTerminatorReferenceRun)
+                bFutaleufuTerminatorReferenceRun ||
+                bZambeziUpperGorgeReferenceRun)
             {
                 Test->TestTrue(
                     TEXT("accepted transmitting-water river enables the wet-cell-clipped optical core"),
@@ -389,6 +400,27 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     FMath::IsFinite(Vertex.UV1.X) && FMath::IsFinite(Vertex.UV1.Y);
                 NonzeroSolverVelocityVertexCount +=
                     Vertex.UV1.SizeSquared() > 0.0025f ? 1 : 0;
+            }
+        }
+        if (bZambeziUpperGorgeReferenceRun)
+        {
+            // Cartesian maps draw the live water on the shoreline-clipped
+            // carrier (the South Fork Cartesian pattern), not SurfaceMesh.
+            TArray<URaftSimShorelineMeshComponent*> Carriers;
+            It->GetComponents(Carriers);
+            for (const URaftSimShorelineMeshComponent* Carrier : Carriers)
+            {
+                if (!Carrier || Carrier->GetFName() != TEXT("CartesianShorelineMesh"))
+                {
+                    continue;
+                }
+                for (const FProcMeshVertex& Vertex : Carrier->GetWaterVertices())
+                {
+                    bAllSolverVelocityUvsFinite &=
+                        FMath::IsFinite(Vertex.UV1.X) && FMath::IsFinite(Vertex.UV1.Y);
+                    NonzeroSolverVelocityVertexCount +=
+                        Vertex.UV1.SizeSquared() > 0.0025f ? 1 : 0;
+                }
             }
         }
         Test->TestTrue(TEXT("solver velocity UV1 remains finite"),
@@ -2630,6 +2662,108 @@ bool FRaftSimAssertRiverMapCommand::Update()
         return true;
     }
 
+    if (bZambeziUpperGorgeReferenceRun)
+    {
+        // Evidence-based upper gorge on the Cartesian runtime (see
+        // zambezi-upper-gorge-evidence.md): export-checked launch, the
+        // curved progress map on its own run manager, the cooked far field.
+        Test->TestTrue(
+            TEXT("Zambezi upper gorge player raft is marked reference-runnable"),
+            PlayerRaft->Tags.Contains(TEXT("RaftSimReferenceRunnable")));
+        Test->TestTrue(
+            TEXT("Zambezi upper gorge launch keeps the raft upright"),
+            PlayerRaft->GetRaftMode() == ERaftSimRaftMode::Upright);
+        Test->TestEqual(
+            TEXT("Zambezi upper gorge launch keeps every person in the raft"),
+            PlayerRaft->GetSwimmerCount(),
+            0);
+        int32 RuntimeWaterConfigCount = 0;
+        for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
+        {
+            if ((*It)->GetActorLabelView() != TEXT("RaftSim_ZambeziUpperGorge_RuntimeWaterConfig"))
+            {
+                continue;
+            }
+            ++RuntimeWaterConfigCount;
+            const FString Runtime = TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+                                         "scenario_upper_gorge_evidence_2025/cartesian_runtime/");
+            Test->TestEqual(TEXT("Zambezi upper gorge binds the Cartesian coordinate map"),
+                (*It)->CoordinateMapPath, Runtime + TEXT("coordinate_map.json"));
+            Test->TestEqual(TEXT("Zambezi upper gorge binds the Cartesian streaming manifest"),
+                (*It)->StreamingManifestPath, Runtime + TEXT("streaming_manifest.json"));
+            Test->TestEqual(TEXT("Zambezi upper gorge loads the 283 m3/s image-day band"),
+                (*It)->FlowBand, FName(TEXT("low_water_283cms")));
+            Test->TestTrue(TEXT("Zambezi upper gorge streams 224 m windows and draws the cooked far field"),
+                (*It)->bEnableMovingWindowStreaming && (*It)->bEnableCookedFarFieldWater &&
+                    FMath::IsNearlyEqual((*It)->LivePresentationWidthM, 224.0f) &&
+                    FMath::IsNearlyEqual((*It)->LivePresentationLengthM, 224.0f));
+            Test->TestTrue(TEXT("Zambezi upper gorge Landscape owns terrain and the solver owns the river"),
+                (*It)->bMapProvidesTerrain && (*It)->bLiveSolverOwnsRuntimeRendering);
+            Test->TestTrue(TEXT("Zambezi upper gorge reuses the Batoka live-water instance"),
+                (*It)->LiveVolumeCoreMaterialOverride &&
+                    (*It)->LiveVolumeCoreMaterialOverride->GetPathName().Contains(
+                        TEXT("MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2")));
+        }
+        Test->TestEqual(TEXT("Zambezi upper gorge has one runtime water config"), RuntimeWaterConfigCount, 1);
+
+        const UGameInstance* GI = World->GetGameInstance();
+        URaftSimPhysicsBridgeSubsystem* Bridge = GI ? GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
+        URaftSimWaterRuntimeAdapter* Water = Bridge ? Bridge->GetWaterRuntime() : nullptr;
+        Test->TestTrue(TEXT("Zambezi upper gorge water runs on Cartesian coordinates"),
+            Water && Water->HasCartesianWaterCoordinates());
+
+        int32 RunManagerCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if ((*It)->GetActorLabelView() != TEXT("RaftSim_ZambeziUpperGorge_RunManager"))
+            {
+                continue;
+            }
+            ++RunManagerCount;
+            const FStrProperty* Progress =
+                FindFProperty<FStrProperty>((*It)->GetClass(), TEXT("ProgressCoordinateMapPath"));
+            Test->TestTrue(TEXT("Zambezi upper gorge run manager holds the curved progress map"),
+                Progress && Progress->GetPropertyValue_InContainer(*It).EndsWith(
+                    TEXT("scenario_upper_gorge_evidence_2025/cartesian_runtime/progress_coordinate_map.json")));
+        }
+        Test->TestEqual(TEXT("Zambezi upper gorge places one run manager"), RunManagerCount, 1);
+
+        for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
+        {
+            TArray<URaftSimShorelineMeshComponent*> Meshes;
+            It->GetComponents(Meshes);
+            bool bFarFieldVisible = false;
+            for (const URaftSimShorelineMeshComponent* Mesh : Meshes)
+            {
+                bFarFieldVisible |= Mesh && Mesh->GetFName() == TEXT("CartesianFarFieldMesh") &&
+                    Mesh->IsVisible() && Mesh->GetWaterVertices().Num() > 0;
+            }
+            Test->TestTrue(TEXT("Zambezi upper gorge draws the cooked Cartesian far field beyond the live window"),
+                bFarFieldVisible);
+        }
+
+        int32 BackdropCount = 0;
+        int32 EvidenceCanopyInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            BackdropCount += (*It)->Tags.Contains(TEXT("RaftSimZambeziUpperGorgeGLO30Backdrop")) ? 1 : 0;
+            if ((*It)->Tags.Contains(TEXT("RaftSimZambeziUpperGorgeEvidenceCanopy")))
+            {
+                const UHierarchicalInstancedStaticMeshComponent* Instances =
+                    (*It)->FindComponentByClass<UHierarchicalInstancedStaticMeshComponent>();
+                Test->TestTrue(
+                    TEXT("Zambezi upper gorge evidence canopy is visual-only, labelled inferred vegetation"),
+                    Instances && Instances->GetCollisionEnabled() == ECollisionEnabled::NoCollision &&
+                        (*It)->Tags.Contains(TEXT("InferredVegetationNotSurveyedTrees")));
+                EvidenceCanopyInstanceCount += Instances ? Instances->GetInstanceCount() : 0;
+            }
+        }
+        Test->TestEqual(TEXT("Zambezi upper gorge places one GLO-30 terrain backdrop"), BackdropCount, 1);
+        Test->TestEqual(TEXT("Zambezi upper gorge evidence canopy places every row (8,853 trees, 2,534 shrubs)"),
+            EvidenceCanopyInstanceCount, 11387);
+        return true;
+    }
+
     Test->AddError(TEXT("No reach-specific contract matched this playable river"));
     return true;
 }
@@ -2941,7 +3075,7 @@ bool FRaftSimRiverMapLoadsTest::RunTest(const FString& MapPath)
         return true;
     }
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.0f));
-    if (MapPath.Contains(TEXT("Zambezi")))
+    if (MapPath.EndsWith(TEXT("/L_Zambezi")))
     {
         ADD_LATENT_AUTOMATION_COMMAND(FRaftSimStartZambeziLaunchCommand(this));
     }

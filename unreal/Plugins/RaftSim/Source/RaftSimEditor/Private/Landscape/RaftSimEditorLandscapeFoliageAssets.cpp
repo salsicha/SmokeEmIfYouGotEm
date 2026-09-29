@@ -1438,6 +1438,38 @@ bool CreateZambeziOpaqueVegetationAssets(
     return bComplete;
 }
 
+bool LoadZambeziOpaqueVegetationAssets(
+    UStaticMesh*& OutRiparianTree,
+    UStaticMesh*& OutUmbrellaTree,
+    UStaticMesh*& OutThornScrub,
+    UStaticMesh*& OutGroundCoverA,
+    UStaticMesh*& OutGroundCoverB,
+    UMaterialInterface*& OutMaterial,
+    FString& OutSummary)
+{
+    auto LoadMesh = [](const TCHAR* Name)
+    {
+        return LoadObject<UStaticMesh>(nullptr, *FString::Printf(
+            TEXT("/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/%s.%s"), Name, Name));
+    };
+    OutMaterial = LoadObject<UMaterialInterface>(nullptr,
+        TEXT("/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation."
+             "M_RaftSim_Zambezi_OpaqueVegetation"));
+    OutRiparianTree = LoadMesh(TEXT("SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1"));
+    OutUmbrellaTree = LoadMesh(TEXT("SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1"));
+    OutThornScrub = LoadMesh(TEXT("SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1"));
+    OutGroundCoverA = LoadMesh(TEXT("SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1"));
+    OutGroundCoverB = LoadMesh(TEXT("SM_RaftSim_Zambezi_SavannaGroundCover_B_OpaqueV2"));
+    const bool bComplete = OutMaterial && OutRiparianTree && OutUmbrellaTree && OutThornScrub &&
+        OutGroundCoverA && OutGroundCoverB;
+    if (!bComplete)
+    {
+        OutSummary += TEXT(
+            "The saved Zambezi opaque vegetation family is incomplete; build L_Zambezi's dressing first.\n");
+    }
+    return bComplete;
+}
+
 bool CreateHanceOpaqueDrylandVegetationAssets(
     UWorld* World,
     UStaticMesh*& OutShrubA,

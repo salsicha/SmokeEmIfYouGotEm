@@ -17,6 +17,7 @@ RIVER_BUILD_TARGETS = (
     ("zambezi_batoka_gorge", "L_Zambezi"),
     ("futaleufu_terminator", "L_Terminator"),
     ("chilko_river_lava_canyon", "L_LavaCanyon"),
+    ("zambezi_upper_gorge", "L_ZambeziUpperGorge"),
 )
 
 

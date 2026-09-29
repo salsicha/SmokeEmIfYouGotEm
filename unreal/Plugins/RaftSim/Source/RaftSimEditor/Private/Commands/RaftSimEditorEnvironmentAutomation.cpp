@@ -436,7 +436,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         // records the water material actually built.
         if ((Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
              Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
-             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon")) &&
+             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") ||
+             IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId)) &&
             (!Candidate.bUseSolverVisualizationFields ||
              !Candidate.SolverVisualizationFieldRelativePath.IsEmpty()))
         {
@@ -513,7 +514,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const bool bUsesOpaqueVolumetricVegetation =
             Result.bDressingUsesOpaqueVolumetricVegetation;
         const bool bUsesZambeziDefaultLitWater =
-            Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+            Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge") ||
+            IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
         const bool bUsesPacuareRainforestDefaultLitWater =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
         const bool bUsesColoradoHanceDefaultLitWater =
@@ -568,17 +570,25 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                      "T_RaftSim_ChilkoLavaCanyon_EvidenceDrape")) != nullptr;
         const bool bUsesChilkoOrganicLavaCanyonSurface =
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") && !bUsesChilkoEvidenceDrape;
+        // The Zambezi upper gorge takes its colour from its Sentinel-2 drape.
+        const bool bUsesZambeziUpperGorgeEvidenceDrape =
+            IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId) &&
+            LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/ZambeziRun/Terrain/T_RaftSim_ZambeziUpperGorge_EvidenceDrape."
+                     "T_RaftSim_ZambeziUpperGorge_EvidenceDrape")) != nullptr;
         const bool bUsesDefaultLitLandscape =
             bUsesSouthForkOrganicFoothillSurface ||
             Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
             Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
-            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") ||
+            IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
         const bool bUsesReachLocalReferenceGameplay =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
             Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
-            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") ||
+            IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
         const FString WaterMaterialParentPath = bUsesZambeziDefaultLitWater
             ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_DefaultLitWater")
             : (bUsesPacuareRainforestDefaultLitWater
@@ -1022,7 +1032,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                               ? TEXT("reference_runnable_colorado_hance_live_cooked_water_player_raft_and_game_mode")
                               : (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator")
                                      ? TEXT("reference_runnable_futaleufu_terminator_live_cooked_water_player_raft_and_game_mode")
-                                     : TEXT("reference_runnable_chilko_lava_canyon_live_cooked_water_player_raft_and_game_mode"))))
+                                     : (IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId)
+                                            ? TEXT("reference_runnable_zambezi_upper_gorge_live_cartesian_water_player_raft_and_game_mode")
+                                            : TEXT("reference_runnable_chilko_lava_canyon_live_cooked_water_player_raft_and_game_mode")))))
                 : (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge")
                        ? TEXT("reference_runnable_full_corridor_live_cooked_water_player_raft_and_game_mode")
                        : TEXT("capture_candidate_only")),
@@ -1043,6 +1055,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("futaleufu_terminator_evidence_sentinel2_10m_drape_albedo_scaled_no_procedural_palette")
                        : bUsesChilkoEvidenceDrape
                        ? TEXT("chilko_lava_canyon_evidence_sentinel2_10m_drape_albedo_scaled_no_procedural_palette")
+                       : bUsesZambeziUpperGorgeEvidenceDrape
+                       ? TEXT("zambezi_upper_gorge_evidence_sentinel2_10m_drape_albedo_scaled_no_procedural_palette")
                        : (bUsesFutaleufuOrganicTemperateSurface
                        ? TEXT("futaleufu_v1_three_scale_world_space_forest_floor_moss_leaf_litter_and_slope_aware_wet_granite_response")
                        : (bUsesChilkoOrganicLavaCanyonSurface

@@ -5,6 +5,8 @@
 #include "RaftSimRaftActor.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimRockObstacleActor.h"
+#include "RaftSimWaterSurfaceActor.h"
+#include "UObject/UnrealType.h"
 
 namespace RaftSimEditorEnvironment
 {
@@ -31,6 +33,18 @@ constexpr float FutaleufuProgress(float StationM) { return StationM / kFutaleufu
 constexpr float kChilkoLavaCanyonLaunchStationM = 600.0f;
 constexpr float kChilkoLavaCanyonReachStationM = 3978.0f;
 constexpr float ChilkoProgress(float StationM) { return StationM / kChilkoLavaCanyonReachStationM; }
+// Evidence-based Zambezi upper gorge: evidence stations along the Sentinel-2
+// low-water midline (the local centreline and the run-progress map share
+// them). The launch is the export's checked start (calm, >= 1 m deep, inside
+// a valid Cartesian live-window rectangle; terrain manifest `launch`).
+constexpr float kZambeziUpperGorgeLaunchStationM = 294.7f;
+constexpr float kZambeziUpperGorgeFinishStationM = 3382.0f;
+float CenterlineProgress(const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points, float StationM)
+{
+    return Points.Num() < 2 ? 0.0f : FMath::Clamp(
+        (StationM - Points[0].StationMeters) /
+            FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f);
+}
 }
 
 FString GetLandscapeCandidateCaptureRelativePath(
@@ -1718,6 +1732,76 @@ bool AddLandscapeCandidateScenarioMarkers(
     return SpawnedCount == RapidValues->Num();
 }
 
+namespace
+{
+// A Cartesian map needs its own run manager (the game mode's fallback has no
+// progress map, and a Cartesian hydraulic map is never used for progress) and
+// the South Fork-style live surface: one 224 m square at the solver's cells.
+// The run manager lives in the game module, so it is loaded by class path and
+// configured through reflection.
+bool AddZambeziUpperGorgeCartesianRunActors(
+    UWorld* World, const FVector& LaunchCm, const FRotator& LaunchRotation, FName RunTag, FString& OutSummary)
+{
+    UClass* RunManagerClass = LoadClass<AActor>(nullptr, TEXT("/Script/SmokeEmIfYouGotEm.RaftSimRunManager"));
+    AActor* RunManager = RunManagerClass
+        ? World->SpawnActor<AActor>(RunManagerClass, FTransform(LaunchRotation, LaunchCm + FVector(0.0, 0.0, 600.0)))
+        : nullptr;
+    if (!RunManager)
+    {
+        OutSummary += TEXT("Could not spawn RaftSimRunManager for the Zambezi upper gorge.\n");
+        return false;
+    }
+    FStrProperty* ProgressPath = FindFProperty<FStrProperty>(RunManagerClass, TEXT("ProgressCoordinateMapPath"));
+    FNameProperty* ScenarioId = FindFProperty<FNameProperty>(RunManagerClass, TEXT("ScenarioId"));
+    FFloatProperty* StartStation = FindFProperty<FFloatProperty>(RunManagerClass, TEXT("StartStationM"));
+    FFloatProperty* FinishStation = FindFProperty<FFloatProperty>(RunManagerClass, TEXT("FinishStationM"));
+    if (!ProgressPath || !ScenarioId || !StartStation || !FinishStation)
+    {
+        OutSummary += TEXT("RaftSimRunManager lacks the progress-map, scenario or station properties.\n");
+        return false;
+    }
+    ProgressPath->SetPropertyValue_InContainer(RunManager,
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_upper_gorge_evidence_2025/"
+             "cartesian_runtime/progress_coordinate_map.json"));
+    ScenarioId->SetPropertyValue_InContainer(RunManager, FName(TEXT("zambezi_upper_gorge_challenge")));
+    StartStation->SetPropertyValue_InContainer(RunManager, kZambeziUpperGorgeLaunchStationM);
+    FinishStation->SetPropertyValue_InContainer(RunManager, kZambeziUpperGorgeFinishStationM);
+    RunManager->SetActorLabel(TEXT("RaftSim_ZambeziUpperGorge_RunManager"));
+    RunManager->Tags.AddUnique(RunTag);
+
+    ARaftSimWaterSurfaceActor* Surface = World->SpawnActor<ARaftSimWaterSurfaceActor>(
+        ARaftSimWaterSurfaceActor::StaticClass(), FTransform::Identity);
+    if (!Surface)
+    {
+        OutSummary += TEXT("Could not place the Zambezi upper-gorge live water surface.\n");
+        return false;
+    }
+    // Protected editor properties, set as the South Fork assembly script does.
+    UClass* SurfaceClass = Surface->GetClass();
+    FFloatProperty* Spacing = FindFProperty<FFloatProperty>(SurfaceClass, TEXT("VertexSpacingMeters"));
+    FIntProperty* Subdivision = FindFProperty<FIntProperty>(SurfaceClass, TEXT("RiverPresentationSubdivision"));
+    FFloatProperty* GridLength = FindFProperty<FFloatProperty>(SurfaceClass, TEXT("CurvedGridLengthMeters"));
+    FFloatProperty* GridWidth = FindFProperty<FFloatProperty>(SurfaceClass, TEXT("CurvedGridWidthMeters"));
+    FBoolProperty* FixedGrid = FindFProperty<FBoolProperty>(SurfaceClass, TEXT("bFixedCurvedGrid"));
+    if (!Spacing || !Subdivision || !GridLength || !GridWidth || !FixedGrid)
+    {
+        OutSummary += TEXT("ARaftSimWaterSurfaceActor lacks the spacing or grid properties.\n");
+        return false;
+    }
+    Spacing->SetPropertyValue_InContainer(Surface, 2.0f);
+    Subdivision->SetPropertyValue_InContainer(Surface, 2);
+    GridLength->SetPropertyValue_InContainer(Surface, 224.0f);
+    GridWidth->SetPropertyValue_InContainer(Surface, 224.0f);
+    FixedGrid->SetPropertyValue_InContainer(Surface, false);
+    Surface->SetActorLabel(TEXT("RaftSim_ZambeziUpperGorge_LiveWaterSurface"));
+    Surface->Tags.AddUnique(RunTag);
+    OutSummary += FString::Printf(
+        TEXT("Placed the Zambezi upper-gorge run manager (progress stations %.0f-%.0f m) and the 224 m Cartesian live surface.\n"),
+        kZambeziUpperGorgeLaunchStationM, kZambeziUpperGorgeFinishStationM);
+    return true;
+}
+}
+
 bool AddLandscapeCandidateRunnableGameplay(
     UWorld* World,
     ALandscape* Landscape,
@@ -1737,11 +1821,14 @@ bool AddLandscapeCandidateRunnableGameplay(
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
     const bool bFutaleufuTerminator =
         Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    // Cartesian (map-aligned) live water: the hydraulic frame is east/north,
+    // not a river station, so run progress uses a separate curved map.
+    const bool bZambeziUpperGorge = IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
     const bool bReachLocalRun =
         bPacuare || bColoradoHance || bChilkoLavaCanyon || bFutaleufuTerminator;
-    const bool bSolverOwnedRuntimeWater = bReachLocalRun || bZambezi;
+    const bool bSolverOwnedRuntimeWater = bReachLocalRun || bZambezi || bZambeziUpperGorge;
     if (!bZambezi && !bPacuare && !bColoradoHance && !bChilkoLavaCanyon &&
-        !bFutaleufuTerminator)
+        !bFutaleufuTerminator && !bZambeziUpperGorge)
     {
         return true;
     }
@@ -1835,6 +1922,28 @@ bool AddLandscapeCandidateRunnableGameplay(
         PlayerRaftLabel = TEXT("RaftSim_FutaleufuTerminator_PlayerRaft");
         DisplayName = TEXT("Futaleufu Terminator");
     }
+    else if (bZambeziUpperGorge)
+    {
+        // Evidence-based upper gorge on a map-aligned 2 m Cartesian cook
+        // (Sentinel-2 low-water extent and whitewater, GLO-30 terrain, ZRA
+        // flow of the image day; inferred bed and gorge walls); see
+        // docs/reconstruction-review-2026-09-07/zambezi-upper-gorge-evidence.md.
+        // Cartesian startup reads only the coordinate map, the streaming
+        // manifest and the band; the raft's position selects the window.
+        RuntimeConfigLabel = TEXT("RaftSim_ZambeziUpperGorge_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_upper_gorge_evidence_2025/"
+                 "cartesian_runtime/region_upper_gorge");
+        FlowBand = FName(TEXT("low_water_283cms"));
+        WindowCenterM = FVector2D::ZeroVector;
+        WindowExtentM = 224.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_upper_gorge_evidence_2025/"
+                 "cartesian_runtime/coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimZambeziUpperGorgeRun"));
+        PlayerRaftLabel = TEXT("RaftSim_ZambeziUpperGorge_PlayerRaft");
+        DisplayName = TEXT("Zambezi Upper Gorge");
+    }
     else
     {
         RuntimeConfigLabel = TEXT("RaftSim_Zambezi_RuntimeWaterConfig");
@@ -1877,6 +1986,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         : bChilkoLavaCanyon
         ? FMath::Clamp(kChilkoLavaCanyonLaunchStationM /
               FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f)
+        : bZambeziUpperGorge
+        ? CenterlineProgress(Points, kZambeziUpperGorgeLaunchStationM)
         : (bReachLocalRun ? 0.04f : 0.0025f);
     FVector2D StartTangent2D(1.0f, 0.0f);
     const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
@@ -1932,7 +2043,8 @@ bool AddLandscapeCandidateRunnableGameplay(
     // The 30 km Zambezi run cannot simulate its whole 5999 x 25 cell corridor
     // every 1/60 s tick (~20 ms per step never keeps real time). Crop the same
     // cooked field around the raft and re-centre it every 80 m instead.
-    WaterConfig->bEnableMovingWindowStreaming = bZambezi || bColoradoHance || bPacuare || bFutaleufuTerminator || bChilkoLavaCanyon;
+    WaterConfig->bEnableMovingWindowStreaming =
+        bZambezi || bColoradoHance || bPacuare || bFutaleufuTerminator || bChilkoLavaCanyon || bZambeziUpperGorge;
     if (bColoradoHance)
     {
         // 2.5 km x 160 m at 2 m is 101,817 cells; crop 480 m of it around
@@ -2020,6 +2132,21 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
         WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
         WaterConfig->ObservedWhitewaterGain = 0.9f;
+    }
+    if (bZambeziUpperGorge)
+    {
+        // 224 m square live windows re-centred every 64 m inside the export's
+        // valid-centre rectangles; the shared atlas draws the cooked water
+        // beyond the window (far field).
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_upper_gorge_evidence_2025/"
+                 "cartesian_runtime/streaming_manifest.json");
+        WaterConfig->MovingWindowStationExtentM = 224.0f;
+        WaterConfig->MovingWindowLateralExtentM = 224.0f;
+        WaterConfig->MovingWindowAdvanceM = 64.0f;
+        WaterConfig->LivePresentationWidthM = 224.0f;
+        WaterConfig->LivePresentationLengthM = 224.0f;
+        WaterConfig->bEnableCookedFarFieldWater = true;
     }
     if (bZambezi)
     {
@@ -2304,15 +2431,19 @@ bool AddLandscapeCandidateRunnableGameplay(
             TEXT("RaftSimColdWaterNonlinearOpticalDepthV1"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }
-    else if (bZambezi)
+    else if (bZambezi || bZambeziUpperGorge)
     {
         // A transmitting wet-cell core replaces the opaque physical-corridor
         // card during play. The cooked Zambezi field still owns geometry,
         // wet/dry, stationing, forces, and foam masks; these river-local assets
         // contribute only sediment-water optics and sub-grid surface breakup.
+        // The upper gorge loads L_Zambezi's saved instance (never rebuilds it).
         WaterConfig->bEnableLiveSolverVolumeCore = true;
-        WaterConfig->LiveVolumeCoreMaterialOverride =
-            LoadOrCreateZambeziBatokaLiveWaterV2Instance(OutSummary);
+        WaterConfig->LiveVolumeCoreMaterialOverride = bZambeziUpperGorge
+            ? LoadObject<UMaterialInterface>(nullptr,
+                  TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
+                       "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2.MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2"))
+            : LoadOrCreateZambeziBatokaLiveWaterV2Instance(OutSummary);
         WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
             nullptr,
             TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Textures/"
@@ -2376,11 +2507,15 @@ bool AddLandscapeCandidateRunnableGameplay(
     // Shared rapid-water contract for every physical river: a half-metre
     // bounded carrier plus a 100 m raft-local GPU heightfield. Both deform the
     // solver-owned surface; neither adds another water sheet.
-    WaterConfig->bEnableLiveRapidSurfaceRefinement = true;
+    // The Cartesian upper gorge follows the South Fork Cartesian carrier: one
+    // placed surface at the solver's 2 m cells, subdivided twice.
+    WaterConfig->bEnableLiveRapidSurfaceRefinement = !bZambeziUpperGorge;
     // The geographic Hance strip spans the whole 160 m cooked lateral range;
     // at 1 m its 38,801-vertex refresh cost 19 ms mean (41 ms p95) of game
     // thread. 1.5 m (17k vertices) still samples each 2 m solver cell.
-    WaterConfig->LiveRapidSurfaceSubdivision = (bColoradoHance || bPacuare || bFutaleufuTerminator || bChilkoLavaCanyon) ? 2 : 6;
+    WaterConfig->LiveRapidSurfaceSubdivision = bZambeziUpperGorge
+        ? 1
+        : ((bColoradoHance || bPacuare || bFutaleufuTerminator || bChilkoLavaCanyon) ? 2 : 6);
     WaterConfig->bEnableLiveRaftLocalFluidHeightfield = true;
     WaterConfig->LiveRaftLocalFluidWindowMeters = 100.0f;
     WaterConfig->LiveRaftLocalFluidHeightfieldStrength = 0.65f;
@@ -2440,6 +2575,12 @@ bool AddLandscapeCandidateRunnableGameplay(
     {
         Raft->Tags.AddUnique(TEXT("RaftSimChilkoRapidApproachLaunchV1"));
     }
+    if (bZambeziUpperGorge &&
+        !AddZambeziUpperGorgeCartesianRunActors(
+            World, FVector(StartXY.X, StartXY.Y, SurfaceWorldZ), StartRotation, RunTag, OutSummary))
+    {
+        return false;
+    }
 
     bool bPlayerStartPositioned = false;
     for (TActorIterator<APlayerStart> It(World); It; ++It)
@@ -2491,7 +2632,7 @@ bool AddLandscapeCandidateRunnableGameplay(
              "live cooked-field water, player raft, player start, and vertical-slice "
              "game mode; terrain, flow calibration, and production art remain review-gated.\n"),
         *DisplayName,
-        Points.Last().StationMeters * StartProgress);
+        bZambeziUpperGorge ? kZambeziUpperGorgeLaunchStationM : Points.Last().StationMeters * StartProgress);
     return true;
 }
 
@@ -2566,7 +2707,16 @@ void RepositionLandscapeCandidatePhysicalCameras(
             return;
         }
     };
-    if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+    if (IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId))
+    {
+        // The straight westward run below the launch (evidence stations
+        // 414-700 m; the hairpins elsewhere put the gorge wall in view).
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            CenterlineProgress(Points, 430.0f), CenterlineProgress(Points, 550.0f), 300.0f, 105.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+            CenterlineProgress(Points, 470.0f), CenterlineProgress(Points, 590.0f), 170.0f, 85.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
     {
         // Above Bidwell Rapid looking into its entry (station metres).
         SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), ChilkoProgress(620.0f), ChilkoProgress(620.0f + 120.0f), 300.0f, 105.0f);

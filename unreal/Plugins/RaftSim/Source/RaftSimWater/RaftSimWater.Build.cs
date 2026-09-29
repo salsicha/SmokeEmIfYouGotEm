@@ -81,7 +81,10 @@ public class RaftSimWater : ModuleRules
             "physics/data/real_world/futaleufu_river_chile/scenario_terminator_evidence_2026/runtime",
             // Evidence-based Chilko Lava Canyon (L_LavaCanyon).
             "physics/data/real_world/chilko_river_bc/scenario_lava_canyon_evidence_2023/cooked_flow_fields",
-            "physics/data/real_world/chilko_river_bc/scenario_lava_canyon_evidence_2023/runtime"
+            "physics/data/real_world/chilko_river_bc/scenario_lava_canyon_evidence_2023/runtime",
+            // Evidence-based Zambezi upper gorge (L_ZambeziUpperGorge): the
+            // Cartesian atlas, region, streaming, coordinate and progress maps.
+            "physics/data/real_world/zambezi_batoka_gorge/scenario_upper_gorge_evidence_2025/cartesian_runtime"
         };
         foreach (string RelativeRoot in RuntimeRoots)
         {

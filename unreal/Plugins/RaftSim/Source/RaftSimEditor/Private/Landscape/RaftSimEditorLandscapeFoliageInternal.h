@@ -265,6 +265,16 @@ bool CreateZambeziOpaqueVegetationAssets(
     UStaticMesh*& OutGroundCoverB,
     UMaterialInterface*& OutMaterial,
     FString& OutSummary);
+// Loads the saved Zambezi family without rebuilding or re-saving it (the
+// Zambezi upper gorge shares it with L_Zambezi).
+bool LoadZambeziOpaqueVegetationAssets(
+    UStaticMesh*& OutRiparianTree,
+    UStaticMesh*& OutUmbrellaTree,
+    UStaticMesh*& OutThornScrub,
+    UStaticMesh*& OutGroundCoverA,
+    UStaticMesh*& OutGroundCoverB,
+    UMaterialInterface*& OutMaterial,
+    FString& OutSummary);
 bool CreateHanceOpaqueDrylandVegetationAssets(
     UWorld* World,
     UStaticMesh*& OutShrubA,

@@ -1840,6 +1840,8 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     };
     const FRaftSimPhotographicCaptureSettings CaptureSettings =
         GetPhotographicCaptureSettings(Spec.RiverId);
+    // The Zambezi upper gorge shares the Batoka rig (sun, haze, reflection).
+    const FString LookRiverId = ResolveLookSettingsRiverId(Spec.RiverId);
     const bool bPacuareHumidAtmosphere =
         Spec.RiverId == TEXT("pacuare");
     const bool bColdWaterHighlightNaturalism =
@@ -1850,7 +1852,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     // across its facets at the shared grazing angle.  Keep the shared rig for
     // every other river, but align this review-only sun more closely with the
     // gorge so the renderer does not amplify source sampling into fake ribs.
-    const FRotator SunRotation = Spec.RiverId == TEXT("zambezi_batoka_gorge")
+    const FRotator SunRotation = LookRiverId == TEXT("zambezi_batoka_gorge")
         ? FRotator(-48.0f, -90.0f, 0.0f)
         : Spec.RiverId == TEXT("futaleufu_terminator")
         ? FRotator(-50.0f, 30.0f, 0.0f)
@@ -1884,7 +1886,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
             SunComponent->SetAtmosphereSunLight(true);
             SunComponent->SetAtmosphereSunLightIndex(0);
         }
-        if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+        if (LookRiverId == TEXT("zambezi_batoka_gorge"))
         {
             Sun->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
             Sun->Tags.AddUnique(TEXT("RaftSimAtmosphereSunLight"));
@@ -1917,7 +1919,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
                 TEXT("RaftSimPacuareHumidAtmosphereV1"));
             SkyLight->Tags.AddUnique(TEXT("RaftSimHumiditySkyFill"));
         }
-        if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+        if (LookRiverId == TEXT("zambezi_batoka_gorge"))
         {
             SkyLight->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
             SkyLight->Tags.AddUnique(TEXT("RaftSimCapturedGorgeSkyFill"));
@@ -1945,7 +1947,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
                 TEXT("RaftSimPacuareHumidAtmosphereV1"));
             Atmosphere->Tags.AddUnique(TEXT("RaftSimHumidAerialPerspective"));
         }
-        if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+        if (LookRiverId == TEXT("zambezi_batoka_gorge"))
         {
             Atmosphere->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
             Atmosphere->Tags.AddUnique(TEXT("RaftSimSourceAwareDrySeasonSky"));
@@ -2003,7 +2005,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
             Fog->Tags.AddUnique(TEXT("RaftSimLayeredRainforestHumidity"));
             Fog->Tags.AddUnique(TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
         }
-        if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+        if (LookRiverId == TEXT("zambezi_batoka_gorge"))
         {
             // A shallow warm haze gives the kilometre-scale gorge readable
             // atmospheric perspective without disguising source-terrain gaps.
@@ -2037,7 +2039,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
             ReflectionComponent->Brightness =
                 bColdWaterHighlightNaturalism
                 ? 0.65f
-                : Spec.RiverId == TEXT("zambezi_batoka_gorge")
+                : LookRiverId == TEXT("zambezi_batoka_gorge")
                 ? 0.62f
                 : 1.0f;
             ReflectionComponent->ReflectionSourceType = EReflectionSourceType::CapturedScene;
@@ -2053,7 +2055,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
                 RiverReflectionCapture->Tags.AddUnique(
                     TEXT("RaftSimColdWaterHighlightNaturalismV1"));
             }
-            if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+            if (LookRiverId == TEXT("zambezi_batoka_gorge"))
             {
                 RiverReflectionCapture->Tags.AddUnique(
                     TEXT("RaftSimZambeziExposureSafeReflectionRigV18"));

@@ -466,6 +466,10 @@ bool AddLandscapeCandidateBiomeDressing(
 
     const bool bSouthFork = Candidate.PreviewSpec.RiverId == TEXT("american_south_fork");
     const bool bZambezi = Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+    // The upper gorge shares the Zambezi rock set and opaque vegetation family
+    // (loaded, never rebuilt) but none of the 30 km run's camera layers.
+    const bool bZambeziUpperGorge = IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
+    const bool bZambeziVegetation = bZambezi || bZambeziUpperGorge;
     const bool bPacuare = Candidate.PreviewSpec.RiverId == TEXT("pacuare");
     const bool bFutaleufu = Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
     const bool bChilko =
@@ -474,9 +478,9 @@ bool AddLandscapeCandidateBiomeDressing(
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
     const bool bOpaqueTemperate = bFutaleufu || bChilko;
     const bool bUsesOpaqueVolumetricVegetation =
-        bZambezi || bPacuare || bOpaqueTemperate;
+        bZambeziVegetation || bPacuare || bOpaqueTemperate;
     TArray<UStaticMesh*> ReviewedRockMeshes;
-    if (bSouthFork || bZambezi || bPacuare || bFutaleufu || bChilko)
+    if (bSouthFork || bZambeziVegetation || bPacuare || bFutaleufu || bChilko)
     {
         for (int32 RockIndex = 1; RockIndex <= 6; ++RockIndex)
         {
@@ -658,17 +662,27 @@ bool AddLandscapeCandidateBiomeDressing(
     UStaticMesh* HanceDrylandGroundCoverMeshA = nullptr;
     UStaticMesh* HanceDrylandGroundCoverMeshB = nullptr;
     UMaterialInterface* HanceDrylandVegetationMaterial = nullptr;
-    if (bZambezi)
+    if (bZambeziVegetation)
     {
-        if (!CreateZambeziOpaqueVegetationAssets(
-                World,
-                BroadleafTreeMesh,
-                ConiferTreeMesh,
-                ShrubMesh,
-                UnderstoryMesh,
-                ZambeziGroundCoverMeshB,
-                ZambeziOpaqueVegetationMaterial,
-                OutSummary))
+        const bool bZambeziVegetationReady = bZambeziUpperGorge
+            ? LoadZambeziOpaqueVegetationAssets(
+                  BroadleafTreeMesh,
+                  ConiferTreeMesh,
+                  ShrubMesh,
+                  UnderstoryMesh,
+                  ZambeziGroundCoverMeshB,
+                  ZambeziOpaqueVegetationMaterial,
+                  OutSummary)
+            : CreateZambeziOpaqueVegetationAssets(
+                  World,
+                  BroadleafTreeMesh,
+                  ConiferTreeMesh,
+                  ShrubMesh,
+                  UnderstoryMesh,
+                  ZambeziGroundCoverMeshB,
+                  ZambeziOpaqueVegetationMaterial,
+                  OutSummary);
+        if (!bZambeziVegetationReady)
         {
             return false;
         }
@@ -836,7 +850,7 @@ bool AddLandscapeCandidateBiomeDressing(
             OutResult.DressingConvertedStaticMeshCount ==
                 (bOpaqueTemperate ? 8 : 4) &&
             ValidateZambeziOpaqueVegetationMaterial(
-                bZambezi
+                bZambeziVegetation
                     ? ZambeziOpaqueVegetationMaterial
                     : (bPacuare
                            ? PacuareOpaqueRainforestVegetationMaterial
@@ -952,7 +966,7 @@ bool AddLandscapeCandidateBiomeDressing(
     const FRaftSimEnvironmentPreviewSpec& Spec = Candidate.PreviewSpec;
     const FRaftSimLandscapeCandidateFoliageSettings FoliageSettings =
         GetLandscapeCandidateFoliageSettings(Spec.RiverId);
-    UMaterialInterface* OpaqueVegetationMaterial = bZambezi
+    UMaterialInterface* OpaqueVegetationMaterial = bZambeziVegetation
         ? ZambeziOpaqueVegetationMaterial
         : (bPacuare
                ? PacuareOpaqueRainforestVegetationMaterial
@@ -1021,7 +1035,7 @@ bool AddLandscapeCandidateBiomeDressing(
         return false;
     }
     const FString BroadleafComponentName =
-        bZambezi
+        bZambeziVegetation
             ? FString::Printf(
                   TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueRiparianTree_%s"),
                   *Candidate.PreviewSpec.RiverId)
@@ -1048,7 +1062,7 @@ bool AddLandscapeCandidateBiomeDressing(
             true,
             bUsesOpaqueVolumetricVegetation ? OpaqueVegetationMaterial : nullptr);
     const FString ConiferComponentName =
-        bZambezi
+        bZambeziVegetation
             ? FString::Printf(
                   TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueUmbrellaTree_%s"),
                   *Candidate.PreviewSpec.RiverId)
@@ -1078,7 +1092,7 @@ bool AddLandscapeCandidateBiomeDressing(
         AddLandscapeCandidateInstancedMeshComponent(
             World,
             ShrubMesh,
-            bZambezi
+            bZambeziVegetation
                 ? FString::Printf(
                       TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueThornScrub_%s"),
                       *Candidate.PreviewSpec.RiverId)
@@ -1099,7 +1113,7 @@ bool AddLandscapeCandidateBiomeDressing(
         AddLandscapeCandidateInstancedMeshComponent(
             World,
             UnderstoryMesh,
-            bZambezi
+            bZambeziVegetation
                 ? FString::Printf(
                       TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueGroundCover_%s"),
                       *Candidate.PreviewSpec.RiverId)
@@ -2286,8 +2300,10 @@ bool AddLandscapeCandidateBiomeDressing(
                             ZambeziOpaqueVegetationMaterial;
                 });
     }
-    else if (bOpaqueTemperate || bPacuare)
+    else if (bOpaqueTemperate || bPacuare || bZambeziUpperGorge)
     {
+        // The upper gorge has only the four shared Zambezi forms (none of the
+        // 30 km run's camera or launch layers), so it takes the generic check.
         TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
             BroadleafTreeInstances,
             ConiferTreeInstances,

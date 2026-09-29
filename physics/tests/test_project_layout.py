@@ -13,7 +13,10 @@ class ProjectLayoutTests(unittest.TestCase):
     def test_shipping_scenes_match_frontend_and_cook_list(self):
         shipping={item['map'] for item in CATALOG['shipping']}
         self.assertEqual(len(shipping),len(CATALOG['shipping']))
-        self.assertEqual(sum(item['role']=='river' for item in CATALOG['shipping']),6)
+        # Six rivers; the Zambezi has two maps (the 30 km run and the
+        # evidence-based upper gorge).
+        self.assertEqual(len({item['river'] for item in CATALOG['shipping'] if item['role']=='river'}),6)
+        self.assertEqual(sum(item['role']=='river' for item in CATALOG['shipping']),7)
         config=(ROOT/'unreal/Config/DefaultGame.ini').read_text()
         cooked=re.findall(r'^\+MapsToCook=\(FilePath="([^"]+)"\)',config,re.M)
         self.assertEqual(len(cooked),len(set(cooked)))
