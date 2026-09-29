@@ -42,6 +42,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'physics/scripts'))
 from tiff_numpy import read_geotiff  # noqa: E402
+from solver_face_discharge import face_discharge  # noqa: E402
 
 DATA = ROOT / 'physics/data/real_world/colorado_river_grand_canyon_rowing'
 SRC = DATA / 'hance_sources_2026_09'
@@ -269,7 +270,10 @@ def main():
                              (np.ascontiguousarray(energy.T), '<f4'), (np.ascontiguousarray(bwet.T), 'u1')):
                 flat = arr.astype(fmt).ravel()
                 fb.write(struct.pack('<i', flat.size)); fb.write(flat.tobytes())
-        q_sec = (h * fields['u'][0]).sum(0) * d
+        # Section discharge: the solver's exact face mass flux. The cell-centre
+        # h*u sum overstated it here by 1-2 % (the first export reported it).
+        q_sec = face_discharge(args.solver_binary, sr / 'scenario', f)
+        q_centre = (h * fields['u'][0]).sum(0) * d
         dh = np.abs(f['h'] - f0['h'])[wet]; du = np.abs(f['u'] - f0['u'])[wet]; dv = np.abs(f['v'] - f0['v'])[wet]
         wet_in = wet[:, 0] & (h[:, 0] > 0.05); wet_out = wet[:, -1] & (h[:, -1] > 0.05)
         runtime_boundaries = [
@@ -296,7 +300,11 @@ def main():
                         simulated_seconds=args.steps * sc['fixed_dt']),
             bands=[dict(band_id=BAND, directory=BAND, scenario_id=sc['metadata']['scenario_id'], manning_n=sc['roughness'],
                         effective_manning_n=sc['roughness'], discharge_target_m3s=Q, discharge_target_cfs=8000.0,
-                        discharge_steady_m3s=dict(west=float(q_sec[2]), mid=float(np.median(q_sec[10:-10])), east=float(q_sec[-3])),
+                        discharge_steady_m3s=dict(west=float(q_sec[2]), mid=float(np.median(q_sec[10:-10])), east=float(q_sec[-3]),
+                                                  method='exact numerical face mass flux of the last frame (solver --inspect-face-fluxes)'),
+                        discharge_cell_centre_hu_sum_m3s=dict(
+                            west=float(q_centre[2]), mid=float(np.median(q_centre[10:-10])), east=float(q_centre[-3]),
+                            note='diagnostic only: the cell-centre momentum sum overstates the transported discharge on steep, shallow wet/dry reaches'),
                         convergence=dict(converged=False, compared_frames=[frames[-2].name, frames[-1].name],
                                          frame_spacing_s=args.frame_interval * sc['fixed_dt'],
                                          max_abs_dh_m=float(dh.max()), p95_abs_dh_m=float(np.percentile(dh, 95)),

@@ -26,10 +26,15 @@ agreement) plus a profile chart.
 import argparse
 import json
 import struct
+import sys
 import zlib
 from pathlib import Path
 
 import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'physics/scripts'))
+from solver_face_discharge import face_discharge  # noqa: E402
 
 Q = 226.534772736
 
@@ -73,6 +78,7 @@ def main():
     ap.add_argument('output', type=Path)
     ap.add_argument('--frame', type=int, default=-1)
     ap.add_argument('--evidence', type=Path, default=Path('tmp/hance-evidence-v0'))
+    ap.add_argument('--solver-binary', type=Path, default=ROOT / 'tmp/hance-solver-build/raftsim_water_solver.exe')
     args = ap.parse_args()
     sc = json.loads((args.scenario_root / 'scenario/scenario.json').read_text())
     ny, nx, d = sc['grid']['ny'], sc['grid']['nx'], sc['grid']['dx']
@@ -98,7 +104,10 @@ def main():
     k = 12
     err_s = np.array([np.nanmedian(err[max(0, j - k):j + k + 1]) if ok[max(0, j - k):j + k + 1].any() else np.nan for j in range(nx)])
     cell_err = np.where(both, eta - dem, np.nan)
-    q_sec = (h * u).sum(0) * d
+    # Section discharge: the solver's exact face mass flux. The cell-centre
+    # h*u sum overstates transport on steep, shallow wet/dry reaches.
+    q_sec = face_discharge(args.solver_binary, args.scenario_root / 'scenario', f)
+    q_centre = (h * u).sum(0) * d
     iou = (river & wet).sum() / max((river | wet).sum(), 1)
     false_wet = wet & ~river & (cls != 3)
     missed = river & ~wet
@@ -164,7 +173,10 @@ def main():
         wet_extent=dict(iou=float(iou), cooked_wet_cells=int(wet.sum()), imagery_water_cells=int(river.sum()),
                         false_wet_cells=int(false_wet.sum()), missed_water_cells=int(missed.sum())),
         discharge_m3s=dict(target=Q, section_p5_p50_p95=np.percentile(q_sec[10:-10], [5, 50, 95]).tolist(),
-                           inlet=float(q_sec[1]), outlet=float(q_sec[-2])),
+                           inlet=float(q_sec[1]), outlet=float(q_sec[-2]),
+                           method='exact numerical face mass flux of the frame (solver --inspect-face-fluxes)'),
+        discharge_cell_centre_hu_sum_m3s=dict(section_p5_p50_p95=np.percentile(q_centre[10:-10], [5, 50, 95]).tolist(),
+                                              note='diagnostic only: overstates transport on steep, shallow wet/dry reaches'),
         hydraulics=dict(froude_gt1_share_of_wet=float((fr[wet] > 1).mean()), speed_p50_p95_max=np.percentile(np.hypot(u, v)[wet], [50, 95, 100]).tolist(),
                         rapid_speed_p50_p95=np.percentile(np.hypot(u, v)[wet & rapid[None, :]], [50, 95]).tolist()),
         textured_surface_error_m=textured,

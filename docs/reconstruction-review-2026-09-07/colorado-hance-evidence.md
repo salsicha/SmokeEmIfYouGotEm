@@ -61,11 +61,14 @@ Scripts (numpy only) in `physics/scripts/`:
 | v5 (shipped) | two bed calibration steps | **+0.04 / 0.18 m** | **68%** | **0.95** | 10.4% / 1.7% |
 
 v5 conveys the target discharge: the solver's exact face flux
-(`solver_face_discharge.py`, measured 2026-09-27) is 226.5 / 226.4 /
-226.2 m3/s at the west / mid / east sections against 226.5. The manifest's
-`discharge_steady_m3s` (229.4-231.6) is the cell-centre h·u sum, which
-overstates transport on wet/dry reaches; see pacuare-huacas-evidence.md. The
-next Hance export should record the face flux. v5 is settled (p95 surface change 1.6 mm over the last 150 s). The v0
+(`solver_face_discharge.py`) is 226.5 / 226.4 / 226.2 m3/s at the west / mid /
+east sections against 226.5. Since 2026-09-29 the cooked manifest's
+`discharge_steady_m3s` and the compare's `discharge_m3s` record that face
+flux. The first export recorded the cell-centre h·u sum (229.4-231.6), which
+overstates transport on wet/dry reaches (see pacuare-huacas-evidence.md); it
+is kept as a labelled diagnostic. The re-export from the same v5 cook left
+every cooked array, the observed-whitewater layer and the terrain
+byte-identical. v5 is settled (p95 surface change 1.6 mm over the last 150 s). The v0
 outlet stage came from the clear-water DEM and was 1.6 m low; it drained both
 downstream pools. The waterline pairs put the scour pool at about 750.2 m;
 v5 cooks it at 750.2-750.3 m. Calm-water levels are known only to about
