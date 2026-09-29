@@ -2147,6 +2147,10 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LivePresentationWidthM = 224.0f;
         WaterConfig->LivePresentationLengthM = 224.0f;
         WaterConfig->bEnableCookedFarFieldWater = true;
+        // Observed whitewater (render-only appearance evidence): Sentinel-2
+        // whitewater plus the observed-rapid catalogue, as a Cartesian raster
+        // (export_cartesian_observed_whitewater.py) that floors displayed foam.
+        WaterConfig->ObservedWhitewaterGain = 0.9f;
     }
     if (bZambezi)
     {

@@ -128,6 +128,13 @@ def main():
     ap.add_argument('--bank-blend-m', type=float, default=30.0)
     ap.add_argument('--boulder-crest-below-ws-m', type=float, default=0.4)
     ap.add_argument('--bed-correction', type=Path)
+    ap.add_argument('--observed-rapids', type=Path,
+                    help='observed-rapid catalogue (observed_rapid_features.py schema): its "rapids" (evidence station frame) '
+                         'concentrate the fall between anchors like photographed whitewater, and may run supercritical')
+    ap.add_argument('--rapid-depth-floor', type=float, default=0.7,
+                    help='inside catalogued rapids the inferred depth may fall to this many critical depths (elsewhere 1)')
+    ap.add_argument('--skip-anchor-stations', type=float, nargs='*', default=[],
+                    help='drop these surface anchors (evidence stations) when they contradict an observed rapid position')
     args = ap.parse_args()
     out = args.out.resolve()
     assert not out.exists(), 'fresh output folder required'
@@ -285,12 +292,31 @@ def main():
     a_st, a_z = np.array(a_st), np.array(a_z)
     keep = np.r_[True, np.diff(a_z) < -0.05]
     a_st, a_z = a_st[keep], a_z[keep]
+    skipped = [float(a) for a in a_st if any(abs(a - s) < 1.0 for s in args.skip_anchor_stations)]
+    if skipped:
+        keep = np.array([not any(abs(a - s) < 1.0 for s in args.skip_anchor_stations) for a in a_st])
+        a_st, a_z = a_st[keep], a_z[keep]
     assert np.all(np.diff(a_z) < 0) and len(a_z) >= 3, 'anchors must fall downstream'
 
     # ---------------- surface between anchors: drops distributed by whitewater (inferred)
     wet_at = np.bincount(st_i[river & (st_i >= 0)], minlength=M).astype(float)
     foam_at = np.bincount(st_i[foam & (st_i >= 0)], minlength=M).astype(float)
     share = gauss_smooth(np.where(wet_at > 3, foam_at / np.maximum(wet_at, 1), 0.0), 6.0)
+    # Observed rapids (outfitter, guidebook, video observations) that Sentinel-2's 10 m
+    # pixels do not resolve concentrate the fall as its whitewater does: a class-weighted
+    # share over each rapid's span, 10 m ramps (inferred, labelled).
+    share_cat = np.zeros(M)
+    rapids_used = []
+    if args.observed_rapids:
+        cat = json.loads(args.observed_rapids.read_text(encoding='utf-8'))
+        assert str(cat.get('rapid_station_frame', cat.get('station_frame'))).startswith('evidence'),             'observed rapids must be in the evidence station frame'
+        idx_m = np.arange(M, dtype=float)
+        for r in cat.get('rapids', []):
+            a0 = float(r['station_m']); a1 = a0 + float(r['length_m'])
+            ramp = np.clip(np.minimum(idx_m - (a0 - 10.0), (a1 + 10.0) - idx_m) / 10.0, 0.0, 1.0)
+            share_cat = np.maximum(share_cat, float(r['share']) * ramp)
+            rapids_used.append(dict(id=r['id'], span_m=[a0, a1], share=float(r['share'])))
+    share = np.maximum(share, share_cat)
     w = args.pool_weight + share
     ws_m = np.full(M, np.nan)
     for i in range(len(a_st) - 1):
@@ -335,7 +361,10 @@ def main():
     Hn[have] = (Q * nman[have] * 2.0 / (np.sqrt(slope[have]) * sum_f53[have])) ** 0.6
     hc = ((Q / np.maximum(width, 1.0)) ** 2 / G) ** (1 / 3)
     mean_f = np.where(have, np.bincount(s_bin[rv], weights=fshape_all[rv], minlength=nb) / np.maximum(np.bincount(s_bin[rv], minlength=nb), 1), 1.0)
-    Hn = np.where(have, np.maximum(Hn, hc / np.maximum(mean_f, 0.3)), np.nan)
+    floor = 1.0 / np.maximum(mean_f, 0.3)
+    in_rapid = share_cat[np.clip(np.arange(nb) * 2, 0, M - 1)] >= 0.1
+    floor = np.where(in_rapid, args.rapid_depth_floor * floor, floor)
+    Hn = np.where(have, np.maximum(Hn, hc * floor), np.nan)
     Hn = gauss_smooth(np.interp(np.arange(nb), np.nonzero(have)[0], Hn[have]), 3.0)
     corr = np.load(args.bed_correction) if args.bed_correction else None
     bed = dem.copy()
@@ -405,7 +434,11 @@ def main():
                         margin_m=args.margin_m, boulder_crest_below_ws_m=args.boulder_crest_below_ws_m,
                         station_projection='nearest point on the midline (segment feet clamped to their ends)',
                         bed_correction=None if corr is None else args.bed_correction.resolve().relative_to(ROOT).as_posix(),
-                        bed_correction_sha256=None if corr is None else sha(args.bed_correction)),
+                        bed_correction_sha256=None if corr is None else sha(args.bed_correction),
+                        observed_rapids=None if not args.observed_rapids else args.observed_rapids.resolve().relative_to(ROOT).as_posix(),
+                        observed_rapids_sha256=None if not args.observed_rapids else sha(args.observed_rapids),
+                        rapid_depth_floor_critical_depths=args.rapid_depth_floor if args.observed_rapids else None,
+                        rapids=rapids_used, skipped_anchor_stations_m=skipped),
         statistics=stats, inferred=True, accepted=False)
     (out / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
 

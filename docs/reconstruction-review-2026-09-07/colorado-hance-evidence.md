@@ -279,3 +279,18 @@ backdrop is placed and that it does not collide. That test and
   read pale and hazy; some faceted flat-shaded patches show on the water.
 - The far-field water takes its depth and speed from one encoded energy value,
   not the cooked depth.
+
+## Observed rapids (2026-09-29)
+
+The observed-whitewater layer is raised to the reach's observed-rapid
+catalogue (`observed_rapids/hance_observed_rapids.json`: Hance main rapid and
+Son of Hance; 14 features). It now covers the whole main rapid and Son of
+Hance.
+
+The cooked flow is unchanged:
+- A trial cook with the features drowned the upper main rapid. The pools
+  below the steps are measured 2014 bathymetry, so the features could only
+  raise the inferred bed above each step.
+- The lower main rapid and Son of Hance still do not break hydraulically.
+
+See [observed-rapids-2026-09-29.md](observed-rapids-2026-09-29.md).

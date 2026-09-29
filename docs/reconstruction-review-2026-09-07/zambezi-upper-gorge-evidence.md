@@ -294,3 +294,22 @@ change, only re-measured the launch; they are not reported.
     capture-only ribbon on the straight run at 430-590 m, not the live water.
   - The review start (`-RaftSimWaterReviewStation`) is still South
     Fork-only.
+
+## Observed rapids (2026-09-29)
+
+The map now uses cook v5, built with the reach's observed-rapid catalogue
+(`observed_rapids/upper_gorge_observed_rapids.json`: 10 rapids, 20 features,
+from outfitters, guidebooks, trip reports and video). Method and per-rapid
+numbers: [observed-rapids-2026-09-29.md](observed-rapids-2026-09-29.md).
+Results above describe the earlier cook (v3).
+
+- **v5:** surface anchors -0.62 to +0.97 m (10 anchors; the 1,825 m anchor
+  contradicted Morning Glory and is skipped), wet IoU 0.967, outflow
+  281.8 m³/s, max depth 7.6 m.
+- **Breaking:** every named rapid breaks except 5.5 and the reach-end rapid,
+  from 2 cells at Rapid 3 to 117 at The Wall.
+- **Appearance:** the Cartesian map now loads the observed-whitewater layer
+  (gain 0.9), raised to the catalogue's expected whitewater.
+- **Launch:** unchanged at 212.7 m. The export's launch rule now keeps the
+  raft's 67 m stateful-detail footprint inside a cooked window, and 212.7 m
+  is the most upstream point that does.

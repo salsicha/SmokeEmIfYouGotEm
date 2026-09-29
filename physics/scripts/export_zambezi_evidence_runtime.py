@@ -85,6 +85,8 @@ def main():
     ap.add_argument('--advance-m', type=float, default=64.0)
     ap.add_argument('--context-cells', type=int, default=3)
     ap.add_argument('--raft-margin-m', type=float, default=8.0)
+    ap.add_argument('--detail-footprint-m', type=float, default=67.0,
+                    help="side of the raft's stateful-detail source footprint (RaftSimStatefulDetailComponent LiveSourceSampleSide)")
     ap.add_argument('--centre-step-m', type=float, default=4.0)
     ap.add_argument('--bed-correction-file', type=Path, default=None,
                     help='where the bed correction named by the evidence manifest now lives (checked by its sha256)')
@@ -272,31 +274,40 @@ def main():
     smooth_shift = float(np.max(np.hypot(fx - np.interp(fine, arc, px), fy - np.interp(fine, arc, py))))
 
     # Launch: the slowest midline point 40-500 m into the reach that a live
-    # window can hold (the runtime clamps the window centre into the nearest
-    # valid rectangle and needs the raft >= raft_margin inside the window, so
-    # the raft must lie within extent/2 - margin (L-inf) of a rectangle; 4 m
-    # spare), is >= 1 m deep with every cell within 6 m wet, and flows
+    # window can hold, is >= 1 m deep with every cell within 6 m wet, and flows
     # < 2.5 m/s (at 283 m3/s the inferred gorge runs 2-5 m/s, so "calm" is
-    # relative); finish 40 m before the outflow cut. The editor places the
+    # relative); finish 40 m before the outflow cut. "Hold": the runtime
+    # clamps the window centre into the nearest valid rectangle, and the
+    # raft's stateful detail needs its whole source footprint (a square of
+    # --detail-footprint-m around the raft) inside that window, so the raft
+    # must lie within extent/2 - max(margin, footprint/2) (L-inf) of a
+    # rectangle; 4 m spare. With imprinted observed rapid features the launch
+    # is the slowest such point at least 3 m above the first feature, or, when
+    # none exists, the first (most upstream) one: the slowest point further
+    # down sits inside Rapid 1 (The Wall), past its head. The editor places the
     # raft and run manager at these stations
     # (RaftSimEditorLandscapeGeometry.cpp kZambeziUpperGorge*).
     def region_cell(x, y):
         return int(round((y - r_origin[1]) / D)), int(round((x - r_origin[0]) / D))
-    hold_m = args.live_extent_m / 2 - args.raft_margin_m - 4.0
+    hold_m = args.live_extent_m / 2 - max(args.raft_margin_m, args.detail_footprint_m / 2) - 4.0
 
     def in_rects(x, y):
         return any(max(x0 - x, x - x1, y0 - y, y - y1, 0.0) <= hold_m for x0, y0, x1, y1 in merged)
-    launch = None
+    valid = []
     for s, x, y in zip(sa + station0, qx, qy):
         if not s_in + 40.0 <= s <= s_in + 500.0:
             continue
         r, c = region_cell(x, y)
         near = wet_atlas[r - 3:r + 4, c - 3:c + 4]
         if in_rects(x, y) and wet_atlas[r, c] >= 1.0 and speed_atlas[r, c] < 2.5 and (near > 0.3).all():
-            if launch is None or speed_atlas[r, c] < launch['speed_mps']:
-                launch = dict(station_m=float(s), local_xy_m=[float(x), float(y)], depth_m=float(wet_atlas[r, c]),
-                              speed_mps=float(speed_atlas[r, c]))
-    assert launch is not None, 'no slow, valid launch point in the first 500 m'
+            valid.append(dict(station_m=float(s), local_xy_m=[float(x), float(y)], depth_m=float(wet_atlas[r, c]),
+                              speed_mps=float(speed_atlas[r, c])))
+    assert valid, 'no slow, valid launch point in the first 500 m'
+    feats = [f['station_m'] for f in evm.get('observed_rapid_features', {}).get('imprint', [])]
+    above = [q for q in valid if not feats or q['station_m'] <= min(feats) - 3.0]
+    launch = min(above, key=lambda q: q['speed_mps']) if above else min(valid, key=lambda q: q['station_m'])
+    launch['rule'] = ('slowest valid point' + (' above the first observed rapid feature' if feats else '')
+                      if above else 'first valid point (none above the first observed rapid feature)')
     finish_station = float(np.floor(s_out - 40.0))
     write_json(rt / 'progress_coordinate_map.json', dict(
         schema='raftsim.curved_river_coordinate_map.v1', river_id='zambezi_batoka_gorge', section_id=SECTION,

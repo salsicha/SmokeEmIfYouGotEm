@@ -200,3 +200,14 @@ added 0-2 ms p95 (21.6 / 29.0 / 28.1 ms before them).
   fitted to it.
 - **Licence:** commercial redistribution of IGN-derived data must be
   confirmed with IGN before release.
+
+## Observed rapids (2026-09-29)
+
+The observed-whitewater layer is raised to the reach's observed-rapid
+catalogue (`observed_rapids/huacas_observed_rapids.json`: 6 rapids, 5
+features). The cooked flow is unchanged:
+- A trial cook with the named rocks, the Upper Pinball boulder garden and
+  the Guatemala waves changed breaking by at most one cell per feature.
+- Guatemala sits in the reach-end pool.
+
+See [observed-rapids-2026-09-29.md](observed-rapids-2026-09-29.md).

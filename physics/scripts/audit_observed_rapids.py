@@ -99,6 +99,12 @@ def main():
     sc = json.loads((args.scenario_root / 'scenario/scenario.json').read_text())
     ny, nx = sc['grid']['ny'], sc['grid']['nx']
     st, lat, foam = solver_cells_in_evidence_frame(args.scenario_root, args.evidence)
+    cat0 = json.loads(args.catalogue.read_text())
+    if cat0.get('station_frame') == 'scenario':
+        # footprints in the solver's own (station, lateral) frame
+        ref = np.load(args.scenario_root / 'reference.npz')
+        st = np.broadcast_to(np.asarray(ref['station'], float)[None, :], (ny, nx)).copy()
+        lat = np.broadcast_to(np.asarray(ref['lateral'], float)[:, None], (ny, nx)).copy()
     frames = [read_frame(last_frame(args.run), ny, nx)]
     if args.baseline_run:
         frames.append(read_frame(last_frame(args.baseline_run), ny, nx))

@@ -77,9 +77,11 @@ Editor-hosted Development build on the development host; no packaged-build resul
   - The imagery is 10 m and the elevation 30 m, so rocks, holes and banks are
     unresolved.
   - The bed and flow are inferred.
-  - The main and lower rapids reach about their photographed Froude shares
-    since the 2026-09-29 station-projection fix, but the smaller whitewater
-    at 1.5 and 2.0 km is missing.
+  - Since 2026-09-29 the bed carries observed rapid features from outfitter,
+    guidebook and video observations. The cook breaks at the Terminator Wave,
+    through the Terminator core, at Khyber Pass and at Himalayas. It does not
+    break at T2 (Son of Terminator): GLO-30 shows a flat pool there, so T2
+    shows only as appearance whitewater.
 
   See the [review](../reconstruction-review-2026-09-07/futaleufu-terminator-evidence.md).
   Chilko Lava Canyon is now an evidence-based 4.0 km geographic reach from
@@ -98,15 +100,16 @@ Editor-hosted Development build on the development host; no packaged-build resul
   Stairway to Heaven) is a new evidence-based 3.5 km map beside the 30 km
   `L_Zambezi`. Its water is a map-aligned Cartesian cook at the 283 m³/s
   flow of the 2025-10-03 Sentinel-2 image. The GLO-30 surface anchors are
-  -1.14 to +0.52 m and the wet IoU is 0.97. The first build left grey cones
+  -0.62 to +0.97 m and the wet IoU is 0.97. The first build left grey cones
   of raw DEM standing in the river at the hairpins; a station-projection fix
   on 2026-09-29 removed them. It is not accepted:
   - There is no bathymetry: depth is inferred and capped at 6.5 m by the
     runtime's 10 m gate.
   - The gorge walls are inferred below GLO-30's 30 m resolution.
-  - The cooked field places Stairway to Heaven (28 % white in the image,
-    25.5 % of cells above Froude 0.8) but misses the whitewater at 1.5 and
-    2.5 km.
+  - Since 2026-09-29 the bed carries observed rapid features. The cook breaks
+    at every named rapid except Rapid 5.5 (anchors now -0.62 to +0.97 m), but
+    it has no bed data and its walls are smooth 30 m slopes, not basalt
+    cliffs.
   - It runs p95 35.0, 32.8 and 44.8 ms with no hitches at the launch, the
     1.5 km whitewater and Stairway to Heaven. The last is 5.2 ms under the
     budget.
@@ -114,3 +117,10 @@ Editor-hosted Development build on the development host; no packaged-build resul
     finish looks like a dry bed.
 
   See the [review](../reconstruction-review-2026-09-07/zambezi-upper-gorge-evidence.md).
+- Observed-whitewater display (all five evidence reaches, 2026-09-29): the
+  render-only whitewater floor now includes each reach's observed-rapid
+  catalogue. At the current gain of 0.9 it renders large rapids as one white
+  sheet. Renders measured about 0.25 as matching the photographed white
+  share, but applying it needs the five maps rebuilt. The rebuild failed
+  for lack of disk space (page file). See
+  [observed-rapids-2026-09-29.md](../reconstruction-review-2026-09-07/observed-rapids-2026-09-29.md).

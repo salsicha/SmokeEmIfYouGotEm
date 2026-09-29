@@ -1989,6 +1989,34 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 ResolvedObservedWhitewaterGain = FMath::Clamp(RiverWaterConfig->ObservedWhitewaterGain, 0.0f, 1.0f);
             }
         }
+        // Cartesian maps that opt in (gain > 0; South Fork does not) read the same
+        // render-only appearance evidence as a raster in the Cartesian water frame:
+        // rows along x (east), columns along y (north), sampled at the carrier's
+        // Cartesian coordinates.
+        if (RiverWaterConfig && WaterAdapter->HasCartesianWaterCoordinates() &&
+            RiverWaterConfig->ObservedWhitewaterGain > 0.0f && !RiverWaterConfig->CookedFieldsDir.IsEmpty())
+        {
+            ResolvedObservedWhitewaterGain = 0.0f;
+            if (WaterAdapter->LoadObservedWhitewaterFieldFromFile(
+                    URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(
+                        FPaths::Combine(
+                            RiverWaterConfig->CookedFieldsDir,
+                            FString::Printf(
+                                TEXT("observed_whitewater_%s.bin"),
+                                *RiverWaterConfig->FlowBand.ToString())))))
+            {
+                ResolvedObservedWhitewaterGain = FMath::Clamp(RiverWaterConfig->ObservedWhitewaterGain, 0.0f, 1.0f);
+            }
+        }
+        // Review only: -RaftSimObservedWhitewaterGain=<g> replaces the config's
+        // gain for a loaded layer, so renders at several gains need no rebuild.
+        float ReviewObservedGain = 0.0f;
+        if (ResolvedObservedWhitewaterGain > 0.0f &&
+            FParse::Value(FCommandLine::Get(), TEXT("RaftSimObservedWhitewaterGain="), ReviewObservedGain))
+        {
+            ResolvedObservedWhitewaterGain = FMath::Clamp(ReviewObservedGain, 0.0f, 1.0f);
+            UE_LOG(LogTemp, Display, TEXT("RaftSim observed whitewater: review gain %.3f"), ResolvedObservedWhitewaterGain);
+        }
     }
     BoulderFootprintsSLR.Reset();
     if (RiverWaterConfig && !RiverWaterConfig->CookedFieldsDir.IsEmpty())
@@ -7207,7 +7235,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // shows them. The photo already shows foam after its downstream travel,
     // so it floors the displayed foam only; feeding it to the transported
     // state smeared it into one sheet down the rapid.
-    if (ResolvedObservedWhitewaterGain > 0.0f && bUsesCurvedRiverCoordinates &&
+    if (ResolvedObservedWhitewaterGain > 0.0f && (bUsesCurvedRiverCoordinates || bCartesianFlow) &&
         RiverCoordinatesM.Num() == VertexColors.Num())
     {
         for (int32 I = 0; I < VertexColors.Num(); ++I)

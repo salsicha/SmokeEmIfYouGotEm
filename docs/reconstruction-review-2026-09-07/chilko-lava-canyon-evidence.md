@@ -282,3 +282,13 @@ times:
   2013).
 - **Rocks and holes below the surface are not resolved.** Bidwell's two
   inferred boulders come from its whitewater patch.
+
+## Observed rapids (2026-09-29)
+
+The observed-whitewater layer is raised to the reach's observed-rapid
+catalogue (`observed_rapids/lava_canyon_observed_rapids.json`: Bidwell, White
+Kilometre, White Mile; 13 features). The cooked flow is unchanged:
+- Bidwell, White Kilometre and White Mile already break.
+- A trial cook with the features changed breaking by only a few cells.
+
+See [observed-rapids-2026-09-29.md](observed-rapids-2026-09-29.md).

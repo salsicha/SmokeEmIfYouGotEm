@@ -230,3 +230,23 @@ These are the rebuilt map (2026-09-29). The first map measured 25.2, 38.1 and
 - **Finer data would need purchase** (SAF aerial photography). The
   2024-2026 gauge records need the DGA portal's reCAPTCHA, completed by the
   user.
+
+## Observed rapids (2026-09-29)
+
+The map now uses cook v6, built with the reach's observed-rapid catalogue
+(`observed_rapids/terminator_observed_rapids.json`: 6 rapids, 14 features)
+and two more calibration passes. Method and numbers:
+[observed-rapids-2026-09-29.md](observed-rapids-2026-09-29.md). Results above
+describe the earlier cook.
+
+- **v6:** GLO-30 anchors -0.04 to +0.85 m, wet IoU 0.934, outlet
+  399.8 m³/s.
+- **Breaking:**
+  - now at the Terminator Wave, through the Terminator core (Terminator Hole,
+    the Typewriter), at Khyber Pass and at Himalayas;
+  - not at T2, which sits in a flat 6-8 m pool at its catalogued position.
+    T2 is carried by the appearance layer.
+- **Appearance:** the observed-whitewater layer is raised to the catalogue's
+  expected whitewater.
+- **Landscape:** the relief constants in `RaftSimEditorEnvironmentCatalog.cpp`
+  follow the new bed (+6 cm).
