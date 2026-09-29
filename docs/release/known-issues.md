@@ -103,8 +103,8 @@ Editor-hosted Development build on the development host; no packaged-build resul
   - The cooked field does not place the photographed rapids: Stairway to
     Heaven is 28 % white in the image but only 1.7 % of its cells exceed
     Froude 0.8.
-  - It runs p95 34.3 ms with no hitches at the launch. Downstream stations
-    are untimed, because `RaftSim.SurveyReach` and the review start do not
-    yet support Cartesian maps other than South Fork.
+  - It runs p95 34.3, 36.4 and 45.6 ms with no hitches at the launch, the
+    1.5 km whitewater and Stairway to Heaven. The last is 4.4 ms under the
+    budget.
 
   See the [review](../reconstruction-review-2026-09-07/zambezi-upper-gorge-evidence.md).

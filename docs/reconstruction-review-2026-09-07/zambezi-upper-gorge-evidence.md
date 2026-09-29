@@ -205,12 +205,20 @@ build, Blender or cook job live:
 | station | p95 | max | frames over 100 ms | game thread mean | GPU mean |
 | --- | --- | --- | --- | --- | --- |
 | 294.7 m (launch) | 34.3 ms | 66.7 ms | 0 | 21.5 ms | 8.3 ms |
+| 1,494 m (whitewater at 1.5 km) | 36.4 ms | 78.7 ms | 0 | 21.9 ms | 8.1 ms |
+| 2,762 m (Stairway to Heaven) | 45.6 ms | 68.5 ms | 0 | 20.8 ms | 8.1 ms |
 
-Downstream stations could not be profiled. `RaftSim.SurveyReach` needs a
-curved hydraulic map, so on a Cartesian map it logs "no river coordinate map
-bound" and leaves the raft at the launch; the two runs requested at 1,500 m
-and 2,750 m measured the launch again and are not reported. The run
-manager's review start (`-RaftSimWaterReviewStation`) is South Fork-only.
+All three meet the 20 FPS goal (50 ms p95, no frame over 100 ms). The
+Stairway station is the closest, at 4.4 ms under the budget.
+
+`RaftSim.SurveyReach` first failed on this map: it needed a curved
+hydraulic map and logged "no river coordinate map bound". It now converts
+stations through the scenario's run axis (`RaftSimReviewCoordinates`: the run
+manager's progress map on a Cartesian map), and samples water on the
+hydraulic adapter. The downstream runs walked the raft there through 15 and
+30 Cartesian window handoffs. The final handoffs lie 0.1 m from the midline
+at stations 1,494 and 2,762 m. Two earlier runs, before this change, only
+re-measured the launch; they are not reported.
 
 ## Limits (why this is not accepted)
 
@@ -229,7 +237,8 @@ manager's review start (`-RaftSimWaterReviewStation`) is South Fork-only.
   South Fork-only on this map. They include foam sources, atlas stencil
   caching, the metric breaking search and shoreline fan topology.
 - **Not yet done:**
-  - a runtime reach survey and downstream-station timing, which need survey
-    and review-start support on non-South Fork Cartesian maps;
+  - a full screenshot reach survey;
   - review against photographs. The two landscape captures show the
     capture-only ribbon on the straight run at 430-590 m, not the live water.
+  - The review start (`-RaftSimWaterReviewStation`) is still South
+    Fork-only.

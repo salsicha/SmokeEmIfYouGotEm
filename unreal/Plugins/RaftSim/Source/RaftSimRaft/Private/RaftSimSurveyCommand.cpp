@@ -36,6 +36,7 @@
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRockObstacleActor.h"
+#include "RaftSimRunCoordinateProvider.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
@@ -140,28 +141,49 @@ static URaftSimWaterRuntimeAdapter* FindWater(UWorld* World)
     return Bridge ? Bridge->GetWaterRuntime() : nullptr;
 }
 
+// Stations and laterals come from the scenario's run axis: on a Cartesian map
+// the run manager's progress map (east/north is not a station), otherwise the
+// curved hydraulic map. Water sampling stays on the hydraulic adapter.
+static const URaftSimWaterRuntimeAdapter* FindSurveyAxis(UWorld* World, const URaftSimWaterRuntimeAdapter* Water)
+{
+    return World && Water ? RaftSimReviewCoordinates::GetMap(World, Water) : nullptr;
+}
+
+static bool SurveyWorldToRiver(UWorld* World, const URaftSimWaterRuntimeAdapter* Water, const FVector& WorldCm,
+    FVector2D& OutStationLateralM, FVector& OutTangent, FVector& OutLeft)
+{
+    return World && Water &&
+        RaftSimReviewCoordinates::WorldToCoordinates(World, Water, WorldCm, OutStationLateralM, OutTangent, OutLeft);
+}
+
 // World point of a river station plus a point one metre downstream for the
 // heading. The last station of a corridor has no downstream neighbour, so the
 // heading is mirrored from the upstream one there (the 600 m station of
 // Hance read "unreachable" before this).
 static bool StationPointAndHeading(
+    UWorld* World,
     URaftSimWaterRuntimeAdapter* Water,
     float StationM,
     float LateralM,
     FVector& OutPointCm,
     FVector& OutAheadCm)
 {
-    const float DatumM = Water->GetRiverVerticalDatumM();
-    if (!Water->RiverToWorldPosition(FVector2D(StationM, LateralM), DatumM, OutPointCm))
+    const URaftSimWaterRuntimeAdapter* Axis = FindSurveyAxis(World, Water);
+    if (!Axis)
     {
         return false;
     }
-    if (Water->RiverToWorldPosition(FVector2D(StationM + 1.0f, LateralM), DatumM, OutAheadCm))
+    const float DatumM = Water->GetRiverVerticalDatumM();
+    if (!Axis->RiverToWorldPosition(FVector2D(StationM, LateralM), DatumM, OutPointCm))
+    {
+        return false;
+    }
+    if (Axis->RiverToWorldPosition(FVector2D(StationM + 1.0f, LateralM), DatumM, OutAheadCm))
     {
         return true;
     }
     FVector BehindCm;
-    if (Water->RiverToWorldPosition(FVector2D(StationM - 1.0f, LateralM), DatumM, BehindCm))
+    if (Axis->RiverToWorldPosition(FVector2D(StationM - 1.0f, LateralM), DatumM, BehindCm))
     {
         OutAheadCm = OutPointCm + (OutPointCm - BehindCm);
         return true;
@@ -310,7 +332,7 @@ static void LogSurveyStation(FSurveyState& State)
     FVector2D RiverPosition(StationM, 0.0f);
     FVector Tangent = FVector::ForwardVector;
     FVector LeftNormal = FVector::RightVector;
-    Water->WorldToRiverCoordinates(RaftLocation, RiverPosition, Tangent, LeftNormal);
+    SurveyWorldToRiver(World, Water, RaftLocation, RiverPosition, Tangent, LeftNormal);
     const float HeadingDeg = Rotation.Yaw;
     const float TangentDeg = FMath::RadiansToDegrees(FMath::Atan2(Tangent.Y, Tangent.X));
     const float HeadingErrorDeg = FMath::FindDeltaAngleDegrees(TangentDeg, HeadingDeg);
@@ -357,14 +379,16 @@ static void LogSurveyStation(FSurveyState& State)
     float PreviousCentreZ = 0.0f;
     bool bHavePrevious = false;
     const float DatumM = Water->GetRiverVerticalDatumM();
+    const URaftSimWaterRuntimeAdapter* Axis = FindSurveyAxis(World, Water);
     for (float Offset = -HalfSpanM; Offset <= HalfSpanM + 0.01f; Offset += 5.0f)
     {
         FVector CentreWorld;
         FVector LeftWorld;
         FVector RightWorld;
-        if (!Water->RiverToWorldPosition(FVector2D(StationM + Offset, 0.0f), DatumM, CentreWorld) ||
-            !Water->RiverToWorldPosition(FVector2D(StationM + Offset, 6.0f), DatumM, LeftWorld) ||
-            !Water->RiverToWorldPosition(FVector2D(StationM + Offset, -6.0f), DatumM, RightWorld))
+        if (!Axis ||
+            !Axis->RiverToWorldPosition(FVector2D(StationM + Offset, 0.0f), DatumM, CentreWorld) ||
+            !Axis->RiverToWorldPosition(FVector2D(StationM + Offset, 6.0f), DatumM, LeftWorld) ||
+            !Axis->RiverToWorldPosition(FVector2D(StationM + Offset, -6.0f), DatumM, RightWorld))
         {
             continue;
         }
@@ -548,7 +572,7 @@ static void LogSurveyStation(FSurveyState& State)
     bool bFixedCentreWet = false;
     {
         FVector CentreWorld;
-        if (Water->RiverToWorldPosition(FVector2D(StationM, 0.0f), DatumM, CentreWorld))
+        if (Axis && Axis->RiverToWorldPosition(FVector2D(StationM, 0.0f), DatumM, CentreWorld))
         {
             // Compare terrain and water at the SAME fixed coordinates, not
             // the raft's downstream/lateral drift position at capture time.
@@ -708,7 +732,7 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
         FVector LeftNormal;
         FVector TargetWorldCm;
         FVector TargetAheadCm;
-        if (!StationPointAndHeading(Water, TargetStationM, 0.0f, TargetWorldCm, TargetAheadCm))
+        if (!StationPointAndHeading(World, Water, TargetStationM, 0.0f, TargetWorldCm, TargetAheadCm))
         {
             UE_LOG(LogTemp, Warning,
                 TEXT("RaftSim survey unreachable: index=%d station_m=%.0f reason=no_forward_map"),
@@ -727,7 +751,7 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
         {
             return SurveyTeleportZ(World, Raft, Water, XYCm, FallbackZCm);
         };
-        if (!Water->WorldToRiverCoordinates(Raft->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
+        if (!SurveyWorldToRiver(World, Water, Raft->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
         {
             // Off the corridor (ejected or lost): jump straight to the
             // target point and let the settle phase drop it onto the water.
@@ -792,7 +816,7 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
         const float StepStationM = RiverPosition.X + FMath::Clamp(RemainingM, -79.0f, 79.0f);
         FVector StepWorldCm;
         FVector AheadWorldCm;
-        if (!StationPointAndHeading(Water, StepStationM, 0.0f, StepWorldCm, AheadWorldCm))
+        if (!StationPointAndHeading(World, Water, StepStationM, 0.0f, StepWorldCm, AheadWorldCm))
         {
             ++State->StationHops;
             return;
@@ -846,7 +870,7 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
         FVector Tangent;
         FVector LeftNormal;
         FVector Side = -Raft->GetActorRightVector();
-        if (Water->WorldToRiverCoordinates(RaftLocation, RiverPosition, Tangent, LeftNormal))
+        if (SurveyWorldToRiver(World, Water, RaftLocation, RiverPosition, Tangent, LeftNormal))
         {
             Side = LeftNormal.GetSafeNormal2D();
         }
@@ -914,9 +938,10 @@ static void HandleSurveyReach(const TArray<FString>& Args, UWorld* World)
             }
             float MinStationM = 0.0f;
             float MaxStationM = 0.0f;
-            if (!Water->GetRiverStationRangeM(MinStationM, MaxStationM))
+            const URaftSimWaterRuntimeAdapter* Axis = FindSurveyAxis(W, Water);
+            if (!Axis || !Axis->GetRiverStationRangeM(MinStationM, MaxStationM))
             {
-                UE_LOG(LogTemp, Error, TEXT("RaftSim.SurveyReach: no river coordinate map bound"));
+                UE_LOG(LogTemp, Error, TEXT("RaftSim.SurveyReach: no run axis (curved river map or run-manager progress map) bound"));
                 return;
             }
             const float FirstM = FMath::Clamp(StartM, MinStationM, MaxStationM);
@@ -1142,7 +1167,7 @@ static void HandleCaptureRaftSeries(const TArray<FString>& Args, UWorld* World)
             };
             FVector TargetWorldCm;
             FVector TargetAheadCm;
-            if (!StationPointAndHeading(Water, Spec.StationM, Spec.LateralM, TargetWorldCm, TargetAheadCm))
+            if (!StationPointAndHeading(W, Water, Spec.StationM, Spec.LateralM, TargetWorldCm, TargetAheadCm))
             {
                 UE_LOG(LogTemp, Warning,
                     TEXT("RaftSim.CaptureRaftSeries: station %.0f m has no forward map; shooting from the current position"),
@@ -1162,13 +1187,13 @@ static void HandleCaptureRaftSeries(const TArray<FString>& Args, UWorld* World)
             FVector LeftNormal;
             FVector StepWorldCm = TargetWorldCm;
             FVector AheadWorldCm = TargetAheadCm;
-            if (Water->WorldToRiverCoordinates(Raft->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
+            if (SurveyWorldToRiver(W, Water, Raft->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
             {
                 const float RemainingM = Spec.StationM - RiverPosition.X;
                 const float StepStationM = RiverPosition.X + FMath::Clamp(RemainingM, -79.0f, 79.0f);
                 const bool bFinalStep = FMath::Abs(Spec.StationM - StepStationM) < 2.0f;
                 const float StepLateralM = bFinalStep ? Spec.LateralM : 0.0f;
-                if (!StationPointAndHeading(Water, StepStationM, StepLateralM, StepWorldCm, AheadWorldCm))
+                if (!StationPointAndHeading(W, Water, StepStationM, StepLateralM, StepWorldCm, AheadWorldCm))
                 {
                     StepWorldCm = TargetWorldCm;
                     AheadWorldCm = TargetAheadCm;
