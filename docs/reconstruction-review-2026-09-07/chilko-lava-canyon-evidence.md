@@ -192,14 +192,28 @@ and in the settled field it is 5.5 m/s.
   the photographed whitewater sit at 775-880 m. The check uses that measured
   extent. The regenerated map carries the generator's Lava Canyon ripple and
   roughness (0.72 / 0.42), not the old map's serialized 0.55 / 0.68.
-  - **Regression (2026-09-29):** the check that the launch window
-    activates an interior breaking site now fails. The strongest jump is at
-    678.1 m but 16.0 m off the centreline, with carrier coverage 0 (it was
-    at -11.5 m with coverage 1.0 when committed). It fails identically with
-    the committed map, so the colour change below is not the cause; the
-    cooked data are unchanged. The runtime built at the time also carried
-    uncommitted shoreline and bank-contour work from a concurrent session.
-    Not yet diagnosed.
+  - **Host-dependent timing (found and fixed 2026-09-29):** the check that
+    the launch window activates an interior breaking site failed when P4
+    ran in the editor (`UnrealEditor.exe`, a PIE world). The only site
+    reported was 16.0 m off the centreline with carrier coverage 0.
+    - No runtime, data or map change caused it. The check was validated in a
+      `-game` session (`UnrealEditor-Cmd.exe -game`). There it still passes
+      on the current map and binaries, with the same site as at commit: 678.0
+      m, -11.5 m, coverage 1.0, clearance 4.5 m. It passes with the frame rate
+      capped at 28 fps too.
+    - The site is a transient of the live solver: the first presentation
+      refresh has none in either host, and it forms as the solver runs. The
+      test asserted after a fixed wall-clock wait (1 s + 3 s). A `-game`
+      session had the site by then. A PIE session formed the same site only
+      after a further 10.8-11.0 s of world time (three runs).
+    - Fix: before the unchanged assertions, P4 holds for Lava Canyon until
+      the surface reports a site, bounded by 30 s of world time. It records
+      how long it waited, so a launch window that never forms a site still
+      fails. PIE now passes (10.82 and 10.95 s) and `-game` passes with no
+      wait (0.00 s).
+    - Why the PIE world needs more time is not measured. The bridge runs at
+      most four fixed water ticks per frame and keeps any backlog, so the
+      load hitch probably counts differently in the two hosts.
 - `RaftSim.M9.FChilko*` pass. The terrain test now requires the Sentinel-2
   drape and no procedural palette.
 - **Dressing on measured banks.** The old scene's shoreline gravel, meadow

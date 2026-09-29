@@ -104,6 +104,47 @@ bool FRaftSimStartZambeziLaunchCommand::Update()
     return true;
 }
 
+// The Lava Canyon launch window's interior breaking site is a transient of the
+// live solver: the first refresh has none, and one forms as the solver runs.
+// How far the fixed wall-clock wait gets depends on how the world is hosted:
+// on 2026-09-29 a -game session had the site at the first check, while an
+// editor PIE session formed the same site (678 m, -11.5 m, full coverage)
+// only after a further 10.8 s of world time. Hold the assert pass until the
+// surface reports a site, bounded by 30 s of world time, so a window that
+// never forms one still fails the unchanged checks in
+// FRaftSimAssertRiverMapCommand.
+DEFINE_LATENT_AUTOMATION_COMMAND_TWO_PARAMETER(
+    FRaftSimAwaitLavaCanyonBreakingSiteCommand, FAutomationTestBase*, Test,
+    TSharedPtr<float>, StartTimeSeconds);
+bool FRaftSimAwaitLavaCanyonBreakingSiteCommand::Update()
+{
+    UWorld* World = GetRiverTestWorld();
+    if (World == nullptr)
+    {
+        return true;
+    }
+    TActorIterator<ARaftSimWaterSurfaceActor> It(World);
+    if (!It)
+    {
+        return true;
+    }
+    if (*StartTimeSeconds < 0.0f)
+    {
+        *StartTimeSeconds = World->GetTimeSeconds();
+    }
+    const float WaitedSeconds = World->GetTimeSeconds() - *StartTimeSeconds;
+    TArray<ARaftSimWaterSurfaceActor::FBreakingSite> BreakingSites;
+    It->GetBreakingSites(BreakingSites);
+    if (BreakingSites.IsEmpty() && WaitedSeconds < 30.0f)
+    {
+        return false;
+    }
+    Test->AddInfo(FString::Printf(
+        TEXT("Lava Canyon launch window: %d breaking site(s) after a further %.2f s of world time"),
+        BreakingSites.Num(), WaitedSeconds));
+    return true;
+}
+
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
     FRaftSimAssertRiverMapCommand, FAutomationTestBase*, Test);
 bool FRaftSimAssertRiverMapCommand::Update()
@@ -3080,6 +3121,11 @@ bool FRaftSimRiverMapLoadsTest::RunTest(const FString& MapPath)
         ADD_LATENT_AUTOMATION_COMMAND(FRaftSimStartZambeziLaunchCommand(this));
     }
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(3.0f));
+    if (MapPath.EndsWith(TEXT("/L_LavaCanyon")))
+    {
+        ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAwaitLavaCanyonBreakingSiteCommand(
+            this, MakeShared<float>(-1.0f)));
+    }
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertRiverMapCommand(this));
     return true;
 }
