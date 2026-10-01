@@ -92,7 +92,9 @@ def test_zambezi_cartesian_layer_is_loaded_and_records_its_catalogue() -> None:
     note = geometry.index("(export_cartesian_observed_whitewater.py) that floors displayed foam.")
     block = geometry[geometry.rindex("if (bZambeziUpperGorge)", 0, note):note + 200]
     assert "cartesian_runtime/streaming_manifest.json" in block and "bEnableCookedFarFieldWater = true" in block
-    assert block[block.index("floors displayed foam."):].split("\n")[1].strip() == "WaterConfig->ObservedWhitewaterGain = 0.9f;"
+    assert (block[block.index("floors displayed foam."):].split("\n")[1].strip()
+            == "WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;")
+    assert "constexpr float kObservedWhitewaterDisplayGain = 0.25f;" in geometry
 
 
 def test_reconstructed_beds_record_the_catalogue() -> None:

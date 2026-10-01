@@ -39,6 +39,14 @@ constexpr float ChilkoProgress(float StationM) { return StationM / kChilkoLavaCa
 // a valid Cartesian live-window rectangle; terrain manifest `launch`).
 constexpr float kZambeziUpperGorgeLaunchStationM = 212.7f;
 constexpr float kZambeziUpperGorgeFinishStationM = 3382.0f;
+// Render-only observed whitewater (photographed whitewater plus each reach's
+// observed-rapid catalogue) floors every wet vertex's displayed foam at this
+// gain x the layer's whitewater fraction. Overhead renders of the Terminator
+// core (layer 0.71-0.74 in view) put the share of mostly-white 16 px blocks
+// at 0.51 with no layer, 0.71 at 0.2, 0.91 at 0.45 and 0.97 at the former
+// 0.9 (one white sheet); about 0.25 matches the photographed share and keeps
+// the dark tongues between the white (observed-rapids-2026-09-29.md).
+constexpr float kObservedWhitewaterDisplayGain = 0.25f;
 float CenterlineProgress(const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points, float StationM)
 {
     return Points.Num() < 2 ? 0.0f : FMath::Clamp(
@@ -2070,7 +2078,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveFoamFroudeRamp = 1.25f;
         WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
         WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
-        WaterConfig->ObservedWhitewaterGain = 0.9f;
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
     }
     if (bPacuare)
     {
@@ -2091,7 +2099,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveFoamFroudeRamp = 1.25f;
         WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
         WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
-        WaterConfig->ObservedWhitewaterGain = 0.9f;
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
     }
     if (bChilkoLavaCanyon)
     {
@@ -2111,7 +2119,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveFoamFroudeRamp = 1.25f;
         WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
         WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
-        WaterConfig->ObservedWhitewaterGain = 0.9f;
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
     }
     if (bFutaleufuTerminator)
     {
@@ -2131,7 +2139,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveFoamFroudeRamp = 1.25f;
         WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
         WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
-        WaterConfig->ObservedWhitewaterGain = 0.9f;
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
     }
     if (bZambeziUpperGorge)
     {
@@ -2150,7 +2158,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         // Observed whitewater (render-only appearance evidence): Sentinel-2
         // whitewater plus the observed-rapid catalogue, as a Cartesian raster
         // (export_cartesian_observed_whitewater.py) that floors displayed foam.
-        WaterConfig->ObservedWhitewaterGain = 0.9f;
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
     }
     if (bZambezi)
     {
@@ -2161,6 +2169,10 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->MovingWindowStationExtentM = 640.0f;
         WaterConfig->MovingWindowLateralExtentM = 250.0f;
         WaterConfig->MovingWindowAdvanceM = 80.0f;
+        // The procedural reference field breaks weakly at most of its 25
+        // rapids; the observed-rapid catalogue's expected whitewater
+        // (export_zambezi_run_observed_whitewater.py) floors the displayed foam.
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
     }
     WaterConfig->bMapProvidesTerrain = true;
     WaterConfig->bLiveSolverOwnsRuntimeRendering = bSolverOwnedRuntimeWater;

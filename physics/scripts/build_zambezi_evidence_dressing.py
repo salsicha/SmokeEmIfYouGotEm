@@ -121,6 +121,14 @@ def main():
     cook_wet = cook_wet_mask(args.runtime_atlas, NX, NY, Y1, centre_n)
     allowed = (forest & ~dilate(river | cook_wet, args.channel_clearance_m) &
                (slope <= args.max_slope_deg))
+    # Reconstructed gorge walls (reconstruct_zambezi_gorge_walls.py): the
+    # observed walls are bare basalt, so the cliff zone and its ledges carry
+    # no trees; the talus aprons below keep their woodland.
+    cliff_cells = 0
+    if 'wall_zone' in ev.files:
+        cliff = dilate(ev['wall_zone'] == 3, 1)
+        cliff_cells = int((allowed & cliff).sum())
+        allowed &= ~cliff
 
     rng = np.random.default_rng(SEED)
     s = args.spacing_m
@@ -165,6 +173,7 @@ def main():
                         spacing_m=args.spacing_m, max_slope_deg=args.max_slope_deg, understory_reach_m=args.understory_reach_m,
                         crown_radius='0.7 x nearest-neighbour distance, 2.5-6 m', height='2.2 x crown radius + U(0, 3) m, 6-18 m', seed=SEED),
         statistics=dict(forest_share=float(forest.mean()), allowed_share=float(allowed.mean()), instance_count=int(len(pts)),
+                        cliff_cells_excluded=cliff_cells,
                         cook_wet_share=float(cook_wet.mean()), cook_wet_outside_sentinel2_share=float((cook_wet & ~river).mean()),
                         understory_count=int(len(upts)),
                         crown_radius_m_p10_p50_p90=[float(v) for v in np.percentile(radius, [10, 50, 90])],

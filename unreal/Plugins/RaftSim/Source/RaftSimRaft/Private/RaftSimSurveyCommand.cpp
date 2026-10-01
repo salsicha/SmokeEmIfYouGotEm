@@ -262,7 +262,7 @@ static bool ParseCrewCommand(const FString& Name, ERaftSimCrewCommand& OutComman
 
 struct FSurveyState
 {
-    enum class EPhase : uint8 { Hop, Settle, ChaseShot, ChaseShot2, SideShot, Telemetry, Done };
+    enum class EPhase : uint8 { Hop, Settle, ChaseShot, ChaseShot2, SideShot, WideShot, TopShot, Telemetry, Done };
 
     TWeakObjectPtr<UWorld> World;
     FString Label;
@@ -284,6 +284,22 @@ struct FSurveyState
     int32 AnomalyTotal = 0;
     int32 StationsWithAnomalies = 0;
 };
+
+// Opt-in landscape-scale shot per station (terrain and vegetation review).
+static TAutoConsoleVariable<int32> CVarSurveyWideShot(
+    TEXT("RaftSim.SurveyWideShot"),
+    0,
+    TEXT("1 adds a wide upstream-elevated view to every RaftSim.SurveyReach station (_wide)."));
+
+// Opt-in straight-down shot per station (whitewater-share measurement).
+static TAutoConsoleVariable<int32> CVarSurveyTopShot(
+    TEXT("RaftSim.SurveyTopShot"),
+    0,
+    TEXT("1 adds a straight-down view centred on the raft to every survey station (_top); needs RaftSim.SurveyWideShot 1."));
+static TAutoConsoleVariable<float> CVarSurveyTopHeightM(
+    TEXT("RaftSim.SurveyTopHeightM"),
+    70.0f,
+    TEXT("Height of the RaftSim.SurveyTopShot camera above the raft (m)."));
 
 static FString StationTag(const FSurveyState& State)
 {
@@ -880,6 +896,50 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
             World, State->SideCamera.Get(), CameraLocation, (LookAt - CameraLocation).Rotation());
         FScreenshotRequest::RequestScreenshot(
             ScreenshotPath(StationTag(*State) + TEXT("_side")), false, false);
+        State->Phase = CVarSurveyWideShot.GetValueOnGameThread() > 0
+            ? FSurveyState::EPhase::WideShot
+            : FSurveyState::EPhase::Telemetry;
+        return;
+    }
+    case FSurveyState::EPhase::WideShot:
+    {
+        // Landscape-scale view for terrain and vegetation review: from 45 m
+        // upstream and 22 m up, looking 120 m down the river.
+        const FVector RaftLocation = Raft->GetActorLocation();
+        FVector2D RiverPosition;
+        FVector Tangent = Raft->GetActorForwardVector();
+        FVector LeftNormal;
+        SurveyWorldToRiver(World, Water, RaftLocation, RiverPosition, Tangent, LeftNormal);
+        FVector Forward = Tangent.GetSafeNormal2D();
+        if (Forward.IsNearlyZero())
+        {
+            Forward = FVector::ForwardVector;
+        }
+        const FVector CameraLocation = RaftLocation - Forward * 4500.0f + FVector(0.0f, 0.0f, 2200.0f);
+        const FVector LookAt = RaftLocation + Forward * 12000.0f;
+        State->ChaseCamera = PlaceCamera(
+            World, State->ChaseCamera.Get(), CameraLocation, (LookAt - CameraLocation).Rotation());
+        FScreenshotRequest::RequestScreenshot(
+            ScreenshotPath(StationTag(*State) + TEXT("_wide")), false, false);
+        State->Phase = CVarSurveyTopShot.GetValueOnGameThread() > 0
+            ? FSurveyState::EPhase::TopShot
+            : FSurveyState::EPhase::Telemetry;
+        return;
+    }
+    case FSurveyState::EPhase::TopShot:
+    {
+        // Straight-down view centred on the raft for whitewater-share
+        // measurement (RaftSim.SurveyTopHeightM up, image up = downstream).
+        const FVector RaftLocation = Raft->GetActorLocation();
+        FVector2D RiverPosition;
+        FVector Tangent = Raft->GetActorForwardVector();
+        FVector LeftNormal;
+        SurveyWorldToRiver(World, Water, RaftLocation, RiverPosition, Tangent, LeftNormal);
+        const float Yaw = Tangent.GetSafeNormal2D().IsNearlyZero() ? 0.0f : Tangent.GetSafeNormal2D().Rotation().Yaw;
+        const FVector CameraLocation = RaftLocation + FVector(0.0f, 0.0f, 100.0f * CVarSurveyTopHeightM.GetValueOnGameThread());
+        State->ChaseCamera = PlaceCamera(World, State->ChaseCamera.Get(), CameraLocation, FRotator(-90.0f, Yaw, 0.0f));
+        FScreenshotRequest::RequestScreenshot(
+            ScreenshotPath(StationTag(*State) + TEXT("_top")), false, false);
         State->Phase = FSurveyState::EPhase::Telemetry;
         return;
     }
@@ -961,6 +1021,69 @@ static void HandleSurveyReach(const TArray<FString>& Args, UWorld* World)
         }),
         4.0f, false);
 }
+
+// RaftSim.SurveyStations <settleS> <label> <station1> [station2 ...]
+//   The SurveyReach walk and photographs at an explicit, increasing station
+//   list (for example every named rapid), instead of a uniform step.
+static void HandleSurveyStations(const TArray<FString>& Args, UWorld* World)
+{
+    if (World == nullptr || Args.Num() < 3)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim.SurveyStations <settleS> <label> <station1> [station2 ...]"));
+        return;
+    }
+    TSharedRef<FSurveyState> State = MakeShared<FSurveyState>();
+    State->World = World;
+    State->SettleSeconds = FMath::Max(FCString::Atof(*Args[0]), 0.5f);
+    State->Label = Args[1];
+    State->StepM = 5.0f;
+    TArray<float> Requested;
+    for (int32 Index = 2; Index < Args.Num(); ++Index)
+    {
+        Requested.Add(FCString::Atof(*Args[Index]));
+    }
+    TWeakObjectPtr<UWorld> WeakWorld(World);
+    FTimerHandle StartHandle;
+    World->GetTimerManager().SetTimer(
+        StartHandle,
+        FTimerDelegate::CreateLambda([WeakWorld, State, Requested]()
+        {
+            UWorld* W = WeakWorld.Get();
+            URaftSimWaterRuntimeAdapter* Water = FindWater(W);
+            float MinStationM = 0.0f;
+            float MaxStationM = 0.0f;
+            const URaftSimWaterRuntimeAdapter* Axis = W && Water ? FindSurveyAxis(W, Water) : nullptr;
+            if (!Axis || !Axis->GetRiverStationRangeM(MinStationM, MaxStationM))
+            {
+                UE_LOG(LogTemp, Error, TEXT("RaftSim.SurveyStations: no run axis bound"));
+                return;
+            }
+            float Previous = -TNumericLimits<float>::Max();
+            for (float StationM : Requested)
+            {
+                const float Clamped = FMath::Clamp(StationM, MinStationM, MaxStationM);
+                if (Clamped > Previous)
+                {
+                    State->Stations.Add(Clamped);
+                    Previous = Clamped;
+                }
+            }
+            UE_LOG(LogTemp, Display, TEXT("RaftSim.SurveyStations: %d stations from %.0f to %.0f (settle %.1f s)"),
+                State->Stations.Num(), State->Stations.Num() ? State->Stations[0] : 0.0f,
+                State->Stations.Num() ? State->Stations.Last() : 0.0f, State->SettleSeconds);
+            W->GetTimerManager().SetTimer(
+                State->Timer,
+                FTimerDelegate::CreateLambda([State]() { SurveyTick(State); }),
+                0.4f, true, 0.0f);
+        }),
+        4.0f, false);
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GSurveyStationsCommand(
+    TEXT("RaftSim.SurveyStations"),
+    TEXT("Walk the raft to an explicit increasing station list, photographing and logging each. "
+         "Usage: RaftSim.SurveyStations <settleS> <label> <station1> [station2 ...]"),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleSurveyStations));
 
 static FAutoConsoleCommandWithWorldAndArgs GSurveyReachCommand(
     TEXT("RaftSim.SurveyReach"),

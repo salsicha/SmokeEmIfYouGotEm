@@ -107,9 +107,11 @@ Editor-hosted Development build on the development host; no packaged-build resul
     runtime's 10 m gate.
   - The gorge walls are inferred below GLO-30's 30 m resolution.
   - Since 2026-09-29 the bed carries observed rapid features. The cook breaks
-    at every named rapid except Rapid 5.5 (anchors now -0.62 to +0.97 m), but
-    it has no bed data and its walls are smooth 30 m slopes, not basalt
-    cliffs.
+    at every named rapid except Rapid 5.5 (anchors now -0.62 to +0.97 m). It
+    has no bed data.
+  - Since 2026-09-30 the gorge walls are reconstructed from observations. They
+    are banded basalt cliffs placed on the GLO-30 rim and wall mid-height,
+    with talus aprons and the observed beaches. Their shape is inferred.
   - It runs p95 35.0, 32.8 and 44.8 ms with no hitches at the launch, the
     1.5 km whitewater and Stairway to Heaven. The last is 5.2 ms under the
     budget.
@@ -117,10 +119,22 @@ Editor-hosted Development build on the development host; no packaged-build resul
     finish looks like a dry bed.
 
   See the [review](../reconstruction-review-2026-09-07/zambezi-upper-gorge-evidence.md).
-- Observed-whitewater display (all five evidence reaches, 2026-09-29): the
-  render-only whitewater floor now includes each reach's observed-rapid
-  catalogue. At the current gain of 0.9 it renders large rapids as one white
-  sheet. Renders measured about 0.25 as matching the photographed white
-  share, but applying it needs the five maps rebuilt. The rebuild failed
-  for lack of disk space (page file). See
-  [observed-rapids-2026-09-29.md](../reconstruction-review-2026-09-07/observed-rapids-2026-09-29.md).
+- Observed-whitewater display (all six international river maps,
+  2026-09-30): the render-only whitewater floor includes each reach's
+  observed-rapid catalogue. It is shown at the calibrated gain of 0.25 (the
+  former 0.9 rendered large rapids as one white sheet). It is appearance
+  evidence, not hydraulics. On the Cartesian Zambezi upper gorge the layer
+  loads but is not visible: that map's live core takes its foam from the GPU
+  transport, so its whitewater is the cook's breaking only. See
+  [observed-rapids-2026-09-29.md](../reconstruction-review-2026-09-07/observed-rapids-2026-09-29.md)
+  and
+  [observed-whitewater-terrain-2026-09-30.md](../reconstruction-review-2026-09-07/observed-whitewater-terrain-2026-09-30.md).
+- Zambezi 30 km reference run (`L_Zambezi`, 2026-09-30): its 25 rapids now
+  sit at stations derived from observations, not the stylised map:
+  - Sentinel-2 whitewater, side-stream confluences, the Taita Falcon Lodge
+    fix and outfitter kilometres;
+  - many rapids moved 200-1,800 m;
+  - Rapids 19-25 are low confidence.
+  The run now finishes at Mukuni Beach (28,950 m) and each rapid carries its
+  observed whitewater. The water is still a procedural seed with one bounded
+  jump per rapid; there is no rapid-specific hydraulic geometry.

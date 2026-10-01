@@ -87,14 +87,19 @@ TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenario
             TEXT("Bonus Chilko rapid slice."),
             TEXT("/Game/RaftSim/Maps/L_LavaCanyon"),
             ERaftSimLicenseTier::ExpeditionGuide, 14, -1.0f, -1.0f),
+        // Rapid stations and the Mukuni Beach finish are observed
+        // (observed_rapids/batoka_run_observed_rapids.json: Sentinel-2
+        // whitewater, side-stream confluences, outfitter km); Rapid 25 is at
+        // ~28.3 km, past the stylised map's 27.36 km end.
         MakeScenario(
             TEXT("zambezi_reference_run"), TEXT("Zambezi: Boiling Pot to Mukuni Beach"),
             TEXT("Runnable Reference Free Run: guide the source-scale Batoka Gorge corridor "
-                 "past all 25 mapped rapids. Water and missing bathymetry are procedural "
+                 "past all 25 rapids at their observed stations to Mukuni Beach. Water and "
+                 "missing bathymetry are procedural, with each rapid's observed whitewater, "
                  "pending guide and rapid-specific hydraulic review; Rapid 9 is a mandatory "
                  "portage."),
             TEXT("/Game/RaftSim/Maps/L_Zambezi"),
-            ERaftSimLicenseTier::ExpeditionGuide, 15, 0.0f, 27358.848f),
+            ERaftSimLicenseTier::ExpeditionGuide, 15, 0.0f, 28950.0f),
         // Stations are the upper-gorge progress map's (Sentinel-2 midline);
         // they match the map's run manager and the export's checked launch.
         MakeScenario(

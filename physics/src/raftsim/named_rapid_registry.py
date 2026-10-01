@@ -343,6 +343,40 @@ def _station_record(
             "production_authoritative": True,
         }
 
+    observed_stationing_source = river.get("observed_stationing_source")
+    if observed_stationing_source:
+        source_path = repo_root / observed_stationing_source["path"]
+        payload = json.loads(source_path.read_text(encoding="utf-8"))
+        expected_schema = observed_stationing_source.get("schema")
+        if expected_schema and payload.get("schema") != expected_schema:
+            raise ValueError(
+                f"Unexpected observed stationing schema for {river['river_id']}: "
+                f"{payload.get('schema')}"
+            )
+        rapid_number = str(rapid.get("rapid_number", ""))
+        observed = next(
+            (
+                candidate
+                for candidate in payload.get("rapid_stations", [])
+                if str(candidate.get("rapid_number")) == rapid_number
+            ),
+            None,
+        )
+        if observed is None:
+            raise ValueError(
+                f"Observed stationing is missing rapid {rapid_number} for {river['river_id']}"
+            )
+        return {
+            "station_m": round(float(observed["control_station_m"]), 3),
+            "station_kind": "observed_whitewater_landmarks_and_outfitter_km",
+            "published_value": observed["span_m"],
+            "published_unit": "observed_span_route_station_m",
+            "confidence": observed["confidence"],
+            "source_path": observed_stationing_source["path"],
+            "source_status": observed_stationing_source["status"],
+            "production_authoritative": False,
+        }
+
     map_stationing_source = river.get("map_stationing_source")
     if map_stationing_source:
         source_path = repo_root / map_stationing_source["path"]

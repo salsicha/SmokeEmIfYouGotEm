@@ -26,6 +26,7 @@ from raftsim.zambezi_reference_map import (
     RUNTIME_PRESENTATION_SAMPLE_SPACING_M,
     SCENARIO_RELATIVE,
     build_runtime_coordinate_map,
+    OBSERVED_RAPIDS_RELATIVE,
     build_rapid_map_digitization,
 )
 
@@ -801,9 +802,26 @@ def test_committed_reference_bundle_is_self_consistent_and_not_physics_authority
     assert mesh["collision_authority"] is False
 
 
-def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
+def test_zambezi_scenario_and_named_rapid_markers_use_observed_stationing():
     scenario = _load(REPO_ROOT / SCENARIO_RELATIVE)
     assert scenario["rapid_count"] == 25
+    # Rapids sit at their observed stations (Sentinel-2 whitewater, side-stream
+    # confluences, outfitter km, upper-gorge observations); the stylised map's
+    # digitised station is kept beside each one.
+    observed = _load(REPO_ROOT / OBSERVED_RAPIDS_RELATIVE)
+    digitization = build_rapid_map_digitization(REPO_ROOT)
+    for rapid, seen, digitised in zip(scenario["rapids"], observed["rapid_stations"], digitization["rapids"]):
+        assert rapid["station_m"] == seen["control_station_m"]
+        assert rapid["station_source"] == "observed_whitewater_landmarks_and_outfitter_km"
+        assert rapid["digitised_map_station_m"] == digitised["station_m"]
+    stations = [rapid["station_m"] for rapid in scenario["rapids"]]
+    assert np.diff(stations).min() >= 150.0
+    assert scenario["rapids"][4]["display_name"] == "Stairway to Heaven"
+    assert 3100.0 <= stations[4] <= 3200.0          # lip ~3,145 m; 2.7 km is the tailrace
+    assert scenario["rapids"][2]["display_name"] == "Rapid 3"
+    assert scenario["rapids"][18]["display_name"] == "Rapid 19"
+    take_out = scenario["take_out"]
+    assert take_out["name"] == "Mukuni Beach" and stations[-1] < take_out["finish_station_m"]
     assert scenario["production_promoted"] is False
     assert scenario["gameplay"]["runnable"] is True
     assert scenario["gameplay"]["portfolio_role"] == "runnable_river"
@@ -886,7 +904,7 @@ def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
     assert len(zambezi["markers"]) == 25
     assert all(
         marker["stationing"]["station_kind"]
-        == "stylized_map_relative_spacing_scaled_to_published_run_length"
+        == "observed_whitewater_landmarks_and_outfitter_km"
         for marker in zambezi["markers"]
     )
     assert [marker["stationing"]["station_m"] for marker in zambezi["markers"]] == [

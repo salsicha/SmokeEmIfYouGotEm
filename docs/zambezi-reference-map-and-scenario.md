@@ -6,6 +6,26 @@
 > Production terrain, bathymetry, rapid hydraulics, guide, art, and performance
 > acceptance remain open.
 
+## Observed rapid stations (2026-09-30)
+
+The 25 rapids, the procedural water's rapid controls, the editor markers and
+the run's finish now follow observations, not the stylised map:
+
+- Sources: Sentinel-2 whitewater on the route at low water, side-stream
+  confluences, the Taita Falcon Lodge fix, outfitter kilometres and the
+  upper-gorge observations. The full record is
+  `physics/data/real_world/zambezi_batoka_gorge/observed_rapids/batoka_run_observed_rapids.json`.
+- Many rapids moved 200-1,800 m.
+- Stairway to Heaven is at about 3,145 m. The whitewater at 2.7 km is the
+  power-station tailrace.
+- The run now finishes at Mukuni Beach (28,950 m), past Rapid 25 (about
+  28.3 km).
+- Every rapid has its expected whitewater as a render-only layer.
+- The stylised map's stations are kept as `digitised_map_station_m`.
+
+See [observed-whitewater-terrain-2026-09-30.md](reconstruction-review-2026-09-07/observed-whitewater-terrain-2026-09-30.md).
+The station and naming notes below describe the original digitisation.
+
 ## Run the map
 
 From the game frontend, choose **Free Run** and then **Zambezi: Boiling Pot to

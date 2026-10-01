@@ -1715,6 +1715,16 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             TEXT("RaftSim_FutaleufuEvidence"), TEXT("RaftSimFutaleufuEvidenceCanopy"),
             TEXT("inferred lattice inside Sentinel-2 10 m vegetation cover"));
     }
+    // Observed rock on the Terminator banks (top-bend cliff, the river-left
+    // outcrop at the right bend, granite banks through the rapid):
+    // physics/scripts/build_observed_rock_placement.py.
+    if (bFutaleufu && bPhysicalCorridor)
+    {
+        AddObservedRockShells(
+            Context, Queries, TEXT("physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026"),
+            TEXT("terminator_evidence_observed_rock_placement.json"), TEXT("RaftSim_FutaleufuObservedRock"),
+            TEXT("RaftSimFutaleufuObservedRock"));
+    }
     // Evidence canopy over the Chilko Lava Canyon Landscape
     // (physics/scripts/build_chilko_evidence_dressing.py): counts, species
     // and heights from the BC Vegetation Resources Inventory polygons,
@@ -1727,6 +1737,15 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
             TEXT("lava_canyon_evidence_2023_canopy_placement.json"), TEXT("raftsim.chilko.lava_canyon_evidence_canopy.v1"),
             TEXT("RaftSim_ChilkoEvidence"), TEXT("RaftSimChilkoEvidenceCanopy"),
             TEXT("VRI inventory counts, species and heights; positions by Sentinel-2 darkness"));
+    }
+    // Observed dark basalt boulder talus along the Lava Canyon waterline
+    // (Bidwell, the talus fans, the White Mile head).
+    if (bChilko && bPhysicalCorridor)
+    {
+        AddObservedRockShells(
+            Context, Queries, TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023"),
+            TEXT("lava_canyon_evidence_2023_observed_rock_placement.json"), TEXT("RaftSim_ChilkoObservedRock"),
+            TEXT("RaftSimChilkoObservedRock"));
     }
     // Evidence canopy over the Zambezi upper-gorge Landscape
     // (physics/scripts/build_zambezi_evidence_dressing.py): Sentinel-2 May

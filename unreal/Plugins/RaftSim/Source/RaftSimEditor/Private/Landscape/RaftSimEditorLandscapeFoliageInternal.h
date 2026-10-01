@@ -454,6 +454,23 @@ FEvidenceCanopyCounts AddEvidenceCanopy(
     const TCHAR* FileName, const TCHAR* Schema, const TCHAR* ComponentPrefix, const TCHAR* ActorTag,
     const TCHAR* SourceDescription);
 
+struct FObservedRockCounts
+{
+    int32 Expected = 0;
+    int32 Placed = 0;
+};
+
+// Observed rock (bedrock outcrops, cliff blocks, waterline talus) written
+// beside a reach's terrain (observed_rock_placement.json, schema
+// raftsim.observed_rock_placement.v1, built by
+// physics/scripts/build_observed_rock_placement.py from guidebook, outfitter,
+// photo and video descriptions): the six reviewed rock meshes fitted to the
+// described sizes on the Landscape. Positions and sizes are approximate;
+// visual only (no collision, no water authority).
+FObservedRockCounts AddObservedRockShells(
+    const FPlacementContext& Context, const FPlacementQueries& Queries, const FString& TerrainFolder,
+    const TCHAR* FileName, const TCHAR* ComponentPrefix, const TCHAR* ActorTag);
+
 bool AddLandscapeCandidatePlacements(const FPlacementContext& Context);
 FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, const FPlacementQueries& Queries);
 FZambeziPlacementCounts AddZambeziLaunchPlacements(const FPlacementContext& Context, const FPlacementQueries& Queries);

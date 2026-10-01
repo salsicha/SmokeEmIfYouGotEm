@@ -42,6 +42,14 @@ RUNTIME_RELATIVE = Path(
 )
 COORDINATE_MAP_RELATIVE = RUNTIME_RELATIVE / "river_coordinate_map.json"
 COOKED_FIELDS_RELATIVE = RUNTIME_RELATIVE / "cooked_flow_fields"
+# Observed rapid stations (Sentinel-2 whitewater on the route, side-stream
+# confluences, the Taita Falcon Lodge fix, outfitter kilometres and the
+# upper-gorge observations; build_zambezi_run_observed_rapids.py). They place
+# the procedural controls and the scenario's rapids; the stylised-map
+# digitisation stays the record of that map.
+OBSERVED_RAPIDS_RELATIVE = Path(
+    "physics/data/real_world/zambezi_batoka_gorge/observed_rapids/batoka_run_observed_rapids.json"
+)
 
 SOURCE_HEIGHT_IMAGE = Path("zambezi_batoka_heightmap.png")
 SOURCE_RAPID_MAP = Path("victoria-falls-rapids-map.pdf")
@@ -468,6 +476,15 @@ def _write_obj(
     }
 
 
+def load_observed_rapid_stations(repo_root: Path) -> dict[str, Any]:
+    """The observed catalogue's control station, span, name and evidence per rapid number."""
+    catalogue = json.loads(
+        (repo_root / OBSERVED_RAPIDS_RELATIVE).read_text(encoding="utf-8")
+    )
+    stations = {str(row["rapid_number"]): row for row in catalogue["rapid_stations"]}
+    return {"catalogue": catalogue, "stations": stations}
+
+
 def _rapid_lookup(repo_root: Path) -> tuple[dict[str, Any], dict[int, dict[str, Any]]]:
     catalog = json.loads((repo_root / CATALOG_RELATIVE).read_text(encoding="utf-8"))
     river = next(
@@ -498,8 +515,10 @@ def build_rapid_map_digitization(repo_root: Path) -> dict[str, Any]:
                 "catalog_name": source["name"],
                 "pdf_label": (
                     "The Wall" if pin.number == 1 else
+                    "Between Two Worlds" if pin.number == 3 else
                     "The Three Ugly Sisters" if pin.number == 12 else
                     "The Terminator 1&2" if pin.number == 16 else
+                    "The Last Straw" if pin.number == 19 else
                     source["name"]
                 ),
                 "pin_tips_px": [[round(x, 3), round(y, 3)] for x, y in pin.pin_tips_px],
@@ -596,6 +615,7 @@ def _write_runtime_water_bundle(
     )
     rapid_intensity = np.zeros_like(station_m)
     rapid_controls: list[dict[str, Any]] = []
+    observed = load_observed_rapid_stations(repo_root)["stations"]
     for rapid in digitization["rapids"]:
         difficulty = str(rapid["difficulty_label"])
         weight = (
@@ -603,7 +623,10 @@ def _write_runtime_water_bundle(
             + 0.10 * difficulty.count("V")
             + 0.018 * len(rapid["feature_tags"])
         )
-        distance = (station_m - float(rapid["station_m"])) / 95.0
+        observed_station_m = float(
+            observed[str(rapid["rapid_number"])]["control_station_m"]
+        )
+        distance = (station_m - observed_station_m) / 95.0
         rapid_intensity = np.maximum(
             rapid_intensity, weight * np.exp(-0.5 * distance**2)
         )
@@ -611,7 +634,7 @@ def _write_runtime_water_bundle(
         control_station_target_m = (
             RUNTIME_FIRST_RAPID_CONTROL_STATION_M
             if is_first_rapid
-            else float(rapid["station_m"])
+            else observed_station_m
         )
         rapid_controls.append(
             {
@@ -629,7 +652,8 @@ def _write_runtime_water_bundle(
                 # raft starts at station 75 m. Put its procedural control far
                 # enough downstream to preserve a measured calm launch and a
                 # full approach before the first supercritical cell. Every
-                # other control stays on the nearest five-metre source station.
+                # other control sits on the nearest five-metre station to the
+                # rapid's observed head (OBSERVED_RAPIDS_RELATIVE).
                 "control_index": int(
                     np.clip(
                         round(control_station_target_m / RUNTIME_GRID_DX_M),
@@ -798,8 +822,11 @@ def _write_runtime_water_bundle(
         rapid_transition_records.append(
             {
                 "rapid_number": str(rapid["rapid_number"]),
-                "display_name": str(rapid["catalog_name"]),
+                "display_name": str(observed[str(rapid["rapid_number"])]["name"]),
                 "source_station_m": float(rapid["station_m"]),
+                "observed_station_m": float(
+                    observed[str(rapid["rapid_number"])]["control_station_m"]
+                ),
                 "control_station_m": control_station_m,
                 "difficulty_label": str(rapid["difficulty_label"]),
                 "feature_tags": list(rapid["feature_tags"]),
@@ -1020,14 +1047,22 @@ def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, A
     launch_apron_contract = runtime_manifest["procedural_infill"][
         "safe_launch_apron"
     ]
+    observed = load_observed_rapid_stations(repo_root)
     rapid_entries = []
     for rapid in digitization["rapids"]:
+        seen = observed["stations"][str(rapid["rapid_number"])]
         rapid_entries.append(
             {
                 "rapid_number": rapid["rapid_number"],
-                "display_name": rapid["catalog_name"],
+                "display_name": seen["name"],
+                "aliases": seen.get("aliases", []),
                 "map_label": rapid["pdf_label"],
-                "station_m": rapid["station_m"],
+                "station_m": float(seen["control_station_m"]),
+                "observed_span_m": seen["span_m"],
+                "station_source": "observed_whitewater_landmarks_and_outfitter_km",
+                "station_confidence": seen["confidence"],
+                "station_evidence": seen["evidence"],
+                "digitised_map_station_m": rapid["station_m"],
                 "difficulty_label": rapid["difficulty_label"],
                 "feature_tags": rapid["feature_tags"],
                 "mandatory_commercial_portage": rapid["rapid_number"] == "9",
@@ -1047,6 +1082,15 @@ def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, A
         "production_promoted": False,
         "unreal_map_package": "/Game/RaftSim/Maps/L_Zambezi",
         "run_length_m": digitization["method"]["run_length_m"],
+        "observed_rapids": {
+            "path": OBSERVED_RAPIDS_RELATIVE.as_posix(),
+            "station_policy": (
+                "rapid stations are observed (Sentinel-2 whitewater on the route, side-stream "
+                "confluences, the Taita Falcon Lodge fix, outfitter kilometres, upper-gorge "
+                "observations); the stylised-map digitisation is kept as digitised_map_station_m"
+            ),
+        },
+        "take_out": observed["catalogue"]["take_out"],
         "terrain": {
             "collision_and_height_query_authority": CORRIDOR_MANIFEST_RELATIVE.as_posix(),
             "heightfield": corridor["artifacts"]["heightfield"],

@@ -844,6 +844,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     TEXT("Zambezi solver owns the visible gameplay river"),
                     (*It)->bLiveSolverOwnsRuntimeRendering);
                 Test->TestTrue(
+                    TEXT("Zambezi floors the displayed foam with the 25-rapid observed whitewater"),
+                    FMath::IsNearlyEqual((*It)->ObservedWhitewaterGain, 0.25f));
+                Test->TestTrue(
                     TEXT("Zambezi enables the wet-cell-clipped transmitting core"),
                     (*It)->bEnableLiveSolverVolumeCore);
                 Test->TestTrue(
@@ -1756,6 +1759,15 @@ bool FRaftSimAssertRiverMapCommand::Update()
         Test->TestEqual(TEXT("Pacuare emergent-rock shells use six rock variants"), EvidenceRockActorCount, 6);
         Test->TestTrue(TEXT("Pacuare photographed emergent rocks carry mesh shells"), EvidenceRockInstanceCount >= 700);
 
+        // Huacas Falls (add_pacuare_huacas_falls.py): spray mist at the plunge
+        // and lower cascade of the painted fall.
+        int32 HuacasFallsMistCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            HuacasFallsMistCount += (*It)->Tags.Contains(TEXT("RaftSimPacuareHuacasFalls")) ? 1 : 0;
+        }
+        Test->TestEqual(TEXT("Pacuare Huacas Falls has its mist and falling-water strands"), HuacasFallsMistCount, 6);
+
         return true;
     }
 
@@ -2145,7 +2157,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     FMath::IsNearlyEqual((*It)->LivePresentationWidthM, 96.0f));
             Test->TestTrue(
                 TEXT("Futaleufu floors the displayed foam with the Sentinel-2 whitewater"),
-                FMath::IsNearlyEqual((*It)->ObservedWhitewaterGain, 0.9f));
+                FMath::IsNearlyEqual((*It)->ObservedWhitewaterGain, 0.25f));
             Test->TestFalse(
                 TEXT("Futaleufu preserves source station/lateral coordinates"),
                 (*It)->bRecenterHydraulicCrux);
@@ -2363,6 +2375,26 @@ bool FRaftSimAssertRiverMapCommand::Update()
         Test->TestEqual(TEXT("Futaleufu evidence canopy has two tree forms and an understory"), EvidenceCanopyActorCount, 3);
         Test->TestTrue(TEXT("Futaleufu evidence canopy covers the valley walls"), EvidenceCanopyInstanceCount >= 50000);
 
+        // Observed rock (the top-bend cliff, the river-left outcrop, granite banks; build_observed_rock_placement.py).
+        int32 ObservedRockActorCount = 0;
+        int32 ObservedRockInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimFutaleufuObservedRock")))
+            {
+                continue;
+            }
+            const UHierarchicalInstancedStaticMeshComponent* Instances =
+                (*It)->FindComponentByClass<UHierarchicalInstancedStaticMeshComponent>();
+            Test->TestTrue(
+                TEXT("Futaleufu observed rock is visual only"),
+                Instances && Instances->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+            ObservedRockInstanceCount += Instances ? Instances->GetInstanceCount() : 0;
+            ++ObservedRockActorCount;
+        }
+        Test->TestEqual(TEXT("Futaleufu observed rock uses six rock variants"), ObservedRockActorCount, 6);
+        Test->TestTrue(TEXT("Futaleufu places its observed rock"), ObservedRockInstanceCount >= 84);
+
         // The evidence bed carries its own inferred boulders; the interpreted
         // entry-marker contact of the old reach-local scene is gone.
         int32 InterpretedD4RockCount = 0;
@@ -2422,7 +2454,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     FMath::IsNearlyEqual((*It)->LivePresentationWidthM, 56.0f));
             Test->TestTrue(
                 TEXT("Chilko floors the displayed foam with the Sentinel-2 whitewater"),
-                FMath::IsNearlyEqual((*It)->ObservedWhitewaterGain, 0.9f));
+                FMath::IsNearlyEqual((*It)->ObservedWhitewaterGain, 0.25f));
             Test->TestFalse(
                 TEXT("Chilko preserves source station/lateral coordinates"),
                 (*It)->bRecenterHydraulicCrux);
@@ -2684,6 +2716,26 @@ bool FRaftSimAssertRiverMapCommand::Update()
         Test->TestEqual(TEXT("Chilko evidence canopy has two tree forms and an understory"), EvidenceCanopyActorCount, 3);
         Test->TestTrue(TEXT("Chilko evidence canopy covers the inventory's treed polygons"), EvidenceCanopyInstanceCount >= 60000);
 
+        // Observed rock (dark basalt boulder talus at the waterline and the talus fans; build_observed_rock_placement.py).
+        int32 ObservedRockActorCount = 0;
+        int32 ObservedRockInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimChilkoObservedRock")))
+            {
+                continue;
+            }
+            const UHierarchicalInstancedStaticMeshComponent* Instances =
+                (*It)->FindComponentByClass<UHierarchicalInstancedStaticMeshComponent>();
+            Test->TestTrue(
+                TEXT("Chilko observed rock is visual only"),
+                Instances && Instances->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+            ObservedRockInstanceCount += Instances ? Instances->GetInstanceCount() : 0;
+            ++ObservedRockActorCount;
+        }
+        Test->TestEqual(TEXT("Chilko observed rock uses six rock variants"), ObservedRockActorCount, 6);
+        Test->TestTrue(TEXT("Chilko places its observed rock"), ObservedRockInstanceCount >= 1500);
+
         // The evidence bed carries its own inferred boulders; the interpreted
         // broach-rock contacts of the old reach-local scene are gone.
         int32 InterpretedD4RockCount = 0;
@@ -2800,8 +2852,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
             }
         }
         Test->TestEqual(TEXT("Zambezi upper gorge places one GLO-30 terrain backdrop"), BackdropCount, 1);
-        Test->TestEqual(TEXT("Zambezi upper gorge evidence canopy places every row (8,883 trees, 2,811 shrubs)"),
-            EvidenceCanopyInstanceCount, 11694);
+        // The cliff zone of the reconstructed basalt walls carries no trees.
+        Test->TestEqual(TEXT("Zambezi upper gorge evidence canopy places every row (8,577 trees, 2,467 shrubs)"),
+            EvidenceCanopyInstanceCount, 11044);
         return true;
     }
 

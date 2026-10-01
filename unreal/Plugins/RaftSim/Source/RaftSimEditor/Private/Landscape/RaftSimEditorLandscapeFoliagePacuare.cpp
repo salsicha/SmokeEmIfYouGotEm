@@ -1,5 +1,9 @@
 #include "Landscape/RaftSimEditorLandscapeFoliageInternal.h"
 
+#include "NiagaraActor.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+
 namespace RaftSimEditorEnvironment::LandscapeFoliage
 {
 FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, const FPlacementQueries& Queries)
@@ -731,6 +735,98 @@ FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, c
                 TEXT("footprints (heights inferred); visual only over the Landscape rock bumps.\n"),
                 EvidenceRockPlaced, EvidenceRockExpected);
         }
+    }
+
+    // Huacas Falls (physics/scripts/add_pacuare_huacas_falls.py): the 30-46 m
+    // river-right fall the observations describe between the Huacas rapids
+    // is painted into the drape along its fall line; spray mist rises from
+    // its plunge and drifts off the lower cascade. Visual only.
+    if (bPacuare && bPhysicalCorridor)
+    {
+        FString FallText;
+        TSharedPtr<FJsonObject> Fall;
+        if (FFileHelper::LoadFileToString(FallText, *FPaths::ConvertRelativePathToFull(FPaths::Combine(
+                GetRepoRoot(), EvidenceFolder, TEXT("huacas_evidence_observed_waterfall.json")))))
+        {
+            FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(FallText), Fall);
+        }
+        UNiagaraSystem* Mist = LoadObject<UNiagaraSystem>(
+            nullptr, TEXT("/Game/RaftSim/VFX/Water/NS_RaftSim_AeratedMist.NS_RaftSim_AeratedMist"));
+        const TArray<TSharedPtr<FJsonValue>>* Base = nullptr;
+        const TArray<TSharedPtr<FJsonValue>>* Lip = nullptr;
+        int32 MistPlaced = 0;
+        if (Fall.IsValid() && Mist && Fall->TryGetArrayField(TEXT("base_cm"), Base) &&
+            Fall->TryGetArrayField(TEXT("lip_cm"), Lip) && Base->Num() == 2 && Lip->Num() == 2)
+        {
+            const FVector2D BaseXY((*Base)[0]->AsNumber(), (*Base)[1]->AsNumber());
+            const FVector2D LipXY((*Lip)[0]->AsNumber(), (*Lip)[1]->AsNumber());
+            // plunge, lower cascade, mid cascade: rate and size fall off upward
+            const float Along[3] = {0.0f, 0.25f, 0.5f};
+            const float Rates[3] = {110.0f, 60.0f, 35.0f};
+            const float Scales[3] = {3.2f, 2.2f, 1.6f};
+            for (int32 Index = 0; Index < 3; ++Index)
+            {
+                const FVector2D XY = FMath::Lerp(BaseXY, LipXY, Along[Index]);
+                const FVector Location(XY.X, XY.Y, Queries.GetLandscapeHeight(XY.X, XY.Y) + 120.0f);
+                ANiagaraActor* Actor = Context.World->SpawnActor<ANiagaraActor>(Location, FRotator::ZeroRotator);
+                if (!Actor || !Actor->GetNiagaraComponent())
+                {
+                    continue;
+                }
+                Actor->SetActorLabel(FString::Printf(TEXT("RaftSim_PacuareHuacasFallsMist_%d"), Index));
+                Actor->Tags.Append({TEXT("RaftSimPacuareHuacasFalls"), TEXT("RaftSimObservedWaterfall"),
+                                    TEXT("RaftSimNoTerrainCollisionOrWaterAuthority")});
+                UNiagaraComponent* Component = Actor->GetNiagaraComponent();
+                Component->SetAsset(Mist);
+                Component->SetAutoActivate(true);
+                Component->SetVariableFloat(TEXT("User.SpawnRate"), Rates[Index]);
+                Component->SetVariableQuat(TEXT("User.SourcePlaneRotation"), FQuat::Identity);
+                Actor->SetActorScale3D(FVector(Scales[Index]));
+                ++MistPlaced;
+            }
+            // The wall is in shade, so the painted cascade reads grey: three
+            // thin falling-water strands (the project's translucent
+            // flow-lace breaking-water material) lie along the fall line,
+            // 0.6 m off the rock.
+            UStaticMesh* Plane = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
+            UMaterialInterface* Lace = LoadObject<UMaterialInterface>(
+                nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_BreakingWaterLip.M_RaftSim_BreakingWaterLip"));
+            const FVector Lip3(LipXY, Queries.GetLandscapeHeight(LipXY.X, LipXY.Y));
+            const FVector Base3(BaseXY, Queries.GetLandscapeHeight(BaseXY.X, BaseXY.Y));
+            const FVector FallDir = (Base3 - Lip3).GetSafeNormal();
+            const FVector FallAcross = FVector::CrossProduct(FallDir, FVector::UpVector).GetSafeNormal();
+            FVector FallOut = FVector::CrossProduct(FallAcross, FallDir).GetSafeNormal();
+            if (FallOut.Z < 0.0f)
+            {
+                FallOut = -FallOut;
+            }
+            const float LengthCm = FVector::Dist(Lip3, Base3);
+            // offset across the fall (cm), width (cm), share of the length
+            const float Strands[3][3] = {{0.0f, 600.0f, 1.0f}, {-330.0f, 240.0f, 0.82f}, {360.0f, 200.0f, 0.68f}};
+            int32 StrandsPlaced = 0;
+            for (int32 Index = 0; Plane && Lace && Index < 3; ++Index)
+            {
+                const float Length = LengthCm * Strands[Index][2];
+                const FVector Centre = Lip3 + FallDir * (LengthCm - 0.5f * Length) + FallAcross * Strands[Index][0] + FallOut * 60.0f;
+                AStaticMeshActor* Strand = AddPreviewMeshActor(
+                    Context.World, Plane, FString::Printf(TEXT("RaftSim_PacuareHuacasFallsStrand_%d"), Index),
+                    Centre, FRotationMatrix::MakeFromXY(FallAcross, FallDir).Rotator(),
+                    FVector(Strands[Index][1] / 100.0f, Length / 100.0f, 1.0f), FLinearColor::White, Lace);
+                if (!Strand)
+                {
+                    continue;
+                }
+                Strand->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                Strand->GetStaticMeshComponent()->SetCastShadow(false);
+                Strand->Tags.Append({TEXT("RaftSimPacuareHuacasFalls"), TEXT("RaftSimObservedWaterfall"),
+                                     TEXT("RaftSimNoTerrainCollisionOrWaterAuthority")});
+                ++StrandsPlaced;
+            }
+            MistPlaced += StrandsPlaced;
+        }
+        OutSummary += FString::Printf(
+            TEXT("Pacuare Huacas Falls: %s, %d spray-mist emitters and falling-water strands (inferred appearance).\n"),
+            Fall.IsValid() ? TEXT("cascade painted along its fall line") : TEXT("record missing"), MistPlaced);
     }
 
     FPacuarePlacementCounts Counts{PacuareShorelineRockPlacedCount, PacuareShorelineGroundCoverPlacedCount, PacuareScannedFernPlacedCount,

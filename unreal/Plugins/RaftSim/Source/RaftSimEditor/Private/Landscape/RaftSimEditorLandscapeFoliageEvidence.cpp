@@ -152,4 +152,74 @@ FEvidenceCanopyCounts AddEvidenceCanopy(
         *RiverId, Counts.Trees, Counts.Placed - Counts.Trees, Counts.Placed, Counts.Expected, SourceDescription);
     return Counts;
 }
+
+FObservedRockCounts AddObservedRockShells(
+    const FPlacementContext& Context,
+    const FPlacementQueries& Queries,
+    const FString& TerrainFolder,
+    const TCHAR* FileName,
+    const TCHAR* ComponentPrefix,
+    const TCHAR* ActorTag)
+{
+    FObservedRockCounts Counts;
+    if (Context.ReviewedRockMeshes.Num() != 6)
+    {
+        Counts.Expected = 1;
+        return Counts;
+    }
+    const TSharedPtr<FJsonObject> Root = LoadEvidencePlacement(
+        TerrainFolder, FileName, TEXT("raftsim.observed_rock_placement.v1"), Context.OutSummary);
+    const TArray<TSharedPtr<FJsonValue>>* Rows = nullptr;
+    if (!Root.IsValid() || !Root->TryGetArrayField(TEXT("instances"), Rows))
+    {
+        Counts.Expected = 1;
+        return Counts;
+    }
+    Counts.Expected = Rows->Num();
+    const FString RiverId = Context.Candidate.PreviewSpec.RiverId;
+    UHierarchicalInstancedStaticMeshComponent* Components[6] = {};
+    FVector MeshSizes[6];
+    for (int32 Variant = 0; Variant < 6; ++Variant)
+    {
+        UStaticMesh* Mesh = Context.ReviewedRockMeshes[Variant];
+        Components[Variant] = AddLandscapeCandidateInstancedMeshComponent(
+            Context.World, Mesh, FString::Printf(TEXT("%s%d_%s"), ComponentPrefix, Variant, *RiverId), true);
+        if (!Components[Variant])
+        {
+            return Counts;
+        }
+        Components[Variant]->GetOwner()->Tags.Append(
+            {FName(ActorTag), TEXT("RaftSimObservedRockPositions"), TEXT("RaftSimNoTerrainCollisionOrWaterAuthority")});
+        MeshSizes[Variant] = GetLandscapeCandidateEffectiveMeshBounds(Mesh).GetSize();
+    }
+    for (const TSharedPtr<FJsonValue>& Value : *Rows)
+    {
+        const TArray<TSharedPtr<FJsonValue>>* Row = nullptr;
+        if (!Value.IsValid() || !Value->TryGetArray(Row) || Row->Num() < 10)
+        {
+            continue;
+        }
+        // x_cm, y_cm, sink_cm, length_m, width_m, height_m, yaw_deg, variant, pitch_deg, roll_deg
+        const float X = static_cast<float>((*Row)[0]->AsNumber());
+        const float Y = static_cast<float>((*Row)[1]->AsNumber());
+        const int32 Variant = FMath::Clamp(static_cast<int32>((*Row)[7]->AsNumber()), 0, 5);
+        const FVector& Size = MeshSizes[Variant];
+        const FVector Scale(
+            100.0f * static_cast<float>((*Row)[3]->AsNumber()) / FMath::Max(1.0f, static_cast<float>(Size.X)),
+            100.0f * static_cast<float>((*Row)[4]->AsNumber()) / FMath::Max(1.0f, static_cast<float>(Size.Y)),
+            100.0f * static_cast<float>((*Row)[5]->AsNumber()) / FMath::Max(1.0f, static_cast<float>(Size.Z)));
+        Queries.AddGroundedInstance(
+            Components[Variant], Context.ReviewedRockMeshes[Variant], FVector2D(X, Y),
+            Queries.GetLandscapeHeight(X, Y) - static_cast<float>((*Row)[2]->AsNumber()),
+            FRotator(static_cast<float>((*Row)[8]->AsNumber()), static_cast<float>((*Row)[6]->AsNumber()),
+                static_cast<float>((*Row)[9]->AsNumber())),
+            Scale);
+        ++Counts.Placed;
+    }
+    Context.OutSummary += FString::Printf(
+        TEXT("%s observed rock: %d/%d reviewed rock meshes at described outcrops, cliffs and waterline talus ")
+        TEXT("(positions and sizes approximate), Landscape-grounded, non-colliding.\n"),
+        *RiverId, Counts.Placed, Counts.Expected);
+    return Counts;
+}
 }

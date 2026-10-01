@@ -1,5 +1,21 @@
 # Remaining requested work
 
+LATEST October 1 expected-whitewater/terrain/vegetation goal (Zambezi, Chilko,
+Futaleufu, Pacuare, Colorado), from observations because no bathymetry exists:
+- L_Zambezi 30 km run: all 25 rapids moved to stations observed from Sentinel-2
+  whitewater, confluences, the Taita Falcon Lodge fix and outfitter km (many moved
+  200-1,800 m; Stairway is ~3,145 m, and the 2.7 km whitewater is the tailrace).
+  The run finishes at Mukuni Beach (28,950 m), each rapid carries observed
+  whitewater, and names and classes were corrected.
+- Display gain 0.25 on all six maps. The Cartesian upper gorge layer is inert
+  there (GPU foam path).
+- Upper gorge: banded basalt cliffs, talus and beaches replace the flat shelf.
+- Futaleufu: observed cliff, outcrop and granite blocks. Chilko: basalt boulder
+  talus and fans. Pacuare: Huacas Falls (painted cascade, strands, mist).
+Six-map in-game surveys reviewed. Not done: Pacuare forest density, L_Zambezi
+basalt and lace look, upper gorge visible layer. See
+reconstruction-review-2026-09-07/observed-whitewater-terrain-2026-09-30.md.
+
 LATEST September29 scratch-capacity trial REJECTED: editor build229.50s,
 3/3 native tests and65 exact actual-input pairs; savings only0.037–0.066ms
 on24.5–27.6ms crest updates. No normal-play/package improvement claimed.

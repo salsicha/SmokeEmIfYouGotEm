@@ -194,8 +194,8 @@ bool FRaftSimM6CareerCatalogTest::RunTest(const FString&)
         Zambezi.LevelName,
         FName(TEXT("/Game/RaftSim/Maps/L_Zambezi")));
     TestTrue(
-        TEXT("Zambezi reference run spans the mapped Rapids 1-25 station range"),
-        Zambezi.StartStationM == 0.0f && Zambezi.FinishStationM >= 27358.0f);
+        TEXT("Zambezi reference run spans Rapids 1-25 to Mukuni Beach (Rapid 25 observed at ~28.3 km)"),
+        Zambezi.StartStationM == 0.0f && Zambezi.FinishStationM >= 28900.0f);
     TestEqual(TEXT("assist gold cap deterministic"),
         static_cast<int32>(URaftSimProgressionLibrary::CalculateMedal(0.98f, 0.98f, true)),
         static_cast<int32>(ERaftSimMedal::Silver));

@@ -142,7 +142,8 @@ def test_observed_whitewater_field_is_labelled_appearance_evidence() -> None:
     best = max(r["iou"] for r in audit["indicators"].values())
     assert best < 0.2 and audit["indicators"]["froude"]["iou"] < best  # why the photo, not the cook, places it
     geometry = (EDITOR / "Landscape/RaftSimEditorLandscapeGeometry.cpp").read_text(encoding="utf-8")
-    assert "WaterConfig->ObservedWhitewaterGain = 0.9f;" in geometry
+    assert "WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;" in geometry
+    assert "constexpr float kObservedWhitewaterDisplayGain = 0.25f;" in geometry
 
 
 def test_launch_station_is_in_deep_cooked_water() -> None:

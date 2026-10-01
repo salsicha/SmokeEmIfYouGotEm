@@ -313,3 +313,18 @@ Results above describe the earlier cook (v3).
 - **Launch:** unchanged at 212.7 m. The export's launch rule now keeps the
   raft's 67 m stateful-detail footprint inside a cooked window, and 212.7 m
   is the most upstream point that does.
+
+## Gorge walls reconstructed from observations (2026-09-30)
+
+The flat 60 m shelf at +6 m and the smooth GLO-30 slopes are replaced by the
+observed gorge:
+- banded basalt cliffs, whose mid-height sits where GLO-30's smeared wall
+  crosses mid-height, topping out at the GLO-30 rim;
+- talus aprons;
+- the unchanged 6 m bank band of the cook;
+- the four observed beaches.
+
+The cliff zone carries no trees. The water, the bed and the cook are
+unchanged.
+
+Details: [observed-whitewater-terrain-2026-09-30.md](observed-whitewater-terrain-2026-09-30.md).
