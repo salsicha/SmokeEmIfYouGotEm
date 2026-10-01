@@ -200,7 +200,8 @@ static ACameraActor* PlaceCamera(
         Camera = World->SpawnActor<ACameraActor>(ACameraActor::StaticClass(), Location, Rotation);
         if (Camera)
         {
-            RaftSimCameraPresentation::Configure(Camera->GetCameraComponent());
+            RaftSimCameraPresentation::Configure(
+                Camera->GetCameraComponent(), RaftSimCameraPresentation::ResolveExposureBias(World));
         }
     }
     else
@@ -1157,7 +1158,8 @@ static void StartRaftSeries(UWorld* World, const FRaftSeriesSpec& Spec)
             {
                 return;
             }
-            RaftSimCameraPresentation::Configure(Camera->GetCameraComponent());
+            RaftSimCameraPresentation::Configure(
+                Camera->GetCameraComponent(), RaftSimCameraPresentation::ResolveExposureBias(W));
             Camera->AttachToActor(Raft, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
             const FVector LookAtRelative(AheadM * 100.0f, 0.0f, 60.0f);
             Camera->SetActorRelativeLocation(RelativeLocation);

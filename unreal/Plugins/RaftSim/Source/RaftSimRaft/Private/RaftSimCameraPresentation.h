@@ -1,9 +1,27 @@
 #pragma once
 
 #include "Camera/CameraComponent.h"
+#include "EngineUtils.h"
+#include "RaftSimRiverWaterConfig.h"
 
 namespace RaftSimCameraPresentation
 {
+
+constexpr float DefaultExposureBias = 1.25f;
+
+/** The shared exposure plus the map's river water config offset, if any. */
+inline float ResolveExposureBias(UWorld* World)
+{
+    float Bias = DefaultExposureBias;
+    if (World)
+    {
+        if (TActorIterator<ARaftSimRiverWaterConfig> It(World); It)
+        {
+            Bias += It->PresentationExposureBiasOffset;
+        }
+    }
+    return Bias;
+}
 
 /**
  * Apply the shipping South Fork photographic response to a runtime camera.
@@ -13,7 +31,7 @@ namespace RaftSimCameraPresentation
  * presentation-only and does not affect weather, water, or raft simulation
  * state.
  */
-inline void Configure(UCameraComponent* Camera, float ExposureBias = 1.25f)
+inline void Configure(UCameraComponent* Camera, float ExposureBias = DefaultExposureBias)
 {
     if (Camera == nullptr)
     {

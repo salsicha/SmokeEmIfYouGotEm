@@ -12,6 +12,13 @@ were left open, and this pass closes them:
 3. The Zambezi upper gorge's walls were a 6 m step and a flat 60 m shelf.
    They were not the observed basalt cliffs.
 
+Section 7 (October 1) then fixes five gaps found in this pass:
+- the upper gorge's invisible observed whitewater;
+- `L_Zambezi`'s bank-to-bank lace, tan walls and missing waterline fringe;
+- the sparse Pacuare forest;
+- the mossy-tan rock;
+- the upper gorge's green October trees.
+
 The brief is unchanged. Bathymetry is unavailable, so every rapid is
 reconstructed from observations: imagery, guidebooks, outfitters, trip
 reports and video.
@@ -398,6 +405,137 @@ editor):
   they hash-lock a map and sources that changed in earlier commits, and one
   asserts a C++ line no longer in the source.
 
+## 7. Follow-up fixes (2026-10-01)
+
+Five gaps left open above were then fixed. Each was checked with a fresh
+in-game survey (`RaftSim.SurveyStations`, chase, wide and overhead views).
+
+### Upper gorge whitewater
+
+- **Cause.** The Cartesian live core draws the foam of the GPU moving detail
+  (`URaftSimStatefulDetailComponent`). That foam comes from the detail's own
+  breaking source: the flow's entrainment potential merged with the accepted
+  crest source. The observed layer only floored the carrier's vertex foam,
+  which this core never draws.
+- **Fix.** The river water config has a new `ObservedWhitewaterEntrainmentGain`.
+  - The adapter samples gain × the observed fraction.
+  - The moving detail merges that sample into its breaking source as a third
+    estimate of the same source: a maximum, not added production.
+  - The detail then transports and decays the foam as before.
+  - Render-only; review override `-RaftSimObservedEntrainmentGain=<g>`.
+- **Calibration.** Overhead and chase renders at Morning Glory (1,500 and
+  1,600 m) and Stairway to Heaven (2,930 and 2,990 m), at gains 0, 0.5 and 0.9:
+  - 0 is the cook's own lace;
+  - 0.5 gives heavy broken water that keeps its lace texture;
+  - 0.9 is one white sheet through Stairway.
+  - `L_ZambeziUpperGorge` uses 0.6. The calm pool at 2,200 m stays calm.
+
+### `L_Zambezi` (30 km run)
+
+- **Lace.** Two causes, both in the procedural seed
+  (`zambezi_reference_map.py`):
+  - Each rapid's jump lane was a flat quartic about 100 m wide across the
+    144 m channel.
+  - The rapid's surface relief (the swell through the rapid and the jump
+    profile) was a station-only profile, so the runtime's relief foam painted
+    bank to bank.
+
+  Now each rapid is a deep, fast Gaussian tongue (sigma 20 m; 26 m for
+  river-wide features) between shallow boulder shelves (0.75 m, Froude 0.22)
+  with slow eddies below the jump. The surface relief is carried by the
+  tongue only. The centreline, and so the raft's line and every transition
+  record, is unchanged. The cooked fields, their manifest hash, the streaming
+  manifest and the observed layer were regenerated.
+
+  Result: the lace is centred, with calmer green margins, at Rapid 13
+  (12,020 m) and Rapid 17 (18,350 m). It still spreads bank to bank at the
+  bigger rapids. The live solve evens the rapid's surface drop across the
+  channel, and the relief foam follows it. A higher foam Froude onset (1.1)
+  made no visible difference and was reverted. Deferred to a later water pass.
+- **Walls.** The Batoka basalt material read tan for three reasons:
+  - its rock photos (AerialRocks02 and Rock037) are warm tan, and 10-22 %
+    of the tan drape still blended into the basalt;
+  - the runtime cameras' shared manual exposure (+1.25 EV with bilateral
+    local exposure, set for South Fork) lifts any dark surface in the strong
+    Zambezi sun to light grey. A probe at a sixth of the basalt value turned
+    shadowed walls black but left sunlit walls light;
+  - the warm haze (0.58/0.50/0.39) coloured the distant walls. Haze density
+    turned out to matter little near the river: the fog thins quickly with
+    height.
+
+  Changes:
+  - The basalt tint is now cool (0.20/0.235/0.30), cancelling the photo's
+    tan.
+  - The rust weathering accent is weaker (0.30/0.27/0.28 at 0.20).
+  - Basalt coverage is at least 0.97.
+  - The rock colour is desaturated 0.82 and scaled 0.62.
+  - The haze is the dry season's thin grey smoke (density 0.0007, colour
+    0.50/0.52/0.54).
+  - `L_Zambezi` sets the new `PresentationExposureBiasOffset` to -0.5 EV,
+    which the guide and survey cameras add to the shared exposure.
+
+  Result: the walls render about 27 % darker and greyer, and black in shadow,
+  but still grey-brown in direct sun. The foam no longer clips.
+- **Waterline fringe.** The other `L_Zambezi` layers start 12-26 m back from
+  the water or cover only the launch and camera windows. The new
+  `AddZambeziWaterlineFringe` places patchy green riverine shrubs and riparian
+  trees on the lowest dry ground within about 15 m of the water, along the
+  whole run:
+  - about a third of the bank is left as bare boulders between patches;
+  - 5,008 shrubs and 651 trees;
+  - positions and species are inferred.
+
+### Pacuare forest
+
+`densify_pacuare_rainforest.py` rebuilds the canopy's structure on the same
+measured positions and IGN cover (structure inferred):
+- **Canopy:** crown radius equal to the neighbour spacing (4.5-10 m, median
+  6.6 m), so crowns overlap into a closed canopy.
+  - Height 3.4 × radius + U(0, 6) m, 18-38 m (median 25 m), for the
+    Caribbean-slope wet forest.
+- **Sub-canopy:** 18,843 trees of 9-16 m in the gaps.
+- **Understory:** two 4-8 m shrubs per canopy tree (53,507).
+- **Forest floor:** the drape under the crowns is shaded (91 % of the drape)
+  instead of the hazy orthophoto's pale ground.
+- **Clearances:** 4 m from the cooked water and 9 m from the Huacas Falls fall
+  line. Crowns beside the fall are capped so they cannot close over it.
+- In game the walls carry a tall, closed, layered forest. A few steep or
+  bare-ground slopes stay open.
+
+### Rock colour
+
+`M_RaftSim_ReviewedRockTinted` (`unreal/Scripts/create_tinted_rock_materials.py`)
+keeps the reviewed scan's normal and roughness. It remaps the scan's luminance
+(cracks, facets and lichen pattern, without the moss hue) between two
+parameter colours. Two instances are used:
+- grey granite on the Futaleufu: 0.12-0.42;
+- dark basalt on the Chilko: 0.026-0.125.
+
+The editor applies them to each reach's observed rock, reviewed rock,
+waterline-structure and shoreline-gravel components. The colours are
+approximate, from descriptions and photographs.
+
+### Upper gorge trees (October)
+
+The canopy was placed inside the May 2025 woodland cover, when the whole gorge
+is green. `apply_zambezi_october_leaf_state.py` sets each tree's leaf state
+from the mean NDVI of the two October Sentinel-2 scenes (2024-10-08 and
+2025-10-03) at the tree:
+
+| leaf state | October NDVI | trees |
+| --- | --- | --- |
+| green | ≥ 0.5 (riverine and spray-fed) | 1,659 |
+| a few dry ochre leaves | 0.33-0.5 | 2,708 |
+| leafless | < 0.33 | 4,210 |
+
+- Shrubs with October NDVI below 0.5 become leafless thorn scrub (2,024 of
+  2,467).
+- The new dry-season forms (`DrySeasonBareTree`, `DrySeasonSparseTree`,
+  `DrySeasonScrub`) are procedural trunk, branch and twig geometry with grey
+  bark. They are saved beside the Zambezi family; `AddEvidenceCanopy` takes
+  extra tree forms and an alternate understory.
+- Species and branching are inferred.
+
 ## Limits
 
 - **Rapid stations.** These are observation-derived, not surveyed.
@@ -405,19 +543,26 @@ editor):
     on numbering below Rapid 21.
   - Feature laterals are described sides placed in the run's ~144 m
     procedural channel. The real river is 30-60 m wide at low water.
-- **The upper gorge's observed-whitewater layer is not visible** (the
-  Cartesian foam path; see section 4). Its whitewater is the cook's breaking
-  only.
-- **The 30 km run's water is still a procedural seed** in a uniform ~144 m
-  channel. Its own foam covers the full width at every rapid, so rapids read
-  as a generic lace rather than their described holes and waves. It has one bounded
-  jump per rapid. The observed whitewater is render-only appearance evidence:
-  it never reaches forces, contact or gameplay.
-- **Rock colour** is the reviewed mossy-tan material, not granite or basalt.
+- **The upper gorge's observed whitewater** reaches its foam only as a
+  breaking source of the GPU moving detail (section 7). The detail's
+  transport and decay shape the result, so it is calibrated by eye (0.6), not
+  matched to the photographed extent.
+- **The 30 km run's water is still a procedural seed** with one bounded
+  jump per rapid. Since section 7 each rapid is a central tongue between
+  boulder shelves instead of a bank-to-bank lace. It still has no described
+  holes or waves of its own, and the live solve redistributes the seed. The
+  observed whitewater is render-only appearance evidence: it never reaches
+  forces, contact or gameplay.
+- **Rock and wall colours** (section 7) are approximate, from descriptions
+  and photographs, not measured albedo. The 30 km run's walls keep the
+  30 m DEM's smooth shape.
+- **Vegetation structure is inferred:**
+  - the Pacuare canopy, sub-canopy and understory;
+  - the 30 km run's waterline fringe;
+  - the upper gorge's dry-season forms.
+
+  The upper gorge's leaf state is measured per 10 m pixel.
 - **Not addressed here:**
-  - the Pacuare forest's sparse look;
-  - the 30 km Zambezi run's black basalt cliffs and green waterline fringe
-    (its render-only terrain tiles are a separate system);
   - the Colorado wall artifact;
   - the Zambezi upper gorge's dry channel beyond its cooked cuts.
   These remain realism gaps.

@@ -111,6 +111,21 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     float ObservedWhitewaterGain = 0.0f;
 
+    /** Cartesian maps whose live core takes its foam from the GPU moving
+     * detail (not the carrier's vertex foam): the observed whitewater
+     * fraction, scaled by this gain, joins the detail's breaking source (max
+     * union with the flow and crest sources), so the white starts where the
+     * photographs show it and is then transported and decayed by the detail.
+     * Render-only appearance evidence. 0 disables. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float ObservedWhitewaterEntrainmentGain = 0.0f;
+
+    /** EV added to the runtime cameras' fixed manual exposure on this map
+     * (presentation only). The shared exposure was set for South Fork; under
+     * a stronger sun a dark surface such as basalt reads light grey. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "-3.0", ClampMax = "3.0"))
+    float PresentationExposureBiasOffset = 0.0f;
+
     /** Full-reach production terrain exists in the map; suppress local bed proxy. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment")
     bool bMapProvidesTerrain = false;

@@ -21,7 +21,9 @@ Pacuare canopy method without its crown detection:
 
 Output: upper_gorge_evidence_2025_canopy_placement.json (Pacuare canopy layout,
 schema raftsim.zambezi.upper_gorge_evidence_canopy.v1) and a review PNG,
-in the Landscape frame of the terrain manifest.
+in the Landscape frame of the terrain manifest. Every tree is written in the
+green form; apply_zambezi_october_leaf_state.py then sets each tree's and
+shrub's October (dry-season) leaf state from the October Sentinel-2 NDVI.
 """
 import argparse
 import hashlib

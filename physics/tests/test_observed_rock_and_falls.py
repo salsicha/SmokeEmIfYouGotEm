@@ -50,3 +50,30 @@ def test_huacas_falls_is_recorded_and_painted():
     assert _sha(REPO_ROOT / tm["outputs"]["drape"]) == tm["outputs"]["drape_sha256"]
     canopy = _json(PACUARE / "huacas_evidence_canopy_placement.json")
     assert canopy["statistics"]["removed_on_huacas_falls"] == fall["canopy_removed_trees_shrubs"]
+
+
+def test_pacuare_rainforest_is_closed_and_layered_and_keeps_the_falls_clear():
+    canopy = _json(PACUARE / "huacas_evidence_canopy_placement.json")
+    tm = _json(PACUARE / "huacas_evidence_terrain_manifest.json")
+    fall = _json(PACUARE / "huacas_evidence_observed_waterfall.json")
+    structure = canopy["rainforest_structure"]
+    assert structure["inferred"] is True
+    stats = canopy["statistics"]
+    kinds = [row[6] for row in canopy["instances"]]
+    assert kinds.count(2) == stats["sub_canopy_count"] > 10000
+    assert stats["canopy_tree_count"] + stats["sub_canopy_count"] == len(canopy["instances"])
+    # overlapping crowns (radius ~ neighbour spacing) and a tall stand
+    assert stats["crown_radius_m_p10_p50_p90"][1] >= 6.0
+    assert 22.0 <= stats["height_m_p10_p50_p90"][1] <= 35.0
+    assert len(canopy["understory"]) >= 1.8 * stats["canopy_tree_count"]
+    # nothing stands on the Huacas Falls fall line
+    base, lip = np.array(fall["base_cm"]) / 100.0, np.array(fall["lip_cm"]) / 100.0
+    v = lip - base
+    for rows in (canopy["instances"], canopy["understory"]):
+        xy = np.array(rows, dtype=float)[:, :2] / 100.0
+        u = np.clip(((xy - base) @ v) / (v @ v), 0, 1)
+        assert np.hypot(*(xy - (base + u[:, None] * v)).T).min() >= 7.0
+    # the forest floor under the crowns is shaded, and the drape hash is recorded
+    assert tm["forest_floor_shade"]["shaded_share"] > 0.6
+    assert _sha(REPO_ROOT / tm["outputs"]["drape"]) == tm["outputs"]["drape_sha256"]
+    assert canopy["inputs"]["terrain_manifest_sha256"] == _sha(PACUARE / "huacas_evidence_terrain_manifest.json")

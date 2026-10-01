@@ -2006,6 +2006,15 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                                 *RiverWaterConfig->FlowBand.ToString())))))
             {
                 ResolvedObservedWhitewaterGain = FMath::Clamp(RiverWaterConfig->ObservedWhitewaterGain, 0.0f, 1.0f);
+                // The Cartesian live core draws the GPU moving detail's foam,
+                // not the vertex floor above, so the same layer also joins the
+                // detail's breaking source. Review: -RaftSimObservedEntrainmentGain=<g>.
+                float EntrainmentGain = RiverWaterConfig->ObservedWhitewaterEntrainmentGain;
+                if (FParse::Value(FCommandLine::Get(), TEXT("RaftSimObservedEntrainmentGain="), EntrainmentGain))
+                {
+                    UE_LOG(LogTemp, Display, TEXT("RaftSim observed whitewater: review entrainment gain %.3f"), EntrainmentGain);
+                }
+                WaterAdapter->SetObservedWhitewaterEntrainmentGain(EntrainmentGain);
             }
         }
         // Review only: -RaftSimObservedWhitewaterGain=<g> replaces the config's

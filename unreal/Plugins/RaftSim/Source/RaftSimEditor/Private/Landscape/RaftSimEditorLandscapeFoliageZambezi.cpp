@@ -728,4 +728,113 @@ FZambeziPlacementCounts AddZambeziLaunchPlacements(const FPlacementContext& Cont
 
     return {RunnableLaunchGroundCoverPlacedCount, RunnableLaunchWoodyPlacedCount, bRunnableLaunchEcologyStrataValidated};
 }
+
+int32 AddZambeziWaterlineFringe(const FPlacementContext& Context, const FPlacementQueries& Queries)
+{
+    // Batoka Gorge in the dry season keeps a green riverine fringe at the
+    // waterline (water figs, Syzygium, reeds and shrubs between the basalt
+    // boulders and on the beaches) below the dry, leafless slopes. The other
+    // L_Zambezi layers start 12-26 m back from the 72 m procedural channel or
+    // cover only the launch and camera windows, so the 30 km bank had no
+    // waterline vegetation. This places patchy green shrubs and riparian
+    // trees within ~15 m of the water along the whole reach (positions and
+    // species INFERRED), Landscape-grounded, non-colliding.
+    if (!Context.ShrubMesh || !Context.BroadleafTreeMesh)
+    {
+        return 0;
+    }
+    const FString RiverId = Context.Candidate.PreviewSpec.RiverId;
+    UHierarchicalInstancedStaticMeshComponent* Shrubs = AddLandscapeCandidateInstancedMeshComponent(
+        Context.World, Context.ShrubMesh, FString::Printf(TEXT("RaftSim_ZambeziWaterlineFringeShrub_%s"), *RiverId), true);
+    UHierarchicalInstancedStaticMeshComponent* Trees = AddLandscapeCandidateInstancedMeshComponent(
+        Context.World, Context.BroadleafTreeMesh, FString::Printf(TEXT("RaftSim_ZambeziWaterlineFringeTree_%s"), *RiverId), true);
+    if (!Shrubs || !Trees)
+    {
+        return 0;
+    }
+    for (UHierarchicalInstancedStaticMeshComponent* Component : {Shrubs, Trees})
+    {
+        Component->SetCullDistances(0, 120000);
+        Component->GetOwner()->Tags.Append(
+            {TEXT("RaftSimZambeziWaterlineFringe"), TEXT("InferredVegetationNotSurveyedTrees")});
+    }
+    constexpr int32 FringeTargetCount = 12000;      // both banks, 30 km
+    constexpr float LogicalStart = -2460.0f;
+    constexpr float LogicalEnd = 25300.0f;
+    const float HalfWidth = Queries.ActiveRiverHalfWidth;
+    int32 Placed = 0;
+    int32 Rejected = 0;
+    int32 PlacedTrees = 0;
+    for (int32 Index = 0; Index < FringeTargetCount; ++Index)
+    {
+        const float Side = Index % 2 == 0 ? -1.0f : 1.0f;
+        const int32 AlongIndex = Index / 2;
+        const float AlongT = (static_cast<float>(AlongIndex) + ZambeziVegetationUnitRandom(Index, 12301)) /
+            static_cast<float>(FringeTargetCount / 2);
+        const float BaseLogicalX = FMath::Lerp(LogicalStart, LogicalEnd, AlongT);
+        // Patchy, not a hedge: ~40 m patches, about a third of the bank bare
+        // basalt boulders between them.
+        const int32 PatchIndex = FMath::FloorToInt(BaseLogicalX / 37.0f) * 2 + (Side > 0.0f ? 1 : 0);
+        if (ZambeziVegetationUnitRandom(PatchIndex, 12307) < 0.34f)
+        {
+            continue;
+        }
+        const bool bTree = ZambeziVegetationUnitRandom(Index, 12311) < 0.14f;
+        FVector2D BestPoint = FVector2D::ZeroVector;
+        float BestScore = TNumericLimits<float>::Max();
+        float BestLogicalX = BaseLogicalX;
+        for (int32 Candidate = 0; Candidate < 32; ++Candidate)
+        {
+            const int32 Seed = Index * 41 + Candidate;
+            const float LogicalX = BaseLogicalX + FMath::Lerp(-30.0f, 30.0f, ZambeziVegetationUnitRandom(Seed, 12313));
+            // From well inside the procedural 72 m half width (the gorge floor
+            // is often narrower) to 30 m beyond it; the water-height test
+            // below finds the real edge.
+            const float Offset = FMath::Lerp(-3500.0f, 3000.0f, ZambeziVegetationUnitRandom(Seed, 12317));
+            const FVector2D Point = Queries.ResolveLogicalRiverPoint(LogicalX, Side * (HalfWidth + Offset));
+            const float Slope = Queries.GetLandscapeSlopeDegrees(Point.X, Point.Y);
+            const float DryHeightCm = Queries.GetLandscapeHeight(Point.X, Point.Y) -
+                Queries.GetConditionedWaterWorldZ(LogicalX);
+            const float MinimumDryCm = bTree ? 90.0f : 30.0f;
+            const float MaximumDryCm = bTree ? 900.0f : 650.0f;
+            if (Slope > 42.0f || DryHeightCm < MinimumDryCm || DryHeightCm > MaximumDryCm ||
+                Queries.GetMinimumCenterlineDistanceCm(Point) < 1500.0f)
+            {
+                continue;
+            }
+            // Prefer the lowest dry ground: the fringe hugs the waterline.
+            const float Score = DryHeightCm / MaximumDryCm + 0.25f * Slope / 42.0f;
+            if (Score < BestScore)
+            {
+                BestScore = Score;
+                BestPoint = Point;
+                BestLogicalX = LogicalX;
+            }
+        }
+        if (BestScore == TNumericLimits<float>::Max())
+        {
+            ++Rejected;
+            continue;
+        }
+        const float Yaw = 360.0f * ZambeziVegetationUnitRandom(Index, 12331);
+        const float Scale = bTree
+            ? FMath::Lerp(0.85f, 1.45f, ZambeziVegetationUnitRandom(Index, 12337))
+            : FMath::Lerp(0.75f, 1.6f, ZambeziVegetationUnitRandom(Index, 12341));
+        Queries.AddGroundedInstance(
+            bTree ? Trees : Shrubs, bTree ? Context.BroadleafTreeMesh : Context.ShrubMesh, BestPoint,
+            Queries.GetLandscapeHeight(BestPoint.X, BestPoint.Y) - (bTree ? 30.0f : 15.0f),
+            FRotator(0.0f, Yaw, 0.0f), FVector(Scale, Scale, Scale * FMath::Lerp(0.85f, 1.15f,
+                ZambeziVegetationUnitRandom(Index, 12347))));
+        ++Placed;
+        PlacedTrees += bTree ? 1 : 0;
+    }
+    Context.OutResult.DressingFoliageInstanceCount += Placed;
+    Context.OutResult.DressingCanopyTreeInstanceCount += PlacedTrees;
+    Context.OutResult.DressingUnderstoryInstanceCount += Placed - PlacedTrees;
+    Context.OutSummary += FString::Printf(
+        TEXT("%s waterline fringe: %d green riverine shrubs and %d riparian trees within ~15 m of the water "
+             "(patchy, positions and species inferred), %d candidates without dry ground near the water.\n"),
+        *RiverId, Placed - PlacedTrees, PlacedTrees, Rejected);
+    return Placed;
+}
 }

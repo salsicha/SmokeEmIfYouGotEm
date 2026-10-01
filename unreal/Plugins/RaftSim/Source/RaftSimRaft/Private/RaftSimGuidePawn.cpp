@@ -781,6 +781,10 @@ void ARaftSimGuidePawn::BeginPlay()
 {
     Super::BeginPlay();
     InitialSeatedPawnYaw=GetActorRotation().Yaw;
+    // The map's river water config may offset the shared exposure.
+    const float ExposureBias = RaftSimCameraPresentation::ResolveExposureBias(GetWorld());
+    RaftSimCameraPresentation::Configure(GuideCamera, ExposureBias);
+    RaftSimCameraPresentation::Configure(ChaseCamera, ExposureBias);
     // Do not construct a second paddle. The posed guide avatar already owns
     // the hand-held paddle in both camera modes.
 

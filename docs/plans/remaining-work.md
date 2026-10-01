@@ -1,6 +1,24 @@
 # Remaining requested work
 
-LATEST October 1 expected-whitewater/terrain/vegetation goal (Zambezi, Chilko,
+LATEST October 1 follow-up visual fixes (review section 7):
+- Upper gorge whitewater: the observed layer now joins the GPU moving
+  detail's breaking source (ObservedWhitewaterEntrainmentGain 0.6), so
+  Morning Glory and Stairway break heavily and the pools stay calm.
+- L_Zambezi:
+  - each rapid is a deep central tongue between shallow boulder shelves, and
+    the rapid's surface relief rides the tongue (was bank-to-bank lace);
+  - basalt walls: cool tint, desaturated and darker, coverage 0.97, thin
+    grey haze, exposure -0.5 EV;
+  - 5,008 green shrubs and 651 riparian trees at the waterline.
+- Pacuare: closed, layered rainforest (canopy 18-38 m, sub-canopy, double
+  understory, shaded floor).
+- Rock: grey granite (Futaleufu) and dark basalt (Chilko) tinted instances of
+  the reviewed scan.
+- Upper gorge trees: October leaf state from the October Sentinel-2 NDVI
+  (19 % green, 32 % dry leaves, 49 % leafless).
+Not committed.
+
+PREVIOUS October 1 expected-whitewater/terrain/vegetation goal (Zambezi, Chilko,
 Futaleufu, Pacuare, Colorado), from observations because no bathymetry exists:
 - L_Zambezi 30 km run: all 25 rapids moved to stations observed from Sentinel-2
   whitewater, confluences, the Taita Falcon Lodge fix and outfitter km (many moved

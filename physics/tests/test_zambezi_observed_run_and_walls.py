@@ -57,6 +57,22 @@ def test_scenario_and_procedural_controls_follow_the_observed_stations():
     assert stream["full_reach_transit_seed"]["cooked_fields_manifest_sha256"] == _sha(COOKED / "manifest.json")
 
 
+def test_each_rapid_is_a_central_tongue_between_slow_shelves():
+    # Not a bank-to-bank jump across the 144 m reference channel: the control
+    # is supercritical in the tongue while the shelves beside it stay slow.
+    manifest = _json(COOKED / "manifest.json")
+    grid = manifest["grid"]
+    h, u = np.load(COOKED / "h.npy"), np.load(COOKED / "u.npy")
+    lateral = grid["origin_y_m"] + np.arange(grid["ny"]) * grid["dy_m"]
+    centre = int(np.argmin(np.abs(lateral)))
+    margin = (np.abs(lateral) >= 50.0) & (h[:, 0] > 0.05)
+    froude = np.where(h > 0.05, u / np.sqrt(9.81 * np.maximum(h, 1e-3)), 0.0)
+    for row in manifest["procedural_infill"]["hydraulic_transition_contract"]["transitions"]:
+        col = int(round(row["control_station_m"] / grid["dx_m"])) - 1
+        assert froude[centre, col] > 1.1, row
+        assert froude[margin, col].max() < 0.6, row
+
+
 def test_observed_whitewater_layer_covers_every_rapid():
     side = _json(COOKED / "observed_whitewater_normal_big_water.json")
     path = COOKED / side["file"]
@@ -86,3 +102,10 @@ def test_upper_gorge_walls_are_recorded_and_hydraulics_unchanged():
     assert canopy["inputs"]["evidence_grid_sha256"] == tm["inputs"]["evidence_grid_sha256"]
     assert canopy["statistics"]["cliff_cells_excluded"] > 0
     assert len(canopy["instances"]) + len(canopy["understory"]) == 11044
+    # October (dry season): the leaf state comes from the October Sentinel-2 NDVI.
+    leaf = canopy["october_leaf_state"]
+    forms = [row[5] for row in canopy["instances"]]
+    assert sorted(set(forms)) == [0, 2, 3]
+    assert forms.count(0) == leaf["trees"]["green"] and forms.count(2) == leaf["trees"]["leafless"]
+    assert forms.count(0) < 0.3 * len(forms), "most of the gorge woodland is leafless or dry in October"
+    assert all(len(row) == 6 and row[5] in (0, 1) for row in canopy["understory"])

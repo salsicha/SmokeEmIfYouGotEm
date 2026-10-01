@@ -47,6 +47,9 @@ constexpr float kZambeziUpperGorgeFinishStationM = 3382.0f;
 // 0.9 (one white sheet); about 0.25 matches the photographed share and keeps
 // the dark tongues between the white (observed-rapids-2026-09-29.md).
 constexpr float kObservedWhitewaterDisplayGain = 0.25f;
+// Observed whitewater as a breaking source of the GPU moving detail (the
+// Cartesian upper gorge, whose core ignores the vertex floor).
+constexpr float kObservedWhitewaterEntrainmentGain = 0.6f;
 float CenterlineProgress(const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points, float StationM)
 {
     return Points.Num() < 2 ? 0.0f : FMath::Clamp(
@@ -2159,6 +2162,11 @@ bool AddLandscapeCandidateRunnableGameplay(
         // whitewater plus the observed-rapid catalogue, as a Cartesian raster
         // (export_cartesian_observed_whitewater.py) that floors displayed foam.
         WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
+        // This map's live core draws the GPU moving detail's foam, so the same
+        // layer also joins the detail's breaking source. Overhead renders at
+        // Morning Glory and Stairway: 0.5 keeps the lace texture, 0.9 is one
+        // white sheet through Stairway; 0.6 matches the photographed rapids.
+        WaterConfig->ObservedWhitewaterEntrainmentGain = kObservedWhitewaterEntrainmentGain;
     }
     if (bZambezi)
     {
@@ -2173,6 +2181,10 @@ bool AddLandscapeCandidateRunnableGameplay(
         // rapids; the observed-rapid catalogue's expected whitewater
         // (export_zambezi_run_observed_whitewater.py) floors the displayed foam.
         WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
+        // Under the strong dry-season sun the shared exposure lifted the
+        // black basalt walls to light grey-brown and clipped the foam; half a
+        // stop darker keeps the foam white and the walls dark.
+        WaterConfig->PresentationExposureBiasOffset = -0.5f;
     }
     WaterConfig->bMapProvidesTerrain = true;
     WaterConfig->bLiveSolverOwnsRuntimeRendering = bSolverOwnedRuntimeWater;

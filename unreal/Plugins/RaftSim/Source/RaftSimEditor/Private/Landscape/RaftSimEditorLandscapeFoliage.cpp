@@ -1311,6 +1311,9 @@ bool AddLandscapeCandidateBiomeDressing(
               false,
               ZambeziOpaqueVegetationMaterial)
         : nullptr;
+    // Grey granite (Futaleufu) and dark basalt (Chilko) instead of the scan's
+    // mossy tan on the reach's reviewed rock; nullptr keeps the scan material.
+    UMaterialInterface* ReachRockMaterial = LoadReachRockMaterial(Candidate.PreviewSpec.RiverId, OutSummary);
     TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedRockInstances;
     for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
     {
@@ -1321,7 +1324,8 @@ bool AddLandscapeCandidateBiomeDressing(
                 TEXT("RaftSim_LandscapeCandidate_ReviewedRock%02d_%s"),
                 RockIndex + 1,
                 *Candidate.PreviewSpec.RiverId),
-            true));
+            true,
+            ReachRockMaterial));
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*>
         TemperateWaterlineStructureInstances;
@@ -1337,7 +1341,8 @@ bool AddLandscapeCandidateBiomeDressing(
                         TEXT("RaftSim_LandscapeCandidate_TemperateWaterlineStructureRock%02d_%s"),
                         RockIndex + 1,
                         *Candidate.PreviewSpec.RiverId),
-                    true));
+                    true,
+                    ReachRockMaterial));
         }
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*>
@@ -1354,7 +1359,8 @@ bool AddLandscapeCandidateBiomeDressing(
                         TEXT("RaftSim_LandscapeCandidate_ChilkoOrganicShorelineGravelRock%02d_%s"),
                         RockIndex + 1,
                         *Candidate.PreviewSpec.RiverId),
-                    true));
+                    true,
+                    ReachRockMaterial));
         }
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*>

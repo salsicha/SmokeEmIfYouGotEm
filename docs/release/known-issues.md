@@ -65,7 +65,14 @@ Editor-hosted Development build on the development host; no packaged-build resul
   - At the 45 m³/s planning flow the water covers bars the photo shows dry.
   - The lower rapids are hydraulically milder than their photographed
     whitewater.
-  - Vegetation structure and rock heights are inferred.
+  - Vegetation structure and rock heights are inferred. Since 2026-10-01 the
+    forest is closed and layered:
+    - canopy 18-38 m with overlapping crowns;
+    - a sub-canopy;
+    - two shrubs per canopy tree;
+    - a shaded forest floor.
+
+    The pale ground between lone trees is gone.
   - IGN commercial redistribution is unconfirmed.
 
   See the [review](../reconstruction-review-2026-09-07/pacuare-huacas-evidence.md).
@@ -82,6 +89,9 @@ Editor-hosted Development build on the development host; no packaged-build resul
     through the Terminator core, at Khyber Pass and at Himalayas. It does not
     break at T2 (Son of Terminator): GLO-30 shows a flat pool there, so T2
     shows only as appearance whitewater.
+  - Since 2026-10-01 its observed and bank rock is grey granite, a tinted
+    instance of the reviewed rock scan, not the scan's mossy tan. The colour
+    is approximate.
 
   See the [review](../reconstruction-review-2026-09-07/futaleufu-terminator-evidence.md).
   Chilko Lava Canyon is now an evidence-based 4.0 km geographic reach from
@@ -93,6 +103,8 @@ Editor-hosted Development build on the development host; no packaged-build resul
     45 m³/s calibration without a width or stage check.
   - The imagery is 10 m. The water hue was fitted to Sentinel-2 on
     2026-09-29 (it had read deep blue); its brightness is unmeasured.
+  - Since 2026-10-01 its talus and bank rock is dark basalt, a tinted
+    instance of the reviewed rock scan. The colour is approximate.
   - Tree positions and sizes are inferred within the inventory polygons.
 
   See the [review](../reconstruction-review-2026-09-07/chilko-lava-canyon-evidence.md).
@@ -117,15 +129,24 @@ Editor-hosted Development build on the development host; no packaged-build resul
     budget.
   - Beyond the cooked cuts the channel is dry, so the river ahead of the
     finish looks like a dry bed.
+  - Since 2026-10-01 the woodland shows its October state, measured from the
+    October Sentinel-2 NDVI:
+    - 19 % of trees stay green (riverine and spray-fed);
+    - 32 % hold a few dry leaves;
+    - 49 % are leafless.
+
+    Species and branching are inferred.
 
   See the [review](../reconstruction-review-2026-09-07/zambezi-upper-gorge-evidence.md).
 - Observed-whitewater display (all six international river maps,
   2026-09-30): the render-only whitewater floor includes each reach's
   observed-rapid catalogue. It is shown at the calibrated gain of 0.25 (the
   former 0.9 rendered large rapids as one white sheet). It is appearance
-  evidence, not hydraulics. On the Cartesian Zambezi upper gorge the layer
-  loads but is not visible: that map's live core takes its foam from the GPU
-  transport, so its whitewater is the cook's breaking only. See
+  evidence, not hydraulics. The Cartesian Zambezi upper gorge's live core
+  draws the GPU moving detail's foam, which ignores that floor. Since
+  2026-10-01 the layer also joins the detail's breaking source there
+  (`ObservedWhitewaterEntrainmentGain` 0.6, calibrated by eye), so Morning
+  Glory and Stairway to Heaven break heavily and the pools stay calm. See
   [observed-rapids-2026-09-29.md](../reconstruction-review-2026-09-07/observed-rapids-2026-09-29.md)
   and
   [observed-whitewater-terrain-2026-09-30.md](../reconstruction-review-2026-09-07/observed-whitewater-terrain-2026-09-30.md).
@@ -138,3 +159,13 @@ Editor-hosted Development build on the development host; no packaged-build resul
   The run now finishes at Mukuni Beach (28,950 m) and each rapid carries its
   observed whitewater. The water is still a procedural seed with one bounded
   jump per rapid; there is no rapid-specific hydraulic geometry.
+  Since 2026-10-01:
+  - Each rapid is a central tongue between shallow boulder shelves. The lace
+    still spreads bank to bank at the bigger rapids, because the live solve
+    evens the surface drop across the channel. This is deferred to a later
+    water pass.
+  - The walls are a darker, cooler basalt under a thin grey haze, with -0.5 EV
+    exposure on this map. They are black in shadow but still grey-brown in
+    direct sun.
+  - A patchy green fringe (5,008 shrubs and 651 riparian trees, inferred)
+    lines the waterline along the whole run.

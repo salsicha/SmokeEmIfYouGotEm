@@ -124,6 +124,11 @@ enum class EZambeziVegetationForm : uint8
     UmbrellaTree,
     ThornScrub,
     SavannaGroundCover,
+    // October (late dry season) Batoka woodland: deciduous trees bare or
+    // holding a few dry leaves, thorn scrub leafless.
+    DrySeasonBareTree,
+    DrySeasonSparseTree,
+    DrySeasonScrub,
 };
 
 enum class ETemperateVegetationForm : uint8
@@ -449,10 +454,24 @@ struct FEvidenceCanopyCounts
 // (RaftSimEditorLandscapeFoliageEvidence.cpp).
 TSharedPtr<FJsonObject> LoadEvidencePlacement(
     const FString& TerrainFolder, const TCHAR* FileName, const TCHAR* Schema, FString& OutSummary);
+// Forms 0 and 1 use the reach's broadleaf and conifer canopy meshes; forms
+// 2.. use ExtraTreeForms in order. Understory rows whose optional sixth field
+// (kind) is 1 use AltUnderstoryMesh when it is given.
 FEvidenceCanopyCounts AddEvidenceCanopy(
     const FPlacementContext& Context, const FPlacementQueries& Queries, const FString& TerrainFolder,
     const TCHAR* FileName, const TCHAR* Schema, const TCHAR* ComponentPrefix, const TCHAR* ActorTag,
-    const TCHAR* SourceDescription);
+    const TCHAR* SourceDescription, TConstArrayView<UStaticMesh*> ExtraTreeForms = {},
+    UStaticMesh* AltUnderstoryMesh = nullptr);
+// The reach's observed rock colour for the reviewed rock meshes (grey
+// granite on the Futaleufu, dark basalt on the Chilko; instances of
+// M_RaftSim_ReviewedRockTinted, unreal/Scripts/create_tinted_rock_materials.py),
+// or nullptr where the scan's own mossy material stays.
+UMaterialInterface* LoadReachRockMaterial(const FString& RiverId, FString& OutSummary);
+// October (late dry season) Zambezi forms: a leafless tree, a tree holding a
+// few dry leaves and leafless scrub, saved once beside the Zambezi family.
+bool LoadOrCreateZambeziDrySeasonVegetationAssets(
+    UWorld* World, UMaterialInterface* Material, UStaticMesh*& OutBareTree, UStaticMesh*& OutSparseTree,
+    UStaticMesh*& OutScrub, FString& OutSummary);
 
 struct FObservedRockCounts
 {
@@ -474,4 +493,7 @@ FObservedRockCounts AddObservedRockShells(
 bool AddLandscapeCandidatePlacements(const FPlacementContext& Context);
 FPacuarePlacementCounts AddPacuarePlacements(const FPlacementContext& Context, const FPlacementQueries& Queries);
 FZambeziPlacementCounts AddZambeziLaunchPlacements(const FPlacementContext& Context, const FPlacementQueries& Queries);
+// Patchy green riverine fringe (shrubs and riparian trees) at the waterline
+// along the whole L_Zambezi reach; returns the instances placed.
+int32 AddZambeziWaterlineFringe(const FPlacementContext& Context, const FPlacementQueries& Queries);
 }

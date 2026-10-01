@@ -847,6 +847,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     TEXT("Zambezi floors the displayed foam with the 25-rapid observed whitewater"),
                     FMath::IsNearlyEqual((*It)->ObservedWhitewaterGain, 0.25f));
                 Test->TestTrue(
+                    TEXT("Zambezi exposes half a stop darker under its dry-season sun"),
+                    FMath::IsNearlyEqual((*It)->PresentationExposureBiasOffset, -0.5f));
+                Test->TestTrue(
                     TEXT("Zambezi enables the wet-cell-clipped transmitting core"),
                     (*It)->bEnableLiveSolverVolumeCore);
                 Test->TestTrue(
@@ -1208,6 +1211,23 @@ bool FRaftSimAssertRiverMapCommand::Update()
             GorgeHazeCount +=
                 Actor->Tags.Contains(TEXT("RaftSimVolumetricGorgeHaze")) ? 1 : 0;
         }
+        // The dry-season gorge keeps a green riverine fringe at the waterline
+        // along the whole run (patchy shrubs and riparian trees, inferred).
+        int32 WaterlineFringeInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if ((*It)->Tags.Contains(TEXT("RaftSimZambeziWaterlineFringe")))
+            {
+                const UHierarchicalInstancedStaticMeshComponent* Fringe =
+                    (*It)->FindComponentByClass<UHierarchicalInstancedStaticMeshComponent>();
+                Test->TestTrue(TEXT("Zambezi waterline fringe is visual-only, labelled inferred vegetation"),
+                    Fringe && Fringe->GetCollisionEnabled() == ECollisionEnabled::NoCollision &&
+                        (*It)->Tags.Contains(TEXT("InferredVegetationNotSurveyedTrees")));
+                WaterlineFringeInstanceCount += Fringe ? Fringe->GetInstanceCount() : 0;
+            }
+        }
+        Test->TestTrue(TEXT("Zambezi reference run has a green waterline fringe along the reach"),
+            WaterlineFringeInstanceCount >= 3000);
         Test->TestEqual(
             TEXT("Zambezi reference run has two adaptive near-field banks"),
             AdaptiveNearFieldTerrainCount,
@@ -2796,6 +2816,11 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 (*It)->LiveVolumeCoreMaterialOverride &&
                     (*It)->LiveVolumeCoreMaterialOverride->GetPathName().Contains(
                         TEXT("MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2")));
+            // The Cartesian core draws the GPU moving detail's foam, so the
+            // observed whitewater also feeds the detail's breaking source.
+            Test->TestTrue(TEXT("Zambezi upper gorge feeds the observed whitewater to the moving detail's breaking source"),
+                FMath::IsNearlyEqual((*It)->ObservedWhitewaterGain, 0.25f) &&
+                    FMath::IsNearlyEqual((*It)->ObservedWhitewaterEntrainmentGain, 0.6f));
         }
         Test->TestEqual(TEXT("Zambezi upper gorge has one runtime water config"), RuntimeWaterConfigCount, 1);
 
@@ -2837,6 +2862,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
 
         int32 BackdropCount = 0;
         int32 EvidenceCanopyInstanceCount = 0;
+        int32 DrySeasonInstanceCount = 0;
         for (TActorIterator<AActor> It(World); It; ++It)
         {
             BackdropCount += (*It)->Tags.Contains(TEXT("RaftSimZambeziUpperGorgeGLO30Backdrop")) ? 1 : 0;
@@ -2849,9 +2875,17 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     Instances && Instances->GetCollisionEnabled() == ECollisionEnabled::NoCollision &&
                         (*It)->Tags.Contains(TEXT("InferredVegetationNotSurveyedTrees")));
                 EvidenceCanopyInstanceCount += Instances ? Instances->GetInstanceCount() : 0;
+                if (Instances && Instances->GetStaticMesh() &&
+                    Instances->GetStaticMesh()->GetName().Contains(TEXT("DrySeason")))
+                {
+                    DrySeasonInstanceCount += Instances->GetInstanceCount();
+                }
             }
         }
         Test->TestEqual(TEXT("Zambezi upper gorge places one GLO-30 terrain backdrop"), BackdropCount, 1);
+        // October: only trees that stay green in the October Sentinel-2 NDVI keep leaves.
+        Test->TestTrue(TEXT("Zambezi upper gorge woodland is mostly leafless or dry in October"),
+            DrySeasonInstanceCount * 2 > EvidenceCanopyInstanceCount);
         // The cliff zone of the reconstructed basalt walls carries no trees.
         Test->TestEqual(TEXT("Zambezi upper gorge evidence canopy places every row (8,577 trees, 2,467 shrubs)"),
             EvidenceCanopyInstanceCount, 11044);

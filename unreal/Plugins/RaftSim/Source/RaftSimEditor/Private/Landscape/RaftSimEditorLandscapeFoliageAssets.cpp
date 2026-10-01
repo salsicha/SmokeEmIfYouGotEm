@@ -1162,6 +1162,124 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
                 Colors);
         }
     }
+    else if (Form == EZambeziVegetationForm::DrySeasonBareTree ||
+             Form == EZambeziVegetationForm::DrySeasonSparseTree ||
+             Form == EZambeziVegetationForm::DrySeasonScrub)
+    {
+        // Late dry season (October) Batoka woodland: mopane, Combretum and
+        // Commiphora stand leafless or hold a few dry yellow-brown leaves, so
+        // the crown is a grey branch and twig tangle, not a green lobe mass.
+        // Species and branching are inferred (no inventory).
+        const FLinearColor BarkGrey(0.165f, 0.150f, 0.128f, 1.0f);
+        const FLinearColor TwigGrey(0.205f, 0.182f, 0.150f, 1.0f);
+        const FLinearColor DryLeafOchre(0.205f, 0.128f, 0.042f, 1.0f);
+        const FLinearColor DryLeafBrown(0.142f, 0.096f, 0.046f, 1.0f);
+        const bool bScrub = Form == EZambeziVegetationForm::DrySeasonScrub;
+        const bool bSparseLeaves = Form == EZambeziVegetationForm::DrySeasonSparseTree;
+        auto AppendTwigs = [&](const FVector& Base, const FVector& Direction, float Length, float Radius,
+                               int32 Depth, int32 RandomIndex)
+        {
+            // Two-level forking twigs, each tilted upward and outward from its parent.
+            struct FTwig
+            {
+                FVector Start;
+                FVector Dir;
+                float Len;
+                float Rad;
+                int32 Level;
+            };
+            TArray<FTwig> Stack;
+            Stack.Add({Base, Direction.GetSafeNormal(), Length, Radius, Depth});
+            int32 Visited = 0;
+            while (!Stack.IsEmpty())
+            {
+                const FTwig Twig = Stack.Pop(EAllowShrinking::No);
+                const FVector& Start = Twig.Start;
+                const FVector& Dir = Twig.Dir;
+                const float Len = Twig.Len;
+                const float Rad = Twig.Rad;
+                const int32 Level = Twig.Level;
+                const int32 R = RandomIndex * 31 + Visited++;
+                const FVector End = Start + Dir * Len;
+                AppendZambeziColoredSegment(Start, End, Rad, Rad * 0.42f, Level > 0 ? 5 : 4, BarkGrey, TwigGrey,
+                    Vertices, Triangles, Normals, Uvs, Colors);
+                if (Level > 0)
+                {
+                    const int32 Forks = 2 + (R % 2);
+                    for (int32 F = 0; F < Forks; ++F)
+                    {
+                        const float Yaw = UE_TWO_PI * (static_cast<float>(F) / Forks + ZambeziVegetationUnitRandom(R, 2101 + F));
+                        const FVector Side = FVector::CrossProduct(Dir, FVector::UpVector).GetSafeNormal();
+                        const FVector Spread = (Side * FMath::Cos(Yaw) + FVector::CrossProduct(Side, Dir) * FMath::Sin(Yaw)) * 0.62f;
+                        const FVector ChildDir = (Dir + Spread + FVector::UpVector * 0.30f).GetSafeNormal();
+                        Stack.Add({FMath::Lerp(Start, End, 0.62f + 0.3f * ZambeziVegetationUnitRandom(R, 2131 + F)),
+                            ChildDir, Len * FMath::Lerp(0.48f, 0.66f, ZambeziVegetationUnitRandom(R, 2141 + F)),
+                            Rad * 0.48f, Level - 1});
+                    }
+                }
+                else if (bSparseLeaves && ZambeziVegetationUnitRandom(R, 2161) < 0.55f)
+                {
+                    // A few dry leaf clusters at twig tips; most of the crown stays open.
+                    AppendZambeziOpaqueLobe(End, FVector(46.0f, 38.0f, 30.0f) * FMath::Lerp(0.7f, 1.2f, ZambeziVegetationUnitRandom(R, 2171)),
+                        Seed + R, FMath::Lerp(DryLeafOchre, DryLeafBrown, ZambeziVegetationUnitRandom(R, 2177)),
+                        Vertices, Triangles, Normals, Uvs, Colors);
+                }
+            }
+        };
+        if (bScrub)
+        {
+            const int32 StemCount = 11;
+            for (int32 StemIndex = 0; StemIndex < StemCount; ++StemIndex)
+            {
+                const float Angle = UE_TWO_PI * static_cast<float>(StemIndex) / StemCount + Seed * 0.17f;
+                const FVector Direction(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+                const float Length = 105.0f + 50.0f * ZambeziVegetationUnitRandom(StemIndex + Seed, 1601);
+                const FVector Start = Direction * 8.0f;
+                const FVector End = Direction * Length * 0.55f + FVector::UpVector * (95.0f + 18.0f * (StemIndex % 3));
+                AppendZambeziColoredSegment(Start, End, 7.0f, 3.6f, 6, BarkGrey, TwigGrey,
+                    Vertices, Triangles, Normals, Uvs, Colors);
+                AppendTwigs(End, (Direction + FVector::UpVector * 1.1f), 70.0f + 25.0f * (StemIndex % 3), 3.4f, 1,
+                    Seed + StemIndex);
+            }
+        }
+        else
+        {
+            const FVector LowerTrunkEnd(-12.0f, 14.0f, 300.0f);
+            const FVector UpperTrunkEnd(20.0f, -16.0f, 500.0f);
+            AppendZambeziColoredSegment(FVector::ZeroVector, LowerTrunkEnd, 36.0f, 23.0f, 10, BarkGrey,
+                ScalePreviewColor(BarkGrey, 1.06f), Vertices, Triangles, Normals, Uvs, Colors);
+            AppendZambeziColoredSegment(LowerTrunkEnd, UpperTrunkEnd, 23.0f, 13.0f, 9,
+                ScalePreviewColor(BarkGrey, 1.06f), TwigGrey, Vertices, Triangles, Normals, Uvs, Colors);
+            constexpr int32 RootCount = 6;
+            for (int32 RootIndex = 0; RootIndex < RootCount; ++RootIndex)
+            {
+                const float Angle = UE_TWO_PI * static_cast<float>(RootIndex) / RootCount + Seed * 0.11f;
+                AppendZambeziColoredSegment(FVector(0.0f, 0.0f, 16.0f),
+                    FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f) * (78.0f + 10.0f * (RootIndex % 3)),
+                    15.0f, 3.5f, 6, BarkGrey, ScalePreviewColor(BarkGrey, 0.84f), Vertices, Triangles, Normals, Uvs, Colors);
+            }
+            const int32 BranchCount = 9;
+            for (int32 BranchIndex = 0; BranchIndex < BranchCount; ++BranchIndex)
+            {
+                const float Angle = FMath::Fmod(137.50776f * BranchIndex + Seed * 23.0f, 360.0f) * PI / 180.0f;
+                const FVector Direction(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+                const float Radius = 215.0f + 38.0f * static_cast<float>(BranchIndex % 4);
+                const float StartZ = 290.0f + 34.0f * static_cast<float>(BranchIndex % 6);
+                const float EndZ = 560.0f + 48.0f * static_cast<float>(BranchIndex % 4);
+                const FVector Start(0.0f, 0.0f, StartZ);
+                const FVector Mid = Direction * Radius * 0.5f + FVector::UpVector * FMath::Lerp(StartZ, EndZ, 0.6f);
+                const FVector End = Direction * Radius + FVector::UpVector * EndZ;
+                AppendZambeziColoredSegment(Start, Mid, 12.0f, 7.0f, 7, BarkGrey, ScalePreviewColor(BarkGrey, 1.08f),
+                    Vertices, Triangles, Normals, Uvs, Colors);
+                AppendZambeziColoredSegment(Mid, End, 7.0f, 3.4f, 6, ScalePreviewColor(BarkGrey, 1.08f), TwigGrey,
+                    Vertices, Triangles, Normals, Uvs, Colors);
+                // Twig sprays from the branch's outer half and tip.
+                AppendTwigs(FMath::Lerp(Mid, End, 0.35f), (End - Mid) + FVector::UpVector * 90.0f, 120.0f, 3.6f, 1,
+                    Seed + BranchIndex * 7);
+                AppendTwigs(End, (End - Mid) + FVector::UpVector * 70.0f, 135.0f, 3.2f, 1, Seed + BranchIndex * 7 + 3);
+            }
+        }
+    }
     else
     {
         const bool bUmbrella = Form == EZambeziVegetationForm::UmbrellaTree;
@@ -1466,6 +1584,34 @@ bool LoadZambeziOpaqueVegetationAssets(
     {
         OutSummary += TEXT(
             "The saved Zambezi opaque vegetation family is incomplete; build L_Zambezi's dressing first.\n");
+    }
+    return bComplete;
+}
+
+bool LoadOrCreateZambeziDrySeasonVegetationAssets(
+    UWorld* World,
+    UMaterialInterface* Material,
+    UStaticMesh*& OutBareTree,
+    UStaticMesh*& OutSparseTree,
+    UStaticMesh*& OutScrub,
+    FString& OutSummary)
+{
+    // Saved once and reused; -RaftSimRebuildZambeziDrySeasonVegetation regenerates them.
+    const bool bRebuild = FParse::Param(FCommandLine::Get(), TEXT("RaftSimRebuildZambeziDrySeasonVegetation"));
+    auto LoadOrCreate = [&](const TCHAR* Name, EZambeziVegetationForm Form, int32 Seed) -> UStaticMesh*
+    {
+        UStaticMesh* Mesh = bRebuild ? nullptr : LoadObject<UStaticMesh>(nullptr, *FString::Printf(
+            TEXT("%s%s.%s"), ZambeziVegetationMeshRoot, Name, Name));
+        return Mesh ? Mesh : CreateZambeziOpaqueVegetationMesh(
+            World, Name, Form, Seed, Material, ZambeziVegetationMeshRoot, TEXT("Zambezi"), false, false, OutSummary);
+    };
+    OutBareTree = LoadOrCreate(TEXT("SM_RaftSim_Zambezi_DrySeasonBareTree_A_OpaqueV1"), EZambeziVegetationForm::DrySeasonBareTree, 6113);
+    OutSparseTree = LoadOrCreate(TEXT("SM_RaftSim_Zambezi_DrySeasonSparseTree_B_OpaqueV1"), EZambeziVegetationForm::DrySeasonSparseTree, 6427);
+    OutScrub = LoadOrCreate(TEXT("SM_RaftSim_Zambezi_DrySeasonScrub_A_OpaqueV1"), EZambeziVegetationForm::DrySeasonScrub, 6781);
+    const bool bComplete = Material && OutBareTree && OutSparseTree && OutScrub;
+    if (!bComplete)
+    {
+        OutSummary += TEXT("Failed to load or build the Zambezi dry-season (October) vegetation forms.\n");
     }
     return bComplete;
 }

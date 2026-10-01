@@ -665,9 +665,15 @@ def _write_runtime_water_bundle(
             }
         )
     rapid_intensity = np.clip(rapid_intensity, 0.0, 1.0)
-    center_surface_m += (
+    # Surface relief that belongs to the rapids (the swell through each rapid
+    # and every control's jump profile) is carried by the main tongue, not
+    # across the whole 144 m channel: a station-only surface made every
+    # rapid's relief foam paint bank to bank. Centreline values are unchanged.
+    surface_relief_m = np.zeros((ny, nx), dtype=np.float64)
+    swell_tongue = np.exp(-0.5 * (lateral_m / 24.0) ** 2)[:, None]
+    surface_relief_m += swell_tongue * (
         0.12 * rapid_intensity * np.sin(station_m * 0.055)
-    )
+    )[None, :]
 
     cross_fraction = np.clip(
         1.0 - (np.abs(lateral_m) / RUNTIME_WET_HALF_WIDTH_M) ** 2,
@@ -714,25 +720,40 @@ def _write_runtime_water_bundle(
             token in " ".join(tags)
             for token in ("river_wide", "large_wave", "wave_train", "multiple")
         )
-        lane_sigma_m = 55.0 if broad_feature else 46.0
-        lane = np.exp(-0.5 * (np.abs(lateral_m) / lane_sigma_m) ** 4)
+        # The observed rapids break in a 30-60 m main tongue (the low-water
+        # river width) with slower eddy margins, not bank to bank across the
+        # 144 m reference channel: a Gaussian tongue (sigma 20 m; 26 m for
+        # river-wide features) keeps the centreline control and lets the
+        # margins stay subcritical. A flat quartic lane (sigma 46-55 m) had
+        # turned every rapid into one uniform lace across the channel.
+        lane_sigma_m = 26.0 if broad_feature else 20.0
+        lane = np.exp(-0.5 * (lateral_m / lane_sigma_m) ** 2)
         lane = np.where(wet_mask[:, control_index] != 0, lane, 0.0)
         control_depth_m = 2.15 - 0.48 * severity
         control_froude = 1.58 + 0.34 * severity
+        # Beside the tongue the rapid is shallow boulder shelf with slow eddy
+        # water, shallower than the control, so the live solve keeps the flow
+        # in the tongue instead of routing it around a central sill.
+        shelf = np.where(wet_mask[:, control_index] != 0, 1.0 - lane, 0.0)
+        shelf_depth_m = 0.75
+        shelf_froude = 0.22
         for profile_index, profile_strength in enumerate(approach_profile):
             offset = profile_index - (len(approach_profile) - 1)
             column = control_index + offset
             blend = np.clip(lane * profile_strength, 0.0, 1.0)
+            shelf_blend = np.clip(0.85 * shelf * profile_strength, 0.0, 1.0 - blend)
             h[:, column] = np.where(
                 wet_mask[:, column] != 0,
-                h[:, column] * (1.0 - blend) + control_depth_m * blend,
+                h[:, column] * (1.0 - blend - shelf_blend)
+                + control_depth_m * blend
+                + shelf_depth_m * shelf_blend,
                 0.0,
             )
             target_froude[:, column] = np.maximum(
                 target_froude[:, column],
                 target_froude[:, column] * (1.0 - blend)
                 + control_froude * blend,
-            )
+            ) * (1.0 - shelf_blend) + shelf_froude * shelf_blend
 
         # The first tailwater station is intentionally abrupt: it is the
         # hydraulic jump. Deeper, slower water then releases into a decaying
@@ -745,23 +766,28 @@ def _write_runtime_water_bundle(
             decay = math.exp(-0.34 * (tail_offset - 1))
             phase = math.cos(2.05 * tail_offset)
             blend = np.clip(lane * decay, 0.0, 1.0)
+            # The shelves continue a little below the jump as slow eddies.
+            shelf_blend = np.clip(0.85 * shelf * decay, 0.0, 1.0 - blend)
             tail_depth_m = pile_depth_m + 0.24 * severity * phase * decay
             tail_froude = pile_froude + 0.09 * max(phase, 0.0) * decay
             h[:, column] = np.where(
                 wet_mask[:, column] != 0,
-                h[:, column] * (1.0 - blend) + tail_depth_m * blend,
+                h[:, column] * (1.0 - blend - shelf_blend)
+                + tail_depth_m * blend
+                + shelf_depth_m * shelf_blend,
                 0.0,
             )
             target_froude[:, column] = np.where(
                 wet_mask[:, column] != 0,
-                target_froude[:, column] * (1.0 - blend)
-                + tail_froude * blend,
+                target_froude[:, column] * (1.0 - blend - shelf_blend)
+                + tail_froude * blend
+                + shelf_froude * shelf_blend,
                 0.0,
             )
 
         for offset, relative_surface_m in surface_profile:
-            center_surface_m[control_index + offset] += (
-                relative_surface_m * severity
+            surface_relief_m[:, control_index + offset] += (
+                relative_surface_m * severity * lane
             )
 
     h = h.astype(np.float32)
@@ -771,7 +797,7 @@ def _write_runtime_water_bundle(
     )
     bed = np.where(
         wet_mask != 0,
-        center_surface_m[None, :] - h,
+        center_surface_m[None, :] + surface_relief_m - h,
         center_surface_m[None, :] + dry_bank_rise,
     ).astype(np.float32)
     u = (

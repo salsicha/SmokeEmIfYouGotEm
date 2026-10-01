@@ -1,5 +1,6 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "Materials/MaterialExpressionDesaturation.h"
 #include "Materials/MaterialExpressionNoise.h"
 
 namespace RaftSimEditorEnvironment
@@ -99,17 +100,21 @@ UMaterialExpression* BuildBatokaOrganicBasaltBaseColor(
         PrimaryMacroOutputIndex,
         SecondaryMacroOutputIndex);
 
+    // The macro albedo is a tan aerial rock photo; the cool tint cancels its
+    // red-yellow cast so the walls read as the black-grey Batoka basalt the
+    // photographs and outfitter descriptions show (dark grey ~0.05-0.07),
+    // not desaturated tan.
     UMaterialExpression* DarkMacro = Multiply(
         DeTiledMacro,
-        Vector(TEXT("BatokaBasaltTint"), FLinearColor(0.27f, 0.29f, 0.31f, 1.0f)));
+        Vector(TEXT("BatokaBasaltTint"), FLinearColor(0.20f, 0.235f, 0.30f, 1.0f)));
     UMaterialExpression* WeatheredMacro = Multiply(
         DeTiledMacro,
         Vector(
             TEXT("BatokaWeatheredInterflowTint"),
-            FLinearColor(0.45f, 0.34f, 0.30f, 1.0f)));
+            FLinearColor(0.30f, 0.27f, 0.28f, 1.0f)));
     UMaterialExpression* WeatheringAlpha = Multiply(
         MacroAntiTileNoise,
-        Scalar(TEXT("BatokaWeatheringVariationStrength"), 0.28f));
+        Scalar(TEXT("BatokaWeatheringVariationStrength"), 0.20f));
     UMaterialExpression* WeatheredSurface =
         Lerp(DarkMacro, WeatheredMacro, WeatheringAlpha);
 
@@ -160,7 +165,18 @@ UMaterialExpression* BuildBatokaOrganicBasaltBaseColor(
         Scalar(TEXT("BatokaErosionShadowScaleV18"), 0.70f),
         Scalar(TEXT("BatokaErosionHighlightScaleV18"), 0.98f),
         ErosionStainNoise);
-    return Multiply(TwoScaleBasalt, ErosionValueScale);
+    UMaterialExpression* ErodedBasalt = Multiply(TwoScaleBasalt, ErosionValueScale);
+
+    // The drape and both rock photos are warm tan, so the tint alone left
+    // the walls reading tan in game. The observed Batoka walls are black-grey
+    // basalt: remove most of the remaining hue (the weathering accent keeps a
+    // little) and lower the value, so they read dark against the sky and foam.
+    UMaterialExpressionDesaturation* NeutralBasalt =
+        NewObject<UMaterialExpressionDesaturation>(Material);
+    NeutralBasalt->Input.Expression = ErodedBasalt;
+    NeutralBasalt->Fraction.Expression = Scalar(TEXT("BatokaBasaltDesaturation"), 0.82f);
+    Add(NeutralBasalt);
+    return Multiply(NeutralBasalt, Scalar(TEXT("BatokaBasaltValueScale"), 0.62f));
 }
 
 UMaterialExpression* BuildBatokaOrganicBasaltColorCoverage(
@@ -174,7 +190,7 @@ UMaterialExpression* BuildBatokaOrganicBasaltColorCoverage(
     UMaterialExpressionScalarParameter* CoverageFloor =
         NewObject<UMaterialExpressionScalarParameter>(Material);
     CoverageFloor->ParameterName = TEXT("BatokaTerrainColorCoverageFloor");
-    CoverageFloor->DefaultValue = 0.78f;
+    CoverageFloor->DefaultValue = 0.97f;
     CoverageFloor->Group = TEXT("BatokaOrganicBasaltV16");
     Material->GetExpressionCollection().AddExpression(CoverageFloor);
     UMaterialExpressionAdd* BiasedCoverage =

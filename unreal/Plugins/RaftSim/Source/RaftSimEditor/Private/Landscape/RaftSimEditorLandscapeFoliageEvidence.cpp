@@ -2,6 +2,29 @@
 
 namespace RaftSimEditorEnvironment::LandscapeFoliage
 {
+UMaterialInterface* LoadReachRockMaterial(const FString& RiverId, FString& OutSummary)
+{
+    const TCHAR* Path = RiverId.Contains(TEXT("futaleufu"))
+        ? TEXT("/Game/RaftSim/Environment/FutaleufuRun/Rocks/MI_RaftSim_Futaleufu_GraniteRockV1."
+               "MI_RaftSim_Futaleufu_GraniteRockV1")
+        : RiverId.Contains(TEXT("chilko"))
+        ? TEXT("/Game/RaftSim/Environment/ChilkoRun/Rocks/MI_RaftSim_Chilko_BasaltRockV1."
+               "MI_RaftSim_Chilko_BasaltRockV1")
+        : nullptr;
+    if (!Path)
+    {
+        return nullptr;
+    }
+    UMaterialInterface* Material = LoadObject<UMaterialInterface>(nullptr, Path);
+    if (!Material)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Reach rock material missing (%s); run unreal/Scripts/create_tinted_rock_materials.py. "
+                 "The scan's mossy material stays.\n"), Path);
+    }
+    return Material;
+}
+
 TSharedPtr<FJsonObject> LoadEvidencePlacement(
     const FString& TerrainFolder, const TCHAR* FileName, const TCHAR* Schema, FString& OutSummary)
 {
@@ -31,7 +54,9 @@ FEvidenceCanopyCounts AddEvidenceCanopy(
     const TCHAR* Schema,
     const TCHAR* ComponentPrefix,
     const TCHAR* ActorTag,
-    const TCHAR* SourceDescription)
+    const TCHAR* SourceDescription,
+    TConstArrayView<UStaticMesh*> ExtraTreeForms,
+    UStaticMesh* AltUnderstoryMesh)
 {
     // Evidence canopy over the whole Landscape window (placement JSON from the
     // reach's evidence dressing builder): imagery-placed trees with inferred
@@ -53,29 +78,36 @@ FEvidenceCanopyCounts AddEvidenceCanopy(
     }
     const FString RiverId = Context.Candidate.PreviewSpec.RiverId;
     Counts.Expected = Rows->Num();
-    UStaticMesh* const Meshes[2] = {Context.BroadleafTreeMesh, Context.ConiferTreeMesh};
+    // Forms 0/1 mirror the reach's canopy components (and their materials);
+    // extra forms keep their own mesh materials.
+    TArray<UStaticMesh*> Meshes = {Context.BroadleafTreeMesh, Context.ConiferTreeMesh};
+    Meshes.Append(ExtraTreeForms.GetData(), ExtraTreeForms.Num());
     UHierarchicalInstancedStaticMeshComponent* const Sources[2] = {
         Context.BroadleafTreeInstances, Context.ConiferTreeInstances};
-    UHierarchicalInstancedStaticMeshComponent* Components[2] = {nullptr, nullptr};
-    FVector MeshSizes[2];
-    for (int32 Form = 0; Form < 2; ++Form)
+    TArray<UHierarchicalInstancedStaticMeshComponent*> Components;
+    TArray<FVector> MeshSizes;
+    bool bAllComponents = true;
+    for (int32 Form = 0; Form < Meshes.Num(); ++Form)
     {
-        Components[Form] = AddLandscapeCandidateInstancedMeshComponent(
-            Context.World, Meshes[Form],
-            FString::Printf(TEXT("%sCanopy%s_%s"), ComponentPrefix, Form == 0 ? TEXT("A") : TEXT("B"), *RiverId),
-            true);
-        if (Components[Form])
+        const FString Suffix = Form < 2 ? FString(Form == 0 ? TEXT("A") : TEXT("B")) : FString::Printf(TEXT("Form%d"), Form);
+        UHierarchicalInstancedStaticMeshComponent* Component = Meshes[Form]
+            ? AddLandscapeCandidateInstancedMeshComponent(
+                  Context.World, Meshes[Form], FString::Printf(TEXT("%sCanopy%s_%s"), ComponentPrefix, *Suffix, *RiverId), true)
+            : nullptr;
+        if (Component)
         {
-            Components[Form]->GetOwner()->Tags.Append(
+            Component->GetOwner()->Tags.Append(
                 {FName(ActorTag), TEXT("RaftSimImageryCanopyPositions"), TEXT("InferredVegetationNotSurveyedTrees")});
-            for (int32 Slot = 0; Slot < Sources[Form]->GetNumMaterials(); ++Slot)
+            for (int32 Slot = 0; Form < 2 && Slot < Sources[Form]->GetNumMaterials(); ++Slot)
             {
-                Components[Form]->SetMaterial(Slot, Sources[Form]->GetMaterial(Slot));
+                Component->SetMaterial(Slot, Sources[Form]->GetMaterial(Slot));
             }
         }
-        MeshSizes[Form] = GetLandscapeCandidateEffectiveMeshBounds(Meshes[Form]).GetSize();
+        bAllComponents &= Component != nullptr;
+        Components.Add(Component);
+        MeshSizes.Add(Meshes[Form] ? GetLandscapeCandidateEffectiveMeshBounds(Meshes[Form]).GetSize() : FVector::OneVector);
     }
-    if (Components[0] && Components[1])
+    if (bAllComponents)
     {
         for (const TSharedPtr<FJsonValue>& Value : *Rows)
         {
@@ -89,7 +121,7 @@ FEvidenceCanopyCounts AddEvidenceCanopy(
             const float Y = static_cast<float>((*Row)[1]->AsNumber());
             const float RadiusM = static_cast<float>((*Row)[3]->AsNumber());
             const float HeightM = static_cast<float>((*Row)[4]->AsNumber());
-            const int32 Form = FMath::Clamp(static_cast<int32>((*Row)[5]->AsNumber()), 0, 1);
+            const int32 Form = FMath::Clamp(static_cast<int32>((*Row)[5]->AsNumber()), 0, Meshes.Num() - 1);
             const float YawDegrees = static_cast<float>((*Row)[7]->AsNumber());
             const FVector& Size = MeshSizes[Form];
             const float CrownScale = 200.0f * RadiusM / FMath::Max(1.0f, static_cast<float>(FMath::Max(Size.X, Size.Y)));
@@ -109,14 +141,24 @@ FEvidenceCanopyCounts AddEvidenceCanopy(
             ? AddLandscapeCandidateInstancedMeshComponent(
                   Context.World, Context.ShrubMesh, FString::Printf(TEXT("%sUnderstory_%s"), ComponentPrefix, *RiverId), true)
             : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* AltUnderstoryComponent =
+        UnderstoryComponent && AltUnderstoryMesh
+            ? AddLandscapeCandidateInstancedMeshComponent(
+                  Context.World, AltUnderstoryMesh, FString::Printf(TEXT("%sUnderstoryB_%s"), ComponentPrefix, *RiverId), true)
+            : nullptr;
     if (UnderstoryComponent && Root->TryGetArrayField(TEXT("understory"), UnderstoryRows))
     {
         UnderstoryComponent->GetOwner()->Tags.Append({FName(ActorTag), TEXT("InferredVegetationNotSurveyedTrees")});
+        if (AltUnderstoryComponent)
+        {
+            AltUnderstoryComponent->GetOwner()->Tags.Append({FName(ActorTag), TEXT("InferredVegetationNotSurveyedTrees")});
+        }
         for (int32 Slot = 0; Slot < Context.ShrubInstances->GetNumMaterials(); ++Slot)
         {
             UnderstoryComponent->SetMaterial(Slot, Context.ShrubInstances->GetMaterial(Slot));
         }
         const FVector Size = GetLandscapeCandidateEffectiveMeshBounds(Context.ShrubMesh).GetSize();
+        const FVector AltSize = AltUnderstoryMesh ? GetLandscapeCandidateEffectiveMeshBounds(AltUnderstoryMesh).GetSize() : Size;
         Counts.Expected += UnderstoryRows->Num();
         for (const TSharedPtr<FJsonValue>& Value : *UnderstoryRows)
         {
@@ -125,15 +167,18 @@ FEvidenceCanopyCounts AddEvidenceCanopy(
             {
                 continue;
             }
-            // x_cm, y_cm, height_m, width_m, yaw_deg
+            // x_cm, y_cm, height_m, width_m, yaw_deg[, kind]; kind 1 uses the alternate understory.
+            const bool bAlt = AltUnderstoryComponent && Row->Num() >= 6 && static_cast<int32>((*Row)[5]->AsNumber()) == 1;
+            const FVector& RowSize = bAlt ? AltSize : Size;
             const float X = static_cast<float>((*Row)[0]->AsNumber());
             const float Y = static_cast<float>((*Row)[1]->AsNumber());
             const float WidthScale = 100.0f * static_cast<float>((*Row)[3]->AsNumber()) /
-                FMath::Max(1.0f, static_cast<float>(FMath::Max(Size.X, Size.Y)));
+                FMath::Max(1.0f, static_cast<float>(FMath::Max(RowSize.X, RowSize.Y)));
             const float HeightScale = 100.0f * static_cast<float>((*Row)[2]->AsNumber()) /
-                FMath::Max(1.0f, static_cast<float>(Size.Z));
+                FMath::Max(1.0f, static_cast<float>(RowSize.Z));
             Queries.AddGroundedInstance(
-                UnderstoryComponent, Context.ShrubMesh, FVector2D(X, Y), Queries.GetLandscapeHeight(X, Y) - 20.0f,
+                bAlt ? AltUnderstoryComponent : UnderstoryComponent, bAlt ? AltUnderstoryMesh : Context.ShrubMesh,
+                FVector2D(X, Y), Queries.GetLandscapeHeight(X, Y) - 20.0f,
                 FRotator(0.0f, static_cast<float>((*Row)[4]->AsNumber()), 0.0f),
                 FVector(WidthScale, WidthScale, HeightScale));
             ++Counts.Placed;
@@ -177,13 +222,17 @@ FObservedRockCounts AddObservedRockShells(
     }
     Counts.Expected = Rows->Num();
     const FString RiverId = Context.Candidate.PreviewSpec.RiverId;
+    // The reach's observed rock colour (grey granite, dark basalt) instead of
+    // the scan's mossy tan; the scan's shape, normal and roughness are kept.
+    UMaterialInterface* ReachRockMaterial = LoadReachRockMaterial(RiverId, Context.OutSummary);
     UHierarchicalInstancedStaticMeshComponent* Components[6] = {};
     FVector MeshSizes[6];
     for (int32 Variant = 0; Variant < 6; ++Variant)
     {
         UStaticMesh* Mesh = Context.ReviewedRockMeshes[Variant];
         Components[Variant] = AddLandscapeCandidateInstancedMeshComponent(
-            Context.World, Mesh, FString::Printf(TEXT("%s%d_%s"), ComponentPrefix, Variant, *RiverId), true);
+            Context.World, Mesh, FString::Printf(TEXT("%s%d_%s"), ComponentPrefix, Variant, *RiverId), true,
+            ReachRockMaterial);
         if (!Components[Variant])
         {
             return Counts;

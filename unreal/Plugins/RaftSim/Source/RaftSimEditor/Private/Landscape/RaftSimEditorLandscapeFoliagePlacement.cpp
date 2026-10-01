@@ -1751,14 +1751,30 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     // (physics/scripts/build_zambezi_evidence_dressing.py): Sentinel-2 May
     // vegetation cover at 10 m, where crowns are not resolved, so positions
     // are an inferred lattice inside the measured cover.
+    // The map is the October low-water gorge: the placement's form says
+    // which trees stay green then (Sentinel-2 October NDVI), and the rest
+    // stand leafless (form 2) or hold a few dry leaves (form 3); understory
+    // kind 1 is leafless scrub.
     FEvidenceCanopyCounts ZambeziUpperGorgeEvidenceCanopy;
     if (IsZambeziUpperGorgeRiverId(Spec.RiverId) && bPhysicalCorridor)
     {
+        UStaticMesh* DryBareTree = nullptr;
+        UStaticMesh* DrySparseTree = nullptr;
+        UStaticMesh* DryScrub = nullptr;
+        UMaterialInterface* VegetationMaterial =
+            Context.BroadleafTreeInstances ? Context.BroadleafTreeInstances->GetMaterial(0) : nullptr;
+        if (!LoadOrCreateZambeziDrySeasonVegetationAssets(
+                Context.World, VegetationMaterial, DryBareTree, DrySparseTree, DryScrub, Context.OutSummary))
+        {
+            return false;
+        }
+        UStaticMesh* const DryForms[] = {DryBareTree, DrySparseTree};
         ZambeziUpperGorgeEvidenceCanopy = AddEvidenceCanopy(
             Context, Queries, TEXT("physics/data/real_world/zambezi_batoka_gorge/terrain/upper_gorge_evidence_2025"),
             TEXT("upper_gorge_evidence_2025_canopy_placement.json"), TEXT("raftsim.zambezi.upper_gorge_evidence_canopy.v1"),
             TEXT("RaftSim_ZambeziUpperGorgeEvidence"), TEXT("RaftSimZambeziUpperGorgeEvidenceCanopy"),
-            TEXT("inferred lattice inside Sentinel-2 10 m vegetation cover"));
+            TEXT("inferred lattice inside Sentinel-2 10 m vegetation cover; October leaf state from Sentinel-2 NDVI"),
+            DryForms, DryScrub);
     }
     const int32 PacuareShorelineRockPlacedCount = PacuareCounts.PacuareShorelineRockPlacedCount;
     const int32 PacuareShorelineGroundCoverPlacedCount = PacuareCounts.PacuareShorelineGroundCoverPlacedCount;
@@ -2568,6 +2584,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     const int32 RunnableLaunchGroundCoverPlacedCount = ZambeziCounts.RunnableLaunchGroundCoverPlacedCount;
     const int32 RunnableLaunchWoodyPlacedCount = ZambeziCounts.RunnableLaunchWoodyPlacedCount;
     const bool bRunnableLaunchEcologyStrataValidated = ZambeziCounts.bRunnableLaunchEcologyStrataValidated;
+    const int32 ZambeziWaterlineFringePlacedCount = bZambeziWoodland ? AddZambeziWaterlineFringe(Context, Queries) : 0;
 
     const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
         PacuareCounts.EvidenceCanopyPlaced +
@@ -2584,7 +2601,8 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
              ? ZambeziEvidenceBankMosaicInstanceCount +
                  CameraVisibleWoodyPlacedCount +
                  RunnableLaunchGroundCoverPlacedCount +
-                 RunnableLaunchWoodyPlacedCount
+                 RunnableLaunchWoodyPlacedCount +
+                 ZambeziWaterlineFringePlacedCount
              : 0);
     OutResult.bDressingValidated =
         OutResult.DressingBoulderInstanceCount ==
@@ -2648,6 +2666,7 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
              ZambeziRunnableLaunchMinimumWoodyInstanceCount) &&
         bRunnableLaunchEcologyStrataValidated &&
         (!bZambeziWoodland || RunnableLaunchTalusPlacedCount >= 300) &&
+        (!bZambeziWoodland || ZambeziWaterlineFringePlacedCount >= 3000) &&
         (!bZambeziWoodland ||
          DryScarpOutcropPlacedCount >=
              ZambeziDryScarpOutcropMinimumInstanceCount) &&

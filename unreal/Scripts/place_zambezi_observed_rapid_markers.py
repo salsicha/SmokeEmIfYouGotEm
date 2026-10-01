@@ -61,15 +61,21 @@ def main():
             label = actor.get_actor_label()
             markers[label.split('_')[2]] = actor
     assert len(markers) == 25, len(markers)
-    # Landscape world offset from the existing markers at their digitised stations
-    offsets = []
-    for rapid in scenario['rapids']:
-        actor = markers[rapid['rapid_number']]
-        (lx, ly), _ = local_at(points, rapid['digitised_map_station_m'])
-        loc = actor.get_actor_location()
-        offsets.append((loc.x - lx, loc.y - ly))
-    ox = sum(o[0] for o in offsets) / len(offsets); oy = sum(o[1] for o in offsets) / len(offsets)
-    spread = max(math.hypot(o[0] - ox, o[1] - oy) for o in offsets)
+    # Landscape world offset from the existing markers: at their digitised
+    # stations (a map saved before the observed stationing) or already at the
+    # observed ones (a map the builder regenerated from the current scenario).
+    def offset_from(key):
+        offsets = []
+        for rapid in scenario['rapids']:
+            (lx, ly), _ = local_at(points, rapid[key])
+            loc = markers[rapid['rapid_number']].get_actor_location()
+            offsets.append((loc.x - lx, loc.y - ly))
+        ox = sum(o[0] for o in offsets) / len(offsets); oy = sum(o[1] for o in offsets) / len(offsets)
+        return ox, oy, max(math.hypot(o[0] - ox, o[1] - oy) for o in offsets)
+    ox, oy, spread = offset_from('digitised_map_station_m')
+    if spread >= 50.0:
+        ox, oy, spread = offset_from('station_m')
+        unreal.log(f'RaftSim Zambezi markers already at the observed stations (spread {spread:.1f} cm)')
     assert spread < 50.0, f'markers disagree on the Landscape offset by {spread:.1f} cm'
     rows = []
     for rapid in scenario['rapids']:

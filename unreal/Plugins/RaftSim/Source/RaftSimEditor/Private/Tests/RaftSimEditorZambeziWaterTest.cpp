@@ -186,15 +186,17 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
         }
     };
     TestScalar(TEXT("BatokaMacroAntiTileStrength"), 0.78f);
-    TestScalar(TEXT("BatokaWeatheringVariationStrength"), 0.28f);
+    TestScalar(TEXT("BatokaWeatheringVariationStrength"), 0.20f);
     TestScalar(TEXT("BatokaMineralShadowScale"), 0.62f);
     TestScalar(TEXT("BatokaMineralHighlightScale"), 0.96f);
     TestScalar(TEXT("BatokaMacroWeight"), 0.91f);
-    TestScalar(TEXT("BatokaTerrainColorCoverageFloor"), 0.78f);
+    TestScalar(TEXT("BatokaTerrainColorCoverageFloor"), 0.97f);
     TestScalar(TEXT("BatokaDetailColorScale"), 0.72f);
     TestScalar(TEXT("BatokaDetailColorWeight"), 0.16f);
     TestScalar(TEXT("BatokaErosionShadowScaleV18"), 0.70f);
     TestScalar(TEXT("BatokaErosionHighlightScaleV18"), 0.98f);
+    TestScalar(TEXT("BatokaBasaltDesaturation"), 0.82f);
+    TestScalar(TEXT("BatokaBasaltValueScale"), 0.62f);
     TestScalar(TEXT("BatokaDetailNormalWeight"), 0.38f);
     TestScalar(TEXT("BatokaDetailRoughnessWeight"), 0.30f);
     TestScalar(TEXT("BatokaWetBankAlbedoScale"), 0.62f);
@@ -209,14 +211,14 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
     if (BasaltTint)
     {
         TestTrue(
-            TEXT("Basalt is blue-gray and substantially darker than the old tan response"),
-            BasaltTint->Equals(FLinearColor(0.27f, 0.29f, 0.31f, 1.0f), 0.0001f));
+            TEXT("Basalt tint cancels the tan macro photo into black-grey basalt"),
+            BasaltTint->Equals(FLinearColor(0.20f, 0.235f, 0.30f, 1.0f), 0.0001f));
     }
     if (WeatheredTint)
     {
         TestTrue(
             TEXT("Weathering stays a bounded brown accent"),
-            WeatheredTint->Equals(FLinearColor(0.45f, 0.34f, 0.30f, 1.0f), 0.0001f));
+            WeatheredTint->Equals(FLinearColor(0.30f, 0.27f, 0.28f, 1.0f), 0.0001f));
     }
     const FLinearColor* WetBankTint = VectorDefaults.Find(TEXT("BatokaWetBankTint"));
     TestNotNull(TEXT("Conditioned wet-bank tint exists"), WetBankTint);

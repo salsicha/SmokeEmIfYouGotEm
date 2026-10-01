@@ -379,7 +379,7 @@ bool URaftSimStatefulDetailComponent::UpdateMeanFlow()
     FRaftSimDetailEntrainment::Build(FIntPoint(128,128),0.5f,BaseFlow);
     if (bMovingWindow)
     {
-        int32 Augmented=0;float MaxAdded=0,MaxCrestSource=0;
+        int32 Augmented=0;float MaxAdded=0,MaxCrestSource=0,MaxObservedSource=0;
         for (int32 Y=0;Y<128;++Y)for (int32 X=0;X<128;++X)
         {
             auto& F=BaseFlow[Y*128+X];
@@ -388,14 +388,17 @@ bool URaftSimStatefulDetailComponent::UpdateMeanFlow()
             // metres. Never reinterpret absolute Y as a route lateral offset.
             const FVector2D P(double(WindowOriginMeters.X)+X*.5,double(WindowOriginMeters.Y)+Y*.5);
             const float Crest=Water->SampleAcceptedBreakingSource(P);
-            const float Merged=FRaftSimDetailEntrainment::MergeBreakingSource(F,Crest);
+            // Photographed/observed whitewater (render-only appearance evidence)
+            // is a third estimate of the same source, not additive production.
+            const float Observed=Water->SampleObservedWhitewaterEntrainmentSource(P);
+            const float Merged=FRaftSimDetailEntrainment::MergeBreakingSource(F,FMath::Max(Crest,Observed));
             Augmented+=Merged>F.W;MaxAdded=FMath::Max(MaxAdded,Merged-F.W);
-            MaxCrestSource=FMath::Max(MaxCrestSource,Crest);F.W=Merged;
+            MaxCrestSource=FMath::Max(MaxCrestSource,Crest);MaxObservedSource=FMath::Max(MaxObservedSource,Observed);F.W=Merged;
         }
         if (!bReportedBreakingSource && Elapsed>=10.)
         {
-            UE_LOG(LogTemp,Display,TEXT("Moving detail accepted-crest source: augmented_wet_cells=%d max_added=%.9g max_crest=%.9g origin_m=(%.3f,%.3f); max union, no extra surface or density reset"),
-                Augmented,MaxAdded,MaxCrestSource,WindowOriginMeters.X,WindowOriginMeters.Y);
+            UE_LOG(LogTemp,Display,TEXT("Moving detail accepted-crest source: augmented_wet_cells=%d max_added=%.9g max_crest=%.9g max_observed=%.9g origin_m=(%.3f,%.3f); max union, no extra surface or density reset"),
+                Augmented,MaxAdded,MaxCrestSource,MaxObservedSource,WindowOriginMeters.X,WindowOriginMeters.Y);
             bReportedBreakingSource=true;
         }
     }

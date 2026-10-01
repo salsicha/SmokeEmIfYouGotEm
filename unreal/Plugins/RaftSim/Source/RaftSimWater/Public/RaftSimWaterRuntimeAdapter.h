@@ -462,6 +462,19 @@ public:
     bool HasObservedWhitewaterField() const { return ObservedWhitewaterField.IsValid(); }
     /** Observed whitewater fraction; 0 outside the field or its wet mask. */
     float SampleObservedWhitewaterAtRiverCoordinates(FVector2D StationLateralM) const;
+    /** Gain of the observed fraction as a breaking (entrainment) source for
+     * the GPU moving detail; 0 (default) keeps the detail's own sources. */
+    void SetObservedWhitewaterEntrainmentGain(float Gain)
+    {
+        ObservedWhitewaterEntrainmentGain = FMath::Clamp(Gain, 0.0f, 1.0f);
+    }
+    /** Observed entrainment source in [0,1]; 0 without a field or gain. */
+    float SampleObservedWhitewaterEntrainmentSource(const FVector2D& RiverCoordinatesMeters) const
+    {
+        return ObservedWhitewaterEntrainmentGain > 0.0f
+            ? ObservedWhitewaterEntrainmentGain * SampleObservedWhitewaterAtRiverCoordinates(RiverCoordinatesMeters)
+            : 0.0f;
+    }
 
     /**
      * Flow-warped presentation wave clock pushed by the visible water surface
@@ -675,6 +688,7 @@ private:
     FSupportBandField RaftSupportBandField;
     FSupportBandField PresentationBaselineField;
     FSupportBandField ObservedWhitewaterField;
+    float ObservedWhitewaterEntrainmentGain = 0.0f;
     float PresentationWaveClockSeconds = -1.0f;
 
 #if RAFTSIM_HAS_LIVE_SOLVER
