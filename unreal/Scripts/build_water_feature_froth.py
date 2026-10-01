@@ -1,6 +1,6 @@
 """Prepare a standalone finite plunging-jet pulse into a closed impact tank.
 
-Actual 3D FLIP liquid; subgrid foam/bubbles/spray are not resolved air volume.
+Actual 3D liquid; subgrid foam/bubbles/spray are not resolved air volume.
 No pre-authored splash, cavity or froth animation.
 """
 import argparse
@@ -13,6 +13,7 @@ import bpy
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_water_feature_lab import box, solid, flow, material, aim
+from prepare_modular_water_feature import settings_snapshot
 
 
 def nozzle_mesh():
@@ -39,11 +40,27 @@ def main():
                    help='Controlled solver boundary comparison; no geometry or inlet change')
     p.add_argument('--liquid-particle-radius', type=float, default=1.,
                    help='Primary liquid reconstruction radius in cell units, not mesh or optical radius')
+    p.add_argument('--modular', action='store_true',
+                   help='Keep all phases enabled but bake base liquid before mesh and secondary particles')
+    p.add_argument('--no-inflow-control', action='store_true',
+                   help='Matched pool control: retain geometry/settings but disable the jet for every frame')
+    p.add_argument('--timestep-refinement', type=int, choices=(1, 2, 4), default=1,
+                   help='Refine only time integration: multiply min/max substeps and divide CFL by this factor')
+    p.add_argument('--contained-inlet', action='store_true',
+                   help='Keep the emission cylinder inside the nozzle and remove artificial level-set dilation')
+    p.add_argument('--simulation-method', choices=('FLIP', 'APIC'), default='FLIP',
+                   help='Controlled particle/grid transport comparison; not a physical acceptance switch')
+    p.add_argument('--solver-export-probe', action='store_true',
+                   help='One-frame MODULAR code-export probe only; not a feature candidate or animation')
     args = p.parse_args(sys.argv[sys.argv.index('--')+1:])
     if not 80 <= args.resolution <= 160 or not 96 <= args.frames <= 168:
         p.error('Use resolution 80..160 and frames 96..168')
     if not .75 <= args.liquid_particle_radius <= 1.25:
         p.error('Use liquid particle radius .75..1.25 for controlled comparisons')
+    if args.solver_export_probe:
+        if not args.modular:
+            p.error('The one-frame export probe requires MODULAR staging')
+        args.frames = 1
     args.output.mkdir(parents=True, exist_ok=False)
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
@@ -60,8 +77,9 @@ def main():
     bpy.context.collection.objects.link(tube)
     tube.data.materials.append(material('Nozzle ceramic', (.08, .10, .12), .35))
     tube.modifiers.new('Shared physical nozzle', 'FLUID').fluid_type = 'EFFECTOR'
-    bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=.145, depth=.23,
-                                       location=(1., 0., 1.535))
+    inlet_bottom, inlet_top = (1.48 if args.contained_inlet else 1.42), 1.65
+    bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=.145, depth=inlet_top-inlet_bottom,
+                                       location=(1., 0., (inlet_top+inlet_bottom)/2))
     source = bpy.context.object
     source.name = 'Finite downward jet source'
     mod = source.modifiers.new('Prescribed new-liquid velocity only', 'FLUID')
@@ -70,19 +88,24 @@ def main():
     settings.flow_type, settings.flow_behavior = 'LIQUID', 'INFLOW'
     settings.use_initial_velocity = True
     settings.velocity_coord = (0., 0., -1.8)
-    settings.surface_distance = .5
-    for frame, enabled in ((1, True), (72, True), (73, False), (args.frames, False)):
-        settings.use_inflow = enabled
+    settings.surface_distance = 0. if args.contained_inlet else .5
+    inlet_keys = [(1, True), (72, True), (73, False)]
+    if args.frames > 73:
+        inlet_keys.append((args.frames, False))
+    for frame, enabled in inlet_keys:
+        settings.use_inflow = enabled and not args.no_inflow_control
         settings.keyframe_insert(data_path='use_inflow', frame=frame)
     source.hide_render = True
     scene.frame_set(1)
     domain = box('Feature liquid', (0., -.8, -.1), (2., .8, 2.8))
-    mod = domain.modifiers.new('3D FLIP water', 'FLUID')
+    mod = domain.modifiers.new('3D '+args.simulation_method+' water', 'FLUID')
     mod.fluid_type = 'DOMAIN'
     s = mod.domain_settings
     s.domain_type = 'LIQUID'
+    s.export_manta_script = args.solver_export_probe
+    s.simulation_method = args.simulation_method
     s.resolution_max = args.resolution
-    s.cache_type = 'ALL'
+    s.cache_type = 'MODULAR' if args.modular else 'ALL'
     s.cache_frame_start, s.cache_frame_end = 1, args.frames
     s.cache_directory = str((args.output/'cache').resolve())
     s.cache_resumable = True
@@ -91,7 +114,8 @@ def main():
     s.mesh_scale = 2
     s.use_spray_particles = s.use_foam_particles = s.use_bubble_particles = True
     s.use_adaptive_timesteps = True
-    s.timesteps_min, s.timesteps_max, s.cfl_condition = 2, 8, 2.
+    n = args.timestep_refinement
+    s.timesteps_min, s.timesteps_max, s.cfl_condition = 2*n, 8*n, 2./n
     s.use_fractions = args.fractional_obstacles
     s.particle_radius = args.liquid_particle_radius
     s.use_collision_border_top = False
@@ -146,18 +170,36 @@ def main():
                   blend=str(blend), source_script=str(Path(__file__).resolve()),
                   blender_version=bpy.app.version_string, dimensions_m=[2., 1.6, 2.9],
                   resolution=args.resolution, approximate_cell_m=2.9/args.resolution,
-                  frames=args.frames, fps=24, initial_depth_m=.35,
+                  simulation_method=s.simulation_method,
+                  frames=args.frames, fps=24, initial_depth_m=.33,
+                  initial_liquid_bottom_m=.02, initial_water_surface_m=.35,
                   jet_center_xy_m=[1., 0.], emitter_radius_m=.145,
-                  emitter_z_bounds_m=[1.42, 1.65], nozzle_inner_radius_m=.15,
+                  emitter_z_bounds_m=[inlet_bottom, inlet_top], nozzle_inner_radius_m=.15,
+                  contained_inlet=args.contained_inlet, emitter_surface_distance_cells=float(settings.surface_distance),
                   nozzle_outer_radius_m=.19, nozzle_z_bounds_m=[1.45, 1.75],
-                  inlet_velocity_mps=[0., 0., -1.8], inflow_frames=[1, 72],
-                  nominal_flux_m3s=math.pi*.145**2*1.8, actual_flux_measured=False,
+                  inlet_velocity_mps=[0., 0., -1.8], inflow_frames=[] if args.no_inflow_control else [1, min(72, args.frames)],
+                  nominal_flux_m3s=0. if args.no_inflow_control else math.pi*.145**2*1.8, actual_flux_measured=False,
                   gravity_mps2=9.80665, outlet=None, fractional_obstacles=args.fractional_obstacles,
                   liquid_particle_radius_cells=float(s.particle_radius),
+                  timestep_refinement=n, timestep_min=int(s.timesteps_min),
+                  timestep_max=int(s.timesteps_max), cfl_condition=float(s.cfl_condition),
                   physical_accuracy_accepted=False, visual_accuracy_accepted=False,
                   boundaries='Closed bottom/sides, open top; finite inflow. Front/side collision boundaries invisible. Pool level rises; no fixed-head drain.',
                   limitations='Synthetic startup/pulse experiment, not measured jet or calibrated CFD. No resolved gas phase, film breakup or air-volume fraction. Secondary particles are heuristic samples; number and radius are not measured bubble population. Boundary and nozzle voxelization, mass budget and resolution dependence remain open.')
+    if args.no_inflow_control:
+        report.update(experiment='Matched pool with jet disabled throughout', no_inflow_control=True,
+                      boundaries='Closed bottom/sides, open top; jet disabled. Original pool geometry settles under gravity.',
+                      limitations='Diagnostic control retains the original pool 20 mm above the floor, so initial gravitational settling remains. No jet injection. Late volume drift is tested; this is not a froth deliverable.')
+    if args.solver_export_probe:
+        report.update(experiment='One-frame generated solver-code export probe',
+                      solver_export_probe=True,
+                      limitations='One frame only to inspect this installed build\'s generated code. Not a physical candidate, complete jet bake, mesh, aerated phase or animation.')
     (args.output/'setup.json').write_text(json.dumps(report, indent=2))
+    if args.modular:
+        report.update(bake_schedule='MODULAR',
+                      staging_scope='Base liquid first; mesh and secondary stages remain required for froth.')
+        (args.output/'setup.json').write_text(json.dumps(report, indent=2))
+        (args.output/'domain-settings.json').write_text(json.dumps(settings_snapshot(s), indent=2))
     print('FROTH_PREPARED', json.dumps(report), flush=True)
 
 

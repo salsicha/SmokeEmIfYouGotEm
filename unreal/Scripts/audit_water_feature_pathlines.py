@@ -56,7 +56,7 @@ def outside(p, bounds):
     return None
 
 
-def advance(track, a, b, frame, fps, substeps, bounds):
+def advance(track, a, b, frame, fps, substeps, bounds, support_description='liquid-particle'):
     if track['stopped']:
         return
     p = np.array(track['positions_m'][-1], dtype=float)
@@ -64,13 +64,13 @@ def advance(track, a, b, frame, fps, substeps, bounds):
     for j in range(substeps):
         v = interpolate(a, b, p, j/substeps)
         if v is None:
-            track['stopped'] = 'insufficient local liquid-particle support'
+            track['stopped'] = f'insufficient local {support_description} support'
             break
         midpoint = p+.5*dt*v
         reason = outside(midpoint, bounds)
         vm = None if reason else interpolate(a, b, midpoint, (j+.5)/substeps)
         if vm is None:
-            track['stopped'] = reason or 'insufficient midpoint liquid-particle support'
+            track['stopped'] = reason or f'insufficient midpoint {support_description} support'
             break
         candidate = p+dt*vm
         reason = outside(candidate, bounds)

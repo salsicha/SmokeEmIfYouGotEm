@@ -12,14 +12,20 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_water_feature_lab import box
+from water_feature_grid_alignment import aligned_domain
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--resolution', type=int, default=80)
+    parser.add_argument('--simulation-method', choices=('FLIP', 'APIC'), default='FLIP')
+    parser.add_argument('--export-solver-script', action='store_true',
+                        help='Export this installed build\'s generated solver script for read-only mechanism review')
     parser.add_argument('--domain-xy', type=float, nargs=2, default=[6., 1.6],
                         help='Match horizontal domain dimensions; vertical bounds stay -0.1..2.8 m')
+    parser.add_argument('--grid-aligned-domain', action='store_true',
+                        help='Match grid-aligned authoring while retaining the nominal domain center')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
     if not 48 <= args.resolution <= 160:
         parser.error('Resolution must match a supported laboratory case (48..160)')
@@ -39,12 +45,15 @@ def main():
     mod.fluid_type = 'FLOW'
     mod.flow_settings.flow_type = 'LIQUID'
     mod.flow_settings.flow_behavior = 'GEOMETRY'
-    domain = box('Calibration domain', (0., -args.domain_xy[1]/2, -.1),
-                 (args.domain_xy[0], args.domain_xy[1]/2, 2.8))
+    lower, upper = (0., -args.domain_xy[1]/2, -.1), (args.domain_xy[0], args.domain_xy[1]/2, 2.8)
+    alignment = aligned_domain(lower, upper, args.resolution) if args.grid_aligned_domain else None
+    domain = box('Calibration domain', alignment['lower_m'] if alignment else lower,
+                 alignment['upper_m'] if alignment else upper)
     mod = domain.modifiers.new('FLIP calibration', 'FLUID')
     mod.fluid_type = 'DOMAIN'
     settings = mod.domain_settings
     settings.domain_type = 'LIQUID'
+    settings.simulation_method = args.simulation_method
     settings.resolution_max = args.resolution
     settings.flip_ratio = .95
     settings.cache_type = 'ALL'
@@ -52,6 +61,7 @@ def main():
     settings.cache_frame_end = 12
     settings.cache_directory = str((args.output/'cache').resolve())
     settings.cache_resumable = True
+    settings.export_manta_script = args.export_solver_script
     settings.timesteps_min = 2
     settings.timesteps_max = 8
     settings.cfl_condition = 2.
@@ -75,6 +85,9 @@ def main():
             raise RuntimeError('Missing particles or contact invalidated free fall')
         state = obj.modifiers[0].domain_settings
         nx, ny, nz = state.domain_resolution
+        if alignment:
+            assert [nx, ny, nz] == alignment['expected_grid_cells']
+            np.testing.assert_allclose(state.cell_size, [alignment['isotropic_cell_m']]*3, atol=1e-7)
         grid = np.array(state.velocity_grid[:]).reshape(nz, ny, nx, 3)
         origin = np.array(obj.matrix_world @ state.start_point)
         centroid = pos.mean(axis=0)
@@ -95,7 +108,11 @@ def main():
     max_residual = float(np.max(np.abs(np.polyval(fit, t)-z)))
     grid_v = np.array([row['interior_grid_velocity_div_resolution'][2] for row in rows])
     grid_relative_error = float(np.max(np.abs(grid_v-v))/max(np.max(np.abs(v)), 1e-9))
-    report = dict(blender=bpy.app.version_string, domain_dimensions_m=[*args.domain_xy, 2.9],
+    report = dict(blender=bpy.app.version_string,
+        domain_dimensions_m=alignment['dimensions_m'] if alignment else [*args.domain_xy, 2.9],
+        grid_aligned_domain=bool(alignment), grid_alignment=alignment,
+        simulation_method=settings.simulation_method,
+        solver_script_export_requested=bool(settings.export_manta_script),
         resolution=args.resolution, fps=24, requested_gravity_mps2=-9.80665,
         fitted_centroid_acceleration_mps2=acceleration,
         raw_velocity_slope_per_second=raw_slope,

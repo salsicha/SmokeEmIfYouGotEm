@@ -15,6 +15,8 @@ def main():
     blend = Path(bpy.data.filepath).resolve()
     root = blend.parent
     setup = json.loads((root/'setup.json').read_text())
+    if setup.get('rejected_before_bake'):
+        raise ValueError('Prepared case failed its physical preflight; preserve it as evidence, do not bake')
     domain = bpy.data.objects['Feature liquid']
     settings = domain.modifiers[0].domain_settings
     cache = Path(bpy.path.abspath(settings.cache_directory)).resolve()

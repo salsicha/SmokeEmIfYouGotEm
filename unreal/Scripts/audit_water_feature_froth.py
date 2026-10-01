@@ -22,6 +22,8 @@ def main():
     cal = json.loads(args.calibration.read_text())
     if setup['case'] != 'froth' or not cal['passed'] or any(cal[k] != setup[k] for k in ('resolution', 'fps')) or cal['domain_dimensions_m'] != setup['dimensions_m'] or cal['blender'] != bpy.app.version_string:
         raise ValueError('Wrong case or unmatched calibration')
+    if cal.get('simulation_method', 'FLIP') != setup.get('simulation_method', 'FLIP'):
+        raise ValueError('Calibration transport method does not match the scene')
     rows = []
     settings = bpy.data.objects['Feature liquid'].modifiers[0].domain_settings
     secondary_settings = {}
@@ -62,8 +64,7 @@ def main():
                         jets.append(dict(z_m=z, count=int(selected.sum()),
                             mean_vertical_mps=float(vel[selected, 2].mean()) if selected.any() else None,
                             downward_fraction=float(np.mean(vel[selected, 2] < 0)) if selected.any() else None,
-                            median_radius_m=float(np.median(radial[selected])) if selected.any() else None,
-                            ideal_no_drag_speed_mps=float(np.sqrt(1.8**2+2*9.80665*(1.42-z)))))
+                            median_radius_m=float(np.median(radial[selected])) if selected.any() else None))
                     wall = (radial > .165) & (radial < .175) & (pos[:, 2] > 1.47) & (pos[:, 2] < 1.73)
                     primary_diagnostics = dict(particles=count, deeply_below_floor=int(np.sum(pos[:, 2] < -.02)),
                                                inside_nozzle_midwall=int(wall.sum()))

@@ -14,6 +14,7 @@ import bpy
 from mathutils import Vector
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from liquid_review_geometry import height_volume_geometry
+from water_feature_grid_alignment import aligned_domain
 
 
 def box(name, lo, hi):
@@ -86,7 +87,13 @@ def main():
     parser.add_argument('--approach-height', type=float, default=0., help='Wave/obstacle approach bed elevation, tapering to zero by x=1.5 m')
     parser.add_argument('--bake', action='store_true')
     parser.add_argument('--fractional-obstacles', action='store_true', help='Use the solver fractional-cell obstacle boundary for a controlled comparison')
+    parser.add_argument('--grid-aligned-domain', action='store_true',
+                        help='Align domain bounds to isotropic allocation; preserve center and collider/source meshes')
+    parser.add_argument('--modular', action='store_true',
+                        help='Prepare all phases but bake base liquid before mesh/secondary qualification')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
+    if args.bake and args.modular:
+        parser.error('Use bake_prepared_water_feature_data.py for guarded modular base staging')
     if args.case in ('standing-wave', 'boulder-pillow', 'eddy') and (args.chute or args.ledge_height is not None):
         parser.error('Wave/obstacle cases use an approach bed, not a ledge/chute')
     if not 0. <= args.approach_height <= .8 or (args.approach_height and args.case not in ('standing-wave', 'boulder-pillow', 'eddy')):
@@ -207,13 +214,15 @@ def main():
     flow('Constant inlet', (.025, -.78, shelf_z+.025),
          (.55, .78, shelf_z+inlet_depth), 'INFLOW', (inlet_u, 0., 0.))
     flow('Level drain', (5.5, -.82, tailwater_z), (6.15, .82, 2.8), 'OUTFLOW')
-    domain = box('Feature liquid', (0., -.8, -.1), (6., .8, 2.8))
+    alignment = aligned_domain((0., -.8, -.1), (6., .8, 2.8), args.resolution) if args.grid_aligned_domain else None
+    domain = box('Feature liquid', alignment['lower_m'] if alignment else (0., -.8, -.1),
+                 alignment['upper_m'] if alignment else (6., .8, 2.8))
     mod = domain.modifiers.new('3D FLIP water', 'FLUID')
     mod.fluid_type = 'DOMAIN'
     s = mod.domain_settings
     s.domain_type = 'LIQUID'
     s.resolution_max = args.resolution
-    s.cache_type = 'ALL'
+    s.cache_type = 'MODULAR' if args.modular else 'ALL'
     s.cache_frame_start = 1
     s.cache_frame_end = args.frames
     s.cache_directory = str((args.output/'cache').resolve())
@@ -286,7 +295,8 @@ def main():
     bpy.ops.wm.save_as_mainfile(filepath=str(blend))
     report = dict(case=args.case, blender_version=bpy.app.version_string,
                   source_script=str(Path(__file__).resolve()), blend=str(blend),
-                  dimensions_m=[6., 1.6, 2.9], gravity_mps2=9.80665,
+                  dimensions_m=alignment['dimensions_m'] if alignment else [6., 1.6, 2.9], gravity_mps2=9.80665,
+                  grid_aligned_domain=bool(alignment), grid_alignment=alignment,
                   resolution=args.resolution, approximate_cell_m=6/args.resolution,
                   fractional_obstacles=args.fractional_obstacles,
                   inlet_velocity_mps=inlet_u, inlet_depth_m=inlet_depth,
@@ -308,6 +318,12 @@ def main():
                   boundaries='Closed sides; invisible front wall; prescribed inlet; artificial level drain.',
                   limitations='Uncalibrated coarse FLIP; unresolved bubbles; no two-way air phase; no measured turbulence or mass budget.')
     (args.output/'setup.json').write_text(json.dumps(report, indent=2))
+    if args.modular:
+        from prepare_modular_water_feature import settings_snapshot
+        report.update(bake_schedule='MODULAR',
+                      staging_scope='All phases enabled; base liquid first, mesh/secondary still required for the feature.')
+        (args.output/'setup.json').write_text(json.dumps(report, indent=2))
+        (args.output/'domain-settings.json').write_text(json.dumps(settings_snapshot(s), indent=2))
     if args.bake:
         start = time.monotonic()
         result = bpy.ops.fluid.bake_all()
