@@ -219,6 +219,12 @@ class RAFTSIMPHYSICS_API URaftSimChronoRuntimeAdapter : public UObject
     friend class FRaftSimCrewOccupancyTest;
 
 public:
+    /** Read-only configuration for in-engine controls using identical loading. */
+    const FRaftSimFlexParameters& GetFlexibleParameters() const { return FlexParameters; }
+    const TArray<FRaftSimFlexCrewSeat>& GetFlexibleSeats() const { return FlexSeats; }
+    FORCEINLINE bool SampleBoundFlexibleWater(const FVector& WorldCm, FRaftSimFlexUniformWater& OutWater) const
+    { return FlexibleWaterFieldSampler && FlexibleWaterFieldSampler(WorldCm, OutWater); }
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Chrono")
     void ConfigureRaftBody(const FRaftSimRaftBodyConfig& InConfig);
 

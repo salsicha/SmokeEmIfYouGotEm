@@ -49,6 +49,21 @@ How it is built:
   moves with the upper spine. `RaftSim.CC0NeckCollar 0` hides it.
 - The guide's eyewear and collar are hidden in the first-person view.
 
+The vest is fitted to each body:
+- **Depth and position:** measured once on the seated body. The chest
+  front and the back are taken from the posed vertices in a central strip,
+  and the vest's depth and fore-aft position are set so both carriers sit
+  about 5 mm off them. Depth comes out at x0.99-1.09.
+- **Taper:** a seated paddler's torso is wedge-shaped. The chest front holds
+  at 15-17 cm from the spine to mid-chest and falls back to 8-12 cm under
+  the collarbones. The back runs from about -3 cm at the lumbar curve to
+  -8 cm at the shoulder blades. The vest mesh (`build_production_whitewater_pfd.py`
+  v13) is shaped to match:
+  - its front leans in up to 5.5 cm above mid-chest;
+  - its back moves in up to 4.3 cm over the lumbar curve.
+- **Side panels:** foam panels in the vest's colour close the flanks under
+  the arms, just inside the side adjustment straps.
+
 ## How they behave
 
 - **Swimming:** in an aimed rescue, each person swims as well as they do:
@@ -109,7 +124,6 @@ Rigged gear (`ARaftSimRaftActor::BuildRaftGear`):
 - **Movement:** individual paddling styles are not modelled. The crew
   paddles in sync on the guide's call.
 - **Voices:** chatter is text only. The crew still has no recorded voice.
-- **Vest fit:** seen side-on, the PFD's front and back panels stand a few
-  centimetres off the chest and back, and the sides are open. The vest's fit
-  is unchanged in this pass.
+- **Vest fit:** the vest is one rigid shell. It is fitted to the resting
+  seated chest and does not flex with the stroke.
 - **Gear is rigid:** the bag, lines and drybag do not flex with the tubes.

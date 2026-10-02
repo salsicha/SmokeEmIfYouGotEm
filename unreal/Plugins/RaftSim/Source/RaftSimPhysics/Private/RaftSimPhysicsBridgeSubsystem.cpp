@@ -165,7 +165,7 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
                     return false;
                 }
                 FRaftSimWaterSample Sample;
-                if (!Water->SampleWaterAtWorldPosition(WorldPositionCm, Sample))
+                if (!Water->SampleRaftInteractionWaterAtWorldPosition(WorldPositionCm, Sample))
                 {
                     return false;
                 }

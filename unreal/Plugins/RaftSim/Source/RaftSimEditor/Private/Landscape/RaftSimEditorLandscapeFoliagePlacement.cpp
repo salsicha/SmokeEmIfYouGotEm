@@ -1,4 +1,5 @@
 #include "Landscape/RaftSimEditorLandscapeFoliageInternal.h"
+#include "Landscape/RaftSimEditorZambeziWallRelief.h"
 #include <type_traits>
 
 namespace RaftSimEditorEnvironment::LandscapeFoliage
@@ -168,8 +169,20 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
         return SurfaceWorldZ +
             Candidate.PreviewSpec.FlowWaterLevelOffsetCm;
     };
-    auto GetLandscapeHeight = [Landscape, &Spec](float X, float Y)
+    // L_Zambezi's render walls carry inferred lava-flow ledges
+    // (FZambeziWallRelief); its dressing sits on them, not on the smooth
+    // Landscape underneath.
+    FZambeziWallRelief WallRelief;
+    if (bZambeziWoodland)
     {
+        WallRelief.Initialize(Candidate, Landscape, OutSummary);
+    }
+    auto GetLandscapeHeight = [Landscape, &Spec, &WallRelief](float X, float Y)
+    {
+        if (WallRelief.IsValid())
+        {
+            return WallRelief.HeightWithReliefCm(X, Y, Spec.FlowWaterLevelOffsetCm - 24.0f);
+        }
         return Landscape->GetHeightAtLocation(FVector(X, Y, 0.0f), EHeightfieldSource::Editor)
             .Get(Spec.FlowWaterLevelOffsetCm - 24.0f);
     };

@@ -251,6 +251,10 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
         "back_panel_lateral_wrap_depth_cm": 3.2,
         "rigid_side_foam_wings": 0,
         "side_webbing_connector_profile": "curved torso-following fabric",
+        "seated_torso_taper": (
+            "front leans in up to 5.5 cm above mid-chest; back moves in up to 4.3 cm "
+            "over the lumbar curve (measured on the five seated CC0 bodies)"
+        ),
         "side_webbing_connector_thickness_cm": 0.22,
         "side_webbing_connector_height_cm": 1.05,
         "front_pocket_flat_exterior_faces": 0,

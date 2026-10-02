@@ -1,5 +1,8 @@
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimDynamicsStageAudit.h"
+#include "RaftSimImplicitDrag.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 
 namespace
 {
@@ -458,6 +461,13 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     // sampler; forces are evaluated from the pre-impulse state, exactly as
     // the actor's integrator did.
     double SubmergedFraction = 0.0;
+    RaftSimImplicitDrag::FSystem ImplicitDrag;
+    bool bImplicitDragCandidate=false;
+#if !UE_BUILD_SHIPPING
+    // Lab-only until severe flips, controls, recovery and normal play pass.
+    static const bool Candidate=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFlipStableDragCandidate"));
+    bImplicitDragCandidate=Candidate;
+#endif
     const bool bSupportStage = static_cast<bool>(WaterSurfaceSampler) && TubeSamplePointsM.Num() > 0;
     if (bSupportStage)
     {
@@ -709,8 +719,19 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
                         (-static_cast<double>(
                              RaftConfig.ForwardSlicingDragCoefficient) *
                          PointWeight * SlicingDragSpeedMps);
-                ForceN += PointDragForceN;
-                TorqueNm += FVector::CrossProduct(WorldOffset, PointDragForceN);
+                if(bImplicitDragCandidate)
+                {
+                    const double Blunt=double(RaftConfig.LinearDragCoefficient)*PointWeight*DragSpeedMps;
+                    const double Slicing=double(RaftConfig.ForwardSlicingDragCoefficient)*PointWeight*SlicingDragSpeedMps;
+                    const double Correction=bHasHullForward && FVector::DotProduct(RelativeVelocity,HullForward)>0.
+                        ? (Slicing-Blunt)*SlicingFraction : 0.;
+                    ImplicitDrag.AddPoint(WorldOffset,PointWaterVelocityMps,Blunt,Correction,HullForward);
+                }
+                else
+                {
+                    ForceN += PointDragForceN;
+                    TorqueNm += FVector::CrossProduct(WorldOffset, PointDragForceN);
+                }
             }
         }
 
@@ -718,7 +739,9 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         // speeds, leaving the buoyancy spring underdamped.
         if (SubmergedFraction > 0.0)
         {
-            ForceN.Z += -static_cast<double>(RaftConfig.HeaveDampingNsPerM) *
+            if(bImplicitDragCandidate)
+                ImplicitDrag.K[2][2]+=double(RaftConfig.HeaveDampingNsPerM)*SubmergedFraction;
+            else ForceN.Z += -static_cast<double>(RaftConfig.HeaveDampingNsPerM) *
                         SubmergedFraction * State.LinearVelocity.Z;
         }
     }
@@ -741,8 +764,18 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         TorqueNm.Z / Inertia.Z);
 
     // Semi-implicit fixed-step update (RaftState6DoF.advance semantics).
-    State.LinearVelocity += LinearAcceleration * Dt;
-    State.AngularVelocity += AngularAcceleration * Dt;
+    if(bImplicitDragCandidate)
+    {
+        FVector DragForce,DragTorque;
+        if(!ImplicitDrag.Advance(State,MassKg,Inertia,ForceN,TorqueNm,Dt,DragForce,DragTorque))
+        {UE_LOG(LogTemp,Error,TEXT("Flip lab implicit drag refused non-positive/non-finite solve"));return false;}
+        ForceN+=DragForce;TorqueNm+=DragTorque;
+    }
+    else
+    {
+        State.LinearVelocity += LinearAcceleration * Dt;
+        State.AngularVelocity += AngularAcceleration * Dt;
+    }
     if (bSupportStage)
     {
         State.AngularVelocity *= FMath::Clamp(

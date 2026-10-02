@@ -22,7 +22,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd"
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_pfd_manifest.json"
-GENERATOR_VERSION = 12
+GENERATOR_VERSION = 13
 MATERIAL_NAMES = [
     "PfdShell",
     "PfdWebbing",
@@ -974,6 +974,45 @@ def validate(mesh_object: bpy.types.Object) -> dict[str, object]:
     }
 
 
+def smoothstep(edge0: float, edge1: float, value: float) -> float:
+    t = min(max((value - edge0) / (edge1 - edge0), 0.0), 1.0)
+    return t * t * (3.0 - 2.0 * t)
+
+
+def seated_front_taper_cm(z: float) -> float:
+    """How far the front leans in toward the upper chest (vest-local cm)."""
+    t = min(max((z - 8.0) / 13.0, 0.0), 1.25)
+    return 5.5 * t**1.5
+
+
+def seated_back_taper_cm(z: float) -> float:
+    """How far the back moves in toward the lumbar curve (vest-local cm)."""
+    return 4.3 * smoothstep(9.0, -4.0, z) * (1.0 - 0.3 * smoothstep(-8.0, -17.0, z))
+
+
+def taper_to_seated_torso(obj: bpy.types.Object) -> None:
+    """Fit the rigid shell to the seated paddler's wedge-shaped torso.
+
+    Measured on all five CC0 bodies seated (chest frame, central 24 cm strip):
+    the chest front holds at 15-17 cm from the spine frame to mid-chest, then
+    falls back to 8-12 cm under the collarbones; the back runs from about -3 cm
+    at the lumbar curve to -8 cm at the shoulder blades. A parallel-sided vest
+    stood 5-7 cm off the upper chest and about 4 cm off the lower back. The
+    front half leans in above mid-chest and the back half moves in over the
+    lumbar region, both blended to nothing across the flanks so the side
+    straps and panels stay continuous.
+    """
+    world = obj.matrix_world
+    local = world.inverted()
+    for vertex in obj.data.vertices:
+        point = world @ vertex.co
+        front = smoothstep(0.0, 10.0, point.x)
+        back = smoothstep(0.0, -10.0, point.x)
+        point.x += -front * seated_front_taper_cm(point.z) + back * seated_back_taper_cm(point.z)
+        vertex.co = local @ point
+    obj.data.update()
+
+
 def main() -> None:
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
     reset_scene()
@@ -985,6 +1024,7 @@ def main() -> None:
         "PfdLabel": material("PfdLabel", (0.08, 0.085, 0.09, 1.0), 0.68),
     }
     mesh_object = join_and_uv(build_pfd(materials), materials)
+    taper_to_seated_torso(mesh_object)
     audit = validate(mesh_object)
     bpy.context.view_layer.objects.active = mesh_object
     mesh_object.select_set(True)
@@ -1070,6 +1110,7 @@ def main() -> None:
             "back_panel_lateral_wrap_depth_cm": 3.2,
             "rigid_side_foam_wings": 0,
             "side_webbing_connector_profile": "curved torso-following fabric",
+            "seated_torso_taper": "front leans in up to 5.5 cm above mid-chest; back moves in up to 4.3 cm over the lumbar curve (measured on the five seated CC0 bodies)",
             "side_webbing_connector_thickness_cm": 0.22,
             "side_webbing_connector_height_cm": 1.05,
             "front_pocket_flat_exterior_faces": 0,

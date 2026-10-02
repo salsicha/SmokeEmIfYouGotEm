@@ -47,6 +47,7 @@ class FRaftSimDetailWaterCS : public FGlobalShader
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float>,StepInitialActivity)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float>,NextActivity)
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,MeanFlow)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,FoamTransport)
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,PreviousState)
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,StepInitialState)
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float2>,PressurePotential)
@@ -285,10 +286,18 @@ void FRaftSimDetailWaterGPU::Reset()
 bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
     const FRaftSimDetailWaterGrid& Grid,const TArray<FVector4f>& Flow,int32 Steps,
     const TArray<FVector4f>* InitialState,FRHIGPUBufferReadback* Readback,FString& Error,
-    const TArray<float>* InitialActivity,FRHIGPUBufferReadback* ActivityReadback)
+    const TArray<float>* InitialActivity,FRHIGPUBufferReadback* ActivityReadback,
+    const TArray<FVector4f>* FoamTransport)
 {
     check(IsInRenderingThread());
     if (!Grid.Validate(Flow,Error))return false;
+    if(FoamTransport)
+    {
+        if(!Grid.Validate(*FoamTransport,Error))return false;
+        for(int32 I=0;I<Flow.Num();++I)
+            if((*FoamTransport)[I].X!=Flow[I].X || (*FoamTransport)[I].W!=Flow[I].W)
+            {Error=TEXT("Foam transport may change only surface velocity, not depth/source ownership");return false;}
+    }
     if (Steps<1 || Steps>512 || (State.IsValid() &&
         (StateSize!=Grid.Size || StateCellMeters!=Grid.CellMeters || bStatePeriodic!=Grid.bPeriodic ||
         StateOriginMeters!=Grid.OriginMeters || bStateSecondOrder!=Grid.bSecondOrder ||
@@ -315,6 +324,7 @@ bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
     float PressureMaximumDepth=0;
     if (Grid.bFiniteDepthDispersion)for (const FVector4f& F:Flow)PressureMaximumDepth=FMath::Max(PressureMaximumDepth,F.X);
     FRDGBufferRef FlowBuffer=CreateStructuredBuffer(Graph,TEXT("RaftSim.Detail.MeanFlow"),Flow);
+    FRDGBufferRef FoamBuffer=FoamTransport ? CreateStructuredBuffer(Graph,TEXT("RaftSim.Detail.FoamTransport"),*FoamTransport) : FlowBuffer;
     TArray<FVector4f> Zero;
     if (!State.IsValid() && !InitialState)Zero.Init(FVector4f(0,0,0,0),Flow.Num());
     FRDGBufferRef Current=State.IsValid() ? Graph.RegisterExternalBuffer(State) :
@@ -359,6 +369,7 @@ bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
             P->PressurePotential=Grid.bFiniteDepthDispersion ?
                 Graph.CreateSRV(BuildFiniteDepthPressure(Graph,Grid,FlowBuffer,Current,PressureMaximumDepth)) : nullptr;
             P->MeanFlow=Graph.CreateSRV(FlowBuffer);P->PreviousState=Graph.CreateSRV(Current);P->NextState=Graph.CreateUAV(Next);
+            P->FoamTransport=Graph.CreateSRV(FoamBuffer);
             FComputeShaderUtils::AddPass(Graph,RDG_EVENT_NAME("RaftSim Stateful Detail Water"),Shader,P,
                 FComputeShaderUtils::GetGroupCount(Grid.Size,FIntPoint(8,8)));
             Current=Next;

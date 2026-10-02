@@ -382,6 +382,19 @@ FVector ARaftSimCC0CrewVisualActor::GetSolvedFaceUpWorldVector() const
 bool ARaftSimCC0CrewVisualActor::GetSolvedChestWorldTransform(
     FTransform& OutWorld) const
 {
+    // The review CVar overrides the fit when moved off its 4.5 cm default.
+    const float ReviewForwardCm = CVarCC0VestForwardOfSpineCm.GetValueOnGameThread();
+    return ComputeChestWorldTransform(
+        bVestFitMeasured && FMath::IsNearlyEqual(ReviewForwardCm, 4.5f)
+            ? FittedVestForwardOfSpineCm
+            : ReviewForwardCm,
+        OutWorld);
+}
+
+bool ARaftSimCC0CrewVisualActor::ComputeChestWorldTransform(
+    float ForwardOfSpineCm,
+    FTransform& OutWorld) const
+{
     if (!bBodyReady || !Body ||
         Body->GetBoneIndex(TEXT("spine_01")) == INDEX_NONE ||
         Body->GetBoneIndex(TEXT("spine_02")) == INDEX_NONE ||
@@ -427,7 +440,7 @@ bool ARaftSimCC0CrewVisualActor::GetSolvedChestWorldTransform(
     // spine-to-chest-centre depth. Posed central torso measurements and all-five
     // front/profile/rear captures place it at 4.5 cm: the former 9 cm floated
     // the chest panels forward while burying the rear flotation in the back.
-    const float ChestCenterForwardOfSpineCm = CVarCC0VestForwardOfSpineCm.GetValueOnGameThread();
+    const float ChestCenterForwardOfSpineCm = ForwardOfSpineCm;
     OutWorld = FTransform(
         FRotationMatrix::MakeFromZX(SpineUp, ChestForward).ToQuat(),
         ComponentTransform.TransformPosition(
@@ -493,6 +506,10 @@ bool ARaftSimCC0CrewVisualActor::EnsureBodyLoaded()
     if (bBodyReady && (bMeshChanged || !bNeckCollarBuilt))
     {
         BuildNeckCollar();
+    }
+    if (bMeshChanged)
+    {
+        bVestFitMeasured = false;
     }
     return bBodyReady;
 }
@@ -840,6 +857,10 @@ void ARaftSimCC0CrewVisualActor::ApplyCrewPose_Implementation(
     }
     UpdateGaze(Action);
     ApplyBodyPose(Pose);
+    if (!bVestFitMeasured && Action == ERaftSimCrewAvatarAction::SeatedIdle)
+    {
+        MeasureVestFit();
+    }
 }
 
 FVector ARaftSimCC0CrewVisualActor::ToMeshSpace(const FVector& PointCm) const
@@ -2557,4 +2578,99 @@ void ARaftSimCC0CrewVisualActor::UpdateNeckCollar()
     NeckCollar->UpdateMeshSection_LinearColor(0, NeckCollarPosedPositions, NeckCollarPosedNormals, {}, {}, {});
     const FTransform& BodyWorld = Body->GetComponentTransform();
     NeckCollar->SetWorldLocationAndRotation(BodyWorld.GetLocation(), BodyWorld.GetRotation());
+}
+
+void ARaftSimCC0CrewVisualActor::MeasureVestFit()
+{
+    // Measured once per body, seated: the vest is a rigid shell, so it fits
+    // the resting chest and follows the chest frame from then on.
+    bVestFitMeasured = true;
+    FittedVestForwardOfSpineCm = 4.5f;
+    FittedVestDepthScale = 1.0f;
+    FTransform SpineFrame;
+    if (!ComputeChestWorldTransform(0.0f, SpineFrame))
+    {
+        bVestFitMeasured = false;
+        return;
+    }
+    const TArray<FVector> Points = GetPosedBodyVerticesWorldCmForValidation();
+    // Front and back of the torso in a central 18 cm strip over the vest's
+    // height, in the chest frame (X toward the face, Z up the spine). Arms
+    // and the paddle hands sit outside the strip or far in front of it.
+    TArray<float> Front;
+    TArray<float> Back;
+    for (const FVector& Point : Points)
+    {
+        const FVector Local = SpineFrame.InverseTransformPositionNoScale(Point);
+        if (FMath::Abs(Local.Y) > 9.0f || Local.Z < -12.0f || Local.Z > 14.0f)
+        {
+            continue;
+        }
+        // Compared against the vest's untapered carriers: the front's inner
+        // face leans in by FrontTaperCm above mid-chest and the back's moves
+        // in by BackTaperCm over the lumbar curve (RaftSimVestShape).
+        if (Local.X > 0.0f && Local.X < 24.0f)
+        {
+            Front.Add(Local.X + RaftSimVestShape::FrontTaperCm(Local.Z));
+        }
+        else if (Local.X <= 0.0f && Local.X > -26.0f)
+        {
+            Back.Add(Local.X - RaftSimVestShape::BackTaperCm(Local.Z));
+        }
+    }
+    if (Front.Num() < 30 || Back.Num() < 30)
+    {
+        UE_LOG(LogTemp, Display, TEXT("RaftSim CC0 vest fit: too few torso samples (%d front, %d back); default fit"),
+            Front.Num(), Back.Num());
+        return;
+    }
+    if (CVarCC0PoseForensics.GetValueOnGameThread())
+    {
+        // Chest-front and back depth by height band (vest taper review).
+        FString Row;
+        for (float Z0 = -18.0f; Z0 < 24.0f; Z0 += 6.0f)
+        {
+            TArray<float> F, B;
+            for (const FVector& Point : Points)
+            {
+                const FVector L = SpineFrame.InverseTransformPositionNoScale(Point);
+                if (FMath::Abs(L.Y) <= 12.0f && L.Z >= Z0 && L.Z < Z0 + 6.0f)
+                {
+                    if (L.X > 0.0f && L.X < 24.0f) F.Add(L.X);
+                    else if (L.X <= 0.0f && L.X > -26.0f) B.Add(L.X);
+                }
+            }
+            F.Sort();
+            B.Sort();
+            Row += FString::Printf(TEXT(" z%.0f:%.1f/%.1f"), Z0 + 3.0f,
+                F.Num() ? F[FMath::Min(FMath::FloorToInt(F.Num() * 0.95f), F.Num() - 1)] : 0.0f,
+                B.Num() ? B[FMath::FloorToInt(B.Num() * 0.05f)] : 0.0f);
+        }
+        UE_LOG(LogTemp, Display, TEXT("RaftSim CC0 vest bands %s:%s"),
+            *GetNameSafe(Body ? Body->GetSkinnedAsset() : nullptr), *Row);
+    }
+    Front.Sort();
+    Back.Sort();
+    // The 95th-percentile chest and 5th-percentile back: the few points past
+    // them sit inside the foam cells in front of and behind the carriers.
+    // (Fitted over z -12..14; the taper fits the upper chest and lower back.)
+    const float BodyFrontCm = Front[FMath::Clamp(FMath::FloorToInt(Front.Num() * 0.95f), 0, Front.Num() - 1)];
+    const float BodyBackCm = Back[FMath::Clamp(FMath::FloorToInt(Back.Num() * 0.05f), 0, Back.Num() - 1)];
+    // Carrier inner faces of SM_RaftSim_WhitewaterRescuePfd (vest local cm,
+    // build_production_whitewater_pfd.py): front 12.15, rear -11.4.
+    constexpr float VestInnerFrontCm = 12.15f;
+    constexpr float VestInnerBackCm = -11.4f;
+    constexpr float ClearanceCm = 0.5f;
+    const float FrontTargetCm = BodyFrontCm + ClearanceCm;
+    const float BackTargetCm = BodyBackCm - ClearanceCm;
+    FittedVestDepthScale = FMath::Clamp(
+        (FrontTargetCm - BackTargetCm) / (VestInnerFrontCm - VestInnerBackCm), 0.80f, 1.15f);
+    FittedVestForwardOfSpineCm = FMath::Clamp(
+        0.5f * (FrontTargetCm + BackTargetCm) -
+            0.5f * (VestInnerFrontCm + VestInnerBackCm) * FittedVestDepthScale,
+        0.0f, 9.0f);
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim CC0 vest fit %s: chest %.1f / back %.1f cm from the spine frame -> depth x%.3f, centre %.2f cm ahead"),
+        *GetNameSafe(Body ? Body->GetSkinnedAsset() : nullptr), BodyFrontCm, BodyBackCm, FittedVestDepthScale,
+        FittedVestForwardOfSpineCm);
 }

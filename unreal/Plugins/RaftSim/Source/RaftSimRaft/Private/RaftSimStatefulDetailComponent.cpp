@@ -423,6 +423,20 @@ bool URaftSimStatefulDetailComponent::UpdateMeanFlow()
                     FMath::Lerp(BaseGeometry[(R+1)*128+C],BaseGeometry[(R+1)*128+C+1],GX-C),GY-R);
         }
     }
+    CachedFoamTransport.Reset();
+    if(bMovingWindow && Water->HasFeatureKinematics())
+    {
+        CachedFoamTransport=CachedFlow;
+        for(int32 Y=0;Y<DetailSize;++Y)for(int32 X=0;X<DetailSize;++X)
+        {
+            auto& F=CachedFoamTransport[Y*DetailSize+X];
+            if(F.X<=.01f)continue;
+            const FVector2D P(double(WindowOriginMeters.X)+X*DetailCellMeters,double(WindowOriginMeters.Y)+Y*DetailCellMeters);
+            const FVector V=Water->ComputeFeatureVelocityAtRiverCoordinates(P,FVector2D(F.Y,F.Z),F.X,1.f);
+            F.Y=float(V.X);F.Z=float(V.Y);
+            MaxSignal=FMath::Max(MaxSignal,FMath::Abs(F.Y)+FMath::Abs(F.Z)+2*FMath::Sqrt(9.81f*F.X));
+        }
+    }
     // Compute from the actual interpolated input too: averaging depth and
     // velocity does not commute with the nonlinear gravity-wave speed.
     for (const FVector4f& F:CachedFlow)
@@ -529,6 +543,7 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
     static const bool bMeanStrainReview=FParse::Param(FCommandLine::Get(),TEXT("RaftSimMeanStrainReview"));
     Grid.bExperimentalMeanStrain=bMeanStrainReview;
     const auto Shared=RenderState;auto Flow=CachedFlow;
+    auto FoamTransport=CachedFoamTransport;
     const auto TotalSource=CachedTotalDepthSource;
     const auto TemporalAuditPath=TemporalBoundaryAuditPath;
     FString CapturePrefix;
@@ -548,7 +563,7 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
         FParse::Param(FCommandLine::Get(),TEXT("RaftSimFrothHistoryAudit"));
 #endif
     FTextureRenderTargetResource* Target=(bFrameContact ? ComputeTexture : SurfaceTexture)->GameThread_GetRenderTargetResource();
-    ENQUEUE_RENDER_COMMAND(RaftSimDetailLive)([Shared,Grid,Flow=MoveTemp(Flow),TotalSource,TemporalAuditPath,CaptureGeometry=MoveTemp(CaptureGeometry),CaptureMeanElapsed,Steps,Target,CapturePrefix,CaptureElapsed,CaptureCenter,CaptureDownstream,CaptureLeft,bFrameContact,bPairedFoamFlow,bCaptureFrothHistory](FRHICommandListImmediate& Cmd)
+    ENQUEUE_RENDER_COMMAND(RaftSimDetailLive)([Shared,Grid,Flow=MoveTemp(Flow),FoamTransport=MoveTemp(FoamTransport),TotalSource,TemporalAuditPath,CaptureGeometry=MoveTemp(CaptureGeometry),CaptureMeanElapsed,Steps,Target,CapturePrefix,CaptureElapsed,CaptureCenter,CaptureDownstream,CaptureLeft,bFrameContact,bPairedFoamFlow,bCaptureFrothHistory](FRHICommandListImmediate& Cmd)
     {
         if (Shared->ContactAudit && Shared->ContactAudit->Poll()) Shared->ContactAudit.Reset();
         if (Shared->TemporalAudit && Shared->TemporalAudit->Poll())Shared->TemporalAudit.Reset();
@@ -607,13 +622,15 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
             else ++Shared->Remaps;
         }
         const double IntervalStart=Shared->Simulation.GetSimulationSeconds();
-        if (!Shared->Simulation.Advance(Cmd,Grid,Flow,Steps,nullptr,bCapture ? &Shared->Snapshot->StateReadback : nullptr,Error) ||
+        const auto* FoamInput=FoamTransport.IsEmpty()?nullptr:&FoamTransport;
+        const auto& DisplayFlow=FoamInput?*FoamInput:Flow;
+        if (!Shared->Simulation.Advance(Cmd,Grid,Flow,Steps,nullptr,bCapture ? &Shared->Snapshot->StateReadback : nullptr,Error,nullptr,nullptr,FoamInput) ||
             !Shared->Simulation.Resolve(Cmd,Target->GetRenderTargetTexture(),Error))
         { Shared->bFailed.Store(true);UE_LOG(LogTemp,Error,TEXT("Stateful detail dispatch rejected: %s"),*Error);return; }
         if(bCaptureFrothHistory)
         {
             const bool Appended=Shared->FrothFlowHistory.Append(IntervalStart,Shared->Simulation.GetSimulationSeconds(),
-                CaptureMeanElapsed,Grid.Size,Grid.OriginMeters,Grid.CellMeters,Flow);
+                CaptureMeanElapsed,Grid.Size,Grid.OriginMeters,Grid.CellMeters,DisplayFlow);
             if(!Appended || (bCapture && !Shared->FrothFlowHistory.Save(CapturePrefix)))
                 UE_LOG(LogTemp,Error,TEXT("Froth flow history capture failed: %s"),*CapturePrefix);
         }
@@ -625,7 +642,7 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
             {
                 static const bool CaptureFoamFlow=[]{FString P;return FParse::Value(FCommandLine::Get(),TEXT("RaftSimFoamFlowPairAudit="),P);}();
                 Slot->Enqueue(Cmd,Target->GetRenderTargetTexture(),Grid.Size,Shared->FrameSequence,
-                    CaptureElapsed,Shared->Simulation.GetSimulationSeconds(),false,(CaptureFoamFlow || bPairedFoamFlow)?&Flow:nullptr);bCopied=true;break;
+                    CaptureElapsed,Shared->Simulation.GetSimulationSeconds(),false,(CaptureFoamFlow || bPairedFoamFlow)?&DisplayFlow:nullptr);bCopied=true;break;
             }
             if (!bCopied) ++Shared->SkippedFrameCopies; // Hold the paired presented frame, never stall the PDE.
         }

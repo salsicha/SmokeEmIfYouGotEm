@@ -18,6 +18,7 @@
 #include "RaftSimSourcePackingAudit.h"
 #include "RaftSimWaterSmoothing.h"
 #include "RaftSimWaterFlowFrame.h"
+#include "RaftSimWaterFeatureKinematics.h"
 #include "RaftSimIndexedBreakingProfile.h"
 #include "RaftSimFineCrestIndexAudit.h"
 #include "RaftSimInlineCrestAudit.h"
@@ -1278,6 +1279,12 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             TEXT("south_fork_american_chili_bar/full_hydraulics"),
             ESearchCase::IgnoreCase);
     bSouthForkOpticalSmoothingReview = bUsesSouthForkFullReachSingleSurface;
+    if (WaterAdapter)
+    {
+        // Ordinary South Fork launches, not a review-only command-line path.
+        WaterAdapter->ConfigureFeatureKinematics(bUsesAuthoredRiverPresentation &&
+            GetWorld() && RaftSimWaterFeatureKinematics::IsPlayableSouthFork(GetWorld()->GetMapName()));
+    }
     bSpatialBreakingReview = bUsesSouthForkFullReachSingleSurface &&
         GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimSpatialBreakingReview"));
@@ -1940,6 +1947,20 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 {
                     const auto* Surface=WeakSurface.Get();
                     return Surface && Surface->SampleCartesianCarrierSupport(P,HeightM,bWet);
+                });
+            WaterAdapter->SetFeatureSurfaceTransportSampler(this,
+                [WeakSurface](const FVector2D& P,FVector2D& V,float& Weight)
+                {
+                    const auto* Surface=WeakSurface.Get();
+                    const auto Frame=Surface && Surface->MovingDetail ? Surface->MovingDetail->GetPresentedFrame() : nullptr;
+                    if(!Frame || Frame->FoamFlowPixels.IsEmpty())return false;
+                    const auto M=Frame->Pixels[Frame->Size.X*Frame->Size.Y];
+                    const FVector2f Position(float(P.X),float(P.Y)),Local=Position-FVector2f(M.X,M.Y);
+                    const float Edge=FMath::Min(FMath::Min(Local.X,Local.Y),FMath::Min((Frame->Size.X-1)*M.Z-Local.X,(Frame->Size.Y-1)*M.Z-Local.Y));
+                    Weight=FMath::SmoothStep(0.f,4.f,Edge);
+                    if(Weight<=0)return false;
+                    const auto Flow=Frame->SampleFoamFlow(Position);
+                    V=FVector2D(Flow.Y,Flow.Z);return Flow.X>.01f;
                 });
         }
         // Legacy detail-overlay maps render the AUTHORED band water (baked
@@ -5099,6 +5120,23 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
         WaterAdapter->ConfigureRaftSupportBoulderFootprints(
             SupportFootprints);
+        SupportFootprints.Reset();
+        for (const FVector3f& Footprint : WindowBoulderFootprintsSLR)
+        {
+            auto& Support=SupportFootprints.AddDefaulted_GetRef();
+            Support.RiverCoordinatesMeters=FVector2D(Footprint.X,Footprint.Y);
+            Support.RadiusMeters=Footprint.Z;
+            FVector2D OwnerVelocity=FVector2D::ZeroVector;
+            const float Offset=FMath::Max(Footprint.Z*2.f,2.f);
+            for(const FVector2D& OffsetDirection : {FVector2D(1,0),FVector2D(-1,0),FVector2D(0,1),FVector2D(0,-1)})
+            {
+                FRaftSimWaterSample OwnerSample;
+                if(WaterAdapter->SampleWaterFieldAtRiverCoordinates(Support.RiverCoordinatesMeters+OffsetDirection*Offset,OwnerSample) && OwnerSample.bWet)
+                    OwnerVelocity+=FVector2D(OwnerSample.VelocityMetersPerSecond.X,OwnerSample.VelocityMetersPerSecond.Y);
+            }
+            Support.FlowDirection=OwnerVelocity.GetSafeNormal();
+        }
+        WaterAdapter->ConfigureFeatureBoulderFootprints(SupportFootprints);
     }
 
     // Build the obstruction field before the vertex pass so its signed relief
@@ -7052,6 +7090,16 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     // A second world projection rotates/reflects the backtrace.
                     FieldPosition = RiverCoordinatesM[Index];
                 }
+                if (WaterAdapter->HasFeatureKinematics())
+                {
+                    // Exact shared surface evaluation; immersed hull points
+                    // use the same model at their own depth. No double return.
+                    const FVector Shared = WaterAdapter->SampleFeatureSurfaceVelocity(
+                        FieldPosition,FieldVelocity,WaterSamples[Index].DepthMeters);
+                    FieldVelocity = FVector2D(Shared.X,Shared.Y);
+                }
+                else
+                {
                 // Foam inside an accepted hydraulic jump must visibly turn
                 // back toward the impact toe instead of sliding through the
                 // froth patch at the bulk current speed. The return is local,
@@ -7125,6 +7173,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                             AlongT);
                     FieldVelocity = FMath::Lerp(
                         FieldVelocity, RaftSimWaterFlowFrame::ToField(EddyVelocity,BulkFlowDirection), PocketEnvelope);
+                }
                 }
                 // Export the exact velocity that moves the foam field, after
                 // every local return contribution, without changing transport.
@@ -9580,7 +9629,8 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
                 }
             }
             auto Report=MakeShared<FJsonObject>();
-            Report->SetStringField(TEXT("scope"),TEXT("Actual submitted Cartesian source UV3 versus exact CPU foam backtrace velocity; UV1 bulk flow unchanged. Roller/eddy contributions are presentation-only, not measured fluid momentum or visual acceptance."));
+            Report->SetStringField(TEXT("scope"),TEXT("Actual submitted Cartesian source UV3 versus exact CPU foam backtrace velocity; UV1 bulk flow unchanged. Enabled authored feature currents are also sampled by immersed hulls; not measured fluid momentum, global conservation or visual acceptance."));
+            Report->SetBoolField(TEXT("feature_kinematics_enabled"),WaterAdapter && WaterAdapter->HasFeatureKinematics());
             Report->SetNumberField(TEXT("source_vertices"),N);
             Report->SetBoolField(TEXT("complete_source_prefix"),!CartesianShorelineMesh->HasCompactCrestSource() && AuditedSourceCount==N);
             Report->SetNumberField(TEXT("audited_source_anchors"),AuditedSourceCount);

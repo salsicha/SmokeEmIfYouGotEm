@@ -365,10 +365,29 @@ public:
     {
         FVector2D RiverCoordinatesMeters = FVector2D::ZeroVector;
         float RadiusMeters = 0.75f;
+        /** Stable owner direction sampled once around the obstruction. Zero
+         * retains the legacy local-current frame for independent fixtures. */
+        FVector2D FlowDirection = FVector2D::ZeroVector;
     };
 
     void ConfigureRaftSupportBoulderFootprints(
         TConstArrayView<FSupportBoulderFootprint> Footprints);
+    /** Reduced-order feature currents, shared by surface transport and hull
+     * interaction. Raw solver samples and cooked evidence remain unchanged. */
+    void ConfigureFeatureKinematics(bool bEnabled) { bFeatureKinematicsEnabled = bEnabled; }
+    bool HasFeatureKinematics() const { return bFeatureKinematicsEnabled; }
+    void ConfigureFeatureBoulderFootprints(TConstArrayView<FSupportBoulderFootprint> Footprints)
+    {
+        FeatureBoulderFootprints.Reset(Footprints.Num());
+        FeatureBoulderFootprints.Append(Footprints.GetData(),Footprints.Num());
+    }
+    FVector ComputeFeatureVelocityAtRiverCoordinates(const FVector2D& P,
+        const FVector2D& BaseVelocity, float DepthM, float DepthFraction = 1.0f) const;
+    using FFeatureSurfaceTransportSampler=TFunction<bool(const FVector2D&,FVector2D&,float&)>;
+    void SetFeatureSurfaceTransportSampler(UObject* Owner,FFeatureSurfaceTransportSampler Sampler)
+    {FeatureSurfaceTransportOwner=Owner;FeatureSurfaceTransportSampler=MoveTemp(Sampler);}
+    FVector SampleFeatureSurfaceVelocity(const FVector2D& P,const FVector2D& Base,float DepthM) const;
+    bool SampleRaftInteractionWaterAtWorldPosition(const FVector& P, FRaftSimWaterSample& Out);
     int32 GetRaftSupportBoulderFootprintCount() const
     {
         return RaftSupportBoulderFootprints.Num();
@@ -683,6 +702,10 @@ private:
     FVector2D RaftSupportLocalFluidAdvectionMeters = FVector2D::ZeroVector;
     TArray<FSupportBreakingSite> RaftSupportBreakingSites;
     TArray<FSupportBoulderFootprint> RaftSupportBoulderFootprints;
+    bool bFeatureKinematicsEnabled = false;
+    TWeakObjectPtr<UObject> FeatureSurfaceTransportOwner;
+    FFeatureSurfaceTransportSampler FeatureSurfaceTransportSampler;
+    TArray<FSupportBoulderFootprint> FeatureBoulderFootprints;
     float RaftSupportBreakingCrestLiftMeters = 0.0f;
     float RaftSupportBreakingStationSpacingMeters = 1.0f;
     FSupportBandField RaftSupportBandField;

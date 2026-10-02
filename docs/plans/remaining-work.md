@@ -1,15 +1,29 @@
 # Remaining requested work
 
+LATEST October 1 South Fork shared feature controls:
+- Native hole, eddy and froth animations use actual production boat forces.
+- The normal FullReach scene now shares its authored surface current between
+  displayed GPU foam and the boat sampler; submerged hole return flow is retained.
+- Eight native regressions pass. Actual gameplay and close-up captures reviewed.
+- Latest editor-game menu sample passes 20 FPS p95; dense section fails with
+  59.45 ms p95 and four frames over 100 ms. Standalone revalidation remains open.
+- Full-map foam still looks too broad and flat; eddy control demonstrates turning
+  and washout, not indefinite retention. No geographic acceptance or new package.
+See [the scoped review](../reconstruction-review-2026-09-07/shared-feature-engine-controls-2026-10-01.md).
+
 LATEST October 1 terrain, crew and raft pass (review section 8, docs/crew-roster.md):
 - L_Zambezi:
   - walls are dark basalt in direct sun; the world-space terrain normal had
     tilted every wall toward the sky;
-  - 34,702 slope-aligned rock plates and 6,793 waterline boulders (inferred);
+  - inferred lava-flow ledges and gullies on 3.1 m render cells (46,059 wall
+    cells), shadow-casting, with 10,860 rockfall blocks on the ledges and
+    7,109 waterline boulders;
   - banks are grey sand, not orange.
 - Rock: a world-scale detail layer on the tinted rock; the Futaleufu granite
   no longer reads as soap. Evidence-wall detail fades with distance.
 - Crew: five people with their own looks, eyewear, guide's kit, neck collar,
-  personal gaze, swimming and chatter.
+  personal gaze, swimming and chatter. Vests are fitted to each seated body,
+  tapered to the torso and closed at the sides.
 - Raft: red tubes with waterline film, sun fade and scuffs, plus a throw bag,
   painters and a bow drybag.
 Not committed.

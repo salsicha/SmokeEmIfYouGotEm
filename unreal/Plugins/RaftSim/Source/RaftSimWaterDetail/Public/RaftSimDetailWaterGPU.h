@@ -51,7 +51,8 @@ public:
         const FRaftSimDetailWaterGrid& Grid, const TArray<FVector4f>& Flow,
         int32 Steps, const TArray<FVector4f>* InitialState,
         FRHIGPUBufferReadback* Readback, FString& Error,
-        const TArray<float>* InitialActivity=nullptr, FRHIGPUBufferReadback* ActivityReadback=nullptr);
+        const TArray<float>* InitialActivity=nullptr, FRHIGPUBufferReadback* ActivityReadback=nullptr,
+        const TArray<FVector4f>* FoamTransport=nullptr);
     // Explicit cell-aligned moving-domain handoff. Overlapping wet state is
     // copied bit-exactly, newly exposed or now-dry cells start at zero detail.
     // Mean flow is supplied for the NEW domain; no interpolation/reseeding,

@@ -13,6 +13,9 @@ float2 OriginMeters;
 float TurbulentHeadMeters;
 float SimulationSeconds;
 StructuredBuffer<float4> MeanFlow;
+// Independently authored surface transport. It never enters liquid height,
+// pressure, perturbation momentum, activity excitation or shoreline masks.
+StructuredBuffer<float4> FoamTransport;
 StructuredBuffer<float4> PreviousState;
 StructuredBuffer<float4> StepInitialState;
 RWStructuredBuffer<float4> NextState;
@@ -174,7 +177,9 @@ float4 Face(int2 l,int2 r,uint axis,float localPressure)
     // Foam retains first-order upwind spatial flux: the limited face-density
     // trial introduced a measurable centroid bias. RK2 still advances its
     // conservative flux; it follows mean current, not gravity-wave phase.
-    flux.w=velocity*(velocity>=0 ? sl.w : sr.w);
+    float4 foamL=FoamTransport[Index(l)],foamR=FoamTransport[Index(r)];
+    float foamVelocity=0.5*(axis==0 ? foamL.y+foamR.y : foamL.z+foamR.z);
+    flux.w=foamVelocity*(foamVelocity>=0 ? sl.w : sr.w);
     return flux;
 }
 

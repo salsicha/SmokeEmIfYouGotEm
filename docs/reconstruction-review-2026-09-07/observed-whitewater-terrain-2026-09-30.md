@@ -567,26 +567,54 @@ Other changes:
 
 ### `L_Zambezi` broken rock
 
-The 30 km run's walls are a 12.5 m grid of smooth slopes; ledges cannot be
-resolved on that grid without reading as terraces. `AddZambeziGorgeWallRocks`
-dresses the whole run instead, with the reviewed rock scans in a new dark
-basalt instance (`MI_RaftSim_Zambezi_BasaltWallRockV1`):
-- **Wall plates:** 34,702 rock plates up both walls, from 6 m above the water
-  toward the rim on 22-80° slopes. They are:
-  - 5-14 m across and a third as thick;
-  - aligned to the local ground normal, with their long axis near the
-    contour;
-  - sunk two-thirds into the slope.
+The 30 km run's walls were smooth half-pipes for two reasons:
+- **Coarse grids:** the physical-source Landscape (about 10 x 6 m quads from
+  a 30-50 m reference) and its 12.5 m render tiles cannot carry ledges.
+- **Smoothing:** the Batoka V17 pass low-pass filters the tiles' steep faces
+  to hide a comb of facet self-shadows, and draws them without shadows.
 
-  They cast no shadows. In the first try, upright rocks on the raking-lit
-  walls threw long black shapes that read as holes.
-- **Waterline boulders:** 6,793 rounded boulders of 1.2-4.5 m, a third sunk,
-  between 0.2 m and 6 m above the water.
-- Positions are inferred. The rocks are generic analogs, without collision.
+A first try laid 34,702 rock plates on the smooth walls. They read as
+separate grey flakes and were retired.
 
-In the survey the plates break up the walls' upper reaches. Where one stands
-proud, it can still read as a separate grey flake. Their basalt was darkened
-twice to sit in the wall's tone (light tone 0.055).
+**Ledges.** `FZambeziWallRelief` (`RaftSimEditorZambeziWallRelief.cpp`) adds
+lava-flow banding:
+- **Units:** flow units of 9-14 m. Their ledge lines wander up to about 7 m
+  along the wall.
+- **Profile:** each unit has a smoothstep riser over its lower 18-40 % and a
+  flat tread above, offset to zero mean so the wall keeps its overall shape.
+- **Where:** the raw ground must be steeper than 20-32°, at least 4-14 m
+  above the water, and within about 480 m of the river. Block-scale jointing
+  (±0.5 m) is added on top.
+- **Gullies:** valleyed noise at 11-26 m wavelengths, which a steep face
+  stretches into vertical flutes (columnar-jointed basalt). It is strongest
+  on the steepest faces.
+- **Anti-aliasing:** each riser is kept at least 4 m (about 1.3 render
+  cells) wide. Narrower risers aliased into rows of pocket-like shadows on
+  35-45° walls; two cells made the walls smooth again.
+
+**Mesh.** As the last pass of the Zambezi build, after V17 and the adaptive
+near-field bank (both read the tiles as grids), `ApplyZambeziWallLedges`:
+- splits 46,059 wall cells of the four render tiles 4 x 4 (3.1 m), adding
+  712,860 vertices. Edges shared with unsplit cells stay straight, so there
+  are no cracks. A 3 x 3 split (4.2 m) still zigzagged diagonal ledge lines
+  into a masonry-like pattern;
+- turns on shadow casting for those tiles, so the ledges shade each other.
+
+The tiles are now about 4.63 M triangles (from 3.25 M). `L_Zambezi.umap`
+grows from 1.84 GB to 2.30 GB. The offscreen survey ran at 53-66 fps with and
+without the ledges, which is within run-to-run noise. The Landscape is still
+the collision authority.
+
+**Dressing on the ledges.** The Zambezi placement height follows the same
+field, so trees and rocks sit on the ledges. `AddZambeziGorgeWallRocks`
+places:
+- 10,860 rockfall blocks of 1-3.2 m on the flat treads (a 1.5 m local slope
+  under 26° on the ledged ground);
+- 7,109 waterline boulders of 1.2-4.5 m.
+
+All are a third sunk, cast shadows, and use the reviewed rock scans in a new
+dark basalt instance (`MI_RaftSim_Zambezi_BasaltWallRockV1`). Ledges and rock
+positions are inferred.
 
 ### Rock material detail (all reaches)
 
@@ -633,10 +661,9 @@ See [the crew](../crew-roster.md). In short:
   forces, contact or gameplay.
 - **Rock and wall colours** (sections 7 and 8) are approximate, from
   descriptions and photographs, not measured albedo.
-- **The 30 km run's wall geometry** is still the 30 m DEM's smooth shape on a
-  12.5 m grid. The broken-rock look comes from inferred dressing (wall plates
-  and waterline boulders) and the material, not from measured relief
-  (section 8).
+- **The 30 km run's wall shape** is the 30 m DEM's, with inferred lava-flow
+  ledges added on the walls (section 8). They are generic banding, not
+  measured relief, and the collision Landscape stays smooth.
 - **Vegetation structure is inferred:**
   - the Pacuare canopy, sub-canopy and understory;
   - the 30 km run's waterline fringe;

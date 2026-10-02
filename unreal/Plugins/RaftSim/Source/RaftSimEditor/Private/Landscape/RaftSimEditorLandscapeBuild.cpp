@@ -1,4 +1,5 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
+#include "Landscape/RaftSimEditorZambeziWallRelief.h"
 
 #include "Engine/CollisionProfile.h"
 
@@ -471,6 +472,7 @@ bool BuildLandscapeImportCandidateMap(
                 "near-field bank surface at the playable launch.\n");
             return false;
         }
+        ApplyZambeziWallLedges(World, Landscape, Candidate, OutSummary);
     }
     if (Candidate.bPhysicalScaleSourceCorridor &&
         Candidate.bUseDensePhysicalTerrainRenderSurface)

@@ -5,6 +5,35 @@
 
 /** Small procedural props (crew accessories, raft gear): tubes, lenses and
  * boxes, committed with both windings so they never vanish to winding. */
+/** The production vest's seated-torso taper (vest-local cm), as built into
+ * SM_RaftSim_WhitewaterRescuePfd by build_production_whitewater_pfd.py v13:
+ * the front leans in above mid-chest, the back moves in over the lumbar
+ * curve, both blended out across the flanks. Keep the two in step. */
+namespace RaftSimVestShape
+{
+inline float FrontTaperCm(float Z)
+{
+    const float T = FMath::Clamp((Z - 8.0f) / 13.0f, 0.0f, 1.25f);
+    return 5.5f * FMath::Pow(T, 1.5f);
+}
+
+inline float BackTaperCm(float Z)
+{
+    return 4.3f * FMath::SmoothStep(0.0f, 1.0f, FMath::Clamp((9.0f - Z) / 13.0f, 0.0f, 1.0f)) *
+        (1.0f - 0.3f * FMath::SmoothStep(0.0f, 1.0f, FMath::Clamp((-8.0f - Z) / 9.0f, 0.0f, 1.0f)));
+}
+
+/** A vest-local point moved the way the mesh's own vertices were. */
+inline FVector ApplySeatedTaper(const FVector& P)
+{
+    const float X = static_cast<float>(P.X);
+    const float Front = FMath::SmoothStep(0.0f, 1.0f, FMath::Clamp(X / 10.0f, 0.0f, 1.0f));
+    const float Back = FMath::SmoothStep(0.0f, 1.0f, FMath::Clamp(-X / 10.0f, 0.0f, 1.0f));
+    const float Z = static_cast<float>(P.Z);
+    return FVector(X - Front * FrontTaperCm(Z) + Back * BackTaperCm(Z), P.Y, P.Z);
+}
+}
+
 namespace RaftSimAccessoryMesh
 {
 struct FAccessoryMesh

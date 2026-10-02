@@ -55,9 +55,11 @@ bool FRaftSimUnavailableWaterTest::RunTest(const FString&)
     Water->ConfigureRaftSupportSurface(true,1.f,1.f,1.f);
     Water->ConfigureRaftSupportLocalFluid(true,1.f,FVector2D(32,15));
     Water->SetPresentationWaveClockSeconds(91.f);
+    Water->ConfigureFeatureKinematics(true);
     Config.ScenarioPackagePath=TEXT("second-unavailable-water-test");
     Water->Configure(Config);
     TestFalse(TEXT("new scenario releases previous physical window"),Water->HasLiveWindow());
+    TestFalse(TEXT("new scenario never inherits another river's authored currents"),Water->HasFeatureKinematics());
     TestEqual(TEXT("new scenario clears boulder coordinates"),Water->GetRaftSupportBoulderFootprintCount(),0);
     TestFalse(TEXT("new scenario does not inherit support configuration"),Water->IsRaftSupportSurfaceEnabled());
     TestFalse(TEXT("old manifest state does not leak into new scenario"),Water->GetReportManifestState().bLoaded);

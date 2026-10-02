@@ -47,6 +47,7 @@ private:
     bool bContactAuditRequested=false;
     TSharedPtr<FRaftSimDetailRenderState,ESPMode::ThreadSafe> RenderState;
     TArray<FVector4f> CachedFlow;
+    TArray<FVector4f> CachedFoamTransport; // Same depth/source; authored surface velocity only.
     // Paired source geometry: live Cartesian total-state inputs and captures.
     // Bed, sampled mean surface, unmasked depth, interpolated wet indicator.
     TArray<FVector4f> CachedMeanGeometry;

@@ -134,6 +134,17 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     bool HasProductionWhitewaterRaft() const { return bUsingProductionRaftRestMesh; }
 
+#if !UE_BUILD_SHIPPING
+    /** Isolated feature controls reuse the exact production geometry producer. */
+    bool BindIsolatedFeatureHull(URaftSimChronoRuntimeAdapter* Runtime);
+    void RefreshIsolatedFeatureHull();
+    /** Execute the normal actor capsize lifecycle on its bound real runtime. */
+    bool AdvanceIsolatedFlipDemo(float Dt);
+    bool BindIsolatedFlipRuntime(URaftSimChronoRuntimeAdapter* Runtime,bool bFullHullExport);
+    void RefreshIsolatedFlipVisual(float Dt);
+    TConstArrayView<FRaftSimSwimmerRescueFrame> GetIsolatedFlipSwimmers() const {return Swimmers;}
+#endif
+
     /** Highest rendered floor point in a centre-deck window, in world cm. */
     bool GetRenderedFloorCenterWorldZCm(float& OutWorldZCm) const;
 
@@ -477,6 +488,9 @@ private:
     void UpdateRaftCondition(float DeltaSeconds);
     void SpawnCrewVisuals();
     void BuildRaftVisual();
+    /** Rigged gear on the hull: the guide's throw bag at the stern and coiled
+     * bow and stern lines (presentation only, no collision). */
+    void BuildRaftGear(const FBox& HullBoundsCm);
     void UpdateFlexibleRaftVisual();
     void ConfigureSharedHullGeometryReview();
     bool PrepareSharedHullGeometry(const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out);
@@ -485,9 +499,6 @@ private:
     void UpdateRaftWetness(float DeltaSeconds);
     void UpdateRockObstacles();
     FVector SampleWaterVelocityMps(const FVector& WorldLocationCm) const;
-    /** Rigged gear on the hull: the guide's throw bag at the stern and coiled
-     * bow and stern lines (presentation only, no collision). */
-    void BuildRaftGear(const FBox& HullBoundsCm);
 
     UPROPERTY()
     TObjectPtr<URaftSimPhysicsBridgeSubsystem> Bridge;
@@ -551,6 +562,8 @@ private:
 
     UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> TubeMaterialInstance;
+    UPROPERTY(Transient)
+    TObjectPtr<class UProceduralMeshComponent> RaftGear;
 
     UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> FloorMaterialInstance;
@@ -559,8 +572,6 @@ private:
     TArray<RaftSimRaftMesh::FMeshData> ProductionRaftRestSections;
 
     /** Persistent dynamic buffers avoid copying immutable topology every frame. */
-    UPROPERTY(Transient)
-    TObjectPtr<class UProceduralMeshComponent> RaftGear;
     TArray<RaftSimRaftMesh::FMeshData> ProductionRaftDeformedSections;
 
     /** Precomputed rest-vertex/D1-D4 Gaussian binding; dynamic solve state is not cached. */

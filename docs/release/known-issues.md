@@ -166,8 +166,11 @@ Editor-hosted Development build on the development host; no packaged-build resul
     water pass.
   - The walls are dark basalt in direct sun as well as in shadow. The fix was
     the world-space terrain normal, which had tilted every wall face toward
-    the sky. They shade by their real orientation and carry inferred rock
-    dressing, but their shape is still the smooth 30 m DEM.
+    the sky.
+  - The walls carry inferred lava-flow ledges and gullies on 3.1 m render
+    cells, cast shadows, and have rockfall on the ledges. The ledges are
+    generic banding, not measured relief. Collision is still the smooth
+    Landscape.
   - The banks are grey sand and black boulders, no longer an orange beach.
   - A patchy green fringe (5,008 shrubs and 651 riparian trees, inferred)
     lines the waterline along the whole run.

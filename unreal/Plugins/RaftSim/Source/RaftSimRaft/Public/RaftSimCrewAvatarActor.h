@@ -399,6 +399,8 @@ private:
      * whistle and river knife), built once and fitted to the solved face
      * and chest frames every tick. */
     void BuildPersonalAccessories();
+    /** Foam side panels between the vest's front and back carriers. */
+    void BuildPfdSidePanels();
     void UpdatePersonalAccessories();
     void UpdatePfdMaterialResponse(float DeltaSeconds);
     void ApplyPfdMaterialWetness();
@@ -488,6 +490,11 @@ private:
     UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> EyewearLenses;
     UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> RescueWhistle;
     UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> RescueKnife;
+
+    /** Closes the production vest's sides under the arms (child of the vest,
+     * so it shares the vest's fit and colour). */
+    UPROPERTY(Transient)
+    TObjectPtr<UProceduralMeshComponent> PfdSidePanels;
 
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Animation")
     ERaftSimCrewAvatarAction CurrentAction = ERaftSimCrewAvatarAction::SeatedIdle;

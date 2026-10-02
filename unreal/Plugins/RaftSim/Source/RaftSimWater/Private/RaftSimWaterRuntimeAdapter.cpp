@@ -1,4 +1,5 @@
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterFeatureKinematics.h"
 #include "RaftSimWaterFlowFrame.h"
 
 #include "RaftSimLiveWaterWindow.h"
@@ -36,6 +37,9 @@ void URaftSimWaterRuntimeAdapter::Configure(const FRaftSimWaterRuntimeConfig& In
     CartesianWaterBoundsM = FBox2D(ForceInit);
     RaftSupportBreakingSites.Reset();
     RaftSupportBoulderFootprints.Reset();
+    bFeatureKinematicsEnabled = false;
+    FeatureSurfaceTransportOwner.Reset();FeatureSurfaceTransportSampler=nullptr;
+    FeatureBoulderFootprints.Reset();
     RaftSupportBreakingCrestLiftMeters = 0.0f;
     RaftSupportBreakingStationSpacingMeters = 1.0f;
     RaftSupportBandField.Reset();
@@ -757,6 +761,88 @@ void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportBoulderFootprints(
     RaftSupportBoulderFootprints.Reset(Footprints.Num());
     RaftSupportBoulderFootprints.Append(
         Footprints.GetData(), Footprints.Num());
+    ConfigureFeatureBoulderFootprints(Footprints);
+}
+
+FVector URaftSimWaterRuntimeAdapter::ComputeFeatureVelocityAtRiverCoordinates(
+    const FVector2D& P, const FVector2D& BaseVelocity, float DepthM, float DepthFraction) const
+{
+    FVector Result(BaseVelocity.X, BaseVelocity.Y, 0.0);
+    if (!bFeatureKinematicsEnabled || DepthM <= 0.05f || BaseVelocity.ContainsNaN()) return Result;
+    using namespace RaftSimWaterFlowFrame;
+    using namespace RaftSimWaterFeatureKinematics;
+    const double Speed = BaseVelocity.Size();
+    const FVector2D D = Direction(BaseVelocity);
+    FVector Hole = FVector::ZeroVector, Eddy = FVector::ZeroVector;
+    double HoleOwner = 0.0, EddyOwner = 0.0;
+    // Strongest local owner prevents overlapping inferred features from
+    // accumulating unbounded force. That selection is not a global CFD proof.
+    for (const FSupportBreakingSite& Site : RaftSupportBreakingSites)
+    {
+        const FVector2D Q = ToLocal(P-Site.RiverCoordinatesMeters, Site.FlowDirection);
+        const double Strength = Site.Intensity*Site.SpillingFraction;
+        const FVector Surface = HoleDelta(Q.X,Q.Y,1.0,DepthM,Speed,Strength);
+        const double Weight = Surface.SizeSquared();
+        if (Weight <= HoleOwner) continue;
+        HoleOwner = Weight;
+        const FVector Local = HoleDelta(Q.X,Q.Y,DepthFraction,DepthM,Speed,Strength);
+        const FVector2D XY = ToField(FVector2D(Local.X,Local.Y),Site.FlowDirection);
+        Hole = FVector(XY.X,XY.Y,Local.Z);
+    }
+    for (const FSupportBoulderFootprint& Rock : FeatureBoulderFootprints)
+    {
+        const FVector2D OwnerDirection = Rock.FlowDirection.IsNearlyZero() ? D : Rock.FlowDirection;
+        const FVector2D Q = ToLocal(P-Rock.RiverCoordinatesMeters,OwnerDirection);
+        const FVector Local = EddyDelta(Q.X,Q.Y,Rock.RadiusMeters,Speed);
+        if (Local.SizeSquared() <= EddyOwner) continue;
+        EddyOwner = Local.SizeSquared();
+        const FVector2D XY = ToField(FVector2D(Local.X,Local.Y),OwnerDirection);
+        Eddy = FVector(XY.X,XY.Y,0.0);
+    }
+    return Result+Hole+Eddy;
+}
+
+FVector URaftSimWaterRuntimeAdapter::SampleFeatureSurfaceVelocity(
+    const FVector2D& P,const FVector2D& Base,float DepthM) const
+{
+    FVector Surface=ComputeFeatureVelocityAtRiverCoordinates(P,Base,DepthM,1.f);
+    if(bFeatureKinematicsEnabled && IsInGameThread() && FeatureSurfaceTransportOwner.IsValid() && FeatureSurfaceTransportSampler)
+    {
+        FVector2D Paired;float Weight=0;
+        if(FeatureSurfaceTransportSampler(P,Paired,Weight) && !Paired.ContainsNaN() && FMath::IsFinite(Weight))
+        {const float W=FMath::Clamp(Weight,0.f,1.f);Surface.X=FMath::Lerp(Surface.X,Paired.X,W);Surface.Y=FMath::Lerp(Surface.Y,Paired.Y,W);}
+    }
+    return Surface;
+}
+
+bool URaftSimWaterRuntimeAdapter::SampleRaftInteractionWaterAtWorldPosition(
+    const FVector& P, FRaftSimWaterSample& Out)
+{
+    if (!bFeatureKinematicsEnabled) return SampleWaterAtWorldPosition(P,Out);
+    // Carrier height, dry exclusion and bed remain authoritative. Never make
+    // an unsupported point wet merely because a feature envelope overlaps it.
+    if (!SampleRaftSupportSurfaceAtWorldPosition(P,Out)) return false;
+    if (!bFeatureKinematicsEnabled || !Out.bWet) return true;
+    FVector2D Coordinates;
+    FVector Tangent,Left;
+    if (!WorldToRiverCoordinates(P,Coordinates,Tangent,Left)) return true;
+    const FVector2D Base(FVector::DotProduct(Out.VelocityMetersPerSecond,Tangent),
+        FVector::DotProduct(Out.VelocityMetersPerSecond,Left));
+    const float Depth = FMath::Max(Out.SurfaceHeightMeters-Out.BedHeightMeters,0.05f);
+    // Preserve world-position precision before converting centimetres to SI;
+    // a float centimetre cast at a 300 m river datum shifts the surface sample.
+    const float Z = float(FMath::Clamp((P.Z*0.01-double(Out.BedHeightMeters))/double(Depth),0.0,1.0));
+    FVector Velocity = ComputeFeatureVelocityAtRiverCoordinates(Coordinates,Base,Depth,Z);
+    if(IsInGameThread() && FeatureSurfaceTransportOwner.IsValid() && FeatureSurfaceTransportSampler)
+    {
+        // Share the retained, displayed surface flow rather than sampling a
+        // newer grid. Keep the authored submerged hole leg relative to that
+        // surface current; never reapply the surface feature a second time.
+        Velocity+=SampleFeatureSurfaceVelocity(Coordinates,Base,Depth)-
+            ComputeFeatureVelocityAtRiverCoordinates(Coordinates,Base,Depth,1.f);
+    }
+    Out.VelocityMetersPerSecond = Tangent*Velocity.X + Left*Velocity.Y + FVector::UpVector*Velocity.Z;
+    return true;
 }
 
 FVector2D URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderWakePresentation(

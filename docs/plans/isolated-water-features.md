@@ -42,6 +42,255 @@ seamless loop. Do not fabricate whitewater by coloring all fast flow white.
 
 ### Current handoff
 
+October 1 continuation (general curved material transport calibration): new
+continuous P2 3D geometry/velocity, full material kinetic mass and local DG P1
+pressure advance a nonuniform free surface with fixed slip-wall/bed contact.
+The retained continuous-pressure control fails local density (bound up to
+2.899x initial) despite excellent global conservation; rejected, NOT animated.
+All three local controls pass unchanged preliminary 1% bounded-density gates.
+Independent different spatial/time quadratures check ALL 600 saved steps,
+original pressure rows, fresh momentum, kinematics, global/local volume,
+energy, wall coordinates and positive curved maps. Finest density bound
+deviation 0.5648%; this is not exact local incompressibility or pressure
+stability. Two time steps/two meshes and independent curved Eulerian surface
+integration: modal differences 9.61e-7 m temporal, 3.24e-4 m spatial. Initial
+interpolated surfaces differ; no full-period/frequency/convergence acceptance.
+Delivered 21-view actual engine animation and embedded playback at
+`docs/water-feature-lab/moving-tank-calibration-v1/`: CALIBRATION, not accepted
+standing wave. Physical 0.4 s shown 5x slow + end hold; diagnostic orange
+material-node markers NOT foam; illuminated bed is authored apparatus.
+Finest boundary only (no easier fallback), 3,458 welded vertices/6,912
+triangles, chord volume error 5.93e-6 m3. No geometry expansion/amplitude
+exaggeration/smoothing modifier, clamp, density reset or hidden fluid domain.
+Fresh read-only Blender reopens delivered file; ALL 21 poses/markers match
+within 2.98e-8/2.92e-8 m. First dark/cropped previews preserved separately.
+240 numerical tests / 15 strict compiles pass (eight Blender-context modules
+not claimed from stock Python). Physics finest 623.87 s for 0.4 s, independent
+readback 81.83 s, 21 engine renders 349.66 s: not gameplay FPS. Large arrays
+remain local, no duplicate fields or source/cache deletions.
+Final 415-file pin verification plus three old eddy artifacts passes with no
+hash conflicts or mismatches. All owned physics/qualifier/render/playback
+workers terminal 0; no Blender/UnrealEditor process remains live. Scoped diff
+whitespace check passes. Delivered animation panel queued for this chat.
+Next full-period motion/further refinement/pressure conditioning, conservative
+solid-contact/inlet chronology and topology handling, then accepted actual
+feature views. No through-flow/impact/breaking/foam/froth, engine river update,
+native-cache repair, Git writes, automation mutation or 20 FPS claim. Preserve
+all prior receipts/source fields/animations; goal remains active, all eight
+features and later playable river integration unfinished.
+
+Previous continuation:
+
+October 1 continuation (conforming liquid gravity/pressure and transport
+calibration): new bounded RT0/P0 tetrahedral reference couples the FULL kinetic
+matrix, physical face flux, pressure, gravity and explicit liquid boundaries.
+No area/dual substitution, mass lumping, buried-center ghost or source fitting.
+Twelve controls at three refinements independently qualify every tetrahedron,
+face, mass matrix, normal trace, pressure/gravity equation and projection-energy
+identity. Inclined-bed hydrostatics and all-free gravity match exact references;
+tilted-interface flow and inlet/free-boundary ledger are represented. These
+controls remain fixed geometry and nonhydrostatic refinement is not accepted.
+Retained 10 ms trial fails its unchanged Courant gate; 4 ms on ALL meshes passes.
+New free-flight parcel advances 4,000 gravity/pressure impulses with uniform
+translation transport, independently checked at 21 saved poses. Gravity-control
+rendering/animation is a CALIBRATION, not waterfall/impact/splash acceptance:
+zero capillarity, no air drag, no collision or emission. Conforming tank/parcel
+meshes are NEW authored geometry, NOT a repair of the old native eddy checkpoint.
+Evidence at `docs/water-feature-lab/rt0-coupled-impulse-v1/`. Next conservative
+general interface transport, solid contact/source chronology and refinement,
+then actual feature animations. Preserve all source data/failed controls.
+Delivered 21-view annotated gravity calibration and embedded Blender playback;
+fresh read-only Blender reopens the delivered file and matches all computed
+poses within 5.64e-8 m. Physical 0.4 s shown 5x slow with end hold. Numerical
+224 tests / 10 strict compiles pass; Blender-only legacy tests are not claimed
+from stock Python. Full-field/pressure/old-animation preservation hashes pass;
+owned render/check workers terminal 0. No actual waterfall/eddy acceptance,
+native cache repair, impact/contact/emission delivery or gameplay/FPS claim.
+All eight features and later normal playable 20 FPS remain unfinished.
+
+Previous continuation:
+
+Latest continuation (October 1, full shared phase support): actual solid/phase
+fields implemented across ALL 117,180 cells, 359,412 N+1 physical faces and
+34,919 possibly-wet duals at TWO guarded refinements. Independent qualifier
+recomputes every declared bound (max cell/dual difference 2.71e-19 m3;
+liquid-area difference 8.67e-19 m2). Evidence delivered in
+`docs/water-feature-lab/eddy-shared-phase-support-v1/`. Supporting fields/audits
+ONLY: no new pressure/physical step, cache/playback, animation or game/FPS.
+12,398 cells definitely wet, 12,625 possibly wet; 227 unresolved cells retained.
+1,201 old empty cells have positive lower liquid volume in actual open regions;
+no old fluid cell proved dry. No definitely-wet face lacks positive lower dual
+support. Direct interval UNION face areas resolve another 60 positive-roundoff
+representations without an area cutoff; old arrays/source geometry unchanged.
+Total reconstructed volume bounds narrow to [3.918710,4.044877] m3: not mass
+conservation or CFD convergence. Common wet-area Cartesian flux audit exposes
+old-reference zero-excluding intervals in 1,257 definitely-wet cells, max
+0.0230665 m3/s; internal free-surface motion and source/removal absent, so do
+NOT call this full incompressibility residual or mass drift. Three receipts
+copied with hash equality; 212 tests / 7 strict compiles pass.
+Final 142-file hash verification plus prior animation/both playbacks pass;
+all new workers terminal 0; no Blender/UnrealEditor job remains live.
+Construction 391.48 s / 32.5 MB; independent full-bound check 1,430.82 s,
+not game FPS.
+Next derive matching pressure/kinetic inertia/velocity/free-surface/source
+chronology and transport on shared phase support, including uncertainty and
+internal boundaries; do NOT blindly substitute volume for area weights or
+force Cartesian cut-cell flux to zero. Matched physical-step/contact/budget/
+refinement acceptance still required before new bake. All 8 features and
+later normal playable 20 FPS delivery remain unfinished; keep goal active.
+
+Previous continuation (October 1, geometric volume/liquid support): actual
+box/roof UNION open volumes and first moments implemented for arbitrary
+pressure/dual cells; independent Gaussian-column verifier checks all 117,180
+cells (max difference 2.71e-19 m3, 8.67e-19 m4) and 72 local cached-liquid
+bounds. Delivered supporting evidence: `docs/water-feature-lab/eddy-geometric-inertia-v1/`.
+NO new animation, full step, changed pressure/cache/playback or game/FPS claim.
+1,188 native fluid pressure centers lie in actual solids, but their cut cells
+retain positive open volume; do not delete them. Minimum represented wet
+sliver 3.16937e-16 m3 is retained. The 15.2709 m/s face's buried center says air
+while its actual open dual is essentially 100% reconstructed liquid: the
+10.9422 ghost response is not its open-region interface. Two other active
+fast duals (9.43476 and 7.58711 m/s) contain zero reconstructed liquid at refined
+bounds. Their neighboring cells remain partly wet, so cell deletion is wrong.
+196 numerical tests / 4 strict compiles pass; two small receipts copied with
+hash equality. Original fields/geometry/pressure/animations stay unchanged.
+Final 102-file pin verification and old animation/both playback hashes pass;
+no Blender/UnrealEditor job remains live, no Git/automation/evidence deletion.
+Next FULL active-stencil liquid-open face/dual support and matching inertia/
+pressure/transport/source handling, not buried-center/centroid relabeling or
+manually replacing a few ghost coefficients. Liquid bounds are guarded values
+of cached reconstruction, NOT conserved mass or accepted physical interface.
+All 8 features and later playable integration remain open; goal stays active.
+
+Previous continuation (October 1, consistent pressure): matching area/distance
+matrix and velocity-gradient reference implemented, with actual native
+correctVelocity and float32 RHS readbacks. Independent qualifier verifies all
+359,412 faces and corrected float32 velocities. Delivered supporting evidence:
+`docs/water-feature-lab/eddy-consistent-pressure-v1/`. NO new animation/cache/
+playback/full fluid step/game/FPS acceptance. First flux-passing candidate has
+a 303.958 m/s jet through a roundoff aperture in a fully blocked floor face:
+retained and rejected. Exact containment of the unchanged 7 actual boxes closes
+2,220 falsely open faces WITHOUT a small-aperture threshold, geometry changes
+or velocity clamp; all unproved faces remain bit-exact. Certified consistent
+pressure passes native float32 weighted-flux max 3.72529e-6 s^-1, 140 iterations,
+0.262 s snapshot cost, but remaining active partial-face peak 15.2709 m/s is
+physically UNQUALIFIED. Native public pressure still fails 16.6194 s^-1 maximum.
+16 unsupported cells in the old native-distance input are retained/rejected,
+not deleted; the prior singular fixed-flags trial is not repeated. No direct
+hidden native-matrix readback. Independent source review finds fractional
+matrix/ghost/outflow response inconsistency; bulk-interior residual is small.
+181 numerical tests and 8 strict compiles pass. Four receipts copied/hash-
+verified; 94 pinned files and old animation/both playback files reverified
+unchanged; no Blender/UnrealEditor process remains live. Next exact general
+coverage plus geometric partial-cell volume/inertia and liquid support, then
+coupled contact/chronology/surface/refinement. Do NOT promote low flux residual
+as physical velocity or animation acceptance. All 8 features remain unfinished.
+
+Previous continuation (October 1, geometric apertures): actual closed-triangle
+sections and all359,412 physical face areas are implemented, exported from the
+unchanged8-solid eddy control, and independently verified against all actual
+box/extruded-bed geometry (max area difference3.04e-18m2). Delivered evidence:
+`docs/water-feature-lab/eddy-subcell-apertures-v1/`. Supporting geometry/native
+pressure only; NO new animation/cache/playback/game/FPS acceptance. Native
+distance-segment fractions are not geometric2D areas. The owned frame169
+pressure-only control using geometric areas with SAME cached flags diverges:
+168 geometrically closed fluid cells remain; independent recount finds87 with
+no empty-neighbor ghost-fluid term, consistent with zero operator rows. The
+other81 have empty neighbors: do NOT call all168 zero matrix rows. No direct
+matrix readback or exclusive failure attribution yet. Do not bake it.
+Rebuilding flags from areas removes those cells but changes6,027 flags and
+the fluid cohort; cut-cell divergence RMS1.448->0.484s^-1 still has9.423s^-1
+maximum, whole-fluid maximum16.611s^-1. No physical/convergence acceptance.
+Two finite controls and the explicit native divergence failure are independently
+qualified from saved readbacks. All source geometry/cache/host fields stay
+unchanged, no primary particles advance. Tiny positive apertures preserved;
+cell-volume/conditioning/contact/surface coupling is still unfinished. Next
+inspect actual matrix/free-surface/corrected-velocity residuals and build the
+shared geometric representation, not nearest-node or aperture-only promotion.
+All169 tests and7 strict source compiles pass. Five reports are delivered with
+copy hashes;56 qualification-pinned files and previous animation/playback
+hashes reverify unchanged. All owned jobs terminal; no source-access blocker.
+
+Previous continuation (October 1, corner mechanism): source diagnosis and twelve
+matched owned native liquid-step experiments are delivered in
+`docs/water-feature-lab/eddy-corner-mechanism-v1/`. Supporting physics evidence,
+NOT a new animation, solver acceptance, changed playback or game delivery.
+All original native controls/animation/playback stay unchanged. Three actual
+late states per mode show authored-contact errors already present in the
+cached obstacle field, compounded by corner interpolation. The installed
+source uses26-direction volumetric ray-distance estimates; native contact
+follows the interpolated field. Exact closest closed-mesh node replacement is
+tested with the same native flag preparation and reconstructed uncached face
+fractions in BOTH controls, exact installed liquid-step code and identical
+initial cached state/clock. Pressure/contact consume the changed geometry
+together; one20.833ms substep per control, not host-emission/full-frame replay.
+ALL12 sampled contact gates still fail. Derived spur20.833->19.519mm and
+approach10.080->9.634mm, primary spur remains up to30.305mm, and changed
+geometry introduces12.501mm far-wall contact. Reject closest-node replacement
+as a full repair; do not bake/promote it. An independent qualifier checks108
+pinned inputs/outputs, all retained node stencils, paired initial states/code/
+clocks and12 post-step volumes at8/16 quadrature. Volume quadrature changes
+reach20..23litres: no conservation/convergence claim.156 tests pass; four
+scripts compile. Early incomplete/asymmetric trials are preserved and explicitly
+superseded. Final49-report verification rehashes6,402 unique pinned files with
+zero conflicts/changes, plus unchanged animation and both playback blends.
+All native jobs finish; no source-access blocker or lost prior work.
+Next prototype actual subcell face/collider intersections shared by pressure,
+swept contact and extraction, with budget/refinement tests; not cosmetic
+clipping, clearance/radius fitting or another identical nearest-node bake.
+Full all8-feature goal and later playable river integration remain active.
+
+Previous continuation (October 1, explicit walls): the two-second paired eddy
+animation and two self-contained geometry-playback Blender files are delivered
+in `docs/water-feature-lab/eddy-explicit-walls-v1/`. Explicit physical planes
+inside a padded computational cage repair the prior effective-width mismatch;
+75 mm cell spacing and original source/floor/slope/spur geometry are retained.
+Both fresh DATA and MESH controls finish 192 frames. Do not duplicate them.
+All 192 cached obstacle fields agree at five fixed wall/bed stations within
+float32 precision; this is sampled plane agreement, not whole-solid accuracy.
+The frame-1 paired volume gap falls from 0.515263 to 0.000055 m3. Late volume
+and section-flux differences remain; no conservation/convergence claim.
+All 60 derived surfaces are closed and support the original 54 columns, but
+ALL still fail authored contact: slope intrusion 10.080 mm, spur 20.833 mm.
+Primary centers retain slope/spur intrusion too; neither solver is accepted.
+48 actual rendered views and all 24 encoded frames are checked. Each saved
+playback file independently reopens with 24 bit-exact poses and 96 visibility
+checks; no external cache or active fluid modifier is needed. Playback is
+sampled geometry, not a self-contained CFD solver or real-time game delivery.
+Six rerenders visually match captures within one 8-bit channel value.
+Final verification rehashes 6,331 unique pinned files across 17 new and 27
+preserved prior reports with no conflicts, plus the delivered clip and blends.
+All owned jobs finish; 156 numerical tests pass. No old files/caches, game,
+Git or automation changes. Full eddy circulation, contact, budgets, convergence
+and foam/froth/optics remain open, as do all eight features and later playable
+river integration. Next repair coupled slope/spur corner discretization;
+do not substitute cosmetic clipping or particle-radius fitting. See README.
+
+Previous continuation (October 1): a verified two-second three-control eddy
+animation is delivered in eddy-fractional-controls-v1/feature.png, 24 native
+frames at normal speed. Both new fractional DATA/MESH runs complete 192
+frames; do not duplicate them. Default37.5mm particle clearance eliminates
+sampled primary-center contact but reduces late reconstructed volume47.6%.
+Zero clearance restores much of it but retains27.545mm primary bank intrusion.
+All60 new derived meshes still fail authored contact (20.833mm bank overlap),
+despite passing closed-edge/exact-zero-area checks. Actual cached wall profiles
+show fractional borders move105.68mm inward per side; the volume gap already
+exists in frame1. Same authored geometry does NOT imply matched effective
+boundaries. Neither toggle is an accepted repair. Default interface gaps at
+157/159/161 are retained. Two corrected paired reports freshly reintegrate
+all180 face/quadrature estimates each using physical MAC scale0.1875, not
+display normalization1/80; old raw flux units are wrong15x and superseded,
+volume integrals unchanged. Primary velocity matching remains raw API units.
+72 actual matched transparent-water views and every decoded APNG frame are
+verified; no cosmetic contact clipping, hidden rock or invented foam. Existing
+156 pure tests pass and eight scripts compile. New reports/clip are copied
+and hash-verified; all native caches and prior deliveries are preserved.
+All owned jobs are terminal, no game/build/Git changes or20FPS claim.
+Next explicit matched wall/bed/spur representation and coupled native contact
+repair, then budgets/circulation/convergence and full foam/froth/optics. Keep
+all eight cases and eventual river integration open under the newer isolated
+feature goal, not the obsolete full-river heartbeat. See the new README.
+
 The first actual waterfall clip is rendered, encoded and verified:
 `docs/water-feature-lab/waterfall-prototype-v1/feature.mp4` (3 seconds).
 See `docs/water-feature-lab/first-feature-review.md` for the physics calibration,
@@ -247,6 +496,254 @@ Reference starting points (no external media bundled):
 - USBR hydraulic design/experimental reference: https://www.usbr.gov/tsc/techreferences/hydraulics_lab/pubs/EM/EM25.pdf
 
 ## Scheduler
+
+Latest bounded continuation (October1, actual padded-bed native eddy): a new
+two-second transparent-water comparison is DELIVERED in
+`docs/water-feature-lab/eddy-padded-bed-comparison-v1/feature.png`.
+Fresh192-frame FLIP evolution adds three computational cells BELOW the
+unchanged authored bed; same75mm grid, physical geometry/sources, gravity,
+2/8 timesteps and24fps. Installed-native plane controls locate loss of the
+old floor interface during obstacle extrapolation when its only negative
+seed is in the excluded bottom row. Actual padded cached bed zero survives
+all192 frames. Three matched primary-particle checks reduce worst floor
+intrusion37.288->0.604mm, not zero; slope/spur contact still fails. The stock
+particle mesh STILL penetrates the bed54.726mm. Field-derived floor contact
+passes sampled checks, but slope/spur mesh intrusion remains8.139/20.833mm.
+Do not claim solver/contact/eddy acceptance or substitute a polished surface.
+Both controls have30 extraction checks; all padded derived meshes pass
+closed-edge/zero-area gates but all30 fail sampled overall contact acceptance.
+One of54 columns is ambiguous at frame147 and retained. Rendering is actual
+matched48 views with unchanged water IOR1.333 shader, flat triangle normals,
+no fake foam/displacement/smoothing/contact clipping.24-frame APNG is verified
+losslessly at12fps,1280x476; first/middle/last views inspected, motion changes
+exclude captions. No retiming; not a seamless loop.12 delivery/evidence files
+are copied/hash-verified; see newREADME for preserved paths, failed guarded
+preparation attempts, exact scope and costs.156 pure tests pass;8 scripts
+compile. DATA2263/MESH7521/audits62854,59355/particle75330,84976/render73805
+are terminal0; encoder is terminal0. No live owned jobs, old cache edits,
+Git writes, playable integration, gameFPS or accepted foam/froth claim.
+Next resolve authored slope/spur versus cached obstacle geometry and primary
+contact, then consistent meshing. All eight features and river integration
+remain unfinished; keep the current isolated-feature goal active. Old hourly
+full-river heartbeat prompt remains obsolete; its previous edit was denied.
+
+Latest bounded continuation (October1, copied-field mesh extraction): a new
+two-second MOVING eddy comparison is DELIVERED in
+`docs/water-feature-lab/eddy-field-mesh-comparison-v1/feature.png`.
+24 frames at12fps,1280x482; preserved standard FLIP evolution193..239,stride2,
+same authored colliders/lights and fixed full-liquid view in both panels.
+Both use opaque geometry-diagnostic shading and flat triangle normals, NOT
+accepted water/foam optics. All decoded frames match composed originals
+losslessly; first/middle/last native views inspected. The field-derived surface
+is visibly more faceted, not an accepted visual improvement. No fake foam,
+source-cache edits, radius tuning, altered solver, smoothing or retiming.
+
+Native controls COMPLETE:15 affine plane/orientation/grid-phase cases plus
+36 preserved flat-control cases,extraction refinements1/2/4. Original cell-center
+knots are preserved; ordinary resampling was rejected for0.625mm surface shift.
+Maximum plane error4.121e-7 base cells; flat queried height discrepancy <=37.02nm,
+no axis-box vertex penetration. Exact-coordinate duplicate merge and EXACT
+zero-area removal do not move vertices; raw native output remains preserved.
+Overall geometry qualification is FALSE: calibrated f1/r2,f1/r4,f48/r4 retain
+21/27/3 boundary edges. No tolerance widening or dropping failed cases.
+
+Moving eddy audit COMPLETE:24 r2 frames plus r1/r4 at193/217/239,30 meshes,
+all closed-edge/zero-degenerate checks pass. All54 query columns remain supported.
+Median absolute column mesh/phi gap14.241..19.123mm in original particle meshes
+versus0.0000567..0.0001062mm in copied-field meshes. These are float32-BVH
+numerical query residuals, NOT submicrometre physical accuracy. Worst retained
+near-contact column gap6.3768mm. ALL30 sampled authored-solid contact gates FAIL:
+floor/approach penetration62.5mm; r2 bank-spur maximum20.8335mm. Matching native
+phi_obstacle is not matching the actual solid geometry. No candidate promotion.
+Mesh signed volumes change with extraction; they are NOT conserved liquid mass.
+
+51-control910 inputs, moving1650 inputs/90 outputs, render48 views and clip are
+hash-pinned;1793 combined inputs/outputs independently rehash unchanged after
+encoding. Five new delivery files (14.08MiB) are copied/hash-verified.156 pure
+tests pass; native controls30127/audit4457/render29447 and encoding/copy finish0.
+No owned Blender job remains. Original/live phi fields and all old captures
+remain unchanged. Offline extraction51.19s/render266.75s,NOT game20FPS.
+All8 features and eventual river integration remain OPEN; full user goal active.
+Next reconcile native obstacle-field boundary zeros/flags with actual authored
+floor/bed/spur before a controlled physical repair; validate moving surface
+transport/mass/contact and real foam/froth afterward. Do not repeat these completed
+controls or hide contact with particles/materials. Full evidence and failed
+attempt history:eddy-field-mesh-comparison-v1/README.md (the existing surface
+review append failed; this sibling handoff is preserved). Old hourly full-river prompt is obsolete;
+its attempted replacement was denied, so do not alter it without user authority.
+
+Latest bounded continuation (September30–October1, manufactured flat-water control):
+`docs/water-feature-lab/flat-equilibrium-control-v1/feature.png` is DELIVERED:
+two seconds,24 native-view frames at12fps,three matched panels. Blue is an
+explicit opaque geometry-diagnostic shader, NOT accepted water/foam optics;
+gold marks the analytic wet-box walls and intended0.9m height. No native mesh
+clipping/correction, artificial motion, foam projection or simulation retiming.
+All24 decoded frames match composed originals losslessly. First/middle/last
+actual views are inspected. Cropped initial preview is rejected/preserved;
+final fixed camera checks every mesh bounding box with3-percent frame margin.
+
+Three new private native controls COMPLETE: visualization-root
+`flat-equilibrium-v6-stock-m2`, `stock-m8`, `flat-lattice-m2`.32x24x24 cells,
+75mm spacing,closed box,zero initial velocity,no emitters,gravity/pressure ON,
+same44800 zero-jitter quarter-cell particles. Exact compiled FLIP body and mesh
+recipes run on owned resources, not modified live engine resources.96/384/96
+fixed steps; integrated time1.999999952s,native final clock2s. First particle
+union agrees with independent analytic lattice within8.924e-8 cells (fixed
+allowance2e-6); initial zero-velocity phi advection bitexact. No APIC switch.
+
+Stock first join raises the interior interface41.2108mm BEFORE pressure.
+After2s,stock median height errors41.2176/41.2313mm;2-vs8-step median absolute
+difference only0.04342mm. The flat-lattice radius0.718713553878169 is derived
+analytically for THIS horizontal grid-phase/8-per-cell seed only. It leaves
+final queried height errors -0.00413..+0.04525mm, but native mesh-minus-phi
+median remains+36.7878mm; maximum vertex wall intrusion53.0657mm (stock91.2495mm).
+Do NOT promote the radius as a general physical repair. Native mesh/field/wall
+consistency and reconstructed volume remain FAILED. This still-water control
+does not reproduce or uniquely explain the eddy's large timestep sensitivity.
+
+All49 fields/meshes per control are independently audited; missing support is
+not filled.147 meshes have zero exact degenerate triangles and closed edge
+counts, NOT certified absence of self-intersection/collision. Native OBJ/raw
+node/triangle coordinates and indices are verified against the exact-build
+Apache2.0 source.905 audit dependencies and982 clip dependencies rehash unchanged.
+145 combined pure tests pass; all owned controls/audit/render/encode jobs finish0.
+Three new controls total245.77MiB; original source inputs/live-field fingerprints
+and older captures/clips remain unchanged. External Unreal work was observed;
+costs are unisolated offline timings, NOT20FPS. No river build/integration or
+feature acceptance is claimed. All8 standalone cases and eventual integration
+remain OPEN; the full isolated-feature goal stays active. Next consistent native
+interface/meshing/walls and orientation/phase/spacing controls, then actual moving
+foam/froth; do not repeat the completed still-water run or resume the obsolete
+full-river heartbeat. Details and rejection history:surface-foam-review.md.
+
+Latest bounded continuation (September30, native host-backed controls): a new
+two-second side-by-side native eddy animation is DELIVERED in
+`docs/water-feature-lab/eddy-temporal-comparison-v1/feature.png`.
+24 frames,12fps,1440x348; unchanged native mesh, fixed camera, modeled studio
+lighting, low-cost4-sample Cycles/denoising, no secondary particles or corrective
+projection/clipping/retiming. All decoded frames match the annotated originals
+losslessly; all23 adjacent LIQUID image comparisons in each panel differ (text
+changes are excluded). This is a liquid-motion diagnostic, NOT accepted foam,
+optical fidelity, circulation, collision, shoreline or gameFPS. Exact zero-area
+native triangles remain in normal frames221/237 (2/4) and quarter frame219 (2).
+Do not conceal these by reporting only the sampled frames without defects.
+
+Three fresh serial controls, `tmp/water-feature-lab/eddy-temporal-resume-v6-m2`,
+`v6-m4`, `v6-m8`, COMPLETE native data and mesh from copied resumable frame192
+through193..240. Same physical scene/geometry,75mm cells,FLIP,24fps,time_scale1;
+min/max timestep bounds2/8,4/16,8/32 only. Actual host source/obstacle rebuilding
+runs.11 seed grids match independent VDB bitexact; primary loading succeeds.
+Native compiled liquid-step entry/return is observed in the actual bake thread
+with frame handlers/profiling, without replacing any solver function.96/192/384
+steps are observed.48 data/config/mesh outputs plus preserved192 seed per case;
+all original input/source hashes remain unchanged. These are serialized resumes,
+NOT proof of identity to an uninterrupted bake; no secondary stage was baked.
+
+Equal NOMINAL frame span is2s; each actual C01 endpoint span is1.999987793s.
+Observed liquid-step dt sums are2.001926422/2.001926315/2.001926494s: the native
+integrator/frame-clock discrepancy is exposed, not silently retimed away.
+Independent audit retains the same54 earlier query columns and samples native
+mesh/fields at193/194/204/216/228/240. At240 normal-to-half absolute vertical
+base-phi differences have median52.3473mm,p95130.037mm (54 supported columns);
+half-to-quarter median32.3035mm,p9589.9578mm (53/54; absent column retained).
+Native mesh signed volumes at240 are3.599114/3.414310/3.429743m3, NOT particle
+mass closure. Median mesh-first-upward-ray minus phi gaps are17.09/14.81/20.27mm;
+ray hits may include detached droplets and are NOT qualified mesh normals or
+material speeds. No convergence threshold has passed; none of the3 is promoted.
+
+Native jobs94421/41586/54819 and render jobs4949/30773/23040 finish0. Native data
+costs10.08/21.71/39.33s, mesh5.24/5.56/5.85s.24-frame render costs41.41/44.73/
+42.07s. These are offline costs, NOT the20fps playable target. Fresh controls
+total412.61MiB; earlier partial attempts are preserved, not recooked. Failed
+v1/v2/v3 lacked a seed after RNA timestep setters invalidated the *new copied*
+cache. The corrected runner redirects first, changes settings, THEN copies the
+seed. This was not a broken VDB payload or new disk-capacity failure. v4 data
+bake finished but old function wrappers saw0 steps after native recompilation;
+its failed receipt/data are preserved and not treated as qualified controls.
+One-frame v5 probe verifies actual profiling and native mesh, finish0. Do not
+retry any unchanged failure or touch original caches with invalidating setters.
+
+Independent audit `eddy-native-temporal-resume-20260930-v1.json` in the
+visualization root:1495164bytes,SHA256
+17d00ffc182dfa0a925271f5f142134309b0eaf75a611f50bbfc468398613a07.
+All692 audit dependencies rehash unchanged. Clip receipt independently verifies
+775 dependencies including audited caches and72 source renders; APNG SHA256
+c6e79f86db5a1c2b0790c29b72e50cc5d8e26e0c82db252863bbbd9e053f13a9.
+Six new pure clock/cohort tests pass;133 combined tests pass. Next isolate
+source sampling/resampling from per-substep particle reconstruction in a
+manufactured steady-interface control, with matched mass/flux and native mesh
+checks. Do not solve timestep sensitivity by picking the prettiest variant,
+enabling broken APIC, hiding defects, or projecting foam onto an unqualified
+surface. All8 features and river integration remain open; full goal active.
+
+Latest bounded continuation (September30, resumed on D:): the actual compiled
+eddy liquid-step body now runs on newly owned in-memory resources, with no
+live solver/grid/particle alias. Eight fields (including resumable phi and
+previous fields) match independent VDB payloads bitexact before evolution;
+all88450 primary positions/velocities match actual native scene API. Six
+affine native advection controls pass, maximum1.095e-6cell error under the
+fixed2e-5cell allowance. Eight ownership and four column-interface controls
+are added;127 combined pure tests pass. Original engine phi/previous phi and
+velocity/previous velocity fingerprints and all original input hashes stay
+unchanged. Only fresh diagnostic arrays and receipts were written.
+
+Three private single-step controls use20.8333/10.4167/5.20833ms from identical
+cached inputs. Across the same54 prior columns, median absolute vertical
+base-phi change from advection alone is2.58645/1.75921/0.888942mm; subsequent
+particle reconstruction changes that interface another4.07749/3.16567/
+1.59983mm. These are vertical zero crossings, NOT rendered-mesh normals or
+material speeds, and unequal elapsed times are NOT temporal convergence.
+All54 have one valid upward crossing; the24 earlier missing columns and35
+normal-neighborhood failures are still unqualified. This directly demonstrates
+an interface change beyond advection in this local native mechanism experiment;
+it does not prove a unique cause of the earlier rendered-motion mismatch.
+
+Native jobs75877/92641/8168 all finish0 with complete receipts. Analysis receipt
+eddy-native-interface-reconstruction-20260930-v1.json, visualization root,
+SHA2568817eb4db9c1165716a42c48814627808c01c6bbba882e0cf15a982c8626ed72.
+All446 analysis dependencies and3 executed analysis modules independently
+rehash unchanged. Existing caches, meshes, scenes and delivered clips are
+preserved; the drive move is handled only by unsaved process cache relocation.
+No native host emission/pre-step/source rebuild, mesh or secondary replay was
+run; zero uncached force/solid velocity is explicitly scoped, not recovered
+bake chronology.5.38..5.67s measured diagnostic costs are not gameFPS.
+
+Next compare equal elapsed-time private evolution with the actual case's
+pre-step/source boundary state and matched mesh extraction, tracking particle
+reconstruction separately from advection and pressure/velocity update. Do not
+fix the apparent mismatch by retiming cache fields, silently projecting foam,
+or accepting a frozen/analytic control as the requested liquid-coupled feature.
+This turn delivers a reproducible native evolution experiment, not a new
+animation or a physically accepted feature. All8 standalone cases and eventual
+realistic river integration remain unfinished; full goal remains active.
+
+Latest bounded continuation (September30): exact case-specific stage/clock
+evidence is preserved in visualization-root
+eddy-cache-stage-clock-20260930-v1.json, SHA256
+8e228ef7b45ded0d1a406594e4994d00a9a0baeb296c066d37a3147d97699dd1.
+All288 C01 configurations parse;287 intervals are strictly increasing and
+agree with24fps/time_scale1 to float32 accumulation accuracy. Stored dt is
+the last adapted step, not the complete substep schedule; Blender clamps the
+host total time at each frame end. The playback-loaded solver clock is zero
+and is NOT a saved simulation timestamp. Exact live compiled liquid-step code
+copies previous phi/velocity only at the beginning of an adaptive frame.
+
+Seven pairs168/190/191/192/193/194/214 verify previous velocity equals the
+prior frame's final velocity bitexact. Previous phi differences occur only
+inside cells marked obstacle by the current final flags in those seven pairs;
+this is not a measured free-surface displacement. Mesh extraction uses current
+phi/primary particles; secondary evolution uses beginning-frame snapshots.
+Playback loading initializes phi and previous fields rather than loading
+their resumable values, so these must be loaded explicitly for a private
+evolution test. No native step or cache correction was performed by this audit.
+
+The repository moved to D:/repos/SmokeEmIfYouGotEm. Independent read-only
+rehashing at that location confirms all312 original inputs and5 executed
+modules match the preserved receipt, without rewriting old path provenance.
+115 combined pure tests pass. Next reconstruct a private, explicitly resumed
+native evolution and observe advection versus interface reconstruction, not
+retime fields or project foam onto an inconsistent mesh. No new clip or
+feature acceptance; all8 cases and eventual river integration remain open.
 
 Latest bounded continuation (September30): native MAC extension provenance is
 now independently reconstructed and checked against installed Blender

@@ -835,3 +835,335 @@ All owned jobs are terminal.2.04s measured native audit cost is not gameFPS.
 No original mesh/cache, authored scene, existing particle, delivered animation
 or normal game was changed. No new clip or accepted feature is claimed;
 liquid-coupled foam motion and all8 physical/visual cases remain open.
+
+## Exact cache stages and private native transport (September30)
+
+The repository is now at D:/repos/SmokeEmIfYouGotEm; its old C:/Users/salsi/repos
+location no longer exists. Saved evidence keeps its original path provenance.
+Read-only prefix remapping for verification confirms all312 inputs and5 source
+modules of the completed cache-stage receipt match at the new location.
+Source/document edits work on D:. No re-bake or file recreation was needed.
+
+`water_feature_cache_stages.py` reads exactly204 uncompressed bytes of a C01
+gzip configuration. Although the writer uses sizeof(int) for time_total's byte
+count, its field is float32, not an integer. Dimensionless dx=1/80 is not the
+75mm physical cell size. All288 configurations and287 strictly increasing
+intervals agree with24fps/time_scale1 to float32 accumulation accuracy. Maximum
+total-time deviation is0.0000667572 native units. The primary
+[host loop](https://raw.githubusercontent.com/blender/blender/fbe6228777e7/source/blender/blenkernel/intern/fluid.cc)
+stores the last adapted dt and clamps total time at frame end: those values
+alone do not recover every substep or its precise schedule.
+
+Read-only disassembly of the actual loaded eddy function confirms the
+beginning-frame phi/velocity copy guard, consistent with the matched
+[liquid template](https://raw.githubusercontent.com/blender/blender/fbe6228777e7/intern/mantaflow/intern/strings/liquid_script.h).
+In seven paired frames168/190/191/192/193/194/214, previous velocity is bitexact
+with the prior frame's final velocity. Previous phi differs only inside cells
+marked obstacle by the current final flags in those seven pairs; that difference
+is not a measured free-surface displacement. The actual mesh function uses
+current phi/primary particles, while the secondary function uses beginning-frame
+snapshots. These stage facts alone do not diagnose the earlier mesh/velocity
+residual or justify retiming it.
+
+Playback does not restore resumable fields or solver chronology. At frame192
+only final velocity matches VDB; live phi is uniformly0.5, previous phi/velocity
+are zero, and solver frame/timeTotal/timePerFrame are zero. Native command exit0
+without a receipt previously concealed a Python exception; subsequent invocations
+use --python-exit-code1 and require a complete receipt. Cache-stage receipt:
+visualization-root eddy-cache-stage-clock-20260930-v1.json,822124bytes,
+SHA2568e228ef7b45ded0d1a406594e4994d00a9a0baeb296c066d37a3147d97699dd1.
+
+### Executing actual liquid evolution, with isolated resources
+
+`probe_water_feature_native_transport.py` now allocates fresh base solver,
+grids, particle system and attached velocity attributes by actual native type.
+It binds the exact compiled liquid-step code to an explicitly owned namespace;
+native C operations are shared code, not shared engine resources. There are no
+engine grid/particle aliases, fabricated missing globals, closure aliases or
+mutable-default aliases. Observer wrappers call the original native operation
+once with unchanged arguments, then copy diagnostic arrays. Engine phi, previous
+phi, final/previous velocity fingerprints remain unchanged. This fingerprint
+gate covers those four arrays, not every possible native global/random state.
+
+Eight required cached grids are loaded explicitly and match independently read
+OpenVDB arrays bitexact, including phi, previous phi/velocity, particle phi and
+obstacle fields. All88450 resumed primary particles match actual engine count,
+positions and velocities under the isotropic75mm/object-centered mapping.
+Scratch grids are new; force and solid velocity are explicit private zero with
+live playback zeros checked, not reconstructed pre-step bake evidence. No host
+emission/solid rebuilding, effectors, mesh extraction, secondary evolution or
+cache writer executes. This is a native local mechanism experiment, not a
+reproduction of the next cached frame.
+
+Six independent affine scalar-advection controls use two plane orientations and
+three positive timesteps. Every interior sample is compared with its analytic
+translated value; maximum error1.09482e-6cell, with a prespecified2e-5cell float32
+allowance. This validates that kernel/control, not general eddy hydraulics.
+Eight ownership tests and four column-interface tests are added.127 combined
+pure regressions pass; all six new source modules compile without warnings.
+
+Full/half/quarter controls begin with identical native frame192 inputs; they use
+the adapted dt=.0520833321 native units or declared fractions thereof. Physical
+step durations are20.8333,10.4167 and5.20833ms. Each completes all36 observed
+before/after-operation checkpoints. The analysis uses the earlier54 query
+columns without selecting by error, demands a unique upward base-phi zero and
+rejects obstacle endpoint crossings. All54 support those scalar measurements;
+the prior24 missing regular columns and35 failed normal neighborhoods remain
+unqualified. This does not turn scalar-column support into foam-force support.
+
+| Private single-step duration | Median absolute advection height change | Median absolute additional particle-reconstruction height change |
+|---|---|---|
+|20.8333ms|2.58645mm|4.07749mm|
+|10.4167ms|1.75921mm|3.16567mm|
+|5.20833ms|0.888942mm|1.59983mm|
+
+At the full step the extra change ranges from-10.9043 to+14.6322mm; absolute
+p95 is10.4423mm. In these54 columns later extrapolation/boundary/pressure stages
+do not move the observed zero further, although arrays elsewhere do change.
+These are vertical interpolated **base-phi** zeros, not actual rendered-mesh
+distances, normals, material speeds or conserved-volume measurements. Smaller
+steps reduce the local change, but the elapsed times differ: this is not an
+equal-time temporal-convergence result or a proved repair. Particle rebuilding
+demonstrably changes the interface beyond advection in this experiment; it is
+not yet a unique diagnosis of the earlier rendered-surface mismatch.
+
+Corrected native controls75877/92641/8168 finish0. Final full/half/quarter receipts,
+respectively, in the visualization root:
+eddy-owned-native-transport-20260930-v4.json, SHA256
+cd3204fd69ef2efa94e3f2cb1cc60e5bad9f4c77fca18ad5285a948303a88379;
+v2.json, SHA25697e36b6b8ab2c0006e146ecff3dd9053e7f7cece7233b3364a221a2b6374c897;
+v3.json, SHA2561b03fc38952ef45f3c6ae2c409bd710845a2c06ca874f8058e19bb1406f984ec.
+Earlier v1 evidence is preserved; the revised controls strengthen ownership
+guards and explicitly declare step fractions. Final independent analysis:
+eddy-native-interface-reconstruction-20260930-v1.json,620724bytes, SHA256
+8817eb4db9c1165716a42c48814627808c01c6bbba882e0cf15a982c8626ed72.
+All446 recorded dependencies and3 analysis modules independently rehash
+unchanged, including432 stage arrays. The latter total162.013MiB for the three
+controls.5.38..5.67s native diagnostic costs are not real-time/gameFPS.
+
+Next test equal elapsed-time evolution with actual case pre-step/source state
+and matched mesh extraction, keeping particle reconstruction distinct from
+advection and pressure/velocity update. No cache retiming, fabricated interface
+normal or foam projection is an accepted substitute. No new animation, change
+to an existing clip/scene/cache, or physically accepted feature was delivered
+by these diagnostic experiments. All8 standalone features and eventual river
+integration remain open; the complete goal remains active.
+
+### Equal-frame-span native eddy evolution and visible comparison (September30)
+
+The missing host/pre-step/mesh experiment now runs in fresh independent caches:
+`tmp/water-feature-lab/eddy-temporal-resume-v6-m2`, `v6-m4`, `v6-m8`.
+NativeFLIP data and mesh stages COMPLETE from a copied frame192 seed through
+193..240. Only timestep bounds change:2..8,4..16,8..32. Physical geometry,
+75mm grid,gravity,24fps and time_scale1 remain unchanged. Actual Blender source
+emission/obstacle rebuilding runs; no fabricated replacement boundary maps.
+11 resumed grid fields are independently bitexact before evolution. Native
+primary import succeeds; earlier private transport receipts separately validate
+all88450 original seed positions/velocities. The new controls do not make that
+private particle equality proof into an observation of every host-emitted particle.
+
+Native bake recompiles/reallocates its solver, invalidating the first attempt's
+Python function wrappers. The successful observer instead uses bake-thread frame
+handlers and read-only Python profiling of actual compiled liquid-step call/return.
+It observes96/192/384 substeps, with native clocks/counts at every step and copied
+before/after grids at the first resumed frame. It does not replace native functions
+or claim the private single-step stage separations are replayed at every host step.
+Original scenes, cache inputs, previously delivered clips and source hashes remain
+unchanged. No secondary bake, foam driver, APIC switch or game integration occurs.
+
+All controls cover the same48-frame window: nominal2s, actual C01 endpoint span
+1.999987793s. Summed observed native dt is2.001926422/2.001926315/2.001926494s,
+nearly identical across controls but ~1.94ms above their clamped cached clocks.
+Both clock measures are reported; no correction or silent retiming is applied.
+This is equal-frame-span temporal sensitivity, not established CFD convergence.
+
+Independent analysis preserves all54 earlier columns, including missing or
+ambiguous later intersections. At frame240, normal-to-half differences have
+median52.3473mm,p95130.037mm (54 columns); half-to-quarter median32.3035mm,
+p9589.9578mm (53 columns). These are native BASE-PHI vertical zero crossings,
+not rendered normals or material velocities. Native mesh signed volumes at240
+are3.599114/3.414310/3.429743m3, not conserved particle mass. First downward
+ray hits with upward-facing normals give median absolute mesh/phi height gaps
+17.09/14.81/20.27mm. Detached droplets/overhangs can affect ray hits; this is not
+a qualified surface-motion sampler or repair. No variant is accepted/promoted.
+
+Visible deliverable: `eddy-temporal-comparison-v1/feature.png`, a two-second,
+24-frame12fps,1440x348 labeled side-by-side native animation. Three fixed-camera
+480x270 Cycles panels use4 samples and existing denoising/studio lights. No liquid
+mesh clipping, corrective displacement, foam, secondary phase, marker trails or
+speed multiplier. Headers/footer only label unchanged rendered content. Every
+decoded frame equals its composed source; all23 adjacent native-content changes
+per panel are nonzero, excluding labels. First/middle/end frames were visually
+inspected; the differences remain an unaccepted liquid diagnostic, not a realistic
+foam-film animation or optical acceptance. The loop is explicitly not seamless.
+All72 rendered meshes have closed edge counts, but exact zero-area triangles
+remain: normal frame221 has2,237 has4; quarter219 has2. Closed edge counts do not
+prove non-self-intersection or repair these defects; missing evidence stays open.
+
+Native data costs10.08/21.71/39.33s; mesh5.24/5.56/5.85s.24-frame GPU renders
+cost41.41/44.73/42.07s. Costs are offline, not measured playable20fps. Three new
+controls total412.61MiB. Earlier empty/partial v1..v4 and one-frame v5 evidence
+are preserved. Early load failures were caused by RNA setting callbacks deleting
+the *new copied seed* before load, not bad captured evidence: redirect cache,
+change settings, then copy and verify seed. Native v4 completed data but0 observed
+steps disqualified it; it is not counted as a successful instrumented control.
+
+Audit receipt in the visualization root:
+eddy-native-temporal-resume-20260930-v1.json,1495164bytes,SHA256
+17d00ffc182dfa0a925271f5f142134309b0eaf75a611f50bbfc468398613a07;
+all692 dependencies independently rehash unchanged. Clip SHA256
+c6e79f86db5a1c2b0790c29b72e50cc5d8e26e0c82db252863bbbd9e053f13a9;
+clip.json SHA25667c75fbfbf61c6431382682f4225e0ebe2cb402c410c3a7973ac485a4ab06c01,
+775 dependencies verified before/after encoding, all original caches unchanged.
+Six clock/cohort tests are added;133 combined pure tests pass. Native jobs
+94421/41586/54819, renders4949/30773/23040 and encode aa1160 all finish0.
+
+Next isolate host particle sampling/resampling from per-substep particle-levelset
+reconstruction with a manufactured steady-interface/mass-flux control and matched
+native mesh. Current evidence establishes timestep sensitivity but not its unique
+cause. Do not pick a visually preferred variant as truth, retime the cache, project
+foam onto the mesh, or enable the known gravity-broken APIC solver. All8 features
+and eventual river integration remain unfinished; full goal active.
+
+### Manufactured closed still-water control and mesh mismatch (September30–October1)
+
+New matched private controls use the original aligned eddy ONLY as the source
+of the installed build's compiled native FLIP/body/mesh recipe. The manufactured
+domain is32x24x24,75mm spacing,closed box,analytic horizontal surface at12 cells
+(0.9m),zero initial velocity,no inflow/outflow or external forces. Native gravity
+and pressure remain enabled; physical velocity scale is0.075*2.5=0.1875. Inherited
+FLIP ratio0.95,min/max particles8/16,narrow band3 are preserved. The inherited
+res scalar80 only occurs in inactive diffusion/viscosity branches; these and
+APIC,guiding,fractions are explicitly checked OFF. The native resampling/band
+deletion still operates; do not pretend all initial particles remain forever.
+Only closed/outflow scalars and the declared radius-control variant change.
+
+Native source scene/cache is never overwritten. Four live engine-grid
+fingerprints and the original blend/setup/frame192VDB/config hashes are checked
+before/after. Owned grids, particles and mesh parents are released after private
+function/global aliases, never via cleanup of the actual engine namespace.
+Compiled code identity is checked; first-substep observers wrap actual native
+calls only in the private function globals. Subsequent calls evolve normally.
+This is not a host-emitter replay or a replacement cache for a game river.
+
+The seed is exactly44800 native particles on quarter/three-quarter cell positions
+with no jitter. Same full position/flag hash in all controls:
+953ee19117c96bf7daacee352df86b5e7d9a8a2a9f34165a49de015541fb07ff.
+Separate fresh Blender processes preserve the matched initialization. Native
+resampling subsequently narrows/remakes the cloud; the analytic lattice prediction
+is asserted only at the first particle union, not fitted to later irregular clouds.
+
+Independent reference uses the exact native union radius sqrt(3)*(factor+.01)/2,
+neighbor search and cell-center distances to the regular seed. Stock factor1
+predicts a zero at12.549476975 cells instead of12. All2688 first-union interior
+samples agree with this calculation within2.452e-8 cells; calibrated samples
+within8.924e-8 cells, below the predeclared2e-6 allowance. Before this union,
+zero-velocity phi advection preserves the analytic plane bitexact. At the first
+join, stock interface height is0.941210775m, a41.2108mm rise before extrapolation
+and pressure; the calibrated variant gives0.900000014m. Thus emission/physical
+advection is not needed to generate THIS particular static reconstruction bias.
+This does not identify the unique cause of the earlier moving eddy's error.
+
+Analytic factor0.718713553878169 makes the two samples straddling this specific
+horizontal plane symmetric. It is not fitted to an observed river volume,
+not a general surface reconstruction repair, and not proof of a signed-distance
+gradient, curved/overturning geometry or ordinary-water foam dynamics. Rotated
+surfaces, grid phases, irregular clouds and spatial refinement remain untested.
+
+Controls `flat-equilibrium-v6-stock-m2`, `stock-m8`, `flat-lattice-m2` in the
+visualization root complete49 states including initialization and48 evolved
+frames.96/384/96 native fixed body steps integrate1.999999952316284s; all final
+native clocks are2s. Native time/frame0 initialization is required because
+`Solver.step()` snaps total time to the incremented frame times frame length.
+No later clock correction or cache retiming occurs. Native dt is fixed here,
+not the earlier host-adaptive timestep schedule; the two experiments stay distinct.
+
+After2 seconds, all24 fixed interior columns retain unambiguous support:
+
+| Control | Median field height error | Median mesh minus field | Maximum vertex wall intrusion |
+|---|---:|---:|---:|
+| Stock,2 steps/frame | +41.2176mm | -4.3986mm | 91.2495mm |
+| Stock,8 steps/frame | +41.2313mm | -4.3694mm | 91.2495mm |
+| Analytic plane-radius,2 steps/frame | +0.00717mm | +36.7878mm | 53.0657mm |
+
+Stock2-to8-step absolute field difference median0.04342mm,p950.08368mm,max0.10410mm,
+far smaller than the moving eddy difference. The calibrated height range is
+-0.00413..+0.04525mm, but this apparent interior improvement is NOT accepted
+because the meshed interface/walls and volume still disagree. Maximum all-grid
+MAC norms after2s are0.00007418/0.00014669/0.00003907m/s; these include air/ghost
+samples and are not independently reconstructed material velocities.
+
+The native closed-box obstacle field independently matches the analytic native
+cell-center box distance everywhere, with wall zeros at2 cells from each end.
+All147 native meshes are audited for actual unchanged vertex positions/faces.
+No exact zero-area triangles, boundary edges or nonmanifold edges occur in these
+controls; this does not prove non-self-intersection or make wall penetration safe.
+Mesh heights are top upward-facing native triangle intersections, not qualified
+normal/material-speed samples. Wall results are vertex checks, not full triangle
+or swept collision certification. Maximum sampled penetration remains a failure.
+
+Native public pointer getters return addresses of std::vector headers. The
+pinned Node layout is28 bytes (flags,position,normal);Triangle16 bytes. Length
+and capacity are checked against native OBJ counts before payload readback.
+All triangle indices match; OBJ coordinates match native float32 subtraction
+and normalization with the original5e-7 decimal-export allowance. Exact decimal
+arithmetic handles comparisons exactly on that boundary without increasing it.
+Rendered coordinates use the verified raw native positions times37.5mm mesh
+cell spacing, not the normalized OBJ as grid coordinates. References:
+[native mesh layout](https://raw.githubusercontent.com/blender/blender/fbe6228777e7/extern/mantaflow/preprocessed/mesh.h),
+[pointer getters](https://raw.githubusercontent.com/blender/blender/fbe6228777e7/extern/mantaflow/preprocessed/mesh.cpp),
+[OBJ writer](https://raw.githubusercontent.com/blender/blender/fbe6228777e7/extern/mantaflow/preprocessed/fileio/iomeshes.cpp),
+[clock advancement](https://raw.githubusercontent.com/blender/blender/fbe6228777e7/extern/mantaflow/preprocessed/fluidsolver.cpp).
+These installed-build sources have Apache2.0 headers; no newly captured river
+imagery, terrain or underwater measurements are introduced by this control.
+
+Reconstructed liquid/obstacle volume is checked at0,1,12,24,48 with midpoint n4/n8
+quadrature, explicitly not conserved particle mass or a rigorous continuum bound.
+Initial n8 volume2.357203491m3; final stock2.474619873m3 (both schedules), calibrated
+2.350175812m3. Final native signed mesh volumes3.054076938/3.054099860/2.724016059m3
+are also NOT mass closure. Matching a queried plane cannot substitute for these
+remaining geometry/volume failures.
+
+Visible checkpoint: `flat-equilibrium-control-v1/feature.png`, two seconds,
+24 frames at12fps,1440x374,three identical native Blender views. Simulation24fps
+with stride2 and no speed multiplier; frame0..46,loop explicitly not seamless.
+Opaque blue shading is a geometry diagnostic, not water optics or froth. Gold
+wire lines annotate the intended wet box/height; they are not fake fluid,
+colliders or foam. Native triangles/coordinates are unchanged, with no clipping,
+projection or smoothing. Every decoded frame matches the annotated native renders
+losslessly. Native image differences exclude changing labels; tiny image changes
+do not prove physical flow in a control that should remain still. First/middle/end
+frames were inspected. Initial cropped view is rejected/preserved; final camera
+checks the bounding-box projection with3-percent margins in all72 views.
+
+Four delivery files are copied/hash-verified in that project folder: feature.png,
+clip.json,native-frames.json,native-audit.json. Audit5538079bytes,SHA256
+8319588144ee2baca68f7da587a62e14b463db3412b6f418a24b754f6c2b4665;
+905 dependencies unchanged. Clip4859168bytes,SHA256
+52b9fb178de071bbc55b7631483291debc9971dd26a38c5ee65a5c76c65042da;
+clip receipt227047bytes,SHA256
+7ff26006a3c21223ad2e8319bd3e829f5a3d44b9150ed52770b76b5a9499f5e6;
+all982 dependencies independently rehash unchanged after encoding. Native body
+cost1.57/6.31/1.34s; mesh/export9.86/10.32/7.40s; final72 CPU renders77.86s.
+External Unreal work was observed, so these are unisolated offline timings, NOT
+measured game20FPS. Three controls total245.77MiB; older evidence is preserved.
+
+One-frame v1 had wrong initial native frame/clock and is disqualified for timing.
+v2 establishes corrected one-frame time. v3/v4/v5 reject the new mesh-readback
+check: first float64-versus-native-float32 arithmetic, then an exact decimal
+boundary represented slightly above the allowance in binary subtraction. Both
+reader issues are repaired using documented operations/exact comparison, not
+tolerance widening or physics changes. Failed outputs remain preserved; no
+unchanged failure is rerun. The audit's first attempt also rejected a different
+floating multiplication association in its own speed readback; exact recorded
+operation order fixes the reader without modifying velocity.
+
+Twelve new analytic/geometry checks plus existing133 tests pass:145 total,
+with all8 new modules compiled without writing pycache. Native sessions1516,
+11351,5141,audit97198,renders26574/16716,encoding/QA/copy are terminal0. No owned
+Blender job remains, no original cache deleted, no river package/solver changed.
+Next derive and validate consistent interface extraction/solid boundaries with
+orientation/grid-phase/spacing controls, then moving foam/froth. Do not promote
+the flat-only radius or project secondary particles to disguise mesh disagreement.
+All8 requested features and eventual realistic river integration remain OPEN;
+the full user goal stays active, not the obsolete full-river heartbeat.

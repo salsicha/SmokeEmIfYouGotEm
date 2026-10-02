@@ -3714,8 +3714,21 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
         ProductionPfd->SetRelativeLocationAndRotation(
             Pose.TorsoCenterCm + FVector(0.0f, 0.0f, 0.5f),
             Pose.TorsoRotation);
+        // Depth fitted to the CC0 body's measured chest (the vest otherwise
+        // stood several centimetres off the chest and back), width and
+        // height from the profile.
+        float VestDepthScale = Profile.X;
+        if (const ARaftSimCC0CrewVisualActor* CC0Visual =
+                Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor()))
+        {
+            float FittedDepth = 1.0f;
+            if (CC0Visual->GetFittedVestDepthScale(FittedDepth))
+            {
+                VestDepthScale = FittedDepth;
+            }
+        }
         ProductionPfd->SetRelativeScale3D(
-            Profile * FVector(1.0f, 1.0f, 1.02f));
+            FVector(VestDepthScale, Profile.Y, Profile.Z * 1.02f));
     }
     const FVector CollarOffset = bUsingProductionVisual
         ? FVector(4.0f, 0.0f, 0.0f)
@@ -4081,6 +4094,7 @@ void ARaftSimCrewAvatarActor::BuildPersonalAccessories()
         Sheath.Commit(RescueKnife, 0);
         Handle.Commit(RescueKnife, 1);
     }
+    BuildPfdSidePanels();
     EyewearFrame->SetMaterial(0, TintedAccessoryMaterial(this,
         TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"), Identity.EyewearFrameColor));
     UMaterialInstanceDynamic* LensMaterial = TintedAccessoryMaterial(this,
@@ -4146,4 +4160,112 @@ void ARaftSimCrewAvatarActor::UpdatePersonalAccessories()
     }
     RescueWhistle->SetVisibility(bShowKit);
     RescueKnife->SetVisibility(bShowKit);
+    if (PfdSidePanels && ProductionPfd)
+    {
+        PfdSidePanels->SetVisibility(ProductionPfd->IsVisible() && HasProductionWhitewaterPfd());
+        // The vest's shell material (and so its colour) is set after the
+        // accessories are built on some appearance paths.
+        if (PfdSidePanels->GetMaterial(0) != ProductionPfd->GetMaterial(0))
+        {
+            PfdSidePanels->SetMaterial(0, ProductionPfd->GetMaterial(0));
+        }
+    }
+}
+
+void ARaftSimCrewAvatarActor::BuildPfdSidePanels()
+{
+    if (!ProductionPfd)
+    {
+        return;
+    }
+    if (!PfdSidePanels)
+    {
+        // Rescue vests close the flanks with foam side panels under the
+        // arms; the vest mesh had only two thin adjustment straps a side, so
+        // the torso showed through in profile. Built in the vest's own
+        // frame along its side-strap path (build_production_whitewater_pfd.py),
+        // just inside the straps so they still read on top.
+        PfdSidePanels = NewObject<UProceduralMeshComponent>(this, TEXT("PfdSidePanels"));
+        PfdSidePanels->SetupAttachment(ProductionPfd);
+        PfdSidePanels->RegisterComponent();
+        PfdSidePanels->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        PfdSidePanels->SetCastShadow(true);
+        static const FVector2D SidePath[] = {
+            {-13.8f, 13.2f}, {-10.5f, 15.2f}, {-6.0f, 16.5f}, {0.0f, 17.0f},
+            {6.0f, 16.5f}, {10.5f, 15.2f}, {13.8f, 13.2f}};
+        constexpr int32 PathCount = UE_ARRAY_COUNT(SidePath);
+        constexpr float BottomZ = -13.0f;
+        constexpr float TopZ = 5.0f;
+        constexpr float OuterInsetCm = 0.05f;
+        constexpr float InnerInsetCm = 1.35f;
+        constexpr float EdgeRollCm = 0.6f;
+        RaftSimAccessoryMesh::FAccessoryMesh Panels;
+        for (int32 Side = -1; Side <= 1; Side += 2)
+        {
+            // Cross-section rings (lateral inset, height, normal mix): a
+            // slab with rolled top and bottom edges.
+            struct FRing
+            {
+                float Inset;
+                float Z;
+                float NormalOut;
+                float NormalUp;
+            };
+            const FRing Rings[] = {
+                {InnerInsetCm, BottomZ + EdgeRollCm, -0.3f, -1.0f},
+                {OuterInsetCm + EdgeRollCm, BottomZ, 0.4f, -1.0f},
+                {OuterInsetCm, BottomZ + EdgeRollCm, 1.0f, -0.3f},
+                {OuterInsetCm, TopZ - EdgeRollCm, 1.0f, 0.3f},
+                {OuterInsetCm + EdgeRollCm, TopZ, 0.4f, 1.0f},
+                {InnerInsetCm, TopZ - EdgeRollCm, -0.3f, 1.0f},
+            };
+            constexpr int32 RingCount = UE_ARRAY_COUNT(Rings);
+            const int32 Base = Panels.Vertices.Num();
+            for (int32 Point = 0; Point < PathCount; ++Point)
+            {
+                const FVector2D P(SidePath[Point].X, SidePath[Point].Y * Side);
+                const FVector2D Prev(SidePath[FMath::Max(Point - 1, 0)].X, SidePath[FMath::Max(Point - 1, 0)].Y * Side);
+                const FVector2D Next(SidePath[FMath::Min(Point + 1, PathCount - 1)].X,
+                    SidePath[FMath::Min(Point + 1, PathCount - 1)].Y * Side);
+                const FVector2D Tangent = (Next - Prev).GetSafeNormal();
+                FVector2D Out(-Tangent.Y, Tangent.X);
+                if (Out.Y * Side < 0.0f)
+                {
+                    Out = -Out;
+                }
+                for (const FRing& Ring : Rings)
+                {
+                    const FVector2D XY = P - Out * Ring.Inset;
+                    const FVector Normal =
+                        FVector(Out.X, Out.Y, 0.0f) * Ring.NormalOut + FVector::UpVector * Ring.NormalUp;
+                    // Follow the vest's seated taper, as its side straps do.
+                    Panels.Add(RaftSimVestShape::ApplySeatedTaper(FVector(XY.X, XY.Y, Ring.Z)), Normal,
+                        FVector2D(static_cast<float>(Point) / (PathCount - 1), (Ring.Z - BottomZ) / (TopZ - BottomZ)));
+                }
+            }
+            for (int32 Point = 0; Point + 1 < PathCount; ++Point)
+            {
+                for (int32 Ring = 0; Ring < RingCount; ++Ring)
+                {
+                    const int32 NextRing = (Ring + 1) % RingCount;
+                    const int32 A = Base + Point * RingCount + Ring;
+                    const int32 B = Base + Point * RingCount + NextRing;
+                    const int32 C = Base + (Point + 1) * RingCount + Ring;
+                    const int32 D = Base + (Point + 1) * RingCount + NextRing;
+                    Panels.Triangles.Append({A, C, B, B, C, D});
+                }
+            }
+            // End caps where the panel tucks under the front and back carriers.
+            for (const int32 Point : {0, PathCount - 1})
+            {
+                const int32 First = Base + Point * RingCount;
+                for (int32 Ring = 1; Ring + 1 < RingCount; ++Ring)
+                {
+                    Panels.Triangles.Append({First, First + Ring, First + Ring + 1});
+                }
+            }
+        }
+        Panels.Commit(PfdSidePanels, 0);
+    }
+    PfdSidePanels->SetMaterial(0, ProductionPfd->GetMaterial(0));
 }

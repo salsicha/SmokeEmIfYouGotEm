@@ -157,6 +157,14 @@ public:
      */
     bool GetSolvedChestWorldTransform(FTransform& OutWorld) const;
 
+    /** The vest's depth scale fitted to this body's measured chest (front
+     * and back carriers about 5 mm off the body); false until measured. */
+    bool GetFittedVestDepthScale(float& OutScale) const
+    {
+        OutScale = FittedVestDepthScale;
+        return bVestFitMeasured;
+    }
+
     /** Midpoint of the rendered eyes (for eyewear); false until posed. */
     bool GetRenderedEyeCenterWorld(FVector& OutWorldLocation) const
     {
@@ -186,6 +194,11 @@ private:
     void BuildNeckCollar();
     /** Carry the collar with the rendered upper spine. */
     void UpdateNeckCollar();
+    /** Chest frame with the vest centre a given distance ahead of the spine. */
+    bool ComputeChestWorldTransform(float ForwardOfSpineCm, FTransform& OutWorld) const;
+    /** Measure the seated body's chest front and back (posed vertices) and fit
+     * the vest's depth and fore-aft position to them. */
+    void MeasureVestFit();
     void ApplyPaddleGripPose(const FRaftSimCrewAvatarPose& Pose);
     void ApplyFingerChain(bool bLeft, const TCHAR* Digit, float GripAlpha);
     void ApplyFingerChainAroundGrip(
@@ -297,4 +310,10 @@ private:
     double GazeLastSeconds = -1.0;
     double GazeNextChangeSeconds = 0.0;
     FRandomStream GazeRandom;
+
+    /** Vest fitted to this body (MeasureVestFit): its centre ahead of the
+     * spine and its depth scale. */
+    bool bVestFitMeasured = false;
+    float FittedVestForwardOfSpineCm = 4.5f;
+    float FittedVestDepthScale = 1.0f;
 };

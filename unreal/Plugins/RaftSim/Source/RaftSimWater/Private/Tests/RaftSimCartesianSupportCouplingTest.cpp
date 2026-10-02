@@ -134,6 +134,36 @@ bool FRaftSimCartesianSupportCouplingTest::RunTest(const FString&)
     Water->SampleRaftSupportSurfaceAtWorldPosition(Probe,After);
     TestEqual(TEXT("expired weak owner is never called"),Calls,BeforeExpired);
     TestEqual(TEXT("expired owner uses fallback"),After.SurfaceHeightMeters,Before.SurfaceHeightMeters);
+    Water->ClearRaftSupportCarrierSampler(Owner);
+    Water->ConfigureFeatureKinematics(true);
+    Site.SpillingFraction=1.f;
+    Water->ConfigureRaftSupportBreakingSites(Sites,.22f,1.f);
+    int32 ChangedCurrentProbes=0;
+    double MaxSharedCurrentError=0.;
+    for(int32 X=-6;X<=6;++X)for(int32 Y=-6;Y<=6;++Y)
+    {
+        FVector P;FRaftSimWaterSample Support,Interaction;
+        if(!Water->RiverToWorldPosition(Center+FVector2D(X*.5,Y*.5),322.,P) ||
+            !Water->SampleRaftSupportSurfaceAtWorldPosition(P,Support) || !Support.bWet)continue;
+        P.Z=Support.SurfaceHeightMeters*100.;
+        FVector2D Coordinates;FVector Tangent,Left;
+        if(!Water->WorldToRiverCoordinates(P,Coordinates,Tangent,Left))return false;
+        const FVector2D Base(FVector::DotProduct(Support.VelocityMetersPerSecond,Tangent),
+            FVector::DotProduct(Support.VelocityMetersPerSecond,Left));
+        const float Depth=FMath::Max(Support.SurfaceHeightMeters-Support.BedHeightMeters,.05f);
+        const FVector Shared=Water->ComputeFeatureVelocityAtRiverCoordinates(Coordinates,Base,Depth,1.f);
+        if(!Water->SampleRaftInteractionWaterAtWorldPosition(P,Interaction))return false;
+        const FVector Expected=Tangent*Shared.X+Left*Shared.Y+FVector::UpVector*Shared.Z;
+        MaxSharedCurrentError=FMath::Max(MaxSharedCurrentError,(Interaction.VelocityMetersPerSecond-Expected).Size());
+        ChangedCurrentProbes+=(Interaction.VelocityMetersPerSecond-Support.VelocityMetersPerSecond).Size()>1.e-6;
+        TestEqual(TEXT("feature current preserves carrier stage"),Interaction.SurfaceHeightMeters,Support.SurfaceHeightMeters);
+    }
+    TestTrue(TEXT("public hull sampler actually receives authored current, not disabled identity"),ChangedCurrentProbes>0);
+    TestTrue(TEXT("shared surface/hull current agrees after Cartesian north reflection"),MaxSharedCurrentError<1.e-5);
+    Water->SetRaftSupportCarrierSampler(OtherOwner,[](const FVector&,float& H,bool& Wet){H=322.f;Wet=false;return true;});
+    Water->SampleRaftInteractionWaterAtWorldPosition(Probe,After);
+    TestFalse(TEXT("authored current cannot wet a carrier-clipped dry point"),After.bWet);
+    Water->ClearRaftSupportCarrierSampler(OtherOwner);
     return !HasAnyErrors();
 }
 #endif

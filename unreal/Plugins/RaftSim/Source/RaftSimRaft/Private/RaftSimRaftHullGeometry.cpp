@@ -6,6 +6,28 @@
 
 CSV_DEFINE_CATEGORY(RaftSimHull,true);
 
+#if !UE_BUILD_SHIPPING
+bool ARaftSimRaftActor::BindIsolatedFeatureHull(URaftSimChronoRuntimeAdapter* Runtime)
+{
+    if(!Runtime || !bUsingProductionRaftRestMesh || GetActorScale3D()!=FVector::OneVector)
+    {
+        const FVector Scale=GetActorScale3D();
+        UE_LOG(LogTemp,Error,TEXT("Isolated hull precondition: runtime=%d production=%d scale=(%.17g,%.17g,%.17g)"),
+            int32(Runtime!=nullptr),int32(bUsingProductionRaftRestMesh),Scale.X,Scale.Y,Scale.Z);
+        return false;
+    }
+    RaftAdapter=Runtime;LastRenderedHullRevision=0;LastLoggedHullRevision=0;
+    const TWeakObjectPtr<ARaftSimRaftActor> WeakThis(this);
+    const bool Bound=Runtime->SetHullGeometryProvider(
+        [WeakThis](const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out)
+        {auto* Self=WeakThis.Get();return Self && Self->PrepareSharedHullGeometry(Segments,Out);},
+        [WeakThis](){if(auto* Self=WeakThis.Get())Self->CommitSharedHullGeometry();});
+    if(!Bound)UE_LOG(LogTemp,Error,TEXT("Isolated production hull export refused: rest_sections=%d visual=%d"),ProductionRaftRestSections.Num(),int32(RaftVisual!=nullptr));
+    return Bound;
+}
+void ARaftSimRaftActor::RefreshIsolatedFeatureHull(){UpdateSharedHullVisual();}
+#endif
+
 void ARaftSimRaftActor::ConfigureSharedHullGeometryReview()
 {
 #if !UE_BUILD_SHIPPING

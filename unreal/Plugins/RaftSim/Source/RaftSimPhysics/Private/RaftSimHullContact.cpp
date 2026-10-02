@@ -1,4 +1,7 @@
 #include "RaftSimHullContact.h"
+#include "RaftSimContactWitnessPrune.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 
 namespace RaftSimHullContact
 {
@@ -35,7 +38,12 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
         ShapeSpeed=FMath::Max(ShapeSpeed,(After.VerticesM[I]-Before.VerticesM[I]).Length()/Dt);
     }
     const auto Local=[&](int32 I,double T){return FMath::Lerp(Before.VerticesM[I],After.VerticesM[I],FMath::Clamp(T/Dt,0.,1.));};
-    struct FContact{FVector Before,After,Normal,Ground;};
+    using FContact=RaftSimContactWitnessPrune::FWitness;
+    bool CompactCandidate=false;
+#if !UE_BUILD_SHIPPING
+    static const bool Compact=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFlipCompactContactCandidate"));
+    CompactCandidate=Compact;
+#endif
     TArray<FContact,TInlineAllocator<32>> Contacts;
     TArray<FVector> StartCm,EndCm;StartCm.SetNumUninitialized(Before.VerticesM.Num());EndCm.SetNumUninitialized(StartCm.Num());
     const auto ContactLocal=[&](const FContact& C,double T){return FMath::Lerp(C.Before,C.After,FMath::Clamp(T/Dt,0.,1.));};
@@ -88,11 +96,21 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
         FContact Fresh;Fresh.Before=Before.VerticesM[Face.X]*B.X+Before.VerticesM[Face.Y]*B.Y+Before.VerticesM[Face.Z]*B.Z;
         Fresh.After=After.VerticesM[Face.X]*B.X+After.VerticesM[Face.Y]*B.Y+After.VerticesM[Face.Z]*B.Z;
         Fresh.Normal=Hit.Normal/Hit.Normal.Length();Fresh.Ground=Hit.Witness.GroundPoint;
+        Fresh.MovingFace=Hit.MovingFace;
         Contacts.RemoveAll([&](const FContact& C){return FVector::DotProduct(Current.WorldPoint(ContactLocal(C,Result.ConsumedSeconds))-C.Ground,C.Normal)>4.*SkinM;});
         if(auto* Existing=Contacts.FindByPredicate([&](const FContact& C)
             {return (C.Before-Fresh.Before).Length()<1.e-7 && (C.After-Fresh.After).Length()<1.e-7 && FVector::DotProduct(C.Normal,Fresh.Normal)>1.-1.e-10;}))
             *Existing=Fresh;
-        else Contacts.Add(Fresh);
+        else
+        {
+            // Error is below the solver's normal-velocity roundoff budget,
+            // including endpoint interpolation and deformation velocity.
+            const double Eps=FMath::Min(1.e-12,ClosingTolerance/(64.*(1.+Omega+2./Dt)));
+            if(!CompactCandidate || !RaftSimContactWitnessPrune::Redundant(Fresh,Contacts,INDEX_NONE,Eps))Contacts.Add(Fresh);
+            if(CompactCandidate)
+                for(int32 I=Contacts.Num()-1;I>=0;--I)
+                    if(RaftSimContactWitnessPrune::Redundant(Contacts[I],Contacts,I,Eps))Contacts.RemoveAt(I);
+        }
         if(Contacts.Num()>128){Result.Failure=TEXT("full-hull manifold capacity exceeded");return Result;}
         const int32 BeforeImpulses=Result.Impulses;bool Resolved=false;
         const auto FutureConstraint=[&](const FContact& C,FVector& P,FVector& D)
