@@ -1,4 +1,5 @@
 #include "RaftSimTriangleSweep.h"
+#include "RaftSimHullArcPair.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "PhysicsEngine/BodySetup.h"
@@ -106,7 +107,7 @@ bool RaftSimTriangleSweep::Triangle(const FVector& Start,const FVector& End,doub
 
 RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
     TConstArrayView<FVector> StartCm,TConstArrayView<FVector> EndCm,
-    TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm,bool bGroupedBroadPhase) const
+    TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm,bool bGroupedBroadPhase,const FRaftSimHullArcPath* Arc) const
 {
     using namespace RaftSimSurfaceSweep;
     FResult Best;
@@ -177,20 +178,34 @@ RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
         }
     }
     Best.Status=EStatus::Clear;Best.Time=1.;uint64 Pairs=0;
-    TArray<int32,TInlineAllocator<64>> GroupLeaves;
-    for(int32 Face=0;Face<Faces.Num();++Face)
+    const auto HasGround=[&](const FBox& Box)
     {
-        if(bGroupedBroadPhase && Face%64==0)
+        TArray<int32,TInlineAllocator<64>> Pending;Pending.Add(0);
+        while(!Pending.IsEmpty())
+        {
+            const auto& N=Nodes[Pending.Pop(EAllowShrinking::No)];if(!Box.Intersect(N.Bounds))continue;
+            if(N.Count)return true;Pending.Add(N.Left);Pending.Add(N.Right);
+        }
+        return false;
+    };
+    TArray<int32> ActiveFaces;
+    if(Arc && bGroupedBroadPhase)ActiveFaces=MovingTree.Candidates(*Arc,SkinCm*.01,OriginCm*.01,HasGround);
+    else for(int32 I=0;I<Faces.Num();++I)ActiveFaces.Add(I);
+    TArray<int32,TInlineAllocator<64>> GroupLeaves;
+    for(int32 Active=0;Active<ActiveFaces.Num();++Active)
+    {
+        const int32 Face=ActiveFaces[Active];
+        if(bGroupedBroadPhase && Active%64==0)
         {
             // Amortize the upper tree walk across consecutive source faces.
             // This box contains EVERY endpoint in the group; no face, time,
             // deformation or source triangle is approximated or omitted.
             FBox GroupBounds(ForceInit);
             const double Limit=Best.Status==EStatus::Contact?Best.Time:1.;
-            for(int32 F=Face;F<FMath::Min(Face+64,Faces.Num());++F)
+            for(int32 F=Active;F<FMath::Min(Active+64,ActiveFaces.Num());++F)
                 for(int32 V=0;V<3;++V)
                 {
-                    const int32 Index=Faces[F][V];
+                    const int32 Index=Faces[ActiveFaces[F]][V];
                     const FVector A=LocalStart[Index],B=LocalEnd[Index];
                     GroupBounds+=A;GroupBounds+=A+(B-A)*Limit;
                 }
@@ -231,6 +246,12 @@ RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
                 const FTriangle Ground{{Vertices[T.X],Vertices[T.Y],Vertices[T.Z]}};
                 FBox FaceBounds(ForceInit);for(const auto& V:Ground.V)FaceBounds+=V;
                 if(!Bounds.Intersect(FaceBounds))continue;
+                if(Arc)
+                {
+                    FTriangle WorldStart=Start,WorldGround=Ground;
+                    for(int32 J=0;J<3;++J){WorldStart.V[J]+=OriginCm*.01;WorldGround.V[J]+=OriginCm*.01;}
+                    if(RaftSimHullArcPair::Separated(Indices,WorldStart,WorldGround,*Arc)){++Pairs;continue;}
+                }
                 // Once an impact is known, later events cannot change the
                 // earliest result. Prove every other source pair only up to
                 // that time, rather than entering already-forbidden geometry
@@ -244,6 +265,8 @@ RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
                 // Witness positions returned in world metres; normals already
                 // include the exact source component scale/reflection/rotation.
                 Hit.Witness.MovingPoint+=OriginCm*.01;Hit.Witness.GroundPoint+=OriginCm*.01;
+                FTriangle WorldGround=Ground;for(auto& P:WorldGround.V)P+=OriginCm*.01;
+                RaftSimHullArcPair::GroundFeature(Hit,WorldGround);
                 if(Hit.Status==EStatus::Invalid || Hit.Status==EStatus::Unresolved || Hit.Status==EStatus::InitialIntersection)
                 {Hit.TrianglePairs=Pairs;return Hit;}
                 if(Hit.Status==EStatus::Contact && (Best.Status==EStatus::Clear || Hit.Time<Best.Time))Best=Hit;

@@ -4,6 +4,7 @@
 namespace RaftSimOverwashLoads
 {
 struct FLoad { FVector ForceN=FVector::ZeroVector,TorqueNm=FVector::ZeroVector; };
+struct FDiagnostics {FLoad Load;int32 WetUpperFaces=0;double MinimumFaceOffsetM=DBL_MAX,MaximumIncomingNormalMps=0.;};
 // Reduced upper-face pressure loading, additional to the submerged chamber
 // drag. Unlike the D3 risk magnitude, this has a signed force and a geometric
 // application point. It does not prescribe a capsize angle or angular rate.
@@ -21,7 +22,7 @@ inline FLoad UpperFace(const FRaftSimFlexSegmentOverwash& Wet,
     Load.TorqueNm=FVector::CrossProduct(Offset,Load.ForceN);
     return Load;
 }
-// Lab scoop control: water entering a dipped upper face transfers momentum
+// Water entering a dipped upper face transfers momentum
 // into that face. Only incoming relative NORMAL flow loads it; tangential or
 // outgoing flow cannot manufacture a downward force. This is a reduced patch
 // pressure model, not a resolved flexible-tube pressure distribution.

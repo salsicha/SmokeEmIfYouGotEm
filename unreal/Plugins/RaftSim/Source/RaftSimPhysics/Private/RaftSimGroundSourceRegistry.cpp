@@ -1,5 +1,8 @@
 #include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimTriangleSweep.h"
+#include "RaftSimHullArcPair.h"
+#include "LandscapeHeightfieldCollisionComponent.h"
+#include "Chaos/HeightField.h"
 #include <limits>
 #include "CollisionQueryParams.h"
 #include "ProfilingDebugging/CsvProfiler.h"
@@ -47,7 +50,7 @@ bool FRaftSimGroundSourceRegistry::SweepCapturedSphere(const FVector& StartCm,
 
 RaftSimSurfaceSweep::FResult FRaftSimGroundSourceRegistry::SweepCapturedSurface(
     TConstArrayView<FVector> StartCm,TConstArrayView<FVector> EndCm,
-    TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm,bool bGroupedBroadPhase)
+    TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm,bool bGroupedBroadPhase,const FRaftSimHullArcPath* Arc)
 {
     CSV_SCOPED_TIMING_STAT(RaftSimGround,SurfaceSweep);
     using namespace RaftSimSurfaceSweep;
@@ -76,11 +79,47 @@ RaftSimSurfaceSweep::FResult FRaftSimGroundSourceRegistry::SweepCapturedSurface(
             UE_LOG(LogTemp,Display,TEXT("Captured surface sweep source: component=%s triangles=%d closed_components=%d ready=%d build_ms=%.3f"),
                 *Mesh->GetPathName(),Cache->TriangleCount(),Cache->ClosedSourceCount(),int32(Built),(FPlatformTime::Seconds()-Started)*1000.);
         }
-        auto Hit=Cache->SweepSurface(StartCm,EndCm,Faces,SkinCm,ProvenClearanceCm,bGroupedBroadPhase);Hit.GroundComponent=Mesh;
+        auto Hit=Cache->SweepSurface(StartCm,EndCm,Faces,SkinCm,ProvenClearanceCm,bGroupedBroadPhase,Arc);Hit.GroundComponent=Mesh;
         Pairs+=Hit.TrianglePairs;
         if(Hit.Status==EStatus::Invalid || Hit.Status==EStatus::Unresolved || Hit.Status==EStatus::InitialIntersection)
         {Hit.TrianglePairs=Pairs;return Hit;}
         if(Hit.Status==EStatus::Contact && (Best.Status==EStatus::Clear || Hit.Time<Best.Time))Best=Hit;
+    }
+    // Visit the actual Complex Chaos heightfield triangles (including its
+    // holes and native diagonal), not a fitted bed or sampled support spheres.
+    for(const auto& WeakLandscape:Landscapes)
+    {
+        auto* Landscape=WeakLandscape.Get();if(!Landscape)continue;
+        TInlineComponentArray<ULandscapeHeightfieldCollisionComponent*> Components(Landscape);
+        for(auto* Component:Components)
+        {
+            if(!Component || !Component->IsQueryCollisionEnabled() || !Bounds.Intersect(Component->Bounds.GetBox()))continue;
+            if(!Component->HeightfieldRef || !Component->HeightfieldRef->HeightfieldGeometry){Best.Status=EStatus::Invalid;return Best;}
+            const FTransform Rigid(Component->GetComponentQuat(),Component->GetComponentLocation());
+            FBox LocalBounds(ForceInit);
+            for(int32 I=0;I<8;++I)LocalBounds+=Rigid.InverseTransformPosition(FVector(
+                I&1?Bounds.Max.X:Bounds.Min.X,I&2?Bounds.Max.Y:Bounds.Min.Y,I&4?Bounds.Max.Z:Bounds.Min.Z));
+            const Chaos::FAABB3 Query(LocalBounds.Min,LocalBounds.Max);
+            Component->HeightfieldRef->HeightfieldGeometry->VisitTriangles(Query,Chaos::FRigidTransform3::Identity,
+                [&](const Chaos::FTriangle& T,int32 GroundFace,int32,int32,int32)
+                {
+                    if(Best.Status!=EStatus::Clear && Best.Status!=EStatus::Contact)return;
+                    FTriangle Ground;FBox GroundBounds(ForceInit);
+                    for(int32 J=0;J<3;++J){Ground.V[J]=Rigid.TransformPosition(FVector(T[J]))*.01;GroundBounds+=Ground.V[J];}
+                    for(int32 I=0;I<Faces.Num();++I)
+                    {
+                        FTriangle A,B;FBox FaceBounds(ForceInit);
+                        for(int32 J=0;J<3;++J){A.V[J]=StartCm[Faces[I][J]]*.01;B.V[J]=EndCm[Faces[I][J]]*.01;FaceBounds+=A.V[J];FaceBounds+=B.V[J];}
+                        if(!FaceBounds.ExpandBy(SkinCm*.01).Intersect(GroundBounds))continue;
+                        ++Pairs;if(Arc && RaftSimHullArcPair::Separated(Faces[I],A,Ground,*Arc))continue;
+                        auto Hit=RaftSimSurfaceSweep::Sweep(A,B,Ground,SkinCm*.01,128,ProvenClearanceCm*.01);
+                        Hit.MovingFace=I;Hit.GroundFace=GroundFace;RaftSimHullArcPair::GroundFeature(Hit,Ground);
+                        if(Hit.Status!=EStatus::Clear && Hit.Status!=EStatus::Contact){Best=Hit;return;}
+                        if(Hit.Status==EStatus::Contact && (Best.Status==EStatus::Clear || Hit.Time<Best.Time))Best=Hit;
+                    }
+                });
+            if(Best.Status!=EStatus::Clear && Best.Status!=EStatus::Contact){Best.TrianglePairs=Pairs;return Best;}
+        }
     }
     Best.TrianglePairs=Pairs;return Best;
 }

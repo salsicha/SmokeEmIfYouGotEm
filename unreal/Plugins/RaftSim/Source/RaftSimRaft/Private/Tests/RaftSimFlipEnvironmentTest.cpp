@@ -16,8 +16,100 @@
 #include "RaftSimSwimmerSubmersion.h"
 #include "RaftSimFlipObstacle.h"
 #include "RaftSimHullPrepareCache.h"
+#include "RaftSimRaftActor.h"
+#include "RaftSimGroundSourceRegistry.h"
+#include "Engine/StaticMeshActor.h"
+#include "Components/StaticMeshComponent.h"
+#include "Misc/ScopeExit.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimProductionCapturedRockPin,
+    "RaftSim.Production.CapturedRockPin",
+    EAutomationTestFlags::EditorContext|EAutomationTestFlags::ClientContext|EAutomationTestFlags::ProductFilter)
+bool FRaftSimProductionCapturedRockPin::RunTest(const FString&)
+{
+    UWorld* World=UWorld::CreateWorld(EWorldType::Editor,false);if(!World)return false;
+    ON_SCOPE_EXIT{World->DestroyWorld(false);World->RemoveFromRoot();};
+    auto* Rock=World->SpawnActor<AStaticMeshActor>();auto* Cube=LoadObject<UStaticMesh>(nullptr,TEXT("/Engine/BasicShapes/Cube.Cube"));
+    if(!Rock || !Cube)return false;
+    Rock->Tags.Add(TEXT("RaftSimPhysicalGround"));Rock->GetStaticMeshComponent()->SetStaticMesh(Cube);
+    Rock->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    Rock->SetActorScale3D(FVector(1.2,2.4,5.5));Rock->SetActorLocation(FVector(0,0,-125));
+    auto Sources=MakeShared<FRaftSimGroundSourceRegistry>(World);
+    const auto Scenes=RaftSimFlipTestEnvironment::Scenes();
+    const auto Scene=*Scenes.FindByPredicate([](const auto& S){return S.Name==TEXT("rock_pin_broadside");});
+    const auto* Defaults=GetDefault<ARaftSimRaftActor>();
+    auto* Runtime=NewObject<URaftSimChronoRuntimeAdapter>(World);
+    FRaftSimRaftBodyConfig Body;Body.Runtime=ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
+    Body.MassKg=Defaults->MassKg+85.f+75.f*Defaults->PaddlerCount;
+    Body.LengthMeters=Defaults->FootprintLengthM;Body.WidthMeters=Defaults->FootprintWidthM;Body.TubeRadiusMeters=Defaults->TubeRadiusM;
+    const float Yaw=Body.MassKg*(Body.LengthMeters*Body.LengthMeters+Body.WidthMeters*Body.WidthMeters)/12.f;
+    Body.InertiaTensorKgM2=FVector(.45f*Yaw,.45f*Yaw,Yaw);Body.BuoyancyWeightMultiple=5.2f;Body.LinearDragCoefficient=9000.f;
+    FRaftSimFlexParameters Flex;Flex.MassKg=Defaults->MassKg;Flex.GuideMassKg=85.;Flex.PassengerMassKg=75.;Flex.PassengerCount=Defaults->PaddlerCount;
+    Flex.LengthM=Body.LengthMeters;Flex.WidthM=Body.WidthMeters;Flex.TubeRadiusM=Body.TubeRadiusMeters;
+    Runtime->ConfigureRaftBody(Body);Runtime->ConfigureFlexibleRaftModel(Flex,RaftSimCrewSeatLayout::BuildNormalSeats(Flex,false),18000.,true);
+    double Seconds=0.;
+    Runtime->SetWaterSurfaceSampler([&](const FVector& P,float& H){H=Scene.Surface(P,Seconds)*100.;return Scene.Wet(P);});
+    Runtime->SetFlexibleWaterFieldSampler([&](const FVector& P,FRaftSimFlexUniformWater& W){W.bWet=Scene.Wet(P);W.SurfaceHeightM=Scene.Surface(P,Seconds);W.VelocityMps=Scene.Velocity(P,Seconds);return true;});
+    Runtime->SetGroundSurfaceSampler([&](const FVector& P,float& Z,FVector& N){double G;if(Sources->SampleGround(P,G,N)){Z=float(G);return true;}Z=-400.f;N=FVector::UpVector;return true;});
+    Runtime->SetHullGroundQuery([Sources](auto A,auto B,auto F,double Skin,double Clearance){return Sources->SweepCapturedSurface(A,B,F,Skin,Clearance);});
+    bool ReferenceChecked=false;
+    Runtime->SetHullGroundArcQuery([&,Sources](auto A,auto B,auto F,double Skin,double Clearance,const FRaftSimHullArcPath& Arc)
+    {
+        auto Fast=Sources->SweepCapturedSurface(A,B,F,Skin,Clearance,true,&Arc);
+        if(!ReferenceChecked && Fast.Status==RaftSimSurfaceSweep::EStatus::Contact)
+        {
+            const auto ExactReference=Sources->SweepCapturedSurface(A,B,F,Skin,Clearance,false,&Arc);
+            ReferenceChecked=true;
+            TestEqual(TEXT("original-face hierarchy retains exhaustive contact status"),int32(Fast.Status),int32(ExactReference.Status));
+            TestEqual(TEXT("original-face hierarchy retains moving face ID"),Fast.MovingFace,ExactReference.MovingFace);
+            TestEqual(TEXT("original-face hierarchy retains captured ground face ID"),Fast.GroundFace,ExactReference.GroundFace);
+            TestTrue(TEXT("original-face hierarchy retains contact time"),FMath::Abs(Fast.Time-ExactReference.Time)<1.e-9);
+            TestTrue(TEXT("original-face hierarchy retains both exact witnesses"),
+                Fast.Witness.MovingPoint.Equals(ExactReference.Witness.MovingPoint,1.e-9) &&
+                Fast.Witness.GroundPoint.Equals(ExactReference.Witness.GroundPoint,1.e-9) &&
+                Fast.Normal.Equals(ExactReference.Normal,1.e-9));
+        }
+        return Fast;
+    });
+    TArray<RaftSimRaftMesh::FMeshData> Rest,Prepared;
+    const auto* Asset=LoadObject<UStaticMesh>(nullptr,TEXT("/Game/RaftSim/Rafts/Production/SM_RaftSim_ProductionPaddleRaft.SM_RaftSim_ProductionPaddleRaft"));
+    if(!RaftSimRaftMesh::ExtractProductionRaftRestMesh(Asset,Rest)){AddError(TEXT("Original production asset missing"));return false;}
+    RaftSimRaftMesh::FProductionRaftDeformationCache DeformCache;RaftSimHullPrepareCache::FCache Exact;
+    const FTransform Datum(FQuat::Identity,FVector(0,0,-Body.TubeRadiusMeters*100.));
+    if(!Runtime->SetHullGeometryProvider([&](const auto& Segments,FRaftSimHullGeometry& H)
+        {
+            const RaftSimRaftMesh::FRaftSimRaftVisualCondition C={Runtime->GetFlexiblePressureFraction(),Runtime->GetFlexibleFabricIntegrity(),0.f};
+            if(Exact.Matches(Rest,Body.TubeRadiusMeters,Segments,C,Datum)){H=Exact.Hull;return true;}
+            RaftSimRaftMesh::DeformProductionRaftRestMesh(Rest,Body.TubeRadiusMeters,Segments,C,Prepared,&DeformCache,false);
+            const bool Good=RaftSimRaftMesh::ExportHullGeometry(Prepared,Datum,H);
+            if(Good)Exact.Remember(Rest,Body.TubeRadiusMeters,Segments,C,Datum,Prepared,H);return Good;
+        },[]{}))return false;
+    TestEqual(TEXT("actual full original hull triangles"),Runtime->GetHullGeometry().Faces.Num(),38344);
+    const FQuat Q=FRotator(0,90,0).Quaternion();double Half=0.;
+    for(const auto& V:Runtime->GetHullGeometry().VerticesM)Half=FMath::Max(Half,Q.RotateVector(V).X);
+    FVector P((-.6-Half-.4)*100.,0,0);P.Z=Scene.Surface(P,0.)*100.+20.;
+    FRaftSimRaftKinematicState Initial;Initial.WorldTransform=FTransform(Q,P);Initial.LinearVelocityMetersPerSecond=FVector(1.5,0,0);Runtime->SetKinematicState(Initial);
+    int32 Impulses=0;double Lift=-1.,Scoop=-1.,Flip=-1.;
+    for(int32 I=0;I<480;++I)
+    {
+        Seconds=I/120.;if(!Runtime->StepRaftDynamics(1.f/120.f)){AddError(FString::Printf(TEXT("Captured original-mesh step %d refused: %s"),I,*Runtime->GetLastHullContact().Failure));break;}
+        const auto& K=Runtime->GetKinematicState();const auto R=K.WorldTransform.GetRotation();
+        Impulses+=Runtime->GetLastHullContact().Impulses;
+        const double Difference=R.RotateVector(FVector(0,-Body.WidthMeters,0)).Z;
+        if(Lift<0. && Impulses>0 && Difference>.1 && R.GetUpVector().Z>0.)Lift=Seconds;
+        const auto& Load=Runtime->GetLastSurfacePressure();
+        if(Scoop<0. && R.GetUpVector().Z>0. && Load.WetUpperFaces>0 && Load.MinimumFaceOffsetM<0. &&
+            FVector::DotProduct(Load.Load.TorqueNm,K.AngularVelocityRadiansPerSecond)>0.)Scoop=Seconds;
+        if(Flip<0. && RaftSimCapsizePolicy::PhysicallyInverted(R,100.)){Flip=Seconds;Runtime->SetFlexibleCapsized(true);}
+        if(K.WorldTransform.ContainsNaN() || K.AngularVelocityRadiansPerSecond.ContainsNaN()){AddError(TEXT("Non-finite captured-mesh pin"));break;}
+    }
+    TestTrue(TEXT("actual captured rock has real full-hull contact impulses"),Impulses>0);
+    TestTrue(TEXT("native captured contact exercised exhaustive full-hull parity"),ReferenceChecked);
+    TestTrue(TEXT("captured source lift precedes dipped upper-face scoop and physical flip"),Lift>=0. && Scoop>Lift && Flip>Scoop);
+    AddInfo(FString::Printf(TEXT("PRODUCTION_CAPTURED_ROCK_PIN lift=%.9f scoop=%.9f flip=%.9f impulses=%d"),Lift,Scoop,Flip,Impulses));
+    return !HasAnyErrors();
+}
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimHullPrepareCacheTest,
     "RaftSim.Demo.RockPinExactShapeCache",
     EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
@@ -250,7 +342,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimFlipEnvironmentBaseline,
 bool FRaftSimFlipEnvironmentBaseline::RunTest(const FString&)
 {
     TArray<TSharedPtr<FJsonValue>> Reports;
-    const bool Candidate=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFlipCandidateLoads"));
+    const bool Candidate=false; // The production adapter owns pressure loads.
     for(const auto& Scene:RaftSimFlipTestEnvironment::Scenes())
     {
         // These moving-wave force controls intentionally exclude obstacle CCD

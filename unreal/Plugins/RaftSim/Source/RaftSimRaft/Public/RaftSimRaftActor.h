@@ -15,6 +15,7 @@ class ARaftSimCrewAvatarActor;
 enum class ERaftSimCrewAvatarAction : uint8;
 class URaftSimChronoRuntimeAdapter;
 class URaftSimPhysicsBridgeSubsystem;
+namespace RaftSimHullPrepareCache {struct FCache;}
 
 /** Scenario-owned destination preparation; no project dependency in the raft module. */
 DECLARE_DELEGATE_RetVal_OneParam(bool, FRaftSimCheckpointPreparation, FTransform&);
@@ -69,6 +70,7 @@ class RAFTSIMRAFT_API ARaftSimRaftActor : public AActor
     friend class FRaftSimCrewCommandWeightTest;
     friend class FRaftSimInputContextIsolationTest;
     friend class FRaftSimCrewOccupancyTest;
+    friend class FRaftSimProductionCapturedRockPin;
 
 public:
     /** Exact triangle samples of current uploaded floor and tube/thwart sections, in raft local cm. */
@@ -142,6 +144,9 @@ public:
     bool AdvanceIsolatedFlipDemo(float Dt);
     bool BindIsolatedFlipRuntime(URaftSimChronoRuntimeAdapter* Runtime,bool bFullHullExport);
     void RefreshIsolatedFlipVisual(float Dt);
+    bool HasScriptedCapsizeTransition() const {return CapsizeTransitionRemainingSeconds>0.f;}
+    double GetPhysicalCapsizeEntryUpZ() const {return PhysicalCapsizeEntryUpZ;}
+    uint64 GetSharedHullShadingUploadCount() const {return SharedHullShadingUploads;}
     TConstArrayView<FRaftSimSwimmerRescueFrame> GetIsolatedFlipSwimmers() const {return Swimmers;}
 #endif
 
@@ -464,8 +469,8 @@ protected:
     float CrewReactionSeconds = 0.4f;
 
 private:
+    double PhysicalCapsizeEntryUpZ=1.;
     void UpdateCapsizeLoop(float DeltaSeconds);
-    void UpdateCapsizeTransition(float DeltaSeconds);
     void EnterCapsize();
     void DriftSwimmers(float DeltaSeconds);
     void AttachSwimmerToWaterSurface(FRaftSimSwimmerRescueFrame& Swimmer) const;
@@ -597,7 +602,7 @@ private:
     bool bUsingProductionRaftRestMesh = false;
 
     // One fixed-step geometry producer, transactional publication to physics
-    // and render. Opt-in until full-surface CCD and cost are qualified.
+    // and render. Normal production contact uses this complete original mesh.
     bool bSharedHullGeometryReview=false;
     TArray<RaftSimRaftMesh::FMeshData> SharedHullPreparedSections;
     TArray<FRaftSimFlexVisualSegmentState> SharedHullPreparedSegments,SharedHullPublishedSegments;
@@ -605,6 +610,8 @@ private:
     uint64 LastRenderedHullRevision=0,LastLoggedHullRevision=0;
     double SharedHullPrepareTotalMs=0,SharedHullPrepareMaximumMs=0;
     uint64 SharedHullPrepareCount=0;
+    TSharedPtr<RaftSimHullPrepareCache::FCache> SharedHullRenderedCache;
+    uint64 SharedHullShadingUploads=0;
 
     /** Persistent surface saturation; contact wets quickly and dries slowly. */
     float SurfaceWetness = 0.0f;

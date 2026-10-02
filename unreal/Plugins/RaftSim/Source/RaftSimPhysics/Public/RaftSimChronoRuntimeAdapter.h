@@ -6,6 +6,7 @@
 #include "RaftSimSweptGroundContact.h"
 #include "RaftSimHullGeometry.h"
 #include "RaftSimHullContact.h"
+#include "RaftSimOverwashLoads.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
@@ -295,6 +296,11 @@ public:
     void SetGroundSphereSweep(FRaftSimGroundSweep Sweep) { GroundSphereSweep=MoveTemp(Sweep); }
     void SetHullGroundQuery(FRaftSimHullGroundQuery Query) { HullGroundQuery=MoveTemp(Query);LastHullContact={}; }
     const FRaftSimHullContactResult& GetLastHullContact() const { return LastHullContact; }
+    const RaftSimOverwashLoads::FDiagnostics& GetLastSurfacePressure() const {return LastSurfacePressure;}
+    // Gameplay lifecycle sees every committed fixed step, never a rejected
+    // intermediate pose or only the final render-frame state.
+    void SetCommittedStepObserver(TFunction<void(const FRaftSimRaftKinematicState&)> Observer)
+    {CommittedStepObserver=MoveTemp(Observer);}
 
     float GetLastMaximumGroundPenetrationMeters() const
     {
@@ -388,6 +394,7 @@ public:
     void SetHullGroundArcQuery(FRaftSimHullGroundArcQuery Query){HullGroundArcQuery=MoveTemp(Query);}
 
 private:
+    TFunction<void(const FRaftSimRaftKinematicState&)> CommittedStepObserver;
     FRaftSimHullGroundArcQuery HullGroundArcQuery;
     UPROPERTY()
     FRaftSimRaftBodyConfig RaftConfig;
@@ -412,6 +419,7 @@ private:
     FRaftSimGroundSweep GroundSphereSweep;
     FRaftSimHullGroundQuery HullGroundQuery;
     FRaftSimHullContactResult LastHullContact;
+    RaftSimOverwashLoads::FDiagnostics LastSurfacePressure;
     int32 LastGroundedSupportPointCount = 0;
     float LastMaximumGroundPenetrationM = 0.0f;
     TFunction<bool(

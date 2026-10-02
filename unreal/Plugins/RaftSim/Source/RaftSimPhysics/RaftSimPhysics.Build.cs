@@ -6,7 +6,7 @@ public class RaftSimPhysics : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "Landscape", "RaftSimCore", "RaftSimWater" });
-        PrivateDependencyModuleNames.AddRange(new[] { "Json", "PhysicsCore" });
+        PrivateDependencyModuleNames.AddRange(new[] { "Json", "PhysicsCore", "Chaos" });
         AddEngineThirdPartyPrivateStaticDependencies(Target, "OpenSSL");
     }
 }

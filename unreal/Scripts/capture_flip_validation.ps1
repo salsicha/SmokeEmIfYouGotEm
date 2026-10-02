@@ -1,6 +1,6 @@
 <# Actual production raft and native water-force lab; not a pose animation.
    Every invocation requires fresh evidence and a shared-engine idle minute.
-   Stable drag remains an explicit lab candidate, not a gameplay promotion.
+   Uses production pressure, drag, collision and capsize defaults.
 #>
 param(
     [Parameter(Mandatory=$true)][ValidatePattern('^[a-zA-Z0-9_.-]+$')][string]$Scene,
@@ -8,12 +8,14 @@ param(
     [ValidateRange(60,900)][int]$TimeoutS=600,
     [ValidateRange(12,40)][int]$DurationSeconds=12,
     [switch]$CaptureContactFailure,
-    [switch]$RockPinArcCandidate
+    [switch]$RockPinArcCandidate,
+    [string]$PackagedRoot=''
 )
 $ErrorActionPreference='Stop'
 $root=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $out=Join-Path $root "tmp/$Label"
 $receipt=Join-Path $root "unreal/Saved/FlipDemo/$Label.json"
+if($PackagedRoot){$receipt=Join-Path $PackagedRoot "SmokeEmIfYouGotEm/Saved/FlipDemo/$Label.json"}
 if((Test-Path -LiteralPath $out) -or (Test-Path -LiteralPath $receipt)){throw 'Preserve prior evidence; use a fresh label'}
 $known=@('calm','small_broadside','large_broadside','large_broadside_mirror','large_bow_on','eddy_line',
     'hydraulic_broadside','rock_oblique','breaking_broadside','breaking_broadside_mirror',
@@ -38,18 +40,26 @@ New-Item -ItemType Directory -Path $out | Out-Null
 $binary='C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe'
 $dll=Join-Path $root 'unreal/Plugins/RaftSim/Binaries/Win64/UnrealEditor-RaftSimRaft.dll'
 $physicsDll=Join-Path $root 'unreal/Plugins/RaftSim/Binaries/Win64/UnrealEditor-RaftSimPhysics.dll'
+if($PackagedRoot){
+    $binary=Join-Path $PackagedRoot 'SmokeEmIfYouGotEm/Binaries/Win64/SmokeEmIfYouGotEm.exe'
+    if(-not (Test-Path -LiteralPath $binary)){throw 'Actual Development packaged game missing'}
+}
 $arguments=@((Join-Path $root 'unreal/SmokeEmIfYouGotEm.uproject'),'/Game/RaftSim/Maps/L_RaftSimTestTank',
-    '-game','-RaftSimEphemeralProfile','-RaftSimFlipStableDragCandidate','-RenderOffscreen','-Unattended',
+    '-game','-RaftSimEphemeralProfile','-RenderOffscreen','-Unattended',
     '-NoSplash','-NoSound','-d3d12','-ResX=1280','-ResY=720','-Windowed',
     "-RaftSimFlipValidationDuration=$DurationSeconds",
     "-AbsLog=$out/engine.log","-ExecCmds=raftsim.RecordingDir $out,RaftSim.FlipDemo $Scene $Label")
 if($CaptureContactFailure){$arguments+="-RaftSimHullFailurePath=$out/full-hull-failure.json"}
 if($RockPinArcCandidate){$arguments+='-RaftSimRockPinArcCandidate'}
+if($PackagedRoot){$arguments=$arguments[1..($arguments.Length-1)]}
 $launch=[ordered]@{schema='raftsim.native_flip_validation_launch.v1';scene=$Scene;label=$Label;
-    scope='Actual production mesh/crew and sampled authored-water forces. Lab-only pressure/implicit-drag candidate; normal gameplay unchanged.';
+    scope='Actual production mesh/crew with default production pressure, coupled drag and physical capsize/submersion. Authored laboratory water/obstacle, not a full-map performance claim.';
     raft_dll_sha256=(Get-FileHash -LiteralPath $dll -Algorithm SHA256).Hash.ToLower();
     physics_dll_sha256=(Get-FileHash -LiteralPath $physicsDll -Algorithm SHA256).Hash.ToLower();
     arguments=$arguments;requested_duration_seconds=$DurationSeconds;launched_at=(Get-Date).ToUniversalTime().ToString('o')}
+$launch['execution_kind']= $(if($PackagedRoot){'packaged-development-game'}else{'native-editor-game'})
+$launch['binary_sha256']=(Get-FileHash -LiteralPath $binary -Algorithm SHA256).Hash.ToLower()
+if($PackagedRoot){$launch.Remove('raft_dll_sha256');$launch.Remove('physics_dll_sha256')}
 $start=New-Object System.Diagnostics.ProcessStartInfo
 $start.FileName=$binary;$start.WorkingDirectory=$root;$start.UseShellExecute=$false;$start.CreateNoWindow=$true
 $start.Arguments=($arguments | ForEach-Object {'"'+[regex]::Replace([regex]::Replace($_,'(\\*)"','$1$1\"'),'(\\+)$','$1$1')+'"'}) -join ' '
@@ -63,8 +73,9 @@ $process.WaitForExit();$launch['exit_code']=$process.ExitCode
 $launch['finished_at']=(Get-Date).ToUniversalTime().ToString('o')
 $launch | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath "$out/launch.json" -Encoding UTF8
 if($process.ExitCode -ne 0){throw "Native flip process exited $($process.ExitCode)"}
-if((Get-FileHash -LiteralPath $dll -Algorithm SHA256).Hash.ToLower() -ne $launch.raft_dll_sha256 -or
-    (Get-FileHash -LiteralPath $physicsDll -Algorithm SHA256).Hash.ToLower() -ne $launch.physics_dll_sha256){throw 'Loaded code changed during validation'}
+if((Get-FileHash -LiteralPath $binary -Algorithm SHA256).Hash.ToLower() -ne $launch.binary_sha256){throw 'Loaded executable changed during validation'}
+if(-not $PackagedRoot -and ((Get-FileHash -LiteralPath $dll -Algorithm SHA256).Hash.ToLower() -ne $launch.raft_dll_sha256 -or
+    (Get-FileHash -LiteralPath $physicsDll -Algorithm SHA256).Hash.ToLower() -ne $launch.physics_dll_sha256)){throw 'Loaded code changed during validation'}
 $log=Get-Content -LiteralPath "$out/engine.log" -Raw
 $errors=@([regex]::Matches($log,'(?m)^.*\bLog\w+: (?:Error|Fatal):[^\r\n]*') | ForEach-Object {$_.Value})
 $videos=@(Get-ChildItem -LiteralPath $out -Filter '*.mp4')

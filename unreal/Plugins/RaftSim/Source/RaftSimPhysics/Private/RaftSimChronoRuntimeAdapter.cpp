@@ -1,6 +1,7 @@
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimDynamicsStageAudit.h"
 #include "RaftSimImplicitDrag.h"
+#include "RaftSimOverwashLoads.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 
@@ -12,6 +13,7 @@ constexpr double kSupportGravityMps2 = 9.80665;
 
 void URaftSimChronoRuntimeAdapter::ConfigureRaftBody(const FRaftSimRaftBodyConfig& InConfig)
 {
+    CommittedStepObserver={};
     SetHullGeometryProvider({},{});
     RaftConfig = InConfig;
     AuthorityIntegrationPolicy.SelectedRuntime = InConfig.Runtime;
@@ -416,6 +418,36 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
 
     if(DynamicsAudit)
     { DynamicsAudit->RetainedForce=ForceN;DynamicsAudit->RetainedTorque=TorqueNm; }
+    // Signed pressure on the actually transformed upper patch. D3 risk is
+    // diagnostic only; the wet face, current and contact must create rotation.
+    LastSurfacePressure={};
+    if(!bFlexCapsized)
+    {
+        const double Radius=FlexParameters.TubeRadiusM*FMath::Lerp(.82,1.,double(FlexPressureFraction));
+        for(const auto& Segment:Overwash.SegmentOverwash)
+        {
+            const auto* Tube=FlexLayout.FindByPredicate([&](const auto& T){return T.SegmentId==Segment.SegmentId;});
+            if(!Tube)continue;
+            const FVector Face=Segment.LocalPosition+FVector(0,0,Radius);
+            FRaftSimFlexUniformWater PatchWater=Water;
+            if(!bUseUniformOverride && (!FlexibleWaterFieldSampler || !FlexibleWaterFieldSampler(State.WorldPoint(Face)*100.,PatchWater)))continue;
+            const FVector Relative=PatchWater.VelocityMps-State.PointVelocity(Face);
+            auto Patch=Segment;
+            Patch.bWet=PatchWater.bWet;
+            Patch.OvertoppingDepthM=FMath::Max(0.,PatchWater.SurfaceHeightM-State.WorldPoint(Face).Z);
+            const double Incoming=-FVector::DotProduct(Relative,State.Orientation.GetUpVector());
+            Patch.bUpstreamExposed=Patch.bWet && Incoming>1.e-6 &&
+                FVector::DotProduct(Relative,State.Orientation.RotateVector(Tube->OutwardNormal))<0.;
+            if(Patch.bUpstreamExposed && Patch.OvertoppingDepthM>1.e-6)
+            {++LastSurfacePressure.WetUpperFaces;
+             LastSurfacePressure.MinimumFaceOffsetM=FMath::Min(LastSurfacePressure.MinimumFaceOffsetM,-Patch.OvertoppingDepthM);
+             LastSurfacePressure.MaximumIncomingNormalMps=FMath::Max(LastSurfacePressure.MaximumIncomingNormalMps,Incoming);}
+            const auto Load=Patch.bUpstreamExposed ? RaftSimOverwashLoads::ScoopingFace(Patch,*Tube,State.Orientation,Radius,Relative)
+                : RaftSimOverwashLoads::UpperFace(Segment,*Tube,State.Orientation,Radius);
+            ForceN+=Load.ForceN;TorqueNm+=Load.TorqueNm;
+            LastSurfacePressure.Load.ForceN+=Load.ForceN;LastSurfacePressure.Load.TorqueNm+=Load.TorqueNm;
+        }
+    }
     for (const FRaftSimFlexRockContact& Contact : Contacts.Contacts)
     {
         if (Contact.bRecovering)
@@ -462,12 +494,9 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     // the actor's integrator did.
     double SubmergedFraction = 0.0;
     RaftSimImplicitDrag::FSystem ImplicitDrag;
-    bool bImplicitDragCandidate=false;
-#if !UE_BUILD_SHIPPING
-    // Lab-only until severe flips, controls, recovery and normal play pass.
-    static const bool Candidate=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFlipStableDragCandidate"));
-    bImplicitDragCandidate=Candidate;
-#endif
+    // The validated coupled drag solve is the production integrator too.
+    // It prevents empty-hull high-spin drag from adding kinetic energy.
+    const bool bImplicitDragCandidate=true;
     const bool bSupportStage = static_cast<bool>(WaterSurfaceSampler) && TubeSamplePointsM.Num() > 0;
     if (bSupportStage)
     {
@@ -768,7 +797,7 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     {
         FVector DragForce,DragTorque;
         if(!ImplicitDrag.Advance(State,MassKg,Inertia,ForceN,TorqueNm,Dt,DragForce,DragTorque))
-        {UE_LOG(LogTemp,Error,TEXT("Flip lab implicit drag refused non-positive/non-finite solve"));return false;}
+        {UE_LOG(LogTemp,Error,TEXT("Production coupled drag refused non-positive/non-finite solve"));return false;}
         ForceN+=DragForce;TorqueNm+=DragTorque;
     }
     else
@@ -984,5 +1013,6 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     LastFlexStepTelemetry.MinReleaseMarginN = Contacts.MinReleaseMarginN;
     LastFlexStepTelemetry.AppliedForceN = ForceN;
     LastFlexStepTelemetry.AppliedTorqueNm = TorqueNm;
+    if(!bInvalidState && CommittedStepObserver)CommittedStepObserver(KinematicState);
     return true;
 }

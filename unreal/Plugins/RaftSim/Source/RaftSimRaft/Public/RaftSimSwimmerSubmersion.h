@@ -1,7 +1,7 @@
 #pragma once
 #include "RaftSimCrewStateContracts.h"
 
-// Reduced PFD resurfacing candidate. Native rescue metadata is retained;
+// Reduced production PFD resurfacing. Native rescue metadata is retained;
 // release momentum is not overwritten by the Eulerian current. The 0.8 m/s2
 // net buoyant acceleration and 2/s wet drag are authored, not measured kit.
 inline FRaftSimSwimmerRescueFrame RaftSimAdvanceSubmergedSwimmer(

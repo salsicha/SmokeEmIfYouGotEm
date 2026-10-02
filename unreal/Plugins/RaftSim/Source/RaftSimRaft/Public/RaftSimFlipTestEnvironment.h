@@ -1,7 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 
-// Authored laboratory waves, not surveyed hydraulics or a solved fluid field.
+// Shared authored test waves, not surveyed hydraulics or a solved fluid field.
 // Rendering and production hull samplers consume this exact moving surface.
 namespace RaftSimFlipTestEnvironment
 {

@@ -23,7 +23,7 @@ void URaftSimPhysicsBridgeSubsystem::Initialize(FSubsystemCollectionBase& Collec
 void URaftSimPhysicsBridgeSubsystem::Deinitialize()
 {
     // Release the contact registry's world delegates before subsystem teardown.
-    if (RaftRuntime) { RaftRuntime->SetHullGroundQuery({}); RaftRuntime->SetGroundSphereSweep({}); RaftRuntime->SetGroundContactObserver({}); RaftRuntime->SetGroundSurfaceSampler({}); }
+    if (RaftRuntime) { RaftRuntime->SetHullGroundArcQuery({}); RaftRuntime->SetHullGroundQuery({}); RaftRuntime->SetGroundSphereSweep({}); RaftRuntime->SetGroundContactObserver({}); RaftRuntime->SetGroundSurfaceSampler({}); }
     WaterRuntime = nullptr;
     RaftRuntime = nullptr;
     Super::Deinitialize();
@@ -94,6 +94,12 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
         RaftRuntime->SetGroundContactObserver({});
         RaftRuntime->SetGroundSphereSweep({});
         RaftRuntime->SetHullGroundQuery({});
+        RaftRuntime->SetHullGroundArcQuery({});
+        RaftRuntime->SetHullGroundQuery([GroundSources](auto A,auto B,auto Faces,double Skin,double Clearance)
+            {return GroundSources->SweepCapturedSurface(A,B,Faces,Skin,Clearance);});
+        RaftRuntime->SetHullGroundArcQuery([GroundSources](auto A,auto B,auto Faces,double Skin,double Clearance,const FRaftSimHullArcPath& Arc)
+            {return GroundSources->SweepCapturedSurface(A,B,Faces,Skin,Clearance,true,&Arc);});
+        UE_LOG(LogTemp,Display,TEXT("Production full-hull contact: original indexed raft against captured triangles and Complex landscape; physical capsize, no pose transition"));
 #if !UE_BUILD_SHIPPING
         if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimFullHullGroundReview")))
         {

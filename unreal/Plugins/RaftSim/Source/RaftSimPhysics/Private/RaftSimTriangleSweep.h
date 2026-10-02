@@ -3,9 +3,11 @@
 #include "Engine/HitResult.h"
 #include "RaftSimSurfaceSweep.h"
 #include "RaftSimClosedGround.h"
+#include "RaftSimHullFaceTree.h"
 
 class UStaticMeshComponent;
 class UStaticMesh;
+struct FRaftSimHullArcPath;
 
 namespace RaftSimTriangleSweep
 {
@@ -25,7 +27,7 @@ public:
     // Indexed full surface, world centimetres. Linear motion of every vertex;
     // no convex hull, support-point subset or fitted capsule replacement.
     RaftSimSurfaceSweep::FResult SweepSurface(TConstArrayView<FVector> StartCm,
-        TConstArrayView<FVector> EndCm,TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm=-1.,bool bGroupedBroadPhase=true) const;
+        TConstArrayView<FVector> EndCm,TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm=-1.,bool bGroupedBroadPhase=true,const FRaftSimHullArcPath* Arc=nullptr) const;
     bool IsValid() const { return bValid; }
     int32 TriangleCount() const { return Triangles.Num(); }
     int32 ClosedSourceCount() const { return ClosedGround.ComponentCount(); }
@@ -48,5 +50,6 @@ private:
     // stale representatives when an allocation is reused for different topology.
     mutable TArray<FIntVector> MovingTopology;
     mutable TArray<FIntPoint> MovingRepresentatives; // original vertex, original face
+    mutable FRaftSimHullFaceTree MovingTree;
     bool bValid=false;
 };

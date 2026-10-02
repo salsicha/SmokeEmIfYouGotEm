@@ -55,10 +55,18 @@ def audit(paths, minimum_fps=20.):
         log = (path.parent/'engine.log').read_text(encoding='utf-8-sig')
         if launch.get('exit_code') != 0 or re.search(r'Log\w+: (?:Error|Fatal):', log):
             raise ValueError('Native engine run failed')
-        if '-RaftSimRockPinArcCandidate' not in launch['arguments']:
-            raise ValueError('Missing linked native full-hull candidate provenance')
-        result['native_raft_dll_sha256'] = launch['raft_dll_sha256']
-        result['native_physics_dll_sha256'] = launch['physics_dll_sha256']
+        production = report.get('production_pressure_default') is True and report.get('pressure_receipts_from_integrator') is True
+        if not production and '-RaftSimRockPinArcCandidate' not in launch['arguments']:
+            raise ValueError('Missing linked native full-hull production/candidate provenance')
+        if production and any(a in launch['arguments'] for a in ('-RaftSimFlipStableDragCandidate', '-RaftSimRockPinArcCandidate')):
+            raise ValueError('Production validation must not depend on laboratory opt-ins')
+        result['production_defaults'] = production
+        result['execution_kind'] = launch.get('execution_kind', 'native-editor-game')
+        if result['execution_kind'] == 'packaged-development-game':
+            result['native_binary_sha256'] = launch['binary_sha256']
+        else:
+            result['native_raft_dll_sha256'] = launch['raft_dll_sha256']
+            result['native_physics_dll_sha256'] = launch['physics_dll_sha256']
         for row in report['motion']:
             for crew in row['crew_motion']:
                 if any(not math.isfinite(crew[k]) for k in ('surface_offset_m', 'vertical_velocity_mps', 'time_in_water_s')):

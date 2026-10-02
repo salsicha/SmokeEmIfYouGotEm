@@ -418,6 +418,17 @@ void ARaftSimRaftActor::BeginPlay()
 
     Bridge = BridgeSubsystem;
     RaftAdapter = Adapter;
+    const TWeakObjectPtr<ARaftSimRaftActor> WeakRaft(this);
+    Adapter->SetCommittedStepObserver([WeakRaft](const FRaftSimRaftKinematicState& K)
+    {
+        auto* Self=WeakRaft.Get();
+        if(Self && Self->RaftMode==ERaftSimRaftMode::Upright &&
+            RaftSimCapsizePolicy::PhysicallyInverted(K.WorldTransform.GetRotation(),Self->CapsizeRollDegrees))
+        {
+            Self->SetActorTransform(K.WorldTransform);
+            Self->EnterCapsize();
+        }
+    });
 
     // Checkpoint = spawn pose; recovery/reset returns the raft here.
     CheckpointTransform = GetActorTransform();
@@ -2048,7 +2059,6 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
 
     {
         TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_CapsizeUpdate);
-        UpdateCapsizeTransition(FMath::Min(DeltaSeconds, 0.25f));
         UpdateCapsizeLoop(FMath::Min(DeltaSeconds, 0.25f));
     }
     {
@@ -2071,69 +2081,16 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
     }
 }
 
-void ARaftSimRaftActor::UpdateCapsizeTransition(float DeltaSeconds)
-{
-    if (RaftMode != ERaftSimRaftMode::Capsized ||
-        CapsizeTransitionRemainingSeconds <= 0.0f || RaftAdapter == nullptr)
-    {
-        return;
-    }
-    const float Duration = FMath::Max(CapsizeTransitionSeconds, FixedSubstepSeconds);
-    CapsizeTransitionRemainingSeconds = FMath::Max(
-        0.0f, CapsizeTransitionRemainingSeconds - FMath::Max(DeltaSeconds, 0.0f));
-    const float Alpha = FMath::Clamp(
-        1.0f - CapsizeTransitionRemainingSeconds / Duration, 0.0f, 1.0f);
-    const float SmoothAlpha = Alpha * Alpha * (3.0f - 2.0f * Alpha);
-    const FRotator LiveRotation = GetActorRotation();
-    const float TransitionPitchDegrees =
-        FMath::Lerp(CapsizeStartPitchDegrees, 0.0f, SmoothAlpha);
-    const float TransitionRollDegrees = FMath::Lerp(
-        CapsizeStartRollDegrees, CapsizeFlipDirection * 180.0f, SmoothAlpha);
-    const FQuat TransitionRotation = FRotator(
-        TransitionPitchDegrees, LiveRotation.Yaw, TransitionRollDegrees).Quaternion();
-    CapsizeTargetRotation = FRotator(
-        0.0f, LiveRotation.Yaw, CapsizeFlipDirection * 180.0f).Quaternion();
-    CapsizeRollAxisWorld = TransitionRotation.GetForwardVector().GetSafeNormal();
-    const float AngularSpeedRadiansPerSecond = CapsizeFlipDirection * PI *
-        (6.0f * Alpha * (1.0f - Alpha)) / Duration;
-
-    // The reduced rigid-body model does not resolve the air/water volume that
-    // carries a real raft through the unstable side-on phase. D3 decides when
-    // and which way the boat overturns; this bounded authoritative constraint
-    // advances that unresolved roll while the adapter continues integrating
-    // translation, buoyancy, drag and D4 contacts from the matching pose/rate.
-    SetActorRotation(TransitionRotation);
-    FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
-    State.WorldTransform.SetTranslation(GetActorLocation());
-    State.WorldTransform.SetRotation(TransitionRotation);
-    State.AngularVelocityRadiansPerSecond = CapsizeRollAxisWorld *
-        AngularSpeedRadiansPerSecond;
-    if (CapsizeTransitionRemainingSeconds <= 0.0f)
-    {
-        State.WorldTransform.SetRotation(CapsizeTargetRotation.GetNormalized());
-        State.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
-        SetActorRotation(CapsizeTargetRotation.GetNormalized());
-    }
-    RaftAdapter->SetKinematicState(State);
-}
-
 #if !UE_BUILD_SHIPPING
 bool ARaftSimRaftActor::AdvanceIsolatedFlipDemo(float Dt)
 {
     if(!RaftAdapter || !RaftAdapter->StepRaftDynamics(Dt))return false;
     SetActorTransform(RaftAdapter->GetKinematicState().WorldTransform);
-    // Non-shipping candidate only. Keep the normal game's timed transition
-    // untouched until this force-driven alternative has been demonstrated.
+    // Same physical capsize gate and crew lifecycle as normal gameplay.
     if(RaftMode==ERaftSimRaftMode::Upright &&
         RaftSimCapsizePolicy::PhysicallyInverted(GetActorQuat(),CapsizeRollDegrees))
     {
-        const auto Integrated=RaftAdapter->GetKinematicState();
         EnterCapsize(); // Real crew ejection/occupancy/rescue lifecycle.
-        // EnterCapsize's legacy animation initializer must not alter this
-        // laboratory candidate's integrated motion. No timed pose is run.
-        CapsizeTransitionRemainingSeconds=0.;
-        RaftAdapter->SetKinematicState(Integrated);
-        SetActorTransform(Integrated.WorldTransform);
     }
     if(RaftMode!=ERaftSimRaftMode::Upright)DriftSwimmers(Dt);
     return true;
@@ -2143,18 +2100,17 @@ bool ARaftSimRaftActor::AdvanceIsolatedFlipDemo(float Dt)
 void ARaftSimRaftActor::UpdateCapsizeLoop(float DeltaSeconds)
 {
     const FRaftSimFlexStepTelemetry& Telemetry = RaftAdapter->GetLastFlexibleStepTelemetry();
-    const float RollDegrees = FMath::Abs(GetActorRotation().Roll);
 
     if (RaftMode == ERaftSimRaftMode::Upright)
     {
-        // Latch on a sustained negative flip margin (overwash roll moment beats
-        // the tube's righting moment) or a hard roll-over.
+        // Risk remains telemetry; only an integrated physical inversion ejects
+        // crew. A risk estimate cannot animate an upright hull through a rock.
         const bool bFlipRisk = Telemetry.bReferenceFlipRisk && Telemetry.ReferenceFlipMarginNm < 0.0;
         FlipRiskLatchSeconds = bFlipRisk
             ? FlipRiskLatchSeconds + DeltaSeconds
             : FMath::Max(0.0f, FlipRiskLatchSeconds - DeltaSeconds);
 
-        if (FlipRiskLatchSeconds >= CapsizeLatchSeconds || RollDegrees >= CapsizeRollDegrees)
+        if (RaftSimCapsizePolicy::PhysicallyInverted(GetActorQuat(),CapsizeRollDegrees))
         {
             EnterCapsize();
         }
@@ -2180,6 +2136,7 @@ void ARaftSimRaftActor::UpdateCapsizeLoop(float DeltaSeconds)
 
 void ARaftSimRaftActor::EnterCapsize()
 {
+    PhysicalCapsizeEntryUpZ=GetActorQuat().GetUpVector().Z;
     CancelTimedBoarding();
     const FRaftSimFlexStepTelemetry EntryTelemetry = RaftAdapter
         ? RaftAdapter->GetLastFlexibleStepTelemetry()
@@ -2241,9 +2198,8 @@ void ARaftSimRaftActor::EnterCapsize()
     if (RaftAdapter != nullptr)
     {
         // An open-floor paddle raft sheds retained deck water and crew mass
-        // when it rolls over. Keep the current authoritative pose and establish
-        // the D3-selected direction for the bounded roll constraint; every
-        // transition frame is copied back into this same adapter state.
+        // when it physically rolls over. Keep the authoritative pose and rate;
+        // no roll constraint or animation drives the empty hull.
         RaftAdapter->SetFlexibleCapsized(true);
         FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
         State.WorldTransform = GetActorTransform();
@@ -2264,15 +2220,9 @@ void ARaftSimRaftActor::EnterCapsize()
         }
         CapsizeTargetRotation = FRotator(
             0.0f, StartRotation.Yaw, CapsizeFlipDirection * 180.0f).Quaternion();
-        bool PhysicalLab=false;
-#if !UE_BUILD_SHIPPING
-        PhysicalLab=Bridge && RaftAdapter!=Bridge->GetRaftRuntime() &&
-            RaftSimCapsizePolicy::PhysicallyInverted(State.WorldTransform.GetRotation(),CapsizeRollDegrees);
-#endif
-        if(!PhysicalLab)State.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
+        // Preserve the integrated pose AND release momentum in normal gameplay.
         RaftAdapter->SetKinematicState(State);
-        CapsizeTransitionRemainingSeconds = PhysicalLab ? 0.f : FMath::Max(
-            CapsizeTransitionSeconds, FixedSubstepSeconds);
+        CapsizeTransitionRemainingSeconds = 0.f;
     }
 
     SpawnSwimmers(CrewSize, true);
@@ -2301,12 +2251,8 @@ void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide)
         Swimmer.SwimmerWorldPositionMeters =
             RaftM + FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f) * 1.5f;
         Swimmer.SwimmerDriftVelocityMetersPerSecond = FlowMps;
-        bool PhysicalLab=false;
-#if !UE_BUILD_SHIPPING
-        PhysicalLab=bIncludeGuide && RaftMode==ERaftSimRaftMode::Capsized && RaftAdapter && Bridge &&
-            RaftAdapter!=Bridge->GetRaftRuntime();
-#endif
-        if(PhysicalLab)
+        const bool PhysicalRelease=bIncludeGuide && RaftMode==ERaftSimRaftMode::Capsized && RaftAdapter;
+        if(PhysicalRelease)
         {
             if(const auto* Avatar=FindAvatar(Swimmer.PassengerId))
             {
@@ -2328,7 +2274,7 @@ void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide)
             // Ejection must not turn the swimmer toward world +X while the
             // detached guide camera retains its world heading. Keep heading,
             // but release seated/capsize roll and pitch for the authored swim.
-            const FQuat SwimHeading = PhysicalLab ? Avatar->GetActorQuat() :
+            const FQuat SwimHeading = PhysicalRelease ? Avatar->GetActorQuat() :
                 FRotator(0.0f, Avatar->GetActorRotation().Yaw, 0.0f).Quaternion();
             Avatar->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
             Avatar->SetActorTransform(FTransform(
@@ -2404,6 +2350,9 @@ void ARaftSimRaftActor::RefreshCrewSeatOccupancy()
 
 void ARaftSimRaftActor::AttachSwimmerToWaterSurface(FRaftSimSwimmerRescueFrame& Swimmer) const
 {
+    // Released crew continue their integrated vertical trajectory until their
+    // PFD brings them back to the SAME bound local water surface.
+    if(RaftMode==ERaftSimRaftMode::Capsized)return;
 #if !UE_BUILD_SHIPPING
     // Isolated labs replace the raft runtime, not the map's shared water
     // subsystem. Crew must see the same authored field as that boat.
@@ -2445,15 +2394,11 @@ void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
         if (Swimmers[Index].PassengerId == BoardingPassenger) continue;
         const FVector SwimmerCm = Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM;
         const FVector FlowMps = SampleWaterVelocityMps(SwimmerCm);
-        bool SubmergedLab=false;
-#if !UE_BUILD_SHIPPING
         FRaftSimFlexUniformWater Field;
-        SubmergedLab=RaftMode==ERaftSimRaftMode::Capsized && RaftAdapter && Bridge &&
-            RaftAdapter!=Bridge->GetRaftRuntime() &&
+        const bool SubmergedLab=RaftMode==ERaftSimRaftMode::Capsized && RaftAdapter &&
             RaftAdapter->SampleBoundFlexibleWater(SwimmerCm,Field) && Field.bWet;
         if(SubmergedLab)
             Swimmers[Index]=RaftSimAdvanceSubmergedSwimmer(Swimmers[Index],FlowMps,Field.SurfaceHeightM,DeltaSeconds);
-#endif
         if(!SubmergedLab)Swimmers[Index] = URaftSimSwimmerRescueLibrary::IntegrateSwimmerDrift(
             Swimmers[Index], FlowMps, DeltaSeconds);
         if (!IsFiniteVector(Swimmers[Index].SwimmerWorldPositionMeters))

@@ -210,18 +210,17 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
         int32 Steps=0;
         while(!bFailed && Debt>=1./120. && Steps<240 && Seconds<DurationSeconds)
         {
-            CandidateLoad={};ScoopDiagnostics={};const double LoadStarted=FPlatformTime::Seconds();
-            if(Boat->GetRaftMode()==ERaftSimRaftMode::Upright)
-            {
-                CandidateLoad=RaftSimFlipCandidateLoads::Evaluate(*Dynamics,Scene,Seconds,1./120.,&ScoopDiagnostics);
-                if(CandidateLoad.ForceN.ContainsNaN() || CandidateLoad.TorqueNm.ContainsNaN()){bFailed=true;break;}
-                Dynamics->AddExternalImpulse(CandidateLoad.ForceN/120.,CandidateLoad.TorqueNm/120.);
-                PressureWorkImpulse+=CandidateLoad.TorqueNm.Size()/120.;
-            }
+            CandidateLoad={};ScoopDiagnostics={};
             const auto Previous=Dynamics->GetKinematicState();
             const auto PreviousMode=Boat->GetRaftMode();
-            LoadMs+=(FPlatformTime::Seconds()-LoadStarted)*1000.;const double PhysicsStarted=FPlatformTime::Seconds();
+            const double PhysicsStarted=FPlatformTime::Seconds();
             if(!Boat->AdvanceIsolatedFlipDemo(1.f/120.f)){bFailed=true;break;}
+            const auto& ActualPressure=Dynamics->GetLastSurfacePressure();
+            CandidateLoad=ActualPressure.Load;
+            ScoopDiagnostics.WetUpperFaces=ActualPressure.WetUpperFaces;
+            ScoopDiagnostics.MinimumFaceOffsetM=ActualPressure.MinimumFaceOffsetM;
+            ScoopDiagnostics.MaximumIncomingNormalMps=ActualPressure.MaximumIncomingNormalMps;
+            PressureWorkImpulse+=CandidateLoad.TorqueNm.Size()/120.;
             PhysicsMs+=(FPlatformTime::Seconds()-PhysicsStarted)*1000.;++NativeSteps;
             Seconds+=1./120.;Debt-=1./120.;++Steps;
             const auto& State=Dynamics->GetKinematicState();
@@ -269,13 +268,16 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
             R->SetNumberField(TEXT("initial_omega_rad_s"),InitialOmega);
             R->SetNumberField(TEXT("sampled_pressure_angular_impulse_magnitude_nms"),PressureWorkImpulse);
             R->SetBoolField(TEXT("timed_pose_transition_used"),false);
+            R->SetBoolField(TEXT("production_pressure_default"),true);
+            R->SetBoolField(TEXT("pressure_receipts_from_integrator"),true);
+            R->SetNumberField(TEXT("full_hull_shading_uploads"),Boat->GetSharedHullShadingUploadCount());
             R->SetStringField(TEXT("external_impulse_sources"),Scene.bPillowRock
                 ? TEXT("D3 dipped upper-face incoming-normal water pressure; no scripted roll impulse or quaternion target.")
                 : TEXT("D3 sampled upper-face water pressure only; no scripted roll impulse or quaternion target."));
             R->SetNumberField(TEXT("minimum_swimmer_surface_offset_m"),MinimumSwimmerOffset);
             R->SetNumberField(TEXT("maximum_submerged_crew"),MaximumSubmergedCrew);
             R->SetStringField(TEXT("geometry_path"),Scene.bObstacle ? TEXT("original source triangles exported per native substep for full-hull CCD") : TEXT("normal production deformation/render path; open water, no terrain query"));
-            R->SetStringField(TEXT("scope"),TEXT("Lab-only upper-face pressure and physical-inversion candidate using actual production mesh/loading, native D2/D3, game impulse integrator and real crew lifecycle. Normal gameplay unchanged. Authored field, not calibrated hydraulics. Fixed-step receipts and native video."));
+            R->SetStringField(TEXT("scope"),TEXT("Default production upper-face pressure, coupled drag, physical capsize and submerged crew lifecycle on the original full indexed hull. Controlled authored water/obstacle, not calibrated hydraulics or full-map FPS acceptance. Fixed-step receipts and native video."));
             FString Json;FJsonSerializer::Serialize(R,TJsonWriterFactory<>::Create(&Json));
             const FString Dir=FPaths::ProjectSavedDir()/TEXT("FlipDemo");IFileManager::Get().MakeDirectory(*Dir,true);
             FFileHelper::SaveStringToFile(Json,*(Dir/(Label+TEXT(".json"))));
@@ -317,8 +319,7 @@ void StartFlipDemo(const TArray<FString>& Args,UWorld* W)
         Demo->Dynamics->SetHullGroundQuery([Pin,Pillow](TConstArrayView<FVector> A,TConstArrayView<FVector> B,
             TConstArrayView<FIntVector> Faces,double Skin,double Clearance)
             {return RaftSimFlipObstacle::Sweep(A,B,Faces,Skin,Clearance,Pin,Pillow);});
-        if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimRockPinArcCandidate")))
-            Demo->Dynamics->SetHullGroundArcQuery([Pin,Pillow](auto A,auto B,auto F,double Skin,double Clearance,const FRaftSimHullArcPath& Arc)
+        Demo->Dynamics->SetHullGroundArcQuery([Pin,Pillow](auto A,auto B,auto F,double Skin,double Clearance,const FRaftSimHullArcPath& Arc)
                 {return RaftSimFlipObstacle::Sweep(A,B,F,Skin,Clearance,Pin,Pillow,&Arc);});
         Demo->Dynamics->SetGroundSurfaceSampler([Pin,Pillow](const FVector& P,float& Z,FVector& N)
             {const bool OnRock=FMath::Abs(P.X)<=60. && FMath::Abs(P.Y)<=120.;
