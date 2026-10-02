@@ -543,7 +543,8 @@ def test_runtime_camera_uses_bounded_local_exposure_without_simulation_authority
 ):
     source = CAMERA_PRESENTATION_SOURCE.read_text(encoding="utf-8")
     for contract in (
-        "float ExposureBias = 1.25f",
+        "constexpr float DefaultExposureBias = 1.25f",
+        "float ExposureBias = DefaultExposureBias",
         "Settings.AutoExposureMethod = AEM_Manual",
         "Settings.LocalExposureMethod = ELocalExposureMethod::Bilateral",
         "Settings.LocalExposureHighlightContrastScale = 0.78f",

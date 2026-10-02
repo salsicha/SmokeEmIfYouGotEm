@@ -1,6 +1,7 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 #include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionComponentMask.h"
+#include "Materials/MaterialExpressionDesaturation.h"
 #include "Materials/MaterialExpressionMax.h"
 #include "Materials/MaterialExpressionCollectionParameter.h"
 #include "Materials/MaterialExpressionNoise.h"
@@ -462,8 +463,11 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     UMaterialExpressionOneMinus* RawSlope = NewObject<UMaterialExpressionOneMinus>(Material);
     RawSlope->Input.Expression = VertexNormalZ;
     Material->GetExpressionCollection().AddExpression(RawSlope);
+    // The Batoka walls in the 30 m DEM are mostly 30-45 deg, where the generic
+    // canyon ramp (full rock only near 60 deg) left the tan drape showing
+    // through the basalt; Zambezi's ramp starts at ~13 deg and is full by ~32.
     UMaterialExpressionConstant* RockSlopeStart = NewObject<UMaterialExpressionConstant>(Material);
-    RockSlopeStart->R = bRockCanyon ? 0.10f : 0.16f;
+    RockSlopeStart->R = bZambezi ? 0.025f : (bRockCanyon ? 0.10f : 0.16f);
     Material->GetExpressionCollection().AddExpression(RockSlopeStart);
     UMaterialExpressionSubtract* RockSlopeAboveThreshold =
         NewObject<UMaterialExpressionSubtract>(Material);
@@ -471,7 +475,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     RockSlopeAboveThreshold->B.Expression = RockSlopeStart;
     Material->GetExpressionCollection().AddExpression(RockSlopeAboveThreshold);
     UMaterialExpressionConstant* RockSlopeGain = NewObject<UMaterialExpressionConstant>(Material);
-    RockSlopeGain->R = 3.3f;
+    RockSlopeGain->R = bZambezi ? 8.0f : 3.3f;
     Material->GetExpressionCollection().AddExpression(RockSlopeGain);
     UMaterialExpressionMultiply* AmplifiedRockSlope = NewObject<UMaterialExpressionMultiply>(Material);
     AmplifiedRockSlope->A.Expression = RockSlopeAboveThreshold;
@@ -492,12 +496,41 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     BaseColor->B.Expression = VertexColor;
     BaseColor->Alpha.Expression = VertexColorWeight;
     Material->GetExpressionCollection().AddExpression(BaseColor);
+    UMaterialExpression* SourceBaseColor = BaseColor;
+    if (bZambezi)
+    {
+        // The reference drape is laterite orange, so the flat banks between
+        // basalt read as an orange beach. In the dry season Batoka's low-water
+        // margin is black boulders, grey sand and dry grass: keep the drape's
+        // light and shade but neutralise its hue toward pale grey sand.
+        UMaterialExpressionDesaturation* GreyDrape = NewObject<UMaterialExpressionDesaturation>(Material);
+        GreyDrape->Input.Expression = BaseColor;
+        Material->GetExpressionCollection().AddExpression(GreyDrape);
+        UMaterialExpressionConstant3Vector* SandTint = NewObject<UMaterialExpressionConstant3Vector>(Material);
+        SandTint->Constant = FLinearColor(0.92f, 0.88f, 0.80f);
+        Material->GetExpressionCollection().AddExpression(SandTint);
+        UMaterialExpressionMultiply* GreySand = NewObject<UMaterialExpressionMultiply>(Material);
+        GreySand->A.Expression = GreyDrape;
+        GreySand->B.Expression = SandTint;
+        Material->GetExpressionCollection().AddExpression(GreySand);
+        UMaterialExpressionScalarParameter* Neutralise = NewObject<UMaterialExpressionScalarParameter>(Material);
+        Neutralise->ParameterName = TEXT("BatokaBankDrapeNeutralise");
+        Neutralise->DefaultValue = 0.8f;
+        Neutralise->Group = TEXT("BatokaOrganicBasaltV16");
+        Material->GetExpressionCollection().AddExpression(Neutralise);
+        UMaterialExpressionLinearInterpolate* NeutralDrape = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        NeutralDrape->A.Expression = BaseColor;
+        NeutralDrape->B.Expression = GreySand;
+        NeutralDrape->Alpha.Expression = Neutralise;
+        Material->GetExpressionCollection().AddExpression(NeutralDrape);
+        SourceBaseColor = NeutralDrape;
+    }
     UMaterialExpressionConstant* DetailAlbedoWeight = NewObject<UMaterialExpressionConstant>(Material);
     DetailAlbedoWeight->R = bZambezi ? 0.16f : (bFutaleufu ? 0.18f : (bRockCanyon ? 0.08f : 0.24f));
     Material->GetExpressionCollection().AddExpression(DetailAlbedoWeight);
     UMaterialExpressionLinearInterpolate* ForestDetailedBaseColor =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    ForestDetailedBaseColor->A.Expression = BaseColor;
+    ForestDetailedBaseColor->A.Expression = SourceBaseColor;
     ForestDetailedBaseColor->B.Expression = ForestFloorAlbedoSample;
     ForestDetailedBaseColor->Alpha.Expression = DetailAlbedoWeight;
     Material->GetExpressionCollection().AddExpression(ForestDetailedBaseColor);
@@ -506,7 +539,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     Material->GetExpressionCollection().AddExpression(RockAlbedoWeight);
     UMaterialExpressionLinearInterpolate* RockDetailedBaseColor =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    RockDetailedBaseColor->A.Expression = BaseColor;
+    RockDetailedBaseColor->A.Expression = SourceBaseColor;
     RockDetailedBaseColor->B.Expression = RockGroundAlbedoSample;
     RockDetailedBaseColor->Alpha.Expression = RockAlbedoWeight;
     Material->GetExpressionCollection().AddExpression(RockDetailedBaseColor);
@@ -515,7 +548,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     {
         RockSurfaceBaseColor = BuildBatokaOrganicBasaltBaseColor(
             Material,
-            BaseColor,
+            SourceBaseColor,
             BatokaMacroAlbedoRef.Expression,
             BatokaMacroAlbedoRef.OutputIndex,
             BatokaMacroSecondaryAlbedoRef.Expression,
@@ -600,7 +633,21 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
         BatokaTwoScaleRoughness->B.Expression = BatokaDetailRoughnessMask;
         BatokaTwoScaleRoughness->Alpha.Expression = BatokaDetailRoughnessWeight;
         Material->GetExpressionCollection().AddExpression(BatokaTwoScaleRoughness);
-        RockSurfaceRoughness = BatokaTwoScaleRoughness;
+        // Weathered basalt is rough. At the photo textures' ~0.45 the sunlit
+        // walls, seen at grazing angles up the gorge, returned a broad warm
+        // specular sheen that read light grey-brown whatever the albedo (a
+        // pure-green albedo probe kept the sunlit wall's red channel).
+        UMaterialExpressionScalarParameter* BatokaBasaltRoughnessFloor =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        BatokaBasaltRoughnessFloor->ParameterName = TEXT("BatokaBasaltRoughnessFloor");
+        BatokaBasaltRoughnessFloor->DefaultValue = 0.88f;
+        BatokaBasaltRoughnessFloor->Group = TEXT("BatokaOrganicBasaltV16");
+        Material->GetExpressionCollection().AddExpression(BatokaBasaltRoughnessFloor);
+        UMaterialExpressionMax* RoughBasalt = NewObject<UMaterialExpressionMax>(Material);
+        RoughBasalt->A.Expression = BatokaTwoScaleRoughness;
+        RoughBasalt->B.Expression = BatokaBasaltRoughnessFloor;
+        Material->GetExpressionCollection().AddExpression(RoughBasalt);
+        RockSurfaceRoughness = RoughBasalt;
     }
     UMaterialExpressionLinearInterpolate* DetailedRoughness =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
@@ -613,6 +660,15 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
         NewObject<UMaterialExpressionConstant3Vector>(Material);
     FlatNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f);
     Material->GetExpressionCollection().AddExpression(FlatNormal);
+    // The world-aligned Batoka material authors WORLD-space normals
+    // (bTangentSpaceNormal false), where (0,0,1) is straight up: it laid the
+    // banks flat and pulled every wall's normal halfway to the sky, so all
+    // wall faces took the same sun and the gorge read as a smooth, evenly lit
+    // half-pipe (and light grey-brown in direct sun). There the base is the
+    // geometry's own world normal, perturbed by the world-aligned rock.
+    UMaterialExpression* BaseNormal = bBatokaWorldAlignedReview
+        ? static_cast<UMaterialExpression*>(VertexNormalWs)
+        : static_cast<UMaterialExpression*>(FlatNormal);
     UMaterialExpressionConstant* DetailNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
     DetailNormalWeight->R = bBatokaWorldAlignedReview
         ? 0.0f
@@ -620,7 +676,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     Material->GetExpressionCollection().AddExpression(DetailNormalWeight);
     UMaterialExpressionLinearInterpolate* ForestDetailedNormal =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    ForestDetailedNormal->A.Expression = FlatNormal;
+    ForestDetailedNormal->A.Expression = BaseNormal;
     ForestDetailedNormal->B.Expression = ForestFloorNormalSample;
     ForestDetailedNormal->Alpha.Expression = DetailNormalWeight;
     Material->GetExpressionCollection().AddExpression(ForestDetailedNormal);
@@ -629,7 +685,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     Material->GetExpressionCollection().AddExpression(RockNormalWeight);
     UMaterialExpressionLinearInterpolate* RockDetailedNormal =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    RockDetailedNormal->A.Expression = FlatNormal;
+    RockDetailedNormal->A.Expression = BaseNormal;
     RockDetailedNormal->B.Expression = bBatokaTerrainIntegratedReview
         ? BatokaMacroNormalRef.Expression
         : RockGroundNormalSample;

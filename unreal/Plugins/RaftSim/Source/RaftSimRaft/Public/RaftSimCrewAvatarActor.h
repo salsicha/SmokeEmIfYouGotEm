@@ -395,6 +395,11 @@ private:
         FVector& OutFaceUpWorld,
         float& OutHelmetScale) const;
     void AlignProductionHeadgearToSolvedHead();
+    /** Personal accessories from URaftSimCrewRoster (eyewear; the guide's
+     * whistle and river knife), built once and fitted to the solved face
+     * and chest frames every tick. */
+    void BuildPersonalAccessories();
+    void UpdatePersonalAccessories();
     void UpdatePfdMaterialResponse(float DeltaSeconds);
     void ApplyPfdMaterialWetness();
     void ApplyPose(const FRaftSimCrewAvatarPose& Pose);
@@ -479,6 +484,10 @@ private:
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> PaddleShaft;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> PaddleBlade;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> PaddleGrip;
+    UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> EyewearFrame;
+    UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> EyewearLenses;
+    UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> RescueWhistle;
+    UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> RescueKnife;
 
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Animation")
     ERaftSimCrewAvatarAction CurrentAction = ERaftSimCrewAvatarAction::SeatedIdle;

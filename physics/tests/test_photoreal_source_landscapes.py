@@ -82,8 +82,8 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
     assert "RockAlbedoWeight->R = bZambezi ? 0.20f" in editor_source
     assert "RockNormalWeight->R = bZambezi ? 0.52f" in editor_source
     assert "RockRoughnessWeight->R = 0.44f" in editor_source
-    assert "RockSlopeStart->R = bRockCanyon ? 0.10f : 0.16f" in editor_source
-    assert "RockSlopeGain->R = 3.3f" in editor_source
+    assert "RockSlopeStart->R = bZambezi ? 0.025f : (bRockCanyon ? 0.10f : 0.16f)" in editor_source
+    assert "RockSlopeGain->R = bZambezi ? 8.0f : 3.3f" in editor_source
     assert "SourceNormalWeight->R = 0.0f" in editor_source
     assert "colorado_lees_ferry_reach_terrain_albedo_2048.png" in editor_source
     assert "bRockCanyon ? 0.05f : 0.24f" in editor_source

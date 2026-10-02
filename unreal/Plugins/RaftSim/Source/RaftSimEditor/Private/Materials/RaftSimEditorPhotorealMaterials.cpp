@@ -31,6 +31,8 @@
 #include "Materials/MaterialExpressionMax.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionNoise.h"
+#include "Materials/MaterialExpressionLocalPosition.h"
+#include "Materials/MaterialExpressionObjectLocalBounds.h"
 #include "Materials/MaterialExpressionNormalize.h"
 #include "Materials/MaterialExpressionOneMinus.h"
 #include "Materials/MaterialExpressionConstant.h"
@@ -623,8 +625,11 @@ static UMaterial* BuildSolidMaterial(
     Material->SetMaterialUsage(MATUSAGE_StaticMesh);
     Material->SetMaterialUsage(MATUSAGE_Nanite);
 
-    UMaterialExpressionConstant3Vector* BaseColor = NewObject<UMaterialExpressionConstant3Vector>(Material);
-    BaseColor->Constant = Color;
+    // A tint parameter (default = the authored colour) lets runtime
+    // instances give each crew member their own helmet and gear colours.
+    UMaterialExpressionVectorParameter* BaseColor = NewObject<UMaterialExpressionVectorParameter>(Material);
+    BaseColor->ParameterName = TEXT("BaseTint");
+    BaseColor->DefaultValue = Color;
     Material->GetExpressionCollection().AddExpression(BaseColor);
     UMaterialExpressionConstant* Rough = NewObject<UMaterialExpressionConstant>(Material);
     Rough->R = Roughness;
@@ -1586,7 +1591,8 @@ static UMaterial* BuildTexturedRaftMaterial(
     bool bUseClothShading = false,
     float DrySpecularValue = 0.28f,
     float WetSpecularValue = 0.56f,
-    bool bUseDynamicPaddleGloveZones = false)
+    bool bUseDynamicPaddleGloveZones = false,
+    bool bRaftWear = false)
 {
     const FString PackagePath = FString::Printf(TEXT("/Game/RaftSim/Materials/%s"), AssetName);
     const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, AssetName);
@@ -1653,9 +1659,13 @@ static UMaterial* BuildTexturedRaftMaterial(
         Material->GetExpressionCollection().AddExpression(Expression);
         return Expression;
     };
-    UMaterialExpressionConstant3Vector* Base =
-        NewObject<UMaterialExpressionConstant3Vector>(Material);
-    Base->Constant = Color;
+    // Tint parameter (default = the authored colour): runtime instances give
+    // each crew member their own PFD, jacket and wetsuit colours.
+    UMaterialExpressionVectorParameter* Base =
+        NewObject<UMaterialExpressionVectorParameter>(Material);
+    Base->ParameterName = TEXT("BaseTint");
+    Base->DefaultValue = Color;
+    Base->Group = TEXT("RaftSimEquipmentTextile");
     Add(Base);
 
     UMaterialExpressionTextureCoordinate* TextureUv =
@@ -1710,6 +1720,142 @@ static UMaterial* BuildTexturedRaftMaterial(
     UMaterialExpression* DryColor = bUseTextileAlbedo
         ? static_cast<UMaterialExpression*>(TexturedColor)
         : static_cast<UMaterialExpression*>(Base);
+    if (bRaftWear)
+    {
+        // A working commercial raft is not showroom PVC: the hull side that
+        // rides in the river carries a brown-green waterline film, the tops
+        // sun-fade, and the coat is scuffed pale where it drags over rock.
+        // Driven by height in the hull's own bounds (object space), so the
+        // weathering stays on the hull as the raft moves and deforms. The
+        // two-sided raft meshes' vertex normals point inward on the tube
+        // tops, so a normal-driven mask put the waterline film on top.
+        UMaterialExpressionLocalPosition* HullPosition = NewObject<UMaterialExpressionLocalPosition>(Material);
+        Add(HullPosition);
+        UMaterialExpressionObjectLocalBounds* HullBounds = NewObject<UMaterialExpressionObjectLocalBounds>(Material);
+        Add(HullBounds);
+        UMaterialExpressionComponentMask* HullZ = NewObject<UMaterialExpressionComponentMask>(Material);
+        HullZ->Input.Expression = HullPosition;
+        HullZ->B = true;
+        Add(HullZ);
+        UMaterialExpressionComponentMask* HullMinZ = NewObject<UMaterialExpressionComponentMask>(Material);
+        HullMinZ->Input.Expression = HullBounds;
+        HullMinZ->Input.OutputIndex = 2;
+        HullMinZ->B = true;
+        Add(HullMinZ);
+        UMaterialExpressionComponentMask* HullHeightZ = NewObject<UMaterialExpressionComponentMask>(Material);
+        HullHeightZ->Input.Expression = HullBounds;
+        HullHeightZ->Input.OutputIndex = 1;
+        HullHeightZ->B = true;
+        Add(HullHeightZ);
+        UMaterialExpressionSubtract* HullAboveBottom = NewObject<UMaterialExpressionSubtract>(Material);
+        HullAboveBottom->A.Expression = HullZ;
+        HullAboveBottom->B.Expression = HullMinZ;
+        Add(HullAboveBottom);
+        UMaterialExpressionMax* SafeHullHeight = NewObject<UMaterialExpressionMax>(Material);
+        SafeHullHeight->A.Expression = HullHeightZ;
+        SafeHullHeight->ConstB = 1.0f;
+        Add(SafeHullHeight);
+        UMaterialExpressionDivide* HullHeight01 = NewObject<UMaterialExpressionDivide>(Material);
+        HullHeight01->A.Expression = HullAboveBottom;
+        HullHeight01->B.Expression = SafeHullHeight;
+        Add(HullHeight01);
+        auto ScalarConst = [&](float Value)
+        {
+            UMaterialExpressionConstant* Constant = NewObject<UMaterialExpressionConstant>(Material);
+            Constant->R = Value;
+            Add(Constant);
+            return Constant;
+        };
+        auto Ramp = [&](UMaterialExpression* Input, float Offset, float Gain) -> UMaterialExpression*
+        {
+            UMaterialExpressionSubtract* Shifted = NewObject<UMaterialExpressionSubtract>(Material);
+            Shifted->A.Expression = Input;
+            Shifted->B.Expression = ScalarConst(Offset);
+            Add(Shifted);
+            UMaterialExpressionMultiply* Scaled = NewObject<UMaterialExpressionMultiply>(Material);
+            Scaled->A.Expression = Shifted;
+            Scaled->B.Expression = ScalarConst(Gain);
+            Add(Scaled);
+            UMaterialExpressionSaturate* Clamped = NewObject<UMaterialExpressionSaturate>(Material);
+            Clamped->Input.Expression = Scaled;
+            Add(Clamped);
+            return Clamped;
+        };
+        // Waterline film on the low third of the hull that rides in the river.
+        UMaterialExpressionMultiply* Depth01 = NewObject<UMaterialExpressionMultiply>(Material);
+        Depth01->A.Expression = HullHeight01;
+        Depth01->B.Expression = ScalarConst(-1.0f);
+        Add(Depth01);
+        UMaterialExpression* GrimeMask = Ramp(Depth01, -0.32f, 5.0f);
+        UMaterialExpressionConstant3Vector* GrimeTint = NewObject<UMaterialExpressionConstant3Vector>(Material);
+        GrimeTint->Constant = FLinearColor(0.58f, 0.55f, 0.42f, 1.0f);
+        Add(GrimeTint);
+        UMaterialExpressionMultiply* Grimed = NewObject<UMaterialExpressionMultiply>(Material);
+        Grimed->A.Expression = DryColor;
+        Grimed->B.Expression = GrimeTint;
+        Add(Grimed);
+        UMaterialExpressionScalarParameter* GrimeStrength = NewObject<UMaterialExpressionScalarParameter>(Material);
+        GrimeStrength->ParameterName = TEXT("RaftWaterlineGrime");
+        GrimeStrength->DefaultValue = 0.85f;
+        GrimeStrength->Group = TEXT("RaftSimRaftWear");
+        Add(GrimeStrength);
+        UMaterialExpressionMultiply* GrimeAlpha = NewObject<UMaterialExpressionMultiply>(Material);
+        GrimeAlpha->A.Expression = GrimeMask;
+        GrimeAlpha->B.Expression = GrimeStrength;
+        Add(GrimeAlpha);
+        UMaterialExpressionLinearInterpolate* WithGrime = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        WithGrime->A.Expression = DryColor;
+        WithGrime->B.Expression = Grimed;
+        WithGrime->Alpha.Expression = GrimeAlpha;
+        Add(WithGrime);
+        // Sun-faded tops: a little paler and greyer.
+        UMaterialExpression* SunMask = Ramp(HullHeight01, 0.62f, 4.0f);
+        UMaterialExpressionDesaturation* Faded = NewObject<UMaterialExpressionDesaturation>(Material);
+        Faded->Input.Expression = WithGrime;
+        Faded->Fraction.Expression = ScalarConst(0.35f);
+        Add(Faded);
+        UMaterialExpressionMultiply* FadedLift = NewObject<UMaterialExpressionMultiply>(Material);
+        FadedLift->A.Expression = Faded;
+        FadedLift->B.Expression = ScalarConst(1.22f);
+        Add(FadedLift);
+        UMaterialExpressionMultiply* SunAlpha = NewObject<UMaterialExpressionMultiply>(Material);
+        SunAlpha->A.Expression = SunMask;
+        SunAlpha->B.Expression = ScalarConst(0.16f);
+        Add(SunAlpha);
+        UMaterialExpressionLinearInterpolate* WithSun = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        WithSun->A.Expression = WithGrime;
+        WithSun->B.Expression = FadedLift;
+        WithSun->Alpha.Expression = SunAlpha;
+        Add(WithSun);
+        // Rock scuffs: small, sparse pale abrasions in object space, on the
+        // lower tube sides and underside that drag over rock (not the tops).
+        UMaterialExpressionNoise* ScuffNoise = NewObject<UMaterialExpressionNoise>(Material);
+        ScuffNoise->Position.Expression = HullPosition;
+        ScuffNoise->Scale = 0.24f;
+        ScuffNoise->Levels = 2;
+        ScuffNoise->bTurbulence = false;
+        ScuffNoise->OutputMin = 0.0f;
+        ScuffNoise->OutputMax = 1.0f;
+        Add(ScuffNoise);
+        UMaterialExpressionMultiply* ScuffSpots = NewObject<UMaterialExpressionMultiply>(Material);
+        ScuffSpots->A.Expression = Ramp(ScuffNoise, 0.74f, 6.0f);
+        ScuffSpots->B.Expression = Ramp(Depth01, -0.55f, 3.0f);
+        Add(ScuffSpots);
+        UMaterialExpression* ScuffMask = ScuffSpots;
+        UMaterialExpressionConstant3Vector* AbradedCoat = NewObject<UMaterialExpressionConstant3Vector>(Material);
+        AbradedCoat->Constant = FLinearColor(0.16f, 0.14f, 0.12f, 1.0f);
+        Add(AbradedCoat);
+        UMaterialExpressionMultiply* ScuffAlpha = NewObject<UMaterialExpressionMultiply>(Material);
+        ScuffAlpha->A.Expression = ScuffMask;
+        ScuffAlpha->B.Expression = ScalarConst(0.22f);
+        Add(ScuffAlpha);
+        UMaterialExpressionLinearInterpolate* WithScuffs = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        WithScuffs->A.Expression = WithSun;
+        WithScuffs->B.Expression = AbradedCoat;
+        WithScuffs->Alpha.Expression = ScuffAlpha;
+        Add(WithScuffs);
+        DryColor = WithScuffs;
+    }
     WetTexturedColor->A.Expression = DryColor;
     WetTexturedColor->B.Expression = WetTint;
     Add(WetTexturedColor);
@@ -2173,18 +2319,26 @@ static void BuildProductionRaftMaterials()
     // character-material defaults.
     BuildTexturedRaftMaterial(
         TEXT("M_RaftSim_RaftTube"), TEXT("RaftCoatedFabric"),
-        FLinearColor(0.075f, 0.006f, 0.002f, 1.0f),
+        // Commercial red PVC/Hypalon, not maroon: the darker 0.075 read
+        // brown-maroon in the river sun.
+        FLinearColor(0.13f, 0.009f, 0.005f, 1.0f),
         0.82f, 0.10f, 5.0f, 0.38f,
         /*bTwoSided=*/true, /*bSkeletalMesh=*/false,
         /*SaturatedRoughnessScale=*/0.46f,
-        /*SaturatedRoughnessMax=*/0.40f);
+        /*SaturatedRoughnessMax=*/0.40f,
+        /*bUseTextileAlbedo=*/true, /*bUseAmbientOcclusion=*/true, /*bUseClothShading=*/false,
+        /*DrySpecularValue=*/0.28f, /*WetSpecularValue=*/0.56f, /*bUseDynamicPaddleGloveZones=*/false,
+        /*bRaftWear=*/true);
     BuildTexturedRaftMaterial(
         TEXT("M_RaftSim_RaftFloor"), TEXT("RaftCoatedFabric"),
         FLinearColor(0.008f, 0.012f, 0.014f, 1.0f),
         0.88f, 0.08f, 8.0f, 0.28f,
         /*bTwoSided=*/true, /*bSkeletalMesh=*/false,
         /*SaturatedRoughnessScale=*/0.46f,
-        /*SaturatedRoughnessMax=*/0.40f);
+        /*SaturatedRoughnessMax=*/0.40f,
+        /*bUseTextileAlbedo=*/true, /*bUseAmbientOcclusion=*/true, /*bUseClothShading=*/false,
+        /*DrySpecularValue=*/0.28f, /*WetSpecularValue=*/0.56f, /*bUseDynamicPaddleGloveZones=*/false,
+        /*bRaftWear=*/true);
 }
 
 static void BuildRaftCrewMaterials()
@@ -2210,13 +2364,18 @@ static void BuildRaftCrewMaterials()
     BuildSplashJacketMaterial();
     BuildProductionCrewWetsuitMaterial();
     BuildSolidMaterial(TEXT("M_RaftSim_PFDWebbing"), FLinearColor(0.008f, 0.010f, 0.012f, 1.0f), 0.72f, 0.0f);
+    // Polarised sport lenses: dark and tinted per person (BaseTint). Glossy
+    // 0.06 turned them into speckled chrome mirrors of the bright river.
+    BuildSolidMaterial(TEXT("M_RaftSim_EyewearLens"), FLinearColor(0.012f, 0.03f, 0.07f, 1.0f), 0.22f, 0.0f,
+        /*bTwoSided=*/true);
     // Charcoal, not black: at 0.006 the boot rendered the same value as the
     // wetsuit shin above it, so leg and boot fused into one featureless
     // column regardless of the mesh's actual shape ("the boots are still
     // cylinders", third report 2026-09-02). A visibly lighter rubber lets
     // the cuff, heel, and sole separate from the neoprene.
     BuildSolidMaterial(TEXT("M_RaftSim_BootRubber"), FLinearColor(0.030f, 0.032f, 0.036f, 1.0f), 0.68f, 0.0f);
-    BuildSolidMaterial(TEXT("M_RaftSim_PaddleShaft"), FLinearColor(0.035f, 0.035f, 0.042f, 1.0f), 0.34f, 0.10f);
+    // Black-anodised aluminium shaft (and the gear hardware sharing it).
+    BuildSolidMaterial(TEXT("M_RaftSim_PaddleShaft"), FLinearColor(0.030f, 0.030f, 0.034f, 1.0f), 0.40f, 0.55f);
     // Commercial polyethylene blade yellow (Carlisle-style). The previous
     // dark blood-red blade (0.30, 0.05, 0.002) sweeping past a paddler's hip
     // on the stroke exit read as an open wound on the glute against the black

@@ -1,4 +1,6 @@
 #include "RaftSimCrewAvatarActor.h"
+#include "RaftSimCrewRoster.h"
+#include "RaftSimAccessoryMesh.h"
 #include "RaftSimCrewBoarding.h"
 
 #include "RaftSimCC0CrewVisualActor.h"
@@ -2268,6 +2270,14 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
     PfdShellMaterialInstance = PfdMaterial
         ? UMaterialInstanceDynamic::Create(PfdMaterial, this)
         : nullptr;
+    // Each person wears their own gear (URaftSimCrewRoster): the shared
+    // materials' BaseTint carries their PFD, jacket and helmet colours.
+    const FRaftSimCrewIdentity& Identity =
+        URaftSimCrewRoster::GetIdentityForVariant(VariantIndex, bGuide);
+    if (PfdShellMaterialInstance)
+    {
+        PfdShellMaterialInstance->SetVectorParameterValue(TEXT("BaseTint"), Identity.PfdColor);
+    }
     UMaterialInterface* VisiblePfdMaterial = PfdShellMaterialInstance
         ? static_cast<UMaterialInterface*>(PfdShellMaterialInstance.Get())
         : PfdMaterial;
@@ -2286,6 +2296,10 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
     SplashJacketMaterialInstance = SplashJacketMaterial
         ? UMaterialInstanceDynamic::Create(SplashJacketMaterial, this)
         : nullptr;
+    if (SplashJacketMaterialInstance)
+    {
+        SplashJacketMaterialInstance->SetVectorParameterValue(TEXT("BaseTint"), Identity.JacketColor);
+    }
     UMaterialInterface* VisibleSplashJacket = SplashJacketMaterialInstance
         ? static_cast<UMaterialInterface*>(SplashJacketMaterialInstance.Get())
         : SplashJacketMaterial;
@@ -2317,6 +2331,12 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
         : HelmetPaths[VariantIndex];
     UMaterialInterface* VisibleHelmet =
         LoadObject<UMaterialInterface>(nullptr, VisibleHelmetPath);
+    if (VisibleHelmet)
+    {
+        UMaterialInstanceDynamic* PersonalHelmet = UMaterialInstanceDynamic::Create(VisibleHelmet, this);
+        PersonalHelmet->SetVectorParameterValue(TEXT("BaseTint"), Identity.HelmetColor);
+        VisibleHelmet = PersonalHelmet;
+    }
     if (VisibleHelmet)
     {
         Helmet->SetMaterial(0, VisibleHelmet);
@@ -2369,6 +2389,7 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
     ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide));
     TryActivateProductionVisual();
     PrepareStartupCrewMaterials(this);
+    BuildPersonalAccessories();
 }
 
 void ARaftSimCrewAvatarActor::UpdatePfdMaterialResponse(float DeltaSeconds)
@@ -2943,6 +2964,7 @@ void ARaftSimCrewAvatarActor::AlignProductionHeadgearToSolvedHead()
             }
         }
     }
+    UpdatePersonalAccessories();
 }
 
 UProceduralMeshComponent* ARaftSimCrewAvatarActor::CreateOrganicPart(
@@ -3942,4 +3964,186 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
             Pose.PaddleTopCm + GripDirection * 7.0f,
             2.2f);
     }
+}
+
+// ---------------------------------------------------------------------------
+// Personal accessories (URaftSimCrewRoster): eyewear for the people who wear
+// it and the guide's rescue whistle and river knife. Small procedural props
+// fitted every tick to the rendered eye line and the PFD's chest frame.
+// ---------------------------------------------------------------------------
+namespace
+{
+using RaftSimAccessoryMesh::FAccessoryMesh;
+
+UProceduralMeshComponent* CreateAccessoryPart(AActor* Owner, USceneComponent* Parent, const TCHAR* Name)
+{
+    UProceduralMeshComponent* Part = NewObject<UProceduralMeshComponent>(Owner, FName(Name));
+    Part->SetupAttachment(Parent);
+    Part->RegisterComponent();
+    Part->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    Part->SetCastShadow(true);
+    Part->SetUsingAbsoluteScale(true);
+    return Part;
+}
+
+UMaterialInstanceDynamic* TintedAccessoryMaterial(UObject* Outer, const TCHAR* Path, const FLinearColor& Tint)
+{
+    UMaterialInterface* Base = LoadObject<UMaterialInterface>(nullptr, Path);
+    if (!Base)
+    {
+        return nullptr;
+    }
+    UMaterialInstanceDynamic* Instance = UMaterialInstanceDynamic::Create(Base, Outer);
+    Instance->SetVectorParameterValue(TEXT("BaseTint"), Tint);
+    return Instance;
+}
+}
+
+void ARaftSimCrewAvatarActor::BuildPersonalAccessories()
+{
+    if (!Root)
+    {
+        return;
+    }
+    const FRaftSimCrewIdentity& Identity = URaftSimCrewRoster::GetIdentityForVariant(VariantIndex, bGuide);
+    if (!EyewearFrame)
+    {
+        // Eye-line frame: X toward the face, Y across, Z up; origin at the
+        // midpoint of the rendered eyes. Sport wrap with a slight brow bar.
+        EyewearFrame = CreateAccessoryPart(this, Root, TEXT("EyewearFrame"));
+        EyewearLenses = CreateAccessoryPart(this, Root, TEXT("EyewearLenses"));
+        FAccessoryMesh Frame, Lenses;
+        for (int32 Side = -1; Side <= 1; Side += 2)
+        {
+            const float S = float(Side);
+            // Lens planes wrap ~10 deg back toward the temples.
+            const FVector Center(2.55f, S * 3.25f, -0.15f);
+            // In-plane axis toward +Y on both lenses; the outer edge (S side)
+            // sits back toward the temple.
+            const FVector Right = FVector(-0.17f, S, 0.0f).GetSafeNormal() * S;
+            const FVector Up = FVector::UpVector;
+            Lenses.Lens(Center, Right, Up, 2.75f, 2.0f, 0.22f);
+            // Rim: a ring of short tubes round the lens edge.
+            constexpr int32 RimSegments = 16;
+            for (int32 Segment = 0; Segment < RimSegments; ++Segment)
+            {
+                auto Edge = [&](int32 Index)
+                {
+                    const float Angle = UE_TWO_PI * Index / RimSegments;
+                    const float C = FMath::Cos(Angle);
+                    const float Squircle = FMath::Pow(FMath::Abs(C), 0.8f) * FMath::Sign(C);
+                    return Center + Right * (2.95f * Squircle) + Up * (2.2f * FMath::Sin(Angle));
+                };
+                Frame.Tube(Edge(Segment), Edge(Segment + 1), 0.24f, 5);
+            }
+            // Hinge and temple arm back over the ear, then a short ear hook.
+            const FVector Hinge(1.9f, S * 6.35f, 0.35f);
+            const FVector OverEar(-8.6f, S * 7.25f, 0.15f);
+            const FVector EarHook(-10.3f, S * 7.05f, -1.7f);
+            Frame.Tube(Center + Right * (S * 2.95f) + Up * 0.6f, Hinge, 0.32f, 6);
+            Frame.Tube(Hinge, OverEar, 0.28f, 6);
+            Frame.Tube(OverEar, EarHook, 0.26f, 6);
+        }
+        // Bridge over the nose.
+        Frame.Tube(FVector(2.75f, -0.75f, 0.55f), FVector(2.95f, 0.0f, 0.85f), 0.3f, 6);
+        Frame.Tube(FVector(2.95f, 0.0f, 0.85f), FVector(2.75f, 0.75f, 0.55f), 0.3f, 6);
+        Frame.Commit(EyewearFrame, 0);
+        Lenses.Commit(EyewearLenses, 0);
+    }
+    if (!RescueWhistle)
+    {
+        // PFD chest frame (X out of the chest, Z up the spine): a pea-less
+        // safety whistle on a short lanyard and a blunt-tip river knife in a
+        // sheath, as clipped to commercial guide vests.
+        RescueWhistle = CreateAccessoryPart(this, Root, TEXT("RescueWhistle"));
+        RescueKnife = CreateAccessoryPart(this, Root, TEXT("RescueKnife"));
+        // Origin at the lanyard's tie-off; the whistle hangs 7 cm below it.
+        FAccessoryMesh Whistle, Lanyard;
+        Whistle.Box(FVector(0.4f, 0.0f, -9.6f), FVector::ForwardVector, FVector::RightVector, FVector::UpVector,
+            FVector(0.75f, 1.05f, 2.5f));
+        Whistle.Tube(FVector(0.4f, 0.0f, -7.1f), FVector(0.4f, 0.0f, -6.5f), 0.7f, 10);
+        Lanyard.Tube(FVector(0.0f, 0.0f, 0.0f), FVector(0.25f, -0.5f, -3.4f), 0.16f, 5);
+        Lanyard.Tube(FVector(0.25f, -0.5f, -3.4f), FVector(0.4f, 0.0f, -6.5f), 0.16f, 5);
+        Whistle.Commit(RescueWhistle, 0);
+        Lanyard.Commit(RescueWhistle, 1);
+        // Blunt-tip river knife, ~21 cm overall, sheath up and handle down
+        // for a one-handed pull, canted 25 degrees across the chest.
+        const FVector KnifeAxis = FVector(0.0f, 0.42f, 0.91f).GetSafeNormal();
+        const FVector KnifeAcross = FVector::CrossProduct(KnifeAxis, FVector::ForwardVector);
+        FAccessoryMesh Sheath, Handle;
+        Sheath.Box(KnifeAxis * 3.2f, FVector::ForwardVector, KnifeAcross, KnifeAxis,
+            FVector(0.9f, 1.9f, 6.6f));
+        Sheath.Box(KnifeAxis * 3.2f + FVector(0.9f, 0.0f, 0.0f), FVector::ForwardVector, KnifeAcross, KnifeAxis,
+            FVector(0.15f, 1.3f, 5.6f));
+        Handle.Box(-KnifeAxis * 7.6f, FVector::ForwardVector, KnifeAcross, KnifeAxis,
+            FVector(1.05f, 1.45f, 4.2f));
+        Handle.Tube(-KnifeAxis * 11.8f, -KnifeAxis * 12.6f, 0.9f, 10);
+        Sheath.Commit(RescueKnife, 0);
+        Handle.Commit(RescueKnife, 1);
+    }
+    EyewearFrame->SetMaterial(0, TintedAccessoryMaterial(this,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"), Identity.EyewearFrameColor));
+    UMaterialInstanceDynamic* LensMaterial = TintedAccessoryMaterial(this,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_EyewearLens.M_RaftSim_EyewearLens"), Identity.LensColor);
+    EyewearLenses->SetMaterial(0, LensMaterial ? LensMaterial : TintedAccessoryMaterial(this,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"), Identity.LensColor));
+    RescueWhistle->SetMaterial(0, TintedAccessoryMaterial(this,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet.M_RaftSim_Helmet"), FLinearColor(0.50f, 0.13f, 0.004f)));
+    RescueWhistle->SetMaterial(1, LoadObject<UMaterialInterface>(nullptr,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PFDWebbing.M_RaftSim_PFDWebbing")));
+    RescueKnife->SetMaterial(0, LoadObject<UMaterialInterface>(nullptr,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PFDWebbing.M_RaftSim_PFDWebbing")));
+    // High-visibility yellow handle so it can be found in a hurry.
+    RescueKnife->SetMaterial(1, TintedAccessoryMaterial(this,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet.M_RaftSim_Helmet"), FLinearColor(0.55f, 0.32f, 0.004f)));
+    UpdatePersonalAccessories();
+}
+
+void ARaftSimCrewAvatarActor::UpdatePersonalAccessories()
+{
+    if (!EyewearFrame || !RescueWhistle)
+    {
+        return;
+    }
+    const FRaftSimCrewIdentity& Identity = URaftSimCrewRoster::GetIdentityForVariant(VariantIndex, bGuide);
+    const ARaftSimCC0CrewVisualActor* CC0Visual = bUsingProductionVisual
+        ? Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor())
+        : nullptr;
+    // The guide's first-person camera sits in the eye socket: no lenses there.
+    bool bShowEyewear = false;
+    FVector EyeCenter;
+    if (Identity.bWearsSunglasses && CC0Visual && !bFirstPersonHeadHidden &&
+        CC0Visual->GetRenderedEyeCenterWorld(EyeCenter))
+    {
+        const FVector Forward = CC0Visual->GetSolvedFaceForwardWorldVector();
+        const FVector Up = CC0Visual->GetSolvedFaceUpWorldVector();
+        if (!Forward.IsNearlyZero() && !Up.IsNearlyZero() && !EyeCenter.ContainsNaN())
+        {
+            const FQuat Rotation = FRotationMatrix::MakeFromXZ(Forward, Up).ToQuat();
+            EyewearFrame->SetWorldLocationAndRotation(EyeCenter, Rotation);
+            EyewearLenses->SetWorldLocationAndRotation(EyeCenter, Rotation);
+            bShowEyewear = true;
+        }
+    }
+    EyewearFrame->SetVisibility(bShowEyewear);
+    EyewearLenses->SetVisibility(bShowEyewear && !Identity.bClearLenses);
+
+    bool bShowKit = false;
+    if (Identity.bRescueKit && bUsingProductionVisual && ProductionPfd && ProductionPfd->IsVisible() &&
+        ProductionPfd->GetStaticMesh() && !bFirstPersonBodyHidden)
+    {
+        const FBox Bounds = ProductionPfd->GetStaticMesh()->GetBoundingBox();
+        const FTransform PfdTransform = ProductionPfd->GetComponentTransform();
+        const FVector Size = Bounds.GetSize();
+        // Front face of the vest: the whistle tied off high on one chest
+        // panel and hanging, the knife's sheath on the other panel's lash tab.
+        const FVector WhistleLocal(Bounds.Max.X - 0.4f, Bounds.Min.Y + 0.30f * Size.Y, Bounds.Min.Z + 0.76f * Size.Z);
+        const FVector KnifeLocal(Bounds.Max.X + 0.2f, Bounds.Max.Y - 0.33f * Size.Y, Bounds.Min.Z + 0.62f * Size.Z);
+        const FQuat Rotation = PfdTransform.GetRotation();
+        RescueWhistle->SetWorldLocationAndRotation(PfdTransform.TransformPosition(WhistleLocal), Rotation);
+        RescueKnife->SetWorldLocationAndRotation(PfdTransform.TransformPosition(KnifeLocal), Rotation);
+        bShowKit = !PfdTransform.GetLocation().ContainsNaN();
+    }
+    RescueWhistle->SetVisibility(bShowKit);
+    RescueKnife->SetVisibility(bShowKit);
 }

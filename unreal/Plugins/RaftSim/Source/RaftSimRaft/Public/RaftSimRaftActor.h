@@ -485,6 +485,9 @@ private:
     void UpdateRaftWetness(float DeltaSeconds);
     void UpdateRockObstacles();
     FVector SampleWaterVelocityMps(const FVector& WorldLocationCm) const;
+    /** Rigged gear on the hull: the guide's throw bag at the stern and coiled
+     * bow and stern lines (presentation only, no collision). */
+    void BuildRaftGear(const FBox& HullBoundsCm);
 
     UPROPERTY()
     TObjectPtr<URaftSimPhysicsBridgeSubsystem> Bridge;
@@ -556,6 +559,8 @@ private:
     TArray<RaftSimRaftMesh::FMeshData> ProductionRaftRestSections;
 
     /** Persistent dynamic buffers avoid copying immutable topology every frame. */
+    UPROPERTY(Transient)
+    TObjectPtr<class UProceduralMeshComponent> RaftGear;
     TArray<RaftSimRaftMesh::FMeshData> ProductionRaftDeformedSections;
 
     /** Precomputed rest-vertex/D1-D4 Gaussian binding; dynamic solve state is not cached. */

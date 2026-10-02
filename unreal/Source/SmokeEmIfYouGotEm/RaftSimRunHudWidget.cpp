@@ -1,4 +1,5 @@
 #include "RaftSimRunHudWidget.h"
+#include "RaftSimCrewRoster.h"
 
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanel.h"
@@ -316,9 +317,10 @@ void URaftSimRunHudWidget::NativeTick(const FGeometry& Geometry, float DeltaSeco
         if (Raft != nullptr && Raft->GetSwimmerCount() > 0)
         {
             const FRaftSimRescueInteractionState Rescue = Raft->GetRescueInteractionState();
+            // Swimmers by name (URaftSimCrewRoster), not their seat ids.
             RescueText->SetText(FText::FromString(FString::Printf(
-                TEXT("RESCUE — target %s | distance %.1fm | %s | E reach, R throw, F reseat"),
-                *Rescue.TargetPassengerId.ToString(), Rescue.DistanceMeters,
+                TEXT("RESCUE — %s | distance %.1fm | %s | E reach, R throw, F reseat"),
+                *URaftSimCrewRoster::GetDisplayName(Rescue.TargetPassengerId).ToString(), Rescue.DistanceMeters,
                 *Rescue.FeedbackCode.ToString())));
         }
         else

@@ -4,7 +4,11 @@
 #include "Components/SceneComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "HAL/IConsoleManager.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "ProceduralMeshComponent.h"
+#include "RaftSimAccessoryMesh.h"
+#include "RaftSimCrewRoster.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "Rendering/SkeletalMeshRenderData.h"
@@ -206,6 +210,14 @@ float ResolvedGuideHelmetScale()
 
 // Diagnostic: draw the CC0 wetsuit section with another material so its
 // geometry can be told apart from every other charcoal surface in a capture.
+TAutoConsoleVariable<int32> CVarCC0CrewGaze(
+    TEXT("RaftSim.CC0CrewGaze"),
+    1,
+    TEXT("1 lets each seated CC0 rafter look about in their own way (URaftSimCrewRoster gaze); 0 holds every head on the line ahead."));
+TAutoConsoleVariable<int32> CVarCC0NeckCollar(
+    TEXT("RaftSim.CC0NeckCollar"),
+    1,
+    TEXT("1 shows the fitted neoprene collar over the CC0 wetsuit neckline."));
 TAutoConsoleVariable<FString> CVarCC0WetsuitDebugMaterial(
     TEXT("raftsim.CC0WetsuitDebugMaterial"),
     TEXT(""),
@@ -213,7 +225,8 @@ TAutoConsoleVariable<FString> CVarCC0WetsuitDebugMaterial(
 
 void ApplyProductionBodyMaterialOverrides(
     UPoseableMeshComponent* Body,
-    const USkeletalMesh* Mesh)
+    const USkeletalMesh* Mesh,
+    const FLinearColor& WetsuitTint)
 {
     if (Body == nullptr || Mesh == nullptr)
     {
@@ -239,15 +252,32 @@ void ApplyProductionBodyMaterialOverrides(
     for (int32 MaterialIndex = 0; MaterialIndex < Slots.Num(); ++MaterialIndex)
     {
         const FString SlotName = Slots[MaterialIndex].MaterialSlotName.ToString();
-        if (SlotName.Contains(TEXT("Wetsuit"), ESearchCase::IgnoreCase) &&
-            Body->GetMaterial(MaterialIndex) != ProductionWetsuit)
+        if (!SlotName.Contains(TEXT("Wetsuit"), ESearchCase::IgnoreCase))
         {
-            // Keep each variant's rights-tracked skin, eye and hair atlases,
-            // but replace the FBX's flat glossy neoprene with the same
-            // physically scaled generated textile used by the production
-            // fallback wardrobe. This is a presentation-only override.
-            Body->SetMaterial(MaterialIndex, ProductionWetsuit);
+            continue;
         }
+        // Keep each variant's rights-tracked skin, eye and hair atlases,
+        // but replace the FBX's flat glossy neoprene with the same
+        // physically scaled generated textile used by the production
+        // fallback wardrobe, tinted per person (their own wetsuit). This is
+        // a presentation-only override.
+        UMaterialInstanceDynamic* Tinted = Cast<UMaterialInstanceDynamic>(Body->GetMaterial(MaterialIndex));
+        if (!DebugWetsuitPath.IsEmpty())
+        {
+            if (Body->GetMaterial(MaterialIndex) != ProductionWetsuit)
+            {
+                Body->SetMaterial(MaterialIndex, ProductionWetsuit);
+            }
+            continue;
+        }
+        if (!Tinted || Tinted->Parent != ProductionWetsuit)
+        {
+            Tinted = UMaterialInstanceDynamic::Create(
+                ProductionWetsuit, Body, MakeUniqueObjectName(Body, UMaterialInstanceDynamic::StaticClass(),
+                    TEXT("M_RaftSim_Wetsuit_Tinted")));
+            Body->SetMaterial(MaterialIndex, Tinted);
+        }
+        Tinted->SetVectorParameterValue(TEXT("BaseTint"), WetsuitTint);
     }
     // Slot forensics ("I still don't see faces inside the helmets",
     // 2026-09-02): which material each CC0 section actually renders with.
@@ -456,9 +486,14 @@ bool ARaftSimCC0CrewVisualActor::EnsureBodyLoaded()
     {
         CacheReferencePose();
     }
-    ApplyProductionBodyMaterialOverrides(Body, Mesh);
+    ApplyProductionBodyMaterialOverrides(
+        Body, Mesh, URaftSimCrewRoster::GetIdentityForVariant(CurrentVariantIndex, bCurrentGuide).WetsuitTint);
     bBodyReady = ReferenceComponentTransforms.Num() >= 19;
     Body->SetVisibility(bBodyReady, true);
+    if (bBodyReady && (bMeshChanged || !bNeckCollarBuilt))
+    {
+        BuildNeckCollar();
+    }
     return bBodyReady;
 }
 
@@ -803,6 +838,7 @@ void ARaftSimCC0CrewVisualActor::ApplyCrewPose_Implementation(
     {
         Pose = URaftSimCrewAvatarPoseLibrary::EvaluatePose(Action, SafePhase, SeatSide);
     }
+    UpdateGaze(Action);
     ApplyBodyPose(Pose);
 }
 
@@ -1044,7 +1080,13 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // vector (0.94, 0, 0.35)); tip the crown forward by that much so the
     // gaze runs level downriver and the helmet brim sits over the brow.
     const FVector TorsoRight = Pose.TorsoRotation.Quaternion().RotateVector(FVector::RightVector);
-    const FVector HeadUp = TorsoUp.RotateAngleAxis(ProductionHeadLevelPitchDegrees, TorsoRight);
+    // Personal idle gaze: the skull turns about the neck (the neck takes a
+    // share of the yaw so the skin between does not wring) and dips toward
+    // the water. Headgear and eyewear read the solved head, so they follow.
+    const float GazeYaw = GazeYawDegrees * GazeWeight;
+    const float GazePitch = GazePitchDegrees * GazeWeight;
+    const FVector HeadUp = TorsoUp.RotateAngleAxis(
+        ProductionHeadLevelPitchDegrees + GazePitch, TorsoRight);
     const FVector HeadTop = PresentedHeadCenter + HeadUp * 16.0f;
 
     SetSegmentBone(TEXT("pelvis"), TEXT("spine_01"), PelvisCm, Spine01Cm,
@@ -1056,9 +1098,9 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     SetSegmentBone(TEXT("spine_03"), TEXT("neck_01"), Spine03Cm, NeckBaseCm,
         ProductionAxialFacingTwistDegrees);
     SetSegmentBone(TEXT("neck_01"), TEXT("head"), NeckBaseCm, PresentedHeadCenter,
-        ProductionAxialFacingTwistDegrees);
+        ProductionAxialFacingTwistDegrees + GazeYaw * 0.45f);
     SetSegmentBone(TEXT("head"), TEXT("head"), PresentedHeadCenter, HeadTop,
-        ProductionAxialFacingTwistDegrees);
+        ProductionAxialFacingTwistDegrees + GazeYaw);
 
     // The shoulders hang from the rig's chest top, not the host shoulder
     // line: children of the driven spine already sit at their rest offsets,
@@ -1222,6 +1264,7 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     Body->RefreshBoneTransforms();
     ApplyPaddleGripPose(Pose);
     Body->RefreshBoneTransforms();
+    UpdateNeckCollar();
     if (CVarCC0PoseForensics.GetValueOnGameThread() && !bLoggedPoseForensics)
     {
         bLoggedPoseForensics = true;
@@ -2099,4 +2142,419 @@ bool ARaftSimCC0CrewVisualActor::HasFinitePose() const
         }
     }
     return true;
+}
+
+void ARaftSimCC0CrewVisualActor::UpdateGaze(ERaftSimCrewAvatarAction Action)
+{
+    const FRaftSimCrewIdentity& Identity =
+        URaftSimCrewRoster::GetIdentityForVariant(CurrentVariantIndex, bCurrentGuide);
+    // Seated people look about; paddlers mostly watch the water; bracing,
+    // high-siding, swimming and rescues hold the head on the job.
+    float TargetWeight = 0.0f;
+    switch (Action)
+    {
+    case ERaftSimCrewAvatarAction::SeatedIdle:
+        TargetWeight = 1.0f;
+        break;
+    case ERaftSimCrewAvatarAction::ForwardStroke:
+    case ERaftSimCrewAvatarAction::BackStroke:
+    case ERaftSimCrewAvatarAction::TurnLeft:
+    case ERaftSimCrewAvatarAction::TurnRight:
+        TargetWeight = 0.35f;
+        break;
+    default:
+        break;
+    }
+    // The first-person guide's camera sits in the eye socket: never turn it.
+    if (bHeadHiddenForFirstPerson || CVarCC0CrewGaze.GetValueOnGameThread() == 0)
+    {
+        TargetWeight = 0.0f;
+    }
+    const UWorld* World = GetWorld();
+    const double Now = World ? World->GetTimeSeconds() : 0.0;
+    if (GazeLastSeconds < 0.0)
+    {
+        GazeRandom.Initialize(9173 + CurrentVariantIndex * 131 + (bCurrentGuide ? 57 : 0));
+        GazeNextChangeSeconds = Now + GazeRandom.FRandRange(0.5f, 2.0f);
+    }
+    const float Dt = GazeLastSeconds < 0.0
+        ? 0.0f
+        : FMath::Clamp(static_cast<float>(Now - GazeLastSeconds), 0.0f, 0.25f);
+    GazeLastSeconds = Now;
+    if (Now >= GazeNextChangeSeconds)
+    {
+        // A new look, held a while; about a third come back to the line ahead.
+        const float Range = FMath::Max(Identity.GazeRangeDeg, 0.0f);
+        GazeTargetYawDegrees = GazeRandom.FRand() < 0.35f
+            ? GazeRandom.FRandRange(-0.15f, 0.15f) * Range
+            : GazeRandom.FRandRange(-Range, Range);
+        GazeTargetPitchDegrees = Identity.GazeDownDeg + GazeRandom.FRandRange(-2.5f, 2.5f);
+        GazeNextChangeSeconds =
+            Now + FMath::Max(Identity.GazeHoldSeconds, 0.3f) * GazeRandom.FRandRange(0.55f, 1.6f);
+    }
+    // Head turns are quick, holds are still.
+    GazeYawDegrees = FMath::FInterpTo(GazeYawDegrees, GazeTargetYawDegrees, Dt, 5.0f);
+    GazePitchDegrees = FMath::FInterpTo(GazePitchDegrees, GazeTargetPitchDegrees, Dt, 4.0f);
+    GazeWeight = FMath::FInterpTo(GazeWeight, TargetWeight, Dt, 3.0f);
+}
+
+void ARaftSimCC0CrewVisualActor::BuildNeckCollar()
+{
+    bNeckCollarBuilt = true;
+    if (!NeckCollar)
+    {
+        NeckCollar = NewObject<UProceduralMeshComponent>(this, TEXT("NeckCollar"));
+        NeckCollar->SetupAttachment(Root);
+        NeckCollar->RegisterComponent();
+        NeckCollar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        NeckCollar->SetUsingAbsoluteLocation(true);
+        NeckCollar->SetUsingAbsoluteRotation(true);
+        NeckCollar->SetUsingAbsoluteScale(true);
+        NeckCollar->SetCastShadow(true);
+    }
+    NeckCollar->ClearAllMeshSections();
+    NeckCollarRestPositions.Reset();
+    NeckCollarRestNormals.Reset();
+    NeckCollarNeckWeights.Reset();
+    USkeletalMesh* Mesh = Body ? Cast<USkeletalMesh>(Body->GetSkinnedAsset()) : nullptr;
+    FSkeletalMeshRenderData* RenderData = Mesh ? Mesh->GetResourceForRendering() : nullptr;
+    const FTransform* RefSpine = ReferenceComponentTransforms.Find(TEXT("spine_03"));
+    const FTransform* RefNeck = ReferenceComponentTransforms.Find(TEXT("neck_01"));
+    const FTransform* RefHead = ReferenceComponentTransforms.Find(TEXT("head"));
+    if (!RenderData || RenderData->LODRenderData.IsEmpty() || !RefSpine || !RefNeck || !RefHead)
+    {
+        return;
+    }
+    const FSkeletalMeshLODRenderData& LOD = RenderData->LODRenderData[0];
+    const FPositionVertexBuffer& Positions = LOD.StaticVertexBuffers.PositionVertexBuffer;
+    if (!Positions.GetVertexData())
+    {
+        return;
+    }
+    int32 SkinIndex = INDEX_NONE;
+    int32 WetsuitIndex = INDEX_NONE;
+    const TArray<FSkeletalMaterial>& Materials = Mesh->GetMaterials();
+    for (int32 MaterialIndex = 0; MaterialIndex < Materials.Num(); ++MaterialIndex)
+    {
+        const FString SlotName = Materials[MaterialIndex].MaterialSlotName.ToString();
+        if (SkinIndex == INDEX_NONE && SlotName.Contains(TEXT("Skin"), ESearchCase::IgnoreCase))
+        {
+            SkinIndex = MaterialIndex;
+        }
+        if (WetsuitIndex == INDEX_NONE && SlotName.Contains(TEXT("Wetsuit"), ESearchCase::IgnoreCase))
+        {
+            WetsuitIndex = MaterialIndex;
+        }
+    }
+    if (SkinIndex == INDEX_NONE || WetsuitIndex == INDEX_NONE)
+    {
+        return;
+    }
+
+    // Rest-pose neck frame in cm: origin at neck_01, A up the neck shaft.
+    const FVector NeckOrigin = RefNeck->GetLocation() * BodyScale;
+    const FVector Axis = (RefHead->GetLocation() - RefNeck->GetLocation()).GetSafeNormal();
+    FVector X0 = FVector::VectorPlaneProject(FVector::ForwardVector, Axis);
+    if (X0.SizeSquared() < 0.01)
+    {
+        X0 = FVector::VectorPlaneProject(FVector::RightVector, Axis);
+    }
+    X0.Normalize();
+    const FVector Y0 = FVector::CrossProduct(Axis, X0);
+    // The rest neck leans toward the face: its lean, flattened onto the
+    // collar plane, is the front of the neck.
+    const FVector Front = FVector::VectorPlaneProject(FVector(Axis.X, Axis.Y, 0.0f), Axis).GetSafeNormal();
+    constexpr int32 Bins = 36;
+    constexpr float NearNeckCm = 17.0f;
+    auto BinOf = [&](const FVector& Radial)
+    {
+        const float Theta = FMath::Atan2(
+            FVector::DotProduct(Radial, Y0), FVector::DotProduct(Radial, X0));
+        return FMath::Clamp(FMath::FloorToInt((Theta + UE_PI) / UE_TWO_PI * Bins), 0, Bins - 1);
+    };
+    auto KeyOf = [](const FVector& P)
+    {
+        return FIntVector(
+            FMath::RoundToInt(P.X * 50.0), FMath::RoundToInt(P.Y * 50.0), FMath::RoundToInt(P.Z * 50.0));
+    };
+
+    // The seam: positions present in both the skin and wetsuit sections.
+    struct FSample
+    {
+        float A;
+        float R;
+        int32 Bin;
+    };
+    TSet<FIntVector> WetsuitKeys;
+    TArray<FSample> Surface;
+    TArray<FSample> Seam;
+    for (int32 Pass = 0; Pass < 2; ++Pass)
+    {
+        const int32 Wanted = Pass == 0 ? WetsuitIndex : SkinIndex;
+        for (const FSkelMeshRenderSection& Section : LOD.RenderSections)
+        {
+            if (Section.MaterialIndex != Wanted)
+            {
+                continue;
+            }
+            const uint32 End = Section.BaseVertexIndex + Section.NumVertices;
+            for (uint32 Vertex = Section.BaseVertexIndex; Vertex < End; ++Vertex)
+            {
+                const FVector P = FVector(Positions.VertexPosition(Vertex)) * BodyScale;
+                const FVector D = P - NeckOrigin;
+                if (D.Size() > NearNeckCm)
+                {
+                    continue;
+                }
+                const float A = FVector::DotProduct(D, Axis);
+                const FVector Radial = D - Axis * A;
+                const float R = Radial.Size();
+                if (R < 2.0f)
+                {
+                    continue;
+                }
+                const FSample Sample{A, R, BinOf(Radial)};
+                Surface.Add(Sample);
+                if (Pass == 0)
+                {
+                    WetsuitKeys.Add(KeyOf(P));
+                }
+                else if (WetsuitKeys.Contains(KeyOf(P)))
+                {
+                    Seam.Add(Sample);
+                }
+            }
+        }
+    }
+    if (Seam.Num() < 16)
+    {
+        UE_LOG(LogTemp, Display, TEXT("RaftSim CC0 neck collar: no neckline seam on %s (%d points)"),
+            *GetNameSafe(Mesh), Seam.Num());
+        return;
+    }
+
+    // Per bin: the lowest and highest seam point (the saw-tooth's troughs and
+    // tips), then fill gaps and smooth round the neck.
+    TArray<float> Low, High;
+    TArray<bool> Has;
+    Low.Init(TNumericLimits<float>::Max(), Bins);
+    High.Init(-TNumericLimits<float>::Max(), Bins);
+    Has.Init(false, Bins);
+    for (const FSample& Sample : Seam)
+    {
+        Low[Sample.Bin] = FMath::Min(Low[Sample.Bin], Sample.A);
+        High[Sample.Bin] = FMath::Max(High[Sample.Bin], Sample.A);
+        Has[Sample.Bin] = true;
+    }
+    for (int32 Bin = 0; Bin < Bins; ++Bin)
+    {
+        if (Has[Bin])
+        {
+            continue;
+        }
+        int32 Prev = Bin, Next = Bin, PrevSteps = 0, NextSteps = 0;
+        do { Prev = (Prev + Bins - 1) % Bins; ++PrevSteps; } while (!Has[Prev] && PrevSteps < Bins);
+        do { Next = (Next + 1) % Bins; ++NextSteps; } while (!Has[Next] && NextSteps < Bins);
+        const float T = float(PrevSteps) / float(PrevSteps + NextSteps);
+        Low[Bin] = FMath::Lerp(Low[Prev], Low[Next], T);
+        High[Bin] = FMath::Lerp(High[Prev], High[Next], T);
+    }
+    auto Smooth = [](TArray<float>& Values)
+    {
+        const int32 Count = Values.Num();
+        for (int32 Iteration = 0; Iteration < 2; ++Iteration)
+        {
+            const TArray<float> Copy = Values;
+            for (int32 Bin = 0; Bin < Count; ++Bin)
+            {
+                Values[Bin] = 0.25f * Copy[(Bin + Count - 1) % Count] + 0.5f * Copy[Bin] +
+                    0.25f * Copy[(Bin + 1) % Count];
+            }
+        }
+    };
+    if (CVarCC0PoseForensics.GetValueOnGameThread())
+    {
+        FString Row;
+        for (int32 Bin = 0; Bin < Bins; ++Bin)
+        {
+            const float Theta = -UE_PI + (float(Bin) + 0.5f) * UE_TWO_PI / Bins;
+            const FVector Dir = X0 * FMath::Cos(Theta) + Y0 * FMath::Sin(Theta);
+            Row += FString::Printf(TEXT(" [%d %s dir=(%.2f,%.2f,%.2f) a=%.1f..%.1f]"), Bin, Has[Bin] ? TEXT("seam") : TEXT("fill"),
+                Dir.X, Dir.Y, Dir.Z, Low[Bin], High[Bin]);
+        }
+        UE_LOG(LogTemp, Display, TEXT("RaftSim CC0 neck seam %s axis=(%.2f,%.2f,%.2f):%s"), *GetNameSafe(Mesh),
+            Axis.X, Axis.Y, Axis.Z, *Row);
+    }
+    Smooth(Low);
+    Smooth(High);
+    // A band at least 3.5 cm tall standing over the seam. The posed head
+    // tips about 20 degrees forward, which drags the front-of-neck skin down
+    // through the suit, so the front of the band reaches 3 cm lower.
+    auto FrontOf = [&](int32 Bin)
+    {
+        const float Theta = -UE_PI + (float(Bin) + 0.5f) * UE_TWO_PI / Bins;
+        const FVector Dir = X0 * FMath::Cos(Theta) + Y0 * FMath::Sin(Theta);
+        return Front.IsNearlyZero() ? 0.0f : FMath::Max(FVector::DotProduct(Dir, Front), 0.0f);
+    };
+    for (int32 Bin = 0; Bin < Bins; ++Bin)
+    {
+        Low[Bin] -= 1.2f + 3.0f * FrontOf(Bin);
+        High[Bin] += 0.9f;
+        if (High[Bin] - Low[Bin] < 3.5f)
+        {
+            Low[Bin] = High[Bin] - 3.5f;
+        }
+    }
+    // Body surface radius at a height in a bin (and its neighbours).
+    auto SurfaceRadius = [&](int32 Bin, float A)
+    {
+        float Best = 0.0f;
+        for (const FSample& Sample : Surface)
+        {
+            const int32 Delta = FMath::Abs(Sample.Bin - Bin);
+            if ((Delta <= 1 || Delta == Bins - 1) && FMath::Abs(Sample.A - A) < 0.9f)
+            {
+                Best = FMath::Max(Best, Sample.R);
+            }
+        }
+        return Best;
+    };
+    // Rings, bottom to top: tucked base, outer face, rolled lip (outer, crest)
+    // and the inner lip against the neck. Clearance is cm off the body.
+    struct FRingSpec
+    {
+        float Height01;
+        float HeightOffset;
+        float Clearance;
+    };
+    const FRingSpec Rings[] = {
+        {0.0f, 0.0f, 0.35f},
+        {0.5f, 0.0f, 0.55f},
+        {1.0f, -0.35f, 0.60f},
+        {1.0f, 0.15f, 0.30f},
+        {1.0f, -0.05f, -0.15f},
+    };
+    constexpr int32 RingCount = UE_ARRAY_COUNT(Rings);
+    TArray<float> RingRadius[RingCount];
+    TArray<float> RingHeight[RingCount];
+    for (int32 Ring = 0; Ring < RingCount; ++Ring)
+    {
+        RingRadius[Ring].SetNum(Bins);
+        RingHeight[Ring].SetNum(Bins);
+        for (int32 Bin = 0; Bin < Bins; ++Bin)
+        {
+            const float A = FMath::Lerp(Low[Bin], High[Bin], Rings[Ring].Height01) + Rings[Ring].HeightOffset;
+            RingHeight[Ring][Bin] = A;
+            // The lip rings hug the neck just below the band's top.
+            const float SampleA = Rings[Ring].Height01 >= 1.0f ? High[Bin] - 0.4f : A;
+            RingRadius[Ring][Bin] = SurfaceRadius(Bin, SampleA);
+        }
+        for (int32 Bin = 0; Bin < Bins; ++Bin)
+        {
+            if (RingRadius[Ring][Bin] <= 0.0f)
+            {
+                RingRadius[Ring][Bin] = FMath::Max(
+                    RingRadius[Ring][(Bin + Bins - 1) % Bins], RingRadius[Ring][(Bin + 1) % Bins]);
+            }
+        }
+        Smooth(RingRadius[Ring]);
+        for (int32 Bin = 0; Bin < Bins; ++Bin)
+        {
+            // The dragged-down skin pokes out of the suit at the front.
+            RingRadius[Ring][Bin] += Rings[Ring].Clearance + (Ring <= 1 ? 0.5f * FrontOf(Bin) : 0.0f);
+        }
+    }
+    // The outer face never pinches in below the lip.
+    for (int32 Bin = 0; Bin < Bins; ++Bin)
+    {
+        RingRadius[1][Bin] = FMath::Max(
+            RingRadius[1][Bin], FMath::Lerp(RingRadius[0][Bin], RingRadius[2][Bin], 0.5f));
+    }
+
+    // Rest mesh in component cm; UpdateNeckCollar poses it every frame.
+    // Neck weight per ring: the base rides the suit, the lip the neck.
+    const float NeckWeights[RingCount] = {0.0f, 0.4f, 0.9f, 1.0f, 1.0f};
+    RaftSimAccessoryMesh::FAccessoryMesh Collar;
+    for (int32 Ring = 0; Ring < RingCount; ++Ring)
+    {
+        for (int32 Bin = 0; Bin <= Bins; ++Bin)
+        {
+            const int32 B = Bin % Bins;
+            const float Theta = -UE_PI + (float(B) + 0.5f) * UE_TWO_PI / Bins;
+            const FVector Dir = X0 * FMath::Cos(Theta) + Y0 * FMath::Sin(Theta);
+            const FVector P = NeckOrigin + Axis * RingHeight[Ring][B] + Dir * RingRadius[Ring][B];
+            const FVector N = Ring <= 1 ? Dir
+                : Ring == 2 ? (Dir + Axis).GetSafeNormal()
+                : Ring == 3 ? Axis
+                : (Axis - Dir).GetSafeNormal();
+            Collar.Add(P, N, FVector2D(float(Bin) / Bins * 0.30f, RingHeight[Ring][B] / 140.0f + Ring * 0.004f));
+            NeckCollarNeckWeights.Add(NeckWeights[Ring]);
+        }
+    }
+    const int32 Stride = Bins + 1;
+    for (int32 Ring = 0; Ring + 1 < RingCount; ++Ring)
+    {
+        for (int32 Bin = 0; Bin < Bins; ++Bin)
+        {
+            const int32 A0 = Ring * Stride + Bin;
+            const int32 A1 = A0 + 1;
+            const int32 B0 = A0 + Stride;
+            const int32 B1 = B0 + 1;
+            Collar.Triangles.Append({A0, B0, A1, A1, B0, B1});
+        }
+    }
+    NeckCollarRestPositions = Collar.Vertices;
+    NeckCollarRestNormals = Collar.Normals;
+    Collar.Commit(NeckCollar, 0);
+    NeckCollar->SetMaterial(0, Body->GetMaterial(WetsuitIndex));
+    UE_LOG(LogTemp, Display, TEXT("RaftSim CC0 neck collar: %s seam=%d band %.1f..%.1f cm"),
+        *GetNameSafe(Mesh), Seam.Num(), Low[0], High[0]);
+    UpdateNeckCollar();
+}
+
+void ARaftSimCC0CrewVisualActor::UpdateNeckCollar()
+{
+    if (!NeckCollar)
+    {
+        return;
+    }
+    const bool bShow = bBodyReady && Body && Body->IsVisible() && NeckCollar->GetNumSections() > 0 &&
+        !bHeadHiddenForFirstPerson && CVarCC0NeckCollar.GetValueOnGameThread() != 0;
+    NeckCollar->SetVisibility(bShow);
+    if (!bShow)
+    {
+        return;
+    }
+    const FTransform* RefSpine = ReferenceComponentTransforms.Find(TEXT("spine_03"));
+    const FTransform* RefNeck = ReferenceComponentTransforms.Find(TEXT("neck_01"));
+    if (!RefSpine || !RefNeck || NeckCollarRestPositions.Num() != NeckCollarNeckWeights.Num())
+    {
+        return;
+    }
+    // Rotation and translation only, like the eye anchor: the bones'
+    // component transforms carry the importer's unit scale.
+    const FTransform Spine = Body->GetBoneTransformByName(TEXT("spine_03"), EBoneSpaces::ComponentSpace);
+    const FTransform Neck = Body->GetBoneTransformByName(TEXT("neck_01"), EBoneSpaces::ComponentSpace);
+    const FQuat SpineDelta = Spine.GetRotation() * RefSpine->GetRotation().Inverse();
+    const FQuat NeckDelta = Neck.GetRotation() * RefNeck->GetRotation().Inverse();
+    const FVector SpineRest = RefSpine->GetLocation() * BodyScale;
+    const FVector NeckRest = RefNeck->GetLocation() * BodyScale;
+    const FVector SpineNow = Spine.GetLocation() * BodyScale;
+    const FVector NeckNow = Neck.GetLocation() * BodyScale;
+    const int32 Count = NeckCollarRestPositions.Num();
+    NeckCollarPosedPositions.SetNum(Count);
+    NeckCollarPosedNormals.SetNum(Count);
+    for (int32 Index = 0; Index < Count; ++Index)
+    {
+        const FVector& Rest = NeckCollarRestPositions[Index];
+        const float W = NeckCollarNeckWeights[Index];
+        const FVector BySpine = SpineNow + SpineDelta.RotateVector(Rest - SpineRest);
+        const FVector ByNeck = NeckNow + NeckDelta.RotateVector(Rest - NeckRest);
+        NeckCollarPosedPositions[Index] = FMath::Lerp(BySpine, ByNeck, W);
+        NeckCollarPosedNormals[Index] = FQuat::Slerp(SpineDelta, NeckDelta, W)
+            .RotateVector(NeckCollarRestNormals[Index]);
+    }
+    NeckCollar->UpdateMeshSection_LinearColor(0, NeckCollarPosedPositions, NeckCollarPosedNormals, {}, {}, {});
+    const FTransform& BodyWorld = Body->GetComponentTransform();
+    NeckCollar->SetWorldLocationAndRotation(BodyWorld.GetLocation(), BodyWorld.GetRotation());
 }

@@ -10,6 +10,9 @@ UMaterialInterface* LoadReachRockMaterial(const FString& RiverId, FString& OutSu
         : RiverId.Contains(TEXT("chilko"))
         ? TEXT("/Game/RaftSim/Environment/ChilkoRun/Rocks/MI_RaftSim_Chilko_BasaltRockV1."
                "MI_RaftSim_Chilko_BasaltRockV1")
+        : RiverId == TEXT("zambezi_batoka_gorge")
+        ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Rocks/MI_RaftSim_Zambezi_BasaltWallRockV1."
+               "MI_RaftSim_Zambezi_BasaltWallRockV1")
         : nullptr;
     if (!Path)
     {

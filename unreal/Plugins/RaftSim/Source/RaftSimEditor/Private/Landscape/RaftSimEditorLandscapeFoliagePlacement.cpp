@@ -2585,6 +2585,11 @@ bool AddLandscapeCandidatePlacements(const FPlacementContext& Context)
     const int32 RunnableLaunchWoodyPlacedCount = ZambeziCounts.RunnableLaunchWoodyPlacedCount;
     const bool bRunnableLaunchEcologyStrataValidated = ZambeziCounts.bRunnableLaunchEcologyStrataValidated;
     const int32 ZambeziWaterlineFringePlacedCount = bZambeziWoodland ? AddZambeziWaterlineFringe(Context, Queries) : 0;
+    // Dressing rock outside the boulder contract: reported, not counted.
+    if (bZambeziWoodland)
+    {
+        AddZambeziGorgeWallRocks(Context, Queries);
+    }
 
     const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
         PacuareCounts.EvidenceCanopyPlaced +

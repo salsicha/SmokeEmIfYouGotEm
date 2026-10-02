@@ -1,6 +1,20 @@
 # Remaining requested work
 
-LATEST October 1 follow-up visual fixes (review section 7):
+LATEST October 1 terrain, crew and raft pass (review section 8, docs/crew-roster.md):
+- L_Zambezi:
+  - walls are dark basalt in direct sun; the world-space terrain normal had
+    tilted every wall toward the sky;
+  - 34,702 slope-aligned rock plates and 6,793 waterline boulders (inferred);
+  - banks are grey sand, not orange.
+- Rock: a world-scale detail layer on the tinted rock; the Futaleufu granite
+  no longer reads as soap. Evidence-wall detail fades with distance.
+- Crew: five people with their own looks, eyewear, guide's kit, neck collar,
+  personal gaze, swimming and chatter.
+- Raft: red tubes with waterline film, sun fade and scuffs, plus a throw bag,
+  painters and a bow drybag.
+Not committed.
+
+PREVIOUS October 1 follow-up visual fixes (review section 7):
 - Upper gorge whitewater: the observed layer now joins the GPU moving
   detail's breaking source (ObservedWhitewaterEntrainmentGain 0.6), so
   Morning Glory and Stairway break heavily and the pools stay calm.
@@ -16,7 +30,7 @@ LATEST October 1 follow-up visual fixes (review section 7):
   the reviewed scan.
 - Upper gorge trees: October leaf state from the October Sentinel-2 NDVI
   (19 % green, 32 % dry leaves, 49 % leafless).
-Not committed.
+Committed 279dd26b4.
 
 PREVIOUS October 1 expected-whitewater/terrain/vegetation goal (Zambezi, Chilko,
 Futaleufu, Pacuare, Colorado), from observations because no bathymetry exists:

@@ -1,4 +1,6 @@
 ﻿#include "RaftSimRaftActor.h"
+#include "RaftSimCrewRoster.h"
+#include "RaftSimAccessoryMesh.h"
 
 #include "Components/SceneComponent.h"
 #include "RaftSimCrewBoarding.h"
@@ -654,9 +656,158 @@ void ARaftSimRaftActor::BuildRaftVisual()
         RaftVisual->SetMaterial(4, RubberMat);
     }
     ConfigureSharedHullGeometryReview();
+    {
+        // Hull extent for the rigged gear: the production mesh bounds (the
+        // visual's local frame), or the fallback footprint.
+        FBox HullBounds(ForceInit);
+        if (bUsingProductionRaftRestMesh)
+        {
+            if (const UStaticMesh* ProductionMesh = LoadObject<UStaticMesh>(nullptr,
+                    TEXT("/Game/RaftSim/Rafts/Production/SM_RaftSim_ProductionPaddleRaft.SM_RaftSim_ProductionPaddleRaft")))
+            {
+                HullBounds = ProductionMesh->GetBoundingBox();
+            }
+        }
+        if (!HullBounds.IsValid)
+        {
+            const FVector Half(0.5f * FootprintLengthM * kCmPerM, 0.5f * FootprintWidthM * kCmPerM, TubeRadiusM * kCmPerM);
+            HullBounds = FBox(FVector(-Half.X, -Half.Y, 0.0f), FVector(Half.X, Half.Y, 2.0f * Half.Z));
+        }
+        BuildRaftGear(HullBounds);
+    }
 }
 
 bool ARaftSimRaftActor::GetRenderedFloorCenterWorldZCm(float& OutWorldZCm) const
+void ARaftSimRaftActor::BuildRaftGear(const FBox& HullBoundsCm)
+{
+    using RaftSimAccessoryMesh::FAccessoryMesh;
+    if (!RaftVisual)
+    {
+        return;
+    }
+    if (!RaftGear)
+    {
+        RaftGear = NewObject<UProceduralMeshComponent>(this, TEXT("RaftGear"));
+        RaftGear->SetupAttachment(RaftVisual);
+        RaftGear->RegisterComponent();
+        RaftGear->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        RaftGear->SetCastShadow(true);
+    }
+    const float TubeCm = TubeRadiusM * kCmPerM;
+    const float TopZ = HullBoundsCm.Max.Z;
+    // Section 0: the guide's throw bag, standing on the stern tube where the
+    // guide can reach it, with its drawstring collar and a webbing strap.
+    FAccessoryMesh Bag, Rope, Webbing;
+    const FVector BagBase(HullBoundsCm.Min.X + 0.95f * TubeCm, -0.62f * TubeCm, TopZ - 3.0f);
+    constexpr int32 BagSides = 14;
+    constexpr float BagRadius = 8.5f;
+    constexpr float BagHeight = 30.0f;
+    for (int32 Ring = 0; Ring < 6; ++Ring)
+    {
+        // Slightly barrel-shaped fabric bag, puckered at the cinched top.
+        const float T0 = Ring / 6.0f, T1 = (Ring + 1) / 6.0f;
+        auto RadiusAt = [](float T) { return BagRadius * (0.92f + 0.10f * FMath::Sin(T * PI)) * (T > 0.9f ? 0.82f : 1.0f); };
+        Bag.Tube(BagBase + FVector(0, 0, BagHeight * T0), BagBase + FVector(0, 0, BagHeight * T1),
+            0.5f * (RadiusAt(T0) + RadiusAt(T1)), BagSides);
+    }
+    // Drawstring collar and the coiled rope showing at the mouth.
+    for (int32 Segment = 0; Segment < 18; ++Segment)
+    {
+        auto Ring = [&](int32 Index, float R, float Z)
+        {
+            const float Angle = UE_TWO_PI * Index / 18.0f;
+            return BagBase + FVector(R * FMath::Cos(Angle), R * FMath::Sin(Angle), Z);
+        };
+        Rope.Tube(Ring(Segment, BagRadius * 0.78f, BagHeight + 0.6f), Ring(Segment + 1, BagRadius * 0.78f, BagHeight + 0.6f), 0.75f, 5);
+        Rope.Tube(Ring(Segment, BagRadius * 0.45f, BagHeight + 1.4f), Ring(Segment + 1, BagRadius * 0.45f, BagHeight + 1.4f), 0.7f, 5);
+    }
+    Webbing.Box(BagBase + FVector(0, 0, 0.45f * BagHeight), FVector::ForwardVector, FVector::RightVector, FVector::UpVector,
+        FVector(BagRadius + 0.35f, BagRadius + 0.35f, 1.3f));
+    // Coiled bow and stern lines (painters) lying on the tube tops.
+    auto Coil = [&](const FVector& Center, float Radius, int32 Loops)
+    {
+        for (int32 Loop = 0; Loop < Loops; ++Loop)
+        {
+            const float R = Radius * (1.0f - 0.07f * Loop);
+            for (int32 Segment = 0; Segment < 20; ++Segment)
+            {
+                auto P = [&](int32 Index)
+                {
+                    const float Angle = UE_TWO_PI * Index / 20.0f + Loop * 0.6f;
+                    return Center + FVector(R * FMath::Cos(Angle), 0.8f * R * FMath::Sin(Angle), 1.5f * Loop + 0.4f * FMath::Sin(Angle * 2.0f));
+                };
+                Rope.Tube(P(Segment), P(Segment + 1), 0.9f, 5);
+            }
+        }
+    };
+    Coil(FVector(HullBoundsCm.Max.X - 0.9f * TubeCm, 0.0f, TopZ + 0.8f), 13.0f, 3);
+    Coil(FVector(HullBoundsCm.Min.X + 0.9f * TubeCm, 0.75f * TubeCm, TopZ + 0.8f), 12.0f, 3);
+    // Section 3: the trip's first-aid drybag, a yellow roll-top lashed
+    // across the bow floor ahead of the front paddlers' feet.
+    FAccessoryMesh DryBag;
+    const float DryBagX = HullBoundsCm.Max.X - 1.55f * TubeCm - 14.0f;
+    float FloorZ = HullBoundsCm.Min.Z + 0.35f * TubeCm;
+    if (const FProcMeshSection* Floor = RaftVisual->GetProcMeshSection(1))
+    {
+        float Highest = -TNumericLimits<float>::Max();
+        for (const FProcMeshVertex& Vertex : Floor->ProcVertexBuffer)
+        {
+            if (FMath::Abs(Vertex.Position.Y) < 35.0f && FMath::Abs(Vertex.Position.X - DryBagX) < 25.0f)
+            {
+                Highest = FMath::Max(Highest, static_cast<float>(Vertex.Position.Z));
+            }
+        }
+        if (Highest > -TNumericLimits<float>::Max())
+        {
+            FloorZ = Highest;
+        }
+    }
+    constexpr float DryBagRadius = 13.0f;
+    const float DryBagZ = FloorZ + DryBagRadius - 1.5f;
+    for (int32 Segment = 0; Segment < 4; ++Segment)
+    {
+        // Slightly barrel-shaped where the contents fill it.
+        const float Y0 = FMath::Lerp(-26.0f, 24.0f, Segment / 4.0f);
+        const float Y1 = FMath::Lerp(-26.0f, 24.0f, (Segment + 1) / 4.0f);
+        const float Bulge = Segment == 0 || Segment == 3 ? 0.9f : 1.0f;
+        DryBag.Tube(FVector(DryBagX, Y0, DryBagZ), FVector(DryBagX, Y1, DryBagZ), DryBagRadius * Bulge, 16);
+    }
+    // Roll-top: the flattened, rolled mouth and its buckle.
+    DryBag.Box(FVector(DryBagX, 28.0f, DryBagZ), FVector::ForwardVector, FVector::RightVector, FVector::UpVector,
+        FVector(2.4f, 4.0f, 10.5f));
+    DryBag.Tube(FVector(DryBagX - 2.5f, 31.5f, DryBagZ - 10.0f), FVector(DryBagX - 2.5f, 31.5f, DryBagZ + 10.0f), 2.6f, 10);
+    // Two lashing straps round it, down to the floor.
+    for (const float StrapY : {-14.0f, 12.0f})
+    {
+        Webbing.Box(FVector(DryBagX, StrapY, DryBagZ), FVector::ForwardVector, FVector::RightVector, FVector::UpVector,
+            FVector(DryBagRadius + 0.4f, 1.3f, DryBagRadius + 0.4f));
+    }
+    Bag.Commit(RaftGear, 0);
+    Rope.Commit(RaftGear, 1);
+    Webbing.Commit(RaftGear, 2);
+    DryBag.Commit(RaftGear, 3);
+    auto Tinted = [this](const TCHAR* Path, const FLinearColor& Tint) -> UMaterialInterface*
+    {
+        UMaterialInterface* Base = LoadObject<UMaterialInterface>(nullptr, Path);
+        if (!Base)
+        {
+            return nullptr;
+        }
+        UMaterialInstanceDynamic* Instance = UMaterialInstanceDynamic::Create(Base, this);
+        Instance->SetVectorParameterValue(TEXT("BaseTint"), Tint);
+        return Instance;
+    };
+    // Rescue-red bag, yellow floating throw rope, black webbing, yellow drybag.
+    RaftGear->SetMaterial(0, Tinted(TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD"),
+        FLinearColor(0.30f, 0.010f, 0.006f)));
+    RaftGear->SetMaterial(1, Tinted(TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftRigging.M_RaftSim_RaftRigging"),
+        FLinearColor(0.45f, 0.30f, 0.010f)));
+    RaftGear->SetMaterial(2, LoadObject<UMaterialInterface>(nullptr,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PFDWebbing.M_RaftSim_PFDWebbing")));
+    RaftGear->SetMaterial(3, Tinted(TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD"),
+        FLinearColor(0.48f, 0.30f, 0.004f)));
+}
+
 {
     OutWorldZCm = 0.0f;
     if (RaftVisual == nullptr)
@@ -2384,7 +2535,9 @@ bool ARaftSimRaftActor::BeginRescue(ERaftSimRescueMethod Method)
     const FRaftSimSwimmerRescueFrame& Swimmer = Swimmers[SelectedSwimmerIndex];
     FRaftSimSwimmingSkillProfile Skill =
         URaftSimSwimmingSkillLibrary::MakeSwimmingSkillProfile(
-            ERaftSimSwimmingSkillLevel::AverageSwimmer);
+            Ability == ERaftSimCrewSwimAbility::Weak ? ERaftSimSwimmingSkillLevel::WeakSwimmer
+            : Ability == ERaftSimCrewSwimAbility::Strong ? ERaftSimSwimmingSkillLevel::StrongSwimmer
+            : ERaftSimSwimmingSkillLevel::AverageSwimmer);
     const FVector LineStartM =
         (GetActorLocation() + GetActorForwardVector() * 45.0f + FVector(0.0f, 0.0f, 65.0f)) /
         kCmPerM;
@@ -2421,6 +2574,9 @@ bool ARaftSimRaftActor::GetSwimmerTubeTarget(FName PassengerId, const FVector& S
     for (const UPrimitiveComponent* Part : Parts)
         if (Part && Part->IsRegistered() && Part->IsVisible())
             BodyBox += Part->CalcBounds(Part->GetComponentTransform()).GetBox();
+    // Each person swims as well as they do (URaftSimCrewRoster): a strong
+    // swimmer helps the reach or throw, a weak one needs more help.
+    const ERaftSimCrewSwimAbility Ability = URaftSimCrewRoster::GetIdentity(Swimmer.PassengerId).SwimAbility;
     if (!HullBox.IsValid || !BodyBox.IsValid) return false;
     const double HullSupport = FVector::DotProduct(HullBox.GetCenter(), Away) +
         FVector::DotProduct(HullBox.GetExtent(), AbsAway);

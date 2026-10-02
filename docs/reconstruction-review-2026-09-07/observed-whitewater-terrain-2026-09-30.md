@@ -536,6 +536,84 @@ from the mean NDVI of the two October Sentinel-2 scenes (2024-10-08 and
   extra tree forms and an alternate understory.
 - Species and branching are inferred.
 
+## 8. Terrain realism pass (2026-10-01)
+
+### `L_Zambezi` walls in direct sun
+
+The walls read grey-brown in direct sun (section 7) because of the
+material's normals, not its colour. The world-aligned Batoka material writes
+world-space normals (`bTangentSpaceNormal` is false). Its base normal was a
+constant (0, 0, 1), which in world space means straight up:
+- the banks shaded as if dead flat;
+- every wall normal was pulled about halfway to the sky.
+
+So every wall face took the same sun, and the gorge read as a smooth,
+evenly lit half-pipe. The base is now the geometry's own world normal,
+perturbed by the world-aligned rock normals. Walls now shade by their real
+orientation.
+
+Other changes:
+- **Colour and gloss:** the basalt colour is desaturated (0.94) and scaled
+  (0.42), with a 0.88 roughness floor. The sunlit wall's specular sheen had
+  stayed light even under a pure-green probe colour.
+- **Banks:** the reference drape is laterite orange, so the flat banks read
+  as an orange beach. The drape's hue is now 80 % neutralised toward pale
+  grey sand (`BatokaBankDrapeNeutralise`), leaving its light and shade.
+  Basalt covers at least 62 % of the flat ground.
+- **Measured result:** at 18,350 m, the sunlit top 30 % of the wall now
+  averages sRGB (68, 63, 53): lightness 0.24, saturation 0.13, a dark basalt
+  with a slight warm cast. This morning's sunlit wall was pale grey-beige, at
+  lightness 0.61-0.72.
+
+### `L_Zambezi` broken rock
+
+The 30 km run's walls are a 12.5 m grid of smooth slopes; ledges cannot be
+resolved on that grid without reading as terraces. `AddZambeziGorgeWallRocks`
+dresses the whole run instead, with the reviewed rock scans in a new dark
+basalt instance (`MI_RaftSim_Zambezi_BasaltWallRockV1`):
+- **Wall plates:** 34,702 rock plates up both walls, from 6 m above the water
+  toward the rim on 22-80° slopes. They are:
+  - 5-14 m across and a third as thick;
+  - aligned to the local ground normal, with their long axis near the
+    contour;
+  - sunk two-thirds into the slope.
+
+  They cast no shadows. In the first try, upright rocks on the raking-lit
+  walls threw long black shapes that read as holes.
+- **Waterline boulders:** 6,793 rounded boulders of 1.2-4.5 m, a third sunk,
+  between 0.2 m and 6 m above the water.
+- Positions are inferred. The rocks are generic analogs, without collision.
+
+In the survey the plates break up the walls' upper reaches. Where one stands
+proud, it can still read as a separate grey flake. Their basalt was darkened
+twice to sit in the wall's tone (light tone 0.055).
+
+### Rock material detail (all reaches)
+
+`M_RaftSim_ReviewedRockTinted` now adds a 1.8 m triplanar Rock037 layer:
+- its luminance relief, as a ratio to its own mean, so the tint is kept;
+- a world-aligned detail normal.
+
+The 1K scan stretched over 3-20 m boulders had gone soft as soap. The
+Futaleufu granite's light tone also drops from 0.42 to 0.33. The Terminator's
+large boulders now read as grey granite with dark speckle and facets.
+
+### Evidence walls at distance
+
+The 6.5 m Rock037 layer on the evidence maps' walls tiled into a woven hatch
+across a distant 60 m cliff. It now fades with camera distance: full to about
+40 m, gone by about 250 m. Far walls keep only the 21 m broad layer.
+
+### Crew and raft
+
+See [the crew](../crew-roster.md). In short:
+- **People:** five people with their own looks, voices and swimming. They now
+  also have a fitted neoprene collar over the CC0 wetsuit's scalloped
+  neckline and an idle gaze shaped by personality.
+- **Boat:** red commercial tubes with height-placed waterline film, sun fade
+  and rock scuffs.
+- **Gear:** a throw bag, coiled painters and a bow drybag.
+
 ## Limits
 
 - **Rapid stations.** These are observation-derived, not surveyed.
@@ -553,9 +631,12 @@ from the mean NDVI of the two October Sentinel-2 scenes (2024-10-08 and
   holes or waves of its own, and the live solve redistributes the seed. The
   observed whitewater is render-only appearance evidence: it never reaches
   forces, contact or gameplay.
-- **Rock and wall colours** (section 7) are approximate, from descriptions
-  and photographs, not measured albedo. The 30 km run's walls keep the
-  30 m DEM's smooth shape.
+- **Rock and wall colours** (sections 7 and 8) are approximate, from
+  descriptions and photographs, not measured albedo.
+- **The 30 km run's wall geometry** is still the 30 m DEM's smooth shape on a
+  12.5 m grid. The broken-rock look comes from inferred dressing (wall plates
+  and waterline boulders) and the material, not from measured relief
+  (section 8).
 - **Vegetation structure is inferred:**
   - the Pacuare canopy, sub-canopy and understory;
   - the 30 km run's waterline fringe;

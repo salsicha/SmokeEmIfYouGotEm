@@ -164,8 +164,10 @@ Editor-hosted Development build on the development host; no packaged-build resul
     still spreads bank to bank at the bigger rapids, because the live solve
     evens the surface drop across the channel. This is deferred to a later
     water pass.
-  - The walls are a darker, cooler basalt under a thin grey haze, with -0.5 EV
-    exposure on this map. They are black in shadow but still grey-brown in
-    direct sun.
+  - The walls are dark basalt in direct sun as well as in shadow. The fix was
+    the world-space terrain normal, which had tilted every wall face toward
+    the sky. They shade by their real orientation and carry inferred rock
+    dressing, but their shape is still the smooth 30 m DEM.
+  - The banks are grey sand and black boulders, no longer an orange beach.
   - A patchy green fringe (5,008 shrubs and 651 riparian trees, inferred)
     lines the waterline along the whole run.

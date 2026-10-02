@@ -6,6 +6,7 @@
 #include "RaftSimCC0CrewVisualActor.generated.h"
 
 class UPoseableMeshComponent;
+class UProceduralMeshComponent;
 class USceneComponent;
 
 /**
@@ -156,6 +157,12 @@ public:
      */
     bool GetSolvedChestWorldTransform(FTransform& OutWorld) const;
 
+    /** Midpoint of the rendered eyes (for eyewear); false until posed. */
+    bool GetRenderedEyeCenterWorld(FVector& OutWorldLocation) const
+    {
+        return bBodyReady && TryGetRenderedFaceEyeCenterWorld(OutWorldLocation);
+    }
+
     /** First-person guide seat: collapse the head bone like the boot-hidden
      * feet so the camera can sit in the eye socket. Applied every pose. */
     void SetHeadHiddenForFirstPerson(bool bShouldHide) { bHeadHiddenForFirstPerson = bShouldHide; }
@@ -173,6 +180,12 @@ private:
     void CacheRenderedFaceAnchorVertices();
     bool TryGetRenderedFaceEyeCenterWorld(FVector& OutWorldLocation) const;
     void ApplyBodyPose(const FRaftSimCrewAvatarPose& Pose);
+    /** Advance the person's idle gaze (URaftSimCrewRoster) for this pose. */
+    void UpdateGaze(ERaftSimCrewAvatarAction Action);
+    /** Fit the neoprene collar to the rest-pose skin/wetsuit seam. */
+    void BuildNeckCollar();
+    /** Carry the collar with the rendered upper spine. */
+    void UpdateNeckCollar();
     void ApplyPaddleGripPose(const FRaftSimCrewAvatarPose& Pose);
     void ApplyFingerChain(bool bLeft, const TCHAR* Digit, float GripAlpha);
     void ApplyFingerChainAroundGrip(
@@ -259,4 +272,29 @@ private:
     float PresentedClavicleRootSpanCm = 0.0f;
     float MaximumPresentedShoulderAnchorErrorCm = 0.0f;
     static constexpr float BodyScale = 1.0f;
+
+    /** Neoprene collar over the wetsuit's scalloped neckline (the source
+     * assigns skin and wetsuit by skin weight, which leaves a saw-tooth seam
+     * round the neck). Built in spine_03's rest frame, in cm. */
+    UPROPERTY(Transient)
+    TObjectPtr<UProceduralMeshComponent> NeckCollar;
+    bool bNeckCollarBuilt = false;
+    /** Rest-pose collar (component cm): each vertex rides spine_03 and
+     * neck_01 by its weight, so the lip follows the neck and the base the
+     * suit, stretching over the band where the posed skin crosses the suit. */
+    TArray<FVector> NeckCollarRestPositions;
+    TArray<FVector> NeckCollarRestNormals;
+    TArray<float> NeckCollarNeckWeights;
+    TArray<FVector> NeckCollarPosedPositions;
+    TArray<FVector> NeckCollarPosedNormals;
+
+    /** Idle gaze: the head turns to a look, holds it, and moves on. */
+    float GazeYawDegrees = 0.0f;
+    float GazePitchDegrees = 0.0f;
+    float GazeTargetYawDegrees = 0.0f;
+    float GazeTargetPitchDegrees = 0.0f;
+    float GazeWeight = 0.0f;
+    double GazeLastSeconds = -1.0;
+    double GazeNextChangeSeconds = 0.0;
+    FRandomStream GazeRandom;
 };

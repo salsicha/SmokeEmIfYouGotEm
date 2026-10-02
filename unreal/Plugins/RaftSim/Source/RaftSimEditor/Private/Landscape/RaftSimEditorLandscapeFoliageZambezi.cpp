@@ -837,4 +837,168 @@ int32 AddZambeziWaterlineFringe(const FPlacementContext& Context, const FPlaceme
         *RiverId, Placed - PlacedTrees, PlacedTrees, Rejected);
     return Placed;
 }
+int32 AddZambeziGorgeWallRocks(const FPlacementContext& Context, const FPlacementQueries& Queries)
+{
+    // The 30 km reference walls are a 12.5 m grid of smooth slopes: they read
+    // as a half-pipe. Batoka's walls are broken basalt (stacked lava flows,
+    // buttresses, blocky talus) with black boulder shelves along the low-water
+    // margin. The grid cannot carry that relief, so it is dressed:
+    // - wall outcrops: rock plates laid in the slope (aligned to the local
+    //   ground normal, flattened and two-thirds sunk), so the wall itself
+    //   reads as broken rock. They cast no shadows: isolated rocks on a
+    //   raking-lit slope threw long black holes in the first survey;
+    // - waterline boulders: dense, rounded, shadow-casting.
+    // Positions are INFERRED; generic rock analogs (the reviewed rock scans)
+    // in the reach's dark basalt, non-colliding.
+    if (Context.ReviewedRockMeshes.IsEmpty())
+    {
+        return 0;
+    }
+    const FString RiverId = Context.Candidate.PreviewSpec.RiverId;
+    UMaterialInterface* Basalt = LoadReachRockMaterial(RiverId, Context.OutSummary);
+    TArray<UHierarchicalInstancedStaticMeshComponent*> BoulderComponents;
+    TArray<UHierarchicalInstancedStaticMeshComponent*> OutcropComponents;
+    TArray<FBox> MeshBounds;
+    for (int32 MeshIndex = 0; MeshIndex < Context.ReviewedRockMeshes.Num(); ++MeshIndex)
+    {
+        UStaticMesh* Mesh = Context.ReviewedRockMeshes[MeshIndex];
+        for (int32 Kind = 0; Kind < 2; ++Kind)
+        {
+            const bool bBoulderKind = Kind == 0;
+            UHierarchicalInstancedStaticMeshComponent* Component = AddLandscapeCandidateInstancedMeshComponent(
+                Context.World, Mesh,
+                FString::Printf(TEXT("RaftSim_ZambeziGorge%s%02d_%s"),
+                    bBoulderKind ? TEXT("WaterlineBoulder") : TEXT("WallOutcrop"), MeshIndex + 1, *RiverId),
+                bBoulderKind, Basalt);
+            if (Component)
+            {
+                Component->SetCullDistances(0, bBoulderKind ? 90000 : 160000);
+                Component->GetOwner()->Tags.Append(
+                    {TEXT("RaftSimZambeziGorgeWallRock"), TEXT("InferredRockNotSurveyed")});
+            }
+            (bBoulderKind ? BoulderComponents : OutcropComponents).Add(Component);
+        }
+        MeshBounds.Add(GetLandscapeCandidateEffectiveMeshBounds(Mesh));
+    }
+    // Ground normal from the Landscape heights 2 m either side.
+    auto GroundNormal = [&Queries](const FVector2D& Point)
+    {
+        constexpr float D = 200.0f;
+        const float Hx = Queries.GetLandscapeHeight(Point.X + D, Point.Y) - Queries.GetLandscapeHeight(Point.X - D, Point.Y);
+        const float Hy = Queries.GetLandscapeHeight(Point.X, Point.Y + D) - Queries.GetLandscapeHeight(Point.X, Point.Y - D);
+        return FVector(-Hx, -Hy, 2.0f * D).GetSafeNormal(SMALL_NUMBER, FVector::UpVector);
+    };
+    constexpr float LogicalStart = -2460.0f;
+    constexpr float LogicalEnd = 25300.0f;
+    constexpr float StepM = 14.0f;
+    const int32 Steps = FMath::FloorToInt((LogicalEnd - LogicalStart) / StepM);
+    const float HalfWidth = Queries.ActiveRiverHalfWidth;
+    int32 Boulders = 0;
+    int32 Outcrops = 0;
+    int32 Rejected = 0;
+    constexpr int32 BoulderTries = 4;
+    constexpr int32 OutcropTries = 10;
+    for (int32 Step = 0; Step < Steps; ++Step)
+    {
+        for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
+        {
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            for (int32 Try = 0; Try < BoulderTries + OutcropTries; ++Try)
+            {
+                const bool bBoulder = Try < BoulderTries;
+                const int32 Index = (Step * 2 + SideIndex) * 16 + Try;
+                bool bPlaced = false;
+                for (int32 Attempt = 0; Attempt < 6 && !bPlaced; ++Attempt)
+                {
+                    const int32 Seed = Index * 13 + Attempt;
+                    const float LogicalX = LogicalStart + (Step + ZambeziVegetationUnitRandom(Seed, 14401)) * StepM;
+                    // Boulders search the low margin; outcrops the whole wall.
+                    const float Offset = bBoulder
+                        ? FMath::Lerp(-3500.0f, 3000.0f, ZambeziVegetationUnitRandom(Seed, 14407))
+                        : FMath::Lerp(-1500.0f, 26000.0f, FMath::Pow(ZambeziVegetationUnitRandom(Seed, 14411), 1.4f));
+                    const FVector2D Point = Queries.ResolveLogicalRiverPoint(LogicalX, Side * (HalfWidth + Offset));
+                    const float GroundZ = Queries.GetLandscapeHeight(Point.X, Point.Y);
+                    const float DryHeightCm = GroundZ - Queries.GetConditionedWaterWorldZ(LogicalX);
+                    const float Slope = Queries.GetLandscapeSlopeDegrees(Point.X, Point.Y);
+                    if (Queries.GetMinimumCenterlineDistanceCm(Point) < 1500.0f)
+                    {
+                        continue;
+                    }
+                    const bool bInBand = bBoulder
+                        ? DryHeightCm >= 20.0f && DryHeightCm <= 600.0f && Slope <= 48.0f
+                        : DryHeightCm >= 600.0f && DryHeightCm <= 16000.0f && Slope >= 22.0f && Slope <= 80.0f;
+                    if (!bInBand)
+                    {
+                        continue;
+                    }
+                    const int32 MeshIndex = FMath::Min(
+                        FMath::FloorToInt(ZambeziVegetationUnitRandom(Seed, 14417) * MeshBounds.Num()),
+                        MeshBounds.Num() - 1);
+                    UHierarchicalInstancedStaticMeshComponent* Component =
+                        (bBoulder ? BoulderComponents : OutcropComponents)[MeshIndex];
+                    if (!Component)
+                    {
+                        continue;
+                    }
+                    const FBox& Bounds = MeshBounds[MeshIndex];
+                    const FVector BoundsSize = Bounds.GetSize();
+                    const float MeshSizeCm = FMath::Max(BoundsSize.GetMax(), 1.0f);
+                    FTransform Instance;
+                    if (bBoulder)
+                    {
+                        // Rounded 1.2-4.5 m boulders, a third sunk, upright.
+                        const float SizeCm = FMath::Lerp(120.0f, 450.0f,
+                            FMath::Pow(ZambeziVegetationUnitRandom(Seed, 14419), 1.6f));
+                        const float Uniform = SizeCm / MeshSizeCm;
+                        const FVector Scale(Uniform,
+                            Uniform * FMath::Lerp(0.8f, 1.2f, ZambeziVegetationUnitRandom(Seed, 14429)),
+                            Uniform * FMath::Lerp(0.6f, 0.95f, ZambeziVegetationUnitRandom(Seed, 14431)));
+                        const FRotator Rotation(
+                            FMath::Lerp(-15.0f, 15.0f, ZambeziVegetationUnitRandom(Seed, 14443)),
+                            360.0f * ZambeziVegetationUnitRandom(Seed, 14447),
+                            FMath::Lerp(-15.0f, 15.0f, ZambeziVegetationUnitRandom(Seed, 14449)));
+                        const float BuryCm = BoundsSize.Z * Scale.Z * 0.33f;
+                        Queries.AddGroundedInstance(Component, Context.ReviewedRockMeshes[MeshIndex], Point,
+                            GroundZ - BuryCm, Rotation, Scale);
+                        ++Boulders;
+                        bPlaced = true;
+                        continue;
+                    }
+                    // Wall plates: 5-14 m across (larger up the wall), a third
+                    // as thick, laid in the slope and two-thirds sunk.
+                    const float HeightT = FMath::Clamp(DryHeightCm / 9000.0f, 0.0f, 1.0f);
+                    const float SizeCm = FMath::Lerp(500.0f, 900.0f + 500.0f * HeightT,
+                        ZambeziVegetationUnitRandom(Seed, 14423));
+                    const float Uniform = SizeCm / MeshSizeCm;
+                    const FVector Scale(
+                        Uniform * FMath::Lerp(1.0f, 1.7f, ZambeziVegetationUnitRandom(Seed, 14437)),
+                        Uniform,
+                        Uniform * FMath::Lerp(0.30f, 0.50f, ZambeziVegetationUnitRandom(Seed, 14441)));
+                    const FVector Normal = GroundNormal(Point);
+                    // Long axis roughly along the contour (lava-flow banding),
+                    // with some scatter.
+                    const FVector Contour = FVector::CrossProduct(Normal, FVector::UpVector).GetSafeNormal(
+                        SMALL_NUMBER, FVector::ForwardVector);
+                    const FVector LongAxis = Contour.RotateAngleAxis(
+                        FMath::Lerp(-25.0f, 25.0f, ZambeziVegetationUnitRandom(Seed, 14443)), Normal);
+                    const FQuat Rotation = FRotationMatrix::MakeFromZX(Normal, LongAxis).ToQuat();
+                    const FVector Surface(Point.X, Point.Y, GroundZ);
+                    const float ThicknessCm = BoundsSize.Z * Scale.Z;
+                    const FVector Centre = Surface - Normal * (0.18f * ThicknessCm);
+                    Instance = FTransform(Rotation,
+                        Centre - Rotation.RotateVector(Bounds.GetCenter() * Scale), Scale);
+                    Component->AddInstance(Instance, /*bWorldSpace=*/true);
+                    ++Outcrops;
+                    bPlaced = true;
+                }
+                Rejected += bPlaced ? 0 : 1;
+            }
+        }
+    }
+    Context.OutSummary += FString::Printf(
+        TEXT("%s gorge walls: %d waterline basalt boulders and %d slope-aligned wall outcrop plates along the run "
+             "(positions inferred, generic rock analogs in dark basalt), %d tries without ground in band.\n"),
+        *RiverId, Boulders, Outcrops, Rejected);
+    return Boulders + Outcrops;
+}
 }

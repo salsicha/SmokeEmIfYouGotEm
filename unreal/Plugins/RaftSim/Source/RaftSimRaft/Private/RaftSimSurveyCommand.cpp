@@ -263,7 +263,7 @@ static bool ParseCrewCommand(const FString& Name, ERaftSimCrewCommand& OutComman
 
 struct FSurveyState
 {
-    enum class EPhase : uint8 { Hop, Settle, ChaseShot, ChaseShot2, SideShot, WideShot, TopShot, Telemetry, Done };
+    enum class EPhase : uint8 { Hop, Settle, ChaseShot, ChaseShot2, SideShot, CrewShot, CrewShot2, WideShot, TopShot, Telemetry, Done };
 
     TWeakObjectPtr<UWorld> World;
     FString Label;
@@ -281,6 +281,7 @@ struct FSurveyState
     float BestRemainingStationM = TNumericLimits<float>::Max();
     TWeakObjectPtr<ACameraActor> ChaseCamera;
     TWeakObjectPtr<ACameraActor> SideCamera;
+    TWeakObjectPtr<ACameraActor> CrewCamera;
     FTimerHandle Timer;
     int32 AnomalyTotal = 0;
     int32 StationsWithAnomalies = 0;
@@ -291,6 +292,14 @@ static TAutoConsoleVariable<int32> CVarSurveyWideShot(
     TEXT("RaftSim.SurveyWideShot"),
     0,
     TEXT("1 adds a wide upstream-elevated view to every RaftSim.SurveyReach station (_wide)."));
+
+// Opt-in close views of the crew and the raft per station (character and
+// equipment review): a bow-quarter view of the faces and a high stern-quarter
+// view of the deck and gear.
+static TAutoConsoleVariable<int32> CVarSurveyCrewShot(
+    TEXT("RaftSim.SurveyCrewShot"),
+    0,
+    TEXT("1 adds close bow-quarter (_crew) and stern-quarter (_deck) raft views to every survey station."));
 
 // Opt-in straight-down shot per station (whitewater-share measurement).
 static TAutoConsoleVariable<int32> CVarSurveyTopShot(
@@ -897,7 +906,42 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
             World, State->SideCamera.Get(), CameraLocation, (LookAt - CameraLocation).Rotation());
         FScreenshotRequest::RequestScreenshot(
             ScreenshotPath(StationTag(*State) + TEXT("_side")), false, false);
-        State->Phase = CVarSurveyWideShot.GetValueOnGameThread() > 0
+        State->Phase = CVarSurveyCrewShot.GetValueOnGameThread() > 0
+            ? FSurveyState::EPhase::CrewShot
+            : CVarSurveyWideShot.GetValueOnGameThread() > 0
+            ? FSurveyState::EPhase::WideShot
+            : FSurveyState::EPhase::Telemetry;
+        return;
+    }
+    case FSurveyState::EPhase::CrewShot:
+    case FSurveyState::EPhase::CrewShot2:
+    {
+        // Raft-relative close views with a 45 deg lens: faces from off the
+        // left bow, then the deck, gear and stern from high off the right
+        // quarter.
+        const bool bDeck = State->Phase == FSurveyState::EPhase::CrewShot2;
+        const FVector RaftLocation = Raft->GetActorLocation();
+        FVector Forward = Raft->GetActorForwardVector().GetSafeNormal2D();
+        if (Forward.IsNearlyZero())
+        {
+            Forward = FVector::ForwardVector;
+        }
+        const FVector Right = FVector::CrossProduct(FVector::UpVector, Forward);
+        const FVector CameraLocation = bDeck
+            ? RaftLocation - Forward * 520.0f + Right * 330.0f + FVector(0.0f, 0.0f, 360.0f)
+            : RaftLocation + Forward * 560.0f - Right * 300.0f + FVector(0.0f, 0.0f, 150.0f);
+        const FVector LookAt = RaftLocation + FVector(0.0f, 0.0f, bDeck ? 20.0f : 70.0f);
+        State->CrewCamera = PlaceCamera(
+            World, State->CrewCamera.Get(), CameraLocation, (LookAt - CameraLocation).Rotation());
+        if (ACameraActor* Camera = State->CrewCamera.Get())
+        {
+            Camera->GetCameraComponent()->SetFieldOfView(45.0f);
+        }
+        FScreenshotRequest::RequestScreenshot(
+            ScreenshotPath(StationTag(*State) + (bDeck ? TEXT("_deck") : TEXT("_crew"))), false, false);
+        State->Phase = !bDeck
+            ? FSurveyState::EPhase::CrewShot2
+            : CVarSurveyWideShot.GetValueOnGameThread() > 0
             ? FSurveyState::EPhase::WideShot
             : FSurveyState::EPhase::Telemetry;
         return;

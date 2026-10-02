@@ -169,14 +169,15 @@ UMaterialExpression* BuildBatokaOrganicBasaltBaseColor(
 
     // The drape and both rock photos are warm tan, so the tint alone left
     // the walls reading tan in game. The observed Batoka walls are black-grey
-    // basalt: remove most of the remaining hue (the weathering accent keeps a
-    // little) and lower the value, so they read dark against the sky and foam.
+    // basalt: remove nearly all the remaining hue and lower the value to ~0.02
+    // (this project's exposure renders ~0.04 as mid grey in sun), so the walls
+    // read black against the sky, foam and vegetation.
     UMaterialExpressionDesaturation* NeutralBasalt =
         NewObject<UMaterialExpressionDesaturation>(Material);
     NeutralBasalt->Input.Expression = ErodedBasalt;
-    NeutralBasalt->Fraction.Expression = Scalar(TEXT("BatokaBasaltDesaturation"), 0.82f);
+    NeutralBasalt->Fraction.Expression = Scalar(TEXT("BatokaBasaltDesaturation"), 0.94f);
     Add(NeutralBasalt);
-    return Multiply(NeutralBasalt, Scalar(TEXT("BatokaBasaltValueScale"), 0.62f));
+    return Multiply(NeutralBasalt, Scalar(TEXT("BatokaBasaltValueScale"), 0.42f));
 }
 
 UMaterialExpression* BuildBatokaOrganicBasaltColorCoverage(
@@ -190,7 +191,7 @@ UMaterialExpression* BuildBatokaOrganicBasaltColorCoverage(
     UMaterialExpressionScalarParameter* CoverageFloor =
         NewObject<UMaterialExpressionScalarParameter>(Material);
     CoverageFloor->ParameterName = TEXT("BatokaTerrainColorCoverageFloor");
-    CoverageFloor->DefaultValue = 0.97f;
+    CoverageFloor->DefaultValue = 0.62f;
     CoverageFloor->Group = TEXT("BatokaOrganicBasaltV16");
     Material->GetExpressionCollection().AddExpression(CoverageFloor);
     UMaterialExpressionAdd* BiasedCoverage =

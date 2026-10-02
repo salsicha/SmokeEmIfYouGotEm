@@ -3,7 +3,12 @@
 #include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionMax.h"
 #include "Materials/MaterialExpressionCollectionParameter.h"
+#include "Materials/MaterialExpressionClamp.h"
+#include "Materials/MaterialExpressionDivide.h"
+#include "Materials/MaterialExpressionDotProduct.h"
 #include "Materials/MaterialExpressionNoise.h"
+#include "Materials/MaterialExpressionTransform.h"
+#include "Materials/MaterialExpressionPixelDepth.h"
 #include "Materials/MaterialExpressionPanner.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Materials/MaterialParameterCollection.h"
@@ -672,6 +677,276 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         FinalBaseColor = BankFloor;
     }
 
+    // Evidence-drape maps: the top-down photo drape is stretched down steep
+    // walls, where one or two texels fill each sheared Landscape quad and
+    // read as hard-edged dark blocks (with the photo's baked shadows). On
+    // steep faces the regional colour comes from a blurred drape (no texel
+    // edges) and the rock's own relief and lighting from a world-aligned
+    // (triplanar) rock scan, normalised by the scan's mean so it modulates,
+    // not replaces, the observed colour. The pilot macro normal/AO/roughness
+    // maps belong to other windows, so these maps use only the local detail.
+    UMaterialExpression* EvidenceWallMask = nullptr;
+    UMaterialExpression* EvidenceWallNormal = nullptr;
+    int32 EvidenceWallNormalOutput = 0;
+    const bool bEvidenceTerrain = Candidate.bPhysicalScaleSourceCorridor && EvidenceDrape != nullptr;
+    UTexture2D* WallRockAlbedo = bEvidenceTerrain ? LoadObject<UTexture2D>(nullptr,
+        TEXT("/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/"
+             "T_RaftSim_Batoka_Rock037_Color_2K.T_RaftSim_Batoka_Rock037_Color_2K")) : nullptr;
+    UTexture2D* WallRockNormal = bEvidenceTerrain ? LoadObject<UTexture2D>(nullptr,
+        TEXT("/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/"
+             "T_RaftSim_Batoka_Rock037_NormalDX_2K.T_RaftSim_Batoka_Rock037_NormalDX_2K")) : nullptr;
+    if (bEvidenceTerrain && WallRockAlbedo && WallRockNormal)
+    {
+        auto AddExpr = [Material](UMaterialExpression* Expression)
+        {
+            Material->GetExpressionCollection().AddExpression(Expression);
+            return Expression;
+        };
+        auto Scalar = [Material, &AddExpr](const TCHAR* Name, float Value)
+        {
+            UMaterialExpressionScalarParameter* Parameter = NewObject<UMaterialExpressionScalarParameter>(Material);
+            Parameter->ParameterName = Name;
+            Parameter->DefaultValue = Value;
+            Parameter->Group = TEXT("RaftSimEvidenceWallRock");
+            AddExpr(Parameter);
+            return Parameter;
+        };
+        auto WorldAligned = [Material, &AddExpr](UTexture2D* Texture, EMaterialSamplerType SamplerType,
+                                                 const TCHAR* Name, float TileCm, bool bNormal, int32& OutIndex)
+            -> UMaterialExpression*
+        {
+            UMaterialExpressionTextureObjectParameter* TextureObject =
+                NewObject<UMaterialExpressionTextureObjectParameter>(Material);
+            TextureObject->ParameterName = Name;
+            TextureObject->Texture = Texture;
+            TextureObject->SamplerType = SamplerType;
+            TextureObject->Group = TEXT("RaftSimEvidenceWallRock");
+            AddExpr(TextureObject);
+            UMaterialExpressionConstant3Vector* Size = NewObject<UMaterialExpressionConstant3Vector>(Material);
+            Size->Constant = FLinearColor(TileCm, TileCm, TileCm, 1.0f);
+            AddExpr(Size);
+            UMaterialFunctionInterface* Function = LoadObject<UMaterialFunctionInterface>(nullptr, bNormal
+                ? TEXT("/Engine/Functions/Engine_MaterialFunctions01/Texturing/WorldAlignedNormal.WorldAlignedNormal")
+                : TEXT("/Engine/Functions/Engine_MaterialFunctions01/Texturing/WorldAlignedTexture.WorldAlignedTexture"));
+            UMaterialExpressionMaterialFunctionCall* Call = NewObject<UMaterialExpressionMaterialFunctionCall>(Material);
+            AddExpr(Call);
+            if (!Function || !Call->SetMaterialFunction(Function))
+            {
+                return nullptr;
+            }
+            for (int32 Index = 0; Index < Call->FunctionInputs.Num(); ++Index)
+            {
+                const FString InputName = Call->GetInputName(Index).ToString();
+                FExpressionInput& Input = Call->FunctionInputs[Index].Input;
+                if (InputName.Contains(TEXT("TextureObject"), ESearchCase::IgnoreCase))
+                {
+                    Input.Expression = TextureObject;
+                }
+                else if (InputName.Contains(TEXT("TextureSize"), ESearchCase::IgnoreCase))
+                {
+                    Input.Expression = Size;
+                }
+            }
+            for (int32 Index = 0; Index < Call->FunctionOutputs.Num(); ++Index)
+            {
+                if (Call->FunctionOutputs[Index].Output.OutputName.ToString().Equals(
+                        TEXT("XYZ Texture"), ESearchCase::IgnoreCase))
+                {
+                    OutIndex = Index;
+                    return Call;
+                }
+            }
+            return nullptr;
+        };
+        // Steepness mask from the geometric normal: 0 below ~33 deg, 1 above ~55.
+        UMaterialExpressionVertexNormalWS* WallNormalWs = NewObject<UMaterialExpressionVertexNormalWS>(Material);
+        AddExpr(WallNormalWs);
+        UMaterialExpressionComponentMask* WallNormalZ = NewObject<UMaterialExpressionComponentMask>(Material);
+        WallNormalZ->Input.Expression = WallNormalWs;
+        WallNormalZ->B = true;
+        AddExpr(WallNormalZ);
+        UMaterialExpressionOneMinus* WallSlope = NewObject<UMaterialExpressionOneMinus>(Material);
+        WallSlope->Input.Expression = WallNormalZ;
+        AddExpr(WallSlope);
+        UMaterialExpressionSubtract* WallSlopeAbove = NewObject<UMaterialExpressionSubtract>(Material);
+        WallSlopeAbove->A.Expression = WallSlope;
+        WallSlopeAbove->B.Expression = Scalar(TEXT("EvidenceWallSlopeStart"), 0.16f);
+        AddExpr(WallSlopeAbove);
+        UMaterialExpressionMultiply* WallSlopeGain = NewObject<UMaterialExpressionMultiply>(Material);
+        WallSlopeGain->A.Expression = WallSlopeAbove;
+        WallSlopeGain->B.Expression = Scalar(TEXT("EvidenceWallSlopeGain"), 4.0f);
+        AddExpr(WallSlopeGain);
+        UMaterialExpressionSaturate* WallMask = NewObject<UMaterialExpressionSaturate>(Material);
+        WallMask->Input.Expression = WallSlopeGain;
+        AddExpr(WallMask);
+        EvidenceWallMask = WallMask;
+
+        // Regional colour: the drape three mips down (~8x), without texel edges
+        // but keeping the cliffs' broad colour bands.
+        UMaterialExpressionTextureSample* BlurredDrape = NewObject<UMaterialExpressionTextureSample>(Material);
+        BlurredDrape->Texture = EvidenceDrape;
+        BlurredDrape->SamplerType = SAMPLERTYPE_Color;
+        BlurredDrape->Coordinates.Expression = MacroCoordinates;
+        BlurredDrape->MipValueMode = TMVM_MipBias;
+        BlurredDrape->ConstMipValue = 3;
+        AddExpr(BlurredDrape);
+
+        // Rock relief: world-aligned scan luminance over the scan's own mean
+        // (its 1x1 mip), so the observed regional colour is kept on average.
+        int32 RockAlbedoOutput = 0;
+        UMaterialExpression* RockAlbedo = WorldAligned(
+            WallRockAlbedo, SAMPLERTYPE_Color, TEXT("EvidenceWallRockAlbedo"), 650.0f, false, RockAlbedoOutput);
+        EvidenceWallNormal = WorldAligned(
+            WallRockNormal, SAMPLERTYPE_Normal, TEXT("EvidenceWallRockNormal"), 650.0f, true, EvidenceWallNormalOutput);
+        UMaterialExpressionConstant2Vector* MeanUv = NewObject<UMaterialExpressionConstant2Vector>(Material);
+        MeanUv->R = 0.5f;
+        MeanUv->G = 0.5f;
+        AddExpr(MeanUv);
+        UMaterialExpressionTextureSample* RockMean = NewObject<UMaterialExpressionTextureSample>(Material);
+        RockMean->Texture = WallRockAlbedo;
+        RockMean->SamplerType = SAMPLERTYPE_Color;
+        RockMean->Coordinates.Expression = MeanUv;
+        RockMean->MipValueMode = TMVM_MipLevel;
+        RockMean->ConstMipValue = 12;
+        AddExpr(RockMean);
+        if (RockAlbedo && EvidenceWallNormal)
+        {
+            UMaterialExpressionConstant3Vector* LumaWeights = NewObject<UMaterialExpressionConstant3Vector>(Material);
+            LumaWeights->Constant = FLinearColor(0.299f, 0.587f, 0.114f, 1.0f);
+            AddExpr(LumaWeights);
+            UMaterialExpressionDotProduct* RockLuma = NewObject<UMaterialExpressionDotProduct>(Material);
+            RockLuma->A.Expression = RockAlbedo;
+            RockLuma->A.OutputIndex = RockAlbedoOutput;
+            RockLuma->B.Expression = LumaWeights;
+            AddExpr(RockLuma);
+            UMaterialExpressionComponentMask* RockMeanRgb = NewObject<UMaterialExpressionComponentMask>(Material);
+            RockMeanRgb->Input.Expression = RockMean;
+            RockMeanRgb->R = true;
+            RockMeanRgb->G = true;
+            RockMeanRgb->B = true;
+            AddExpr(RockMeanRgb);
+            UMaterialExpressionDotProduct* RockMeanLuma = NewObject<UMaterialExpressionDotProduct>(Material);
+            RockMeanLuma->A.Expression = RockMeanRgb;
+            RockMeanLuma->B.Expression = LumaWeights;
+            AddExpr(RockMeanLuma);
+            UMaterialExpressionMax* SafeMean = NewObject<UMaterialExpressionMax>(Material);
+            SafeMean->A.Expression = RockMeanLuma;
+            SafeMean->ConstB = 0.02f;
+            AddExpr(SafeMean);
+            UMaterialExpressionDivide* RockRatio = NewObject<UMaterialExpressionDivide>(Material);
+            RockRatio->A.Expression = RockLuma;
+            RockRatio->B.Expression = SafeMean;
+            AddExpr(RockRatio);
+            UMaterialExpressionClamp* RockRatioClamped = NewObject<UMaterialExpressionClamp>(Material);
+            RockRatioClamped->Input.Expression = RockRatio;
+            RockRatioClamped->MinDefault = 0.30f;
+            RockRatioClamped->MaxDefault = 1.80f;
+            AddExpr(RockRatioClamped);
+            UMaterialExpressionConstant* One = NewObject<UMaterialExpressionConstant>(Material);
+            One->R = 1.0f;
+            AddExpr(One);
+            UMaterialExpressionLinearInterpolate* RockContrast = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+            RockContrast->A.Expression = One;
+            RockContrast->B.Expression = RockRatioClamped;
+            // The 6.5 m layer tiles into a woven hatch across a distant
+            // 60 m wall; fade it out with camera distance (full to ~40 m,
+            // gone by ~250 m) so far walls keep only the 21 m broad layer.
+            UMaterialExpressionPixelDepth* WallDepth = NewObject<UMaterialExpressionPixelDepth>(Material);
+            AddExpr(WallDepth);
+            UMaterialExpressionSubtract* WallDepthPast = NewObject<UMaterialExpressionSubtract>(Material);
+            WallDepthPast->A.Expression = WallDepth;
+            WallDepthPast->ConstB = 4000.0f;
+            AddExpr(WallDepthPast);
+            UMaterialExpressionMultiply* WallDepthScaled = NewObject<UMaterialExpressionMultiply>(Material);
+            WallDepthScaled->A.Expression = WallDepthPast;
+            WallDepthScaled->ConstB = 1.0f / 21000.0f;
+            AddExpr(WallDepthScaled);
+            UMaterialExpressionSaturate* WallDepthT = NewObject<UMaterialExpressionSaturate>(Material);
+            WallDepthT->Input.Expression = WallDepthScaled;
+            AddExpr(WallDepthT);
+            UMaterialExpressionOneMinus* WallNearFade = NewObject<UMaterialExpressionOneMinus>(Material);
+            WallNearFade->Input.Expression = WallDepthT;
+            AddExpr(WallNearFade);
+            UMaterialExpressionMultiply* FadedRockContrast = NewObject<UMaterialExpressionMultiply>(Material);
+            FadedRockContrast->A.Expression = Scalar(TEXT("EvidenceWallRockContrast"), 0.60f);
+            FadedRockContrast->B.Expression = WallNearFade;
+            AddExpr(FadedRockContrast);
+            RockContrast->Alpha.Expression = FadedRockContrast;
+            AddExpr(RockContrast);
+            // A second, larger and incommensurate rock projection (21 m) breaks
+            // the 6.5 m scan's repeat on tall cliffs seen from the river.
+            UMaterialExpression* WallRelief = RockContrast;
+            UTexture2D* BroadRock = LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/"
+                     "T_RaftSim_Batoka_AerialRocks02_Diffuse_4K.T_RaftSim_Batoka_AerialRocks02_Diffuse_4K"));
+            int32 BroadOutput = 0;
+            UMaterialExpression* BroadAlbedo = BroadRock ? WorldAligned(
+                BroadRock, SAMPLERTYPE_Color, TEXT("EvidenceWallBroadRockAlbedo"), 2100.0f, false, BroadOutput) : nullptr;
+            if (BroadAlbedo)
+            {
+                UMaterialExpressionTextureSample* BroadMean = NewObject<UMaterialExpressionTextureSample>(Material);
+                BroadMean->Texture = BroadRock;
+                BroadMean->SamplerType = SAMPLERTYPE_Color;
+                BroadMean->Coordinates.Expression = MeanUv;
+                BroadMean->MipValueMode = TMVM_MipLevel;
+                BroadMean->ConstMipValue = 13;
+                AddExpr(BroadMean);
+                UMaterialExpressionDotProduct* BroadLuma = NewObject<UMaterialExpressionDotProduct>(Material);
+                BroadLuma->A.Expression = BroadAlbedo;
+                BroadLuma->A.OutputIndex = BroadOutput;
+                BroadLuma->B.Expression = LumaWeights;
+                AddExpr(BroadLuma);
+                UMaterialExpressionComponentMask* BroadMeanRgb = NewObject<UMaterialExpressionComponentMask>(Material);
+                BroadMeanRgb->Input.Expression = BroadMean;
+                BroadMeanRgb->R = true;
+                BroadMeanRgb->G = true;
+                BroadMeanRgb->B = true;
+                AddExpr(BroadMeanRgb);
+                UMaterialExpressionDotProduct* BroadMeanLuma = NewObject<UMaterialExpressionDotProduct>(Material);
+                BroadMeanLuma->A.Expression = BroadMeanRgb;
+                BroadMeanLuma->B.Expression = LumaWeights;
+                AddExpr(BroadMeanLuma);
+                UMaterialExpressionMax* BroadSafeMean = NewObject<UMaterialExpressionMax>(Material);
+                BroadSafeMean->A.Expression = BroadMeanLuma;
+                BroadSafeMean->ConstB = 0.02f;
+                AddExpr(BroadSafeMean);
+                UMaterialExpressionDivide* BroadRatio = NewObject<UMaterialExpressionDivide>(Material);
+                BroadRatio->A.Expression = BroadLuma;
+                BroadRatio->B.Expression = BroadSafeMean;
+                AddExpr(BroadRatio);
+                UMaterialExpressionClamp* BroadClamped = NewObject<UMaterialExpressionClamp>(Material);
+                BroadClamped->Input.Expression = BroadRatio;
+                BroadClamped->MinDefault = 0.35f;
+                BroadClamped->MaxDefault = 1.70f;
+                AddExpr(BroadClamped);
+                UMaterialExpressionLinearInterpolate* BroadContrast = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+                BroadContrast->A.Expression = One;
+                BroadContrast->B.Expression = BroadClamped;
+                BroadContrast->Alpha.Expression = Scalar(TEXT("EvidenceWallBroadRockContrast"), 0.60f);
+                AddExpr(BroadContrast);
+                UMaterialExpressionMultiply* Combined = NewObject<UMaterialExpressionMultiply>(Material);
+                Combined->A.Expression = RockContrast;
+                Combined->B.Expression = BroadContrast;
+                AddExpr(Combined);
+                WallRelief = Combined;
+            }
+            UMaterialExpressionMultiply* WallColor = NewObject<UMaterialExpressionMultiply>(Material);
+            WallColor->A.Expression = BlurredDrape;
+            WallColor->B.Expression = WallRelief;
+            AddExpr(WallColor);
+            UMaterialExpressionLinearInterpolate* WallBaseColor = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+            WallBaseColor->A.Expression = FinalBaseColor;
+            WallBaseColor->B.Expression = WallColor;
+            WallBaseColor->Alpha.Expression = WallMask;
+            AddExpr(WallBaseColor);
+            FinalBaseColor = WallBaseColor;
+        }
+        else
+        {
+            EvidenceWallNormal = nullptr;
+        }
+    }
+
     UMaterialExpressionConstant* DetailNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
     DetailNormalWeight->R = Settings.DetailNormalWeight;
     Material->GetExpressionCollection().AddExpression(DetailNormalWeight);
@@ -682,6 +957,31 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     Normal->B.Expression = DetailNormalSample;
     Normal->Alpha.Expression = DetailNormalWeight;
     Material->GetExpressionCollection().AddExpression(Normal);
+    UMaterialExpression* FinalNormal = Normal;
+    if (bEvidenceTerrain)
+    {
+        // The pilot macro normal belongs to another window: use a flat
+        // tangent normal plus the local detail instead.
+        UMaterialExpressionConstant3Vector* FlatTangentNormal = NewObject<UMaterialExpressionConstant3Vector>(Material);
+        FlatTangentNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f, 1.0f);
+        Material->GetExpressionCollection().AddExpression(FlatTangentNormal);
+        Normal->A.Expression = FlatTangentNormal;
+        if (EvidenceWallNormal && EvidenceWallMask)
+        {
+            UMaterialExpressionTransform* WallNormalTangent = NewObject<UMaterialExpressionTransform>(Material);
+            WallNormalTangent->Input.Expression = EvidenceWallNormal;
+            WallNormalTangent->Input.OutputIndex = EvidenceWallNormalOutput;
+            WallNormalTangent->TransformSourceType = TRANSFORMSOURCE_World;
+            WallNormalTangent->TransformType = TRANSFORM_Tangent;
+            Material->GetExpressionCollection().AddExpression(WallNormalTangent);
+            UMaterialExpressionLinearInterpolate* WallNormal = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+            WallNormal->A.Expression = Normal;
+            WallNormal->B.Expression = WallNormalTangent;
+            WallNormal->Alpha.Expression = EvidenceWallMask;
+            Material->GetExpressionCollection().AddExpression(WallNormal);
+            FinalNormal = WallNormal;
+        }
+    }
 
     auto AddChannelMask = [Material](UMaterialExpression* Input, bool bRed, bool bGreen)
     {
@@ -702,16 +1002,30 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     DetailSurfaceResponseWeight->R = Settings.DetailSurfaceResponseWeight;
     Material->GetExpressionCollection().AddExpression(DetailSurfaceResponseWeight);
 
+    // Evidence maps: the pilot macro AO/roughness belong to another window.
+    UMaterialExpression* SurfaceAoBase = MacroAo;
+    UMaterialExpression* SurfaceRoughnessBase = MacroRoughness;
+    if (bEvidenceTerrain)
+    {
+        UMaterialExpressionConstant* NoMacroAo = NewObject<UMaterialExpressionConstant>(Material);
+        NoMacroAo->R = 1.0f;
+        Material->GetExpressionCollection().AddExpression(NoMacroAo);
+        UMaterialExpressionConstant* GroundRoughness = NewObject<UMaterialExpressionConstant>(Material);
+        GroundRoughness->R = 0.86f;
+        Material->GetExpressionCollection().AddExpression(GroundRoughness);
+        SurfaceAoBase = NoMacroAo;
+        SurfaceRoughnessBase = GroundRoughness;
+    }
     UMaterialExpressionLinearInterpolate* AmbientOcclusion =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    AmbientOcclusion->A.Expression = MacroAo;
+    AmbientOcclusion->A.Expression = SurfaceAoBase;
     AmbientOcclusion->B.Expression = DetailAo;
     AmbientOcclusion->Alpha.Expression = DetailSurfaceResponseWeight;
     Material->GetExpressionCollection().AddExpression(AmbientOcclusion);
 
     UMaterialExpressionLinearInterpolate* Roughness =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    Roughness->A.Expression = MacroRoughness;
+    Roughness->A.Expression = SurfaceRoughnessBase;
     Roughness->B.Expression = DetailRoughness;
     Roughness->Alpha.Expression = DetailSurfaceResponseWeight;
     Material->GetExpressionCollection().AddExpression(Roughness);
@@ -742,7 +1056,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
     ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, FinalBaseColor);
     ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
-    ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, Normal);
+    ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, FinalNormal);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, AmbientOcclusion);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, ConditionedRoughness);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);

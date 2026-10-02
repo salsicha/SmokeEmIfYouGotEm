@@ -496,4 +496,5 @@ FZambeziPlacementCounts AddZambeziLaunchPlacements(const FPlacementContext& Cont
 // Patchy green riverine fringe (shrubs and riparian trees) at the waterline
 // along the whole L_Zambezi reach; returns the instances placed.
 int32 AddZambeziWaterlineFringe(const FPlacementContext& Context, const FPlacementQueries& Queries);
+int32 AddZambeziGorgeWallRocks(const FPlacementContext& Context, const FPlacementQueries& Queries);
 }

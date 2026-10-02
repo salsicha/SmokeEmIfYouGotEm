@@ -1,4 +1,5 @@
 #include "RaftSimGuidePlayerController.h"
+#include "RaftSimCrewChatter.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Engine/Engine.h"
@@ -324,6 +325,21 @@ void ARaftSimGuidePlayerController::PlayerTick(float DeltaTime)
     {
         RunHud->SetVisibility(ESlateVisibility::HitTestInvisible);
         bRestoreHudAfterCapture = false;
+    }
+    if (RunHud != nullptr && !bPauseVisible && !bPhotoMode)
+    {
+        if (const ARaftSimRaftActor* Raft = FindActor<ARaftSimRaftActor>(GetWorld()))
+        {
+            if (!CrewChatter.IsValid())
+            {
+                CrewChatter = MakeShared<FRaftSimCrewChatter>();
+            }
+            FText Line;
+            if (CrewChatter->Tick(*Raft, DeltaTime, Line))
+            {
+                RunHud->ShowSubtitle(Line, 3.4f);
+            }
+        }
     }
 }
 

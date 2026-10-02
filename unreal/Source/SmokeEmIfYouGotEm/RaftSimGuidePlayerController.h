@@ -8,6 +8,7 @@
 class URaftSimRunHudWidget;
 class IInputProcessor;
 class FRaftSimMouseLookInputProcessor;
+class FRaftSimCrewChatter;
 
 /** In-run controller: creates the HUD and holds game input focus. */
 UCLASS()
@@ -77,4 +78,6 @@ private:
     bool bRestoreHudAfterCapture = false;
     FVector2D PendingSlateMouseLook = FVector2D::ZeroVector;
     TSharedPtr<IInputProcessor> MouseLookInputProcessor;
+    /** The crew's own lines on the river, shown as subtitles. */
+    TSharedPtr<FRaftSimCrewChatter> CrewChatter;
 };
