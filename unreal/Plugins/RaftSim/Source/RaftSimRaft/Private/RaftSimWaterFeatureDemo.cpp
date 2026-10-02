@@ -578,8 +578,9 @@ void ScheduleFeatureAudit(const TArray<FString>& Args,UWorld* World)
     }
     const FString Label=Args[0];const TWeakObjectPtr<UWorld> WeakWorld=World;
     auto Motion=MakeShared<TArray<TSharedPtr<FJsonValue>>>();
+    auto FeatureCoverage=MakeShared<TArray<TSharedPtr<FJsonValue>>>();
     FTimerHandle MotionTimer;
-    World->GetTimerManager().SetTimer(MotionTimer,FTimerDelegate::CreateLambda([WeakWorld,Motion]
+    World->GetTimerManager().SetTimer(MotionTimer,FTimerDelegate::CreateLambda([WeakWorld,Motion,FeatureCoverage]
     {
         UWorld* W=WeakWorld.Get();if(!W)return;
         auto* Bridge=W->GetGameInstance()->GetSubsystem<URaftSimPhysicsBridgeSubsystem>();
@@ -594,6 +595,7 @@ void ScheduleFeatureAudit(const TArray<FString>& Args,UWorld* World)
         Row->SetNumberField(TEXT("velocity_world_x_mps"),S.LinearVelocityMetersPerSecond.X);
         Row->SetNumberField(TEXT("velocity_world_y_mps"),S.LinearVelocityMetersPerSecond.Y);
         Row->SetNumberField(TEXT("velocity_world_z_mps"),S.LinearVelocityMetersPerSecond.Z);
+        Row->SetNumberField(TEXT("last_fixed_step_full_hull_contact_impulses"),Bridge->GetRaftRuntime()->GetLastHullContact().Impulses);
         auto* Water=Bridge->GetWaterRuntime();
         FVector2D Coordinates;FVector Tangent,Left;
         if(Water && Water->WorldToRiverCoordinates(P,Coordinates,Tangent,Left))
@@ -604,9 +606,79 @@ void ScheduleFeatureAudit(const TArray<FString>& Args,UWorld* World)
             Row->SetNumberField(TEXT("velocity_hydraulic_y_mps"),FVector::DotProduct(S.LinearVelocityMetersPerSecond,Left));
         }
         Motion->Add(MakeShared<FJsonValueObject>(Row));
+        if(Water)
+        {
+            // Observe actual published sites over time: a quiet end-of-run
+            // window must not stand in for proof of exercised circulation.
+            auto Coverage=MakeShared<FJsonObject>();
+            Coverage->SetNumberField(TEXT("world_seconds"),W->GetTimeSeconds());
+            Coverage->SetNumberField(TEXT("published_hole_owners"),Water->GetFeatureBreakingSites().Num());
+            Coverage->SetNumberField(TEXT("physical_eddy_owners"),Water->GetFeatureBoulderFootprints().Num());
+            TArray<TSharedPtr<FJsonValue>> Holes;
+            for(const auto& Site : Water->GetFeatureBreakingSites())
+            {
+                const FVector2D D=Site.FlowDirection.GetSafeNormal();
+                if(D.IsNearlyZero() || Site.Intensity*Site.SpillingFraction<=0.f)continue;
+                const FVector2D Q=Site.RiverCoordinatesMeters+D*4.4;
+                FRaftSimWaterSample Raw,Support,Surface,Submerged;
+                FVector Point,ProbeTangent,ProbeLeft;FVector2D ProbeCoordinates;
+                if(!Water->SampleWaterFieldAtRiverCoordinates(Q,Raw) || !Raw.bWet ||
+                    !Water->RiverToWorldPosition(Q,Raw.SurfaceHeightMeters+Water->GetRiverVerticalDatumM(),Point) ||
+                    !Water->SampleRaftSupportSurfaceAtWorldPosition(Point,Support) || !Support.bWet)continue;
+                const double Depth=Support.SurfaceHeightMeters-Support.BedHeightMeters;
+                if(Depth<=.05 || !Water->WorldToRiverCoordinates(Point,ProbeCoordinates,ProbeTangent,ProbeLeft))continue;
+                Point.Z=Support.SurfaceHeightMeters*100.;
+                if(!Water->SampleRaftInteractionWaterAtWorldPosition(Point,Surface) || !Surface.bWet)continue;
+                Point.Z=(Support.BedHeightMeters+Depth*.25)*100.;
+                if(!Water->SampleRaftInteractionWaterAtWorldPosition(Point,Submerged) || !Submerged.bWet)continue;
+                const FVector Along=ProbeTangent*D.X+ProbeLeft*D.Y;
+                auto Hole=MakeShared<FJsonObject>();
+                Hole->SetNumberField(TEXT("hydraulic_x_m"),Q.X);
+                Hole->SetNumberField(TEXT("hydraulic_y_m"),Q.Y);
+                Hole->SetNumberField(TEXT("intensity"),Site.Intensity);
+                Hole->SetNumberField(TEXT("spilling_fraction"),Site.SpillingFraction);
+                Hole->SetNumberField(TEXT("depth_m"),Depth);
+                Hole->SetNumberField(TEXT("surface_along_mps"),FVector::DotProduct(Surface.VelocityMetersPerSecond,Along));
+                Hole->SetNumberField(TEXT("submerged_along_mps"),FVector::DotProduct(Submerged.VelocityMetersPerSecond,Along));
+                Hole->SetNumberField(TEXT("submerged_minus_surface_along_mps"),FVector::DotProduct(Submerged.VelocityMetersPerSecond-Surface.VelocityMetersPerSecond,Along));
+                Hole->SetNumberField(TEXT("submerged_vertical_mps"),Submerged.VelocityMetersPerSecond.Z);
+                Holes.Add(MakeShared<FJsonValueObject>(Hole));
+            }
+            Coverage->SetArrayField(TEXT("actual_wet_hole_depth_probes"),Holes);
+            TArray<TSharedPtr<FJsonValue>> Eddies;
+            for(const auto& Rock : Water->GetFeatureBoulderFootprints())
+            {
+                const FVector2D D=Rock.FlowDirection.GetSafeNormal(),L(-D.Y,D.X);
+                if(D.IsNearlyZero() || Rock.PhysicalSource.IsEmpty())continue;
+                auto Eddy=MakeShared<FJsonObject>();
+                Eddy->SetStringField(TEXT("physical_source"),Rock.PhysicalSource);
+                TArray<TSharedPtr<FJsonValue>> Probes;
+                for(const FVector2D Local : {FVector2D(4,.1),FVector2D(1.75,.6),FVector2D(2.25,1.25)})
+                {
+                    const FVector2D Q=Rock.RiverCoordinatesMeters+(D*Local.X+L*Local.Y)*Rock.RadiusMeters;
+                    FRaftSimWaterSample Raw,Support,Actual;FVector Point,ProbeTangent,ProbeLeft;FVector2D ProbeCoordinates;
+                    if(!Water->SampleWaterFieldAtRiverCoordinates(Q,Raw) || !Raw.bWet ||
+                        !Water->RiverToWorldPosition(Q,Raw.SurfaceHeightMeters+Water->GetRiverVerticalDatumM(),Point) ||
+                        !Water->SampleRaftSupportSurfaceAtWorldPosition(Point,Support) || !Support.bWet ||
+                        !Water->WorldToRiverCoordinates(Point,ProbeCoordinates,ProbeTangent,ProbeLeft))continue;
+                    Point.Z=Support.SurfaceHeightMeters*100.;
+                    if(!Water->SampleRaftInteractionWaterAtWorldPosition(Point,Actual) || !Actual.bWet)continue;
+                    auto Probe=MakeShared<FJsonObject>();
+                    Probe->SetNumberField(TEXT("local_x_radius"),Local.X);
+                    Probe->SetNumberField(TEXT("local_y_radius"),Local.Y);
+                    Probe->SetNumberField(TEXT("actual_along_mps"),FVector::DotProduct(Actual.VelocityMetersPerSecond,ProbeTangent*D.X+ProbeLeft*D.Y));
+                    Probe->SetNumberField(TEXT("actual_across_mps"),FVector::DotProduct(Actual.VelocityMetersPerSecond,ProbeTangent*L.X+ProbeLeft*L.Y));
+                    Probes.Add(MakeShared<FJsonValueObject>(Probe));
+                }
+                Eddy->SetArrayField(TEXT("actual_wet_hull_current_probes"),Probes);
+                Eddies.Add(MakeShared<FJsonValueObject>(Eddy));
+            }
+            Coverage->SetArrayField(TEXT("actual_wet_eddy_owner_probes"),Eddies);
+            FeatureCoverage->Add(MakeShared<FJsonValueObject>(Coverage));
+        }
     }),.5f,true);
     FTimerHandle AuditTimer;
-    World->GetTimerManager().SetTimer(AuditTimer,FTimerDelegate::CreateLambda([WeakWorld,Label,Motion,MotionTimer,DurationSeconds]() mutable
+    World->GetTimerManager().SetTimer(AuditTimer,FTimerDelegate::CreateLambda([WeakWorld,Label,Motion,FeatureCoverage,MotionTimer,DurationSeconds]() mutable
     {
         UWorld* W=WeakWorld.Get();if(!W)return;
         W->GetTimerManager().ClearTimer(MotionTimer);
@@ -650,6 +722,8 @@ void ScheduleFeatureAudit(const TArray<FString>& Args,UWorld* World)
         Report->SetNumberField(TEXT("maximum_shared_surface_error_mps"),MaximumError);Report->SetNumberField(TEXT("dry_became_wet"),DryViolations);
         Report->SetArrayField(TEXT("examples"),Examples);
         Report->SetArrayField(TEXT("actual_boat_motion"),*Motion);
+        Report->SetArrayField(TEXT("feature_activation_history"),*FeatureCoverage);
+        Report->SetStringField(TEXT("feature_activation_scope"),TEXT("Read-only world-timer observations of actual published owners and public hull velocities at surface and 25% depth, across the loaded window. Not every river location, a guided boat path, or independent solver validation."));
         Report->SetStringField(TEXT("motion_sampling_scope"),TEXT("Actual production raft states sampled by a world timer every 0.5 seconds; render-timer receipts, not fixed-step traces or interpolated motion."));
         Report->SetNumberField(TEXT("requested_audit_duration_seconds"),DurationSeconds);
         Report->SetNumberField(TEXT("audit_world_seconds"),W->GetTimeSeconds());

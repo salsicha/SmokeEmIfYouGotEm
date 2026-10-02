@@ -1,4 +1,5 @@
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterFeatureKinematics.h"
 #include "Misc/AutomationTest.h"
 
 #if WITH_AUTOMATION_TESTS && RAFTSIM_HAS_LIVE_SOLVER
@@ -23,6 +24,34 @@ bool FRaftSimPairedFeatureSurfaceTransportTest::RunTest(const FString&)
     const FVector Expected=Tangent*(-.7)+Left*1.25;
     TestTrue(TEXT("public hull consumes retained displayed flow in actual Cartesian north-reflected map"),(Interaction.VelocityMetersPerSecond-Expected).Size()<1.e-5);
     TestTrue(TEXT("callback actually sampled"),Calls>0);
+    const FVector2D Base(FVector::DotProduct(Support.VelocityMetersPerSecond,Tangent),
+        FVector::DotProduct(Support.VelocityMetersPerSecond,Left));
+    const FVector2D D=Base.GetSafeNormal();
+    TestFalse(TEXT("fixture has actual incident flow"),D.IsNearlyZero());
+    URaftSimWaterRuntimeAdapter::FSupportBreakingSite Site;
+    Site.RiverCoordinatesMeters=Coordinates-D*4.4;
+    Site.FlowDirection=D;Site.Intensity=1;Site.SpillingFraction=1;
+    TArray<URaftSimWaterRuntimeAdapter::FSupportBreakingSite> Sites{Site};
+    Water->ConfigureRaftSupportBreakingSites(Sites,0,1);
+    TestEqual(TEXT("diagnostic owners are the configured rendered-site mirror"),Water->GetFeatureBreakingSites().Num(),1);
+    Water->SampleRaftSupportSurfaceAtWorldPosition(P,Support);
+    const double Depth=Support.SurfaceHeightMeters-Support.BedHeightMeters;
+    TestTrue(TEXT("actual fixture supports depth probes"),Depth>.05);
+    P.Z=Support.SurfaceHeightMeters*100.;
+    Water->SampleRaftInteractionWaterAtWorldPosition(P,Interaction);
+    TestTrue(TEXT("rendered flow remains authoritative at hole surface"),(Interaction.VelocityMetersPerSecond-Expected).Size()<1.e-5);
+    P.Z=(Support.BedHeightMeters+Depth*.25)*100.;
+    Water->SampleRaftInteractionWaterAtWorldPosition(P,Interaction);
+    const FVector Leg=RaftSimWaterFeatureKinematics::HoleDelta(4.4,0,.25,Depth,Base.Size(),1)-
+        RaftSimWaterFeatureKinematics::HoleDelta(4.4,0,1.,Depth,Base.Size(),1);
+    const FVector ExpectedSubmerged=Expected+(Tangent*D.X+Left*D.Y)*Leg.X+FVector::UpVector*Leg.Z;
+    TestTrue(TEXT("public submerged hull retains hole leg relative to the exact displayed surface"),
+        (Interaction.VelocityMetersPerSecond-ExpectedSubmerged).Size()<1.e-5);
+    TestTrue(TEXT("actual submerged current differs from surface along the hole axis"),
+        FVector::DotProduct(Interaction.VelocityMetersPerSecond-Expected,Tangent*D.X+Left*D.Y)>0.);
+    Sites.Reset();Water->ConfigureRaftSupportBreakingSites(Sites,0,1);
+    TestEqual(TEXT("read-only coverage observes removal rather than stale owners"),Water->GetFeatureBreakingSites().Num(),0);
+    P.Z=Support.SurfaceHeightMeters*100.;
     Water->SetRaftSupportCarrierSampler(Owner,[](const FVector&,float& H,bool& Wet){H=322;Wet=false;return true;});
     const int32 BeforeDry=Calls;Water->SampleRaftInteractionWaterAtWorldPosition(P,Interaction);
     TestFalse(TEXT("paired current cannot wet a clipped bank"),Interaction.bWet);

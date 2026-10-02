@@ -6,7 +6,9 @@ param(
     [Parameter(Mandatory=$true)][string]$PackagedRoot,
     [Parameter(Mandatory=$true)][ValidatePattern('^[a-zA-Z0-9_.-]+$')][string]$Label,
     [ValidateRange(0,7)][int]$FirstMap=0,
-    [ValidateRange(1,8)][int]$MapCount=8
+    [ValidateRange(1,8)][int]$MapCount=8,
+    [switch]$NormalSpawn,
+    [switch]$RequireFeatureCoverage
 )
 $ErrorActionPreference='Stop'
 $root=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -39,9 +41,13 @@ foreach($map in $maps[$FirstMap..($FirstMap+$MapCount-1)]){
         Start-Sleep -Seconds 5
     } while($true)
     $captureLabel="$Label-$($map.Name)"
+    # Normal-spawn checks never force the raft onto a diagnostic station.
+    # Station 95 in the compact map is known dry, so preserve that failure
+    # rather than treating a ground-query latch as a feature trajectory.
+    $station=if($NormalSpawn){-1}else{$map.Station}
     Write-Output "Starting actual packaged map $($map.Name)"
     & (Join-Path $PSScriptRoot 'capture_shared_water_map.ps1') -Map $map.Name -Label $captureLabel `
-        -StationM $map.Station -PackagedRoot $PackagedRoot -ProfileFrames 2400 `
+        -StationM $station -PackagedRoot $PackagedRoot -ProfileFrames 2400 `
         -RecordingStartS 12 -RecordingEndS 22 -FeatureAuditSeconds 26 -TimeoutS 600
     $feature=Join-Path $PackagedRoot "SmokeEmIfYouGotEm/Saved/WaterFeatureDemo/$captureLabel.json"
     $audit=Get-Content -LiteralPath $feature -Raw | ConvertFrom-Json
@@ -56,10 +62,14 @@ foreach($map in $maps[$FirstMap..($FirstMap+$MapCount-1)]){
     $pass=$audit.feature_kinematics_enabled -and $audit.wet_probes -gt 0 -and `
         $audit.maximum_shared_surface_error_mps -le 0.00001 -and $audit.dry_became_wet -eq 0 -and `
         $audit.actual_boat_motion.Count -gt 1 -and $finite
-    $results+= [ordered]@{map=$map.Name;label=$captureLabel;station_m=$map.Station;
+    if($RequireFeatureCoverage){
+        $pass=$pass -and $audit.feature_activation_history.Count -gt 1
+    }
+    $results+= [ordered]@{map=$map.Name;label=$captureLabel;station_m=$station;
         enabled=$audit.feature_kinematics_enabled;wet_probes=$audit.wet_probes;changed_probes=$audit.changed_probes;
         shared_surface_error_mps=$audit.maximum_shared_surface_error_mps;dry_became_wet=$audit.dry_became_wet;
         motion_states=$audit.actual_boat_motion.Count;finite_motion=$finite;physical_eddy_owners=$audit.active_physical_eddy_owners;
+        native_feature_coverage_samples=$audit.feature_activation_history.Count;
         runtime_regression_passed=$pass;feature_receipt=$feature;foam_transport_receipt=$transportPath;
         scope='Actual default shared current/hull parity and timer states. Not all-obstacle trajectory, fixed-step collision, visual or 20 FPS acceptance.'}
     [ordered]@{schema='raftsim.packaged_shared_water_rollout.v1';packaged_root=$PackagedRoot;

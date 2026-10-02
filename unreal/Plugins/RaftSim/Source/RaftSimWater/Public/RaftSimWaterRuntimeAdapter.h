@@ -388,6 +388,10 @@ public:
         const FVector2D& BaseVelocity, float DepthM, float DepthFraction = 1.0f) const;
     TConstArrayView<FSupportBoulderFootprint> GetFeatureBoulderFootprints() const
     { return FeatureBoulderFootprints; }
+    /** Read-only diagnostic view of the same rendered breaking-site owners
+     * used by hull circulation. No synthetic sites or raw-field mutation. */
+    TConstArrayView<FSupportBreakingSite> GetFeatureBreakingSites() const
+    { return RaftSupportBreakingSites; }
     using FFeatureSurfaceTransportSampler=TFunction<bool(const FVector2D&,FVector2D&,float&)>;
     void SetFeatureSurfaceTransportSampler(UObject* Owner,FFeatureSurfaceTransportSampler Sampler)
     {FeatureSurfaceTransportOwner=Owner;FeatureSurfaceTransportSampler=MoveTemp(Sampler);}
