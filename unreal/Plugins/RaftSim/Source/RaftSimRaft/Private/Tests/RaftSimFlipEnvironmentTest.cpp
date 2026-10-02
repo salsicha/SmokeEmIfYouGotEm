@@ -14,8 +14,50 @@
 #include "RaftSimImplicitDrag.h"
 #include "RaftSimContactWitnessPrune.h"
 #include "RaftSimSwimmerSubmersion.h"
+#include "RaftSimFlipObstacle.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimRockPillowLoads,
+    "RaftSim.Demo.RockPillowLoads",
+    EAutomationTestFlags::EditorContext|EAutomationTestFlags::ClientContext|EAutomationTestFlags::ProductFilter)
+bool FRaftSimRockPillowLoads::RunTest(const FString&)
+{
+    const auto Scenes=RaftSimFlipTestEnvironment::Scenes();
+    const auto& Pillow=*Scenes.FindByPredicate([](const auto& S){return S.Name==TEXT("rock_pillow_broadside");});
+    TestTrue(TEXT("rock control starts without imposed roll or spin"),Pillow.InitialRollDegrees==0. && Pillow.InitialRollRateRadS==0.);
+    TArray<FVector> V;TArray<FIntVector> Faces;RaftSimFlipObstacle::Geometry(V,Faces,false,true);
+    TestTrue(TEXT("bed-connected wedge has the same twelve rendered/contact triangles"),V.Num()==8 && Faces.Num()==12);
+    const FVector Normal=RaftSimFlipObstacle::TopNormal(true);
+    for(int32 I=4;I<8;++I)TestEqual(TEXT("top mesh vertices match ground height sampler"),V[I].Z,RaftSimFlipObstacle::TopCm(V[I].X,false,true));
+    TestTrue(TEXT("sloped rock supports upstream and upward, not a vertical wall"),Normal.X<0. && Normal.Z>0.);
+    TestTrue(TEXT("top collision/render plane has the sampled normal"),FMath::Abs(FVector::DotProduct(V[5]-V[4],Normal))<1.e-9);
+    for(double X=-3.;X<-.6;X+=.2)
+    {
+        FVector P(X*100.,0,0);P.Z=Pillow.Surface(P,0.)*100.;
+        const FVector Flow=Pillow.Velocity(P,0.);
+        const double Hx=(Pillow.Surface(P+FVector(.1,0,0),0.)-Pillow.Surface(P-FVector(.1,0,0),0.))/.002;
+        TestTrue(TEXT("pillow flow is finite and tangent to visible stationary surface"),!Flow.ContainsNaN() && FMath::Abs(Flow.Z-Flow.X*Hx)<1.e-7);
+        TestTrue(TEXT("pillow bed has no vertical flux"),FMath::Abs(Pillow.Velocity(FVector(X*100.,0,-200.),0.).Z)<1.e-9);
+    }
+    TestTrue(TEXT("no water velocity inside solid footprint"),Pillow.Velocity(FVector::ZeroVector,0.).IsZero());
+    FRaftSimFlexSegmentOverwash Wet;Wet.bWet=true;Wet.bUpstreamExposed=true;
+    Wet.OvertoppingDepthM=.35;Wet.LocalPosition=FVector(0,1.,0);
+    FRaftSimFlexTubeSegment Tube;Tube.TributaryLengthM=1.;
+    // Local +Y is upstream after yaw 90. Negative local X roll lifts the
+    // downstream side and dips upstream. No integrator pose is set here.
+    const FQuat Q=FQuat(FVector::UpVector,PI*.5)*FQuat(FVector::ForwardVector,-PI/6.);
+    const FVector Current(4.,0,0);
+    const auto Scoop=RaftSimOverwashLoads::ScoopingFace(Wet,Tube,Q,.32,Current);
+    TestTrue(TEXT("dipped upstream face receives downward and downstream pressure"),Scoop.ForceN.Z<0. && Scoop.ForceN.X>0.);
+    TestTrue(TEXT("scoop torque reinforces upstream dip about raft longitudinal axis"),FVector::DotProduct(Scoop.TorqueNm,Q.GetForwardVector())<0.);
+    TestTrue(TEXT("scoop transfers momentum from relative water, not a roll target"),FVector::DotProduct(Scoop.ForceN,Current)>0.);
+    TestTrue(TEXT("outgoing relative flow creates no suction load"),RaftSimOverwashLoads::ScoopingFace(Wet,Tube,Q,.32,-Current).ForceN.IsZero());
+    TestTrue(TEXT("tangential water creates no scoop pressure"),RaftSimOverwashLoads::ScoopingFace(Wet,Tube,Q,.32,Q.GetForwardVector()*4.).ForceN.IsNearlyZero(1.e-9));
+    Wet.OvertoppingDepthM=0.;
+    TestTrue(TEXT("non-overtopped tube cannot scoop"),RaftSimOverwashLoads::ScoopingFace(Wet,Tube,Q,.32,Current).ForceN.IsZero());
+    return !HasAnyErrors();
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimFlipLoadsAndPolicy,
     "RaftSim.Demo.FlipLoadsAndPolicy",
     EAutomationTestFlags::EditorContext|EAutomationTestFlags::ClientContext|EAutomationTestFlags::ProductFilter)
@@ -166,7 +208,14 @@ bool FRaftSimFlipEnvironmentBaseline::RunTest(const FString&)
     auto Root=MakeShared<FJsonObject>();Root->SetArrayField(TEXT("scenes"),Reports);
     FString Json;FJsonSerializer::Serialize(Root,TJsonWriterFactory<>::Create(&Json));
     const FString Dir=FPaths::ProjectSavedDir()/TEXT("FlipDemo");IFileManager::Get().MakeDirectory(*Dir,true);
-    FFileHelper::SaveStringToFile(Json,*(Dir/TEXT("native-environments-latest.json")));
+    FString Label=TEXT("native-environments-latest");
+    const bool Named=FParse::Value(FCommandLine::Get(),TEXT("RaftSimFlipEnvironmentLabel="),Label);
+    if(Label.IsEmpty() || Label!=FPaths::MakeValidFileName(Label))
+    {AddError(TEXT("Flip environment receipt requires a plain filename label"));return false;}
+    const FString Receipt=Dir/(Label+TEXT(".json"));
+    if(Named && IFileManager::Get().FileExists(*Receipt))
+    {AddError(TEXT("Preserve prior flip receipt; use a fresh label"));return false;}
+    TestTrue(TEXT("native flip receipt saved"),FFileHelper::SaveStringToFile(Json,*Receipt));
     return !HasAnyErrors();
 }
 #endif

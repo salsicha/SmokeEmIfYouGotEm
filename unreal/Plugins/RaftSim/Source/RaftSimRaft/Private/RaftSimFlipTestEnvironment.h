@@ -16,11 +16,16 @@ struct FScene
     // Explicit initial-condition controls, not a claim that the authored
     // field generated this incoming roll. Native forces own all later motion.
     double InitialRollDegrees=0.,InitialRollRateRadS=0.;
+    bool bPillowRock=false;
+    double PillowCurrentMps=8.;
     bool Wet(const FVector& P) const
     {return !bObstacle || FMath::Abs(P.X)>60. || FMath::Abs(P.Y)>120.;}
     double Surface(const FVector& P,double Seconds) const
     {
         const double Along=(P.X*FMath::Cos(AngleRadians)+P.Y*FMath::Sin(AngleRadians))*.01;
+        // Stationary upstream pillow at a sloped, bed-connected rock. This is
+        // an authored qualitative control, not measured rock hydraulics.
+        if(bPillowRock)return (PillowCurrentMps>0. ? .8 : 0.)*FMath::Exp(-FMath::Square((P.X*.01+.6)/1.25)-FMath::Square(P.Y*.01/3.));
         if(bPinnedBreaker)return .9*FMath::Exp(-FMath::Square((Along+2.6)/.9));
         if(bHydraulic)return .55*FMath::Exp(-FMath::Square((Along+1.)/.7))-.45*FMath::Exp(-FMath::Square((Along-1.)/.7));
         const double WaveCenter=-6.+SpeedMps*FMath::Max(Seconds-2.,0.);
@@ -61,7 +66,7 @@ struct FScene
             // Dividing discharge by local depth and w=s*u.grad(H) supplies
             // an incompressible steady depth-column extension with bed and
             // surface tangency, not a solved turbulent breaker.
-            const double Flux=2.*(bPinnedBreaker ? 8. : 2.8),Depth=Surface(P,Seconds)+2.;
+            const double Flux=2.*(bPillowRock ? PillowCurrentMps : (bPinnedBreaker ? 8. : 2.8)),Depth=Surface(P,Seconds)+2.;
             FVector V(Flux*(F+Y*DF*FMath::Sign(Y)*Dy/D)/Depth,
                 -Flux*Y*DF*FMath::Sign(X)*Dx/D/Depth,0.);
             constexpr double Eps=.001;
@@ -92,7 +97,21 @@ inline TArray<FScene> Scenes()
         {TEXT("rock_oblique"),0.,1.,2.,0.,false,false,true},
         {TEXT("breaking_broadside"),1.6,.65,3.,PI*.5,false,false,false,5.6},
         {TEXT("breaking_broadside_mirror"),1.6,.65,3.,-PI*.5,false,false,false,5.6},
+        // Upright-start severity controls. Only the visible crest height changes;
+        // pressure law, drag, loading, initial angular momentum and gates do not.
+        // Authored extreme waves, not measured real-river flip thresholds.
+        {TEXT("breaking_broadside_1p8m"),1.8,.65,3.,PI*.5,false,false,false,5.6},
+        {TEXT("breaking_broadside_2m"),2.,.65,3.,PI*.5,false,false,false,5.6},
+        {TEXT("breaking_broadside_2p4m"),2.4,.65,3.,PI*.5,false,false,false,5.6},
+        {TEXT("breaking_broadside_2p4m_mirror"),2.4,.65,3.,-PI*.5,false,false,false,5.6},
+        {TEXT("breaking_bow_on_2p4m"),2.4,.65,3.,0.,false,false,false,5.6},
+        {TEXT("breaking_broadside_2p8m"),2.8,.65,3.,PI*.5,false,false,false,5.6},
+        {TEXT("breaking_broadside_3p2m"),3.2,.65,3.,PI*.5,false,false,false,5.6},
+        {TEXT("breaking_broadside_3p2m_mirror"),3.2,.65,3.,-PI*.5,false,false,false,5.6},
+        {TEXT("breaking_bow_on_3p2m"),3.2,.65,3.,0.,false,false,false,5.6},
         {TEXT("pinned_breaker"),0.,1.,2.,0.,false,false,true,0.,true},
+        {TEXT("rock_pillow_broadside"),0.,1.,2.,0.,false,false,true,0.,false,0.,0.,true,8.},
+        {TEXT("rock_pillow_calm"),0.,1.,2.,0.,false,false,true,0.,false,0.,0.,true,0.},
         {TEXT("rolling_entry_control"),0.,1.,2.,PI*.5,false,false,false,0.,false,30.,.5},
         {TEXT("rolling_entry_port"),0.,1.,2.,PI*.5,false,false,false,0.,false,75.,5.},
         {TEXT("rolling_entry_starboard"),0.,1.,2.,PI*.5,false,false,false,0.,false,-75.,-5.}};

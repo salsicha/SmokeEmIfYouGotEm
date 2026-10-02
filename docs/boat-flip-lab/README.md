@@ -1,12 +1,130 @@
 # Native boat flip laboratory
 
-Development in progress: no physical-flip acceptance or release claim yet.
+Water-generated open-water lab validation is complete. Production promotion
+and obstacle/pinning validation remain separate; this is not a release claim.
+
+### Current upright-start validation (2026-10-02)
+
+The missing water-generated test is now exercised, not supplied rolling entry.
+Fresh native severity sweeps are retained in `tmp/flip-water-generated-native-v1`
+and `-v2`; both load/environment automation tests pass. Scene additions change
+only the visible authored crest height (1.8, 2.0, 2.4, 2.8 and 3.2 m), keeping
+the wave width/speed/jet, pressure law, loading and acceptance gates unchanged.
+These are extreme lab controls, not surveyed river waves or calibrated limits.
+
+Actual production-mesh recordings in `tmp/flip-water-generated-v2-*` start at
+zero roll and zero angular velocity. The 3.2 m broadside pair both physically
+cross 100.466 degrees at 5.308 s, with opposite roll directions, five crew
+ejections and no timed pose transition. Peak angular rate is 2.776 rad/s and
+maximum native pose step is 0.02313 rad. The raft floats inverted at +0.240 m
+relative to the local surface; minimum centre offset is -0.0324 m. Mean native
+render cost is 90.29 / 88.33 FPS (lab measurements, not full-map acceptance).
+
+This pair is driven by differential buoyancy/drag against the exact displayed
+moving water surface. Additional upper-face pressure impulse is zero in these
+runs; it is incorrect to require overtopping pressure to call a buoyancy-driven
+flip water-generated. The classifier requires upright/zero-spin initialization,
+actual moving-water torque, no solid contact, integrated pose continuity and
+real crew ejection. The seeded rolling entries still do not qualify.
+
+The calm, small-crest and eddy-line controls remain upright (0, 5.604 and
+0.064 degrees maximum tilt). The 2.4 m broadside and bow-on controls recover
+without ejection after 87.507 / 56.853 degrees. Their mean FPS is 93.62..96.20.
+The independent initial flip/control audit is
+`tmp/flip-water-generated-native-v2/initial-water-flip-audit.json`.
+
+Both fresh 24-second severe runs pass the complete seven-scene strict audit:
+physical water-generated capsize, mirrored roll, submerged crew, final
+resurfacing, continuous finite integration, flotation and 20 mean lab FPS.
+All five crew submerge and return to the local surface with zero final vertical
+velocity; the raft remains afloat inverted. Forcing still ends at 9 s, and
+release momentum, PFD rules and the original 0.03 m resurfacing gate are
+unchanged. The earlier 12-second v1 runs ended before every swimmer resurfaced;
+those incomplete observations and their evidence are preserved, not accepted
+as full crew validation.
+
+The completed strict audit is
+`tmp/flip-water-generated-native-v2/final-water-flip-suite-audit.json`.
+Native APNGs and source-pixel provenance are in each scene's `*-review`
+directory, including `tmp/flip-water-generated-v2-breaking_broadside_3p2m-review`
+and its mirrored counterpart. First, middle and last frames were inspected for
+all seven recordings. The actual recordings show upright initialization,
+opposite physical flips, submerged passengers and their later flotation; the
+five non-flip controls retain their crew. No poses or water frames are
+synthesized or interpolated.
+
+The normal-game `RaftSim.P2.RaftFlipsAndRecovers` regression also passes in
+`tmp/flip-water-generated-recovery-v1/index.json`, without lab candidate flags:
+one successful test, zero errors, one logged capsize warning. This checks the
+existing gameplay recovery path, not global promotion of the lab-only policy.
+Five classifier unit tests also pass; their synthetic fixtures are only parser
+tests and are not used as physical evidence.
+
+No pressure/drag, capsize or swimmer candidate has been globally promoted by
+this validation, and the previously failed pinned/contact tests remain open.
 
 These environments run the game's `URaftSimChronoRuntimeAdapter`, production
 raft deformation/export, and `ARaftSimRaftActor` crew/capsize lifecycle. They
 are not Python boat simulations or pre-rendered capsize animations.
 
 ## Environments
+
+### Broadside rock-pillow mechanism (2026-10-02, validation pending)
+
+The user's requested obstruction case is a downstream tube climbing a rock
+and its pillow, with the upstream side dipping and admitting current that
+loads the hull as a scoop. The accepted open-water flips do not validate this
+rock-assisted sequence. The older vertical-block `pinned_breaker` remains a
+rejected full-hull contact test, not evidence for this mechanism.
+
+`rock_pillow_broadside` adds an authored bed-connected sloped rock and a
+stationary upstream pillow. Rendered triangles, full-hull CCD triangles and
+ground height/normal sampling use the same wedge. The production raft is not
+simplified, solver limits are unchanged, and no roll or angular velocity is
+seeded. `rock_pillow_calm` removes current and pillow elevation as a control.
+This is qualitative authored geometry/flow, not surveyed rock hydraulics.
+
+Only these new lab scenes use an incoming-normal upper-face scoop-pressure
+candidate. The ordinary submerged drag still acts; the old lateral upper-face
+pressure term is not added again on that patch. Incoming water transfers a
+signed force to an overtopped, upstream-exposed upper face; dry, tangential or
+outgoing flow creates no scoop load. Its application point generates torque,
+not an angle target. Existing wave-scene loads and normal gameplay are unchanged.
+
+New receipts separate contact impulses, nominal upstream/downstream tube
+height and local-surface offsets, signed longitudinal scoop torque and retained
+water. These tube probes are body-local nominal centres/tops transformed by
+the actual integrated pose, not exact deformed mesh vertices. Acceptance must
+demonstrate downstream climb, upstream overtopping, reinforcing scoop torque
+and later physical inversion in that order, plus finite continuous full-hull
+contact, submerged/resurfacing crew and the unchanged 20 FPS lab floor. A
+passing load/field test alone does not accept the rock flip.
+
+The first build succeeds, and all three native tests in
+`tmp/rock-pillow-native-v1/index.json` pass: the new rock-pillow geometry/flow/
+scoop checks, existing load/policy checks and the wave/control force sweep.
+The actual full-hull broadside recording is a separate pending acceptance.
+
+The fresh `tmp/flip-rock-pillow-broadside-v1` recording is rejected. It reaches
+1.041667 simulated seconds, with 741 full-hull contact impulses, 48.54 degrees
+maximum tilt and 3.24 mean rendered FPS. The solver refuses an unconsumed
+substep after 512 events (0.006883891 s consumed of 0.008333334 s). No limit is
+raised and no simpler hull is substituted. Native receipt/video and launch
+DLL hashes are preserved, despite clean process exit being insufficient.
+
+The downstream nominal probe rises 1.059 m relative to upstream, but the
+recorded upstream top probe never goes below its local water surface (minimum
+sampled clearance +0.210 m). The boat rides over this wedge rather than staying
+pinned; no sampled reinforcing scoop torque or capsize follows. Thus the first
+stage is observed, but neither the intended scoop sequence nor a complete
+rock-assisted flip is demonstrated. Next work must address stable sustained
+full-hull contact and a genuinely pinned setup, not add an imposed roll.
+
+First/middle/last native frames were inspected. The diagnostic APNG packaging
+also refuses a playback-frame-count mismatch caused by repeated frozen frames;
+its partial output in `tmp/flip-rock-pillow-broadside-failed-v1-review` is not a
+verified animation delivery. No packaging or physical gate is relaxed, and
+this exact failing run is not to be repeated unchanged or promoted.
 
 | Scene | Question |
 | --- | --- |

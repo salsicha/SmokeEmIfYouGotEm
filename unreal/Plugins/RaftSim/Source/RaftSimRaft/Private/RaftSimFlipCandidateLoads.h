@@ -33,7 +33,14 @@ inline RaftSimOverwashLoads::FLoad Evaluate(URaftSimChronoRuntimeAdapter& Runtim
     for(const auto& S:Wet.SegmentOverwash)
     {
         const auto* Tube=Layout.FindByPredicate([&](const auto& T){return T.SegmentId==S.SegmentId;});
-        if(Tube){const auto Load=RaftSimOverwashLoads::UpperFace(S,*Tube,State.Orientation,R);Total.ForceN+=Load.ForceN;Total.TorqueNm+=Load.TorqueNm;}
+        if(Tube)
+        {
+            const FVector Face=S.LocalPosition+FVector(0,0,R);
+            const FVector Relative=Scene.Velocity(State.WorldPoint(Face)*100.,Seconds)-State.PointVelocity(Face);
+            const auto Load=Scene.bPillowRock ? RaftSimOverwashLoads::ScoopingFace(S,*Tube,State.Orientation,R,Relative)
+                : RaftSimOverwashLoads::UpperFace(S,*Tube,State.Orientation,R);
+            Total.ForceN+=Load.ForceN;Total.TorqueNm+=Load.TorqueNm;
+        }
     }
     return Total;
 }

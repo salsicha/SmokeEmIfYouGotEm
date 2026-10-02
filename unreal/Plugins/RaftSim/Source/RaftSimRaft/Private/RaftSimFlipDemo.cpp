@@ -24,6 +24,8 @@
 #include "TimerManager.h"
 #include "ShaderCompiler.h"
 #include "Misc/Paths.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Misc/FileHelper.h"
 #include "Serialization/JsonSerializer.h"
 #include "Dom/JsonObject.h"
@@ -65,6 +67,7 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
     FTimerHandle Timer;
     FString Label;
     double Seconds=0.,Debt=0.,LastWorld=0.,WarmupUntil=0.,RecordingStart=-1.,LastReceipt=-1.;
+    double DurationSeconds=12.;
     double MinimumUp=1.,MaximumOmega=0.,FirstCapsizeSeconds=-1.,RiskSeconds=0.;
     double MinimumSurfaceOffset=DBL_MAX,MaximumSurfaceOffset=-DBL_MAX,MaximumPoseStep=0.;
     double MaximumOmegaStep=0.,RenderSeconds=0.;int32 RenderFrames=0;
@@ -72,6 +75,7 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
     int64 ContactImpulses=0;
     double MinimumSwimmerOffset=0.;int32 MaximumSubmergedCrew=0;
     RaftSimOverwashLoads::FLoad CandidateLoad;
+    double InitialUp=1.,InitialOmega=0.,PressureWorkImpulse=0.;
     bool bRecording=false,bFailed=false;
     void UpdateWater()
     {
@@ -138,6 +142,27 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
         R->SetNumberField(TEXT("contact_impulses"),ContactImpulses);
         R->SetNumberField(TEXT("candidate_pressure_force_n"),CandidateLoad.ForceN.Size());
         R->SetNumberField(TEXT("candidate_pressure_roll_nm"),CandidateLoad.TorqueNm.X);
+        if(Scene.bPillowRock)
+        {
+            // Nominal tube-centre probes, not deformed mesh vertices. Label
+            // sides by downstream WORLD direction. Evidence only: no forces.
+            const auto& Flex=Dynamics->GetFlexibleParameters();
+            const double Side=Flex.WidthM*.5-Flex.TubeRadiusM;
+            const FVector A=P*.01+Q.RotateVector(FVector(0,Side,0));
+            const FVector B=P*.01+Q.RotateVector(FVector(0,-Side,0));
+            const FVector Downstream=A.X>B.X ? A : B,Upstream=A.X>B.X ? B : A;
+            const auto Offset=[&](const FVector& V){return V.Z-Scene.Surface(V*100.,Seconds);};
+            R->SetNumberField(TEXT("downstream_tube_center_z_m"),Downstream.Z);
+            R->SetNumberField(TEXT("upstream_tube_center_z_m"),Upstream.Z);
+            R->SetNumberField(TEXT("downstream_minus_upstream_tube_height_m"),Downstream.Z-Upstream.Z);
+            R->SetNumberField(TEXT("downstream_tube_surface_offset_m"),Offset(Downstream));
+            R->SetNumberField(TEXT("upstream_tube_top_surface_offset_m"),Offset(Upstream)+Q.GetUpVector().Z*Flex.TubeRadiusM);
+            // Broadside longitudinal axis is world +Y; report actual signed
+            // scoop torque about that axis, not the unrelated world X torque.
+            R->SetNumberField(TEXT("scoop_longitudinal_torque_nm"),FVector::DotProduct(CandidateLoad.TorqueNm,Q.GetForwardVector()));
+            R->SetNumberField(TEXT("retained_water_kg"),T.TotalRetainedWaterMassKg);
+            R->SetStringField(TEXT("tube_probe_scope"),TEXT("Nominal body-local tube centre/top probes transformed by actual integrated pose; not exported mesh vertices."));
+        }
         TArray<TSharedPtr<FJsonValue>> Crew;int32 Submerged=0;
         for(const auto& S:Boat->GetIsolatedFlipSwimmers())
         {
@@ -178,7 +203,7 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
         if(LastRenderWall>0.)RenderSeconds+=Wall-LastRenderWall;
         LastRenderWall=Wall;RenderFrames+=EngineFrames;Debt+=FrameSeconds;LastWorld=Now;
         int32 Steps=0;
-        while(!bFailed && Debt>=1./120. && Steps<240 && Seconds<12.)
+        while(!bFailed && Debt>=1./120. && Steps<240 && Seconds<DurationSeconds)
         {
             CandidateLoad={};
             if(Boat->GetRaftMode()==ERaftSimRaftMode::Upright)
@@ -186,6 +211,7 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
                 CandidateLoad=RaftSimFlipCandidateLoads::Evaluate(*Dynamics,Scene,Seconds,1./120.);
                 if(CandidateLoad.ForceN.ContainsNaN() || CandidateLoad.TorqueNm.ContainsNaN()){bFailed=true;break;}
                 Dynamics->AddExternalImpulse(CandidateLoad.ForceN/120.,CandidateLoad.TorqueNm/120.);
+                PressureWorkImpulse+=CandidateLoad.TorqueNm.Size()/120.;
             }
             const auto Previous=Dynamics->GetKinematicState();
             const auto PreviousMode=Boat->GetRaftMode();
@@ -209,12 +235,13 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
         UpdateWater();
         if(GEngine)GEngine->AddOnScreenDebugMessage(7452,.2f,FColor::White,
             FString::Printf(TEXT("Flip lab candidate: %s | native forces; no pose animation | %.2fs | %g kg"),*Scene.Name,Seconds,Dynamics->GetRaftBodyConfig().MassKg));
-        if(bFailed || Seconds>=12.)
+        if(bFailed || Seconds>=DurationSeconds)
         {
             Receipt(true);W->GetTimerManager().ClearTimer(Timer);
             if(bRecording)W->GetGameInstance()->GetSubsystem<URaftSimScreenRecorderSubsystem>()->StopRecording();
             auto R=MakeShared<FJsonObject>();R->SetStringField(TEXT("scene"),Scene.Name);R->SetBoolField(TEXT("failed"),bFailed);
             R->SetNumberField(TEXT("simulated_seconds"),Seconds);R->SetNumberField(TEXT("minimum_up_z"),MinimumUp);
+            R->SetNumberField(TEXT("requested_simulated_duration_seconds"),DurationSeconds);
             R->SetNumberField(TEXT("maximum_omega_rad_s"),MaximumOmega);R->SetNumberField(TEXT("first_capsize_seconds"),FirstCapsizeSeconds);
             R->SetNumberField(TEXT("risk_seconds"),RiskSeconds);R->SetArrayField(TEXT("motion"),Motion);
             R->SetNumberField(TEXT("minimum_surface_offset_m"),MinimumSurfaceOffset);
@@ -226,6 +253,13 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
             R->SetNumberField(TEXT("contact_impulses"),ContactImpulses);
             R->SetNumberField(TEXT("initial_roll_degrees"),Scene.InitialRollDegrees);
             R->SetNumberField(TEXT("initial_roll_rate_rad_s"),Scene.InitialRollRateRadS);
+            R->SetNumberField(TEXT("initial_up_z"),InitialUp);
+            R->SetNumberField(TEXT("initial_omega_rad_s"),InitialOmega);
+            R->SetNumberField(TEXT("sampled_pressure_angular_impulse_magnitude_nms"),PressureWorkImpulse);
+            R->SetBoolField(TEXT("timed_pose_transition_used"),false);
+            R->SetStringField(TEXT("external_impulse_sources"),Scene.bPillowRock
+                ? TEXT("D3 dipped upper-face incoming-normal water pressure; no scripted roll impulse or quaternion target.")
+                : TEXT("D3 sampled upper-face water pressure only; no scripted roll impulse or quaternion target."));
             R->SetNumberField(TEXT("minimum_swimmer_surface_offset_m"),MinimumSwimmerOffset);
             R->SetNumberField(TEXT("maximum_submerged_crew"),MaximumSubmergedCrew);
             R->SetStringField(TEXT("geometry_path"),Scene.bObstacle ? TEXT("original source triangles exported per native substep for full-hull CCD") : TEXT("normal production deformation/render path; open water, no terrain query"));
@@ -243,6 +277,12 @@ void StartFlipDemo(const TArray<FString>& Args,UWorld* W)
 {
     if(!W || Args.Num()!=2)return;
     auto Demo=MakeShared<FFlipDemo>();Demo->World=W;Demo->Label=Args[1];
+    if(Demo->Label.IsEmpty() || Demo->Label!=FPaths::MakeValidFileName(Demo->Label) ||
+        IFileManager::Get().FileExists(*(FPaths::ProjectSavedDir()/TEXT("FlipDemo")/(Demo->Label+TEXT(".json")))))
+    {UE_LOG(LogTemp,Error,TEXT("Flip validation requires a fresh plain filename label; prior receipt preserved"));return;}
+    FParse::Value(FCommandLine::Get(),TEXT("RaftSimFlipValidationDuration="),Demo->DurationSeconds);
+    if(!FMath::IsFinite(Demo->DurationSeconds) || Demo->DurationSeconds<12. || Demo->DurationSeconds>40.)
+    {UE_LOG(LogTemp,Error,TEXT("Flip observation duration must be 12..40 seconds; no run started"));return;}
     const auto Scenes=RaftSimFlipTestEnvironment::Scenes();const auto* Scene=Scenes.FindByPredicate([&](const auto& S){return S.Name==Args[0];});
     if(!Scene){UE_LOG(LogTemp,Error,TEXT("Unknown flip lab scene: %s"),*Args[0]);return;}Demo->Scene=*Scene;
     ARaftSimRaftActor* Boat=nullptr;for(TActorIterator<ARaftSimRaftActor> It(W);It;++It){Boat=*It;break;}
@@ -261,21 +301,25 @@ void StartFlipDemo(const TArray<FString>& Args,UWorld* W)
     if(Scene->bObstacle)
     {
         const bool Pin=Scene->bPinnedBreaker;
-        Demo->Dynamics->SetHullGroundQuery([Pin](TConstArrayView<FVector> A,TConstArrayView<FVector> B,
+        const bool Pillow=Scene->bPillowRock;
+        Demo->Dynamics->SetHullGroundQuery([Pin,Pillow](TConstArrayView<FVector> A,TConstArrayView<FVector> B,
             TConstArrayView<FIntVector> Faces,double Skin,double Clearance)
-            {return RaftSimFlipObstacle::Sweep(A,B,Faces,Skin,Clearance,Pin);});
-        Demo->Dynamics->SetGroundSurfaceSampler([Pin](const FVector& P,float& Z,FVector& N)
-            {Z=FMath::Abs(P.X)<=60. && FMath::Abs(P.Y)<=120. ? (Pin ? 150.f : 55.f) : -200.f;N=FVector::UpVector;return true;});
+            {return RaftSimFlipObstacle::Sweep(A,B,Faces,Skin,Clearance,Pin,Pillow);});
+        Demo->Dynamics->SetGroundSurfaceSampler([Pin,Pillow](const FVector& P,float& Z,FVector& N)
+            {const bool OnRock=FMath::Abs(P.X)<=60. && FMath::Abs(P.Y)<=120.;
+             Z=OnRock ? RaftSimFlipObstacle::TopCm(P.X,Pin,Pillow) : -200.;
+             N=OnRock ? RaftSimFlipObstacle::TopNormal(Pillow) : FVector::UpVector;return true;});
     }
     FRaftSimRaftKinematicState Initial;FVector Start(0,0,20);
     if(Scene->bHydraulic){Start=FVector(0,-500,20);Initial.LinearVelocityMetersPerSecond=FVector(0,3.5,0);}
     if(Scene->bObstacle){Start=FVector(-600,60,20);Initial.LinearVelocityMetersPerSecond=FVector(4,0,0);Initial.WorldTransform.SetRotation(FRotator(0,25,0).Quaternion());}
-    if(Scene->bPinnedBreaker)
+    if(Scene->bPinnedBreaker || Scene->bPillowRock)
     {
         const FQuat Q=FRotator(0,90,0).Quaternion();double HalfWidth=0.;
         for(const auto& P:Demo->Dynamics->GetHullGeometry().VerticesM)HalfWidth=FMath::Max(HalfWidth,Q.RotateVector(P).X);
         Start=FVector((- .6-HalfWidth-.4)*100.,0,0);Start.Z=Scene->Surface(Start,0.)*100.+20.;
         Initial.WorldTransform.SetRotation(Q);Initial.LinearVelocityMetersPerSecond=FVector(1.5,0,0);
+        if(Scene->bPillowRock && Scene->PillowCurrentMps==0.)Initial.LinearVelocityMetersPerSecond=FVector::ZeroVector;
     }
     Initial.WorldTransform.SetLocation(Start);
     if(Scene->InitialRollDegrees!=0.)
@@ -283,6 +327,8 @@ void StartFlipDemo(const TArray<FString>& Args,UWorld* W)
         Initial.WorldTransform.SetRotation(FQuat(FVector::ForwardVector,FMath::DegreesToRadians(Scene->InitialRollDegrees)));
         Initial.AngularVelocityRadiansPerSecond=FVector(Scene->InitialRollRateRadS,0,0);
     }
+    Demo->InitialUp=Initial.WorldTransform.GetRotation().GetUpVector().Z;
+    Demo->InitialOmega=Initial.AngularVelocityRadiansPerSecond.Size();
     Demo->Dynamics->SetKinematicState(Initial);Boat->SetActorTransform(Initial.WorldTransform);Boat->RefreshIsolatedFlipVisual(0.f);
     for(TActorIterator<AActor> It(W);It;++It)
         if(*It!=Boat && It->GetAttachParentActor()!=Boat && It->FindComponentByClass<UMeshComponent>())It->SetActorHiddenInGame(true);
@@ -306,7 +352,7 @@ void StartFlipDemo(const TArray<FString>& Args,UWorld* W)
     {
         auto* Rock=NewObject<UProceduralMeshComponent>(Apparatus);Rock->SetupAttachment(Water);Rock->RegisterComponent();
         Rock->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        TArray<FVector> RV;TArray<FIntVector> Faces;RaftSimFlipObstacle::Geometry(RV,Faces,Scene->bPinnedBreaker);TArray<int32> RT;
+        TArray<FVector> RV;TArray<FIntVector> Faces;RaftSimFlipObstacle::Geometry(RV,Faces,Scene->bPinnedBreaker,Scene->bPillowRock);TArray<int32> RT;
         for(const auto& F:Faces)RT.Append({F.X,F.Y,F.Z});
         Rock->CreateMeshSection_LinearColor(0,RV,RT,{}, {}, {}, {},false);
         Rock->SetMaterial(0,LoadObject<UMaterialInterface>(nullptr,TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial")));
@@ -322,7 +368,7 @@ void StartFlipDemo(const TArray<FString>& Args,UWorld* W)
     UE_LOG(LogTemp,Display,TEXT("FLIP_DEMO_BEGIN scene=%s label=%s production_mass=%g"),*Demo->Scene.Name,*Demo->Label,Reference->GetRaftBodyConfig().MassKg);
 }
 FAutoConsoleCommandWithWorldAndArgs FlipDemoCommand(TEXT("RaftSim.FlipDemo"),
-    TEXT("In-engine capsize lab: calm|small_broadside|large_broadside|large_broadside_mirror|large_bow_on|eddy_line|hydraulic_broadside|rock_oblique|breaking_broadside|breaking_broadside_mirror|pinned_breaker|rolling_entry_control|rolling_entry_port|rolling_entry_starboard [unique label]."),
+    TEXT("In-engine capsize lab [scene] [fresh label]. Upright wave controls include breaking_broadside_1p8m|2m|2p4m|2p8m|3p2m (full scene names), breaking_broadside_3p2m_mirror and breaking_bow_on_3p2m. Optional -RaftSimFlipValidationDuration=12..40 changes observation time, not forcing."),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&StartFlipDemo));
 }
 #endif

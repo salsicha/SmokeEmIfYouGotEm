@@ -21,4 +21,22 @@ inline FLoad UpperFace(const FRaftSimFlexSegmentOverwash& Wet,
     Load.TorqueNm=FVector::CrossProduct(Offset,Load.ForceN);
     return Load;
 }
+// Lab scoop control: water entering a dipped upper face transfers momentum
+// into that face. Only incoming relative NORMAL flow loads it; tangential or
+// outgoing flow cannot manufacture a downward force. This is a reduced patch
+// pressure model, not a resolved flexible-tube pressure distribution.
+inline FLoad ScoopingFace(const FRaftSimFlexSegmentOverwash& Wet,
+    const FRaftSimFlexTubeSegment& Tube,const FQuat& Orientation,double RadiusM,
+    const FVector& RelativeWaterVelocityMps)
+{
+    FLoad Load;
+    if(!Wet.bWet || !Wet.bUpstreamExposed || RadiusM<=0.)return Load;
+    const double Depth=FMath::Clamp(Wet.OvertoppingDepthM,0.,2.*RadiusM);
+    const FVector Normal=Orientation.GetUpVector();
+    const double Incoming=FMath::Clamp(-FVector::DotProduct(RelativeWaterVelocityMps,Normal),0.,8.);
+    Load.ForceN=-Normal*(.5*1000.*Incoming*Incoming*Depth*Tube.TributaryLengthM);
+    const FVector Offset=Orientation.RotateVector(Wet.LocalPosition+FVector(0,0,RadiusM));
+    Load.TorqueNm=FVector::CrossProduct(Offset,Load.ForceN);
+    return Load;
+}
 }
