@@ -5,7 +5,7 @@ live in `URaftSimCrewRoster`
 (`unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewRoster.h`).
 
 What the roster changes:
-- Each person's look: their own helmet, PFD, wetsuit and jacket colours,
+- Each person's look: their own helmet and PFD colours, their own clothes,
   eyewear, and the guide's rescue kit.
 - Their names, shown on the rescue HUD.
 - Their swimming ability in a rescue.
@@ -28,26 +28,43 @@ What it does not change:
 
 ## How each one looks
 
-| Person | Helmet | PFD | Wetsuit | Eyewear | Extra |
-| --- | --- | --- | --- | --- | --- |
-| Rhys | matte graphite | rescue red | charcoal | dark polarised sport sunglasses | whistle on a lanyard and a 21 cm river knife on the vest |
-| Kwame | red | orange | black | none | none |
-| Kenji | white | navy | navy-charcoal | clear glasses, thin titanium frame | none |
-| Ingrid | yellow | red | black-teal | white-frame sport sunglasses, amber lenses | none |
-| Amara | teal | yellow | black | none | none |
+| Person | Helmet | PFD | Top | Bottom | Eyewear | Extra |
+| --- | --- | --- | --- | --- | --- | --- |
+| Rhys | matte graphite | rescue red | long-sleeved sun shirt, faded blue-grey | olive quick-dry shorts, above the knee | dark polarised sport sunglasses | whistle on a lanyard and a 21 cm river knife on the vest |
+| Kwame | red | orange | loose white T-shirt | tropical board shorts, blue with a yellow print, to the knee | none | none |
+| Kenji | white | navy | navy-and-cream striped T-shirt | stone walking shorts, to the knee | clear glasses, thin titanium frame | none |
+| Ingrid | yellow | red | coral sleeveless athletic top | black three-quarter leggings | white-frame sport sunglasses, amber lenses | none |
+| Amara | teal | yellow | oversized lavender T-shirt | charcoal running shorts, mid-thigh | none | none |
 
-Everyone wears a neoprene collar over the top of the wetsuit.
+Forearms and lower legs are bare skin; everyone wears river boots.
 
 How it is built:
-- Colours tint the shared helmet, PFD, splash-jacket and wetsuit materials
-  through their `BaseTint` parameter (`RaftSim.CreateRaftCrewMaterials`).
+- **Clothes:** the MPFB bodies had no garments: their "Wetsuit" slot was the
+  bare body from the neck to the toes, so all five wore one black suit.
+  `unreal/Scripts/build_cc0_river_clothing.py` (stock Blender) dresses each
+  body in its own top and bottom:
+  - the body surface under each garment is copied and cut along
+    bone-relative planes (neckline, hems, sleeve and leg openings), with the
+    skin weights interpolated along the cuts;
+  - the copy is pushed off the body (snug on the torso, flaring toward loose
+    hems), relaxed so it bridges the body's hollows, and given fabric
+    thickness;
+  - body faces under a garment take its slot, so anything that pokes
+    through while posed shows the same fabric.
+
+  The dressed FBXs, their manifests and previews are in
+  `SourceArt/RaftSim/Characters/CC0Production/Dressed/`. The cut and fit of
+  each garment are in the generator; its colours and pattern (stripes, a
+  print, mottled cotton) are in the roster (`FRaftSimCrewGarmentLook`) and
+  go on the shared `M_RaftSim_CC0_RiverClothing` material.
+- Colours tint the shared helmet and PFD materials through their
+  `BaseTint` parameter (`RaftSim.CreateRaftCrewMaterials`).
 - Eyewear and the rescue kit are small procedural props, fitted every frame:
   - eyewear to the rendered eye line;
   - the rescue kit to the front of the vest's chest frame.
-- The collar is fitted to each body when it loads. It covers the saw-tooth
-  seam where the source mesh changes from skin to wetsuit round the neck, and
-  moves with the upper spine. `RaftSim.CC0NeckCollar 0` hides it.
-- The guide's eyewear and collar are hidden in the first-person view.
+- The neoprene collar that hid the wetsuit's neck seam is no longer drawn:
+  the clothed bodies have no wetsuit slot.
+- The guide's eyewear is hidden in the first-person view.
 
 The vest is fitted to each body:
 - **Depth and position:** measured once on the seated body. The chest
@@ -63,6 +80,27 @@ The vest is fitted to each body:
   - its back moves in up to 4.3 cm over the lumbar curve.
 - **Side panels:** foam panels in the vest's colour close the flanks under
   the arms, just inside the side adjustment straps.
+
+## How they paddle
+
+Each paddler holds the paddle as a rafter does: the inboard hand caps the
+T-grip palm-down, and the outboard hand grips the shaft about 66 cm down.
+- **Catch:** they lean forward and turn the paddle-side shoulder ahead. The
+  T-grip is at eye height, out over the paddle side of the face. The shaft
+  stands about 25 degrees off vertical and the blade is planted 60 cm ahead,
+  just outside the tube.
+- **Power:** the blade travels back to the hip while the top hand drives
+  forward and a little down.
+- **Exit and recovery:** the blade comes out at the hip, lifts clear of the
+  water and swings forward low over it.
+- **Back strokes and turns** run the same stroke in reverse.
+- **At rest** the paddle lies across the thighs with the blade out over the
+  tube.
+
+The T-grip crossbar runs parallel to the blade, as on a real paddle. Elbows
+bend on each body's own arm lengths: out, down and a little back.
+`review_crew_paddle_stroke_cycle.py` renders the crew at the catch, in the
+power phase, at the exit and in the recovery.
 
 ## How they behave
 
@@ -121,6 +159,10 @@ Rigged gear (`ARaftSimRaftActor::BuildRaftGear`):
 
 - **Bodies:** the CC0 bodies, faces and helmet-contained hair are unchanged.
   There are still four paddler bodies and one guide body.
+- **Clothes are skinned, not simulated:** they follow the body but do not
+  flutter, cling or darken when wet.
+- **Paddling:** the reaching arm can run out of length at the catch. Its
+  forearm then stretches slightly to keep the hand on the shaft.
 - **Movement:** individual paddling styles are not modelled. The crew
   paddles in sync on the guide's call.
 - **Voices:** chatter is text only. The crew still has no recorded voice.

@@ -83,13 +83,26 @@ HAIR_TEXTURES = {
     ),
 }
 
+# The imported bodies wear their own river clothes: build_cc0_river_clothing.py
+# dresses the MPFB bodies in FBX/ (verified below as its inputs) and writes
+# the dressed FBXs, hashed here, to Dressed/.
 CHARACTERS = {
-    "Guide": ("young_lightskinned_male_diffuse.png", "49506857a5f208ab8a6f911931ee7dbfd72fc589f6bfd6ee6f4673a3d65a3f2f"),
-    "Crew01": ("young_darkskinned_male_diffuse.png", "41e2ac4217928d64196a17a2dbc00a7f2b2695b6e2ea76fb987bc84e148cc395"),
-    "Crew02": ("young_lightskinned_male_diffuse3.png", "ca863f7456086d8dd2569226ed978bb27a29a67ae284eecd99e0ccf28a159f8e"),
-    "Crew03": ("young_lightskinned_female_diffuse.png", "17dfba3ba51deb1bcdb3cc8f494bd4f107aae1b9b0789975a01b30a6e0bd6e07"),
-    "Crew04": ("young_darkskinned_female_diffuse.png", "2891732c837ed38c0d9e2f566e422c993b414766773e2f92d4cca0f812a2e4ee"),
+    "Guide": ("young_lightskinned_male_diffuse.png", "986036ddaebd4356c07d64d09b86ebab692541e13fe04489aa87fccd624e2544"),
+    "Crew01": ("young_darkskinned_male_diffuse.png", "57e8f5e2e04efaf007ebe498c75b7659109a6bfa2169fc4be1f6d48daada4e91"),
+    "Crew02": ("young_lightskinned_male_diffuse3.png", "0e7268dcd0ee83856a482c6a9f95b6144408462b57a978f8c1ca6133dcee1fc2"),
+    "Crew03": ("young_lightskinned_female_diffuse.png", "7616e838075075765ad92e27326b3d3d95d1f005ad789323247a886b06a0ef81"),
+    "Crew04": ("young_darkskinned_female_diffuse.png", "de48abde2a3cd170052502d449a0e51a6b8ef055e14393305ad335ab6c72d656"),
 }
+UNDRESSED_BODY_SHA256 = {
+    "Guide": "49506857a5f208ab8a6f911931ee7dbfd72fc589f6bfd6ee6f4673a3d65a3f2f",
+    "Crew01": "41e2ac4217928d64196a17a2dbc00a7f2b2695b6e2ea76fb987bc84e148cc395",
+    "Crew02": "ca863f7456086d8dd2569226ed978bb27a29a67ae284eecd99e0ccf28a159f8e",
+    "Crew03": "17dfba3ba51deb1bcdb3cc8f494bd4f107aae1b9b0789975a01b30a6e0bd6e07",
+    "Crew04": "2891732c837ed38c0d9e2f566e422c993b414766773e2f92d4cca0f812a2e4ee",
+}
+DRESSED_FBX_DIRECTORY = "Dressed"
+CLOTHING_MATERIAL = "M_RaftSim_CC0_RiverClothing"
+WEAVE_NORMAL = "/Game/RaftSim/Equipment/Textures/T_RaftSim_PfdRipstop_Normal.T_RaftSim_PfdRipstop_Normal"
 
 CHARACTER_HAIR = {
     "Guide": ("grump_diffuse", None, unreal.LinearColor(0.22, 0.13, 0.08, 1.0)),
@@ -131,11 +144,14 @@ def verify_sources() -> list[dict[str, object]]:
             raise RuntimeError(f"Hair texture hash mismatch for {path}: {actual_hash}")
         records.append({"file": str(path), "sha256": actual_hash, "bytes": path.stat().st_size})
     for variant, (_, expected_hash) in CHARACTERS.items():
-        path = SOURCE_ROOT / "FBX" / f"RaftSim_CC0_{variant}.fbx"
-        actual_hash = sha256(path)
-        if actual_hash != expected_hash:
-            raise RuntimeError(f"FBX hash mismatch for {path}: {actual_hash}")
-        records.append({"file": str(path), "sha256": actual_hash, "bytes": path.stat().st_size})
+        for path, expected in (
+            (SOURCE_ROOT / "FBX" / f"RaftSim_CC0_{variant}.fbx", UNDRESSED_BODY_SHA256[variant]),
+            (SOURCE_ROOT / DRESSED_FBX_DIRECTORY / f"RaftSim_CC0_{variant}.fbx", expected_hash),
+        ):
+            actual_hash = sha256(path)
+            if actual_hash != expected:
+                raise RuntimeError(f"FBX hash mismatch for {path}: {actual_hash}")
+            records.append({"file": str(path), "sha256": actual_hash, "bytes": path.stat().st_size})
     return records
 
 
@@ -336,7 +352,7 @@ def import_characters() -> dict[str, unreal.SkeletalMesh]:
         )
 
         task = unreal.AssetImportTask()
-        task.filename = str(SOURCE_ROOT / "FBX" / f"RaftSim_CC0_{variant}.fbx")
+        task.filename = str(SOURCE_ROOT / DRESSED_FBX_DIRECTORY / f"RaftSim_CC0_{variant}.fbx")
         task.destination_path = DESTINATION
         task.destination_name = asset_name
         task.automated = True
@@ -482,6 +498,153 @@ def color_material(name: str, color: unreal.LinearColor, roughness: float) -> un
     return material
 
 
+def clothing_material(rebuild_existing: bool = False) -> unreal.Material:
+    """Everyday river clothing, coloured per person at runtime.
+
+    Parameters (set by ARaftSimCC0CrewVisualActor from the crew roster):
+    BaseColor and AccentColor; StripeAmount with StripePeriodCm for
+    horizontal stripes; PrintAmount with PrintScaleCm for a blotched print
+    (board shorts); HeatherAmount for mottled cotton; Roughness. Patterns
+    run in the body's reference pose (pre-skinned position), so stripes
+    stay level on the torso and follow the cloth as the crew move.
+    """
+    existing = unreal.load_asset(f"{MATERIAL_DESTINATION}/{CLOTHING_MATERIAL}")
+    if isinstance(existing, unreal.Material) and not rebuild_existing:
+        return existing
+    if isinstance(existing, unreal.Material):
+        material = existing
+        material.modify()
+        unreal.MaterialEditingLibrary.delete_all_material_expressions(material)
+    else:
+        material = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
+            CLOTHING_MATERIAL, MATERIAL_DESTINATION, unreal.Material, unreal.MaterialFactoryNew()
+        )
+    if not isinstance(material, unreal.Material):
+        raise RuntimeError(f"Could not create material {CLOTHING_MATERIAL}")
+    lib = unreal.MaterialEditingLibrary
+
+    def node(kind, x, y):
+        return lib.create_material_expression(material, kind, x, y)
+
+    def vector(name, value, x, y):
+        parameter = node(unreal.MaterialExpressionVectorParameter, x, y)
+        parameter.set_editor_property("parameter_name", name)
+        parameter.set_editor_property("default_value", value)
+        return parameter
+
+    def scalar(name, value, x, y):
+        parameter = node(unreal.MaterialExpressionScalarParameter, x, y)
+        parameter.set_editor_property("parameter_name", name)
+        parameter.set_editor_property("default_value", value)
+        return parameter
+
+    def constant(value, x, y):
+        result = node(unreal.MaterialExpressionConstant, x, y)
+        result.set_editor_property("r", value)
+        return result
+
+    def binary(kind, a, b, x, y):
+        result = node(kind, x, y)
+        lib.connect_material_expressions(a, "", result, "A")
+        lib.connect_material_expressions(b, "", result, "B")
+        return result
+
+    def saturate(value, x, y):
+        result = node(unreal.MaterialExpressionSaturate, x, y)
+        lib.connect_material_expressions(value, "", result, "")
+        return result
+
+    base = vector("BaseColor", unreal.LinearColor(0.45, 0.47, 0.50, 1.0), -1400, -400)
+    accent = vector("AccentColor", unreal.LinearColor(0.05, 0.06, 0.10, 1.0), -1400, -200)
+    # The reference-pose position exists only in the vertex shader; carry it
+    # to the pixel shader through an interpolator.
+    reference_position = node(unreal.MaterialExpressionPreSkinnedPosition, -2000, 100)
+    position = node(unreal.MaterialExpressionVertexInterpolator, -1800, 100)
+    lib.connect_material_expressions(reference_position, "", position, "VS")
+
+    # Horizontal stripes: a sharpened sine of the reference-pose height.
+    height = node(unreal.MaterialExpressionComponentMask, -1600, 100)
+    height.set_editor_property("r", False)
+    height.set_editor_property("g", False)
+    height.set_editor_property("b", True)
+    lib.connect_material_expressions(position, "", height, "")
+    phase = binary(unreal.MaterialExpressionDivide, height,
+                   scalar("StripePeriodCm", 2.6, -1600, 220), -1400, 100)
+    wave = node(unreal.MaterialExpressionSine, -1250, 100)
+    wave.set_editor_property("period", 1.0)
+    lib.connect_material_expressions(phase, "", wave, "")
+    sharpened = binary(unreal.MaterialExpressionMultiply, wave, constant(6.0, -1250, 220), -1100, 100)
+    stripe = saturate(binary(unreal.MaterialExpressionAdd, sharpened, constant(0.5, -1100, 220),
+                             -950, 100), -800, 100)
+    stripe_mask = binary(unreal.MaterialExpressionMultiply, stripe,
+                         scalar("StripeAmount", 0.0, -800, 220), -650, 100)
+
+    # Print: large blotches of the accent colour (tropical board shorts).
+    print_position = binary(unreal.MaterialExpressionDivide, position,
+                            scalar("PrintScaleCm", 9.0, -1600, 420), -1400, 420)
+    print_noise = node(unreal.MaterialExpressionNoise, -1250, 420)
+    print_noise.set_editor_property("scale", 1.0)
+    print_noise.set_editor_property("levels", 2)
+    print_noise.set_editor_property("output_min", -1.0)
+    print_noise.set_editor_property("output_max", 1.0)
+    lib.connect_material_expressions(print_position, "", print_noise, "Position")
+    print_mask = binary(
+        unreal.MaterialExpressionMultiply,
+        saturate(binary(unreal.MaterialExpressionMultiply, print_noise, constant(5.0, -1100, 540),
+                        -1100, 420), -950, 420),
+        scalar("PrintAmount", 0.0, -950, 540), -800, 420)
+
+    pattern_mask = saturate(binary(unreal.MaterialExpressionAdd, stripe_mask, print_mask, -500, 200),
+                            -350, 200)
+    colour = node(unreal.MaterialExpressionLinearInterpolate, -200, -200)
+    lib.connect_material_expressions(base, "", colour, "A")
+    lib.connect_material_expressions(accent, "", colour, "B")
+    lib.connect_material_expressions(pattern_mask, "", colour, "Alpha")
+
+    # Heather: fine mottling of cotton jersey, about +/- the amount.
+    heather_noise = node(unreal.MaterialExpressionNoise, -1400, 700)
+    heather_noise.set_editor_property("scale", 1.0)
+    heather_noise.set_editor_property("levels", 3)
+    heather_noise.set_editor_property("output_min", -1.0)
+    heather_noise.set_editor_property("output_max", 1.0)
+    lib.connect_material_expressions(
+        binary(unreal.MaterialExpressionMultiply, position, constant(0.5, -1600, 820), -1600, 700),
+        "", heather_noise, "Position")
+    heather = binary(unreal.MaterialExpressionMultiply, heather_noise,
+                     scalar("HeatherAmount", 0.08, -1400, 820), -1250, 700)
+    heather_scale = binary(unreal.MaterialExpressionAdd, heather, constant(1.0, -1250, 820), -1100, 700)
+    shaded = binary(unreal.MaterialExpressionMultiply, colour, heather_scale, -50, -100)
+    lib.connect_material_property(shaded, "", unreal.MaterialProperty.MP_BASE_COLOR)
+    lib.connect_material_property(scalar("Roughness", 0.86, -200, 300), "",
+                                  unreal.MaterialProperty.MP_ROUGHNESS)
+
+    # Fine weave relief from the reviewed ripstop normal, tiled small.
+    weave = unreal.load_asset(WEAVE_NORMAL)
+    if weave is not None:
+        coordinates = node(unreal.MaterialExpressionTextureCoordinate, -800, 900)
+        coordinates.set_editor_property("u_tiling", 70.0)
+        coordinates.set_editor_property("v_tiling", 70.0)
+        sample = node(unreal.MaterialExpressionTextureSample, -600, 900)
+        sample.texture = weave
+        sample.sampler_type = unreal.MaterialSamplerType.SAMPLERTYPE_NORMAL
+        lib.connect_material_expressions(coordinates, "", sample, "UVs")
+        flat = node(unreal.MaterialExpressionConstant3Vector, -600, 1100)
+        flat.set_editor_property("constant", unreal.LinearColor(0.0, 0.0, 1.0, 1.0))
+        softened = node(unreal.MaterialExpressionLinearInterpolate, -350, 950)
+        lib.connect_material_expressions(flat, "", softened, "A")
+        lib.connect_material_expressions(sample, "RGB", softened, "B")
+        lib.connect_material_expressions(scalar("WeaveNormalStrength", 0.35, -600, 1200), "",
+                                         softened, "Alpha")
+        lib.connect_material_property(softened, "", unreal.MaterialProperty.MP_NORMAL)
+    material.modify()
+    lib.layout_material_expressions(material)
+    lib.recompile_material(material)
+    # build_materials() saves only materials that needed skeletal usage; a
+    # rebuilt graph must be saved here or the old one stays on disk.
+    unreal.EditorAssetLibrary.save_loaded_asset(material, only_if_is_dirty=False)
+    return material
+
+
 def hidden_helmet_hair_material() -> unreal.Material:
     name = "M_RaftSim_CC0_HelmetContainedHairHidden"
     existing = unreal.load_asset(f"{MATERIAL_DESTINATION}/{name}")
@@ -519,6 +682,8 @@ def build_materials(
             "M_RaftSim_CC0_Brows", unreal.LinearColor(0.012, 0.0045, 0.002, 1.0), 0.79
         ),
         "helmet_hidden_hair": hidden_helmet_hair_material(),
+        "clothing": clothing_material(
+            rebuild_existing=os.environ.get("RAFTSIM_CC0_REBUILD_CLOTHING", "0") == "1"),
     }
     for variant, (atlas_name, _) in CHARACTERS.items():
         materials[f"skin_{variant}"] = texture_material(
@@ -570,6 +735,9 @@ def configure_mesh(
             selected = materials[f"skin_{variant}"]
         elif "wetsuit" in normalized:
             selected = materials["wetsuit"]
+        elif normalized.endswith(("_top", "_bottom")):
+            # The garments; ARaftSimCC0CrewVisualActor colours them per person.
+            selected = materials["clothing"]
         elif "eye" in normalized:
             selected = materials["eyes"]
         elif "brow" in normalized:

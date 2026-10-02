@@ -12,6 +12,17 @@ TArray<FText> Lines(std::initializer_list<const TCHAR*> Source)
     return Result;
 }
 
+FRaftSimCrewGarmentLook Garment(
+    const TCHAR* Name, FLinearColor Base, float Roughness, float Heather = 0.05f)
+{
+    FRaftSimCrewGarmentLook Look;
+    Look.Name = FText::FromString(Name);
+    Look.BaseColor = Base;
+    Look.Roughness = Roughness;
+    Look.HeatherAmount = Heather;
+    return Look;
+}
+
 TArray<FRaftSimCrewIdentity> BuildRoster()
 {
     TArray<FRaftSimCrewIdentity> Roster;
@@ -30,6 +41,9 @@ TArray<FRaftSimCrewIdentity> BuildRoster()
             TEXT("Calm and wry. Calls the lines early, never raises his voice, and counts heads after every rapid."));
         Guide.HelmetColor = FLinearColor(0.020f, 0.022f, 0.026f);
         Guide.PfdColor = FLinearColor(0.30f, 0.012f, 0.006f);
+        // Sun-faded guide kit: a long-sleeved UPF shirt and quick-dry shorts.
+        Guide.Top = Garment(TEXT("long-sleeved sun shirt"), FLinearColor(0.20f, 0.26f, 0.31f), 0.80f, 0.06f);
+        Guide.Bottom = Garment(TEXT("quick-dry shorts"), FLinearColor(0.085f, 0.085f, 0.050f), 0.70f, 0.02f);
         Guide.WetsuitTint = FLinearColor(0.014f, 0.016f, 0.018f);
         Guide.JacketColor = FLinearColor(0.020f, 0.060f, 0.100f);
         Guide.bWearsSunglasses = true;
@@ -64,6 +78,12 @@ TArray<FRaftSimCrewIdentity> BuildRoster()
             TEXT("Loud, generous and a little overconfident. Claimed the front seat and paddles like he means it."));
         Kwame.HelmetColor = FLinearColor(0.32f, 0.015f, 0.008f);
         Kwame.PfdColor = FLinearColor(0.42f, 0.060f, 0.004f);
+        // A loose white T-shirt and loud tropical board shorts.
+        Kwame.Top = Garment(TEXT("loose white T-shirt"), FLinearColor(0.60f, 0.60f, 0.58f), 0.88f, 0.03f);
+        Kwame.Bottom = Garment(TEXT("tropical board shorts"), FLinearColor(0.010f, 0.090f, 0.20f), 0.55f, 0.0f);
+        Kwame.Bottom.AccentColor = FLinearColor(0.55f, 0.36f, 0.030f);
+        Kwame.Bottom.PrintAmount = 1.0f;
+        Kwame.Bottom.PrintScaleCm = 18.0f;
         Kwame.WetsuitTint = FLinearColor(0.010f, 0.011f, 0.012f);
         Kwame.JacketColor = FLinearColor(0.10f, 0.20f, 0.010f);
         Kwame.Nerves = 0.12f;
@@ -95,6 +115,12 @@ TArray<FRaftSimCrewIdentity> BuildRoster()
             TEXT("Methodical and quietly funny. Third trip down the gorge; keeps perfect time and reads the river."));
         Kenji.HelmetColor = FLinearColor(0.42f, 0.46f, 0.50f);
         Kenji.PfdColor = FLinearColor(0.006f, 0.030f, 0.140f);
+        // A navy-and-cream striped T-shirt and stone walking shorts.
+        Kenji.Top = Garment(TEXT("striped T-shirt"), FLinearColor(0.52f, 0.50f, 0.44f), 0.86f, 0.02f);
+        Kenji.Top.AccentColor = FLinearColor(0.010f, 0.016f, 0.055f);
+        Kenji.Top.StripeAmount = 1.0f;
+        Kenji.Top.StripePeriodCm = 2.4f;
+        Kenji.Bottom = Garment(TEXT("stone walking shorts"), FLinearColor(0.22f, 0.20f, 0.16f), 0.80f, 0.03f);
         Kenji.WetsuitTint = FLinearColor(0.008f, 0.012f, 0.022f);
         Kenji.JacketColor = FLinearColor(0.060f, 0.064f, 0.070f);
         Kenji.bWearsSunglasses = true;
@@ -129,6 +155,9 @@ TArray<FRaftSimCrewIdentity> BuildRoster()
             TEXT("Competitive adrenaline seeker. Always asks for the biggest line and laughs when she swims."));
         Ingrid.HelmetColor = FLinearColor(0.55f, 0.25f, 0.006f);
         Ingrid.PfdColor = FLinearColor(0.32f, 0.008f, 0.003f);
+        // Training kit: a coral sleeveless top and black three-quarter leggings.
+        Ingrid.Top = Garment(TEXT("coral sleeveless top"), FLinearColor(0.55f, 0.11f, 0.065f), 0.55f, 0.0f);
+        Ingrid.Bottom = Garment(TEXT("black three-quarter leggings"), FLinearColor(0.012f, 0.012f, 0.014f), 0.48f, 0.0f);
         Ingrid.WetsuitTint = FLinearColor(0.008f, 0.016f, 0.016f);
         Ingrid.JacketColor = FLinearColor(0.14f, 0.020f, 0.12f);
         Ingrid.bWearsSunglasses = true;
@@ -161,6 +190,9 @@ TArray<FRaftSimCrewIdentity> BuildRoster()
             TEXT("First time on a river. Terrified at the top of every rapid and thrilled at the bottom."));
         Amara.HelmetColor = FLinearColor(0.010f, 0.18f, 0.16f);
         Amara.PfdColor = FLinearColor(0.42f, 0.20f, 0.004f);
+        // An oversized lavender T-shirt and charcoal running shorts.
+        Amara.Top = Garment(TEXT("oversized lavender T-shirt"), FLinearColor(0.28f, 0.20f, 0.46f), 0.88f, 0.08f);
+        Amara.Bottom = Garment(TEXT("charcoal running shorts"), FLinearColor(0.035f, 0.035f, 0.040f), 0.60f, 0.0f);
         Amara.WetsuitTint = FLinearColor(0.011f, 0.010f, 0.012f);
         Amara.JacketColor = FLinearColor(0.30f, 0.020f, 0.060f);
         Amara.Nerves = 0.80f;

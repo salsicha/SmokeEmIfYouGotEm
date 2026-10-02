@@ -15,13 +15,41 @@ enum class ERaftSimCrewSwimAbility : uint8
 };
 
 /**
+ * One garment's look on the shared river-clothing material
+ * (M_RaftSim_CC0_RiverClothing). The cut -- sleeve and leg length, fit -- is
+ * in each body's dressed source mesh (build_cc0_river_clothing.py).
+ */
+USTRUCT(BlueprintType)
+struct RAFTSIMRAFT_API FRaftSimCrewGarmentLook
+{
+    GENERATED_BODY()
+
+    /** What it is, e.g. "board shorts". */
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") FText Name;
+    /** Linear albedo of the fabric, and of its stripes or print. */
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") FLinearColor BaseColor = FLinearColor::Gray;
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") FLinearColor AccentColor = FLinearColor::Black;
+    /** 1 for horizontal stripes of StripePeriodCm (one light and one dark band). */
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") float StripeAmount = 0.0f;
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") float StripePeriodCm = 2.6f;
+    /** 1 for a blotched print of PrintScaleCm in the accent colour. */
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") float PrintAmount = 0.0f;
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") float PrintScaleCm = 9.0f;
+    /** Mottling of cotton jersey (0 for smooth synthetics). */
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") float HeatherAmount = 0.05f;
+    /** About 0.85 for cotton, 0.5-0.6 for nylon and Lycra. */
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") float Roughness = 0.85f;
+};
+
+/**
  * One person in the raft: who they are, how they look on the river and how
  * they talk. The four paddlers keep their seats and CC0 bodies (paddler_1 ..
  * paddler_4 use Crew01 .. Crew04); the guide is the stern seat. Gear colours
- * tint the shared helmet, PFD and wetsuit materials (their BaseTint
- * parameter); accessories are small procedural props fitted to the solved
- * face and chest frames. Presentation only: masses, seats and paddling
- * cadence stay shared so the crew still paddles in time.
+ * tint the shared helmet and PFD materials (their BaseTint parameter); each
+ * person wears their own clothes (Top, Bottom); accessories are small
+ * procedural props fitted to the solved face and chest frames. Presentation
+ * only: masses, seats and paddling cadence stay shared so the crew still
+ * paddles in time.
  */
 USTRUCT(BlueprintType)
 struct RAFTSIMRAFT_API FRaftSimCrewIdentity
@@ -39,6 +67,10 @@ struct RAFTSIMRAFT_API FRaftSimCrewIdentity
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") FLinearColor HelmetColor = FLinearColor::White;
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") FLinearColor PfdColor = FLinearColor::Red;
+    /** Their clothes under the PFD (the CC0 bodies). */
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") FRaftSimCrewGarmentLook Top;
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") FRaftSimCrewGarmentLook Bottom;
+    /** Neoprene tint for the MetaHuman bodies' wetsuit (not the CC0 crew). */
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") FLinearColor WetsuitTint = FLinearColor::Black;
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") FLinearColor JacketColor = FLinearColor::Blue;
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Crew|Look") bool bWearsSunglasses = false;

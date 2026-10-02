@@ -267,6 +267,8 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
              "M_RaftSim_CC0_Eyes"),
         TEXT("/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Wetsuit."
              "M_RaftSim_CC0_Wetsuit"),
+        TEXT("/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_RiverClothing."
+             "M_RaftSim_CC0_RiverClothing"),
         TEXT("/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Brows."
              "M_RaftSim_CC0_Brows"),
         TEXT("/Game/RaftSim/Characters/Production/CC0/Materials/"
@@ -360,10 +362,31 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
         {
             continue;
         }
+        // The bodies wear their own clothes (build_cc0_river_clothing.py):
+        // a top and a bottom garment instead of the former wetsuit slot.
         TestEqual(
-            FString::Printf(TEXT("%s has skin, wetsuit, hair, eyes, and brows"), Variant),
+            FString::Printf(TEXT("%s has skin, top, bottom, hair, eyes, and brows"), Variant),
             Mesh->GetMaterials().Num(),
-            5);
+            6);
+        for (const TCHAR* Garment : {TEXT("_Top"), TEXT("_Bottom")})
+        {
+            const FSkeletalMaterial* GarmentSlot = Mesh->GetMaterials().FindByPredicate(
+                [Garment](const FSkeletalMaterial& Slot)
+                {
+                    return Slot.MaterialSlotName.ToString().EndsWith(Garment);
+                });
+            TestTrue(
+                FString::Printf(TEXT("%s wears a %s garment on the river-clothing material"), Variant, Garment),
+                GarmentSlot && GarmentSlot->MaterialInterface &&
+                    GarmentSlot->MaterialInterface->GetName() == TEXT("M_RaftSim_CC0_RiverClothing"));
+        }
+        TestFalse(
+            FString::Printf(TEXT("%s no longer wears the wetsuit"), Variant),
+            Mesh->GetMaterials().ContainsByPredicate(
+                [](const FSkeletalMaterial& Slot)
+                {
+                    return Slot.MaterialSlotName.ToString().Contains(TEXT("Wetsuit"));
+                }));
         const FSkeletalMaterial* HairSlot = Mesh->GetMaterials().FindByPredicate(
             [](const FSkeletalMaterial& Slot)
             {
@@ -718,10 +741,15 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
             PortSeatHighSide.PaddleBottomCm.Z <= -10.0f &&
             HighSide.PaddleBottomCm.Z <= -10.0f);
     TestTrue(TEXT("high-side visibly shifts the torso"), FMath::Abs(HighSide.TorsoCenterCm.Y) > 25.0f);
+    // The stroke leans forward and turns the paddle-side shoulder ahead; the
+    // inboard shoulder's turn back nearly cancels its lean, so the reaching
+    // shoulder is the one that shows the articulation.
     TestTrue(
         TEXT("forward stroke articulates the upper body around the waist"),
         FVector::Distance(Forward.HeadCenterCm, Seated.HeadCenterCm) > 4.0f &&
-            FVector::Distance(Forward.LeftShoulderCm, Seated.LeftShoulderCm) > 2.0f);
+            FMath::Max(
+                FVector::Distance(Forward.LeftShoulderCm, Seated.LeftShoulderCm),
+                FVector::Distance(Forward.RightShoulderCm, Seated.RightShoulderCm)) > 2.0f);
     // The blade travels WITH the top hand since the 2026-08-10 stroke fix:
     // planted forward at the catch, swept rearward through power. The old
     // expectation here encoded the reversed "back-paddle in mirror" motion.
@@ -751,12 +779,20 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
                     StrokePose->PaddleTopCm,
                 StrokePose->PaddleBottomCm) <= 0.5f);
     }
+    // The blade plants outside the tube (its outer face is ~38 cm outboard
+    // of the seat); the T-grip rides above it, inboard of the blade and of
+    // the tube's face, out over the paddle side of the paddler's face.
+    constexpr float TubeOuterFaceCm = 38.0f;
     TestTrue(
-        TEXT("port and starboard forward-stroke blades stay outboard of their seats"),
-        PortForward.PaddleBottomCm.Y < 0.0f &&
-            StarboardForward.PaddleBottomCm.Y > 0.0f &&
-            PortForward.PaddleTopCm.Y > 0.0f &&
-            StarboardForward.PaddleTopCm.Y < 0.0f);
+        TEXT("port and starboard forward-stroke blades plant outside their tubes"),
+        PortForward.PaddleBottomCm.Y < -TubeOuterFaceCm &&
+            StarboardForward.PaddleBottomCm.Y > TubeOuterFaceCm);
+    TestTrue(
+        TEXT("forward-stroke T-grips ride inboard of the blade and the tube face"),
+        PortForward.PaddleTopCm.Y > PortForward.PaddleBottomCm.Y &&
+            StarboardForward.PaddleTopCm.Y < StarboardForward.PaddleBottomCm.Y &&
+            FMath::Abs(PortForward.PaddleTopCm.Y) < TubeOuterFaceCm &&
+            FMath::Abs(StarboardForward.PaddleTopCm.Y) < TubeOuterFaceCm);
     TestTrue(
         TEXT("port and starboard paddle endpoints are true lateral mirrors"),
         FMath::IsNearlyEqual(

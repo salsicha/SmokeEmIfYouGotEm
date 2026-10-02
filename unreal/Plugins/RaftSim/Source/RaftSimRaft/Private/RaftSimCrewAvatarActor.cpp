@@ -1110,6 +1110,8 @@ float StrokeWave(float Phase)
         SmoothUnitInterval((Wrapped - PowerEndPhase) / (1.0f - PowerEndPhase)));
 }
 
+constexpr float StrokeRecoveryLiftPeakCm = 34.0f;
+
 float StrokeRecoveryLiftCm(float Phase)
 {
     constexpr float PowerEndPhase = 0.58f;
@@ -1120,7 +1122,10 @@ float StrokeRecoveryLiftCm(float Phase)
     }
     const float RecoveryAlpha =
         (Wrapped - PowerEndPhase) / (1.0f - PowerEndPhase);
-    return 26.0f * FMath::Sin(PI * RecoveryAlpha);
+    // The blade must clear the water: with the shaft tipped about 40 deg
+    // from horizontal in the recovery, a 26 cm lift left the tip dragging
+    // ~3 cm under the surface.
+    return StrokeRecoveryLiftPeakCm * FMath::Sin(PI * RecoveryAlpha);
 }
 
 bool UsesWaistPivotedUpperBodyArticulation(ERaftSimCrewAvatarAction Action)
@@ -1156,10 +1161,42 @@ void ApplyWaistPivotedUpperBodyArticulation(FRaftSimCrewAvatarPose& Pose)
     RotateAroundPivot(Pose.HeadCenterCm);
 }
 
+// The outboard hand rides 66 cm down the 120 cm shaft: about 50 cm above
+// the water at the catch, as low as a seated paddler's arm reaches with the
+// torso leaned out over the tube.
 void ApplyMirroredPaddleGrip(
     FRaftSimCrewAvatarPose& Pose,
     float SeatSide,
-    float LowerHandAlpha = 0.43f)
+    float LowerHandAlpha = 0.55f);
+
+// One forward stroke, landmarks only. Catch (Wave 1): leaning forward with
+// the paddle-side shoulder rotated ahead, the blade planted 60 cm forward
+// with the shaft leaning forward at its foot. Power: the blade travels back
+// to the hip while the top hand drives forward and a little down, standing
+// the shaft past vertical by the exit. Recovery: the blade lifts clear and
+// swings forward low over the water.
+void ApplyForwardStroke(FRaftSimCrewAvatarPose& Pose, float Side, float Wave, float RecoveryLiftCm)
+{
+    const float Catch = 0.5f * (1.0f + Wave);
+    const float RecoveryAlpha = RecoveryLiftCm / StrokeRecoveryLiftPeakCm;
+    Pose.TorsoRotation.Pitch = -6.0f - 12.0f * Catch;
+    // Negative yaw turns the +Y (starboard) shoulder forward: the paddle
+    // side leads at the catch. The former sign rotated the inboard shoulder
+    // forward instead.
+    Pose.TorsoRotation.Yaw = -Side * (2.0f + 10.0f * Catch);
+    Pose.TorsoRotation.Roll = -Side * (2.0f + 3.0f * (1.0f - Catch));
+    Pose.TorsoCenterCm.X += 6.0f * Catch;
+    Pose.PaddleTopCm.X = FMath::Lerp(14.0f, 40.0f, Catch) + 6.0f * RecoveryAlpha;
+    Pose.PaddleTopCm.Z = FMath::Lerp(98.0f, 103.0f, Catch) + 5.0f * RecoveryAlpha;
+    Pose.PaddleBottomCm.X = FMath::Lerp(2.0f, 60.0f, Catch) + 24.0f * RecoveryAlpha;
+    Pose.PaddleBottomCm.Z = -10.0f + RecoveryLiftCm;
+    ApplyMirroredPaddleGrip(Pose, Side);
+}
+
+void ApplyMirroredPaddleGrip(
+    FRaftSimCrewAvatarPose& Pose,
+    float SeatSide,
+    float LowerHandAlpha)
 {
     const FVector LowerHandCm = FMath::Lerp(
         Pose.PaddleTopCm,
@@ -1234,12 +1271,16 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
     Pose.RightKneeCm = FVector(26.0f, InboardSign * 15.0f + 11.0f, 34.0f);
     Pose.LeftFootCm = FVector(20.0f, InboardSign * 32.0f - 9.0f, 6.0f);
     Pose.RightFootCm = FVector(20.0f, InboardSign * 32.0f + 9.0f, 6.0f);
-    // The T-grip belongs inboard of the tube and the blade belongs outboard
-    // in the water. The previous signs were reversed, so both blades aimed at
-    // the raft centre; perspective happened to hide the error on port while
-    // making the starboard paddles visibly cross the boat.
-    Pose.PaddleTopCm = FVector(25.0f, -25.0f * Side, 67.0f);
-    Pose.PaddleBottomCm = FVector(65.0f, 42.0f * Side, -7.0f);
+    // A raft paddle works nearly upright: the inboard hand caps the T-grip
+    // at eye height out over the paddle side of the face (centred on the
+    // face it read as the paddler biting the grip), the shaft drops past
+    // the outboard knee, and the blade plants just outside the tube (raft
+    // tube outer face ~38 cm outboard of the seat at its widest; water
+    // about Z -10 here). The former catch held the T-grip at belly height
+    // 25 cm inboard with the shaft 52 deg off vertical and the lower hand
+    // 73 cm above the blade: a jab low across the body, not a stroke.
+    Pose.PaddleTopCm = FVector(40.0f, 12.0f * Side, 103.0f);
+    Pose.PaddleBottomCm = FVector(60.0f, 48.0f * Side, -10.0f);
     ApplyMirroredPaddleGrip(Pose, Side);
 
     switch (Action)
@@ -1282,41 +1323,20 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             break;
         }
         case ERaftSimCrewAvatarAction::ForwardStroke:
-        {
-            const float Reach = 14.0f * Wave;
-            const float PowerAlpha = 0.5f * (1.0f - Wave);
-            Pose.TorsoRotation.Pitch = -8.0f - 7.0f * Wave;
-            Pose.TorsoRotation.Yaw = Side * (4.0f + 3.0f * Wave);
-            Pose.TorsoRotation.Roll = -Side * (2.0f + 1.5f * PowerAlpha);
-            Pose.TorsoCenterCm.X += 5.0f * Wave;
-            Pose.PaddleTopCm.X += Reach;
-            // Blade travels WITH the top hand: forward at the catch, back
-            // through the power phase. The former negated term swept the
-            // blade forward through the water during power — a back-paddle
-            // in mirror (2026-08-10 playtest: "their forward paddle looks
-            // like a back paddle").
-            Pose.PaddleBottomCm.X += 20.0f * Wave;
-            Pose.PaddleBottomCm.Z += StrokeRecoveryLiftCm(NormalizedPhase);
-            ApplyMirroredPaddleGrip(Pose, Side);
+            ApplyForwardStroke(Pose, Side, Wave, StrokeRecoveryLiftCm(NormalizedPhase));
             break;
-        }
         case ERaftSimCrewAvatarAction::BackStroke:
         {
-            // Mirror the forward cadence without recursively returning an
-            // already-articulated pose. Upper-body articulation is applied
-            // exactly once after the action landmarks are complete.
-            const float BackWave = -Wave;
-            const float Reach = 14.0f * BackWave;
-            const float PowerAlpha = 0.5f * (1.0f - BackWave);
-            Pose.TorsoRotation.Pitch = -8.0f - 7.0f * BackWave;
-            Pose.TorsoRotation.Yaw = -Side * (4.0f + 3.0f * BackWave);
-            Pose.TorsoRotation.Roll = Side * (2.0f + 1.5f * PowerAlpha);
-            Pose.TorsoCenterCm.X += 5.0f * BackWave;
-            Pose.PaddleTopCm.X += Reach;
-            Pose.PaddleBottomCm.X += 20.0f * BackWave;
-            Pose.PaddleBottomCm.Z += StrokeRecoveryLiftCm(NormalizedPhase);
-            ApplyMirroredPaddleGrip(Pose, Side);
-            Pose.TorsoRotation.Pitch *= -0.7f;
+            // The forward cadence run in reverse: the blade plants by the
+            // hip and drives forward. ApplyForwardStroke sets landmarks only,
+            // never returning an already-articulated pose; upper-body
+            // articulation is applied exactly once after the action
+            // landmarks are complete.
+            ApplyForwardStroke(Pose, Side, -Wave, StrokeRecoveryLiftCm(NormalizedPhase));
+            // Sit up and turn toward the blade behind instead of reaching
+            // forward over the knees.
+            Pose.TorsoRotation.Pitch *= -0.5f;
+            Pose.TorsoRotation.Yaw = Side * 10.0f;
             break;
         }
         case ERaftSimCrewAvatarAction::TurnLeft:
@@ -1327,11 +1347,9 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             // blades remain outside their own tubes instead of every paddler
             // reaching across the boat toward the commanded turn direction.
             const float StrokeDirection = -Turn * Side;
+            ApplyForwardStroke(
+                Pose, Side, StrokeDirection * Wave, StrokeRecoveryLiftCm(NormalizedPhase));
             Pose.TorsoRotation.Yaw = Turn * (18.0f + 8.0f * Wave);
-            Pose.PaddleTopCm.X += 12.0f * StrokeDirection * Wave;
-            Pose.PaddleBottomCm.X += 18.0f * StrokeDirection * Wave;
-            Pose.PaddleBottomCm.Z += StrokeRecoveryLiftCm(NormalizedPhase);
-            ApplyMirroredPaddleGrip(Pose, Side, 0.42f);
             break;
         }
         case ERaftSimCrewAvatarAction::Brace:
@@ -1506,6 +1524,20 @@ float URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseStart()
 float URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseEnd()
 {
     return 0.48f;
+}
+
+FVector URaftSimCrewAvatarPoseLibrary::GetPaddleBladeNormal(const FVector& Direction, bool bResting)
+{
+    const FVector Preferred = bResting ? FVector::UpVector : FVector::ForwardVector;
+    return (Preferred - Direction * FVector::DotProduct(Preferred, Direction))
+        .GetSafeNormal(SMALL_NUMBER, FVector::RightVector);
+}
+
+FVector URaftSimCrewAvatarPoseLibrary::GetPaddleBladeWidthAxis(const FVector& Direction, bool bResting)
+{
+    const FVector Width = FVector::CrossProduct(Direction, GetPaddleBladeNormal(Direction, bResting))
+        .GetSafeNormal(SMALL_NUMBER, -FVector::RightVector);
+    return Width.Y > 0.0f ? -Width : Width;
 }
 
 bool URaftSimCrewAvatarPoseLibrary::IsPaddleBladeInPowerPhase(
@@ -2238,6 +2270,20 @@ void ARaftSimCrewAvatarActor::SetAvatarAction(
     else
     {
         DispatchProductionPose();
+    }
+}
+
+void ARaftSimCrewAvatarActor::SetAvatarActionPhaseForValidation(
+    ERaftSimCrewAvatarAction NewAction,
+    float NormalizedPhase)
+{
+    SetAvatarAction(NewAction, 1.0f);
+    AnimationPhase = WrapNormalizedPhase(NormalizedPhase);
+    if (bVisualBuilt)
+    {
+        ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide));
+        DispatchProductionPose();
+        AlignProductionHeadgearToSolvedHead();
     }
 }
 
@@ -3956,21 +4002,19 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
         // caught no skylight and read as unlit ("their paddles look like
         // they are in shade", 2026-09-02). Face up at rest, forward for
         // every working stroke.
-        const FVector PreferredFaceAxis =
-            CurrentAction == ERaftSimCrewAvatarAction::SeatedIdle
-                ? FVector::UpVector
-                : FVector::ForwardVector;
-        const FVector PreferredBladeNormal = PreferredFaceAxis -
-            Direction * FVector::DotProduct(PreferredFaceAxis, Direction);
-        const FVector BladeNormal = PreferredBladeNormal.GetSafeNormal(
-            SMALL_NUMBER,
-            FVector::RightVector);
+        const bool bResting = CurrentAction == ERaftSimCrewAvatarAction::SeatedIdle;
+        const FVector BladeNormal =
+            URaftSimCrewAvatarPoseLibrary::GetPaddleBladeNormal(Direction, bResting);
         PaddleBlade->SetRelativeLocationAndRotation(
             Pose.PaddleBottomCm,
             FRotationMatrix::MakeFromZY(Direction, BladeNormal).Rotator());
         PaddleBlade->SetRelativeScale3D(FVector::OneVector);
-        const FVector GripDirection = FVector::CrossProduct(Direction, FVector::UpVector)
-            .GetSafeNormal(SMALL_NUMBER, FVector::RightVector);
+        // The crossbar parallels the blade's width, as on a real paddle.
+        // It was cross(shaft, up): for a near-vertical shaft that ran
+        // fore-aft, about 70 deg off the blade, and it flipped as the shaft
+        // passed vertical.
+        const FVector GripDirection =
+            URaftSimCrewAvatarPoseLibrary::GetPaddleBladeWidthAxis(Direction, bResting);
         SetRoundedLimb(
             PaddleGrip,
             Pose.PaddleTopCm - GripDirection * 7.0f,

@@ -223,15 +223,68 @@ TAutoConsoleVariable<FString> CVarCC0WetsuitDebugMaterial(
     TEXT(""),
     TEXT("Object path of a material to draw the CC0 wetsuit section with (debug only)."));
 
+// The dressed bodies' garment slots end in _Top and _Bottom.
+const FRaftSimCrewGarmentLook* GarmentForSlot(
+    const FString& SlotName,
+    const FRaftSimCrewIdentity& Identity)
+{
+    if (SlotName.EndsWith(TEXT("_Top"), ESearchCase::IgnoreCase))
+    {
+        return &Identity.Top;
+    }
+    if (SlotName.EndsWith(TEXT("_Bottom"), ESearchCase::IgnoreCase))
+    {
+        return &Identity.Bottom;
+    }
+    return nullptr;
+}
+
+// Each person's own clothes on the shared river-clothing material the
+// importer assigns to the garment slots.
+void ApplyGarmentLooks(
+    UPoseableMeshComponent* Body,
+    const USkeletalMesh* Mesh,
+    const FRaftSimCrewIdentity& Identity)
+{
+    const TArray<FSkeletalMaterial>& Slots = Mesh->GetMaterials();
+    for (int32 MaterialIndex = 0; MaterialIndex < Slots.Num(); ++MaterialIndex)
+    {
+        const FRaftSimCrewGarmentLook* Look =
+            GarmentForSlot(Slots[MaterialIndex].MaterialSlotName.ToString(), Identity);
+        UMaterialInterface* Clothing = Slots[MaterialIndex].MaterialInterface;
+        if (Look == nullptr || Clothing == nullptr)
+        {
+            continue;
+        }
+        UMaterialInstanceDynamic* Dressed = Cast<UMaterialInstanceDynamic>(Body->GetMaterial(MaterialIndex));
+        if (!Dressed || Dressed->Parent != Clothing)
+        {
+            Dressed = UMaterialInstanceDynamic::Create(
+                Clothing, Body, MakeUniqueObjectName(Body, UMaterialInstanceDynamic::StaticClass(),
+                    TEXT("M_RaftSim_CC0_RiverClothing_Dressed")));
+            Body->SetMaterial(MaterialIndex, Dressed);
+        }
+        Dressed->SetVectorParameterValue(TEXT("BaseColor"), Look->BaseColor);
+        Dressed->SetVectorParameterValue(TEXT("AccentColor"), Look->AccentColor);
+        Dressed->SetScalarParameterValue(TEXT("StripeAmount"), Look->StripeAmount);
+        Dressed->SetScalarParameterValue(TEXT("StripePeriodCm"), Look->StripePeriodCm);
+        Dressed->SetScalarParameterValue(TEXT("PrintAmount"), Look->PrintAmount);
+        Dressed->SetScalarParameterValue(TEXT("PrintScaleCm"), Look->PrintScaleCm);
+        Dressed->SetScalarParameterValue(TEXT("HeatherAmount"), Look->HeatherAmount);
+        Dressed->SetScalarParameterValue(TEXT("Roughness"), Look->Roughness);
+    }
+}
+
 void ApplyProductionBodyMaterialOverrides(
     UPoseableMeshComponent* Body,
     const USkeletalMesh* Mesh,
-    const FLinearColor& WetsuitTint)
+    const FRaftSimCrewIdentity& Identity)
 {
     if (Body == nullptr || Mesh == nullptr)
     {
         return;
     }
+    ApplyGarmentLooks(Body, Mesh, Identity);
     UMaterialInterface* ProductionWetsuit = LoadObject<UMaterialInterface>(
         nullptr,
         TEXT("/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit"));
@@ -277,7 +330,7 @@ void ApplyProductionBodyMaterialOverrides(
                     TEXT("M_RaftSim_Wetsuit_Tinted")));
             Body->SetMaterial(MaterialIndex, Tinted);
         }
-        Tinted->SetVectorParameterValue(TEXT("BaseTint"), WetsuitTint);
+        Tinted->SetVectorParameterValue(TEXT("BaseTint"), Identity.WetsuitTint);
     }
     // Slot forensics ("I still don't see faces inside the helmets",
     // 2026-09-02): which material each CC0 section actually renders with.
@@ -500,7 +553,7 @@ bool ARaftSimCC0CrewVisualActor::EnsureBodyLoaded()
         CacheReferencePose();
     }
     ApplyProductionBodyMaterialOverrides(
-        Body, Mesh, URaftSimCrewRoster::GetIdentityForVariant(CurrentVariantIndex, bCurrentGuide).WetsuitTint);
+        Body, Mesh, URaftSimCrewRoster::GetIdentityForVariant(CurrentVariantIndex, bCurrentGuide));
     bBodyReady = ReferenceComponentTransforms.Num() >= 19;
     Body->SetVisibility(bBodyReady, true);
     if (bBodyReady && (bMeshChanged || !bNeckCollarBuilt))
@@ -1158,12 +1211,38 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     const FVector RightWristCm = bPalmTarget
         ? ResolvePaddleGripWristCm(false, Pose, Pose.RightHandCm)
         : Pose.RightHandCm;
-    FVector LeftElbow =
-        FMath::Lerp(LeftShoulderCm, LeftWristCm, 0.48f) +
-        FVector(0.0f, -5.0f, -2.0f);
-    FVector RightElbow =
-        FMath::Lerp(RightShoulderCm, RightWristCm, 0.48f) +
-        FVector(0.0f, 5.0f, -2.0f);
+    // Two-bone elbows on the rig's own upper-arm and forearm lengths. The
+    // former elbow, 48 % of the way to the wrist, kept every arm straight:
+    // a hand brought in toward the chin (the T-grip) compressed the whole
+    // arm, skin and all, instead of bending it. Elbows hang down, out from
+    // the body and a little back, as when holding a paddle; a target beyond
+    // reach leaves the arm straight and the forearm takes the difference.
+    const auto SolveElbow = [&RestLengthCm](
+        bool bLeftArm, const FVector& ShoulderCm, const FVector& WristCm)
+    {
+        const float UpperCm = bLeftArm ? RestLengthCm(TEXT("upperarm_l"), TEXT("lowerarm_l"))
+                                       : RestLengthCm(TEXT("upperarm_r"), TEXT("lowerarm_r"));
+        const float LowerCm = bLeftArm ? RestLengthCm(TEXT("lowerarm_l"), TEXT("hand_l"))
+                                       : RestLengthCm(TEXT("lowerarm_r"), TEXT("hand_r"));
+        const FVector ToWrist = WristCm - ShoulderCm;
+        const float ReachCm = ToWrist.Size();
+        if (UpperCm <= 1.0f || LowerCm <= 1.0f || ReachCm <= KINDA_SMALL_NUMBER)
+        {
+            return FMath::Lerp(ShoulderCm, WristCm, 0.48f);
+        }
+        const FVector Along = ToWrist / ReachCm;
+        const FVector Pole = FVector::VectorPlaneProject(
+            FVector(-0.35f, bLeftArm ? -0.55f : 0.55f, -1.0f), Along)
+            .GetSafeNormal(SMALL_NUMBER, -FVector::UpVector);
+        const float SolvedReachCm = FMath::Clamp(
+            ReachCm, FMath::Abs(UpperCm - LowerCm) + 0.5f, UpperCm + LowerCm - 0.05f);
+        const float AlongCm = (UpperCm * UpperCm - LowerCm * LowerCm + SolvedReachCm * SolvedReachCm) /
+            (2.0f * SolvedReachCm);
+        const float OutCm = FMath::Sqrt(FMath::Max(0.0f, UpperCm * UpperCm - AlongCm * AlongCm));
+        return ShoulderCm + Along * AlongCm + Pole * OutCm;
+    };
+    FVector LeftElbow = SolveElbow(true, LeftShoulderCm, LeftWristCm);
+    FVector RightElbow = SolveElbow(false, RightShoulderCm, RightWristCm);
     // Swinging the upper-arm bone steeply DOWN from the rig's near-lateral
     // rest pose rolls the deltoid skin up beside the neck, so keep a bound
     // on the elbow's drop below the shoulder; the forearm still reaches the
@@ -1429,10 +1508,14 @@ FQuat ARaftSimCC0CrewVisualActor::ResolvePaddleGripHandRotation(
         DesiredWidth = -DesiredWidth;
     }
     const FVector ShoulderCm = bLeft ? Pose.LeftShoulderCm : Pose.RightShoulderCm;
-    // Both grips approach palm-first from the shoulder side: the shaft hand
-    // wraps the far side of the shaft, and the T-grip hand caps the grip
-    // from above (palm away from the shoulder, never underhand).
-    const FVector PalmApproachCm = GripCenterCm - ShoulderCm;
+    // The shaft hand approaches palm-first from the shoulder side and wraps
+    // the far side of the shaft. The T-grip hand caps the grip from above:
+    // its palm presses down the shaft toward the blade. (Approaching it from
+    // the shoulder too left that palm facing forward, pushing the T like a
+    // door handle.)
+    const FVector PalmApproachCm = IsUpperTGrip(Pose, GripCenterCm)
+        ? (Pose.PaddleBottomCm - Pose.PaddleTopCm)
+        : GripCenterCm - ShoulderCm;
     FVector DesiredNormal = FVector::VectorPlaneProject(
         PalmApproachCm, DesiredWidth).GetSafeNormal();
     if (ReferenceWidth.IsNearlyZero() || ReferenceNormal.IsNearlyZero() ||
@@ -1489,14 +1572,10 @@ FVector ARaftSimCC0CrewVisualActor::ResolvePaddleGripAxis(
     }
     if (IsUpperTGrip(Pose, DesiredGripCm))
     {
-        FVector TGripAxis = FVector::CrossProduct(ShaftAxis, FVector::UpVector)
-            .GetSafeNormal();
-        if (TGripAxis.IsNearlyZero())
-        {
-            TGripAxis = FVector::CrossProduct(ShaftAxis, FVector::ForwardVector)
-                .GetSafeNormal();
-        }
-        return TGripAxis.IsNearlyZero() ? FVector::RightVector : TGripAxis;
+        // Along the crossbar, which parallels the blade's width (the host
+        // draws the same axis); oriented toward -Y so either top hand caps
+        // it palm-down with its fingers forward.
+        return URaftSimCrewAvatarPoseLibrary::GetPaddleBladeWidthAxis(ShaftAxis, false);
     }
     return ShaftAxis;
 }

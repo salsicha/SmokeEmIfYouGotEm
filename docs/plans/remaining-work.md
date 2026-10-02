@@ -31,6 +31,13 @@ LATEST October 1 terrain, crew and raft pass (review section 8, docs/crew-roster
 - Crew: five people with their own looks, eyewear, guide's kit, neck collar,
   personal gaze, swimming and chatter. Vests are fitted to each seated body,
   tapered to the torso and closed at the sides.
+- Crew (October 2): the shared black wetsuit is gone. Each person wears their
+  own clothes (sun shirt, T-shirts, a striped tee, a sleeveless top; shorts,
+  board shorts, leggings), built from the body surface by
+  build_cc0_river_clothing.py and coloured from the roster. The paddle is
+  held as a rafter holds it: T-grip palm-down at eye height over the paddle
+  side, shaft near vertical, blade planted outside the tube, elbows bending
+  on the rig's own arm lengths (docs/crew-roster.md).
 - Raft: red tubes with waterline film, sun fade and scuffs, plus a throw bag,
   painters and a bow drybag.
 Pushed in c4952f7b4, 26c514a32 and b4f1bfdec; the shaded-wall and

@@ -117,6 +117,15 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
     static bool IsPaddleBladeInPowerPhase(float NormalizedPhase);
 
+    /** The blade's face normal for a shaft running T-grip to blade along
+     * Direction: forward on a working stroke, up for a paddle resting across
+     * the lap. */
+    static FVector GetPaddleBladeNormal(const FVector& Direction, bool bResting);
+
+    /** The blade's width axis, oriented toward -Y. A paddle's T-grip
+     * crossbar runs parallel to it, so the top hand's knuckles line up with
+     * the blade and the paddler can feel its angle. */
+    static FVector GetPaddleBladeWidthAxis(const FVector& Direction, bool bResting);
 
 };
 
@@ -158,6 +167,11 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Animation")
     void SetAvatarAction(ERaftSimCrewAvatarAction NewAction, float Intensity = 1.0f);
+
+    /** Validation captures: pose this avatar at one point of an action's
+     * cycle (0 catch .. 0.58 exit .. 1 the next catch for the strokes). */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Validation")
+    void SetAvatarActionPhaseForValidation(ERaftSimCrewAvatarAction NewAction, float NormalizedPhase);
 
     /**
      * Hides this avatar's head and helmet so a first-person camera can sit
