@@ -8,6 +8,7 @@
 #include "RaftSimRaftActor.h"
 #include "RaftSimWaterVfxActor.h"
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimCameraPresentation.h"
 #include "RaftSimScreenRecorderSubsystem.h"
 #include "Camera/CameraActor.h"
@@ -41,6 +42,7 @@
 #include "ShaderCompiler.h"
 
 #if !UE_BUILD_SHIPPING
+#include "RaftSimActualEddyClearanceAudit.h"
 namespace
 {
 struct FWaterFeatureDemo : TSharedFromThis<FWaterFeatureDemo>
@@ -473,11 +475,107 @@ FAutoConsoleCommandWithWorldAndArgs FeatureDemoCommand(TEXT("RaftSim.FeatureDemo
     TEXT("Isolated engine-rendered authored feature: hole|eddy|froth [label] [collision|mirror]. Writes actual hull motion and video."),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&StartWaterFeatureDemo));
 
+// One initial condition in the ACTUAL map. No added geometry, hull, current,
+// or subsequent guidance: the production raft then evolves freely.
+void ScheduleActualEddyEntry(const TArray<FString>& Args,UWorld* World)
+{
+    if(!World || Args.Num()!=1 || !RaftSimWaterFeatureKinematics::IsPlayableRiver(World->GetMapName()))return;
+    const FString Label=FPaths::MakeValidFileName(Args[0]);
+    const TWeakObjectPtr<UWorld> WeakWorld=World;
+    FTimerHandle Start;
+    World->GetTimerManager().SetTimer(Start,FTimerDelegate::CreateLambda([WeakWorld,Label]
+    {
+        UWorld* W=WeakWorld.Get();if(!W)return;
+        auto* Bridge=W->GetGameInstance()->GetSubsystem<URaftSimPhysicsBridgeSubsystem>();
+        auto* Water=Bridge ? Bridge->GetWaterRuntime() : nullptr;
+        ARaftSimRaftActor* Raft=nullptr;
+        if(TActorIterator<ARaftSimRaftActor> It(W);It)Raft=*It;
+        if(!Water || !Raft || !Water->HasFeatureKinematics())return;
+        FRaftSimGroundSourceRegistry Ground(W);
+        double BestRadius=0.;FVector BestPosition,Facing;
+        URaftSimWaterRuntimeAdapter::FSupportBoulderFootprint Selected;
+        for(const auto& Rock : Water->GetFeatureBoulderFootprints())
+        {
+            if(Rock.RadiusMeters<2.f || Rock.RadiusMeters<=BestRadius || Rock.PhysicalSource.IsEmpty())continue;
+            const FVector2D D=Rock.FlowDirection,L(-D.Y,D.X);
+            if(D.IsNearlyZero())continue;
+            bool FlowQualified=true,HasStartPosition=false;FVector StartPosition=FVector::ZeroVector;
+            for(const FVector2D Local : {FVector2D(4,.1),FVector2D(1.75,.6),FVector2D(2.25,1.25)})
+            {
+                const FVector2D Q=Rock.RiverCoordinatesMeters+(D*Local.X+L*Local.Y)*Rock.RadiusMeters;
+                FRaftSimWaterSample Raw;
+                if(!Water->SampleWaterFieldAtRiverCoordinates(Q,Raw) || !Raw.bWet){FlowQualified=false;break;}
+                const FVector Shared=Water->SampleFeatureSurfaceVelocity(Q,FVector2D(Raw.VelocityMetersPerSecond.X,Raw.VelocityMetersPerSecond.Y),Raw.DepthMeters);
+                const double Along=Shared.X*D.X+Shared.Y*D.Y,Across=Shared.X*L.X+Shared.Y*L.Y;
+                if((Local.X==4 && Along>=-.1) || (Local.X==1.75 && Across<=.05) || (Local.X==2.25 && Along<=.1))
+                {FlowQualified=false;break;}
+                if(Local.X==4)
+                {
+                    HasStartPosition=Water->RiverToWorldPosition(Q,Raw.SurfaceHeightMeters+Water->GetRiverVerticalDatumM(),StartPosition);
+                    if(!HasStartPosition){FlowQualified=false;break;}
+                }
+            }
+            if(!FlowQualified || !HasStartPosition)continue;
+            // Conservative initial-condition clearance probes only. They
+            // do not replace the production raft's actual hull/contact.
+            // Directly behind the obstacle, with a small nonzero offset to
+            // avoid an exactly symmetric initial condition. The earlier .4R
+            // entry put the finite-width hull on the outer shear/exit branch.
+            const FVector2D Q0=Rock.RiverCoordinatesMeters+(D*4.+L*.1)*Rock.RadiusMeters;
+            for(const FVector2D Offset : {FVector2D(0,0),FVector2D(3,1.4),FVector2D(3,-1.4),FVector2D(-3,1.4),FVector2D(-3,-1.4)})
+            {
+                FRaftSimWaterSample Raw;FVector P,Normal;double GroundZ=0.;
+                const FVector2D Q=Q0+D*Offset.X+L*Offset.Y;
+                if(!Water->SampleWaterFieldAtRiverCoordinates(Q,Raw) || !Raw.bWet || Raw.DepthMeters<.6 ||
+                    !Water->RiverToWorldPosition(Q,Raw.SurfaceHeightMeters+Water->GetRiverVerticalDatumM(),P) ||
+                    !Ground.SampleGround(P,GroundZ,Normal) || P.Z-GroundZ<50.)
+                {FlowQualified=false;break;}
+            }
+            if(!FlowQualified)continue;
+            FVector Ahead;
+            if(!Water->RiverToWorldPosition(Q0+D,StartPosition.Z*.01,Ahead))continue;
+            Facing=Ahead-StartPosition;BestPosition=StartPosition+FVector(0,0,40);
+            Selected=Rock;BestRadius=Rock.RadiusMeters;
+        }
+        if(BestRadius<=0.)
+        {
+            UE_LOG(LogTemp,Error,TEXT("Actual EddyEntry refused: no existing physical owner has verified return/head/exit wet flow and safe production-raft initial clearance; nothing moved"));
+            return;
+        }
+        Raft->TeleportForTesting(BestPosition,Facing.Rotation().Yaw,true);
+        auto Receipt=MakeShared<FJsonObject>();
+        Receipt->SetStringField(TEXT("scope"),TEXT("One verified initial-condition placement of the existing production raft in the actual river. No subsequent guidance, forced trajectory, new hull, or authored current override."));
+        Receipt->SetStringField(TEXT("physical_source"),Selected.PhysicalSource);
+        Receipt->SetNumberField(TEXT("world_seconds"),W->GetTimeSeconds());
+        Receipt->SetNumberField(TEXT("owner_hydraulic_x_m"),Selected.RiverCoordinatesMeters.X);
+        Receipt->SetNumberField(TEXT("owner_hydraulic_y_m"),Selected.RiverCoordinatesMeters.Y);
+        Receipt->SetNumberField(TEXT("owner_direction_x"),Selected.FlowDirection.X);
+        Receipt->SetNumberField(TEXT("owner_direction_y"),Selected.FlowDirection.Y);
+        Receipt->SetNumberField(TEXT("inferred_radius_m"),BestRadius);
+        Receipt->SetNumberField(TEXT("entry_local_x_radius"),4.);
+        Receipt->SetNumberField(TEXT("entry_local_y_radius"),.1);
+        RaftSimActualEddyClearanceAudit::Run(W,Water,Selected,Receipt);
+        FString Json;FJsonSerializer::Serialize(Receipt,TJsonWriterFactory<>::Create(&Json));
+        IFileManager::Get().MakeDirectory(*(FPaths::ProjectSavedDir()/TEXT("WaterFeatureDemo")),true);
+        FFileHelper::SaveStringToFile(Json,*(FPaths::ProjectSavedDir()/TEXT("WaterFeatureDemo")/(Label+TEXT("-entry.json"))));
+        UE_LOG(LogTemp,Display,TEXT("Actual EddyEntry placed existing raft once: owner=(%.3f,%.3f) radius=%.3f source=%s"),Selected.RiverCoordinatesMeters.X,Selected.RiverCoordinatesMeters.Y,BestRadius,*Selected.PhysicalSource);
+    }),8.f,false);
+}
+FAutoConsoleCommandWithWorldAndArgs ActualEddyEntryCommand(TEXT("RaftSim.EddyEntry"),
+    TEXT("One safe initial-condition placement behind an existing physical playable-river obstacle: [label]. Production boat then evolves freely."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&ScheduleActualEddyEntry));
+
 // Diagnostic only: verify the public hull sampler agrees with the exact
 // surface-current evaluator used by foam, at actual loaded river positions.
 void ScheduleFeatureAudit(const TArray<FString>& Args,UWorld* World)
 {
-    if(!World || Args.Num()!=1)return;
+    if(!World || Args.Num()<1 || Args.Num()>2)return;
+    const float DurationSeconds=Args.Num()==2 ? FCString::Atof(*Args[1]) : 10.f;
+    if(!FMath::IsFinite(DurationSeconds) || DurationSeconds<1.f || DurationSeconds>120.f)
+    {
+        UE_LOG(LogTemp,Error,TEXT("FeatureAudit duration must be between 1 and 120 world seconds; no audit started"));
+        return;
+    }
     const FString Label=Args[0];const TWeakObjectPtr<UWorld> WeakWorld=World;
     auto Motion=MakeShared<TArray<TSharedPtr<FJsonValue>>>();
     FTimerHandle MotionTimer;
@@ -493,10 +591,22 @@ void ScheduleFeatureAudit(const TArray<FString>& Args,UWorld* World)
         Row->SetNumberField(TEXT("world_z_m"),P.Z*.01);Row->SetNumberField(TEXT("yaw_deg"),R.Yaw);
         Row->SetNumberField(TEXT("pitch_deg"),R.Pitch);Row->SetNumberField(TEXT("roll_deg"),R.Roll);
         Row->SetNumberField(TEXT("speed_mps"),S.LinearVelocityMetersPerSecond.Size());
+        Row->SetNumberField(TEXT("velocity_world_x_mps"),S.LinearVelocityMetersPerSecond.X);
+        Row->SetNumberField(TEXT("velocity_world_y_mps"),S.LinearVelocityMetersPerSecond.Y);
+        Row->SetNumberField(TEXT("velocity_world_z_mps"),S.LinearVelocityMetersPerSecond.Z);
+        auto* Water=Bridge->GetWaterRuntime();
+        FVector2D Coordinates;FVector Tangent,Left;
+        if(Water && Water->WorldToRiverCoordinates(P,Coordinates,Tangent,Left))
+        {
+            Row->SetNumberField(TEXT("hydraulic_x_m"),Coordinates.X);
+            Row->SetNumberField(TEXT("hydraulic_y_m"),Coordinates.Y);
+            Row->SetNumberField(TEXT("velocity_hydraulic_x_mps"),FVector::DotProduct(S.LinearVelocityMetersPerSecond,Tangent));
+            Row->SetNumberField(TEXT("velocity_hydraulic_y_mps"),FVector::DotProduct(S.LinearVelocityMetersPerSecond,Left));
+        }
         Motion->Add(MakeShared<FJsonValueObject>(Row));
     }),.5f,true);
     FTimerHandle AuditTimer;
-    World->GetTimerManager().SetTimer(AuditTimer,FTimerDelegate::CreateLambda([WeakWorld,Label,Motion,MotionTimer]() mutable
+    World->GetTimerManager().SetTimer(AuditTimer,FTimerDelegate::CreateLambda([WeakWorld,Label,Motion,MotionTimer,DurationSeconds]() mutable
     {
         UWorld* W=WeakWorld.Get();if(!W)return;
         W->GetTimerManager().ClearTimer(MotionTimer);
@@ -540,15 +650,49 @@ void ScheduleFeatureAudit(const TArray<FString>& Args,UWorld* World)
         Report->SetNumberField(TEXT("maximum_shared_surface_error_mps"),MaximumError);Report->SetNumberField(TEXT("dry_became_wet"),DryViolations);
         Report->SetArrayField(TEXT("examples"),Examples);
         Report->SetArrayField(TEXT("actual_boat_motion"),*Motion);
+        Report->SetStringField(TEXT("motion_sampling_scope"),TEXT("Actual production raft states sampled by a world timer every 0.5 seconds; render-timer receipts, not fixed-step traces or interpolated motion."));
+        Report->SetNumberField(TEXT("requested_audit_duration_seconds"),DurationSeconds);
+        Report->SetNumberField(TEXT("audit_world_seconds"),W->GetTimeSeconds());
+        TArray<TSharedPtr<FJsonValue>> RockRows;
+        for(const auto& Rock : Water->GetFeatureBoulderFootprints())
+        {
+            auto Item=MakeShared<FJsonObject>();
+            Item->SetNumberField(TEXT("hydraulic_x_m"),Rock.RiverCoordinatesMeters.X);
+            Item->SetNumberField(TEXT("hydraulic_y_m"),Rock.RiverCoordinatesMeters.Y);
+            Item->SetNumberField(TEXT("radius_m"),Rock.RadiusMeters);
+            Item->SetStringField(TEXT("physical_source"),Rock.PhysicalSource);
+            Item->SetStringField(TEXT("radius_scope"),TEXT("Inferred/authored wake scale; the existing physical mesh/contact owns solid geometry, not this radius."));
+            Item->SetNumberField(TEXT("owner_direction_x"),Rock.FlowDirection.X);
+            Item->SetNumberField(TEXT("owner_direction_y"),Rock.FlowDirection.Y);
+            TArray<TSharedPtr<FJsonValue>> Probes;
+            for(const FVector2D& Local : {FVector2D(4,0),FVector2D(4,.4),FVector2D(1.75,.6),FVector2D(2.25,1.25)})
+            {
+                const FVector2D D=Rock.FlowDirection,L(-D.Y,D.X);
+                const FVector2D Q=Rock.RiverCoordinatesMeters+(D*Local.X+L*Local.Y)*Rock.RadiusMeters;
+                FRaftSimWaterSample Raw;
+                if(!Water->SampleWaterFieldAtRiverCoordinates(Q,Raw) || !Raw.bWet)continue;
+                const FVector2D Base(Raw.VelocityMetersPerSecond.X,Raw.VelocityMetersPerSecond.Y);
+                const FVector Shared=Water->SampleFeatureSurfaceVelocity(Q,Base,Raw.DepthMeters);
+                auto Probe=MakeShared<FJsonObject>();
+                Probe->SetNumberField(TEXT("local_x_radius"),Local.X);Probe->SetNumberField(TEXT("local_y_radius"),Local.Y);
+                Probe->SetNumberField(TEXT("shared_along_mps"),Shared.X*D.X+Shared.Y*D.Y);
+                Probe->SetNumberField(TEXT("shared_across_mps"),Shared.X*L.X+Shared.Y*L.Y);
+                Probes.Add(MakeShared<FJsonValueObject>(Probe));
+            }
+            Item->SetArrayField(TEXT("actual_wet_shared_current_probes"),Probes);
+            RockRows.Add(MakeShared<FJsonValueObject>(Item));
+        }
+        Report->SetNumberField(TEXT("active_physical_eddy_owners"),RockRows.Num());
+        Report->SetArrayField(TEXT("physical_eddy_owners"),RockRows);
         FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
         IFileManager::Get().MakeDirectory(*(FPaths::ProjectSavedDir()/TEXT("WaterFeatureDemo")),true);
         FFileHelper::SaveStringToFile(Json,*(FPaths::ProjectSavedDir()/TEXT("WaterFeatureDemo")/(Label+TEXT(".json"))));
         UE_LOG(LogTemp,Display,TEXT("SharedFeatureAudit enabled=%d wet=%d changed=%d max_delta=%g max_error=%g dry_became_wet=%d"),
             int32(Water->HasFeatureKinematics()),Wet,Changed,MaximumDelta,MaximumError,DryViolations);
-    }),10.f,false);
+    }),DurationSeconds,false);
 }
 FAutoConsoleCommandWithWorldAndArgs FeatureAuditCommand(TEXT("RaftSim.FeatureAudit"),
-    TEXT("After ten seconds, audit actual shared current/hull surface parity: [label]."),
+    TEXT("Audit actual shared current/hull surface parity and motion: [label] [duration_seconds=10]."),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&ScheduleFeatureAudit));
 }
 #endif

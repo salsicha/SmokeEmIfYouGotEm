@@ -21,15 +21,11 @@ inline double WakePsi(double X,double Y)
     // The inner branch returns upstream; its upstream end turns outward,
     // and the outer branch runs downstream. The exact symmetry axis is a
     // separatrix: no invented lateral kick chooses a side for a boat.
-    return -3.*2.*Y*RaftSimWaterFeatureKinematics::Compact((X-13.)/13.)*
-        RaftSimWaterFeatureKinematics::Compact(Y/8.);
+    return RaftSimWaterFeatureKinematics::EddyWakePsi(X,Y,HalfWidthM,2.);
 }
 inline FVector WakeDelta(double X,double Y)
 {
-    using namespace RaftSimWaterFeatureKinematics;
-    const double Tx=(X-13.)/13.,Ty=Y/8.;
-    return FVector(-6.*Compact(Tx)*(Compact(Ty)+Ty*CompactDerivative(Ty)),
-        6.*Y*CompactDerivative(Tx)*Compact(Ty)/13.,0.);
+    return RaftSimWaterFeatureKinematics::EddyDelta(X,Y,HalfWidthM,2.);
 }
 
 inline FVector Velocity(const FVector& P)

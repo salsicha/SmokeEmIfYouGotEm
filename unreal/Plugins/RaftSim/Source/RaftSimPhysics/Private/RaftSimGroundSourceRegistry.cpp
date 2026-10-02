@@ -174,6 +174,12 @@ bool FRaftSimGroundSourceRegistry::SampleGround(const FVector& WorldPositionCm,
                     NormalProbeOffsetCm,
                 1.0f).GetSafeNormal();
         }
+        // Identify the actual Complex heightfield that supplied this sample.
+        // This is provenance, not a fabricated blocking trace or new collider;
+        // terrain height, normal and all contact behavior stay unchanged.
+        if(OutCapturedHit)
+            *OutCapturedHit=FHitResult(const_cast<ALandscapeProxy*>(HighestLandscape),nullptr,
+                FVector(WorldPositionCm.X,WorldPositionCm.Y,OutGroundZCm),OutGroundNormal);
         return true;
     }
     return false;

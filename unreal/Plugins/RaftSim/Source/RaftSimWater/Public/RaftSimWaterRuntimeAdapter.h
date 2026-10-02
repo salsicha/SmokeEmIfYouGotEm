@@ -368,6 +368,9 @@ public:
         /** Stable owner direction sampled once around the obstruction. Zero
          * retains the legacy local-current frame for independent fixtures. */
         FVector2D FlowDirection = FVector2D::ZeroVector;
+        /** Existing physical component receipt; empty for legacy fixtures.
+         * Wake radius remains an authored/inferred scale, not a new collider. */
+        FString PhysicalSource;
     };
 
     void ConfigureRaftSupportBoulderFootprints(
@@ -383,6 +386,8 @@ public:
     }
     FVector ComputeFeatureVelocityAtRiverCoordinates(const FVector2D& P,
         const FVector2D& BaseVelocity, float DepthM, float DepthFraction = 1.0f) const;
+    TConstArrayView<FSupportBoulderFootprint> GetFeatureBoulderFootprints() const
+    { return FeatureBoulderFootprints; }
     using FFeatureSurfaceTransportSampler=TFunction<bool(const FVector2D&,FVector2D&,float&)>;
     void SetFeatureSurfaceTransportSampler(UObject* Owner,FFeatureSurfaceTransportSampler Sampler)
     {FeatureSurfaceTransportOwner=Owner;FeatureSurfaceTransportSampler=MoveTemp(Sampler);}

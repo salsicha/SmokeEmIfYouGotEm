@@ -19,6 +19,10 @@
 #include "RaftSimWaterSmoothing.h"
 #include "RaftSimWaterFlowFrame.h"
 #include "RaftSimWaterFeatureKinematics.h"
+#include "RaftSimRockObstacleActor.h"
+#include "RaftSimCartesianEddyOwners.h"
+#include "RaftSimPhysicalEddyExposure.h"
+#include "RaftSimSurfaceWinding.h"
 #include "RaftSimIndexedBreakingProfile.h"
 #include "RaftSimFineCrestIndexAudit.h"
 #include "RaftSimInlineCrestAudit.h"
@@ -46,6 +50,7 @@
 #include "RenderingThread.h"
 #include "RHICommandList.h"
 #include "Engine/World.h"
+#include "Engine/StaticMesh.h"
 #include "EngineUtils.h"
 #include "HAL/IConsoleManager.h"
 #include "HAL/PlatformTime.h"
@@ -1283,7 +1288,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     {
         // Ordinary South Fork launches, not a review-only command-line path.
         WaterAdapter->ConfigureFeatureKinematics(bUsesAuthoredRiverPresentation &&
-            GetWorld() && RaftSimWaterFeatureKinematics::IsPlayableSouthFork(GetWorld()->GetMapName()));
+            GetWorld() && RaftSimWaterFeatureKinematics::IsPlayableRiver(GetWorld()->GetMapName()));
     }
     bSpatialBreakingReview = bUsesSouthForkFullReachSingleSurface &&
         GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
@@ -4015,12 +4020,65 @@ void ARaftSimWaterSurfaceActor::UpdateSurfaceCarrierMesh(bool bCreate,const TArr
 {
     TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimWater_UpdateSurfaceCarrierMesh);
     const TArray<FVector2D> EmptyUVs;
+    // Compact captured maps use SurfaceMesh, not LiveVolumeCoreMesh. UV1
+    // remains the bulk current; UV3 carries the actual shared foam current.
+    // The GPU review carrier owns UV3 as macro coordinates and is untouched.
+    const bool bSharedTransport=WaterAdapter && WaterAdapter->HasFeatureKinematics() &&
+        !bStatefulGPUCarrierReview && FoamTransportVelocityMetersPerSecond.Num()==Vertices.Num();
+    const TArray<FVector2D>& Transport=bSharedTransport ? FoamTransportVelocityMetersPerSecond : EmptyUVs;
+    const auto AuditTransport=[&](const TArray<FVector2D>& Expected,const TArray<FVector2D>& Bulk)
+    {
+#if !UE_BUILD_SHIPPING
+        FString Path;
+        if(!bSharedTransport || !bFoamFieldValid || !GetWorld() || GetWorld()->GetTimeSeconds()<10.f ||
+            !FParse::Value(FCommandLine::Get(),TEXT("RaftSimFoamTransportAudit="),Path) || FPaths::FileExists(Path))return;
+        const FProcMeshSection* Section=SurfaceMesh->GetProcMeshSection(0);
+        const int32 N=Expected.Num();
+        const bool Shape=Section && Section->ProcVertexBuffer.Num()==N && Bulk.Num()==N;
+        int32 NonFinite=0,Moving=0,Changed=0;double Error=0,BulkError=0,MaximumSpeed=0;
+        if(Shape)for(int32 I=0;I<N;++I)
+        {
+            const auto& V=Section->ProcVertexBuffer[I];
+            if(V.UV3.ContainsNaN() || Expected[I].ContainsNaN()){++NonFinite;continue;}
+            Error=FMath::Max(Error,(V.UV3-Expected[I]).Size());
+            BulkError=FMath::Max(BulkError,(V.UV1-Bulk[I]).Size());
+            MaximumSpeed=FMath::Max(MaximumSpeed,V.UV3.Size());
+            Moving+=V.UV3.SizeSquared()>1.e-8;Changed+=(Expected[I]-Bulk[I]).SizeSquared()>1.e-8;
+        }
+        FLinearColor Clock=FLinearColor::Black;
+        bool ClockPresent=false;
+        if(auto* M=Cast<UMaterialInstanceDynamic>(SurfaceMesh->GetMaterial(0)))
+            ClockPresent=M->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("RaftSimCPUFoamClock")),Clock);
+        auto Report=MakeShared<FJsonObject>();
+        Report->SetStringField(TEXT("schema"),TEXT("raftsim.carrier_foam_transport_payload.v1"));
+        Report->SetStringField(TEXT("scope"),TEXT("Actual compact carrier UV3 and published CPU optical phase; no pixel, boat, CFD or FPS acceptance."));
+        Report->SetStringField(TEXT("map"),GetWorld()->GetMapName());
+        if(auto* M=SurfaceMesh->GetMaterial(0))Report->SetStringField(TEXT("base_material"),M->GetMaterial()->GetPathName());
+        Report->SetBoolField(TEXT("feature_current_enabled"),bSharedTransport);
+        Report->SetBoolField(TEXT("shape_valid"),Shape);
+        Report->SetNumberField(TEXT("vertices"),N);
+        Report->SetNumberField(TEXT("moving_transport_vertices"),Moving);
+        Report->SetNumberField(TEXT("transport_differs_from_bulk_vertices"),Changed);
+        Report->SetNumberField(TEXT("non_finite_vertices"),NonFinite);
+        Report->SetNumberField(TEXT("maximum_submitted_transport_error_mps"),Error);
+        Report->SetNumberField(TEXT("maximum_bulk_channel_error_mps"),BulkError);
+        Report->SetNumberField(TEXT("maximum_transport_speed_mps"),MaximumSpeed);
+        Report->SetNumberField(TEXT("cpu_foam_phase_seconds"),FoamWaterClock.TargetSeconds());
+        Report->SetBoolField(TEXT("material_clock_present"),ClockPresent);
+        Report->SetNumberField(TEXT("material_clock_error_seconds"),FMath::Abs(double(Clock.R)+double(Clock.G)-FoamWaterClock.TargetSeconds()));
+        FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
+        const bool Saved=FFileHelper::SaveStringToFile(Json,*Path);
+        UE_LOG(LogTemp,Display,TEXT("CarrierFoamTransportAudit shape=%d moving=%d nonfinite=%d error=%g clock=%d saved=%d"),int32(Shape),Moving,NonFinite,Error,int32(ClockPresent),int32(Saved));
+#endif
+    };
     // Source topology/refinement remains in solver station/lateral space.
-    // A reflected geographic world changes front-face winding only on upload.
+    // Geographic metadata alone is not actual geometry handedness: compact
+    // Cartesian coordinates can already include that conversion. Inspect
+    // the actual base vertices so a single-sided carrier is not flipped twice.
     TArray<int32> ReflectedTriangles;
     const auto WorldWinding = [&](const TArray<int32>& Source) -> const TArray<int32>&
     {
-        if (!WaterAdapter || WaterAdapter->GetRiverWorldYSign() > 0) return Source;
+        if (!RaftSimSurfaceWinding::NeedsClockwiseFlip(Vertices,Triangles)) return Source;
         ReflectedTriangles=Source;
         for (int32 I=0;I+2<ReflectedTriangles.Num();I+=3) Swap(ReflectedTriangles[I+1],ReflectedTriangles[I+2]);
         return ReflectedTriangles;
@@ -4028,9 +4086,10 @@ void ARaftSimWaterSurfaceActor::UpdateSurfaceCarrierMesh(bool bCreate,const TArr
     if (!bStatefulDetailGeometryReview && !bPlayableCrestRefinement)
     {
         if (bCreate)SurfaceMesh->CreateMeshSection_LinearColor(0,Vertices,WorldWinding(Triangles),Normals,UVs,
-            FlowVelocityMetersPerSecond,BoatWakePresentationData,EmptyUVs,Colors,Tangents,false);
+            FlowVelocityMetersPerSecond,BoatWakePresentationData,Transport,Colors,Tangents,false);
         else SurfaceMesh->UpdateMeshSection_LinearColor(0,Vertices,Normals,UVs,
-            FlowVelocityMetersPerSecond,BoatWakePresentationData,EmptyUVs,Colors,Tangents,false);
+            FlowVelocityMetersPerSecond,BoatWakePresentationData,Transport,Colors,Tangents,false);
+        AuditTransport(Transport,FlowVelocityMetersPerSecond);
         return;
     }
     const bool bRebuild=DetailRefinement.SourceVertexCount!=Vertices.Num() || DetailRefinementOrigin!=RiverCoordinatesM[0];
@@ -4069,6 +4128,8 @@ void ARaftSimWaterSurfaceActor::UpdateSurfaceCarrierMesh(bool bCreate,const TArr
     }
     DetailRefinement.Expand(Vertices,RefinedVertices);DetailRefinement.Expand(Normals,RefinedNormals);
     DetailRefinement.Expand(UVs,RefinedUVs);DetailRefinement.Expand(FlowVelocityMetersPerSecond,RefinedFlow);
+    if(bSharedTransport)DetailRefinement.Expand(Transport,RefinedFoamTransport);
+    else RefinedFoamTransport.Reset();
     DetailRefinement.Expand(BoatWakePresentationData,RefinedWake);DetailRefinement.Expand(Colors,RefinedColors);
     RefinedTangents.SetNumUninitialized(RefinedVertices.Num());
     for (int32 I=0;I<Tangents.Num();++I)RefinedTangents[I]=Tangents[I];
@@ -4155,9 +4216,10 @@ void ARaftSimWaterSurfaceActor::UpdateSurfaceCarrierMesh(bool bCreate,const TArr
         }
     }
     if (bCreate || bRebuild)SurfaceMesh->CreateMeshSection_LinearColor(0,RefinedVertices,WorldWinding(DetailRefinement.Triangles),
-        RefinedNormals,RefinedUVs,RefinedFlow,RefinedWake,bStatefulGPUCarrierReview ? RefinedMacroCoordinates : EmptyUVs,RefinedColors,RefinedTangents,false);
+        RefinedNormals,RefinedUVs,RefinedFlow,RefinedWake,bStatefulGPUCarrierReview ? RefinedMacroCoordinates : RefinedFoamTransport,RefinedColors,RefinedTangents,false);
     else SurfaceMesh->UpdateMeshSection_LinearColor(0,RefinedVertices,RefinedNormals,
-        RefinedUVs,RefinedFlow,RefinedWake,EmptyUVs,RefinedColors,RefinedTangents,false);
+        RefinedUVs,RefinedFlow,RefinedWake,RefinedFoamTransport,RefinedColors,RefinedTangents,false);
+    AuditTransport(RefinedFoamTransport,RefinedFlow);
 }
 
 void ARaftSimWaterSurfaceActor::RefreshSurface()
@@ -4241,6 +4303,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     };
     FBox2D LiveCropBounds(ForceInit);
     const bool bHasLiveCropBounds = bCartesianFlow && WaterAdapter->GetLiveWaterFieldBoundsM(LiveCropBounds);
+    // Physical owner locality uses actual live solver coordinates on curved
+    // maps too. Do not reuse the Cartesian-only shoreline handover flag:
+    // that would silently exclude every existing curved-map contact actor.
+    FBox2D FeatureOwnerBounds(ForceInit);
+    const bool bHasFeatureOwnerBounds=WaterAdapter && WaterAdapter->GetLiveWaterFieldBoundsM(FeatureOwnerBounds);
     const auto CropAuthorityFor = [this, bCartesianFlow, bHasLiveCropBounds, LiveCropBounds](int32 Index)
     {
         if (bCartesianFlow)
@@ -4255,6 +4322,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     Scratch.Reset(Vertices.Num());
     auto& WetVertexMask=Scratch.Wet;
     auto& LiveSolverWetVertexMask=Scratch.LiveWet;
+    // LiveWet later includes shoreline presentation vetoes. Physical eddy
+    // ownership must retain the original wet/dry verdict before those edits.
+    auto& RawSolverWetVertexMask=Scratch.RawLiveWet;
     // Which vertices the live solver actually answered for this refresh
     // (wet OR dry), and the feathered presence contribution of baseline-only
     // shoreline water inside the crop's authority handover band.
@@ -4321,6 +4391,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 if (bCartesianFlow) CartesianShoreAvailable[Index] = bSampled || bBaselineSampled;
                 LiveSolverWetVertexMask[Index] =
                     bSampled && Sample.bWet ? 1 : 0;
+                RawSolverWetVertexMask[Index] = LiveSolverWetVertexMask[Index];
                 if (bBaselineSampled && Sample.bWet)
                 {
                     FeatheredBaselineWet[Index] = 1.0f;
@@ -4621,6 +4692,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         bSourceAuditWritten=true;
         auto SavedSamples=WaterSamples;
         auto SavedWet=WetVertexMask, SavedLiveWet=LiveSolverWetVertexMask;
+        auto SavedRawWet=RawSolverWetVertexMask;
         auto SavedSampled=SolverSampledVertexMask, SavedAvailable=CartesianShoreAvailable;
         auto SavedProbeWanted=BaselineKeepProbeWanted;
         auto SavedFeather=FeatheredBaselineWet, SavedHeights=PresentationSurfaceHeightMeters;
@@ -4630,6 +4702,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         {
             WaterSamples.Init(FRaftSimWaterSample{},Count);
             WetVertexMask.Init(0,Count); LiveSolverWetVertexMask.Init(0,Count);
+            RawSolverWetVertexMask.Init(0,Count);
             SolverSampledVertexMask.Init(0,Count); CartesianShoreAvailable.Init(0,Count);
             BaselineKeepProbeWanted.Init(0,Count); FeatheredBaselineWet.Init(0.f,Count);
             PresentationSurfaceHeightMeters.Init(0.f,Count);
@@ -4644,6 +4717,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     A.VelocityMetersPerSecond==B.VelocityMetersPerSecond && A.SurfaceNormal==B.SurfaceNormal && A.bWet==B.bWet)) return false;
             }
             return SavedWet==WetVertexMask && SavedLiveWet==LiveSolverWetVertexMask &&
+                SavedRawWet==RawSolverWetVertexMask &&
                 SavedSampled==SolverSampledVertexMask && SavedAvailable==CartesianShoreAvailable &&
                 SavedProbeWanted==BaselineKeepProbeWanted && SavedFeather==FeatheredBaselineWet &&
                 SavedHeights==PresentationSurfaceHeightMeters;
@@ -4660,6 +4734,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 A.VelocityMetersPerSecond==B.VelocityMetersPerSecond && A.SurfaceNormal==B.SurfaceNormal && A.bWet==B.bWet);
         }
         const bool SameFields=SavedWet==WetVertexMask && SavedLiveWet==LiveSolverWetVertexMask &&
+            SavedRawWet==RawSolverWetVertexMask &&
             SavedSampled==SolverSampledVertexMask && SavedAvailable==CartesianShoreAvailable &&
             SavedProbeWanted==BaselineKeepProbeWanted && SavedFeather==FeatheredBaselineWet &&
             SavedHeights==PresentationSurfaceHeightMeters;
@@ -4698,6 +4773,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         bCacheAtlasStencil=SavedCacheAtlasStencil;
         WaterSamples=MoveTemp(SavedSamples); WetVertexMask=MoveTemp(SavedWet);
         LiveSolverWetVertexMask=MoveTemp(SavedLiveWet); SolverSampledVertexMask=MoveTemp(SavedSampled);
+        RawSolverWetVertexMask=MoveTemp(SavedRawWet);
         CartesianShoreAvailable=MoveTemp(SavedAvailable); BaselineKeepProbeWanted=MoveTemp(SavedProbeWanted);
         FeatheredBaselineWet=MoveTemp(SavedFeather); PresentationSurfaceHeightMeters=MoveTemp(SavedHeights);
         TSharedRef<FJsonObject> Audit=MakeShared<FJsonObject>();
@@ -5137,6 +5213,124 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             Support.FlowDirection=OwnerVelocity.GetSafeNormal();
         }
         WaterAdapter->ConfigureFeatureBoulderFootprints(SupportFootprints);
+        if (WaterAdapter->HasFeatureKinematics())
+        {
+            // All coordinate systems share the same physical-ground checks.
+            // Existing contact geometry, never scenery alone, owns the wake.
+            SupportFootprints.Reset();
+            for (TActorIterator<ARaftSimRockObstacleActor> It(GetWorld()); It; ++It)
+            {
+                if (bCartesianFlow && !It->ActorHasTag(TEXT("RaftSimFullReachBoulderContact"))) continue;
+                FVector2D Center; FVector Tangent,Left;
+                if (!WaterAdapter->WorldToRiverCoordinates(It->GetActorLocation(),Center,Tangent,Left)) continue;
+                const float Radius=It->GetContactRadiusM();
+                if (!FMath::IsFinite(Radius) || Radius<=0.f ||
+                    !bHasFeatureOwnerBounds || !FeatureOwnerBounds.ExpandBy(7.f*Radius).IsInside(Center)) continue;
+                FVector2D OwnerVelocity=FVector2D::ZeroVector;
+                int32 WetRing=0;
+                for(const FVector2D& Direction : {FVector2D(1,0),FVector2D(-1,0),FVector2D(0,1),FVector2D(0,-1)})
+                {
+                    FRaftSimWaterSample Sample;
+                    if(WaterAdapter->SampleWaterFieldAtRiverCoordinates(Center+Direction*FMath::Max(2.f*Radius,2.f),Sample) && Sample.bWet)
+                    {OwnerVelocity+=FVector2D(Sample.VelocityMetersPerSecond.X,Sample.VelocityMetersPerSecond.Y);++WetRing;}
+                }
+                if(WetRing<2 || OwnerVelocity.IsNearlyZero()) continue;
+                auto& EddyOwnerFootprint=SupportFootprints.AddDefaulted_GetRef();
+                EddyOwnerFootprint.RiverCoordinatesMeters=Center;EddyOwnerFootprint.RadiusMeters=Radius;
+                EddyOwnerFootprint.FlowDirection=OwnerVelocity.GetSafeNormal();
+                EddyOwnerFootprint.PhysicalSource=It->GetPathName();
+            }
+            // An exposed captured rock can join a bank, so it is not always
+            // an enclosed solver-dry island. Bind the explicitly installed
+            // captured rock component, never arbitrary terrain tile bounds.
+            // Its existing render/contact mesh remains the only collider.
+            if(!CarrierGroundSources)
+                CarrierGroundSources=MakeShared<FRaftSimGroundSourceRegistry>(GetWorld());
+            CarrierGroundSources->RefreshIfDirty();
+            int32 CapturedRockComponents=0;
+            for(const auto& WeakMesh : CarrierGroundSources->Meshes)
+            {
+                auto* Mesh=WeakMesh.Get();
+                if(!Mesh || !Mesh->IsQueryCollisionEnabled() || !Mesh->GetStaticMesh() ||
+                    Mesh->GetStaticMesh()->GetName()!=TEXT("SM_CapturedRockEnvelope"))continue;
+                ++CapturedRockComponents;
+                FVector2D Center;FVector Tangent,Left;
+                if(!WaterAdapter->WorldToRiverCoordinates(Mesh->Bounds.Origin,Center,Tangent,Left))continue;
+                // Equal-area horizontal bound is an inferred wake scale.
+                // It does not assert a circular measured rock footprint.
+                const FVector Extent=Mesh->Bounds.BoxExtent*.01;
+                const double Radius=FMath::Sqrt(4.*Extent.X*Extent.Y/UE_DOUBLE_PI);
+                if(!FMath::IsFinite(Radius) || Radius<.75 || Radius>32. ||
+                    !bHasFeatureOwnerBounds || !FeatureOwnerBounds.ExpandBy(7.*Radius).IsInside(Center))continue;
+                FVector2D CollarVelocity=FVector2D::ZeroVector;
+                double CollarSurfaceM=0.;int32 WetCollar=0;
+                for(const FVector2D Direction : {FVector2D(1,0),FVector2D(-1,0),FVector2D(0,1),FVector2D(0,-1)})
+                {
+                    FRaftSimWaterSample Sample;
+                    if(WaterAdapter->SampleWaterFieldAtRiverCoordinates(Center+Direction*(2.*Radius),Sample) && Sample.bWet)
+                    {
+                        CollarVelocity+=FVector2D(Sample.VelocityMetersPerSecond.X,Sample.VelocityMetersPerSecond.Y);
+                        CollarSurfaceM+=Sample.SurfaceHeightMeters;++WetCollar;
+                    }
+                }
+                if(WetCollar<2 || CollarVelocity.IsNearlyZero())continue;
+                FVector GroundNormal;double GroundZCm=0.;FHitResult CapturedHit;
+                if(!CarrierGroundSources->SampleGround(Mesh->Bounds.Origin,GroundZCm,GroundNormal,&CapturedHit) ||
+                    CapturedHit.GetComponent()!=Mesh ||
+                    !RaftSimPhysicalEddyExposure::IsExposed(GroundZCm,CollarSurfaceM/WetCollar))continue;
+                bool Duplicate=false;
+                for(const auto& Existing : SupportFootprints)
+                    Duplicate|=(Existing.RiverCoordinatesMeters-Center).Size()<Existing.RadiusMeters+Radius;
+                if(Duplicate)continue;
+                auto& CapturedRock=SupportFootprints.AddDefaulted_GetRef();
+                CapturedRock.RiverCoordinatesMeters=Center;CapturedRock.RadiusMeters=Radius;
+                CapturedRock.FlowDirection=CollarVelocity.GetSafeNormal();
+                CapturedRock.PhysicalSource=Mesh->GetPathName();
+            }
+            // Captured terrain owns today's reconstructed map. Discover only
+            // enclosed solver-dry islands, then independently verify exposed
+            // ground using the very registry used by production raft contact.
+            const auto Islands=RaftSimCartesianEddyOwners::Find(RawSolverWetVertexMask,SolverSampledVertexMask,
+                RiverCoordinatesM,GridStationN,GridLateralN,ResolvedVertexSpacingMeters);
+            // Reuse the carrier's streaming-invalidated contact registry;
+            // rediscovering every physical component each refresh is unnecessary.
+            if(!Islands.IsEmpty() && !CarrierGroundSources)
+                CarrierGroundSources=MakeShared<FRaftSimGroundSourceRegistry>(GetWorld());
+            for(const auto& Island : Islands)
+            {
+                FVector2D CollarVelocity=FVector2D::ZeroVector;double CollarSurfaceM=0.;int32 WetCollar=0;
+                for(const int32 I : Island.Collar)
+                {
+                    // WaterSamples can also carry presentation-baseline values.
+                    FRaftSimWaterSample Sample;
+                    if(!WaterAdapter->SampleWaterFieldAtRiverCoordinates(RiverCoordinatesM[I],Sample) || !Sample.bWet)continue;
+                    CollarVelocity+=FVector2D(Sample.VelocityMetersPerSecond.X,Sample.VelocityMetersPerSecond.Y);
+                    CollarSurfaceM+=Sample.SurfaceHeightMeters;
+                    ++WetCollar;
+                }
+                if(WetCollar!=Island.Collar.Num() || CollarVelocity.IsNearlyZero())continue;
+                CollarSurfaceM/=WetCollar;
+                FVector WorldPoint,GroundNormal;double GroundZCm=0.;FHitResult CapturedHit;
+                if(!WaterAdapter->RiverToWorldPosition(Island.Center,CollarSurfaceM+WaterAdapter->GetRiverVerticalDatumM(),WorldPoint) ||
+                    !CarrierGroundSources->SampleGround(WorldPoint,GroundZCm,GroundNormal,&CapturedHit) || GroundZCm<WorldPoint.Z)continue;
+                bool Duplicate=false;
+                for(const auto& Existing : SupportFootprints)
+                    Duplicate|=(Existing.RiverCoordinatesMeters-Island.Center).Size()<Existing.RadiusMeters+Island.Radius;
+                if(Duplicate)continue;
+                auto& CapturedIsland=SupportFootprints.AddDefaulted_GetRef();
+                CapturedIsland.RiverCoordinatesMeters=Island.Center;CapturedIsland.RadiusMeters=Island.Radius;
+                CapturedIsland.FlowDirection=CollarVelocity.GetSafeNormal();
+                if(CapturedHit.GetComponent())CapturedIsland.PhysicalSource=CapturedHit.GetComponent()->GetPathName();
+                else if(CapturedHit.GetActor())
+                    CapturedIsland.PhysicalSource=CapturedHit.GetActor()->GetPathName()+TEXT(":ComplexHeightfieldSample");
+            }
+            WaterAdapter->ConfigureFeatureBoulderFootprints(SupportFootprints);
+            if(CapturedEddyBindingLogCount<3)
+            {
+                ++CapturedEddyBindingLogCount;
+                UE_LOG(LogTemp,Display,TEXT("Captured eddy owner binding: raw_dry_islands=%d captured_rock_components=%d physical_owners=%d"),Islands.Num(),CapturedRockComponents,SupportFootprints.Num());
+            }
+        }
     }
 
     // Build the obstruction field before the vertex pass so its signed relief
@@ -7308,18 +7502,35 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     if(bFoamBFECCReview)FoamFieldWetMask=WetVertexMask;
     FoamField = MoveTemp(NewFoamField);
     FoamFieldOriginM = CurrentFieldOriginM;
-    if(bCartesianFlow)
+    if(!bCartesianFlow)
     {
-        FoamWaterClock=NextFoamClock;++FoamClockRefreshes;FoamClockHolds+=bHoldFoam;FoamClockInitializations+=!bPreviousFoamUsable;
-        if(LiveVolumeCoreMesh)
-            if(auto* Material=Cast<UMaterialInstanceDynamic>(LiveVolumeCoreMesh->GetMaterial(0)))
+        // Optical phase follows the ACTUAL legacy CPU advection delta. This
+        // does not claim that the legacy wall-clock kernel is solver-synchronous.
+        // Preserve its existing delta and all solver/debt clocks unchanged.
+        // Initialize only at attachment: reinitializing each refresh resets
+        // Origin as well as Last, making TargetSeconds permanently zero.
+        const bool Valid=bPreviousFoamUsable ? NextFoamClock.AdvanceBy(FoamDeltaSeconds)
+            : NextFoamClock.Initialize(0.);
+        if(!Valid){UE_LOG(LogTemp,Error,TEXT("Legacy CPU foam optical phase invalid; refusing publication"));return;}
+    }
+    FoamWaterClock=NextFoamClock;
+    {
+        if(bCartesianFlow){++FoamClockRefreshes;FoamClockHolds+=bHoldFoam;FoamClockInitializations+=!bPreviousFoamUsable;}
+        for(UProceduralMeshComponent* Mesh : {LiveVolumeCoreMesh.Get(),SurfaceMesh.Get()})
+            if(Mesh)if(auto* Material=Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(0)))
             {
                 const double Seconds=FoamWaterClock.TargetSeconds();
                 const float High=float(Seconds),Low=float(Seconds-double(High));
                 Material->SetVectorParameterValue(TEXT("RaftSimCPUFoamClock"),FLinearColor(High,Low,0,0));
+                Material->SetVectorParameterValue(TEXT("RaftSimWaterUVOrigin"),
+                    FLinearColor(WaterTextureOriginMeters.X/kWaterTextureRepeatMeters,
+                        WaterTextureOriginMeters.Y/kWaterTextureRepeatMeters,0,0));
             }
-        CSV_CUSTOM_STAT(RaftSimSurface,FoamWaterSeconds,FoamWaterClock.Last,ECsvCustomStatOp::Set);
-        CSV_CUSTOM_STAT(RaftSimSurface,FoamDeltaSeconds,FoamCommittedDelta,ECsvCustomStatOp::Set);
+        if(bCartesianFlow)
+        {
+            CSV_CUSTOM_STAT(RaftSimSurface,FoamWaterSeconds,FoamWaterClock.Last,ECsvCustomStatOp::Set);
+            CSV_CUSTOM_STAT(RaftSimSurface,FoamDeltaSeconds,FoamCommittedDelta,ECsvCustomStatOp::Set);
+        }
     }
     bFoamFieldValid = true;
     bFoamUsesCommittedClock=bCartesianFlow;
@@ -9820,11 +10031,52 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
 #endif
         return;
     }
-    const TArray<FVector2D> Empty;
+    // Curved-map optics consume the same field velocity as CPU foam transport.
+    // Previously UV3 was empty: local froth would freeze despite moving foam.
+    const TArray<FVector2D>& Transport=FoamTransportVelocityMetersPerSecond.Num()==Positions.Num()
+        ? FoamTransportVelocityMetersPerSecond : Flow;
     if (bCreate) LiveVolumeCoreMesh->CreateMeshSection_LinearColor(0, Positions,
-        LiveVolumeCoreTriangles, VertexNormals, UVs, Flow, Wake, Empty, Colors, Tangents, false, false);
+        LiveVolumeCoreTriangles, VertexNormals, UVs, Flow, Wake, Transport, Colors, Tangents, false, false);
     else LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(0, Positions, VertexNormals,
-        UVs, Flow, Wake, Empty, Colors, Tangents, false);
+        UVs, Flow, Wake, Transport, Colors, Tangents, false);
+#if !UE_BUILD_SHIPPING
+    FString TransportAuditPath;
+    if(GetWorld() && GetWorld()->GetTimeSeconds()>=10.f &&
+        FParse::Value(FCommandLine::Get(),TEXT("RaftSimFoamTransportAudit="),TransportAuditPath) &&
+        !FPaths::FileExists(TransportAuditPath))
+    {
+        // Actual production mesh payload, not a source-text or fixture test.
+        const FProcMeshSection* Section=LiveVolumeCoreMesh->GetProcMeshSection(0);
+        const int32 N=Positions.Num();
+        int32 NonFinite=0,Moving=0;double MaximumError=0.,MaximumSpeed=0.;
+        const bool ShapeValid=Section && Section->ProcVertexBuffer.Num()==N && Transport.Num()==N;
+        if(ShapeValid)for(int32 I=0;I<N;++I)
+        {
+            const FVector2D Submitted=Section->ProcVertexBuffer[I].UV3;
+            if(Submitted.ContainsNaN() || Transport[I].ContainsNaN()){++NonFinite;continue;}
+            MaximumError=FMath::Max(MaximumError,(Submitted-Transport[I]).Size());
+            MaximumSpeed=FMath::Max(MaximumSpeed,Submitted.Size());Moving+=Submitted.SizeSquared()>1.e-8;
+        }
+        auto Report=MakeShared<FJsonObject>();
+        Report->SetStringField(TEXT("schema"),TEXT("raftsim.curved_foam_transport_payload.v1"));
+        Report->SetStringField(TEXT("scope"),TEXT("Actual curved production core UV3 versus CPU foam transport payload. Not pixel advection, CFD, full boat/contact or FPS acceptance; legacy CPU clock remains distinct from the solver clock."));
+        Report->SetStringField(TEXT("map"),GetWorld()->GetMapName());
+        if(auto* M=LiveVolumeCoreMesh->GetMaterial(0))
+            Report->SetStringField(TEXT("base_material"),M->GetMaterial()->GetPathName());
+        Report->SetBoolField(TEXT("feature_current_enabled"),WaterAdapter && WaterAdapter->HasFeatureKinematics());
+        Report->SetBoolField(TEXT("shape_valid"),ShapeValid);
+        Report->SetNumberField(TEXT("vertices"),N);
+        Report->SetNumberField(TEXT("moving_transport_vertices"),Moving);
+        Report->SetNumberField(TEXT("non_finite_vertices"),NonFinite);
+        Report->SetNumberField(TEXT("maximum_submitted_transport_error_mps"),MaximumError);
+        Report->SetNumberField(TEXT("maximum_transport_speed_mps"),MaximumSpeed);
+        Report->SetNumberField(TEXT("cpu_foam_phase_seconds"),FoamWaterClock.TargetSeconds());
+        Report->SetNumberField(TEXT("committed_solver_seconds"),WaterAdapter->GetCommittedStepSeconds());
+        FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
+        const bool Saved=FFileHelper::SaveStringToFile(Json,*TransportAuditPath);
+        UE_LOG(LogTemp,Display,TEXT("CurvedFoamTransportAudit shape=%d moving=%d nonfinite=%d error=%g saved=%d"),int32(ShapeValid),Moving,NonFinite,MaximumError,int32(Saved));
+    }
+#endif
 }
 
 void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(

@@ -39,6 +39,7 @@
 #include "RaftSimRunCoordinateProvider.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterFeatureKinematics.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "TimerManager.h"
 #include "UnrealClient.h"
@@ -1009,6 +1010,45 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
     }
     }
 }
+
+// A single setup placement for dynamic feature tests. Unlike SurveyReach,
+// this installs no repeating timer, station hops, camera, capture or guidance.
+static void HandlePlaceAtStation(const TArray<FString>& Args,UWorld* World)
+{
+    if(!World || Args.Num()!=1 ||
+        !RaftSimWaterFeatureKinematics::IsPlayableRiver(World->GetMapName()))return;
+    const float Station=FCString::Atof(*Args[0]);
+    if(!FMath::IsFinite(Station))return;
+    const TWeakObjectPtr<UWorld> WeakWorld=World;
+    FTimerHandle InitialPlacement;
+    World->GetTimerManager().SetTimer(InitialPlacement,FTimerDelegate::CreateLambda([WeakWorld,Station]
+    {
+        UWorld* W=WeakWorld.Get();
+        auto* Water=FindWater(W);auto* Raft=FindRaft(W);
+        const auto* Axis=W && Water ? FindSurveyAxis(W,Water) : nullptr;
+        float Min=0,Max=0;FVector P,Ahead;
+        if(!W || !Water || !Raft || !Axis || !Axis->GetRiverStationRangeM(Min,Max) ||
+            Station<Min || Station>Max || !StationPointAndHeading(W,Water,Station,0.f,P,Ahead))
+        {
+            UE_LOG(LogTemp,Error,TEXT("PlaceAtStation refused unavailable/out-of-range initial condition; nothing moved"));
+            return;
+        }
+        const float Z=SurveyTeleportZ(W,Raft,Water,P,Raft->GetActorLocation().Z);
+        if(P.ContainsNaN() || Ahead.ContainsNaN() || !FMath::IsFinite(Z))
+        {
+            UE_LOG(LogTemp,Error,TEXT("PlaceAtStation refused nonfinite initial condition; nothing moved"));
+            return;
+        }
+        P.Z=Z;
+        Raft->TeleportForTesting(P,(Ahead-P).Rotation().Yaw,true);
+        UE_LOG(LogTemp,Display,TEXT("PlaceAtStation single setup: station=%.3f world_seconds=%.6f location=%s; no subsequent placement or guidance"),
+            Station,W->GetTimeSeconds(),*P.ToString());
+    }),4.f,false);
+}
+static FAutoConsoleCommandWithWorldAndArgs GPlaceAtStationCommand(
+    TEXT("RaftSim.PlaceAtStation"),
+    TEXT("One initial placement of the existing production raft: <station_m>. No repeated hops or guidance."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandlePlaceAtStation));
 
 static void HandleSurveyReach(const TArray<FString>& Args, UWorld* World)
 {

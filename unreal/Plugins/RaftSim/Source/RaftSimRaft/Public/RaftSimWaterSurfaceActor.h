@@ -695,6 +695,7 @@ private:
     FRaftSimWetEdgeCache WetEdgeDistanceCache;
     friend class FRaftSimVisibleSprayCarrierTest;
     mutable TSharedPtr<FRaftSimGroundSourceRegistry> CarrierGroundSources;
+    int32 CapturedEddyBindingLogCount=0;
     bool SampleCartesianCarrierPosition(const FVector& WorldPositionCm,FVector& OutPositionCm,bool& OutWet) const;
     friend class FRaftSimCartesianSurfaceGridTest;
     friend class FRaftSimCartesianBoulderSurfaceTest;
@@ -810,7 +811,7 @@ private:
     FRaftSimSurfaceRefinement DetailRefinement;
     FVector2D DetailRefinementOrigin=FVector2D::ZeroVector;
     TArray<FVector> RefinedVertices,RefinedNormals;
-    TArray<FVector2D> RefinedUVs,RefinedFlow,RefinedWake;
+    TArray<FVector2D> RefinedUVs,RefinedFlow,RefinedWake,RefinedFoamTransport;
     TArray<FVector2D> RefinedMacroCoordinates;
     TArray<FLinearColor> RefinedColors;
     TArray<FProcMeshTangent> RefinedTangents;

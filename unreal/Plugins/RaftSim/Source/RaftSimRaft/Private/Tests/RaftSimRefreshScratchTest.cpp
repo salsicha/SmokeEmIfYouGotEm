@@ -10,7 +10,7 @@ bool FRaftSimRefreshScratchTest::RunTest(const FString&)
     for(int32 N : {1200,1200,3,0,1400,1400,1})
     {
         Scratch.Reset(N);
-        for(auto* A : {&Scratch.Wet,&Scratch.LiveWet,&Scratch.Sampled,&Scratch.ProbeWanted})
+        for(auto* A : {&Scratch.Wet,&Scratch.LiveWet,&Scratch.RawLiveWet,&Scratch.Sampled,&Scratch.ProbeWanted})
         {
             TestEqual(TEXT("mask shape"),A->Num(),N);
             for(auto& V : *A){TestEqual(TEXT("no stale mask"),int32(V),0);V=255;}

@@ -32,7 +32,7 @@ if (-not (Test-Path $ZambeziMap)) {
 
 & "$UeRoot\Engine\Build\BatchFiles\RunUAT.bat" BuildCookRun `
     -project="$Project" `
-    -platform=Win64 -clientconfig=$Config `
+    -platform=Win64 "-clientconfig=$Config" `
     -build -cook -stage -pak -package `
     -archive -archivedirectory="$OutputDir" `
     -nop4 -utf8output -unattended

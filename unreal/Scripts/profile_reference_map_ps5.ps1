@@ -1,12 +1,13 @@
 <#
 Windows PowerShell 5.1 frame audit for a directly launched reference map
-(for example L_Hance), editor-hosted game, same CSV rules as
+(for example L_Hance), editor-hosted by default or an explicit retained package,
+same CSV rules as
 profile_south_fork_menu_launch_ps5.ps1: rows 30..N-30 are audited against the
 20 FPS desktop goal (50 ms p95; a hitch is any frame over 100 ms).
 
--StationM moves the player raft with RaftSim.SurveyReach before the capture
-(it settles there and drifts on; the survey exits after the capture window),
-so a rapid can be profiled instead of the put-in. Refuses to run while another
+-StationM performs ONE placement at world time 4 s, then the real raft freely
+integrates. The CSV includes setup and is labeled diagnostic, not a menu launch.
+No recording is enabled. Refuses to run while another
 game, editor, build or hydraulic cook is live.
 #>
 param(
@@ -15,16 +16,36 @@ param(
     [ValidateRange(300, 2400)][int]$ProfileFrames = 1200,
     [ValidateRange(-1, 100000)][int]$StationM = -1,
     [int]$TimeoutS = 900,
+    [string]$PackagedRoot = '',
     [ValidatePattern('^[a-zA-Z0-9_. ;=-]*$')][string]$DiagnosticExecCmds = ''
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $project = Join-Path $root 'unreal/SmokeEmIfYouGotEm.uproject'
+if(-not (Test-Path -LiteralPath (Join-Path $root "unreal/Content/RaftSim/Maps/$Map.umap") -PathType Leaf)){
+    throw 'Requested authored production map does not exist; no native launch started'
+}
 $gameBinary = 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe'
+$workingDirectory=$root
+$projectArguments=@("`"$project`"")
+$executionScope='Editor-hosted direct production-map launch'
 $logFile = Join-Path $root "unreal/Saved/Logs/$Label.log"
 $csvDir = Join-Path $root 'unreal/Saved/Profiling/CSV'
+if($PackagedRoot -ne ''){
+    $stage=[IO.Path]::GetFullPath($PackagedRoot)
+    $allowed=[IO.Path]::GetFullPath((Join-Path $root 'tmp'))+[IO.Path]::DirectorySeparatorChar
+    if(-not $stage.StartsWith($allowed,[StringComparison]::OrdinalIgnoreCase)){throw 'Use a retained project-local tmp package'}
+    $gameRoot=Join-Path $stage 'SmokeEmIfYouGotEm'
+    $gameBinary=Join-Path $gameRoot 'Binaries/Win64/SmokeEmIfYouGotEm.exe'
+    if(-not (Test-Path -LiteralPath $gameBinary -PathType Leaf) -or -not (Test-Path -LiteralPath (Join-Path $gameRoot 'Content/Paks') -PathType Container)){throw 'Cooked executable or Paks missing'}
+    $workingDirectory=$stage
+    $projectArguments=@()
+    $csvDir=Join-Path $gameRoot 'Saved/Profiling/CSV'
+    $executionScope='Packaged direct production-map launch, not Boot/menu acceptance'
+}
 $receipt = Join-Path $root "unreal/Saved/RaftSimValidation/$Label-frame-audit.json"
 if (Test-Path -LiteralPath $logFile) { throw "Log already exists: $logFile" }
+if (Test-Path -LiteralPath $receipt) { throw "Receipt already exists: $receipt" }
 $busy = @(Get-CimInstance Win32_Process | Where-Object {
     $_.Name -match '^(UnrealEditor|UnrealBuildTool|SmokeEm|raftsim_cartesian_cook|raftsim_water_solver|blender)' -or
     ($_.Name -in @('dotnet.exe','cmd.exe') -and $_.CommandLine -match 'UnrealBuildTool|Build\.bat|RunUAT|AutomationTool')
@@ -32,21 +53,28 @@ $busy = @(Get-CimInstance Win32_Process | Where-Object {
 if ($busy.Count) { throw 'Isolated profiling requires no other game, engine, build, Blender job or hydraulic cook' }
 $started = Get-Date
 $commands = 'csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 20,CsvCategory FMsgLogf disable'
-if ($StationM -ge 0) { $commands += ",RaftSim.SurveyReach $StationM $StationM 100 600 $Label-station 30" }
+if ($StationM -ge 0) { $commands += ",RaftSim.PlaceAtStation $StationM" }
 if ($DiagnosticExecCmds -ne '') { $commands += ',' + (($DiagnosticExecCmds.Split(';') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }) -join ',') }
 $commands += ",csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames"
-$gameArgs = @("`"$project`"", "/Game/RaftSim/Maps/$Map",
+$gameArgs = $projectArguments+@("/Game/RaftSim/Maps/$Map",
     '-game', '-RenderOffscreen', '-Unattended', '-NoSplash', '-NoSound',
     '-ResX=1280', '-ResY=720', '-Windowed', '-RaftSimEphemeralProfile', '-csvCompression=0',
     "`"-abslog=$logFile`"", '-ExitAfterCsvProfiling', "`"-ExecCmds=$commands`"")
 $binaryHash = (Get-FileHash -LiteralPath $gameBinary -Algorithm SHA256).Hash.ToLower()
-$game = Start-Process -FilePath $gameBinary -ArgumentList $gameArgs -WorkingDirectory $root -WindowStyle Hidden -PassThru
+$game = Start-Process -FilePath $gameBinary -ArgumentList $gameArgs -WorkingDirectory $workingDirectory -WindowStyle Hidden -PassThru
 if (-not $game.WaitForExit($TimeoutS * 1000)) {
     Stop-Process -Id $game.Id -Force -Confirm:$false
     throw "Game timed out after $TimeoutS s"
 }
 $game.WaitForExit()
+if($game.ExitCode -ne 0){throw "Native map exited $($game.ExitCode)"}
+if((Get-FileHash -LiteralPath $gameBinary -Algorithm SHA256).Hash.ToLower() -ne $binaryHash){throw 'Native executable changed during profile'}
 $log = Get-Content -LiteralPath $logFile -Raw -Encoding UTF8
+if($log -notmatch ('LogLoad: LoadMap: /Game/RaftSim/Maps/'+[regex]::Escape($Map)+'(?:\?|\s|$)')){throw 'Requested production map not confirmed in native log'}
+if($StationM -ge 0){
+    $placements=[regex]::Matches($log,'LogTemp: Display: PlaceAtStation single setup: station=([^ ]+)')
+    if($placements.Count -ne 1 -or [double]::Parse($placements[0].Groups[1].Value,[Globalization.CultureInfo]::InvariantCulture) -ne $StationM){throw 'Exactly one requested native station placement required'}
+}
 $runtimeErrors = @([regex]::Matches($log, '(?m)^.*\bLog\w+: (?:Error|Fatal):[^\r\n]*') | ForEach-Object { $_.Value })
 $m = [regex]::Matches($log, 'LogCsvProfiler: Display: Capture Ended\. Writing CSV to file : [^\r\n]*[/\\]([^/\\\r\n]+\.csv)\s*$', [Text.RegularExpressions.RegexOptions]::Multiline)
 if ($m.Count -ne 1) { throw 'CSV capture not confirmed in log' }
@@ -60,10 +88,15 @@ $header = $lines[$footer].Split(',')
 $frameIndex = [Array]::IndexOf($header, 'FrameTime')
 $gameIndex = [Array]::IndexOf($header, 'GameThreadTime')
 $gpuIndex = [Array]::IndexOf($header, 'GPUTime')
+foreach($metric in @('FrameTime','GameThreadTime','GPUTime')){
+    if(@($header | Where-Object {$_ -eq $metric}).Count -ne 1){throw "Exactly one $metric timing column required"}
+}
 $times = New-Object System.Collections.Generic.List[double]; $gt = New-Object System.Collections.Generic.List[double]; $gpu = New-Object System.Collections.Generic.List[double]
 for ($i = 1; $i -lt $footer; $i++) {
     $cells = $lines[$i].Split(',')
-    $times.Add([double]::Parse($cells[$frameIndex], [Globalization.CultureInfo]::InvariantCulture))
+    $elapsed=[double]::Parse($cells[$frameIndex], [Globalization.CultureInfo]::InvariantCulture)
+    if([double]::IsNaN($elapsed) -or [double]::IsInfinity($elapsed) -or $elapsed -le 0){throw 'Finite positive actual elapsed frame time required'}
+    $times.Add($elapsed)
     if ($gameIndex -ge 0 -and $cells.Count -gt $gameIndex) { $gt.Add([double]::Parse($cells[$gameIndex], [Globalization.CultureInfo]::InvariantCulture)) }
     if ($gpuIndex -ge 0 -and $cells.Count -gt $gpuIndex) { $gpu.Add([double]::Parse($cells[$gpuIndex], [Globalization.CultureInfo]::InvariantCulture)) }
 }
@@ -74,6 +107,8 @@ $p95 = $sorted[[int][Math]::Ceiling(0.95 * $sorted.Count) - 1]
 $result = [ordered]@{
     schema = 'raftsim.reference_map_frame_audit.v1'; label = $Label; map = $Map; station_m = $StationM
     game_binary_sha256 = $binaryHash; diagnostic_exec_cmds = $DiagnosticExecCmds; csv = $csv
+    execution_scope=$executionScope; packaged_root=$PackagedRoot; game_binary=$gameBinary
+    placement_scope=$(if($StationM -ge 0){'One diagnostic placement at 4 s, CSV includes setup; no subsequent placement or guidance'}else{'Authored spawn; no diagnostic placement'})
     frames_total = $times.Count; audited_frames = $window.Count
     mean_ms = [Math]::Round(($window | Measure-Object -Average).Average, 3); p95_ms = [Math]::Round($p95, 3)
     max_ms = [Math]::Round(($window | Measure-Object -Maximum).Maximum, 3)

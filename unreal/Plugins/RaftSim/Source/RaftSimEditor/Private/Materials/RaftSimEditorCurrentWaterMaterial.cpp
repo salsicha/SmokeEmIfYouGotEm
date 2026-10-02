@@ -3,6 +3,7 @@
 #include "Materials/MaterialExpressionCollectionParameter.h"
 #include "Materials/MaterialExpressionClamp.h"
 #include "Materials/MaterialExpressionTime.h"
+#include "HAL/IConsoleManager.h"
 
 namespace RaftSimEditorEnvironment
 {
@@ -140,15 +141,18 @@ return saturate(lerp(Legacy, max(Legacy, packed * 0.98), dense * saturate(Blend)
     return true;
 }
 
-bool ConfigureSouthForkTransportedFoam(UMaterial* Material)
+bool ConfigureSharedTransportedFoam(UMaterial* Material,const FString& RiverLabel)
 {
+    const FString CoverageMarker=RiverLabel+TEXT("TransportedFoamOpticsV1");
+    const FString LaceMarker=RiverLabel+TEXT("LocalFoamLaceV1");
+    const FString ClockMarker=RiverLabel+TEXT("CommittedFrothTimeV1");
     UMaterialExpressionCustom* Coverage = nullptr;
     UMaterialExpressionLinearInterpolate* WaterColor = nullptr;
     UMaterialExpressionTextureSampleParameter2D* Lace = nullptr;
     for (UMaterialExpression* Expression : Material->GetExpressions())
     {
         if (auto* Custom = Cast<UMaterialExpressionCustom>(Expression))
-            if (Custom->Desc == TEXT("SouthForkTransportedFoamOpticsV1")) Coverage = Custom;
+            if (Custom->Desc == CoverageMarker) Coverage = Custom;
         if (auto* Texture = Cast<UMaterialExpressionTextureSampleParameter2D>(Expression))
             if (Texture->ParameterName == TEXT("WhitewaterFoamLace")) Lace = Texture;
         if (auto* Lerp = Cast<UMaterialExpressionLinearInterpolate>(Expression))
@@ -157,18 +161,18 @@ bool ConfigureSouthForkTransportedFoam(UMaterial* Material)
                 {
                     auto* Custom = Cast<UMaterialExpressionCustom>(Lerp->Alpha.Expression);
                     if (Cast<UMaterialExpressionClamp>(Lerp->Alpha.Expression) ||
-                        (Custom && Custom->Desc == TEXT("SouthForkTransportedFoamOpticsV1"))) WaterColor = Lerp;
+                        (Custom && (Custom->Desc == CoverageMarker || Custom->Desc==TEXT("ChilkoDensityFoamV1")))) WaterColor = Lerp;
                 }
     }
     if (!WaterColor || !Lace || !Lace->Coordinates.Expression) return false;
     if (!Coverage)
     {
         Coverage = AddCurrentWaterExpression<UMaterialExpressionCustom>(Material);
-        Coverage->Desc = TEXT("SouthForkTransportedFoamOpticsV1");
+        Coverage->Desc = CoverageMarker;
         Coverage->Inputs.Reset();
         auto* Vertex = AddCurrentWaterExpression<UMaterialExpressionVertexColor>(Material);
         auto* Density = AddCurrentWaterExpression<UMaterialExpressionScalarParameter>(Material);
-        Density->ParameterName = TEXT("SouthForkFoamOpticalDensity");
+        Density->ParameterName = FName(*(RiverLabel+TEXT("FoamOpticalDensity")));
         Density->DefaultValue = 3.0f;
         const auto Input = [Coverage](const TCHAR* Name, UMaterialExpression* Source)
         {
@@ -189,7 +193,7 @@ bool ConfigureSouthForkTransportedFoam(UMaterial* Material)
     for (UMaterialExpression* Expression : Material->GetExpressions())
     {
         if (auto* Custom = Cast<UMaterialExpressionCustom>(Expression))
-            if (Custom->Desc == TEXT("SouthForkLocalFoamLaceV1")) LocalLace = Custom;
+            if (Custom->Desc == LaceMarker) LocalLace = Custom;
         if (auto* Parameter = Cast<UMaterialExpressionVectorParameter>(Expression))
             if (Parameter->ParameterName == TEXT("RaftSimWaterUVOrigin")) Origin = Parameter;
     }
@@ -199,7 +203,7 @@ bool ConfigureSouthForkTransportedFoam(UMaterial* Material)
     if (!LocalLace)
     {
         LocalLace = AddCurrentWaterExpression<UMaterialExpressionCustom>(Material);
-        LocalLace->Desc = TEXT("SouthForkLocalFoamLaceV1");
+        LocalLace->Desc = LaceMarker;
         LocalLace->Inputs.Reset();
         auto* UV = AddCurrentWaterExpression<UMaterialExpressionTextureCoordinate>(Material);
         UV->Desc = TEXT("RaftSimFullPrecisionRiverUV LocalFoamLace");
@@ -231,22 +235,21 @@ bool ConfigureSouthForkTransportedFoam(UMaterial* Material)
     {
         if(auto* Custom=Cast<UMaterialExpressionCustom>(Expression))
         {
-            if(Custom->Desc==TEXT("SouthForkCommittedFrothTimeV1"))FoamClock=Custom;
+            if(Custom->Desc==ClockMarker)FoamClock=Custom;
             if(Custom->Desc==TEXT("SouthForkMovingFoamAuthorityV1"))Authority=Custom;
         }
         if(auto* Parameter=Cast<UMaterialExpressionVectorParameter>(Expression))
             if(Parameter->ParameterName==TEXT("RaftSimCPUFoamClock"))CPUClock=Parameter;
     }
-    // Only the registered Cartesian parent has the matching runtime clock.
-    if(Authority)
-    {
+    // Every production carrier publishes its actual CPU advection phase.
+    // Only an already registered Cartesian parent uses the GPU frame clock.
     if(!CPUClock)
     {
         CPUClock=AddCurrentWaterExpression<UMaterialExpressionVectorParameter>(Material);
         CPUClock->ParameterName=TEXT("RaftSimCPUFoamClock");CPUClock->DefaultValue=FLinearColor(0,0,0,0);
     }
     if(!FoamClock)FoamClock=AddCurrentWaterExpression<UMaterialExpressionCustom>(Material);
-    FoamClock->Desc=TEXT("SouthForkCommittedFrothTimeV1");FoamClock->OutputType=CMOT_Float1;
+    FoamClock->Desc=ClockMarker;FoamClock->OutputType=CMOT_Float1;
     FoamClock->Inputs.Reset();FoamClock->IncludeFilePaths.Reset();
     FCustomInput ClockInput;ClockInput.InputName=TEXT("CPUClock");ClockInput.Input.Connect(0,CPUClock);
     FoamClock->Inputs.Add(ClockInput);
@@ -264,7 +267,6 @@ bool ConfigureSouthForkTransportedFoam(UMaterial* Material)
     }
     for(auto& Input:LocalLace->Inputs)
         if(Input.InputName==TEXT("TimeSeconds"))Input.Input.Connect(0,FoamClock);
-    }
     LocalLace->OutputType = CMOT_Float3;
     for (FCustomInput& Input : LocalLace->Inputs)
         if (Input.InputName == TEXT("Flow"))
@@ -330,24 +332,30 @@ bool ConfigureSouthForkTransportedFoam(UMaterial* Material)
     for (const FCustomInput& Input : Coverage->Inputs)
         if (Input.InputName == TEXT("Legacy")) Legacy = Input.Input.Expression;
     if (!Legacy) return false;
+    const auto IsOldOrNewCoverage=[Legacy,Coverage](UMaterialExpression* Source)
+    {
+        if(Source==Legacy || Source==Coverage)return true;
+        const auto* Custom=Cast<UMaterialExpressionCustom>(Source);
+        return Custom && Custom->Desc==TEXT("ChilkoDensityFoamOpticsV1");
+    };
     bool bRoughness = false, bOpacity = false, bScattering = false;
     for (UMaterialExpression* Expression : Material->GetExpressions())
     {
         if (auto* Multiply = Cast<UMaterialExpressionMultiply>(Expression))
             if (auto* Scale = Cast<UMaterialExpressionScalarParameter>(Multiply->B.Expression))
                 if (Scale->ParameterName == TEXT("FoamRoughness") &&
-                    (Multiply->A.Expression == Legacy || Multiply->A.Expression == Coverage))
+                    IsOldOrNewCoverage(Multiply->A.Expression))
                 { Multiply->A.Connect(0, Coverage); bRoughness = true; }
         if (auto* Lerp = Cast<UMaterialExpressionLinearInterpolate>(Expression))
             if (auto* Opacity = Cast<UMaterialExpressionScalarParameter>(Lerp->B.Expression))
                 if (Opacity->ParameterName == TEXT("FoamWaterOpacity") &&
-                    (Lerp->Alpha.Expression == Legacy || Lerp->Alpha.Expression == Coverage))
+                    IsOldOrNewCoverage(Lerp->Alpha.Expression))
                 { Lerp->Alpha.Connect(0, Coverage); bOpacity = true; }
         if (auto* Add = Cast<UMaterialExpressionAdd>(Expression))
             if (auto* Speed = Cast<UMaterialExpressionMultiply>(Add->B.Expression))
                 if (auto* Fraction = Cast<UMaterialExpressionScalarParameter>(Speed->B.Expression))
                     if (Fraction->ParameterName == TEXT("SpeedAerationFraction") &&
-                        (Add->A.Expression == Legacy || Add->A.Expression == Coverage))
+                        IsOldOrNewCoverage(Add->A.Expression))
                     { Add->A.Connect(0, Coverage); bScattering = true; }
     }
     if (!bRoughness || !bOpacity || !bScattering) return false;
@@ -357,8 +365,8 @@ bool ConfigureSouthForkTransportedFoam(UMaterial* Material)
 }
 
 // River-specific optical detail, not another displaced surface. The normal
-// follows current-carried optical detail. South Fork uses effective UV3 flow;
-// other river variants retain their existing integrated-current calibration.
+// follows effective local UV3 foam transport. River colours, normal strength,
+// geometry, wet-mask and existing aeration calibration remain river-specific.
 UMaterial* LoadOrCreateCurrentGradientWaterParent(
     UMaterial* Shared, const FString& Path, const FString& RiverLabel,
     float FoamCutoff, float NormalStrength, FString& Summary,
@@ -372,6 +380,8 @@ UMaterial* LoadOrCreateCurrentGradientWaterParent(
     }
     const FString AssetName = FPackageName::GetLongPackageAssetName(Path);
     const FString NormalMarker = RiverLabel + TEXT("CurrentGradientNormalV1");
+    const bool bSharedFeatureOptics=RiverLabel==TEXT("SouthFork") || RiverLabel==TEXT("Colorado") ||
+        RiverLabel==TEXT("Pacuare") || RiverLabel==TEXT("Futaleufu") || RiverLabel==TEXT("Chilko");
     UPackage* Package = CreatePackage(*Path);
     UMaterial* Material = LoadObject<UMaterial>(nullptr, *(Path + TEXT(".") + AssetName));
     if (!Material)
@@ -531,7 +541,7 @@ return normalize(float3(-slope, 1.0));
         Detail->Code.ReplaceInline(TEXT("float2 gradient(float2 p)"), *TriangularKernel);
         Detail->Code.ReplaceInline(TEXT("n.gradient("), TEXT("n.simplexGradient("));
     }
-    if (RiverLabel == TEXT("SouthFork"))
+    if (bSharedFeatureOptics)
     {
         FString LocalNormalCode;
         if (!FFileHelper::LoadFileToString(LocalNormalCode,
@@ -582,26 +592,26 @@ return normalize(float3(-slope, 1.0));
         Material->GetEditorOnlyData()->Normal.Connect(0, RegisteredDetailNormal);
     }
     else Material->GetEditorOnlyData()->Normal.Connect(0, Detail);
-    if (RiverLabel == TEXT("Chilko") && !ConfigureChilkoDensityFoam(Material, AerationSignal))
+    if (!bSharedFeatureOptics && RiverLabel == TEXT("Chilko") && !ConfigureChilkoDensityFoam(Material, AerationSignal))
     {
         Summary += TEXT("Chilko density foam could not locate the existing advected foam colour branch.\n");
         return nullptr;
     }
-    if (RiverLabel == TEXT("SouthFork") && !ConfigureSouthForkTransportedFoam(Material))
+    if (bSharedFeatureOptics && !ConfigureSharedTransportedFoam(Material,RiverLabel))
     {
         Summary += TEXT("South Fork transported foam could not locate all optical consumers.\n");
         return nullptr;
     }
-    if (RiverLabel == TEXT("SouthFork"))
+    if (bSharedFeatureOptics)
         Summary += TEXT("Transported foam drives colour, roughness, opacity and scattering; geometry is unchanged.\n");
-    if (RiverLabel == TEXT("SouthFork"))
+    if (bSharedFeatureOptics)
     {
         // Share the displayed-frame clock with foam in the registered parent.
         // Nonregistered legacy parents keep their existing time source.
         UMaterialExpressionCustom* DisplayedClock = nullptr;
         for (UMaterialExpression* Expression : Material->GetExpressions())
             if (auto* Custom = Cast<UMaterialExpressionCustom>(Expression))
-                if (Custom->Desc == TEXT("SouthForkCommittedFrothTimeV1")) DisplayedClock = Custom;
+                if (Custom->Desc == RiverLabel+TEXT("CommittedFrothTimeV1")) DisplayedClock = Custom;
         if (DisplayedClock)
             for (FCustomInput& Input : Detail->Inputs)
                 if (Input.InputName == TEXT("TimeSeconds")) Input.Input.Connect(0, DisplayedClock);
@@ -618,3 +628,24 @@ return normalize(float3(-slope, 1.0));
     return Material;
 }
 } // namespace RaftSimEditorEnvironment
+
+// Narrow migration of the four saved production parents only. The caller
+// audits/backs up these assets; no map, instance, bed, mesh or solver is edited.
+static FAutoConsoleCommand GRefreshSharedFeatureOptics(
+    TEXT("RaftSim.RefreshSharedFeatureOptics"),TEXT("Migrate four river-specific optical parents to shared transported froth/current."),
+    FConsoleCommandDelegate::CreateLambda([]()
+    {
+        struct FParent {const TCHAR* Label;const TCHAR* Path;};
+        for(const FParent P : {
+            FParent{TEXT("Colorado"),TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Materials/M_RaftSim_ColoradoCurrentWaterV3")},
+            FParent{TEXT("Pacuare"),TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_PacuareCurrentWaterV2")},
+            FParent{TEXT("Futaleufu"),TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_FutaleufuCurrentWaterV5")},
+            FParent{TEXT("Chilko"),TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_ChilkoCurrentWaterV4")}})
+        {
+            UMaterial* Existing=LoadObject<UMaterial>(nullptr,P.Path);
+            FString Summary;
+            const bool Success=Existing && RaftSimEditorEnvironment::LoadOrCreateCurrentGradientWaterParent(
+                Existing,P.Path,P.Label,0.f,.18f,Summary,true)!=nullptr;
+            UE_LOG(LogTemp,Display,TEXT("SharedFeatureOptics river=%s success=%d %s"),P.Label,int32(Success),*Summary);
+        }
+    }));

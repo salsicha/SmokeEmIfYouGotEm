@@ -793,7 +793,8 @@ FVector URaftSimWaterRuntimeAdapter::ComputeFeatureVelocityAtRiverCoordinates(
     {
         const FVector2D OwnerDirection = Rock.FlowDirection.IsNearlyZero() ? D : Rock.FlowDirection;
         const FVector2D Q = ToLocal(P-Rock.RiverCoordinatesMeters,OwnerDirection);
-        const FVector Local = EddyDelta(Q.X,Q.Y,Rock.RadiusMeters,Speed);
+        const FVector2D Incident=ToLocal(BaseVelocity,OwnerDirection);
+        const FVector Local = EddyDelta(Q.X,Q.Y,Rock.RadiusMeters,Speed,Incident.Y);
         if (Local.SizeSquared() <= EddyOwner) continue;
         EddyOwner = Local.SizeSquared();
         const FVector2D XY = ToField(FVector2D(Local.X,Local.Y),OwnerDirection);

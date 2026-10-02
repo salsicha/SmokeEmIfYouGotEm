@@ -1,5 +1,328 @@
 # Remaining requested work
 
+LATEST October 2 native physical-clearance investigation (not acceptance):
+- Subsequent native observations ruled out zero wet alpha, missing depth and
+  missing opacity parameter: actual submitted lane alpha is 0.971..1,
+  depth G is nonzero, and the loaded 0.45/m parameter yields 0.44..0.65
+  no-froth coverage before GPU hull masking. The single-sided compact carrier
+  was instead uploaded with positive geometric cross Z despite its intended
+  clockwise top-facing winding. Valid bounds were independently verified.
+- Production SurfaceMesh upload now determines winding from actual source
+  geometry, not the river-Y metadata that had already been applied. Positions,
+  wet masks, topology membership, collision and currents are unchanged. Fresh
+  `tmp/southfork-actual-winding-v1-compact` exits cleanly and its native lane
+  cross Z is now -0.98..-1. Three actual frames in the 31-frame pixel-verified
+  APNG were inspected: liquid is VISIBLY delivered in normal compact materials.
+  Blue/grey optical appearance remains provisional; this is not final foam,
+  boat-washout, normal-menu or packaged/FPS acceptance.
+- A first analytical head-current correction passed all 13 native tests in
+  `tmp/southfork-head-winding-native-v1/index.json`, including the newly gathered
+  SurfaceWinding test, but real 60-second compact motion FAILS washout and head:
+  104 timer states, 14.710 m return, closest 2.279 radii, no exit. Source and
+  video are retained at `tmp/southfork-head-turn-v1-compact[-review]`; 43 APNG
+  frames have zero adjacent duplicates and first/middle/last were inspected.
+  It counteracted head cross-drift but strengthened inlet drift; the raft moved
+  toward a different physical contact. Passing flat-control tests did not
+  justify calling the actual map correct.
+- Session 29405 finished cleanly: all 13 fresh native tests PASS in
+  `tmp/southfork-head-winding-native-v2/index.json`. The C2 oblique potential
+  through existing inlet/return/head support now returns the actual compact raft
+  21.312 m upstream and reaches 1.507 inferred radii. It starts moving outward
+  and downstream, but remains inside the unchanged radius exit gate at 60 s:
+  washout is NOT accepted. All 104 actual timer states are finite, with a
+  0.703 s maximum gap (not fixed-step collision coverage). Shared-current error
+  and dry-wet violations remain zero. Compact UV3 transport, bulk and optical
+  clock payload errors are zero. The 738-frame native recording is retained in
+  `tmp/southfork-head-turn-v2-compact`; its 54-frame pixel-verified APNG has zero
+  adjacent duplicates and first/middle/last were inspected. Liquid is visible,
+  but full foam/shoreline appearance remains provisional.
+  This is authored/inferred kinematics shared by boat and foam, not a side-force
+  clamp or measured/resolved CFD. No solver, collision, wet-mask, elapsed-time,
+  quality or acceptance rule changed.
+  Current-code FullReach obstacle capture (`southfork-head-turn-v2-fullreach`,
+  station 8360) finished cleanly. Its actual raft now PASSES all three unchanged
+  trajectory gates: 12.399 m upstream, closest 1.512 inferred radii, outward/
+  downstream exit observed. All 104 timer states are finite (maximum gap
+  0.745 s; not fixed-step contact proof); shared-current errors and dry-wet
+  violations are zero. Actual submitted compacted UV3 source anchors also
+  have zero transport/bulk errors. Its 591-frame native video yielded a
+  50-frame verified APNG with zero adjacent duplicates; first/middle/last were
+  inspected. Water/raft/rocks are visible; broad flat white foam patches remain
+  visually unaccepted. The entry audit retains one wet probe at/below ground.
+  FullReach acceptance does not erase the compact washout failure.
+  Session 53341 is terminal: packaging failed BEFORE cooking because the
+  Windows wrapper passed literal `$Config`. The clientconfig argument is now
+  quoted; actual UAT confirms `Development`. Session 86766 finished cleanly:
+  fresh build/cook/stage/package/archive SUCCESS in 421.74 s, 2,299 cooked
+  packages, retained at `tmp/southfork-head-turn-package-v3/Archive/Windows`.
+  Source and staged EXE SHA256 match:
+  `7db92f7ac7dfb6d4f9bc0e0e1d22149ee2d200804d1a43b27e29fe3b2892865d`.
+  Selected South Fork runtime-stage audit verifies all 2,405 files / 917,995,570
+  bytes, without source fallback. Preserved MetaHuman UDIM cook warnings are
+  not resolved by this water work; no water compile error was found.
+  Recording-free packaged normal Boot/menu passes only the short 1,140-frame
+  gate: p95 49.9868 ms, max 64.2291 ms, zero frames >100 ms/errors. Dense default-
+  quality station 8360 FAILS: p95 77.608 ms, max 203.6581 ms, nine >100 ms,
+  zero runtime errors. Receipts are `unreal/Saved/RaftSimValidation/
+  southfork-head-turn-package-v3-{normal,8360}-frame-audit.json`. Independent
+  clock/scope receipts in the package root retain all requested elapsed time,
+  fixed ticks and debt: dense bridge backlog peak 1.922 s, end 0.016047 s,
+  adapter commit difference zero. These are not simulation-capacity acceptance.
+  Dense water Tick p95 49.80 ms, SetMesh 26.23 ms, crest Update 20.82 ms and
+  Selection 13.77 ms are INCLUSIVE/NESTED, not costs to add together. Different
+  actual trajectories prevent attributing the lower p95 versus old packages
+  solely to a CPU optimization. Strict 20 FPS remains unfinished.
+  Session 69775 finished CLEANLY with the same verified standalone executable.
+  Fresh `southfork-head-turn-package-v3-eddy` PASSES the unchanged selected-rock
+  trajectory gates: 12.390 m upstream, closest 1.513 inferred radii, head reached,
+  outward/downstream exit observed. All 104 actual timer states are finite,
+  maximum gap 0.626 s (not fixed-step collision coverage), shared-current error
+  and dry-wet violations zero. Actual submitted UV3/bulk errors are zero. Its
+  593-frame video was packaged into 50 verified APNG frames with zero adjacent
+  duplicates; first/middle/last were inspected. The real packaged raft returns
+  toward the rock and leaves its head. Broad flat white foam is still visually
+  unaccepted; this one obstacle does not qualify every river obstacle, the
+  compact scene or full-river shoreline/contact/FPS acceptance. Delivery:
+  `tmp/southfork-head-turn-package-v3-eddy-review/animation.png` (actual native
+  diagnostic overview, not an offline animation or FPS measurement).
+  All owned sessions 29405/53341/86766/40358/69775 are terminal; no pending build,
+  cook, profile or capture remains. Do not duplicate these labels or rerun
+  unchanged failures. Next work is measured publication/crest CPU cost, foam
+  appearance and compact washout without weakening gates, time or collision.
+  Sessions 94231/13077/33649/67460/34170/73921/8848 are terminal; no duplicate
+  repairs/builds/captures should be launched from their old pending records.
+- Corrected captured-rock exposure binding to compare ground world centimeters
+  against datum-relative water height. The old path added the river datum
+  twice for this comparison. A forced source-discovery editor rebuild compiled
+  the new native datum/finite/boundary regression; all 12 targeted tests pass
+  in `tmp/southfork-physical-exposure-native-v1/index.json`.
+- Fresh opt-in read-only clearance probes inspect 273 actual ground/water/
+  submitted-triangle locations per map. Their approximately 182 ms diagnostic
+  cost is excluded from FPS claims; they do not change masks, forces or geometry
+  and do not prove GPU WPO, pixel opacity or full-hull clearance.
+- `tmp/southfork-exposure-clearance-v1-fullreach` still returns 8.500 m upstream
+  and exits, but closest 2.294 inferred radii FAILS the unchanged head gate.
+  All three current native review frames were inspected: water/raft/rocks are
+  visible, while broad flat white foam remains unaccepted. The head boundary
+  has water 5.30 cm below physical ground at 1.25 radii, while 1.5 radii is wet
+  and above ground. This is not permission to move the hull through the rock.
+- `tmp/southfork-exposure-clearance-v1-compact` returns 19.022 m upstream,
+  reaches 1.774 radii, but no exit is established in its short 26-second audit.
+  Submitted liquid triangles along the 1.25..4-radius return lane are roughly
+  1.3..2.4 m above physical ground; burial does not explain the nearly invisible
+  water in the three inspected compact frames. Eleven wet probe points at/
+  below ground remain unresolved and are not silently reclassified.
+- The actual compact material's preserved opacity graph multiplies liquid
+  coverage by vertex R (foam). This hides foam-free wet water. A guarded native
+  repair saved only M_TroublemakerWater, retaining native A wet/shore/hull coverage,
+  and uses G depth plus shared froth for liquid opacity. Its 0.45/m extinction
+  is an authored visual approximation, not measured optical data. No saved
+  visual acceptance is claimed. Byte-verified receipt/backup:
+  `tmp/southfork-compact-liquid-coverage-v1.json` / `.backup.zip`; actual saved
+  SHA256 `83732ff9421fce51b83c7fd410df1be9b3b4e0928ef9b235b1093de32ca3eb4c`.
+  The editor saved/closed its log but returned access-violation status; session
+  94231 is terminal, not a pending job and must not rerun the mutation.
+- Fresh `tmp/southfork-liquid-coverage-v1-compact` game load exited CLEANLY,
+  with zero runtime errors. Its 64 actual timer states show 21.179 m upstream
+  return, closest 1.522 radii, but NO exit at 40 seconds. Maximum sampling gap
+  0.711 s is not dense fixed-step coverage. Shared-current error and dry-wet
+  violations are zero; submitted UV3/bulk/clock errors are zero. The actual
+  348-frame video was packaged to 39 pixel-verified APNG frames with zero
+  adjacent duplicates, and first/middle/last were inspected. Water is STILL
+  poorly visible; neither the saved opacity repair nor these payload checks
+  count as a visible delivered fix. Preserve this failed visual evidence.
+  Another task began a build after this capture's idle guard; this diagnostic
+  video is not isolated performance evidence. No owned build replaced its DLLs.
+- The narrow opt-in clearance audit now also reads actual barycentric submitted
+  R/G/B/A and the loaded extinction parameter, without changing any vertices,
+  masks, forces or material. Session 33649 is terminal; its distinct compact
+  capture confirmed nonzero depth/alpha and the actual loaded optical parameter.
+  The old
+  displacement graph has no WPO root, so WPO is not an evidenced burial cause.
+  The previous package does NOT include the new datum/opacity/audit changes.
+- Actual boat head/exit, foam appearance and dense 20 FPS remain unfinished.
+  Preserve failed runs and keep the goal active; no acceptance thresholds,
+  simulation elapsed time, quality, fixed steps or source data were weakened.
+
+LATEST October 2 compact South Fork carrier repair and strict package check:
+- The shared rollout package completed its full fresh cook and archive at
+  `tmp/shared-feature-rollout-package-v1/Archive/Windows`; the later Archive-v2
+  stages the same executable with ten missing Batoka runtime dependencies.
+  Batoka's previous failed launch is preserved, not yet a verified recovery.
+- Normal packaged Boot/menu -> South Fork, default 1280x720 settings and no
+  recording, passes the SHORT 1140-frame window: p95 49.5737 ms, maximum
+  61.9917 ms, zero frames >100 ms and zero runtime errors. Receipt:
+  `unreal/Saved/RaftSimValidation/shared-feature-package-v1-normal-frame-audit.json`.
+  This is NOT dense-reach/full-river or simulation-capacity acceptance.
+- Fresh recording-free packaged station 8360 fails unchanged 20 FPS rules:
+  p95 94.2422 ms, 25 frames >100 ms, zero native errors. All 1140 elapsed
+  samples are retained. Clock/scope audit:
+  `tmp/shared-feature-package-v2-8360-clock-audit.json`; peak bridge backlog
+  5.377 s, ending 0.015258 s; native field epoch offsets are not discarded.
+  Inclusive water Tick averages 33.274 ms, crest selection 5.380 ms;
+  these nested timings must not be summed or treated as causal attribution.
+  A mistyped map launch preceding this test failed and is preserved; the
+  profiling wrapper now rejects a missing authored map before launch.
+- Actual compact `L_SouthFork_Troublemaker` uses SurfaceMesh/M_TroublemakerWater,
+  NOT the full-reach volume core. Its previously empty UV3 and unpublished
+  optical phase were a missed delivery path. Both plain/refined carriers now
+  submit actual CPU foam transport; UV1 and GPU review macro coordinates retain
+  their original contracts. This material now uses the same native procedural
+  froth helper and CPU phase, with the old ripple normal retained. No opacity,
+  WPO, foam amount/density source, physical mesh, hydraulic mask or map changed.
+  Guarded native migration and byte-verified backup:
+  `tmp/southfork-compact-shared-froth-v1.json` / `.backup.zip`.
+- Editor rebuild succeeds (27 actions, 133.59 s); all eleven targeted native
+  hull/current/clock/ground regressions pass in `tmp/southfork-compact-native-v1`.
+  Actual compact carrier audit: 38488 submitted vertices, 17687 transport/bulk
+  differences, zero submitted UV3 or UV1 error, zero nonfinite values, and zero
+  published material-clock error. Receipt:
+  `tmp/southfork-compact-shared-froth-v1-capture/foam-transport.json`.
+- Actual production raft behind an existing physical compact owner returns
+  19.022 m upstream and reaches 1.774 inferred radii, but no outward/downstream
+  exit is established in the 26-second audit. Motion receipts are native
+  ~0.5-second world-timer samples, not dense contact/fixed-step proof. Shared
+  surface error and dry-became-wet are zero. First/middle/last native frames
+  were inspected in `tmp/southfork-compact-shared-froth-v1-review`: guide-seat
+  water/terrain appearance and foam are NOT visually accepted. Do not present
+  this as a finished eddy/foam demonstration.
+- Standalone rebuild of that repair succeeds (17 actions, 100.13 s), followed
+  by a successful fresh Cook/Stage/Pak/Package/Archive in 338.99 s at
+  `tmp/southfork-carrier-transfer-package-v2/Archive/Windows`. Source and staged
+  EXE SHA256 match: `6d7a108873dcca272b28be0df86d11c8d9d71f1aa03baff48866c179c1ada0ce`.
+  All 2405 selected runtime files (917995570 bytes) pass without source fallback.
+  Fresh recording-free Boot/menu passes p95 48.9637 ms, max 58.3065 ms, zero
+  >100 ms frames; bridge backlog peak 0.016656 s. Fresh direct station 8360
+  FAILS p95 93.3737 ms, 27 >100 ms frames; bridge backlog peak 4.9436 s.
+  Both retain all 1140 audited frames, default quality and zero runtime errors.
+  Independent frame/clock audits are in the package root; no capacity tolerance,
+  fixed step, native epoch or elapsed time was changed to conceal the failure.
+- Fresh packaged FullReach actual-owner test (40 s) returns 8.508 m upstream,
+  exits downstream/outward, but closest 2.292 radii still FAILS the head gate.
+  Zero shared-current error/dry-wet violations; 64 native world-timer states,
+  maximum gap 0.604 s. Actual compacted source UV3 audit checks 9219 anchors
+  (9205 differing from bulk), zero UV3/UV1 error. APNG/native first/middle/last
+  frames inspected at `tmp/southfork-carrier-package-v2-fullreach-entry-review`:
+  actual water/rock/raft are visible; broad flat white foam remains unaccepted.
+  These recorded diagnostic overhead views are not normal-camera FPS evidence.
+- Fresh packaged compact carrier submits 38488 vertices with zero UV3/UV1
+  error and <1 microsecond material-clock error. The first 2400-frame run exited
+  before its 40-second motion audit and is preserved as INCOMPLETE evidence.
+  The distinct 4800-frame/60-world-second packaged run has now completed
+  (exec session 21956 exited 0; no native engine/build/cook remains active).
+  Receipt: `tmp/southfork-carrier-package-v2-compact-entry-long/motion-audit.json`.
+  Its 104 actual world-timer states (maximum gap 0.5255 s) show 21.447 m
+  upstream return and closest 1.491 inferred radii, but NO downstream/outward
+  exit. At 60 s the raft speed is 0.00643 m/s; intermittent native ground
+  contacts are recorded, with penetration <=0.001 m. Do not call this washout
+  or infer the contact/stall cause without actual boundary/clearance evidence.
+  Shared-current error/dry-wet violations remain zero. Actual compact UV3
+  error is zero; material-clock error is 0.343 microseconds. These payload
+  checks do not establish visual agreement.
+  Actual late video `RaftSim_20261002-053001.mp4` has 349 decoded frames;
+  45 pixel-verified APNG frames have no adjacent duplicates. First/middle/last
+  were inspected in `tmp/southfork-carrier-package-v2-compact-entry-long-review`:
+  the raft approaches the existing rocks, but water is poorly visible over
+  the apparent bed. Compact visual and washout acceptance both FAIL.
+  Capture wrapper supports a non-guiding native overview camera and longer
+  motion receipt; no repeating station walk, paddle command or forced path.
+  Full-reach head-turn/foam appearance, strict dense FPS and other maps remain
+  unfinished. Keep the all-map goal active and reconstruction automation paused.
+  Next bounded work: inspect actual physical downstream obstacle boundary and
+  raft/bed/water clearance before altering head-turn flow, repair the compact
+  carrier's visible bed/water mismatch, and optimize measured dense CPU scopes.
+  Do not rerun the same captures or change quality, fixed steps, timing/debt
+  handling or acceptance thresholds to hide the established failures.
+
+LATEST October 2 shared water rollout (not all-map acceptance):
+- The eight exact production river maps now enable the shared authored hole,
+  physical-obstacle eddy and foam-current path without a gameplay opt-in. The
+  four Colorado/Pacuare/Futaleufu/Chilko production material parents were saved
+  with transported foam, preserving parameters, WPO/mask and map hashes;
+  receipt/asset backup: `tmp/shared-river-feature-optics-v1.json` / `.backup.zip`.
+- Curved production surface UV3 now carries the effective CPU foam current;
+  its actual optical phase accumulates instead of resetting on every refresh.
+  This legacy CPU phase remains distinct from committed solver time. Actual
+  Hance, Huacas, Terminator and Lava captures verify finite submitted transport
+  with zero payload error; this is not pixel-advection or packaged acceptance.
+- Native physical Landscape heightfield samples now report their actual source
+  actor. The diagnostic entry fixture uses one station placement at 4 s and one
+  physical-owner placement at 8 s, never the repeating SurveyReach timer. Old
+  Huacas entry-v2 evidence is invalid for free motion because that survey timer
+  overwrote its initial condition; it remains preserved.
+- Compact oblique-current eddy correction uses a second streamfunction shared
+  by hull and foam sampling, not a direct side-force/velocity clamp. Existing
+  wet/solid exclusion and physical meshes remain authoritative. No measured CFD
+  or global conservation proof is claimed for curved/clipped/overlapping owners.
+  Full editor build succeeded; eleven native tests pass in
+  `tmp/shared-river-feature-native-v4/index.json`, including analytic curl,
+  divergence, mirrored cross-current and full-hull/ground-source regressions.
+- Actual Pacuare Huacas entry-v4 returns 6.366 m upstream, reaches 1.621 inferred
+  radii (head criterion <=2), then exits outward/downstream. Actual South Fork
+  entry-v5 returns 8.508 m upstream and exits, but closest approach is 2.292
+  radii: its head criterion STILL FAILS. Both have zero shared surface error
+  and zero dry-became-wet samples. These are 0.5-second native world-timer
+  states, not dense collision/fixed-step traces. Motion audits and inspected
+  native first/middle/last frames are in their respective `tmp/shared-features-
+  huacas-eddy-entry-v4[-review]` and `tmp/shared-features-southfork-eddy-entry-
+  v5[-review]` directories. APNGs contain decoded native frames, no interpolation.
+- Actual Pacuare foam still has broad white sheet patches; actual South Fork
+  foam is visible but subtle at this owner. Visual calibration/pixel transport,
+  other physical-owner/head checks and a fresh broad standalone cook/performance
+  pass remain open. The previous packaged four-run 20 FPS failures below remain
+  valid; no timing/debt/quality threshold was relaxed and no all-map completion
+  is claimed. Command execution recovered via Windows PowerShell 5; there was
+  no demonstrated repository ACL/write-access failure and no ACL changes.
+- The standalone Development executable now rebuilds successfully (25 actions,
+  163.36 s). A new full Cook/Stage/Pak/Package/Archive is in progress at
+  `tmp/shared-feature-rollout-package-v1` using the concrete `Cooked/Windows`
+  directory verified against local UE5.8 cook/staging source. It is NOT yet a
+  delivered package or FPS pass. Preserve the running cook; do not duplicate it.
+  Cook log: UE5.8 `Engine/Programs/AutomationTool/Saved/Cook-2026.10.02-04.24.41.txt`.
+  `capture_shared_water_map.ps1` now supports an explicit retained packaged
+  root; its direct-map recording remains separate from normal Boot/menu and
+  recording-free strict 20 FPS profiles. Windows PowerShell 5 parse passes.
+
+LATEST October 2 South Fork actual-obstacle eddy transfer and fresh package:
+- The corrected shared authored wake now binds existing physical captured dry
+  islands (and checks the explicit captured-rock component), not decorative
+  bounding boxes or a new collider. Wet/solid masks, source bed and render/contact
+  meshes are unchanged; wake radii are inferred, not measured rock geometry.
+- Seven focused native regressions pass in
+  `tmp/southfork-eddy-transfer-native-v4/index.json`. A read-only material graph
+  audit confirms the production paired-flow texture input. CPU fallback UV3
+  differences are preserved; they are not final shader/pixel-advection proof.
+- Actual editor AND cooked-game tests at station 8360 use the production raft,
+  placed once behind a verified physical owner, then freely integrated. The cooked
+  boat returns 4.197 m upstream (peak 2.202 m/s upstream) and exits outward into
+  current. Shared surface/hull sample error is zero; dry samples remain dry and
+  periodic native contact logs show zero ground penetration. This boat did NOT
+  reach the eddy head (closest 3.158 inferred radii): complete head-turn traversal
+  remains unaccepted. World-timer receipts are not dense fixed-step traces.
+- Packaged recording and inspected first/middle/last frames:
+  `tmp/southfork-eddy-packaged-entry-v1-review/animation.png`;
+  motion audit: `tmp/southfork-eddy-packaged-entry-v1-audit.json`.
+- Rebuilt Development game and fresh full cook/package succeed. A cook output
+  placeholder mismatch was repaired by renaming only the fresh cooked directory
+  to `Cooked/Windows` and staging with `-skipcook`; no duplicate cook or asset
+  deletion. Playable archive: `tmp/southfork-eddy-transfer-package-v1/Archive-v2/Windows`.
+  All 2405 selected v8 runtime files verify, without source fallback; staged
+  executable SHA256 is `056d98892515564cb53762658d8831ee0651c20426d187b05f34d88f68a3b85c`.
+- Four isolated packaged 1200-frame profiles, default quality/water settings,
+  each audit rows 30..1169: normal Boot/menu p95 55.007 ms / 0 >100 ms frames;
+  8310 p95 93.3351 / 25; 8360 p95 82.0561 / 10; 11520 p95 96.7139 / 9.
+  Every run has zero runtime errors, but ALL FAIL the 20 FPS gate (p95 <=50 ms
+  and zero >100 ms hitches). Independent native clock receipts retain lag:
+  peak 8310 5.3921 s; 8360 1.7203 s; 11520 ends 23.7527 s behind. Normal peak
+  is only 0.016648 s. No elapsed-time discard or fixed-step/quality override.
+  Receipts: `unreal/Saved/RaftSimValidation/southfork-eddy-package-v1-*-frame-audit.json`
+  and `tmp/southfork-eddy-package-v1-*-clock-audit.json`.
+- Remaining: actual head-turn path validation/calibration, pixel-level foam
+  advection acceptance, and CPU surface/crest/solver cost with retained clock
+  capacity. Do not accept the river, advance the reconstruction queue, enable
+  rejected solvers or attribute a regression to this change without a paired
+  same-build baseline. Existing paused reconstruction automation stays paused.
+
 LATEST October 1 South Fork shared feature controls:
 - Native hole, eddy and froth animations use actual production boat forces.
 - The normal FullReach scene now shares its authored surface current between

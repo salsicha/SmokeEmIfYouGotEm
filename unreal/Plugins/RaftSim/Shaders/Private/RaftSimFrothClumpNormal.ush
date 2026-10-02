@@ -1,0 +1,25 @@
+// Optical clump-scale relief above the existing fine bubbles. No coverage,
+// density, geometry, collision or momentum change. Dimensions are authored
+// presentation scales, not measured foam heights. Requires FrothMicroNormal.
+struct RaftSimFrothClumpNormal
+{
+    float2 Phase(float2 position,float footprintM)
+    {
+        RaftSimFrothMicroNormal domain;
+        precise float2 primary=position*1.5;
+        precise float2 broad=position*0.375+float2(17.13,9.37);
+        return domain.GridSlope(primary)*0.05*1.5*
+                   (1-smoothstep(0.35,0.85,footprintM*1.5))+
+               domain.GridSlope(broad)*0.10*0.375*
+                   (1-smoothstep(0.35,0.85,footprintM*0.375));
+    }
+    float3 Sample(float3 base,float coverage,float2 position,float2 velocity,float time,float footprintM)
+    {
+        if(coverage<=0)return base;
+        float a=frac(time),b=frac(a+0.5),weight=1-abs(2*a-1);
+        precise float2 pa=position-velocity*a;
+        precise float2 pb=position-velocity*b;
+        float2 slope=lerp(Phase(pb,footprintM),Phase(pa,footprintM),weight)*saturate(coverage);
+        return normalize(float3(base.xy/max(base.z,0.1)-slope,1));
+    }
+};

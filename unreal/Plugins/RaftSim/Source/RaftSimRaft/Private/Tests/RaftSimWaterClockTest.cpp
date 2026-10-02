@@ -64,6 +64,17 @@ bool FCommittedWaterClockTest::RunTest(const FString&)
     TestTrue(TEXT("accepted water advances detail"),Clock.Observe(12.75,Delta));
     TestEqual(TEXT("exact committed delta"),Delta,.25);
     TestEqual(TEXT("target relative to attachment"),Clock.TargetSeconds(),.25);
+    FRaftSimCommittedWaterClock LegacyOptics;
+    TestTrue(TEXT("legacy phase attaches once"),LegacyOptics.Initialize(0.));
+    for(double KernelDelta : {0.,.25,.5,.125})
+        TestTrue(TEXT("actual CPU kernel delta advances without rebasing"),LegacyOptics.AdvanceBy(KernelDelta));
+    TestEqual(TEXT("phase retains all accepted optical deltas"),LegacyOptics.TargetSeconds(),.875);
+    TestEqual(TEXT("optical origin stays attached"),LegacyOptics.Origin,0.);
+    for(double BadDelta : {-1.,std::numeric_limits<double>::infinity(),std::numeric_limits<double>::quiet_NaN()})
+    {
+        TestFalse(TEXT("invalid optical delta refused"),LegacyOptics.AdvanceBy(BadDelta));
+        TestEqual(TEXT("rejected optical delta preserves phase"),LegacyOptics.TargetSeconds(),.875);
+    }
     for(double Bad : {12.,-1.,std::numeric_limits<double>::infinity(),std::numeric_limits<double>::quiet_NaN()})
     {
         TestFalse(TEXT("invalid/regressed source refused"),Clock.Observe(Bad,Delta));

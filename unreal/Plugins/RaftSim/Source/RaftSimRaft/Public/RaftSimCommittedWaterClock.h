@@ -18,5 +18,14 @@ struct FRaftSimCommittedWaterClock
         if(!FMath::IsFinite(Seconds) || Seconds<Last)return false;
         Delta=Seconds-Last;Last=Seconds;return true;
     }
+    // Advance an optical phase by its actual kernel delta without resetting
+    // the attachment origin. The caller still owns the source clock policy;
+    // this does not make legacy wall-time foam solver-synchronous.
+    bool AdvanceBy(double ActualDelta)
+    {
+        if(!FMath::IsFinite(ActualDelta) || ActualDelta<0)return false;
+        double ObservedDelta=0;
+        return Observe(Last+ActualDelta,ObservedDelta);
+    }
     double TargetSeconds() const{return Last-Origin;}
 };

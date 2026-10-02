@@ -120,7 +120,9 @@ bool URaftSimStatefulDetailComponent::Initialize(URaftSimWaterRuntimeAdapter* Ad
     SurfaceTexture->bCanCreateUAV=true;
     SurfaceTexture->InitCustomFormat(DetailSize,TextureHeight,PF_A32B32G32R32F,true);
     SurfaceTexture->UpdateResourceImmediate(true);
-    if(bVerifiedFullReach && !FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyFoamFlow")))
+    // Optical density/current pairing is independent of the separately gated
+    // finite-depth solver above. Do not expand solver eligibility here.
+    if(bMovingWindow && Water->HasFeatureKinematics() && !FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyFoamFlow")))
     {
         FoamFlowTexture.Reset(NewObject<UTextureRenderTarget2D>(this));
         FoamFlowTexture->ClearColor=FLinearColor::Transparent;
