@@ -1286,7 +1286,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     bSouthForkOpticalSmoothingReview = bUsesSouthForkFullReachSingleSurface;
     if (WaterAdapter)
     {
-        // Ordinary South Fork launches, not a review-only command-line path.
+        // All eight ordinary playable rivers, not a review-only opt-in path.
         WaterAdapter->ConfigureFeatureKinematics(bUsesAuthoredRiverPresentation &&
             GetWorld() && RaftSimWaterFeatureKinematics::IsPlayableRiver(GetWorld()->GetMapName()));
     }

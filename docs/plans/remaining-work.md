@@ -1,5 +1,51 @@
 # Remaining requested work
 
+CURRENT user direction (October 2): use the already settled controlled-demo
+foam, eddy and hole techniques in every playable river. Do not make rollout
+conditional on redesigning or re-approving their visual style. The shared
+production allowlist covers FullReach, Troublemaker, Hance, Lava Canyon,
+Terminator, Upper Huacas, Zambezi and Zambezi Upper Gorge. Their normal hull
+sampler and foam transport use the same agreed current, with existing ground,
+wet masks and full-hull contact retained. Six saved optical parents are already
+migrated; the two Zambezi maps inherit the FullReach parent.
+
+The uninstalled clump-normal experiment was withdrawn following this direction;
+only its native qualification evidence remains in tmp. No playable material was
+changed by that experiment. Gathered cleanup build 59885 succeeded in 88.97 s;
+the withdrawn test registration is no longer linked. Its two temporary shaders
+were then removed, without deleting recordings or changing playable materials.
+
+Eight-map standalone regression 90355 is terminal and passed using
+`unreal/Scripts/verify_packaged_shared_water_rollout.ps1` and verified package
+`tmp/southfork-head-turn-package-v3/Archive/Windows`. Independent receipt audit
+`tmp/settled-water-allmaps-package-v1/all-eight-audit.json` confirms all eight
+distinct playable maps, clean native exits, default-enabled shared currents,
+finite actual full-production-raft timer states, zero shared-surface sampling
+error, zero submitted foam-transport error and no dry-to-wet violations. All
+launches used the same staged EXE SHA256
+`7db92f7ac7dfb6d4f9bc0e0e1d22149ee2d200804d1a43b27e29fe3b2892865d`.
+No solver, effect, quality or force command-line opt-in was used.
+
+Native videos and eight verified 23-frame APNGs are retained under
+`tmp/settled-water-allmaps-package-v1-L_*-review`; first/middle/last frames of
+every map were inspected. These show the settled effects in actual packaged
+map rendering, not an offline replacement. There is no new optical-style gate.
+Keep the following separate from the completed default rollout:
+- The sampled Chilko, Terminator, Batoka and Upper Gorge windows have zero
+  eligible physical eddy owners. This does not prove their entire maps lack
+  eddies, or demonstrate a boat recirculating at an unexercised obstacle.
+- Terminator and Batoka's final sampled windows have zero changed current
+  probes; quiet-window parity does not prove hole activation. Existing holes
+  remain driven by the accepted rendered breaking sites, not invented owners.
+- Compact station 95's diagnostic placement is dry/grounded and run-complete;
+  that capture is not a boat-washout demonstration. The retained wet EddyEntry
+  control still fails its unchanged 60-second exit gate.
+- Timer states and these recordings do not establish dense contact coverage,
+  ordinary menu progression or all-map performance acceptance. The retained
+  recording-free dense South Fork 20 FPS test still fails (p95 77.608 ms,
+  nine frames over 100 ms). No all-map 20 FPS claim is made.
+Preserve these receipts and inspect live work before new builds or captures.
+
 LATEST October 2 native physical-clearance investigation (not acceptance):
 - Subsequent native observations ruled out zero wet alpha, missing depth and
   missing opacity parameter: actual submitted lane alpha is 0.971..1,
