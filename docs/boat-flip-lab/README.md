@@ -1,7 +1,80 @@
 # Native boat flip laboratory
 
 Water-generated open-water lab validation is complete. Production promotion
-and obstacle/pinning validation remain separate; this is not a release claim.
+remains separate. The rock-pin lab sequence is now validated as described
+below; neither result is a full-map or packaged-release claim.
+
+### Rock pinning sequence (2026-10-02)
+
+The tall-rock native run starts broadside, upright and with zero angular
+velocity. Actual full-hull contact lifts the downstream side; dipped upstream
+upper-face patches admit relative current and apply pressure torque in the
+direction of the ongoing roll. The first sampled downstream rise is at 0.225 s,
+the first sampled reinforcing scoop at 1.283 s, and physical 100.164-degree
+capsize/ejection at 1.575 s. Two upper patches are wet before vertical inversion,
+with up to 62.085 N of added scoop force and an 0.0866 m sub-surface patch offset.
+This pressure reinforces the composite contact/buoyancy/drag flip; it is not
+proof that scoop pressure alone causes overturning. No roll target, incoming
+spin, timed pose transition or proxy hull is supplied.
+
+All three fresh 24-second native scenes complete without solver refusal:
+
+| Scene | Outcome | Mean recorded engine FPS |
+| --- | --- | ---: |
+| Tall rock, 8 m/s far-field authored current | Capsize at 1.575 s; five passengers submerge and resurface | 29.884 |
+| Same tall rock, calm water | Level throughout, no ejection | 39.021 |
+| Previous lower sloped rock, flowing pillow | 48.542-degree tilt and recovery, no ejection | 32.647 |
+
+The severe run records 540 real contact impulses. Minimum swimmer root offset
+is -2.688 m; all five are simultaneously underwater in a native sample at
+5.358 s and all return to the local datum by the end. The raft settles afloat
+inverted at +0.24084 m. Initial five-passenger loading is 605 kg. The new tall
+fixture's bed is -4 m and its flat rock top is +1.5 m, both shared by rendering
+and collision. The original lower wedge remains unchanged as a ride-over
+control. These are authored qualitative laboratory fields, not surveyed rock
+geometry or measured real-raft flip thresholds.
+
+The full 26,610-vertex / 38,344-triangle production hull and all five material
+sections are retained. The earlier corner/edge refusal is addressed by
+whole-arc separation certificates and feature-owned contact support updates,
+not larger event/manifold budgets or dropped collision geometry. Both recorded
+failure substeps now finish with passive impulse energy balance and agree with
+exhaustive original-triangle replay on pose, velocities, impulses and energy.
+Nine native load, cache and collision tests pass in
+`tmp/rock-pin-cache-native-v1/index.json`.
+
+Performance improvements are exact acceleration: original-face BVH pruning,
+clear-only whole-curved-path flight proofs (contact/refusal uses the unchanged
+bounded contact loop), and exact-input source-shape memoization. Same-count
+source edits, D4/condition changes and transform changes invalidate the cache.
+The cached and uncached 24-second recordings agree exactly at all 227 sampled
+boat positions, orientations, angular velocities, pressures and contact counts.
+Rendering independently reconstructs the committed shape and verifies every
+uploaded vertex/index against collision. Recorded mean FPS passes the 20 FPS
+gate; this is not a minimum instantaneous FPS or full-map performance claim.
+
+Evidence: `tmp/flip-rock-pin-native-v4`, `tmp/flip-rock-pin-calm-native-v4`,
+`tmp/flip-rock-low-wedge-native-v4`, and the strict three-scene audit in
+`tmp/rock-pin-cache-native-v1/three-scene-audit-v4.json`.
+The tightened final audit is `tmp/rock-pin-cache-native-v1/final-three-scene-audit-v4.json`;
+a compact repository record is `captures/native-rock-pin-suite-v4-audit.json`.
+Ordinary `RaftSim.P2.RaftFlipsAndRecovers` also passes without lab candidate
+flags (`tmp/rock-pin-normal-recovery-v1/index.json`, zero errors and the existing
+capsize warning). This regression preserves the old normal-game policy; it is
+not evidence of rock-sequence rollout into normal maps.
+
+Actual backbuffer
+animations are packaged with verified pixels/frame counts in the corresponding
+`-review` directories. The severe 12-second APNG has 49 verified frames and
+zero adjacent duplicate selected frames; original video is retained. Earlier
+10.2/17.3 FPS recordings and failed fine-interval packaging remain preserved as
+rejected/intermediate evidence.
+
+The contact, shape-cache and upper-patch experiments remain explicitly opt-in
+native lab code (`-RaftSimRockPinArcCandidate` plus the existing stable-drag lab
+candidate). Normal maps and shipping capsize policy have not been changed by
+this rock test. Full-map placement, performance and production promotion are
+separate gates, not implied by the laboratory acceptance.
 
 ### Current upright-start validation (2026-10-02)
 

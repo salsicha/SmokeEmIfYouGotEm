@@ -6,7 +6,9 @@ param(
     [Parameter(Mandatory=$true)][ValidatePattern('^[a-zA-Z0-9_.-]+$')][string]$Scene,
     [Parameter(Mandatory=$true)][ValidatePattern('^[a-zA-Z0-9_.-]+$')][string]$Label,
     [ValidateRange(60,900)][int]$TimeoutS=600,
-    [ValidateRange(12,40)][int]$DurationSeconds=12
+    [ValidateRange(12,40)][int]$DurationSeconds=12,
+    [switch]$CaptureContactFailure,
+    [switch]$RockPinArcCandidate
 )
 $ErrorActionPreference='Stop'
 $root=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -18,7 +20,7 @@ $known=@('calm','small_broadside','large_broadside','large_broadside_mirror','la
     'breaking_broadside_1p8m','breaking_broadside_2m','breaking_broadside_2p4m',
     'breaking_broadside_2p4m_mirror','breaking_bow_on_2p4m','pinned_breaker',
     'breaking_broadside_2p8m','breaking_broadside_3p2m','breaking_broadside_3p2m_mirror','breaking_bow_on_3p2m',
-    'rolling_entry_control','rolling_entry_port','rolling_entry_starboard','rock_pillow_broadside','rock_pillow_calm')
+    'rolling_entry_control','rolling_entry_port','rolling_entry_starboard','rock_pillow_broadside','rock_pillow_calm','rock_pin_broadside','rock_pin_calm')
 if($Scene -notin $known){throw 'Unknown native flip scene'}
 $deadline=(Get-Date).AddMinutes(15);$idleSince=$null
 do {
@@ -41,6 +43,8 @@ $arguments=@((Join-Path $root 'unreal/SmokeEmIfYouGotEm.uproject'),'/Game/RaftSi
     '-NoSplash','-NoSound','-d3d12','-ResX=1280','-ResY=720','-Windowed',
     "-RaftSimFlipValidationDuration=$DurationSeconds",
     "-AbsLog=$out/engine.log","-ExecCmds=raftsim.RecordingDir $out,RaftSim.FlipDemo $Scene $Label")
+if($CaptureContactFailure){$arguments+="-RaftSimHullFailurePath=$out/full-hull-failure.json"}
+if($RockPinArcCandidate){$arguments+='-RaftSimRockPinArcCandidate'}
 $launch=[ordered]@{schema='raftsim.native_flip_validation_launch.v1';scene=$Scene;label=$Label;
     scope='Actual production mesh/crew and sampled authored-water forces. Lab-only pressure/implicit-drag candidate; normal gameplay unchanged.';
     raft_dll_sha256=(Get-FileHash -LiteralPath $dll -Algorithm SHA256).Hash.ToLower();

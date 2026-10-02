@@ -383,8 +383,12 @@ public:
         TFunction<void()> Commit);
     const FRaftSimHullGeometry& GetHullGeometry() const { return PublishedHullGeometry; }
     uint64 GetHullGeometryRevision() const { return HullGeometryRevision; }
+    // Optional certified curved-path query. Existing normal-game queries keep
+    // their current semantics; the caller must still inspect every source face.
+    void SetHullGroundArcQuery(FRaftSimHullGroundArcQuery Query){HullGroundArcQuery=MoveTemp(Query);}
 
 private:
+    FRaftSimHullGroundArcQuery HullGroundArcQuery;
     UPROPERTY()
     FRaftSimRaftBodyConfig RaftConfig;
 

@@ -15,8 +15,106 @@
 #include "RaftSimContactWitnessPrune.h"
 #include "RaftSimSwimmerSubmersion.h"
 #include "RaftSimFlipObstacle.h"
+#include "RaftSimHullPrepareCache.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimHullPrepareCacheTest,
+    "RaftSim.Demo.RockPinExactShapeCache",
+    EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FRaftSimHullPrepareCacheTest::RunTest(const FString&)
+{
+    // Cache invalidation fixture, not a replacement hull for a boat run.
+    TArray<RaftSimRaftMesh::FMeshData> Rest;Rest.SetNum(1);auto& S=Rest[0];
+    S.Vertices={FVector(0,0,0),FVector(100,0,0),FVector(0,100,0)};S.Triangles={0,1,2};
+    S.Normals.Init(FVector::UpVector,3);S.UVs.Init(FVector2D::ZeroVector,3);S.Tangents.Init(FProcMeshTangent(1,0,0),3);
+    TArray<FRaftSimFlexVisualSegmentState> Input;Input.AddDefaulted();Input[0].SegmentId=TEXT("fixture");
+    RaftSimRaftMesh::FRaftSimRaftVisualCondition C;FTransform T=FTransform::Identity;
+    FRaftSimHullGeometry H;TestTrue(TEXT("fixture export valid"),RaftSimRaftMesh::ExportHullGeometry(Rest,T,H));
+    RaftSimHullPrepareCache::FCache Cache;Cache.Remember(Rest,.32f,Input,C,T,Rest,H);
+    TestTrue(TEXT("exact unchanged inputs reuse full snapshot"),Cache.Matches(Rest,.32f,Input,C,T));
+    for(int32 Case=0;Case<10;++Case)
+    {
+        auto Source=Rest;auto D=Input;auto Condition=C;auto Transform=T;float Radius=.32f;
+        switch(Case)
+        {
+        case 0:Source[0].Vertices[0].X+=1.e-9;break;
+        case 1:Swap(Source[0].Triangles[0],Source[0].Triangles[1]);break;
+        case 2:Source[0].Normals[0].X+=1.e-9;break;
+        case 3:Source[0].UVs[0].X+=1.e-9;break;
+        case 4:Source[0].Tangents[0].bFlipTangentY=true;break;
+        case 5:D[0].FreeboardLossM+=1.e-9;break;
+        case 6:D[0].bRecovering=true;break;
+        case 7:Condition.PressureFraction=.99f;break;
+        case 8:Transform.SetTranslation(FVector(1.e-9,0,0));break;
+        case 9:Radius=.33f;break;
+        }
+        TestFalse(FString::Printf(TEXT("same-count changed input invalidates exact cache %d"),Case),Cache.Matches(Source,Radius,D,Condition,Transform));
+    }
+    TestTrue(TEXT("cached export preserves every original vertex and indexed face"),Cache.Hull.VerticesM==H.VerticesM && Cache.Hull.Faces==H.Faces);
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimRockPinContactReplay,
+    "RaftSim.Demo.RockPinContactReplay",
+    EAutomationTestFlags::EditorContext|EAutomationTestFlags::ClientContext|EAutomationTestFlags::ProductFilter)
+bool FRaftSimRockPinContactReplay::RunTest(const FString& SecondaryPath)
+{
+    FString Path=SecondaryPath;
+    if(Path.IsEmpty() && !FParse::Value(FCommandLine::Get(),TEXT("RaftSimRockPinReplay="),Path))
+    {AddInfo(TEXT("No recorded full-hull pinning failure selected; replay not exercised"));return true;}
+    FString Json;TSharedPtr<FJsonObject> J;
+    if(!TestTrue(TEXT("actual native snapshot reads"),FFileHelper::LoadFileToString(Json,*Path) &&
+        FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Json),J) && J.IsValid()))return false;
+    if(!TestEqual(TEXT("native failure snapshot schema"),J->GetStringField(TEXT("schema")),FString(TEXT("raftsim.full_hull_native_failure.v1"))))return false;
+    const auto Vec=[](const TArray<TSharedPtr<FJsonValue>>& V){return FVector(V[0]->AsNumber(),V[1]->AsNumber(),V[2]->AsNumber());};
+    const auto Body=[&](const TSharedPtr<FJsonObject>& B)
+    {FRaftSimFlexRigidState S;S.Position=Vec(B->GetArrayField(TEXT("position")));S.LinearVelocity=Vec(B->GetArrayField(TEXT("velocity")));
+     S.AngularVelocity=Vec(B->GetArrayField(TEXT("omega")));const auto& Q=B->GetArrayField(TEXT("quaternion"));
+     S.Orientation=FQuat(Q[0]->AsNumber(),Q[1]->AsNumber(),Q[2]->AsNumber(),Q[3]->AsNumber());return S;};
+    FRaftSimHullGeometry Before,After;
+    for(const auto& V:J->GetArrayField(TEXT("before_vertices")))Before.VerticesM.Add(Vec(V->AsArray()));
+    for(const auto& V:J->GetArrayField(TEXT("after_vertices")))After.VerticesM.Add(Vec(V->AsArray()));
+    for(const auto& F:J->GetArrayField(TEXT("faces"))){const auto V=Vec(F->AsArray());Before.Faces.Add(FIntVector(V.X,V.Y,V.Z));}
+    After.Faces=Before.Faces;Before.Sections={{0,Before.VerticesM.Num(),0,Before.Faces.Num()}};After.Sections=Before.Sections;
+    if(!TestTrue(TEXT("replay retains actual full production hull, not a proxy"),Before.VerticesM.Num()==26610 && Before.Faces.Num()==38344 && Before.IsValid() && After.IsValid()))return false;
+    const auto Previous=Body(J->GetObjectField(TEXT("previous")));auto State=Body(J->GetObjectField(TEXT("predicted")));
+    FRaftSimHullGroundArcQuery ArcQuery;
+    if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimRockPinArcCandidate")))
+        ArcQuery=[](auto A,auto B,auto F,double Skin,double Clearance,const FRaftSimHullArcPath& Arc)
+        {return RaftSimFlipObstacle::Sweep(A,B,F,Skin,Clearance,false,true,&Arc);};
+    const auto R=RaftSimHullContact::Integrate(State,Previous,Before,After,J->GetNumberField(TEXT("mass_kg")),
+        Vec(J->GetArrayField(TEXT("inertia"))),J->GetNumberField(TEXT("dt")),
+        [](auto A,auto B,auto F,double Skin,double Clearance){return RaftSimFlipObstacle::Sweep(A,B,F,Skin,Clearance,false,true);},ArcQuery);
+    AddInfo(FString::Printf(TEXT("ROCK_PIN_REPLAY completed=%d failure=%s consumed=%.17g queries=%d impulses=%d shape_work=%.17g dissipated=%.17g kinetic_change=%.17g"),
+        int32(R.bCompleted),*R.Failure,R.ConsumedSeconds,R.Queries,R.Impulses,R.PrescribedShapeWorkJ,R.DissipatedJ,R.KineticChangeJ));
+    if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimRockPinRequireComplete")))
+    {
+        TestTrue(TEXT("recorded contact substep completes under unchanged limits"),R.bCompleted);
+        TestTrue(TEXT("whole native substep is consumed"),FMath::Abs(R.ConsumedSeconds-J->GetNumberField(TEXT("dt")))<1.e-12);
+        if(ArcQuery)
+        {
+            auto Reference=Body(J->GetObjectField(TEXT("predicted")));
+            const FRaftSimHullGroundArcQuery Exhaustive=[](auto A,auto B,auto F,double Skin,double Clearance,const FRaftSimHullArcPath& Arc)
+                {return RaftSimFlipObstacle::Sweep(A,B,F,Skin,Clearance,false,true,&Arc,false);};
+            const auto Slow=RaftSimHullContact::Integrate(Reference,Previous,Before,After,J->GetNumberField(TEXT("mass_kg")),
+                Vec(J->GetArrayField(TEXT("inertia"))),J->GetNumberField(TEXT("dt")),
+                [](auto A,auto B,auto F,double Skin,double Clearance){return RaftSimFlipObstacle::Sweep(A,B,F,Skin,Clearance,false,true);},Exhaustive,false);
+            TestTrue(TEXT("exhaustive original triangles without clear-flight shortcut also complete"),Slow.bCompleted);
+            TestTrue(TEXT("accelerated original hull agrees with exhaustive contact pose"),
+                State.Position.Equals(Reference.Position,1.e-9) && State.Orientation.Equals(Reference.Orientation,1.e-9));
+            TestTrue(TEXT("accelerated original hull agrees with exhaustive velocities"),
+                State.LinearVelocity.Equals(Reference.LinearVelocity,1.e-9) && State.AngularVelocity.Equals(Reference.AngularVelocity,1.e-9));
+            TestEqual(TEXT("actual contact impulses unchanged by acceleration"),R.Impulses,Slow.Impulses);
+            TestTrue(TEXT("dissipated work unchanged by acceleration"),FMath::Abs(R.DissipatedJ-Slow.DissipatedJ)<1.e-9);
+        }
+    }
+    else TestTrue(TEXT("recorded baseline contact refusal reproduces"),!R.bCompleted && R.Failure==J->GetStringField(TEXT("failure")));
+    FString Other;
+    if(!HasAnyErrors() && SecondaryPath.IsEmpty() && FParse::Value(FCommandLine::Get(),TEXT("RaftSimRockPinReplay2="),Other))
+        return RunTest(Other);
+    return !HasAnyErrors();
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimRockPillowLoads,
     "RaftSim.Demo.RockPillowLoads",
     EAutomationTestFlags::EditorContext|EAutomationTestFlags::ClientContext|EAutomationTestFlags::ProductFilter)
@@ -40,6 +138,9 @@ bool FRaftSimRockPillowLoads::RunTest(const FString&)
         TestTrue(TEXT("pillow bed has no vertical flux"),FMath::Abs(Pillow.Velocity(FVector(X*100.,0,-200.),0.).Z)<1.e-9);
     }
     TestTrue(TEXT("no water velocity inside solid footprint"),Pillow.Velocity(FVector::ZeroVector,0.).IsZero());
+    TArray<FVector> PinV;TArray<FIntVector> PinF;RaftSimFlipObstacle::Geometry(PinV,PinF,true,true);
+    for(int32 I=4;I<8;++I)TestEqual(TEXT("pinned pillow control has the same tall rendered/contact top"),PinV[I].Z,150.);
+    TestTrue(TEXT("pinned ground sampler uses the flat tall top, not the low ramp normal"),RaftSimFlipObstacle::TopNormal(true,true)==FVector::UpVector);
     FRaftSimFlexSegmentOverwash Wet;Wet.bWet=true;Wet.bUpstreamExposed=true;
     Wet.OvertoppingDepthM=.35;Wet.LocalPosition=FVector(0,1.,0);
     FRaftSimFlexTubeSegment Tube;Tube.TributaryLengthM=1.;

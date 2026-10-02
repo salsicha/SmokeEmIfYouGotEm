@@ -2,6 +2,11 @@
 #include "RaftSimContactWitnessPrune.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "Misc/ScopeExit.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonSerializer.h"
 
 namespace RaftSimHullContact
 {
@@ -20,7 +25,7 @@ bool Finite(const FRaftSimFlexRigidState& S)
 FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
     const FRaftSimFlexRigidState& Previous,const FRaftSimHullGeometry& Before,
     const FRaftSimHullGeometry& After,double Mass,const FVector& Inertia,double Dt,
-    const FRaftSimHullGroundQuery& Query)
+    const FRaftSimHullGroundQuery& Query,const FRaftSimHullGroundArcQuery& ArcQuery,bool bProbeClearFlight)
 {
     using namespace RaftSimSurfaceSweep;
     FRaftSimHullContactResult Result;
@@ -30,6 +35,33 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
         !Finite(State) || !Finite(Previous))
     {Result.Failure=TEXT("invalid full-hull input or changed topology");return Result;}
     auto Current=State;Current.Position=Previous.Position;Current.Orientation=Previous.Orientation;
+    // Opt-in native failure evidence. Does not change integration, limits or
+    // acceptance. Preserve the first failure so it can be replayed exactly.
+    FString FailurePath;
+#if !UE_BUILD_SHIPPING
+    FParse::Value(FCommandLine::Get(),TEXT("RaftSimHullFailurePath="),FailurePath);
+#endif
+    TArray<TSharedPtr<FJsonValue>> FailureEvents;
+    ON_SCOPE_EXIT
+    {
+        if(Result.bCompleted || FailurePath.IsEmpty() || IFileManager::Get().FileExists(*FailurePath))return;
+        const auto Vec=[](const FVector& V){return MakeShared<FJsonValueArray>(TArray<TSharedPtr<FJsonValue>>{
+            MakeShared<FJsonValueNumber>(V.X),MakeShared<FJsonValueNumber>(V.Y),MakeShared<FJsonValueNumber>(V.Z)});};
+        const auto Body=[&](const FRaftSimFlexRigidState& S)
+        {auto J=MakeShared<FJsonObject>();J->SetField(TEXT("position"),Vec(S.Position));J->SetField(TEXT("velocity"),Vec(S.LinearVelocity));
+         J->SetField(TEXT("omega"),Vec(S.AngularVelocity));const auto Q=S.Orientation;
+         J->SetArrayField(TEXT("quaternion"),{MakeShared<FJsonValueNumber>(Q.X),MakeShared<FJsonValueNumber>(Q.Y),MakeShared<FJsonValueNumber>(Q.Z),MakeShared<FJsonValueNumber>(Q.W)});return J;};
+        auto J=MakeShared<FJsonObject>();J->SetStringField(TEXT("schema"),TEXT("raftsim.full_hull_native_failure.v1"));
+        J->SetStringField(TEXT("failure"),Result.Failure);J->SetNumberField(TEXT("mass_kg"),Mass);J->SetField(TEXT("inertia"),Vec(Inertia));J->SetNumberField(TEXT("dt"),Dt);
+        J->SetObjectField(TEXT("previous"),Body(Previous));J->SetObjectField(TEXT("predicted"),Body(State));J->SetObjectField(TEXT("last_contact_state"),Body(Current));
+        TArray<TSharedPtr<FJsonValue>> A,B,F;
+        for(const auto& V:Before.VerticesM)A.Add(Vec(V));for(const auto& V:After.VerticesM)B.Add(Vec(V));
+        for(const auto& Face:Before.Faces)F.Add(Vec(FVector(Face)));
+        J->SetArrayField(TEXT("before_vertices"),A);J->SetArrayField(TEXT("after_vertices"),B);J->SetArrayField(TEXT("faces"),F);J->SetArrayField(TEXT("events"),FailureEvents);
+        J->SetNumberField(TEXT("consumed_seconds"),Result.ConsumedSeconds);J->SetNumberField(TEXT("impulses"),Result.Impulses);
+        FString Json;FJsonSerializer::Serialize(J,TJsonWriterFactory<>::Create(&Json));
+        if(!FFileHelper::SaveStringToFile(Json,*FailurePath))UE_LOG(LogTemp,Warning,TEXT("Native full-hull failure snapshot could not be saved: %s"),*FailurePath);
+    };
     const double InitialEnergy=Energy(Current,Mass,Inertia);
     double Radius=0.,ShapeSpeed=0.;
     for(int32 I=0;I<Before.VerticesM.Num();++I)
@@ -62,6 +94,22 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
         ++Result.Impulses;return true;
     };
     double Remaining=Dt,MaximumInterval=Dt;
+    if(ArcQuery && bProbeClearFlight)
+    {
+        // Clear-only acceleration: enclose the ENTIRE curved/deforming path.
+        // A contact or unresolved result is not integrated here; the unchanged
+        // small-interval contact loop below owns all impulses and refusals.
+        const double W=Current.AngularVelocity.Length();
+        const double Bound=(W*W*Radius+2.*W*ShapeSpeed)*Dt*Dt/8.;
+        auto End=Current;RaftSimSweptGround::Advance(End,Dt);
+        for(int32 I=0;I<StartCm.Num();++I)
+        {StartCm[I]=Current.WorldPoint(Before.VerticesM[I])*100.;EndCm[I]=End.WorldPoint(After.VerticesM[I])*100.;}
+        FRaftSimHullArcPath Path{Current,&Before,&After,0.,Dt,Dt,W*W*W*Radius+3.*W*W*ShapeSpeed};
+        const auto Flight=ArcQuery(StartCm,EndCm,Before.Faces,(SkinM+Bound)*100.,(Bound+RoundoffM)*100.,Path);
+        ++Result.Queries;Result.TrianglePairs+=Flight.TrianglePairs;
+        if(Flight.Status==EStatus::Clear)
+        {Current=End;Result.ConsumedSeconds=Dt;Result.MaximumCurveBoundM=Bound;Remaining=0.;}
+    }
     for(int32 Event=0;Event<512 && Remaining>1.e-12;++Event)
     {
         const double Omega=Current.AngularVelocity.Length();
@@ -76,7 +124,17 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
         auto Predicted=Current;RaftSimSweptGround::Advance(Predicted,Segment);
         for(int32 I=0;I<StartCm.Num();++I)
         {StartCm[I]=Current.WorldPoint(Local(I,Now))*100.;EndCm[I]=Predicted.WorldPoint(Local(I,Later))*100.;}
-        const auto Hit=Query(StartCm,EndCm,Before.Faces,(SkinM+CurveBound)*100.,Clearance*100.);
+        FRaftSimHullArcPath Path{Current,&Before,&After,Now,Segment,Dt,
+            Omega*Omega*Omega*Radius+3.*Omega*Omega*ShapeSpeed};
+        const auto Hit=ArcQuery ? ArcQuery(StartCm,EndCm,Before.Faces,(SkinM+CurveBound)*100.,Clearance*100.,Path)
+            : Query(StartCm,EndCm,Before.Faces,(SkinM+CurveBound)*100.,Clearance*100.);
+        if(!FailurePath.IsEmpty())
+        {auto J=MakeShared<FJsonObject>();J->SetNumberField(TEXT("event"),Event);J->SetNumberField(TEXT("now"),Now);
+         J->SetNumberField(TEXT("remaining"),Remaining);J->SetNumberField(TEXT("segment"),Segment);J->SetNumberField(TEXT("shape_speed"),ShapeSpeed);
+         J->SetNumberField(TEXT("omega"),Omega);J->SetNumberField(TEXT("clearance"),Clearance);J->SetNumberField(TEXT("hit_time"),Hit.Time);
+         J->SetNumberField(TEXT("status"),int32(Hit.Status));J->SetNumberField(TEXT("face"),Hit.MovingFace);J->SetNumberField(TEXT("ground_face"),Hit.GroundFace);
+         J->SetNumberField(TEXT("impulses"),Result.Impulses);J->SetNumberField(TEXT("contacts"),Contacts.Num());
+         FailureEvents.Add(MakeShared<FJsonValueObject>(J));}
         ++Result.Queries;Result.TrianglePairs+=Hit.TrianglePairs;
         if(Hit.Status==EStatus::Clear)
         {Current=Predicted;Remaining-=Segment;Result.ConsumedSeconds+=Segment;MaximumInterval=Dt;continue;}
@@ -97,9 +155,39 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
         Fresh.After=After.VerticesM[Face.X]*B.X+After.VerticesM[Face.Y]*B.Y+After.VerticesM[Face.Z]*B.Z;
         Fresh.Normal=Hit.Normal/Hit.Normal.Length();Fresh.Ground=Hit.Witness.GroundPoint;
         Fresh.MovingFace=Hit.MovingFace;
+        if(ArcQuery && B.GetMin()>1.e-10)
+        {
+            const FVector A=Current.WorldPoint(Local(Face.X,Result.ConsumedSeconds));
+            const FVector U=Current.WorldPoint(Local(Face.Y,Result.ConsumedSeconds))-A;
+            const FVector V=Current.WorldPoint(Local(Face.Z,Result.ConsumedSeconds))-A;
+            const double Align=FVector::DotProduct(FVector::CrossProduct(U,V).GetSafeNormal(),Fresh.Normal);
+            Fresh.bRotatingSourceFace=FMath::Abs(Align)>1.-1.e-8;Fresh.bReverseFaceNormal=Align<0.;
+        }
+        if(ArcQuery && !Fresh.bRotatingSourceFace && Hit.bHasGroundFeature && Hit.GroundFeatureA!=Hit.GroundFeatureB)
+        {
+            int32 Positive=0,Missing=INDEX_NONE;
+            for(int32 I=0;I<3;++I){if(B[I]>1.e-10)++Positive;else Missing=I;}
+            if(Positive==2)
+            {
+                const FVector U=Current.WorldPoint(Local(Face[(Missing+2)%3],Result.ConsumedSeconds))
+                    -Current.WorldPoint(Local(Face[(Missing+1)%3],Result.ConsumedSeconds));
+                const FVector N=FVector::CrossProduct(U,Hit.GroundFeatureB-Hit.GroundFeatureA).GetSafeNormal();
+                if(!N.IsNearlyZero())
+                {
+                    Fresh.bMovingEdge=true;Fresh.MissingCorner=Missing;
+                    Fresh.GroundFeatureA=Hit.GroundFeatureA;Fresh.GroundFeatureB=Hit.GroundFeatureB;
+                    Fresh.bReverseFaceNormal=FVector::DotProduct(N,Fresh.Normal)<0.;
+                }
+            }
+        }
         Contacts.RemoveAll([&](const FContact& C){return FVector::DotProduct(Current.WorldPoint(ContactLocal(C,Result.ConsumedSeconds))-C.Ground,C.Normal)>4.*SkinM;});
         if(auto* Existing=Contacts.FindByPredicate([&](const FContact& C)
-            {return (C.Before-Fresh.Before).Length()<1.e-7 && (C.After-Fresh.After).Length()<1.e-7 && FVector::DotProduct(C.Normal,Fresh.Normal)>1.-1.e-10;}))
+            {return (Fresh.bRotatingSourceFace && C.bRotatingSourceFace && C.MovingFace==Fresh.MovingFace
+                && C.bReverseFaceNormal==Fresh.bReverseFaceNormal && C.Ground.Equals(Fresh.Ground,1.e-12))
+                || (Fresh.bMovingEdge && C.bMovingEdge && Fresh.MovingFace==C.MovingFace && Fresh.MissingCorner==C.MissingCorner
+                    && Fresh.GroundFeatureA==C.GroundFeatureA && Fresh.GroundFeatureB==C.GroundFeatureB
+                    && Fresh.bReverseFaceNormal==C.bReverseFaceNormal)
+                || ((C.Before-Fresh.Before).Length()<1.e-7 && (C.After-Fresh.After).Length()<1.e-7 && FVector::DotProduct(C.Normal,Fresh.Normal)>1.-1.e-10);}))
             *Existing=Fresh;
         else
         {
@@ -113,27 +201,80 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
         }
         if(Contacts.Num()>128){Result.Failure=TEXT("full-hull manifold capacity exceeded");return Result;}
         const int32 BeforeImpulses=Result.Impulses;bool Resolved=false;
-        const auto FutureConstraint=[&](const FContact& C,FVector& P,FVector& D)
+        const auto SourceSupport=[&](const FContact& C,const FRaftSimFlexRigidState& Body,double Time,
+            FVector& Point,FVector& ShapeVelocity,FVector& Normal,double& Gap)
+        {
+            const auto Face=Before.Faces[C.MovingFace];FTriangle Triangle;
+            for(int32 I=0;I<3;++I)Triangle.V[I]=Body.WorldPoint(Local(Face[I],Time));
+            if(C.bMovingEdge)
+            {
+                const int32 I=(C.MissingCorner+1)%3,J=(C.MissingCorner+2)%3;
+                const FTriangle MovingEdge{{Triangle.V[I],Triangle.V[J],Triangle.V[J]}};
+                const FTriangle GroundEdge{{C.GroundFeatureA,C.GroundFeatureB,C.GroundFeatureB}};
+                const auto Support=Distance(MovingEdge,GroundEdge);
+                const double MovingT=Support.MovingBary.Y+Support.MovingBary.Z,GroundT=Support.GroundBary.Y+Support.GroundBary.Z;
+                if(MovingT<=1.e-10 || MovingT>=1.-1.e-10 || GroundT<=1.e-10 || GroundT>=1.-1.e-10)return false;
+                Normal=FVector::CrossProduct(Triangle.V[J]-Triangle.V[I],C.GroundFeatureB-C.GroundFeatureA).GetSafeNormal();
+                if(C.bReverseFaceNormal)Normal=-Normal;if(Normal.IsNearlyZero())return false;
+                Point=Support.MovingPoint-Body.Position;
+                const FVector Shape=(After.VerticesM[Face[I]]-Before.VerticesM[Face[I]])*(1.-MovingT)
+                    +(After.VerticesM[Face[J]]-Before.VerticesM[Face[J]])*MovingT;
+                ShapeVelocity=Body.Orientation.RotateVector(Shape/Dt);Gap=FVector::DotProduct(Support.MovingPoint-Support.GroundPoint,Normal);
+                return true;
+            }
+            const FTriangle GroundPoint{{C.Ground,C.Ground,C.Ground}};
+            const auto Support=Distance(Triangle,GroundPoint);const auto Bary=Support.MovingBary;
+            if(Bary.GetMin()<=1.e-10)return false;
+            Normal=FVector::CrossProduct(Triangle.V[1]-Triangle.V[0],Triangle.V[2]-Triangle.V[0]).GetSafeNormal();
+            if(C.bReverseFaceNormal)Normal=-Normal;if(Normal.IsNearlyZero())return false;
+            Point=Support.MovingPoint-Body.Position;
+            const FVector Shape=(After.VerticesM[Face.X]-Before.VerticesM[Face.X])*Bary.X
+                +(After.VerticesM[Face.Y]-Before.VerticesM[Face.Y])*Bary.Y
+                +(After.VerticesM[Face.Z]-Before.VerticesM[Face.Z])*Bary.Z;
+            ShapeVelocity=Body.Orientation.RotateVector(Shape/Dt);Gap=FVector::DotProduct(Support.MovingPoint-C.Ground,Normal);
+            return true;
+        };
+        // An interior source-face constraint expires at its edge; the next
+        // full-triangle query owns that edge/vertex transition, not a ghost face.
+        Contacts.RemoveAll([&](const FContact& C)
+        {FVector P,D,N;double G;return (C.bRotatingSourceFace || C.bMovingEdge) && (!SourceSupport(C,Current,Result.ConsumedSeconds,P,D,N,G) || G>4.*SkinM);});
+        const auto PresentConstraint=[&](const FContact& C,FVector& P,FVector& D,FVector& N)
+        {
+            P=ContactLocal(C,Result.ConsumedSeconds);D=Current.Orientation.RotateVector((C.After-C.Before)/Dt);N=C.Normal;
+            if(C.bRotatingSourceFace || C.bMovingEdge)
+            {FVector WorldPoint;double Gap;SourceSupport(C,Current,Result.ConsumedSeconds,WorldPoint,D,N,Gap);P=Current.Orientation.UnrotateVector(WorldPoint);}
+        };
+        const auto FutureConstraint=[&](const FContact& C,FVector& P,FVector& D,FVector& N)
         {
             auto Future=Current;const double H=FMath::Min(Remaining,Segment);RaftSimSweptGround::Advance(Future,H);
             const FVector FutureLocal=ContactLocal(C,Result.ConsumedSeconds+H);
             P=Current.Orientation.UnrotateVector(Future.Orientation.RotateVector(FutureLocal));
-            D=Future.Orientation.RotateVector((C.After-C.Before)/Dt);
+            D=Future.Orientation.RotateVector((C.After-C.Before)/Dt);N=C.Normal;
+            if(C.bRotatingSourceFace || C.bMovingEdge)
+            {
+                // A static ground corner supported by a rotating source FACE
+                // does not keep the same hull barycentric coordinate. Predict
+                // the real source triangle and reproject that ground witness.
+                // Using yesterday's hull point here creates Zeno-like repeats.
+                FVector WorldPoint;double Gap;
+                if(!SourceSupport(C,Future,Result.ConsumedSeconds+H,WorldPoint,D,N,Gap))return false;
+                P=Current.Orientation.UnrotateVector(WorldPoint);return Gap<Clearance;
+            }
             return FVector::DotProduct(Future.WorldPoint(FutureLocal)-C.Ground,C.Normal)<Clearance;
         };
         for(int32 Pass=0;Pass<128;++Pass)
         {
             for(const auto& C:Contacts)
             {
-                Apply(ContactLocal(C,Result.ConsumedSeconds),C.Normal,Current.Orientation.RotateVector((C.After-C.Before)/Dt));
-                FVector P,D;if(FutureConstraint(C,P,D))Apply(P,C.Normal,D);
+                FVector CP,CD,CN;PresentConstraint(C,CP,CD,CN);Apply(CP,CN,CD);
+                FVector P,D,N;if(FutureConstraint(C,P,D,N))Apply(P,N,D);
             }
             Resolved=true;
             for(const auto& C:Contacts)
             {
-                const FVector P=ContactLocal(C,Result.ConsumedSeconds),D=Current.Orientation.RotateVector((C.After-C.Before)/Dt);
-                Resolved &= FVector::DotProduct(Current.PointVelocity(P)+D,C.Normal)>=-ClosingTolerance;
-                FVector FP,FD;if(FutureConstraint(C,FP,FD))Resolved &= FVector::DotProduct(Current.PointVelocity(FP)+FD,C.Normal)>=-ClosingTolerance;
+                FVector P,D,N;PresentConstraint(C,P,D,N);
+                Resolved &= FVector::DotProduct(Current.PointVelocity(P)+D,N)>=-ClosingTolerance;
+                FVector FP,FD,FN;if(FutureConstraint(C,FP,FD,FN))Resolved &= FVector::DotProduct(Current.PointVelocity(FP)+FD,FN)>=-ClosingTolerance;
             }
             if(Resolved)break;
         }

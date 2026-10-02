@@ -794,7 +794,7 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     if(HullGroundQuery)
     {
         LastHullContact=RaftSimHullContact::Integrate(State,PreviousFiniteState,PublishedHullGeometry,
-            PendingHullGeometry,MassKg,Inertia,Dt,HullGroundQuery);
+            PendingHullGeometry,MassKg,Inertia,Dt,HullGroundQuery,HullGroundArcQuery);
         if(!LastHullContact.bCompleted)
         {
             UE_LOG(LogTemp,Error,TEXT("Full-hull ground review rejected: %s; consumed_s=%.17g dt=%.17g queries=%d faces=%d/%d"),

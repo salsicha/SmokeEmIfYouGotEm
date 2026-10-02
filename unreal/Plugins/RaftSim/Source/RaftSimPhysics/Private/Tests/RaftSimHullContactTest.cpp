@@ -3,8 +3,59 @@
 #include "Engine/GameInstance.h"
 #include "Subsystems/SubsystemCollection.h"
 #include "Misc/AutomationTest.h"
+#include "RaftSimHullArcClearance.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimArcPlaneCertificateTest,"RaftSim.Physics.FullHullArcPlaneCertificate",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimArcPlaneCertificateTest::RunTest(const FString&)
+{
+    using namespace RaftSimSurfaceSweep;
+    const FTriangle Floor{{FVector(-100,-100,0),FVector(100,-100,0),FVector(0,100,0)}};
+    FRaftSimHullGeometry H;H.VerticesM={FVector(0,0,-1),FVector(0,0,-1),FVector(0,0,-1)};
+    auto After=H;FRaftSimFlexRigidState S;S.Position=FVector(0,0,1.+2.e-9);S.AngularVelocity=FVector(0,3.,0);
+    const auto Certificate=[&](const FRaftSimFlexRigidState& Body,const FRaftSimHullGeometry& A,const FRaftSimHullGeometry& B,double Interval)
+    {
+        const double W=Body.AngularVelocity.Length();double Radius=0.,ShapeSpeed=0.;
+        for(int32 I=0;I<3;++I){Radius=FMath::Max(Radius,FMath::Max(A.VerticesM[I].Length(),B.VerticesM[I].Length()));ShapeSpeed=FMath::Max(ShapeSpeed,(B.VerticesM[I]-A.VerticesM[I]).Length()/Interval);}
+        FRaftSimHullArcPath Path{Body,&A,&B,0.,Interval,Interval,W*W*W*Radius+3.*W*W*ShapeSpeed};
+        FTriangle Start,Velocity,Acceleration;
+        for(int32 I=0;I<3;++I){Start.V[I]=Body.WorldPoint(A.VerticesM[I]);Path.Derivatives(I,Velocity.V[I],Acceleration.V[I]);}
+        return RaftSimHullArcClearance::PlaneSeparated(Start,Velocity,Acceleration,Floor,FVector::UpVector,Interval,Path.JerkBound);
+    };
+    TestTrue(TEXT("neutral support curving away has a certified whole interval"),Certificate(S,H,After,.001));
+    for(int32 I=0;I<=1000;++I)
+    {auto Exact=S;RaftSimSweptGround::Advance(Exact,I*.001/1000.);TestTrue(TEXT("independent exact arc stays clear for certified interval"),Exact.WorldPoint(H.VerticesM[0]).Z>0.);}
+    for(auto& P:H.VerticesM)P=FVector(1,0,0);After=H;S.Position=FVector(0,0,2.e-9);
+    TestFalse(TEXT("a genuinely closing vertex is not certified clear"),Certificate(S,H,After,.001));
+    S.Position.Z=.1;S.AngularVelocity=FVector(0,PI,0);
+    TestFalse(TEXT("clear chord endpoints do not hide interior arc penetration"),Certificate(S,H,After,1.));
+    auto Middle=S;RaftSimSweptGround::Advance(Middle,.5);
+    TestTrue(TEXT("rejected arc counterexample actually crosses plane"),Middle.WorldPoint(H.VerticesM[0]).Z<0.);
+    S.AngularVelocity=FVector::ZeroVector;S.Position.Z=.001;
+    for(auto& P:H.VerticesM)P=FVector::ZeroVector;After=H;for(auto& P:After.VerticesM)P.Z=-.002;
+    TestFalse(TEXT("prescribed deformation into rock cannot be discarded"),Certificate(S,H,After,.01));
+    S.Position.Z=2.e-9;for(auto& P:After.VerticesM)P.Z=.002;
+    TestTrue(TEXT("actual separating deformation can be certified"),Certificate(S,H,After,.01));
+    const FTriangle Source{{FVector(-1,-1,0),FVector(1,-1,0),FVector(0,1,0)}};
+    const FTriangle Corner{{FVector(.5,0,1.e-5),FVector(2,0,1),FVector(.5,2,1)}};
+    TestTrue(TEXT("inverse rigid frame certifies supported static corner over full interval"),
+        RaftSimHullArcClearance::RigidFaceSeparated(Source,Corner,FQuat::Identity,FVector::ZeroVector,
+            FVector::ZeroVector,FVector(0,1,0),.001));
+    TestFalse(TEXT("inverse rigid frame refuses genuinely entering corner"),
+        RaftSimHullArcClearance::RigidFaceSeparated(Source,Corner,FQuat::Identity,FVector::ZeroVector,
+            FVector::ZeroVector,FVector(0,-1,0),.001));
+    const FTriangle High{{FVector(-1,-1,0),FVector(1,-1,0),FVector(0,1,0)}};
+    const FTriangle Low{{FVector(-1,-1,-1),FVector(0,1,-1),FVector(1,-1,-1)}};
+    TestTrue(TEXT("rotating edge-axis proves separated actual triangles over a short interval"),
+        RaftSimHullArcClearance::RigidEdgeAxisSeparated(High,Low,FQuat::Identity,FVector::ZeroVector,
+            FVector::ZeroVector,FVector(0,1,0),.001,0,0));
+    TestFalse(TEXT("rotating edge-axis refuses a genuine crossing interval"),
+        RaftSimHullArcClearance::RigidEdgeAxisSeparated(High,Low,FQuat::Identity,FVector::ZeroVector,
+            FVector(0,0,-2),FVector::ZeroVector,1.,0,0));
+    return !HasAnyErrors();
+}
+
 namespace
 {
 FRaftSimHullGeometry Plate()
@@ -99,6 +150,17 @@ bool FRaftSimHullArcAndFailureTest::RunTest(const FString&)
     auto S=Predicted;const auto R=RaftSimHullContact::Integrate(S,Before,Hull,After,220.,FVector(100),Dt,Clear);
     TestTrue(TEXT("bounded curved path completes"),R.bCompleted && Queries>1 && R.MaximumCurveBoundM<=1.250000001e-6);
     TestTrue(TEXT("no-contact pose agrees with exact arc"),(S.Position-Predicted.Position).Length()<1.e-12 && S.Orientation.Equals(Predicted.Orientation,1.e-12));
+    const FRaftSimHullGroundArcQuery WholeClear=[&](auto A,auto B,auto F,double Skin,double Clearance,const FRaftSimHullArcPath&)
+        {return Clear(A,B,F,Skin,Clearance);};
+    S=Predicted;Queries=0;
+    const auto Flight=RaftSimHullContact::Integrate(S,Before,Hull,After,220.,FVector(100),Dt,Clear,WholeClear);
+    TestTrue(TEXT("full curved/deforming clear flight uses one enclosed query"),Flight.bCompleted && Queries==1);
+    TestTrue(TEXT("clear flight preserves exact integrated arc"),(S.Position-Predicted.Position).Length()<1.e-12 && S.Orientation.Equals(Predicted.Orientation,1.e-12));
+    // A whole-flight refusal cannot become accepted time or a pose write.
+    const FRaftSimHullGroundArcQuery WholeRefuse=[](auto,auto,auto,double,double,const FRaftSimHullArcPath&)
+        {return RaftSimSurfaceSweep::FResult();};
+    S=Predicted;const auto FlightRefused=RaftSimHullContact::Integrate(S,Before,Hull,After,220.,FVector(100),Dt,Clear,WholeRefuse);
+    TestTrue(TEXT("unresolved full-flight proof falls back and still refuses"),!FlightRefused.bCompleted && S.Position==Predicted.Position && S.Orientation==Predicted.Orientation);
     int32 Calls=0;
     const FRaftSimHullGroundQuery Refuse=[&](TConstArrayView<FVector>,TConstArrayView<FVector>,TConstArrayView<FIntVector>,double,double)
     {RaftSimSurfaceSweep::FResult X;X.Status=++Calls==1?RaftSimSurfaceSweep::EStatus::Clear:RaftSimSurfaceSweep::EStatus::Unresolved;return X;};

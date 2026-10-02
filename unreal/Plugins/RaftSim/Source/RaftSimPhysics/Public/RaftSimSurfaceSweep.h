@@ -23,6 +23,10 @@ struct FResult
     int32 Iterations=0,MovingFace=INDEX_NONE,GroundFace=INDEX_NONE;
     uint64 TrianglePairs=0;
     TWeakObjectPtr<UStaticMeshComponent> GroundComponent;
+    // Optional exact static vertex/edge provenance for feature-owned response.
+    // No ground mesh or moving hull geometry is replaced by these witnesses.
+    bool bHasGroundFeature=false;
+    FVector GroundFeatureA=FVector::ZeroVector,GroundFeatureB=FVector::ZeroVector;
 };
 // Includes both vertex/face directions, every edge pair, and crossing faces.
 // Degenerate source faces retain their segment/point geometry rather than vanish.

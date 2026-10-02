@@ -1,5 +1,6 @@
 #include "RaftSimRaftActor.h"
 #include "RaftSimRaftMesh.h"
+#include "RaftSimHullPrepareCache.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "ProfilingDebugging/CsvProfiler.h"
@@ -18,9 +19,29 @@ bool ARaftSimRaftActor::BindIsolatedFeatureHull(URaftSimChronoRuntimeAdapter* Ru
     }
     RaftAdapter=Runtime;LastRenderedHullRevision=0;LastLoggedHullRevision=0;
     const TWeakObjectPtr<ARaftSimRaftActor> WeakThis(this);
+    const auto SnapshotCache=MakeShared<RaftSimHullPrepareCache::FCache>();
+    const bool bCacheExactShape=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRockPinArcCandidate"));
     const bool Bound=Runtime->SetHullGeometryProvider(
-        [WeakThis](const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out)
-        {auto* Self=WeakThis.Get();return Self && Self->PrepareSharedHullGeometry(Segments,Out);},
+        [WeakThis,SnapshotCache,bCacheExactShape](const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out)
+        {
+            auto* Self=WeakThis.Get();if(!Self || !Self->RaftVisual || !Self->RaftAdapter)return false;
+            const double Started=FPlatformTime::Seconds();
+            const RaftSimRaftMesh::FRaftSimRaftVisualCondition C={Self->RaftAdapter->GetFlexiblePressureFraction(),
+                Self->RaftAdapter->GetFlexibleFabricIntegrity(),Self->RaftCondition.PermanentCreaseAmplitudeM};
+            const auto T=Self->RaftVisual->GetRelativeTransform();
+            if(bCacheExactShape && Self->bUsingProductionRaftRestMesh && Self->GetActorScale3D()==FVector::OneVector &&
+                SnapshotCache->Matches(Self->ProductionRaftRestSections,Self->TubeRadiusM,Segments,C,T))
+            {
+                Self->SharedHullPreparedSegments=Segments;Self->SharedHullPreparedCondition=C;
+                Self->SharedHullPreparedSections=SnapshotCache->Prepared;Out=SnapshotCache->Hull;
+                const double Ms=(FPlatformTime::Seconds()-Started)*1000.;++Self->SharedHullPrepareCount;
+                Self->SharedHullPrepareTotalMs+=Ms;Self->SharedHullPrepareMaximumMs=FMath::Max(Self->SharedHullPrepareMaximumMs,Ms);
+                return Out.IsValid();
+            }
+            const bool Valid=Self->PrepareSharedHullGeometry(Segments,Out);
+            if(Valid && bCacheExactShape)SnapshotCache->Remember(Self->ProductionRaftRestSections,Self->TubeRadiusM,Segments,C,T,Self->SharedHullPreparedSections,Out);
+            return Valid;
+        },
         [WeakThis](){if(auto* Self=WeakThis.Get())Self->CommitSharedHullGeometry();});
     if(!Bound)UE_LOG(LogTemp,Error,TEXT("Isolated production hull export refused: rest_sections=%d visual=%d"),ProductionRaftRestSections.Num(),int32(RaftVisual!=nullptr));
     return Bound;

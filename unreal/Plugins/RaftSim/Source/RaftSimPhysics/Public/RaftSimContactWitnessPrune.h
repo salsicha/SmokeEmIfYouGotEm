@@ -12,6 +12,13 @@ struct FWitness
 {
     FVector Before,After,Normal,Ground;
     int32 MovingFace=INDEX_NONE;
+    // A static ground feature supported by the interior of this source face
+    // is reprojected on that ACTUAL rotating face at every solve, not stored
+    // forever as many historical hull barycentric coordinates.
+    bool bRotatingSourceFace=false,bReverseFaceNormal=false;
+    bool bMovingEdge=false;
+    int32 MissingCorner=INDEX_NONE;
+    FVector GroundFeatureA=FVector::ZeroVector,GroundFeatureB=FVector::ZeroVector;
 };
 inline bool SamePlane(const FWitness& A,const FWitness& B,double Eps)
 {

@@ -8,8 +8,9 @@
 // changed by this experiment. No quaternion or angular rate is prescribed.
 namespace RaftSimFlipCandidateLoads
 {
+struct FDiagnostics {int32 WetUpperFaces=0;double MinimumFaceOffsetM=DBL_MAX,MaximumIncomingNormalMps=0.;};
 inline RaftSimOverwashLoads::FLoad Evaluate(URaftSimChronoRuntimeAdapter& Runtime,
-    const RaftSimFlipTestEnvironment::FScene& Scene,double Seconds,double Dt)
+    const RaftSimFlipTestEnvironment::FScene& Scene,double Seconds,double Dt,FDiagnostics* Diagnostics=nullptr)
 {
     const auto& K=Runtime.GetKinematicState();FRaftSimFlexRigidState State;
     State.Position=K.WorldTransform.GetLocation()*.01;State.Orientation=K.WorldTransform.GetRotation().GetNormalized();
@@ -36,8 +37,26 @@ inline RaftSimOverwashLoads::FLoad Evaluate(URaftSimChronoRuntimeAdapter& Runtim
         if(Tube)
         {
             const FVector Face=S.LocalPosition+FVector(0,0,R);
-            const FVector Relative=Scene.Velocity(State.WorldPoint(Face)*100.,Seconds)-State.PointVelocity(Face);
-            const auto Load=Scene.bPillowRock ? RaftSimOverwashLoads::ScoopingFace(S,*Tube,State.Orientation,R,Relative)
+            const FVector FaceWorld=State.WorldPoint(Face)*100.;
+            const FVector Relative=Scene.Velocity(FaceWorld,Seconds)-State.PointVelocity(Face);
+            auto Patch=S;
+            if(Scene.bPillowRock)
+            {
+                // D3's vertical tube-crest overflow is not the immersion of a
+                // TILTED upper patch. The latter admits current into the boat
+                // before the circular tube's highest WORLD-Z point is covered.
+                // Sample the actual transformed upper patch and its normal.
+                Patch.bWet=Scene.Wet(FaceWorld);
+                Patch.OvertoppingDepthM=FMath::Max(0.,Scene.Surface(FaceWorld,Seconds)-FaceWorld.Z*.01);
+                const FVector Outward=State.Orientation.RotateVector(Tube->OutwardNormal);
+                const double Incoming=-FVector::DotProduct(Relative,State.Orientation.GetUpVector());
+                Patch.bUpstreamExposed=Patch.bWet && FVector::DotProduct(Relative,Outward)<0. && Incoming>1.e-6;
+                if(Diagnostics && Patch.bUpstreamExposed)
+                {Diagnostics->MinimumFaceOffsetM=FMath::Min(Diagnostics->MinimumFaceOffsetM,-Patch.OvertoppingDepthM);
+                 Diagnostics->MaximumIncomingNormalMps=FMath::Max(Diagnostics->MaximumIncomingNormalMps,Incoming);
+                 if(Patch.OvertoppingDepthM>1.e-6)++Diagnostics->WetUpperFaces;}
+            }
+            const auto Load=Scene.bPillowRock ? RaftSimOverwashLoads::ScoopingFace(Patch,*Tube,State.Orientation,R,Relative)
                 : RaftSimOverwashLoads::UpperFace(S,*Tube,State.Orientation,R);
             Total.ForceN+=Load.ForceN;Total.TorqueNm+=Load.TorqueNm;
         }

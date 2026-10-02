@@ -75,6 +75,8 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
     int64 ContactImpulses=0;
     double MinimumSwimmerOffset=0.;int32 MaximumSubmergedCrew=0;
     RaftSimOverwashLoads::FLoad CandidateLoad;
+    RaftSimFlipCandidateLoads::FDiagnostics ScoopDiagnostics;
+    double LoadMs=0.,PhysicsMs=0.,HullRenderMs=0.,WaterRenderMs=0.;int32 NativeSteps=0;
     double InitialUp=1.,InitialOmega=0.,PressureWorkImpulse=0.;
     bool bRecording=false,bFailed=false;
     void UpdateWater()
@@ -161,6 +163,9 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
             // scoop torque about that axis, not the unrelated world X torque.
             R->SetNumberField(TEXT("scoop_longitudinal_torque_nm"),FVector::DotProduct(CandidateLoad.TorqueNm,Q.GetForwardVector()));
             R->SetNumberField(TEXT("retained_water_kg"),T.TotalRetainedWaterMassKg);
+            R->SetNumberField(TEXT("scoop_wet_upper_faces"),ScoopDiagnostics.WetUpperFaces);
+            R->SetNumberField(TEXT("scoop_upper_face_surface_offset_m"),ScoopDiagnostics.MinimumFaceOffsetM==DBL_MAX?0.:ScoopDiagnostics.MinimumFaceOffsetM);
+            R->SetNumberField(TEXT("scoop_incoming_normal_mps"),ScoopDiagnostics.MaximumIncomingNormalMps);
             R->SetStringField(TEXT("tube_probe_scope"),TEXT("Nominal body-local tube centre/top probes transformed by actual integrated pose; not exported mesh vertices."));
         }
         TArray<TSharedPtr<FJsonValue>> Crew;int32 Submerged=0;
@@ -205,17 +210,19 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
         int32 Steps=0;
         while(!bFailed && Debt>=1./120. && Steps<240 && Seconds<DurationSeconds)
         {
-            CandidateLoad={};
+            CandidateLoad={};ScoopDiagnostics={};const double LoadStarted=FPlatformTime::Seconds();
             if(Boat->GetRaftMode()==ERaftSimRaftMode::Upright)
             {
-                CandidateLoad=RaftSimFlipCandidateLoads::Evaluate(*Dynamics,Scene,Seconds,1./120.);
+                CandidateLoad=RaftSimFlipCandidateLoads::Evaluate(*Dynamics,Scene,Seconds,1./120.,&ScoopDiagnostics);
                 if(CandidateLoad.ForceN.ContainsNaN() || CandidateLoad.TorqueNm.ContainsNaN()){bFailed=true;break;}
                 Dynamics->AddExternalImpulse(CandidateLoad.ForceN/120.,CandidateLoad.TorqueNm/120.);
                 PressureWorkImpulse+=CandidateLoad.TorqueNm.Size()/120.;
             }
             const auto Previous=Dynamics->GetKinematicState();
             const auto PreviousMode=Boat->GetRaftMode();
+            LoadMs+=(FPlatformTime::Seconds()-LoadStarted)*1000.;const double PhysicsStarted=FPlatformTime::Seconds();
             if(!Boat->AdvanceIsolatedFlipDemo(1.f/120.f)){bFailed=true;break;}
+            PhysicsMs+=(FPlatformTime::Seconds()-PhysicsStarted)*1000.;++NativeSteps;
             Seconds+=1./120.;Debt-=1./120.;++Steps;
             const auto& State=Dynamics->GetKinematicState();
             MinimumUp=FMath::Min(MinimumUp,State.WorldTransform.GetRotation().GetUpVector().Z);
@@ -231,8 +238,10 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
             if(State.WorldTransform.ContainsNaN() || State.AngularVelocityRadiansPerSecond.ContainsNaN())bFailed=true;
             Receipt(PreviousMode!=Boat->GetRaftMode());
         }
-        Boat->RefreshIsolatedFlipVisual(float(Steps/120.));
+        const double HullStarted=FPlatformTime::Seconds();Boat->RefreshIsolatedFlipVisual(float(Steps/120.));
+        HullRenderMs+=(FPlatformTime::Seconds()-HullStarted)*1000.;const double WaterStarted=FPlatformTime::Seconds();
         UpdateWater();
+        WaterRenderMs+=(FPlatformTime::Seconds()-WaterStarted)*1000.;
         if(GEngine)GEngine->AddOnScreenDebugMessage(7452,.2f,FColor::White,
             FString::Printf(TEXT("Flip lab candidate: %s | native forces; no pose animation | %.2fs | %g kg"),*Scene.Name,Seconds,Dynamics->GetRaftBodyConfig().MassKg));
         if(bFailed || Seconds>=DurationSeconds)
@@ -249,6 +258,9 @@ struct FFlipDemo: TSharedFromThis<FFlipDemo>
             R->SetNumberField(TEXT("maximum_pose_step_rad"),MaximumPoseStep);
             R->SetNumberField(TEXT("maximum_omega_step_rad_s"),MaximumOmegaStep);
             R->SetNumberField(TEXT("rendered_fps_mean"),RenderSeconds>0. ? RenderFrames/RenderSeconds : 0.);
+            R->SetNumberField(TEXT("native_steps"),NativeSteps);R->SetNumberField(TEXT("profile_load_total_ms"),LoadMs);
+            R->SetNumberField(TEXT("profile_physics_total_ms"),PhysicsMs);R->SetNumberField(TEXT("profile_hull_render_total_ms"),HullRenderMs);
+            R->SetNumberField(TEXT("profile_water_render_total_ms"),WaterRenderMs);
             R->SetBoolField(TEXT("plausible_depth"),MinimumSurfaceOffset>=-2.);
             R->SetNumberField(TEXT("contact_impulses"),ContactImpulses);
             R->SetNumberField(TEXT("initial_roll_degrees"),Scene.InitialRollDegrees);
@@ -305,10 +317,13 @@ void StartFlipDemo(const TArray<FString>& Args,UWorld* W)
         Demo->Dynamics->SetHullGroundQuery([Pin,Pillow](TConstArrayView<FVector> A,TConstArrayView<FVector> B,
             TConstArrayView<FIntVector> Faces,double Skin,double Clearance)
             {return RaftSimFlipObstacle::Sweep(A,B,Faces,Skin,Clearance,Pin,Pillow);});
+        if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimRockPinArcCandidate")))
+            Demo->Dynamics->SetHullGroundArcQuery([Pin,Pillow](auto A,auto B,auto F,double Skin,double Clearance,const FRaftSimHullArcPath& Arc)
+                {return RaftSimFlipObstacle::Sweep(A,B,F,Skin,Clearance,Pin,Pillow,&Arc);});
         Demo->Dynamics->SetGroundSurfaceSampler([Pin,Pillow](const FVector& P,float& Z,FVector& N)
             {const bool OnRock=FMath::Abs(P.X)<=60. && FMath::Abs(P.Y)<=120.;
-             Z=OnRock ? RaftSimFlipObstacle::TopCm(P.X,Pin,Pillow) : -200.;
-             N=OnRock ? RaftSimFlipObstacle::TopNormal(Pillow) : FVector::UpVector;return true;});
+             Z=OnRock ? RaftSimFlipObstacle::TopCm(P.X,Pin,Pillow) : (Pin && Pillow ? -400. : -200.);
+             N=OnRock ? RaftSimFlipObstacle::TopNormal(Pillow,Pin) : FVector::UpVector;return true;});
     }
     FRaftSimRaftKinematicState Initial;FVector Start(0,0,20);
     if(Scene->bHydraulic){Start=FVector(0,-500,20);Initial.LinearVelocityMetersPerSecond=FVector(0,3.5,0);}

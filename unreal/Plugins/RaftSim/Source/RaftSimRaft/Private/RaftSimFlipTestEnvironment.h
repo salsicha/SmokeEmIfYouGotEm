@@ -18,6 +18,7 @@ struct FScene
     double InitialRollDegrees=0.,InitialRollRateRadS=0.;
     bool bPillowRock=false;
     double PillowCurrentMps=8.;
+    double BedM() const {return bPinnedBreaker && bPillowRock ? -4. : -2.;}
     bool Wet(const FVector& P) const
     {return !bObstacle || FMath::Abs(P.X)>60. || FMath::Abs(P.Y)>120.;}
     double Surface(const FVector& P,double Seconds) const
@@ -25,7 +26,7 @@ struct FScene
         const double Along=(P.X*FMath::Cos(AngleRadians)+P.Y*FMath::Sin(AngleRadians))*.01;
         // Stationary upstream pillow at a sloped, bed-connected rock. This is
         // an authored qualitative control, not measured rock hydraulics.
-        if(bPillowRock)return (PillowCurrentMps>0. ? .8 : 0.)*FMath::Exp(-FMath::Square((P.X*.01+.6)/1.25)-FMath::Square(P.Y*.01/3.));
+        if(bPillowRock)return (PillowCurrentMps>0. ? .8 : 0.)*FMath::Exp(-FMath::Square((P.X*.01+.6)/(bPinnedBreaker?2.:1.25))-FMath::Square(P.Y*.01/3.));
         if(bPinnedBreaker)return .9*FMath::Exp(-FMath::Square((Along+2.6)/.9));
         if(bHydraulic)return .55*FMath::Exp(-FMath::Square((Along+1.)/.7))-.45*FMath::Exp(-FMath::Square((Along-1.)/.7));
         const double WaveCenter=-6.+SpeedMps*FMath::Max(Seconds-2.,0.);
@@ -66,13 +67,13 @@ struct FScene
             // Dividing discharge by local depth and w=s*u.grad(H) supplies
             // an incompressible steady depth-column extension with bed and
             // surface tangency, not a solved turbulent breaker.
-            const double Flux=2.*(bPillowRock ? PillowCurrentMps : (bPinnedBreaker ? 8. : 2.8)),Depth=Surface(P,Seconds)+2.;
+            const double Flux=-BedM()*(bPillowRock ? PillowCurrentMps : (bPinnedBreaker ? 8. : 2.8)),Depth=Surface(P,Seconds)-BedM();
             FVector V(Flux*(F+Y*DF*FMath::Sign(Y)*Dy/D)/Depth,
                 -Flux*Y*DF*FMath::Sign(X)*Dx/D/Depth,0.);
             constexpr double Eps=.001;
             const double Hx=(Surface(P+FVector(Eps*100,0,0),Seconds)-Surface(P-FVector(Eps*100,0,0),Seconds))/(2.*Eps);
             const double Hy=(Surface(P+FVector(0,Eps*100,0),Seconds)-Surface(P-FVector(0,Eps*100,0),Seconds))/(2.*Eps);
-            V.Z=FMath::Clamp((P.Z*.01+2.)/Depth,0.,1.)*(V.X*Hx+V.Y*Hy);
+            V.Z=FMath::Clamp((P.Z*.01-BedM())/Depth,0.,1.)*(V.X*Hx+V.Y*Hy);
             return V;
         }
         // Linear long-wave orbital velocity: perturbation carried with crest,
@@ -112,6 +113,10 @@ inline TArray<FScene> Scenes()
         {TEXT("pinned_breaker"),0.,1.,2.,0.,false,false,true,0.,true},
         {TEXT("rock_pillow_broadside"),0.,1.,2.,0.,false,false,true,0.,false,0.,0.,true,8.},
         {TEXT("rock_pillow_calm"),0.,1.,2.,0.,false,false,true,0.,false,0.,0.,true,0.},
+        // A tall upstream face holds the downstream tube below the crest;
+        // the previous low wedge is retained as the ride-over control.
+        {TEXT("rock_pin_broadside"),0.,1.,2.,0.,false,false,true,0.,true,0.,0.,true,8.},
+        {TEXT("rock_pin_calm"),0.,1.,2.,0.,false,false,true,0.,true,0.,0.,true,0.},
         {TEXT("rolling_entry_control"),0.,1.,2.,PI*.5,false,false,false,0.,false,30.,.5},
         {TEXT("rolling_entry_port"),0.,1.,2.,PI*.5,false,false,false,0.,false,75.,5.},
         {TEXT("rolling_entry_starboard"),0.,1.,2.,PI*.5,false,false,false,0.,false,-75.,-5.}};
