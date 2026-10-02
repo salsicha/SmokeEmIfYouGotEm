@@ -600,10 +600,17 @@ near-field bank (both read the tiles as grids), `ApplyZambeziWallLedges`:
   into a masonry-like pattern;
 - turns on shadow casting for those tiles, so the ledges shade each other.
 
-The tiles are now about 4.63 M triangles (from 3.25 M). `L_Zambezi.umap`
-grows from 1.84 GB to 2.30 GB. The offscreen survey ran at 53-66 fps with and
-without the ledges, which is within run-to-run noise. The Landscape is still
-the collision authority.
+The split is stored, not baked. Procedural-mesh vertices serialise at about
+640 bytes each, and baking the ledges grew `L_Zambezi.umap` from 1.84 GB to
+2.30 GB, past Git LFS's 2 GiB object limit (the push was refused). Each tile
+now keeps its plain grid and carries a `URaftSimTerrainRefinementComponent`
+holding only the moved corner heights and the new vertices' heights (about
+3 MB in all). The component rebuilds the ledged mesh when play begins, in
+game worlds only, so an editor save never bakes it back. The map stays at
+1.84 GB. In play the tiles are about 4.63 M triangles (from 3.25 M). The
+offscreen survey ran at 53-66 fps with and without the ledges, which is within
+run-to-run noise. The Landscape is still the collision authority, and the
+editor viewport shows the plain grid.
 
 **Dressing on the ledges.** The Zambezi placement height follows the same
 field, so trees and rocks sit on the ledges. `AddZambeziGorgeWallRocks`

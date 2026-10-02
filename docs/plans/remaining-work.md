@@ -17,7 +17,8 @@ LATEST October 1 terrain, crew and raft pass (review section 8, docs/crew-roster
     tilted every wall toward the sky;
   - inferred lava-flow ledges and gullies on 3.1 m render cells (46,059 wall
     cells), shadow-casting, with 10,860 rockfall blocks on the ledges and
-    7,109 waterline boulders;
+    7,109 waterline boulders. The ledges are stored as heights and rebuilt
+    when play begins, which keeps the map at 1.84 GB, under the 2 GiB LFS limit;
   - banks are grey sand, not orange.
 - Rock: a world-scale detail layer on the tinted rock; the Futaleufu granite
   no longer reads as soap. Evidence-wall detail fades with distance.

@@ -170,7 +170,9 @@ Editor-hosted Development build on the development host; no packaged-build resul
   - The walls carry inferred lava-flow ledges and gullies on 3.1 m render
     cells, cast shadows, and have rockfall on the ledges. The ledges are
     generic banding, not measured relief. Collision is still the smooth
-    Landscape.
+    Landscape. The ledged mesh is rebuilt when play begins (it would push
+    the map past Git LFS's 2 GiB limit if saved), so the editor viewport
+    shows the plain wall grid.
   - The banks are grey sand and black boulders, no longer an orange beach.
   - A patchy green fringe (5,008 shrubs and 651 riparian trees, inferred)
     lines the waterline along the whole run.
