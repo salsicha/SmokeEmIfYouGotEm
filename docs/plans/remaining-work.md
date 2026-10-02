@@ -19,6 +19,12 @@ LATEST October 1 terrain, crew and raft pass (review section 8, docs/crew-roster
     cells), shadow-casting, with 10,860 rockfall blocks on the ledges and
     7,109 waterline boulders. The ledges are stored as heights and rebuilt
     when play begins, which keeps the map at 1.84 GB, under the 2 GiB LFS limit;
+  - the shaded walls are no longer black: basalt value 0.60 and a 2.5 sky
+    fill that the runtime presentation director now keeps (it had replaced
+    every map's sky fill with 1.25). The director still replaces the
+    authored sun and haze on every map;
+  - the launch bank cover leans with the ground and narrows onto ledges, so
+    the rows of flat yellow strips on the upper walls are gone;
   - banks are grey sand, not orange.
 - Rock: a world-scale detail layer on the tinted rock; the Futaleufu granite
   no longer reads as soap. Evidence-wall detail fades with distance.
@@ -27,7 +33,8 @@ LATEST October 1 terrain, crew and raft pass (review section 8, docs/crew-roster
   tapered to the torso and closed at the sides.
 - Raft: red tubes with waterline film, sun fade and scuffs, plus a throw bag,
   painters and a bow drybag.
-Not committed.
+Pushed in c4952f7b4, 26c514a32 and b4f1bfdec; the shaded-wall and
+launch-cover fixes followed on October 2.
 
 PREVIOUS October 1 follow-up visual fixes (review section 7):
 - Upper gorge whitewater: the observed layer now joins the GPU moving

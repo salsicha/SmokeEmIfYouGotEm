@@ -1923,6 +1923,9 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         {
             SkyLight->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
             SkyLight->Tags.AddUnique(TEXT("RaftSimCapturedGorgeSkyFill"));
+            // The runtime presentation director keeps this intensity as the
+            // clear-weather fill instead of its shared 1.25.
+            SkyLight->Tags.AddUnique(TEXT("RaftSimAuthoredSkyFill"));
         }
     }
 

@@ -169,15 +169,18 @@ UMaterialExpression* BuildBatokaOrganicBasaltBaseColor(
 
     // The drape and both rock photos are warm tan, so the tint alone left
     // the walls reading tan in game. The observed Batoka walls are black-grey
-    // basalt: remove nearly all the remaining hue and lower the value to ~0.02
-    // (this project's exposure renders ~0.04 as mid grey in sun), so the walls
-    // read black against the sky, foam and vegetation.
+    // basalt: remove nearly all the remaining hue and lower the value to
+    // ~0.03 (this project's exposure renders ~0.04 as mid grey in sun), so
+    // the walls read dark grey against the sky, foam and vegetation. At
+    // ~0.02 the sunlit walls rendered at sRGB 51-60 and, once the ledged
+    // walls cast shadows, the shaded faces at sRGB 20-24: black, with almost
+    // no bounce from the sunlit side.
     UMaterialExpressionDesaturation* NeutralBasalt =
         NewObject<UMaterialExpressionDesaturation>(Material);
     NeutralBasalt->Input.Expression = ErodedBasalt;
     NeutralBasalt->Fraction.Expression = Scalar(TEXT("BatokaBasaltDesaturation"), 0.94f);
     Add(NeutralBasalt);
-    return Multiply(NeutralBasalt, Scalar(TEXT("BatokaBasaltValueScale"), 0.42f));
+    return Multiply(NeutralBasalt, Scalar(TEXT("BatokaBasaltValueScale"), 0.60f));
 }
 
 UMaterialExpression* BuildBatokaOrganicBasaltColorCoverage(

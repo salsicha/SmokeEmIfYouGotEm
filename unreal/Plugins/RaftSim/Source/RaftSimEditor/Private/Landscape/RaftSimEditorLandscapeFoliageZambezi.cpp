@@ -46,7 +46,10 @@ FZambeziPlacementCounts AddZambeziLaunchPlacements(const FPlacementContext& Cont
         const int32 GroundCoverInstancesPerSide =
             ZambeziRunnableLaunchBankCoverInstanceCount / BankSideCount;
         int32 RunnableLaunchGroundCoverRejectedCount = 0;
+        int32 RunnableLaunchGroundCoverRejectedFootprintCount = 0;
+        int32 RunnableLaunchGroundCoverNarrowedCount = 0;
         float RunnableLaunchGroundCoverMaximumSlopeDegrees = 0.0f;
+        float RunnableLaunchGroundCoverMaximumTiltDegrees = 0.0f;
         for (int32 CoverIndex = 0;
              CoverIndex < ZambeziRunnableLaunchBankCoverInstanceCount;
              ++CoverIndex)
@@ -101,11 +104,117 @@ FZambeziPlacementCounts AddZambeziLaunchPlacements(const FPlacementContext& Cont
                 FMath::Pow(
                     ZambeziVegetationUnitRandom(CoverIndex, 9119),
                     1.18f));
+            const float ElevationBandHeightScale = ElevationBand == 0
+                ? 0.76f
+                : (ElevationBand == 1 ? 1.0f : 1.18f);
+            const float TargetHeightCm = ElevationBandHeightScale * FMath::Lerp(
+                55.0f,
+                155.0f,
+                ZambeziVegetationUnitRandom(CoverIndex, 9133));
+            UStaticMesh* GroundCoverMesh = UnderstoryMesh;
+            UHierarchicalInstancedStaticMeshComponent* GroundCoverInstances =
+                ZambeziRunnableLaunchGroundCoverInstances;
+            if ((CoverIndex & 1) != 0)
+            {
+                GroundCoverMesh = ZambeziGroundCoverMeshB;
+                GroundCoverInstances = ZambeziRunnableLaunchGroundCoverInstancesB;
+            }
+            const FBox GroundCoverBounds =
+                GetLandscapeCandidateEffectiveMeshBounds(GroundCoverMesh);
+            const float SelectedMeshHeightCm =
+                FMath::Max(1.0f, GroundCoverBounds.GetSize().Z);
+            const float UniformScale = TargetHeightCm / SelectedMeshHeightCm;
+            const float FootprintScale = FMath::Lerp(
+                1.20f,
+                2.45f,
+                ZambeziVegetationUnitRandom(CoverIndex, 9151));
+            const float DepthScale = FMath::Lerp(
+                0.80f,
+                1.20f,
+                ZambeziVegetationUnitRandom(CoverIndex, 9173));
+            // The patches are low and wide (up to ~8 m) and stood upright, so
+            // on a slope or across a ledge riser most of a patch sank into
+            // the rock and only a thin slice showed: rows of flat yellow
+            // strips on the walls. A patch now leans with the ground under
+            // its footprint (up to 20 deg) and must fit it: what that plane
+            // leaves over must stay within a third of the patch's height.
+            // Where a riser crosses it, the patch narrows (to 30 %) to sit on
+            // one ledge.
+            const float FullFootprintRadiusCm = UniformScale * FootprintScale * FMath::Max(
+                0.5f * GroundCoverBounds.GetSize().X,
+                0.5f * GroundCoverBounds.GetSize().Y * DepthScale);
+            const float FootprintToleranceCm = TargetHeightCm / 3.0f;
+            struct FFootprintFit
+            {
+                float WidthFactor = 1.0f;
+                float GroundZ = 0.0f;
+                FQuat Tilt = FQuat::Identity;
+            };
+            auto FitFootprint = [&GetLandscapeHeight, FullFootprintRadiusCm,
+                                 FootprintToleranceCm](const FVector2D& Point, float CentreZ,
+                                                       FFootprintFit& OutFit)
+            {
+                static constexpr float WidthFactors[] = {1.0f, 0.75f, 0.55f, 0.4f, 0.3f};
+                const float MaxGradient = FMath::Tan(FMath::DegreesToRadians(20.0f));
+                for (const float WidthFactor : WidthFactors)
+                {
+                    const float Radius = FullFootprintRadiusCm * WidthFactor;
+                    float RingZ[8];
+                    float MeanZ = CentreZ;
+                    float GradientX = 0.0f;
+                    float GradientY = 0.0f;
+                    for (int32 Direction = 0; Direction < 8; ++Direction)
+                    {
+                        const float Angle = Direction * UE_PI / 4.0f;
+                        RingZ[Direction] = GetLandscapeHeight(
+                            Point.X + Radius * FMath::Cos(Angle),
+                            Point.Y + Radius * FMath::Sin(Angle));
+                        MeanZ += RingZ[Direction];
+                        GradientX += RingZ[Direction] * FMath::Cos(Angle);
+                        GradientY += RingZ[Direction] * FMath::Sin(Angle);
+                    }
+                    // Least-squares plane through the centre and the ring
+                    // (the ring's cos^2 and sin^2 each sum to 4).
+                    MeanZ /= 9.0f;
+                    GradientX /= 4.0f * Radius;
+                    GradientY /= 4.0f * Radius;
+                    const float Gradient = FMath::Sqrt(
+                        GradientX * GradientX + GradientY * GradientY);
+                    if (Gradient > MaxGradient)
+                    {
+                        GradientX *= MaxGradient / Gradient;
+                        GradientY *= MaxGradient / Gradient;
+                    }
+                    float MinResidual = CentreZ - MeanZ;
+                    float MaxResidual = MinResidual;
+                    for (int32 Direction = 0; Direction < 8; ++Direction)
+                    {
+                        const float Angle = Direction * UE_PI / 4.0f;
+                        const float Residual = RingZ[Direction] - (MeanZ + Radius *
+                            (GradientX * FMath::Cos(Angle) + GradientY * FMath::Sin(Angle)));
+                        MinResidual = FMath::Min(MinResidual, Residual);
+                        MaxResidual = FMath::Max(MaxResidual, Residual);
+                    }
+                    if (MaxResidual - MinResidual <= FootprintToleranceCm)
+                    {
+                        OutFit.WidthFactor = WidthFactor;
+                        // Lowered to the lowest point so no edge floats.
+                        OutFit.GroundZ = MeanZ + MinResidual;
+                        OutFit.Tilt = FQuat::FindBetweenNormals(
+                            FVector::UpVector,
+                            FVector(-GradientX, -GradientY, 1.0f).GetSafeNormal());
+                        return true;
+                    }
+                }
+                return false;
+            };
             FVector2D BestPoint = ResolveLogicalRiverPoint(
                 BaseLogicalX,
                 Side * (ActiveRiverHalfWidth + TargetAdditionalOffset));
             float BestSlopeDegrees = TNumericLimits<float>::Max();
             float BestPlacementScore = TNumericLimits<float>::Max();
+            FFootprintFit BestFit;
+            bool bAnyInBand = false;
             for (int32 CandidateIndex = 0; CandidateIndex < 256; ++CandidateIndex)
             {
                 const int32 CandidateSeedIndex =
@@ -160,58 +269,50 @@ FZambeziPlacementCounts AddZambeziLaunchPlacements(const FPlacementContext& Cont
                         TargetDryHeightAboveWaterCm) +
                     0.00030f * FMath::Abs(
                         CandidateLogicalX - BaseLogicalX);
-                if (PlacementScore < BestPlacementScore)
+                bAnyInBand = true;
+                FFootprintFit CandidateFit;
+                if (PlacementScore < BestPlacementScore &&
+                    FitFootprint(CandidatePoint, GroundZ, CandidateFit))
                 {
-                    BestPlacementScore = PlacementScore;
-                    BestSlopeDegrees = SlopeDegrees;
-                    BestPoint = CandidatePoint;
+                    // Prefer a full-width patch over a narrowed one.
+                    const float FittedScore =
+                        PlacementScore + 6.0f * (1.0f - CandidateFit.WidthFactor);
+                    if (FittedScore < BestPlacementScore)
+                    {
+                        BestPlacementScore = FittedScore;
+                        BestSlopeDegrees = SlopeDegrees;
+                        BestPoint = CandidatePoint;
+                        BestFit = CandidateFit;
+                    }
                 }
             }
             if (BestPlacementScore == TNumericLimits<float>::Max())
             {
-                ++RunnableLaunchGroundCoverRejectedCount;
+                ++(bAnyInBand ? RunnableLaunchGroundCoverRejectedFootprintCount
+                              : RunnableLaunchGroundCoverRejectedCount);
                 continue;
             }
-
-            const float ElevationBandHeightScale = ElevationBand == 0
-                ? 0.76f
-                : (ElevationBand == 1 ? 1.0f : 1.18f);
-            const float TargetHeightCm = ElevationBandHeightScale * FMath::Lerp(
-                55.0f,
-                155.0f,
-                ZambeziVegetationUnitRandom(CoverIndex, 9133));
-            UStaticMesh* GroundCoverMesh = UnderstoryMesh;
-            UHierarchicalInstancedStaticMeshComponent* GroundCoverInstances =
-                ZambeziRunnableLaunchGroundCoverInstances;
-            if ((CoverIndex & 1) != 0)
+            if (BestFit.WidthFactor < 1.0f)
             {
-                GroundCoverMesh = ZambeziGroundCoverMeshB;
-                GroundCoverInstances = ZambeziRunnableLaunchGroundCoverInstancesB;
+                ++RunnableLaunchGroundCoverNarrowedCount;
             }
-            const float SelectedMeshHeightCm = FMath::Max(
-                1.0f,
-                GetLandscapeCandidateEffectiveMeshBounds(
-                    GroundCoverMesh).GetSize().Z);
-            const float UniformScale = TargetHeightCm / SelectedMeshHeightCm;
-            const float FootprintScale = FMath::Lerp(
-                1.20f,
-                2.45f,
-                ZambeziVegetationUnitRandom(CoverIndex, 9151));
+            RunnableLaunchGroundCoverMaximumTiltDegrees = FMath::Max(
+                RunnableLaunchGroundCoverMaximumTiltDegrees,
+                FMath::RadiansToDegrees(BestFit.Tilt.GetAngle()));
+
+            const FQuat Yaw(
+                FVector::UpVector,
+                FMath::DegreesToRadians(
+                    360.0f * ZambeziVegetationUnitRandom(CoverIndex, 9161)));
             const int32 InstanceIndex = AddGroundedInstance(
                 GroundCoverInstances,
                 GroundCoverMesh,
                 BestPoint,
-                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
-                FRotator(
-                    FMath::Clamp(BestSlopeDegrees * 0.07f, 0.0f, 1.7f),
-                    360.0f * ZambeziVegetationUnitRandom(CoverIndex, 9161),
-                    1.1f * FMath::Sin(static_cast<float>(CoverIndex) * 0.91f)),
+                BestFit.GroundZ,
+                (BestFit.Tilt * Yaw).Rotator(),
                 FVector(
-                    UniformScale * FootprintScale,
-                    UniformScale * FootprintScale * FMath::Lerp(
-                        0.80f,
-                        1.20f,
-                        ZambeziVegetationUnitRandom(CoverIndex, 9173)),
+                    UniformScale * FootprintScale * BestFit.WidthFactor,
+                    UniformScale * FootprintScale * DepthScale * BestFit.WidthFactor,
                     UniformScale));
             GroundCoverInstances->SetCustomDataValue(
                 InstanceIndex,
@@ -230,12 +331,17 @@ FZambeziPlacementCounts AddZambeziLaunchPlacements(const FPlacementContext& Cont
             TEXT("Zambezi runnable-launch bank cover: %d/%d opaque, grounded, "
                  "non-colliding, non-shadow-casting instances across both "
                  "banks; %d candidates rejected by full-route distance, dry "
-                 "height, or %.1f-degree slope gates; maximum selected slope "
-                 "%.2f degrees.\n"),
+                 "height, or %.1f-degree slope gates and %d with no spot "
+                 "where even a 30 %% patch fits the ledged ground; %d "
+                 "narrowed to fit a ledge; patches lean with the ground up "
+                 "to %.1f degrees; maximum selected slope %.2f degrees.\n"),
             RunnableLaunchGroundCoverPlacedCount,
             ZambeziRunnableLaunchBankCoverInstanceCount,
             RunnableLaunchGroundCoverRejectedCount,
             ZambeziRunnableLaunchGroundCoverSlopeCeilingDegrees,
+            RunnableLaunchGroundCoverRejectedFootprintCount,
+            RunnableLaunchGroundCoverNarrowedCount,
+            RunnableLaunchGroundCoverMaximumTiltDegrees,
             RunnableLaunchGroundCoverMaximumSlopeDegrees);
 
         constexpr int32 WoodySpeciesSlotCount = 4;

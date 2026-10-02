@@ -1058,6 +1058,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
         int32 ZambeziAtmosphereActorCount = 0;
         int32 AtmosphereSunCount = 0;
         int32 CapturedSkyFillCount = 0;
+        int32 AuthoredSkyFillCount = 0;
         int32 DrySeasonSkyCount = 0;
         int32 GorgeHazeCount = 0;
         for (TActorIterator<AActor> It(World); It; ++It)
@@ -1206,6 +1207,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 Actor->Tags.Contains(TEXT("RaftSimAtmosphereSunLight")) ? 1 : 0;
             CapturedSkyFillCount +=
                 Actor->Tags.Contains(TEXT("RaftSimCapturedGorgeSkyFill")) ? 1 : 0;
+            AuthoredSkyFillCount +=
+                Actor->Tags.Contains(TEXT("RaftSimAuthoredSkyFill")) ? 1 : 0;
             DrySeasonSkyCount +=
                 Actor->Tags.Contains(TEXT("RaftSimSourceAwareDrySeasonSky")) ? 1 : 0;
             GorgeHazeCount +=
@@ -1254,6 +1257,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
             4);
         Test->TestEqual(TEXT("Zambezi links one atmosphere sun"), AtmosphereSunCount, 1);
         Test->TestEqual(TEXT("Zambezi captures one gorge sky fill"), CapturedSkyFillCount, 1);
+        // Its shaded walls are lit almost only by the sky; the runtime
+        // presentation director must keep the authored fill, not its 1.25.
+        Test->TestEqual(TEXT("Zambezi's gorge sky fill is kept in play"), AuthoredSkyFillCount, 1);
         Test->TestEqual(TEXT("Zambezi has one dry-season sky"), DrySeasonSkyCount, 1);
         Test->TestEqual(TEXT("Zambezi has one volumetric gorge haze"), GorgeHazeCount, 1);
         return true;

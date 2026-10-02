@@ -196,7 +196,7 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
     TestScalar(TEXT("BatokaErosionShadowScaleV18"), 0.70f);
     TestScalar(TEXT("BatokaErosionHighlightScaleV18"), 0.98f);
     TestScalar(TEXT("BatokaBasaltDesaturation"), 0.94f);
-    TestScalar(TEXT("BatokaBasaltValueScale"), 0.42f);
+    TestScalar(TEXT("BatokaBasaltValueScale"), 0.60f);
     TestScalar(TEXT("BatokaBasaltRoughnessFloor"), 0.88f);
     TestScalar(TEXT("BatokaDetailNormalWeight"), 0.38f);
     TestScalar(TEXT("BatokaDetailRoughnessWeight"), 0.30f);

@@ -122,6 +122,11 @@ void ARaftSimPresentationDirector::ResolveEnvironmentActors()
     {
         Sun->GetLightComponent()->SetMobility(EComponentMobility::Movable);
     }
+    if (SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr &&
+        SkyLight->Tags.Contains(TEXT("RaftSimAuthoredSkyFill")))
+    {
+        AuthoredSkyFillIntensity = SkyLight->GetLightComponent()->Intensity;
+    }
     if (SkyLight == nullptr)
     {
         SkyLight = GetWorld()->SpawnActor<ASkyLight>(ASkyLight::StaticClass(), FTransform::Identity);
@@ -264,7 +269,13 @@ void ARaftSimPresentationDirector::ApplyEnvironmentState()
         // Preserve the captured-scene fill authored for the South Fork map.
         // The former 0.9 clear-weather ceiling crushed backlit faces, PPE,
         // and wet rock into black silhouettes in normal gameplay cameras.
-        const float SkyIntensity = FMath::Lerp(1.25f, 0.62f, CurrentState.WeatherWetness);
+        // A map may author its own clear-weather fill (RaftSimAuthoredSkyFill):
+        // the Zambezi gorges' shaded walls are lit almost only by the sky, and
+        // at 1.25 they rendered black. Wet weather dims it in proportion.
+        const float ClearSkyIntensity =
+            AuthoredSkyFillIntensity > 0.0f ? AuthoredSkyFillIntensity : 1.25f;
+        const float SkyIntensity = ClearSkyIntensity *
+            FMath::Lerp(1.0f, 0.62f / 1.25f, CurrentState.WeatherWetness);
         SkyLight->GetLightComponent()->SetIntensity(SkyIntensity);
     }
     if (HeightFog != nullptr && HeightFog->GetComponent() != nullptr)

@@ -313,8 +313,17 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
         // 0.58/0.50/0.39) in-scattered over the walls 100-500 m away, so they
         // read as tan haze whatever their albedo; at 0.0022 they still read
         // as light grey haze. Distant walls keep their atmospheric perspective.
+        // The sky fill is the shaded walls' main light now that the ledged
+        // walls cast shadows. In play ARaftSimPresentationDirector replaced it
+        // with its shared 1.25 (about 1.22 in clear weather); the sky light is
+        // tagged RaftSimAuthoredSkyFill so the director keeps this value. The
+        // camera's filmic toe crushes the shade's low values: at 1.22 the
+        // shaded walls rendered at sRGB 20-23 (black) and the crew in the
+        // shade at about 20; at 2.44 the walls reach 30-31 with their ledges
+        // readable and the crew 37, while sunlit walls only go from 57-61 to
+        // 63-65 (2026-10-02 survey, L_Zambezi stations 4690 m and 12020 m).
         Settings.SunIntensity = 4.35f;
-        Settings.SkyLightIntensity = 1.28f;
+        Settings.SkyLightIntensity = 2.50f;
         Settings.FogDensity = 0.0007f;
         Settings.ExposureBias = -0.30f;
         Settings.Saturation = 1.01f;

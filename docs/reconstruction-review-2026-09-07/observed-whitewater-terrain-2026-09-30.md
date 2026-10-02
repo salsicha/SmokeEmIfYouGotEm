@@ -554,7 +554,8 @@ orientation.
 
 Other changes:
 - **Colour and gloss:** the basalt colour is desaturated (0.94) and scaled
-  (0.42), with a 0.88 roughness floor. The sunlit wall's specular sheen had
+  (0.42, raised to 0.60 once the walls cast shadows; see "`L_Zambezi` shaded
+  walls"), with a 0.88 roughness floor. The sunlit wall's specular sheen had
   stayed light even under a pure-green probe colour.
 - **Banks:** the reference drape is laterite orange, so the flat banks read
   as an orange beach. The drape's hue is now 80 % neutralised toward pale
@@ -622,6 +623,48 @@ places:
 All are a third sunk, cast shadows, and use the reviewed rock scans in a new
 dark basalt instance (`MI_RaftSim_Zambezi_BasaltWallRockV1`). Ledges and rock
 positions are inferred.
+
+**Launch ground cover.** Above the launch (station 140 m), rows of flat yellow
+strips showed on the upper walls. They were the launch bank-cover patches:
+low and wide (up to about 8 m), stood upright on slopes up to 42°. Across a
+slope or a ledge riser, most of a patch sank into the rock and only a thin
+slice showed. Each patch now:
+- leans with the ground under its footprint, up to 20°, by a least-squares
+  plane through its centre and an eight-point ring at its edge;
+- must fit that ground: what the plane leaves over stays within a third of
+  the patch's height;
+- narrows to 75, 55, 40 or 30 % of its width where a riser crosses it, so it
+  sits on one ledge;
+- is grounded at its lowest point, so no edge floats.
+
+6,142 of 7,200 patches are placed and 4,648 of them are narrowed. Every
+ecology stratum keeps its 450 minimum (the right bank's low band has 509).
+Rejecting misfits outright, with no lean or narrowing, left 2,873 patches and
+no low-band cover on either bank, and failed the build's dressing validation.
+
+### `L_Zambezi` shaded walls
+
+Once the ledged walls cast shadows, the shaded side of the gorge read almost
+black. The survey measured the walls in shade at sRGB 20-24 against 51-60 in
+sun. The sun-to-shade ratio was normal (about 5:1 in linear light); the walls
+were simply too dark overall, and the camera's filmic toe crushes values that
+low.
+
+- **Albedo:** the basalt value scale goes back from 0.42 to 0.60
+  (`BatokaBasaltValueScale`), about 0.03. Sunlit walls now render at sRGB
+  57-61. The basalt stays desaturated (0.94), so it reads dark grey, not
+  brown.
+- **Sky fill never reached play.** `ARaftSimPresentationDirector` (game
+  module) replaces the map's sky-light intensity with its shared 1.25 (about
+  1.22 in clear weather) every frame. Raising the map's value from 1.28 to 1.9
+  and 3.8 changed nothing in play; `r.SkylightIntensityMultiplier 2` did.
+  The director now keeps a map's own clear-weather fill when its sky light is
+  tagged `RaftSimAuthoredSkyFill`, dimming it in wet weather in the same
+  proportion as before. Only the Zambezi rig (both gorge maps) carries the
+  tag, at 2.5. Other maps keep 1.25.
+- The director also replaces the authored sun (6.5 at -38/-128 instead of
+  Zambezi's 4.35 at -48/-90) and fog (0.009 instead of 0.0007) in play. That
+  is unchanged here and noted as a known issue.
 
 ### Rock material detail (all reaches)
 

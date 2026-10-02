@@ -173,6 +173,13 @@ Editor-hosted Development build on the development host; no packaged-build resul
     Landscape. The ledged mesh is rebuilt when play begins (it would push
     the map past Git LFS's 2 GiB limit if saved), so the editor viewport
     shows the plain wall grid.
+  - The shaded walls keep their gorge sky fill in play (2.5, tagged
+    `RaftSimAuthoredSkyFill`). The runtime presentation director still
+    replaces the authored sun (6.5 at -38/-128 instead of 4.35 at -48/-90)
+    and the gorge haze (fog 0.009 instead of 0.0007) on every map, so the
+    in-game light is not the one the map was tuned under.
+  - The launch bank cover leans with the ground (up to 20°) and narrows to
+    fit one ledge; 1,058 of the 7,200 patches find no spot and are left out.
   - The banks are grey sand and black boulders, no longer an orange beach.
   - A patchy green fringe (5,008 shrubs and 651 riparian trees, inferred)
     lines the waterline along the whole run.
