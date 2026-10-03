@@ -45,6 +45,30 @@ bool FRaftSimFoamEvolutionTest::RunTest(const FString&)
 #endif
 
 #if WITH_DEV_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimRapidPoolFrothTest,"RaftSim.Water.RapidPoolFrothRelease",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimRapidPoolFrothTest::RunTest(const FString&)
+{
+    using RaftSimFoamEvolution::PoolReleaseRetention;
+    TestEqual(TEXT("held water clock cannot age bubbles"),PoolReleaseRetention(0.f,0.f),1.f);
+    TestEqual(TEXT("active rapid retains its existing release"),PoolReleaseRetention(.1f,1.f),1.f);
+    TestTrue(TEXT("no source: less than 0.04 percent froth after one second"),PoolReleaseRetention(0.f,1.f)<.0004f);
+    TestTrue(TEXT("bubble release starts immediately at rapid exit"),PoolReleaseRetention(0.f,.25f)<.14f);
+    for(float Source : {0.f,.01f,.025f,.05f,.1f,1.f})
+    {
+        const float Whole=PoolReleaseRetention(Source,1.f);
+        const float Split=FMath::Pow(PoolReleaseRetention(Source,1.f/120.f),120.f);
+        TestTrue(TEXT("release depends on elapsed water time, not frame rate"),FMath::Abs(Whole-Split)<1.e-5f);
+    }
+    float Froth=1.f;
+    for(int32 I=0;I<120;++I)
+        Froth=RaftSimFoamEvolution::Resolve(Froth*PoolReleaseRetention(0.f,1.f/120.f),0.f,.1f,0.f,1.f,false);
+    TestTrue(TEXT("transported rapid froth cannot form a persistent pool sheet"),Froth<.0004f);
+    return true;
+}
+#endif
+
+#if WITH_DEV_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimDirectionalFoamSourceTest,"RaftSim.Water.DirectionalFoamSource",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FRaftSimDirectionalFoamSourceTest::RunTest(const FString&)

@@ -5,6 +5,7 @@ float CellMeters;
 float StepSeconds;
 float MomentumDamping;
 float FoamDecay;
+float PoolFoamDecay;
 float FoamSource;
 uint Periodic;
 uint SecondOrder;
@@ -238,7 +239,11 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     s.yz*=exp(-MomentumDamping*StepSeconds);
     // Exact source/decay integration after conservative current advection.
     float source=FoamSource*flow.w;
-    float decay=exp(-FoamDecay*StepSeconds);
-    s.w=s.w*decay+(FoamDecay>0 ? source*(1-decay)/FoamDecay : source*StepSeconds);
+    // Fresh-water froth is replenished where water crashes, not a persistent
+    // sea-foam tracer in downstream pools. This sink changes only density W;
+    // mean flow, liquid height/momentum and activity memory remain unchanged.
+    float localDecay=FoamDecay+PoolFoamDecay*(1-smoothstep(0.01,0.1,flow.w));
+    float decay=exp(-localDecay*StepSeconds);
+    s.w=s.w*decay+(localDecay>0 ? source*(1-decay)/localDecay : source*StepSeconds);
     NextState[i]=s;
 }

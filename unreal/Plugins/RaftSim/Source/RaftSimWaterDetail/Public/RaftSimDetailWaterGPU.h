@@ -26,6 +26,9 @@ struct RAFTSIMWATERDETAIL_API FRaftSimDetailWaterGrid
     float StepSeconds = 1.0f/120.0f;
     float MomentumDampingPerSecond = 0.6f;
     float FoamDecayPerSecond = 0.15f;
+    // Extra fresh-water bubble release where no local aeration is active.
+    // Zero retains conservative transport fixtures; production sets 8 /s.
+    float PoolFoamDecayPerSecond = 0.f;
     float FoamSourcePerSecond = 0.7f;
     bool bPeriodic = false; // Regression fixtures only; runtime uses walls.
     bool bSecondOrder = false; // MC wave reconstruction + SSP-RK2; foam spatial flux stays upwind.

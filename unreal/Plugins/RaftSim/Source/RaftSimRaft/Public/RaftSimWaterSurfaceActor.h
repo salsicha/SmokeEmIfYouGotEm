@@ -676,10 +676,9 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
     float RefreshIntervalSeconds = 1.0f / 15.0f;
 
-    /** Half-life of persistent surface foam. Generated foam decays through this
-     * while being advected downstream with the sampled flow, so whitewater
-     * streaks and tails follow the current instead of sitting statically on the
-     * generation cell. Presentation only. */
+    /** Release half-life near active aeration. Froth follows the sampled flow;
+     * a separate rapid calm-water bubble-release sink prevents this value from
+     * producing persistent sea-foam sheets in pools. Presentation only. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water", meta = (ClampMin = "0.5"))
     float FoamHalfLifeSeconds = 4.0f;
 

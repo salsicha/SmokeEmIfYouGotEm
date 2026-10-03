@@ -34,6 +34,7 @@ class FRaftSimDetailWaterCS : public FGlobalShader
         SHADER_PARAMETER(float,StepSeconds)
         SHADER_PARAMETER(float,MomentumDamping)
         SHADER_PARAMETER(float,FoamDecay)
+        SHADER_PARAMETER(float,PoolFoamDecay)
         SHADER_PARAMETER(float,FoamSource)
         SHADER_PARAMETER(uint32,Periodic)
         SHADER_PARAMETER(uint32,SecondOrder)
@@ -248,6 +249,7 @@ bool FRaftSimDetailWaterGrid::Validate(TConstArrayView<FVector4f> Flow,FString& 
         !FMath::IsFinite(CellMeters) || CellMeters<=0 || !FMath::IsFinite(StepSeconds) || StepSeconds<=0 ||
         !FMath::IsFinite(MomentumDampingPerSecond) || MomentumDampingPerSecond<0 ||
         !FMath::IsFinite(FoamDecayPerSecond) || FoamDecayPerSecond<0 ||
+        !FMath::IsFinite(PoolFoamDecayPerSecond) || PoolFoamDecayPerSecond<0 ||
         !FMath::IsFinite(FoamSourcePerSecond) || FoamSourcePerSecond<0 ||
         !FMath::IsFinite(ActivitySourcePerSecond) || ActivitySourcePerSecond<0 ||
         !FMath::IsFinite(ActivityDecayPerSecond) || ActivityDecayPerSecond<0 ||
@@ -353,6 +355,7 @@ bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
             auto* P=Graph.AllocParameters<FRaftSimDetailWaterCS::FParameters>();
             P->GridSize=Grid.Size;P->CellMeters=Grid.CellMeters;P->StepSeconds=Grid.StepSeconds;
             P->MomentumDamping=Grid.MomentumDampingPerSecond;P->FoamDecay=Grid.FoamDecayPerSecond;
+            P->PoolFoamDecay=Grid.PoolFoamDecayPerSecond;
             P->FoamSource=Grid.FoamSourcePerSecond;P->Periodic=Grid.bPeriodic ? 1u : 0u;
             P->SecondOrder=Grid.bSecondOrder ? 1u : 0u;P->RKStage=Stage;
             P->OriginMeters=Grid.OriginMeters;P->TurbulentHeadMeters=Grid.TurbulentHeadMeters;

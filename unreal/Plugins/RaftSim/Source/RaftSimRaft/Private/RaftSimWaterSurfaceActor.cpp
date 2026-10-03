@@ -7232,9 +7232,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     }
     // Semi-Lagrangian: each wet vertex looks upstream along the sampled flow
     // into the previous foam field, decays what it finds through the half-life,
-    // and takes the maximum with this refresh's generation. Foam therefore
-    // streaks downstream of every hole and wave train and pools into eddy
-    // lines, instead of blinking in and out on the generation cells.
+    // and attacks toward this refresh's generation. Fresh froth follows the
+    // current near a crash, but a local no-source sink releases bubbles before
+    // they can accumulate as a persistent sheet in a pool or quiet eddy.
     const FVector2D CurrentFieldOriginM = bUsesCurvedRiverCoordinates
         ? FVector2D(
               CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f,
@@ -7401,14 +7401,16 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     Advected = FMath::Lerp(
                         FMath::Lerp(V00, V01, Fx), FMath::Lerp(V10, V11, Fx), Fy);
                 }
-                Advected *= DecayFactor;
+                Advected *= DecayFactor * RaftSimFoamEvolution::PoolReleaseRetention(
+                    SourceFoam[Index],FoamDeltaSeconds);
             }
             // The hydraulic field refreshes at 15 Hz. Feeding a newly
             // generated source directly to vertex colour made an entire crest
             // jump from water to white in one rendered frame even though its
             // advected release was persistent. Give generation a short
-            // exponential attack while retaining the existing four-second
-            // transported release. This is state smoothing only: the solver
+            // exponential attack. Retain transported froth at active breaking
+            // sites, but release bubbles rapidly when they enter calm water.
+            // This is presentation only: the solver
             // still decides where foam is born and the sampled current still
             // decides where it travels.
             const float FinalFoam=RaftSimFoamEvolution::Resolve(Advected,SourceFoam[Index],FoamAttackBlend,
@@ -7471,7 +7473,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         {
             if(Correction.Corrected.IsValidIndex(I) && Correction.Corrected[I])
             {
-                const float Value=RaftSimFoamEvolution::Resolve(Correction.Values[I]*DecayFactor,SourceFoam[I],
+                const float Value=RaftSimFoamEvolution::Resolve(Correction.Values[I]*DecayFactor*
+                    RaftSimFoamEvolution::PoolReleaseRetention(SourceFoam[I],FoamDeltaSeconds),SourceFoam[I],
                     FoamAttackBlend,TongueFoamSuppression[I],ShoreDisplacementWeight[I],false);
                 Change+=FMath::Abs(Value-NewFoamField[I]);NewFoamField[I]=Value;VertexColors[I].R=Value;
             }

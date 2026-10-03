@@ -3,6 +3,16 @@
 
 namespace RaftSimFoamEvolution
 {
+// Presentation closure for fresh-water froth, not persistent sea foam. The
+// existing release survives at active breaking sites; without a local source,
+// rising bubbles disappear (less than 0.04% remains after one second).
+inline float PoolReleaseRetention(float LocalSource,float DeltaSeconds)
+{
+    if(DeltaSeconds<=0.f)return 1.f;
+    const float Activity=FMath::SmoothStep(.01f,.1f,LocalSource);
+    return FMath::Exp(-8.f*(1.f-Activity)*DeltaSeconds);
+}
+
 inline float Resolve(float Advected,float Source,float AttackBlend,float Tongue,float Shore,bool bHold)
 {
     // A held clock must not repeatedly apply generation or attenuation.

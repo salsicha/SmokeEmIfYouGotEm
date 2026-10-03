@@ -537,6 +537,7 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
     Accumulator-=Steps*double(StepSeconds);
     FRaftSimDetailWaterGrid Grid;Grid.Size=FIntPoint(DetailSize,DetailSize);Grid.CellMeters=DetailCellMeters;
     Grid.OriginMeters=WindowOriginMeters;Grid.StepSeconds=StepSeconds;Grid.TurbulentHeadMeters=0.06f;
+    Grid.PoolFoamDecayPerSecond=8.f;
     Grid.bSecondOrder=bSecondOrder;
     Grid.bActivityMemory=bActivityMemory;
     Grid.bFiniteDepthDispersion=bFiniteDepthDispersion;
