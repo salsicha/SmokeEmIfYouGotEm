@@ -87,6 +87,12 @@ struct FRaftSimCrewAvatarPose
     // independently of whether the paddle prop is visible.
     float BoardingPaddleGripBlend = 0.f;
     bool bFeetPlanted = false;
+    /** Both hands hold oar handles (an oar rig's rower): each hand grips
+     * along its own oar, whose direction from handle toward blade is
+     * LeftOarAxis / RightOarAxis. The paddle prop stays hidden. */
+    bool bOarGrip = false;
+    FVector LeftOarAxis = FVector::RightVector * -1.0;
+    FVector RightOarAxis = FVector::RightVector;
 };
 
 UCLASS()
@@ -126,6 +132,14 @@ public:
      * crossbar runs parallel to it, so the top hand's knuckles line up with
      * the blade and the paddler can feel its angle. */
     static FVector GetPaddleBladeWidthAxis(const FVector& Direction, bool bResting);
+
+    /** A seated rower on an oar frame, facing the bow: hands on the two oar
+     * handles (grip centres and oar directions, avatar-local), feet braced
+     * on the foot bar, the torso leaning and twisting with the handles. */
+    static FRaftSimCrewAvatarPose EvaluateRowingPose(
+        const FVector& LeftGripCm, const FVector& LeftOarAxis,
+        const FVector& RightGripCm, const FVector& RightOarAxis,
+        const FVector& FootBarCm);
 
 };
 
@@ -172,6 +186,14 @@ public:
      * cycle (0 catch .. 0.58 exit .. 1 the next catch for the strokes). */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Validation")
     void SetAvatarActionPhaseForValidation(ERaftSimCrewAvatarAction NewAction, float NormalizedPhase);
+
+    /** Drive the seated pose from outside (an oar rig posing its rower each
+     * frame). Replaces the library pose while the avatar is SeatedIdle;
+     * other actions (swimming, boarding) keep their own. bApplyNow poses
+     * the body immediately instead of on the avatar's next tick. */
+    void SetExternalPose(const FRaftSimCrewAvatarPose& Pose, bool bApplyNow = false);
+    void ClearExternalPose();
+    bool HasExternalPose() const { return bHasExternalPose; }
 
     /**
      * Hides this avatar's head and helmet so a first-person camera can sit
@@ -378,6 +400,8 @@ private:
     void FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose, ERaftSimCrewAvatarAction Action);
     FRaftSimCrewAvatarPose LastRenderedPose;
     bool bHasRenderedPose = false;
+    FRaftSimCrewAvatarPose ExternalPose;
+    bool bHasExternalPose = false;
     struct FGroundedFootPlacement
     {
         bool bBound = false;

@@ -5,6 +5,7 @@
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimRaftCondition.h"
 #include "RaftSimRaftMesh.h"
+#include "RaftSimOarRig.h"
 
 #include "RaftSimRaftActor.generated.h"
 
@@ -71,6 +72,7 @@ class RAFTSIMRAFT_API ARaftSimRaftActor : public AActor
     friend class FRaftSimInputContextIsolationTest;
     friend class FRaftSimCrewOccupancyTest;
     friend class FRaftSimProductionCapturedRockPin;
+    friend class URaftSimOarRigComponent;
 
 public:
     /** Exact triangle samples of current uploaded floor and tube/thwart sections, in raft local cm. */
@@ -280,6 +282,9 @@ public:
     /** Number of physics impulse slices emitted inside planted power phases. */
     int32 GetCrewStrokeImpulseApplicationCount() const { return CrewStrokeImpulseApplicationCount; }
 
+    /** The crew's blades entering the water: one per cadence stroke (audio cues). */
+    int32 GetCrewStrokeCatchCount() const { return CrewStrokeCatchCount; }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Training")
     int32 GetHighSideResponseCount() const { return HighSideResponseCount; }
 
@@ -335,6 +340,33 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
     ERaftSimCrewCommand GetActiveCrewCommand() const { return ActiveCrewCommand; }
+
+    /** How this raft is crewed, resolved at BeginPlay (Auto resolves by map). */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
+    ERaftSimRaftRig GetRaftRig() const { return ResolvedRaftRig; }
+
+    /** One rower on an oar frame instead of a guide and paddle crew. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
+    bool IsSoloOarRig() const { return URaftSimOarRigComponent::IsOarRig(ResolvedRaftRig); }
+
+    /** The rower's input for each oar, -1 pull .. +1 push (oar rigs only). */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew")
+    void SetOarIntents(float Left, float Right);
+
+    URaftSimOarRigComponent* GetOarRig() const { return OarRig; }
+
+    /** The rig a map is crewed with: the Grand Canyon (Colorado) and
+     * Zambezi runs are rowed oar rigs; every other map a paddle crew. */
+    static ERaftSimRaftRig ResolveRaftRigForMap(const FString& MapName);
+
+    /** Validation: choose the rig before seating (InitializeCrewSeatingForValidation). */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Validation")
+    void SetRaftRigForValidation(ERaftSimRaftRig InRig);
+
+    /** Validation: pose the oars and rower at one point of a stroke (+1
+     * push, -1 pull, 0 rest per oar), with no impulses. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Validation")
+    void PoseOarRigForValidation(float Phase, float LeftDirection, float RightDirection);
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Raft")
@@ -460,6 +492,11 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Crew")
     int32 PaddlerCount = 4;
 
+    /** Paddle crew or a single rower's oar rig. Auto rows the Colorado and
+     * Zambezi maps (docs/oar-rig-reference.md); raftsim.RaftRig overrides. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Crew")
+    ERaftSimRaftRig RaftRig = ERaftSimRaftRig::Auto;
+
     /** Crew stroke cadence in seconds. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Crew")
     float CrewStrokeIntervalSeconds = 0.8f;
@@ -493,6 +530,8 @@ private:
     void UpdateRaftCondition(float DeltaSeconds);
     void SpawnCrewVisuals();
     void BuildRaftVisual();
+    /** Resolve RaftRig (map, console override) and size the crew for it. */
+    void ResolveRaftRig();
     /** Rigged gear on the hull: the guide's throw bag at the stern and coiled
      * bow and stern lines (presentation only, no collision). */
     void BuildRaftGear(const FBox& HullBoundsCm);
@@ -571,6 +610,11 @@ private:
     TObjectPtr<class UProceduralMeshComponent> RaftGear;
 
     UPROPERTY(Transient)
+    TObjectPtr<URaftSimOarRigComponent> OarRig;
+
+    ERaftSimRaftRig ResolvedRaftRig = ERaftSimRaftRig::PaddleCrew;
+
+    UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> FloorMaterialInstance;
 
     /** CPU-readable authored rest topology, split by the five material slots. */
@@ -620,6 +664,7 @@ private:
     float CrewStrokePhase = 0.0f;
     float LastCrewStrokeImpulsePhase = -1.0f;
     int32 CrewStrokeImpulseApplicationCount = 0;
+    int32 CrewStrokeCatchCount = 0;
     float DriftTelemetrySeconds = 0.0f;
 
     // The guide's own W/S/turn strokes hold this pose on the stern avatar

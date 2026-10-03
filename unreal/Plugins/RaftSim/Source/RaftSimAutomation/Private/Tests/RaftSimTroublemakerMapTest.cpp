@@ -96,7 +96,16 @@ bool FRaftSimStartZambeziLaunchCommand::Update()
                 TEXT("Zambezi initial settle keeps every person in the raft"),
                 It->GetSwimmerCount(),
                 0);
-            It->IssueCrewCommand(ERaftSimCrewCommand::AllForward);
+            // The Zambezi boat is a single rower's oar rig: row both oars
+            // forward where a paddle crew would take the all-forward call.
+            if (It->IsSoloOarRig())
+            {
+                It->SetOarIntents(1.0f, 1.0f);
+            }
+            else
+            {
+                It->IssueCrewCommand(ERaftSimCrewCommand::AllForward);
+            }
             return true;
         }
     }
@@ -210,6 +219,28 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("raft rests within depth envelope (z=%.0f)"),
                 PlayerRaft->GetActorLocation().Z),
             FMath::Abs(PlayerRaft->GetActorLocation().Z) < 60000.0f);
+        // The Grand Canyon and Zambezi runs are rowed by one person on an
+        // oar rig (docs/oar-rig-reference.md); every other river keeps the
+        // guided paddle crew.
+        const bool bOarRigRiver =
+            bColoradoHanceReferenceRun || bZambeziReferenceRun || bZambeziUpperGorgeReferenceRun;
+        Test->TestEqual(
+            TEXT("Colorado and Zambezi rafts are oar rigs; other rivers keep the paddle crew"),
+            PlayerRaft->IsSoloOarRig(),
+            bOarRigRiver);
+        if (bOarRigRiver)
+        {
+            Test->TestEqual(
+                TEXT("oar rig carries the river's own rig"),
+                static_cast<int32>(PlayerRaft->GetRaftRig()),
+                static_cast<int32>(bColoradoHanceReferenceRun
+                    ? ERaftSimRaftRig::ColoradoOarRig
+                    : ERaftSimRaftRig::ZambeziOarRig));
+            Test->TestEqual(TEXT("oar rig carries one rower"), PlayerRaft->GetCrewAvatarCount(), 1);
+            Test->TestTrue(
+                TEXT("oar rig frame and oars are built on the raft"),
+                PlayerRaft->GetOarRig() != nullptr && PlayerRaft->GetOarRig()->IsBuilt());
+        }
     }
     else
     {
@@ -786,9 +817,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
             PlayerRaft->GetSwimmerCount(),
             0);
         Test->TestEqual(
-            TEXT("Zambezi calm launch retains four paddlers and one guide"),
+            TEXT("Zambezi calm launch retains its rower"),
             PlayerRaft->GetCrewAvatarCount(),
-            5);
+            1);
         int32 AttachedCrewCount = 0;
         for (TActorIterator<ARaftSimCrewAvatarActor> It(World); It; ++It)
         {
@@ -810,9 +841,13 @@ bool FRaftSimAssertRiverMapCommand::Update()
             ++AttachedCrewCount;
         }
         Test->TestEqual(
-            TEXT("Zambezi has five attached live crew actors"),
+            TEXT("Zambezi has one attached live rower"),
             AttachedCrewCount,
-            5);
+            1);
+        const URaftSimOarRigComponent* OarRig = PlayerRaft->GetOarRig();
+        Test->TestTrue(
+            TEXT("Zambezi rower has rowed strokes after the launch"),
+            OarRig != nullptr && OarRig->GetCompletedStrokeCount() > 0);
         int32 ScenarioMarkerCount = 0;
         for (TActorIterator<AActor> It(World); It; ++It)
         {

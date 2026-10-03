@@ -1165,8 +1165,8 @@ def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, A
         ],
         "gameplay": {
             "portfolio_role": "runnable_river",
-            "control_mode": "guided_paddle_crew",
-            "voice_paddle_commands_enabled": True,
+            "control_mode": "manual_oar_rig",
+            "voice_paddle_commands_enabled": False,
             "flexible_raft_enabled": True,
             "rock_wrap_and_flip_enabled": True,
             "swimmer_and_rescue_enabled": True,

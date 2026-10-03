@@ -46,6 +46,14 @@ static TAutoConsoleVariable<int32> CVarRaftSimGuideLeftHanded(
     TEXT("0 = right-handed guide (sits the right stern quarter, paddles on ")
     TEXT("the right; default), 1 = left-handed (mirrored)."));
 
+// Which boat the raft is rigged as, overriding the map (review captures and
+// test tanks): -1 by map (default), 0 paddle crew, 1 Colorado oar rig,
+// 2 Zambezi oar rig. Read at BeginPlay.
+static TAutoConsoleVariable<int32> CVarRaftSimRaftRig(
+    TEXT("raftsim.RaftRig"), -1,
+    TEXT("-1 = by map (oar rigs on the Colorado and Zambezi maps; default), ")
+    TEXT("0 = paddle crew, 1 = Colorado oar rig, 2 = Zambezi oar rig."));
+
 namespace
 {
 constexpr float kCmPerM = 100.0f;
@@ -142,9 +150,78 @@ ARaftSimRaftActor::ARaftSimRaftActor()
     SternSeatAttachPoint->SetRelativeLocation(FVector(-165.0f, 0.0f, 55.0f));
 }
 
+ERaftSimRaftRig ARaftSimRaftActor::ResolveRaftRigForMap(const FString& MapName)
+{
+    FString Leaf = UWorld::RemovePIEPrefix(MapName);
+    int32 Slash = INDEX_NONE;
+    if (Leaf.FindLastChar(TEXT('/'), Slash))
+    {
+        Leaf = Leaf.Mid(Slash + 1);
+    }
+    int32 Dot = INDEX_NONE;
+    if (Leaf.FindChar(TEXT('.'), Dot))
+    {
+        Leaf = Leaf.Left(Dot);
+    }
+    if (Leaf == TEXT("L_Hance"))
+    {
+        return ERaftSimRaftRig::ColoradoOarRig;
+    }
+    if (Leaf == TEXT("L_Zambezi") || Leaf == TEXT("L_ZambeziUpperGorge"))
+    {
+        return ERaftSimRaftRig::ZambeziOarRig;
+    }
+    return ERaftSimRaftRig::PaddleCrew;
+}
+
+void ARaftSimRaftActor::ResolveRaftRig()
+{
+    ERaftSimRaftRig Rig = RaftRig;
+    const int32 Override = CVarRaftSimRaftRig.GetValueOnGameThread();
+    if (Override >= 0 && Override <= 2)
+    {
+        Rig = static_cast<ERaftSimRaftRig>(Override + 1);
+    }
+    if (Rig == ERaftSimRaftRig::Auto)
+    {
+        Rig = ResolveRaftRigForMap(GetWorld() ? GetWorld()->GetMapName() : FString());
+    }
+    ResolvedRaftRig = Rig;
+    if (IsSoloOarRig())
+    {
+        // One rower, seated on the frame: no paddlers, and a capsize puts
+        // only the rower in the water.
+        PaddlerCount = 0;
+        CrewSize = 1;
+    }
+}
+
+void ARaftSimRaftActor::SetRaftRigForValidation(ERaftSimRaftRig InRig)
+{
+    RaftRig = InRig;
+    ResolveRaftRig();
+}
+
+void ARaftSimRaftActor::SetOarIntents(float Left, float Right)
+{
+    if (OarRig)
+    {
+        OarRig->SetOarIntents(Left, Right);
+    }
+}
+
+void ARaftSimRaftActor::PoseOarRigForValidation(float Phase, float LeftDirection, float RightDirection)
+{
+    if (OarRig && OarRig->IsBuilt())
+    {
+        OarRig->PoseForValidation(Phase, LeftDirection, RightDirection, FindAvatar(TEXT("guide")));
+    }
+}
+
 void ARaftSimRaftActor::BeginPlay()
 {
     Super::BeginPlay();
+    ResolveRaftRig();
 
     // A-3 authoritative path: configure the bridge subsystem from this
     // actor's properties, then mirror the adapter's kinematic state.
@@ -176,8 +253,10 @@ void ARaftSimRaftActor::BeginPlay()
     // model below keeps MassKg as the dry raft mass and applies the same crew
     // masses to tube compression; using dry mass here made moving-water rafts
     // settle far below their loaded waterline and admit runaway deck water.
+    // An oar rig adds its frame and load to the boat's own mass.
+    const float DryMassKg = MassKg + URaftSimOarRigComponent::GetRigLoadKg(ResolvedRaftRig);
     const float LoadedBodyMassKg =
-        MassKg + kGuideMassKg + kPassengerMassKg * static_cast<float>(PaddlerCount);
+        DryMassKg + kGuideMassKg + kPassengerMassKg * static_cast<float>(PaddlerCount);
     FRaftSimRaftBodyConfig BodyConfig;
     BodyConfig.Runtime = ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
     BodyConfig.MassKg = LoadedBodyMassKg;
@@ -379,7 +458,7 @@ void ARaftSimRaftActor::BeginPlay()
     // D1-D4 flexible-raft stack with the actual production crew load bound to
     // seats. Commands now move the same masses that the avatars depict.
     FRaftSimFlexParameters FlexParameters;
-    FlexParameters.MassKg = MassKg;
+    FlexParameters.MassKg = DryMassKg;
     FlexParameters.LengthM = FootprintLengthM;
     FlexParameters.WidthM = FootprintWidthM;
     FlexParameters.TubeRadiusM = TubeRadiusM;
@@ -387,8 +466,10 @@ void ARaftSimRaftActor::BeginPlay()
     FlexParameters.PassengerMassKg = kPassengerMassKg;
     FlexParameters.PassengerCount = PaddlerCount;
     Adapter->ConfigureFlexibleRaftModel(
-        FlexParameters, RaftSimCrewSeatLayout::BuildNormalSeats(FlexParameters,
-            CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0), 18000.0,
+        FlexParameters, IsSoloOarRig()
+            ? RaftSimCrewSeatLayout::BuildOarRowerSeats(FlexParameters)
+            : RaftSimCrewSeatLayout::BuildNormalSeats(FlexParameters,
+                CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0), 18000.0,
         /*bBodyMassIncludesAllSeats=*/true);
 
     // Seed the adapter in the local water frame. Starting a floating raft at
@@ -686,8 +767,38 @@ void ARaftSimRaftActor::BuildRaftVisual()
             HullBounds = FBox(FVector(-Half.X, -Half.Y, 0.0f), FVector(Half.X, Half.Y, 2.0f * Half.Z));
         }
         BuildRaftGear(HullBounds);
+        if (IsSoloOarRig())
+        {
+            if (!OarRig)
+            {
+                OarRig = NewObject<URaftSimOarRigComponent>(this, TEXT("OarRig"));
+                OarRig->RegisterComponent();
+            }
+            OarRig->Build(ResolvedRaftRig, RaftVisual, HullBounds);
+        }
     }
-    ConfigureSharedHullGeometryReview();
+    if (IsSoloOarRig())
+    {
+        // Grand Canyon oar boats are commonly blue; Zambezi operators' boats
+        // yellow (docs/oar-rig-reference.md). Floors match their tubes.
+        const FLinearColor Tint = ResolvedRaftRig == ERaftSimRaftRig::ColoradoOarRig
+            ? FLinearColor(0.012f, 0.045f, 0.16f)
+            : FLinearColor(0.45f, 0.30f, 0.010f);
+        if (TubeMaterialInstance)
+        {
+            TubeMaterialInstance->SetVectorParameterValue(TEXT("BaseTint"), Tint);
+        }
+        if (FloorMaterialInstance)
+        {
+            FloorMaterialInstance->SetVectorParameterValue(TEXT("BaseTint"), Tint * 0.8f);
+        }
+    }
+    // The shared hull binds to the physics adapter; seating-only validation
+    // (InitializeCrewSeatingForValidation) builds the visual without one.
+    if (RaftAdapter != nullptr)
+    {
+        ConfigureSharedHullGeometryReview();
+    }
 }
 
 void ARaftSimRaftActor::BuildRaftGear(const FBox& HullBoundsCm)
@@ -1121,6 +1232,32 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     }
     Avatar->InitializeAvatarVisual();
     Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
+    if (PassengerId == TEXT("guide") && IsSoloOarRig() && OarRig && OarRig->IsBuilt())
+    {
+        // The rower sits on the frame's seat pad, facing the bow, its
+        // lowest seated contact on the pad.
+        float PelvisBottomZ = Avatar->GetSeatedPelvisBottomLocalZCm();
+        const TArray<FVector> Contacts = Avatar->GetSeatedContactPointsLocalCm();
+        if (!Contacts.IsEmpty())
+        {
+            PelvisBottomZ = TNumericLimits<float>::Max();
+            for (const FVector& Contact : Contacts)
+            {
+                PelvisBottomZ = FMath::Min(PelvisBottomZ, static_cast<float>(Contact.Z));
+            }
+        }
+        const FVector SeatCm = OarRig->GetRowerSeatOriginActorCm(PelvisBottomZ);
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim seat: id=guide oar_rig=%d pelvis_bottom=%.1f seat=(%.1f, %.1f, %.1f)"),
+            static_cast<int32>(ResolvedRaftRig), PelvisBottomZ, SeatCm.X, SeatCm.Y, SeatCm.Z);
+        Avatar->AttachToComponent(Root, FAttachmentTransformRules::KeepWorldTransform);
+        Avatar->SetActorRelativeLocation(SeatCm);
+        Avatar->SetActorRelativeRotation(FRotator::ZeroRotator);
+        // The rig poses the rower each frame; the avatar applies it after.
+        Avatar->AddTickPrerequisiteActor(this);
+        OarRig->PoseForValidation(0.0f, 0.0f, 0.0f, Avatar);
+        return;
+    }
     // Both the raft component's offset and the posed body's underside
     // matter. Seat the visible mesh on the rendered tube, not the old
     // placeholder pelvis or a fixed actor-height guess.
@@ -1309,6 +1446,11 @@ float ARaftSimRaftActor::ComputeSeatTubeTopZCm(
 
 void ARaftSimRaftActor::IssueCrewCommand(ERaftSimCrewCommand Command)
 {
+    if (IsSoloOarRig())
+    {
+        // A single rower takes no crew calls.
+        return;
+    }
     // An explicit call (number keys / command wheel) sets a standing order
     // that never expires; guide-paddle (W/S/A/D) cadence ownership ends
     // here and is re-marked by the caller when the tap owns the crew.
@@ -1337,6 +1479,13 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
 {
     if (RaftAdapter == nullptr || RaftMode != ERaftSimRaftMode::Upright)
     {
+        return;
+    }
+    if (IsSoloOarRig())
+    {
+        // The rower drives the boat through the oar rig (TickRig), posed by
+        // it; there is no crew cadence or seat action.
+        RaftAdapter->SetFlexibleCrewActions({});
         return;
     }
 
@@ -1502,6 +1651,12 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
         URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseStart();
     const float PowerEnd =
         URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseEnd();
+    if ((PhaseStart < PowerStart && UnwrappedPhaseEnd >= PowerStart) ||
+        UnwrappedPhaseEnd >= 1.0f + PowerStart)
+    {
+        // The blades plant as the power window opens.
+        ++CrewStrokeCatchCount;
+    }
     const auto MeasurePowerOverlap =
         [PowerStart, PowerEnd](float SegmentStart, float SegmentEnd)
         {
@@ -1716,7 +1871,8 @@ FVector ARaftSimRaftActor::GetRaftVelocity() const
 
 void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float ForwardScale)
 {
-    if (RaftAdapter == nullptr)
+    // An oar rig is rowed through SetOarIntents, not paddle strokes.
+    if (RaftAdapter == nullptr || IsSoloOarRig())
     {
         return;
     }
@@ -1769,7 +1925,7 @@ void ARaftSimRaftActor::QueueDirectStrokeImpulse(
 
 void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
 {
-    if (RaftAdapter == nullptr)
+    if (RaftAdapter == nullptr || IsSoloOarRig())
     {
         return;
     }
@@ -1790,7 +1946,7 @@ void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
 
 void ARaftSimRaftActor::ApplyGuideSteerStroke(float TurnScale)
 {
-    if (RaftAdapter == nullptr)
+    if (RaftAdapter == nullptr || IsSoloOarRig())
     {
         return;
     }
@@ -2064,6 +2220,14 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
     {
         TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_CrewUpdate);
         UpdateCrew(FMath::Min(DeltaSeconds, 0.25f));
+        if (OarRig && IsSoloOarRig())
+        {
+            // Rowing only while the rower sits upright on the seat.
+            ARaftSimCrewAvatarActor* Rower = FindAvatar(TEXT("guide"));
+            const bool bRowerAboard = RaftMode == ERaftSimRaftMode::Upright && Rower &&
+                Rower->GetAttachParentActor() == this && FindSwimmerIndex(TEXT("guide")) == INDEX_NONE;
+            OarRig->TickRig(FMath::Min(DeltaSeconds, 0.25f), this, Rower, bRowerAboard);
+        }
     }
     {
         TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_RescueUpdate);
@@ -3222,7 +3386,8 @@ void ARaftSimRaftActor::RequestReflip()
 
 void ARaftSimRaftActor::HandleHighSideResponse(int32 Direction)
 {
-    if (RaftAdapter == nullptr || Direction == 0 || RaftMode != ERaftSimRaftMode::Upright)
+    if (RaftAdapter == nullptr || Direction == 0 || RaftMode != ERaftSimRaftMode::Upright ||
+        IsSoloOarRig())
     {
         return;
     }

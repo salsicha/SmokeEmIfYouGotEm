@@ -274,6 +274,7 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
     UpdateSeatedHeading();
     UpdateComfortCamera(DeltaSeconds);
     UpdateChaseCamera();
+    UpdateOarInputs();
     // The seated guide avatar owns the sole visible paddle; the former
     // camera-attached view model duplicated it and floated ahead of the guide.
     // With the view seated in the guide avatar's own eye socket, its head
@@ -916,8 +917,54 @@ void ARaftSimGuidePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     }
 }
 
+bool ARaftSimGuidePawn::RecordOarAxis(int32 Axis, float Value)
+{
+    const ARaftSimRaftActor* Raft = ResolveRaft();
+    if (!Raft || !Raft->IsSoloOarRig() || MobilityMode != ERaftSimGuideMobilityMode::InRaft)
+    {
+        return false;
+    }
+    OarAxisValues[Axis] = FMath::Clamp(Value, -1.0f, 1.0f);
+    OarAxisTimes[Axis] = GetWorld()->GetTimeSeconds();
+    return true;
+}
+
+void ARaftSimGuidePawn::UpdateOarInputs()
+{
+    ARaftSimRaftActor* Raft = ResolveRaft();
+    if (!Raft || !Raft->IsSoloOarRig())
+    {
+        return;
+    }
+    // A held key fires every frame; one that has not fired for a few frames
+    // has been released.
+    constexpr double ReleaseSeconds = 0.12;
+    const double Now = GetWorld()->GetTimeSeconds();
+    float Held[3];
+    for (int32 Axis = 0; Axis < 3; ++Axis)
+    {
+        Held[Axis] = MobilityMode == ERaftSimGuideMobilityMode::InRaft && Now - OarAxisTimes[Axis] <= ReleaseSeconds
+            ? OarAxisValues[Axis]
+            : 0.0f;
+    }
+    // W/S pushes or pulls both oars (W drives the bow downstream, S is the
+    // pull, the rower's power stroke). A/D pivots on opposed oars: turning
+    // right pushes the left oar and pulls the right. A mouse button pulls
+    // the one oar on its side, swinging the bow that way.
+    const float Stroke = Held[0];
+    const float Pivot = Held[1];
+    const float Steer = Held[2];
+    const float Left = Stroke + Pivot - (Steer < -0.2f ? 1.0f : 0.0f);
+    const float Right = Stroke - Pivot - (Steer > 0.2f ? 1.0f : 0.0f);
+    Raft->SetOarIntents(FMath::Clamp(Left, -1.0f, 1.0f), FMath::Clamp(Right, -1.0f, 1.0f));
+}
+
 void ARaftSimGuidePawn::HandlePaddleStroke(const FInputActionValue& Value)
 {
+    if (RecordOarAxis(0, Value.Get<FVector>().X))
+    {
+        return;
+    }
     const float Now = GetWorld()->GetTimeSeconds();
     if (Now - LastStrokeTimeSeconds < StrokeCooldownSeconds)
     {
@@ -948,6 +995,10 @@ void ARaftSimGuidePawn::HandlePaddleStroke(const FInputActionValue& Value)
 void ARaftSimGuidePawn::HandleTurnStroke(const FInputActionValue& Value)
 {
     const FVector2D Axis = Value.Get<FVector2D>();
+    if (RecordOarAxis(1, Axis.X))
+    {
+        return;
+    }
     if (FMath::Abs(Axis.X) < 0.2f)
     {
         return;
@@ -967,6 +1018,10 @@ void ARaftSimGuidePawn::HandleTurnStroke(const FInputActionValue& Value)
 void ARaftSimGuidePawn::HandleGuideSteer(const FInputActionValue& Value)
 {
     const float Axis = Value.Get<float>();
+    if (RecordOarAxis(2, Axis))
+    {
+        return;
+    }
     if (FMath::Abs(Axis) < 0.2f)
     {
         return;

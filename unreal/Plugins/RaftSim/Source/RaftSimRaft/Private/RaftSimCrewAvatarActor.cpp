@@ -1540,6 +1540,75 @@ FVector URaftSimCrewAvatarPoseLibrary::GetPaddleBladeWidthAxis(const FVector& Di
     return Width.Y > 0.0f ? -Width : Width;
 }
 
+FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluateRowingPose(
+    const FVector& LeftGripCm, const FVector& LeftOarAxis,
+    const FVector& RightGripCm, const FVector& RightOarAxis,
+    const FVector& FootBarCm)
+{
+    // The seated body square on the seat, without the paddle.
+    FRaftSimCrewAvatarPose Pose = EvaluatePose(ERaftSimCrewAvatarAction::SeatedIdle, 0.0f, 1);
+    Pose.bShowPaddle = false;
+    Pose.bOarGrip = true;
+    Pose.LeftOarAxis = LeftOarAxis.GetSafeNormal(SMALL_NUMBER, -FVector::RightVector);
+    Pose.RightOarAxis = RightOarAxis.GetSafeNormal(SMALL_NUMBER, FVector::RightVector);
+    Pose.LeftHandCm = LeftGripCm;
+    Pose.RightHandCm = RightGripCm;
+    Pose.LeftHipCm = FVector(-4.0f, -10.0f, 40.0f);
+    Pose.RightHipCm = FVector(-4.0f, 10.0f, 40.0f);
+    // The trunk pivots at the hips: leaning back as the handles come to the
+    // chest at the finish of a pull, forward to reach them out for its
+    // catch, and twisting toward the forward handle when the oars work
+    // against each other in a pivot. Arms past their reach lean the trunk
+    // further forward rather than stretch.
+    constexpr float ArmReachCm = 58.0f;
+    const FVector HipCenter(-4.0f, 0.0f, 40.0f);
+    const float MeanHandleX = 0.5f * (LeftGripCm.X + RightGripCm.X);
+    const float Twist = FMath::Clamp((LeftGripCm.X - RightGripCm.X) * 0.3f, -15.0f, 15.0f);
+    float Lean = FMath::Clamp((MeanHandleX - 45.0f) * 0.55f, -14.0f, 18.0f);
+    for (int32 Iteration = 0; Iteration < 12 && Lean < 30.0f; ++Iteration)
+    {
+        const FQuat Trunk = FRotator(-Lean, Twist, 0.0f).Quaternion();
+        const float Reach = FMath::Max(
+            FVector::Distance(HipCenter + Trunk.RotateVector(Pose.LeftShoulderCm - HipCenter), LeftGripCm),
+            FVector::Distance(HipCenter + Trunk.RotateVector(Pose.RightShoulderCm - HipCenter), RightGripCm));
+        if (Reach <= ArmReachCm)
+        {
+            break;
+        }
+        Lean += 2.0f;
+    }
+    Pose.TorsoRotation = FRotator(-Lean, Twist, 0.0f);
+    Pose.TorsoCenterCm = HipCenter + Pose.TorsoRotation.Quaternion().RotateVector(Pose.TorsoCenterCm - HipCenter);
+    ApplyWaistPivotedUpperBodyArticulation(Pose);
+    // Legs braced forward: the balls of the feet on the foot bar, knees bent
+    // up and a little out (the CC0 guide body's own thigh and calf lengths).
+    static constexpr float ThighCm = 45.7f;
+    static constexpr float CalfCm = 44.6f;
+    const auto Leg = [&FootBarCm](const FVector& Hip, float Side, FVector& OutKnee, FVector& OutFoot)
+    {
+        FVector Foot = FootBarCm + FVector(-9.0f, Side * 15.0f, 8.0f);
+        FVector ToFoot = Foot - Hip;
+        const float Reach = ThighCm + CalfCm - 1.0f;
+        if (ToFoot.Size() > Reach)
+        {
+            Foot = Hip + ToFoot.GetSafeNormal() * Reach;
+            ToFoot = Foot - Hip;
+        }
+        const float Distance = FMath::Max(ToFoot.Size(), 1.0f);
+        const FVector Axis = ToFoot / Distance;
+        const float Along = (ThighCm * ThighCm - CalfCm * CalfCm + Distance * Distance) / (2.0f * Distance);
+        const float Rise = FMath::Sqrt(FMath::Max(ThighCm * ThighCm - Along * Along, 0.0f));
+        const FVector Bend = FVector::VectorPlaneProject(FVector(0.0f, 0.25f * Side, 1.0f), Axis)
+            .GetSafeNormal(SMALL_NUMBER, FVector::UpVector);
+        OutKnee = Hip + Axis * Along + Bend * Rise;
+        OutFoot = Foot;
+    };
+    Leg(Pose.LeftHipCm, -1.0f, Pose.LeftKneeCm, Pose.LeftFootCm);
+    Leg(Pose.RightHipCm, 1.0f, Pose.RightKneeCm, Pose.RightFootCm);
+    Pose.bFeetPlanted = false;
+    return Pose;
+}
+
 bool URaftSimCrewAvatarPoseLibrary::IsPaddleBladeInPowerPhase(
     float NormalizedPhase)
 {
@@ -2285,6 +2354,23 @@ void ARaftSimCrewAvatarActor::SetAvatarActionPhaseForValidation(
         DispatchProductionPose();
         AlignProductionHeadgearToSolvedHead();
     }
+}
+
+void ARaftSimCrewAvatarActor::SetExternalPose(const FRaftSimCrewAvatarPose& Pose, bool bApplyNow)
+{
+    ExternalPose = Pose;
+    bHasExternalPose = true;
+    if (bApplyNow && bVisualBuilt)
+    {
+        ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide));
+        DispatchProductionPose();
+        AlignProductionHeadgearToSolvedHead();
+    }
+}
+
+void ARaftSimCrewAvatarActor::ClearExternalPose()
+{
+    bHasExternalPose = false;
 }
 
 void ARaftSimCrewAvatarActor::ConfigureAppearance(
@@ -3627,7 +3713,10 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
     {
         return;
     }
-    FRaftSimCrewAvatarPose Pose = AuthoredPose;
+    // An oar rig drives its seated rower's whole pose; its feet brace on
+    // the foot bar, not the raft floor.
+    const bool bExternal = bHasExternalPose && CurrentAction == ERaftSimCrewAvatarAction::SeatedIdle;
+    FRaftSimCrewAvatarPose Pose = bExternal ? ExternalPose : AuthoredPose;
     if (CurrentAction == ERaftSimCrewAvatarAction::Reentry && BoardingPoseAlpha >= 0.f)
     {
         Pose = BoardingStartPose;
@@ -3716,7 +3805,10 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
             ? Blend : 0.f;
         Pose.bFeetPlanted = false;
     }
-    FitFeetToRenderedRaft(Pose, CurrentAction);
+    if (!bExternal)
+    {
+        FitFeetToRenderedRaft(Pose, CurrentAction);
+    }
     LastRenderedPose = Pose;
     bHasRenderedPose = true;
     const FVector HipCenter = (Pose.LeftHipCm + Pose.RightHipCm) * 0.5f;

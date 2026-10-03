@@ -499,6 +499,10 @@ def test_named_rapid_review_runs_cover_flow_lines_controls_and_safety_policy():
     zambezi = [run for run in committed["runs"] if run["river_id"] == "zambezi_batoka_gorge"]
     assert zambezi
     assert all(run["portfolio_role"] == "runnable_river" for run in zambezi)
+    # The Zambezi boat is rowed by one person on an oar rig, like the
+    # Grand Canyon's (docs/oar-rig-reference.md).
+    assert all(run["control_mode"] == "manual_oar_rig" for run in zambezi)
+    assert all(run["voice_paddle_commands_enabled"] is False for run in zambezi)
 
     commercial_suicide = [
         run for run in committed["runs"]

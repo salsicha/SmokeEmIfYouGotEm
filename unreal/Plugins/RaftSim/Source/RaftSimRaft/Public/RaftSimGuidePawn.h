@@ -218,6 +218,12 @@ protected:
     void HandleLook(const FInputActionValue& Value);
     void HandleHighSide(const FInputActionValue& Value);
     void HandleGuideCommand(FName CommandActionName);
+    /** Oar rig: turn the held stroke, draw and steer inputs into the two
+     * oars' intents each frame. */
+    void UpdateOarInputs();
+    /** Records one held rowing axis; true when the raft is a rowed oar rig
+     * (the input then rows instead of calling the crew). */
+    bool RecordOarAxis(int32 Axis, float Value);
     void HandleRescueTargetSelect(const FInputActionValue& Value);
     void HandleRescueReach(const FInputActionValue& Value);
     void HandleRescueThrowLine(const FInputActionValue& Value);
@@ -283,6 +289,12 @@ protected:
 
     /** The steering blade is independent of voice calls: its own cooldown. */
     float LastSteerTimeSeconds = -1.0f;
+
+    /** Oar rig rowing axes (stroke W/S, pivot A/D, single-oar steer mouse
+     * buttons) and when each last fired; Enhanced Input fires them every
+     * frame while held. */
+    float OarAxisValues[3] = {0.0f, 0.0f, 0.0f};
+    double OarAxisTimes[3] = {-1.0, -1.0, -1.0};
 
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Guide")
     ERaftSimGuideMobilityMode MobilityMode = ERaftSimGuideMobilityMode::InRaft;

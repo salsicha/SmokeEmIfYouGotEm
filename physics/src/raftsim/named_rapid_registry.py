@@ -28,6 +28,12 @@ SIMULATOR_RUNS_RELATIVE_PATH = (
 
 MILES_TO_METERS = 1609.344
 FLOW_BANDS = ("low_review", "reference_review", "high_review")
+# Rivers rowed by one person on an oar rig rather than a guided paddle crew
+# (docs/oar-rig-reference.md): no voice paddle commands.
+OAR_RIG_RIVERS = {
+    "colorado_river_grand_canyon_rowing",
+    "zambezi_batoka_gorge",
+}
 RUNNABLE_RIVERS = {
     "south_fork_american_chili_bar",
     "colorado_river_grand_canyon_rowing",
@@ -721,7 +727,7 @@ def _line_definitions(marker: dict[str, Any]) -> list[dict[str, Any]]:
 def build_simulator_review_runs(editor_markers: dict[str, Any]) -> dict[str, Any]:
     runs: list[dict[str, Any]] = []
     for river in editor_markers["rivers"]:
-        control_mode = "manual_oar_rig" if river["river_id"] == "colorado_river_grand_canyon_rowing" else "guided_paddle_crew"
+        control_mode = "manual_oar_rig" if river["river_id"] in OAR_RIG_RIVERS else "guided_paddle_crew"
         voice_commands = control_mode == "guided_paddle_crew"
         for marker in river["markers"]:
             for flow_band in FLOW_BANDS:

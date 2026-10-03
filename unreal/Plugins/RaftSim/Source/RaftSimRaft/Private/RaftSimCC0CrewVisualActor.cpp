@@ -16,6 +16,12 @@
 
 namespace
 {
+// Both hands hold equipment: the crew paddle, or an oar rower's two handles.
+bool HasHeldGrip(const FRaftSimCrewAvatarPose& Pose)
+{
+    return Pose.bShowPaddle || Pose.bOarGrip;
+}
+
 const TCHAR* GuideMeshPath = TEXT(
     "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Guide."
     "SK_RaftSim_CC0_Guide");
@@ -1203,7 +1209,7 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // bone is a wrist pivot. Offset each wrist by its own hash-locked reference
     // palm vector so the visible knuckle plane, not the wrist, meets the
     // side-correct paddle handle.
-    const bool bPalmTarget = Pose.bShowPaddle || Pose.BoardingPalmSupportBlend > 0.f ||
+    const bool bPalmTarget = HasHeldGrip(Pose) || Pose.BoardingPalmSupportBlend > 0.f ||
         Pose.BoardingPaddleGripBlend > 0.f;
     const FVector LeftWristCm = bPalmTarget
         ? ResolvePaddleGripWristCm(true, Pose, Pose.LeftHandCm)
@@ -1392,7 +1398,7 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     MaximumPresentedShoulderAnchorErrorCm = FMath::Max(
         FVector::Distance(PresentedLeftShoulderCm, LeftShoulderCm),
         FVector::Distance(PresentedRightShoulderCm, RightShoulderCm));
-    bPaddleGripActive = Pose.bShowPaddle && HasArticulatedPaddleGripRig();
+    bPaddleGripActive = HasHeldGrip(Pose) && HasArticulatedPaddleGripRig();
     MaximumPaddleGripAnchorErrorCm = bPaddleGripActive
         ? FMath::Max(
               MeasurePaddleGripAnchorErrorCm(true, Pose.LeftHandCm),
@@ -1438,7 +1444,7 @@ FVector ARaftSimCC0CrewVisualActor::ResolvePaddleGripWristCm(
     const FQuat TargetHandRotation = ResolvePaddleGripHandRotation(bLeft, Pose);
     const FQuat HandDelta =
         (TargetHandRotation * ReferenceHand->GetRotation().Inverse()).GetNormalized();
-    const float PalmWeight = Pose.bShowPaddle ? 1.f :
+    const float PalmWeight = HasHeldGrip(Pose) ? 1.f :
         FMath::Clamp(Pose.BoardingPalmSupportBlend + Pose.BoardingPaddleGripBlend, 0.f, 1.f);
     return DesiredGripCm - HandDelta.RotateVector(ReferencePalmOffsetCm) * PalmWeight;
 }
@@ -1476,7 +1482,7 @@ FQuat ARaftSimCC0CrewVisualActor::ResolvePaddleGripHandRotation(
         (bLeft ? FVector::CrossProduct(ReferenceWidth, ReferenceForward)
                : FVector::CrossProduct(ReferenceForward, ReferenceWidth))
             .GetSafeNormal();
-    if (!Pose.bShowPaddle && Pose.BoardingPalmSupportBlend > 0.f)
+    if (!HasHeldGrip(Pose) && Pose.BoardingPalmSupportBlend > 0.f)
     {
         // Boarding frame faces into the raft. Fingers point inward (+X),
         // palm faces the upper tube (-Z); mirrored knuckle widths preserve
@@ -1513,7 +1519,11 @@ FQuat ARaftSimCC0CrewVisualActor::ResolvePaddleGripHandRotation(
     // its palm presses down the shaft toward the blade. (Approaching it from
     // the shoulder too left that palm facing forward, pushing the T like a
     // door handle.)
-    const FVector PalmApproachCm = IsUpperTGrip(Pose, GripCenterCm)
+    // An oar handle is held overhand: the palm comes over the top of the
+    // handle from the shoulder, wrist flat, knuckles up.
+    const FVector PalmApproachCm = Pose.bOarGrip
+        ? (GripCenterCm - ShoulderCm).GetSafeNormal() - 0.6f * FVector::UpVector
+        : IsUpperTGrip(Pose, GripCenterCm)
         ? (Pose.PaddleBottomCm - Pose.PaddleTopCm)
         : GripCenterCm - ShoulderCm;
     FVector DesiredNormal = FVector::VectorPlaneProject(
@@ -1564,6 +1574,15 @@ FVector ARaftSimCC0CrewVisualActor::ResolvePaddleGripAxis(
     const FRaftSimCrewAvatarPose& Pose,
     const FVector& DesiredGripCm) const
 {
+    if (Pose.bOarGrip)
+    {
+        // Each hand on its own oar, its axis from the handle toward the
+        // blade, as the paddle shaft runs from the top hand toward its blade.
+        return FVector::DistSquared(DesiredGripCm, Pose.LeftHandCm) <=
+                FVector::DistSquared(DesiredGripCm, Pose.RightHandCm)
+            ? Pose.LeftOarAxis
+            : Pose.RightOarAxis;
+    }
     const FVector ShaftAxis =
         (Pose.PaddleBottomCm - Pose.PaddleTopCm).GetSafeNormal();
     if (ShaftAxis.IsNearlyZero())
@@ -1584,7 +1603,7 @@ bool ARaftSimCC0CrewVisualActor::IsUpperTGrip(
     const FRaftSimCrewAvatarPose& Pose,
     const FVector& DesiredGripCm) const
 {
-    return FVector::DistSquared(DesiredGripCm, Pose.PaddleTopCm) <= 4.0f;
+    return !Pose.bOarGrip && FVector::DistSquared(DesiredGripCm, Pose.PaddleTopCm) <= 4.0f;
 }
 
 float ARaftSimCC0CrewVisualActor::MeasurePaddleGripAnchorErrorCm(
@@ -1626,7 +1645,7 @@ float ARaftSimCC0CrewVisualActor::MeasureMinimumPaddleFingerClosureDegrees(
     const FRaftSimCrewAvatarPose& Pose,
     bool bUpperTGrip) const
 {
-    if (!Body || !Pose.bShowPaddle)
+    if (!Body || !HasHeldGrip(Pose))
     {
         return 0.0f;
     }
@@ -1732,7 +1751,7 @@ float ARaftSimCC0CrewVisualActor::MeasureMinimumPaddleThumbClosureDegrees() cons
 float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleFingerContactErrorCm(
     const FRaftSimCrewAvatarPose& Pose) const
 {
-    if (!Body || !Pose.bShowPaddle)
+    if (!Body || !HasHeldGrip(Pose))
     {
         return 0.0f;
     }
@@ -1785,7 +1804,7 @@ float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleFingerContactErrorCm(
 float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleThumbContactErrorCm(
     const FRaftSimCrewAvatarPose& Pose) const
 {
-    if (!Body || !Pose.bShowPaddle)
+    if (!Body || !HasHeldGrip(Pose))
     {
         return 0.0f;
     }
@@ -1830,7 +1849,7 @@ float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleThumbContactErrorCm(
 float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleThumbOppositionDot(
     const FRaftSimCrewAvatarPose& Pose) const
 {
-    if (!Body || !Pose.bShowPaddle)
+    if (!Body || !HasHeldGrip(Pose))
     {
         return -1.0f;
     }
@@ -2074,7 +2093,7 @@ void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
     {
         return;
     }
-    const float GripWeight = Pose.bShowPaddle ? 1.f : FMath::Clamp(Pose.BoardingPaddleGripBlend, 0.f, 1.f);
+    const float GripWeight = HasHeldGrip(Pose) ? 1.f : FMath::Clamp(Pose.BoardingPaddleGripBlend, 0.f, 1.f);
     const float GripAlpha = FMath::Lerp(0.16f, 0.32f, GripWeight);
     for (const bool bLeft : {true, false})
     {
@@ -2082,7 +2101,7 @@ void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
         {
             ApplyFingerChain(bLeft, Digit, GripAlpha);
         }
-        if (!Pose.bShowPaddle && Pose.BoardingPalmSupportBlend > 0.f)
+        if (!HasHeldGrip(Pose) && Pose.BoardingPalmSupportBlend > 0.f)
         {
             // The reference thumb is opposed below the knuckle plane. A
             // supported open palm needs thumb abduction into that plane,

@@ -29,4 +29,18 @@ inline TArray<FRaftSimFlexCrewSeat> BuildNormalSeats(
     }
     return Seats;
 }
+
+// A single oar rower sits on the frame's centre seat just behind the
+// oarlocks (RaftSimOarRig.cpp SeatXCm); the rig's own load is distributed
+// with the boat's mass.
+inline TArray<FRaftSimFlexCrewSeat> BuildOarRowerSeats(const FRaftSimFlexParameters& Parameters)
+{
+    auto Seats = RaftSimFlex::BuildDefaultCrewSeats(Parameters);
+    if (!Seats.IsEmpty())
+    {
+        Seats[0].LocalPosition.X = -0.42;
+        Seats[0].LocalPosition.Y = 0.0;
+    }
+    return Seats;
+}
 }
