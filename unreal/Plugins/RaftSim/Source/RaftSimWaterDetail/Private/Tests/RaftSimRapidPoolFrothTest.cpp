@@ -1,4 +1,5 @@
 #include "RaftSimDetailWaterGPU.h"
+#include "RaftSimDetailEntrainment.h"
 #include "Misc/AutomationTest.h"
 #include "RHIGPUReadback.h"
 #include "RenderingThread.h"
@@ -14,9 +15,21 @@ bool FRaftSimRapidPoolFrothGPUTest::RunTest(const FString&)
     FRaftSimDetailWaterGrid Grid;Grid.Size=FIntPoint(8,8);Grid.CellMeters=.5f;
     Grid.StepSeconds=1.f/120.f;Grid.bPeriodic=true;Grid.bSecondOrder=true;
     TArray<FVector4f> Pool,Rapid,Initial;
+    TestEqual(TEXT("photographed white pool cannot generate bubbles"),
+        FRaftSimDetailEntrainment::ObservedBreakingSource(0.f,1.f),0.f);
+    TestEqual(TEXT("active crash retains appearance evidence"),
+        FRaftSimDetailEntrainment::ObservedBreakingSource(1.f,.8f),.8f);
+    for(int32 I=0;I<=1000;++I)
+    {
+        const float Source=float(I)/1000.f;
+        const float Gated=FRaftSimDetailEntrainment::ObservedBreakingSource(Source,1.f);
+        TestTrue(TEXT("gated photo source remains bounded"),FMath::IsFinite(Gated) && Gated>=0.f && Gated<=1.f);
+    }
     for(int32 I=0;I<64;++I)
     {
-        Pool.Emplace(1.f,1.f,0.f,0.f);Rapid.Emplace(1.f,1.f,0.f,1.f);
+        // Even a fully white observed mask must not replenish this pool.
+        Pool.Emplace(1.f,1.f,0.f,FRaftSimDetailEntrainment::ObservedBreakingSource(0.f,1.f));
+        Rapid.Emplace(1.f,1.f,0.f,FRaftSimDetailEntrainment::ObservedBreakingSource(1.f,1.f));
         Initial.Emplace(.001f*FMath::Cos((I%8)*2.f*PI/8.f),0.f,0.f,1.f);
     }
     auto Invalid=Grid;Invalid.PoolFoamDecayPerSecond=-1.f;FString Error;

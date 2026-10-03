@@ -17,6 +17,7 @@ enum class ERaftSimCrewAvatarAction : uint8;
 class URaftSimChronoRuntimeAdapter;
 class URaftSimPhysicsBridgeSubsystem;
 namespace RaftSimHullPrepareCache {struct FCache;}
+namespace RaftSimRaftMesh {class FImmutableProductionRestMesh;}
 
 /** Scenario-owned destination preparation; no project dependency in the raft module. */
 DECLARE_DELEGATE_RetVal_OneParam(bool, FRaftSimCheckpointPreparation, FTransform&);
@@ -618,7 +619,7 @@ private:
     TObjectPtr<UMaterialInstanceDynamic> FloorMaterialInstance;
 
     /** CPU-readable authored rest topology, split by the five material slots. */
-    TArray<RaftSimRaftMesh::FMeshData> ProductionRaftRestSections;
+    TSharedPtr<const RaftSimRaftMesh::FImmutableProductionRestMesh> ProductionRaftRestSections;
 
     /** Persistent dynamic buffers avoid copying immutable topology every frame. */
     TArray<RaftSimRaftMesh::FMeshData> ProductionRaftDeformedSections;

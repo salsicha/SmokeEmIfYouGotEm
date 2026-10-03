@@ -1,4 +1,5 @@
 #include "RaftSimHullContact.h"
+#include "RaftSimHullShapeEnclosure.h"
 #include "RaftSimContactWitnessPrune.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
@@ -7,6 +8,9 @@
 #include "HAL/FileManager.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+
+CSV_DEFINE_CATEGORY(RaftSimContact,true);
 
 namespace RaftSimHullContact
 {
@@ -27,13 +31,17 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
     const FRaftSimHullGeometry& After,double Mass,const FVector& Inertia,double Dt,
     const FRaftSimHullGroundQuery& Query,const FRaftSimHullGroundArcQuery& ArcQuery,bool bProbeClearFlight)
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimContact,Integrate);
     using namespace RaftSimSurfaceSweep;
     FRaftSimHullContactResult Result;
-    if(!Query || !Before.IsValid() || !After.IsValid() || Before.Faces!=After.Faces ||
-        Before.VerticesM.Num()!=After.VerticesM.Num() || !FMath::IsFinite(Dt) || Dt<=1.e-12 ||
-        !FMath::IsFinite(Mass) || Mass<=0. || Inertia.ContainsNaN() || Inertia.GetMin()<=0. ||
-        !Finite(State) || !Finite(Previous))
-    {Result.Failure=TEXT("invalid full-hull input or changed topology");return Result;}
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimContact,ValidateOriginalHull);
+        if(!Query || !Before.IsValid() || !After.IsValid() || Before.Faces!=After.Faces ||
+            Before.VerticesM.Num()!=After.VerticesM.Num() || !FMath::IsFinite(Dt) || Dt<=1.e-12 ||
+            !FMath::IsFinite(Mass) || Mass<=0. || Inertia.ContainsNaN() || Inertia.GetMin()<=0. ||
+            !Finite(State) || !Finite(Previous))
+        {Result.Failure=TEXT("invalid full-hull input or changed topology");return Result;}
+    }
     auto Current=State;Current.Position=Previous.Position;Current.Orientation=Previous.Orientation;
     // Opt-in native failure evidence. Does not change integration, limits or
     // acceptance. Preserve the first failure so it can be replayed exactly.
@@ -64,10 +72,9 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
     };
     const double InitialEnergy=Energy(Current,Mass,Inertia);
     double Radius=0.,ShapeSpeed=0.;
-    for(int32 I=0;I<Before.VerticesM.Num();++I)
     {
-        Radius=FMath::Max(Radius,FMath::Max(Before.VerticesM[I].Length(),After.VerticesM[I].Length()));
-        ShapeSpeed=FMath::Max(ShapeSpeed,(After.VerticesM[I]-Before.VerticesM[I]).Length()/Dt);
+        CSV_SCOPED_TIMING_STAT(RaftSimContact,ShapeEnclosure);
+        MeasureShapeEnclosure(Before,After,Dt,Radius,ShapeSpeed);
     }
     const auto Local=[&](int32 I,double T){return FMath::Lerp(Before.VerticesM[I],After.VerticesM[I],FMath::Clamp(T/Dt,0.,1.));};
     using FContact=RaftSimContactWitnessPrune::FWitness;
@@ -102,8 +109,11 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
         const double W=Current.AngularVelocity.Length();
         const double Bound=(W*W*Radius+2.*W*ShapeSpeed)*Dt*Dt/8.;
         auto End=Current;RaftSimSweptGround::Advance(End,Dt);
-        for(int32 I=0;I<StartCm.Num();++I)
-        {StartCm[I]=Current.WorldPoint(Before.VerticesM[I])*100.;EndCm[I]=End.WorldPoint(After.VerticesM[I])*100.;}
+        {
+            CSV_SCOPED_TIMING_STAT(RaftSimContact,EndpointTransforms);
+            for(int32 I=0;I<StartCm.Num();++I)
+            {StartCm[I]=Current.WorldPoint(Before.VerticesM[I])*100.;EndCm[I]=End.WorldPoint(After.VerticesM[I])*100.;}
+        }
         FRaftSimHullArcPath Path{Current,&Before,&After,0.,Dt,Dt,W*W*W*Radius+3.*W*W*ShapeSpeed};
         const auto Flight=ArcQuery(StartCm,EndCm,Before.Faces,(SkinM+Bound)*100.,(Bound+RoundoffM)*100.,Path);
         ++Result.Queries;Result.TrianglePairs+=Flight.TrianglePairs;
@@ -122,8 +132,11 @@ FRaftSimHullContactResult Integrate(FRaftSimFlexRigidState& State,
         const double Clearance=CurveBound+RoundoffM;
         const double Now=Result.ConsumedSeconds,Later=Now+Segment;
         auto Predicted=Current;RaftSimSweptGround::Advance(Predicted,Segment);
-        for(int32 I=0;I<StartCm.Num();++I)
-        {StartCm[I]=Current.WorldPoint(Local(I,Now))*100.;EndCm[I]=Predicted.WorldPoint(Local(I,Later))*100.;}
+        {
+            CSV_SCOPED_TIMING_STAT(RaftSimContact,EndpointTransforms);
+            for(int32 I=0;I<StartCm.Num();++I)
+            {StartCm[I]=Current.WorldPoint(Local(I,Now))*100.;EndCm[I]=Predicted.WorldPoint(Local(I,Later))*100.;}
+        }
         FRaftSimHullArcPath Path{Current,&Before,&After,Now,Segment,Dt,
             Omega*Omega*Omega*Radius+3.*Omega*Omega*ShapeSpeed};
         const auto Hit=ArcQuery ? ArcQuery(StartCm,EndCm,Before.Faces,(SkinM+CurveBound)*100.,Clearance*100.,Path)

@@ -1,10 +1,16 @@
 #include "RaftSimTriangleSweep.h"
 #include "RaftSimHullArcPair.h"
+#include "RaftSimLocalEndpointEnclosure.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "PhysicsEngine/BodySetup.h"
 #include "Interface_CollisionDataProviderCore.h"
 #include "Algo/Sort.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+
+CSV_DEFINE_CATEGORY(RaftSimOriginalFaces,true);
 
 namespace
 {
@@ -114,18 +120,24 @@ RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
     if(!bValid || StartCm.IsEmpty() || StartCm.Num()!=EndCm.Num() || Faces.IsEmpty() ||
         !FMath::IsFinite(SkinCm) || SkinCm<=1.e-8 || !FMath::IsFinite(ProvenClearanceCm) || ProvenClearanceCm>=SkinCm)return Best;
     TArray<FVector> LocalStart,LocalEnd;
+    RaftSimHullArcPair::FQueryDerivatives ArcDerivatives(Arc);
     FBox InitialBounds(ForceInit);
-    if(bGroupedBroadPhase){LocalStart.SetNumUninitialized(StartCm.Num());LocalEnd.SetNumUninitialized(EndCm.Num());}
-    for(int32 I=0;I<StartCm.Num();++I)
+    FRaftSimLocalEndpointEnclosure EndEnclosure;
     {
-        if(StartCm[I].ContainsNaN() || EndCm[I].ContainsNaN())return Best;
-        // Exactly the reference arithmetic, once per original vertex rather
-        // than repeated for each indexed face and its enclosing group.
-        if(bGroupedBroadPhase){LocalStart[I]=(StartCm[I]-OriginCm)*.01;LocalEnd[I]=(EndCm[I]-OriginCm)*.01;}
-        InitialBounds+=bGroupedBroadPhase?LocalStart[I]:(StartCm[I]-OriginCm)*.01;
+        CSV_SCOPED_TIMING_STAT(RaftSimOriginalFaces,MeshEndpointPreparation);
+        if(bGroupedBroadPhase){LocalStart.SetNumUninitialized(StartCm.Num());LocalEnd.SetNumUninitialized(EndCm.Num());}
+        for(int32 I=0;I<StartCm.Num();++I)
+        {
+            if(StartCm[I].ContainsNaN() || EndCm[I].ContainsNaN())return Best;
+            // Exactly the reference arithmetic, once per original vertex rather
+            // than repeated for each indexed face and its enclosing group.
+            if(bGroupedBroadPhase){LocalStart[I]=(StartCm[I]-OriginCm)*.01;LocalEnd[I]=(EndCm[I]-OriginCm)*.01;}
+            InitialBounds+=bGroupedBroadPhase?LocalStart[I]:(StartCm[I]-OriginCm)*.01;
+            if(Arc && bGroupedBroadPhase)EndEnclosure.Add(LocalStart[I],LocalEnd[I]);
+        }
+        for(const auto& F:Faces)
+            if(!StartCm.IsValidIndex(F.X) || !StartCm.IsValidIndex(F.Y) || !StartCm.IsValidIndex(F.Z))return Best;
     }
-    for(const auto& F:Faces)
-        if(!StartCm.IsValidIndex(F.X) || !StartCm.IsValidIndex(F.Y) || !StartCm.IsValidIndex(F.Z))return Best;
     if(ClosedGround.ComponentCount()>0)
     {
         if(MovingTopology.Num()!=Faces.Num() ||
@@ -189,7 +201,68 @@ RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
         return false;
     };
     TArray<int32> ActiveFaces;
-    if(Arc && bGroupedBroadPhase)ActiveFaces=MovingTree.Candidates(*Arc,SkinCm*.01,OriginCm*.01,HasGround);
+    if(Arc && bGroupedBroadPhase)
+    {
+        {
+            CSV_SCOPED_TIMING_STAT(RaftSimOriginalFaces,MeshWholeHullGroundProbe);
+            // Every original endpoint, the SAME origin-relative arithmetic,
+            // and the integrator's complete curved/deforming-path skin. If
+            // even this enclosing box misses every immutable source-tree
+            // leaf, every original face misses too. Both directions of
+            // closed-solid containment have already been checked above.
+            // End bounds and local finiteness were gathered alongside the
+            // identical endpoint transforms. Unioning their extrema includes
+            // exactly the same points, without a second full-array scan.
+            // Delay the refusal until HERE: containment precedence is unchanged.
+            FBox Whole(ForceInit);
+            if(!EndEnclosure.Whole(InitialBounds,Whole))
+            {Best.Status=EStatus::Invalid;return Best;}
+            Whole=Whole.ExpandBy(SkinCm*.01+1.e-10);
+            // Overflow of the expanded enclosure is not a separation proof;
+            // fall through to the existing complete face-tree/query path.
+            if(!Whole.Min.ContainsNaN() && !Whole.Max.ContainsNaN() && !HasGround(Whole))
+            {
+                CSV_CUSTOM_STAT(RaftSimOriginalFaces,MeshWholeHullRejects,1,ECsvCustomStatOp::Accumulate);
+                return Best;
+            }
+        }
+        static const bool RigidOnlyReference=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRigidOnlyMovingFaceTree"));
+        static const bool AuditEndpointTree=FParse::Param(FCommandLine::Get(),TEXT("RaftSimMovingEndpointTreeAudit"));
+        if(RigidOnlyReference)ActiveFaces=MovingTree.Candidates(*Arc,SkinCm*.01,OriginCm*.01,HasGround);
+        else
+        {
+            CSV_SCOPED_TIMING_STAT(RaftSimOriginalFaces,MeshFaceTree);
+            // LocalStart/End have exactly the existing origin-relative
+            // arithmetic. Skin already includes the integrator's complete
+            // curved/deforming-path bound. No rigid or rest-mesh proof used.
+            {
+                CSV_SCOPED_TIMING_STAT(RaftSimOriginalFaces,MeshEndpointRefit);
+                if(!MovingEndpointTree.Refit(LocalStart,LocalEnd,Faces,SkinCm*.01+1.e-10,true))
+                {Best.Status=EStatus::Invalid;return Best;}
+            }
+            {
+                CSV_SCOPED_TIMING_STAT(RaftSimOriginalFaces,MeshCandidateGroups);
+                MovingEndpointTree.CandidateGroups(HasGround,ActiveFaces);
+            }
+            CSV_CUSTOM_STAT(RaftSimOriginalFaces,MeshOriginalFaces,Faces.Num(),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimOriginalFaces,MeshCandidateFaces,ActiveFaces.Num(),ECsvCustomStatOp::Accumulate);
+            if(AuditEndpointTree)
+            {
+                TSet<int32> Present;for(const int32 I:ActiveFaces)Present.Add(I);
+                for(int32 I=0;I<Faces.Num();++I)
+                {
+                    FBox Reference(ForceInit);
+                    for(int32 J=0;J<3;++J){Reference+=LocalStart[Faces[I][J]];Reference+=LocalEnd[Faces[I][J]];}
+                    if(HasGround(Reference.ExpandBy(SkinCm*.01+1.e-10)) && !Present.Contains(I))
+                    {
+                        UE_LOG(LogTemp,Error,TEXT("Moving endpoint tree omitted an original ground-overlapping face"));
+                        Best.Status=EStatus::Invalid;return Best;
+                    }
+                }
+                CSV_CUSTOM_STAT(RaftSimOriginalFaces,MeshAuditQueries,1,ECsvCustomStatOp::Accumulate);
+            }
+        }
+    }
     else for(int32 I=0;I<Faces.Num();++I)ActiveFaces.Add(I);
     TArray<int32,TInlineAllocator<64>> GroupLeaves;
     for(int32 Active=0;Active<ActiveFaces.Num();++Active)
@@ -250,7 +323,9 @@ RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
                 {
                     FTriangle WorldStart=Start,WorldGround=Ground;
                     for(int32 J=0;J<3;++J){WorldStart.V[J]+=OriginCm*.01;WorldGround.V[J]+=OriginCm*.01;}
-                    if(RaftSimHullArcPair::Separated(Indices,WorldStart,WorldGround,*Arc)){++Pairs;continue;}
+                    if(bGroupedBroadPhase
+                        ? RaftSimHullArcPair::Separated(Indices,WorldStart,WorldGround,*Arc,ArcDerivatives)
+                        : RaftSimHullArcPair::Separated(Indices,WorldStart,WorldGround,*Arc)){++Pairs;continue;}
                 }
                 // Once an impact is known, later events cannot change the
                 // earliest result. Prove every other source pair only up to

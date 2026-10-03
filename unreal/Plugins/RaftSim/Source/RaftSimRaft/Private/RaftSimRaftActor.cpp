@@ -20,6 +20,7 @@
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimCrewAvatarActor.h"
 #include "RaftSimRaftMesh.h"
+#include "RaftSimImmutableRestMesh.h"
 #include "RaftSimRockObstacleActor.h"
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimFlexibleRaftModel.h"
@@ -647,9 +648,12 @@ void ARaftSimRaftActor::BuildRaftVisual()
             TEXT("/Game/RaftSim/Rafts/Production/SM_RaftSim_ProductionPaddleRaft."
                  "SM_RaftSim_ProductionPaddleRaft")))
     {
+        TArray<RaftSimRaftMesh::FMeshData> ImportedRestSections;
         bUsingProductionRaftRestMesh =
             RaftSimRaftMesh::ExtractProductionRaftRestMesh(
-                ProductionMesh, ProductionRaftRestSections);
+                ProductionMesh, ImportedRestSections);
+        if(bUsingProductionRaftRestMesh)
+            ProductionRaftRestSections=MakeShared<const RaftSimRaftMesh::FImmutableProductionRestMesh>(ImportedRestSections);
     }
 
     TArray<RaftSimRaftMesh::FMeshData> FallbackSections;
@@ -657,7 +661,7 @@ void ARaftSimRaftActor::BuildRaftVisual()
     if (bUsingProductionRaftRestMesh)
     {
         RaftSimRaftMesh::DeformProductionRaftRestMesh(
-            ProductionRaftRestSections,
+            ProductionRaftRestSections->GetSections(),
             TubeRadiusM,
             {},
             RaftSimRaftMesh::FRaftSimRaftVisualCondition{
@@ -1013,7 +1017,7 @@ void ARaftSimRaftActor::UpdateFlexibleRaftVisual()
     {
         TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_DeformProductionRaftMesh);
         RaftSimRaftMesh::DeformProductionRaftRestMesh(
-            ProductionRaftRestSections,
+            ProductionRaftRestSections->GetSections(),
             TubeRadiusM,
             CurrentSegments,
             CurrentCondition,

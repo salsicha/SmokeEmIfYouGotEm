@@ -4,6 +4,7 @@
 #include "LandscapeProxy.h"
 #include "Components/StaticMeshComponent.h"
 #include "RaftSimSurfaceSweep.h"
+#include "RaftSimEndpointFaceTree.h"
 class FRaftSimTriangleSweepMesh;
 struct FRaftSimHullArcPath;
 
@@ -68,4 +69,8 @@ private:
     bool bDirty=true;
     uint32 RefreshCount=0;
     TMap<TWeakObjectPtr<UStaticMeshComponent>,TSharedPtr<FRaftSimTriangleSweepMesh>> TriangleCaches;
+    FRaftSimEndpointFaceTree LandscapeMovingFaces;
+    // Scratch storage only; EVERY visited query repopulates all original
+    // endpoints. No pose cache, retained clearance or simplified hull.
+    TArray<FVector> LandscapeStartMeters,LandscapeEndMeters;
 };

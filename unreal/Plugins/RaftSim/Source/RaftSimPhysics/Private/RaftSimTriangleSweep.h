@@ -4,6 +4,7 @@
 #include "RaftSimSurfaceSweep.h"
 #include "RaftSimClosedGround.h"
 #include "RaftSimHullFaceTree.h"
+#include "RaftSimEndpointFaceTree.h"
 
 class UStaticMeshComponent;
 class UStaticMesh;
@@ -51,5 +52,6 @@ private:
     mutable TArray<FIntVector> MovingTopology;
     mutable TArray<FIntPoint> MovingRepresentatives; // original vertex, original face
     mutable FRaftSimHullFaceTree MovingTree;
+    mutable FRaftSimEndpointFaceTree MovingEndpointTree;
     bool bValid=false;
 };

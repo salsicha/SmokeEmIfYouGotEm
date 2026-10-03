@@ -4,6 +4,9 @@
 #include "RaftSimOverwashLoads.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+
+CSV_DEFINE_CATEGORY(RaftSimBody,true);
 
 namespace
 {
@@ -222,6 +225,7 @@ bool URaftSimChronoRuntimeAdapter::SetHullGeometryProvider(
 
 bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimBody,FlexibleDynamics);
     if (!bFlexibleCrewMassContractValid) return false;
     // Build the rigid state in meters from the UE-centimeter kinematic state.
     FRaftSimFlexRigidState State;
@@ -391,11 +395,14 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     // Prepare the exact visible hull from the same fixed-step deformation,
     // before contact integration. Keep the previous published shape available
     // for future deforming-surface CCD; a rejected step must not publish this one.
-    if(HullGeometryProvider &&
-        (!HullGeometryCommit || !HullGeometryProvider(LastFlexVisualSegments,PendingHullGeometry) || !PendingHullGeometry.IsValid()))
     {
-        UE_LOG(LogTemp,Error,TEXT("Shared hull geometry rejected: missing or invalid source snapshot"));
-        return false;
+        CSV_SCOPED_TIMING_STAT(RaftSimBody,HullPrepareAndValidate);
+        if(HullGeometryProvider &&
+            (!HullGeometryCommit || !HullGeometryProvider(LastFlexVisualSegments,PendingHullGeometry) || !PendingHullGeometry.IsValid()))
+        {
+            UE_LOG(LogTemp,Error,TEXT("Shared hull geometry rejected: missing or invalid source snapshot"));
+            return false;
+        }
     }
 
     // Quasi-static force/moment modifiers on the kinematic state.
@@ -500,6 +507,7 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     const bool bSupportStage = static_cast<bool>(WaterSurfaceSampler) && TubeSamplePointsM.Num() > 0;
     if (bSupportStage)
     {
+        CSV_SCOPED_TIMING_STAT(RaftSimBody,WaterSupportAndDrag);
         const double WeightN = MassKg * kSupportGravityMps2;
         ForceN.Z += -WeightN;
         const double PerPointBuoyancyN =
@@ -822,6 +830,7 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     { DynamicsAudit->PreContactVelocity=State.LinearVelocity;DynamicsAudit->PreContactOmega=State.AngularVelocity; }
     if(HullGroundQuery)
     {
+        CSV_SCOPED_TIMING_STAT(RaftSimBody,FullHullContact);
         LastHullContact=RaftSimHullContact::Integrate(State,PreviousFiniteState,PublishedHullGeometry,
             PendingHullGeometry,MassKg,Inertia,Dt,HullGroundQuery,HullGroundArcQuery);
         if(!LastHullContact.bCompleted)
@@ -977,7 +986,11 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     KinematicState.WorldTransform.SetRotation(State.Orientation);
     KinematicState.LinearVelocityMetersPerSecond = State.LinearVelocity;
     KinematicState.AngularVelocityRadiansPerSecond = State.AngularVelocity;
-    if(HullGeometryProvider && !bInvalidState)HullGeometryCommit();
+    if(HullGeometryProvider && !bInvalidState)
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimBody,HullPublish);
+        HullGeometryCommit();
+    }
 
     if(DynamicsAudit)
         DynamicsAudit->Write(GetWorld()->GetTimeSeconds(),Dt,MassKg,Inertia,

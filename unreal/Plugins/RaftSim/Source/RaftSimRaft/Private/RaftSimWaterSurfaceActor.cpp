@@ -34,6 +34,7 @@
 #include "RaftSimWaterTextureHistory.h"
 #include "RaftSimFoamTransportFrame.h"
 #include "RaftSimFoamEvolution.h"
+#include "RaftSimDetailEntrainment.h"
 #include "RaftSimFoamAdvection.h"
 #include "RaftSimFoamFlowPairAudit.h"
 #include "RaftSimPlayableCrestMesh.h"
@@ -1279,6 +1280,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         RiverWaterConfig = *ConfigIt;
     }
     const bool bUsesAuthoredRiverPresentation = RiverWaterConfig != nullptr;
+    bAuthoredRiverFoamClock=bUsesAuthoredRiverPresentation;
     const bool bUsesSouthForkFullReachSingleSurface =
         RiverWaterConfig && RiverWaterConfig->CookedFieldsDir.Contains(
             TEXT("south_fork_american_chili_bar/full_hydraulics"),
@@ -4065,6 +4067,10 @@ void ARaftSimWaterSurfaceActor::UpdateSurfaceCarrierMesh(bool bCreate,const TArr
         Report->SetNumberField(TEXT("maximum_transport_speed_mps"),MaximumSpeed);
         Report->SetNumberField(TEXT("cpu_foam_phase_seconds"),FoamWaterClock.TargetSeconds());
         Report->SetBoolField(TEXT("material_clock_present"),ClockPresent);
+        Report->SetBoolField(TEXT("uses_committed_water_clock"),bFoamUsesCommittedClock);
+        Report->SetNumberField(TEXT("foam_clock_origin_seconds"),FoamWaterClock.Origin);
+        Report->SetNumberField(TEXT("foam_field_committed_seconds"),FoamWaterClock.Last);
+        if(WaterAdapter)Report->SetNumberField(TEXT("committed_solver_seconds"),WaterAdapter->GetCommittedStepSeconds());
         Report->SetNumberField(TEXT("material_clock_error_seconds"),FMath::Abs(double(Clock.R)+double(Clock.G)-FoamWaterClock.TargetSeconds()));
         FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
         const bool Saved=FFileHelper::SaveStringToFile(Json,*Path);
@@ -4228,10 +4234,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     FWaterSurfacePerf Perf(TEXT("refresh"));
     const bool bCartesianFlow = WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates();
     FRaftSimCommittedWaterClock NextFoamClock=FoamWaterClock;
-    const bool bPreviousFoamUsable=bFoamFieldValid && bCartesianFlow==bFoamUsesCommittedClock;
+    // Authored curved rivers use the same accepted-water duration as straight
+    // rivers. Coordinate layout must not make pool froth age on wall time.
+    const bool bUseCommittedFoamClock=WaterAdapter &&
+        (bCartesianFlow || bAuthoredRiverFoamClock);
+    const bool bPreviousFoamUsable=bFoamFieldValid && bUseCommittedFoamClock==bFoamUsesCommittedClock;
     double FoamCommittedDelta=0;
     float FoamDeltaSeconds=0;
-    if(bCartesianFlow)
+    if(bUseCommittedFoamClock)
     {
         const double WaterSeconds=WaterAdapter->GetCommittedStepSeconds();
         const bool Valid=WaterAdapter->GetStatus()!=ERaftSimWaterRuntimeStatus::Faulted &&
@@ -4253,8 +4263,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     const double RefreshStartSeconds = FPlatformTime::Seconds();
     const bool bCrestLocalizedFoam = bSharedBreakingReliefEnabled &&
         CVarRaftSimChilkoCrestFoam.GetValueOnGameThread() != 0;
-    bool bDirectionalFoamSource = bCartesianFlow && bSingleLiveWaterSurfaceEnabled &&
-        GetWorld() && GetWorld()->GetMapName().Contains(TEXT("L_SouthForkAmerican_FullReach"));
+    // SampleVertex supplies field velocity/normals for curved grids and world
+    // velocity/normals for straight grids, matching WorkingGradient below.
+    // The settled rising-face source rule belongs to every map: a descending
+    // chute or a cross-current bank slope is not itself crashing whitewater.
+    // Explicit crest/wake/pocket sources and pool bubble release stay intact.
+    bool bDirectionalFoamSource = true;
     FString FoamSourceAuditPath;
 #if !UE_BUILD_SHIPPING
     static const bool bLegacyGenericFoamSource=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyGenericFoamSource"));
@@ -4337,9 +4351,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     auto& FroudeField=Scratch.Froude;
     auto& SourceFoam=Scratch.Foam;
 
-    // Legacy non-Cartesian reviews retain their separate clock. The normal
-    // Cartesian field uses only the committed-water duration prepared above.
-    if(!bCartesianFlow)
+    // Only unauthored review surfaces retain their separate wall-time clock.
+    // Every authored river uses the committed-water duration prepared above.
+    if(!bUseCommittedFoamClock)
     {
         const double NowRealSeconds=FPlatformTime::Seconds();
         FoamDeltaSeconds=bPreviousFoamUsable ? FMath::Clamp(float(NowRealSeconds-LastRefreshRealSeconds),0.f,.5f) : 0.f;
@@ -7196,6 +7210,25 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     }
 
     Perf.Mark(TEXT("breaking_carve"));
+    // Captured whitewater is appearance evidence at active crashing sites,
+    // not a permanent vertex-colour floor after bubbles have left the rapid.
+    // Feed it into the ordinary source so it shares attack, current transport
+    // and pool release. Preserve the captured raster and all physical fields.
+    int32 ObservedQuietSuppressed=0;
+    double ObservedUngatedSum=0.,ObservedGatedSum=0.;
+    if (ResolvedObservedWhitewaterGain>0.f && (bUsesCurvedRiverCoordinates || bCartesianFlow) &&
+        WaterAdapter && RiverCoordinatesM.Num()==Vertices.Num())
+    {
+        for(int32 I=0;I<Vertices.Num();++I)if(WetVertexMask[I])
+        {
+            const float Observed=ResolvedObservedWhitewaterGain*
+                WaterAdapter->SampleObservedWhitewaterAtRiverCoordinates(RiverCoordinatesM[I]);
+            const float Gated=FRaftSimDetailEntrainment::ObservedBreakingSource(SourceFoam[I],Observed);
+            ObservedQuietSuppressed+=Observed>0.f && SourceFoam[I]<=.01f;
+            ObservedUngatedSum+=Observed;ObservedGatedSum+=Gated;
+            SourceFoam[I]=FMath::Max(SourceFoam[I],Gated);
+        }
+    }
     // --- Persistent advected foam ----------------------------------------
     if (!FoamSourceAudit.IsEmpty())
     {
@@ -7225,6 +7258,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         Report->SetNumberField(TEXT("legacy_final_source_sum_upper_bound"),OldFinal);
         Report->SetNumberField(TEXT("legacy_final_source_sum_lower_bound"),OldFinalLower);
         Report->SetNumberField(TEXT("current_final_source_sum"),NewFinal);
+        Report->SetNumberField(TEXT("observed_quiet_vertices_suppressed"),ObservedQuietSuppressed);
+        Report->SetNumberField(TEXT("observed_ungated_source_sum"),ObservedUngatedSum);
+        Report->SetNumberField(TEXT("observed_gated_source_sum"),ObservedGatedSum);
+        Report->SetBoolField(TEXT("observed_is_crash_gated_source_not_optical_floor"),true);
         Report->SetNumberField(TEXT("committed_water_seconds"),WaterAdapter->GetCommittedStepSeconds());
         FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
         const bool Saved=FFileHelper::SaveStringToFile(Json,*FoamSourceAuditPath);
@@ -7240,11 +7277,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
               CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f,
               CartesianGridCenterNorthM - CurvedGridWidthMeters * 0.5f)
         : FVector2D(GridOriginCm.X / kSurfCmPerM, GridOriginCm.Y / kSurfCmPerM);
-    const bool bHoldFoam=bCartesianFlow && FoamDeltaSeconds==0.f;
-    const float DecayFactor = FoamDeltaSeconds > 0.0f || bCartesianFlow
+    const bool bHoldFoam=bUseCommittedFoamClock && FoamDeltaSeconds==0.f;
+    const float DecayFactor = FoamDeltaSeconds > 0.0f || bUseCommittedFoamClock
         ? FMath::Pow(0.5f, FoamDeltaSeconds / FMath::Max(FoamHalfLifeSeconds, 0.5f))
         : 0.0f;
-    const float FoamAttackDeltaSeconds=bCartesianFlow ? FoamDeltaSeconds :
+    const float FoamAttackDeltaSeconds=bUseCommittedFoamClock ? FoamDeltaSeconds :
         (FoamDeltaSeconds>0.f ? FoamDeltaSeconds : FMath::Max(RefreshIntervalSeconds,1.f/60.f));
     const float FoamAttackBlend=1.f-FMath::Exp(-FoamAttackDeltaSeconds/.22f);
     static const bool bFoamBFECCReview=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFoamBFECCReview"));
@@ -7485,27 +7522,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         UE_LOG(LogTemp,Verbose,TEXT("FoamBFECC corrected=%d limited=%d absolute_change=%.9g water_seconds=%.9g"),
             Correction.CorrectedCount,Correction.LimitedCount,Change,NextFoamClock.Last);
     }
-    // Photographed whitewater at the cooked flow (appearance evidence): the
-    // 2 m cooked field cannot place the holes and crest caps where the photo
-    // shows them. The photo already shows foam after its downstream travel,
-    // so it floors the displayed foam only; feeding it to the transported
-    // state smeared it into one sheet down the rapid.
-    if (ResolvedObservedWhitewaterGain > 0.0f && (bUsesCurvedRiverCoordinates || bCartesianFlow) &&
-        RiverCoordinatesM.Num() == VertexColors.Num())
-    {
-        for (int32 I = 0; I < VertexColors.Num(); ++I)
-        {
-            if (WetVertexMask[I])
-            {
-                VertexColors[I].R = FMath::Max(VertexColors[I].R, ResolvedObservedWhitewaterGain *
-                    WaterAdapter->SampleObservedWhitewaterAtRiverCoordinates(RiverCoordinatesM[I]));
-            }
-        }
-    }
     if(bFoamBFECCReview)FoamFieldWetMask=WetVertexMask;
     FoamField = MoveTemp(NewFoamField);
     FoamFieldOriginM = CurrentFieldOriginM;
-    if(!bCartesianFlow)
+    if(!bUseCommittedFoamClock)
     {
         // Optical phase follows the ACTUAL legacy CPU advection delta. This
         // does not claim that the legacy wall-clock kernel is solver-synchronous.
@@ -7518,7 +7538,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     }
     FoamWaterClock=NextFoamClock;
     {
-        if(bCartesianFlow){++FoamClockRefreshes;FoamClockHolds+=bHoldFoam;FoamClockInitializations+=!bPreviousFoamUsable;}
+        if(bUseCommittedFoamClock){++FoamClockRefreshes;FoamClockHolds+=bHoldFoam;FoamClockInitializations+=!bPreviousFoamUsable;}
         for(UProceduralMeshComponent* Mesh : {LiveVolumeCoreMesh.Get(),SurfaceMesh.Get()})
             if(Mesh)if(auto* Material=Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(0)))
             {
@@ -7529,14 +7549,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     FLinearColor(WaterTextureOriginMeters.X/kWaterTextureRepeatMeters,
                         WaterTextureOriginMeters.Y/kWaterTextureRepeatMeters,0,0));
             }
-        if(bCartesianFlow)
+        if(bUseCommittedFoamClock)
         {
             CSV_CUSTOM_STAT(RaftSimSurface,FoamWaterSeconds,FoamWaterClock.Last,ECsvCustomStatOp::Set);
             CSV_CUSTOM_STAT(RaftSimSurface,FoamDeltaSeconds,FoamCommittedDelta,ECsvCustomStatOp::Set);
         }
     }
     bFoamFieldValid = true;
-    bFoamUsesCommittedClock=bCartesianFlow;
+    bFoamUsesCommittedClock=bUseCommittedFoamClock;
     FoamSum = FoamAdvectionSum;
     MaximumFoam = FoamAdvectionMax;
     Perf.Mark(TEXT("foam_transport_history"));
@@ -9854,6 +9874,16 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             Report->SetNumberField(TEXT("maximum_difference_from_published_bulk_mps"),MaxReturn);
             Report->SetNumberField(TEXT("maximum_source_transport_error_mps"),MaxTransportError);
             Report->SetNumberField(TEXT("maximum_bulk_channel_error_mps"),MaxBulkError);
+            Report->SetBoolField(TEXT("uses_committed_water_clock"),bFoamUsesCommittedClock);
+            Report->SetNumberField(TEXT("foam_clock_origin_seconds"),FoamWaterClock.Origin);
+            Report->SetNumberField(TEXT("foam_field_committed_seconds"),FoamWaterClock.Last);
+            Report->SetNumberField(TEXT("cpu_foam_phase_seconds"),FoamWaterClock.TargetSeconds());
+            Report->SetNumberField(TEXT("committed_solver_seconds"),WaterAdapter->GetCommittedStepSeconds());
+            FLinearColor Clock=FLinearColor::Black;bool ClockPresent=false;
+            if(auto* Material=Cast<UMaterialInstanceDynamic>(CartesianShorelineMesh->GetMaterial(0)))
+                ClockPresent=Material->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("RaftSimCPUFoamClock")),Clock);
+            Report->SetBoolField(TEXT("material_clock_present"),ClockPresent);
+            Report->SetNumberField(TEXT("material_clock_error_seconds"),FMath::Abs(double(Clock.R)+double(Clock.G)-FoamWaterClock.TargetSeconds()));
             FString Json; FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
             FFileHelper::SaveStringToFile(Json,*TransportAuditPath);
         }
@@ -10062,7 +10092,9 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
         }
         auto Report=MakeShared<FJsonObject>();
         Report->SetStringField(TEXT("schema"),TEXT("raftsim.curved_foam_transport_payload.v1"));
-        Report->SetStringField(TEXT("scope"),TEXT("Actual curved production core UV3 versus CPU foam transport payload. Not pixel advection, CFD, full boat/contact or FPS acceptance; legacy CPU clock remains distinct from the solver clock."));
+        Report->SetStringField(TEXT("scope"),bFoamUsesCommittedClock
+            ? TEXT("Actual curved production core UV3 and committed-water CPU foam clock. Phase is relative to attachment; field publication may precede the latest solver step. Not pixel advection, CFD, full boat/contact or FPS acceptance.")
+            : TEXT("Actual curved production core UV3 versus CPU foam transport payload. Not pixel advection, CFD, full boat/contact or FPS acceptance; unauthored review CPU clock remains distinct from the solver clock."));
         Report->SetStringField(TEXT("map"),GetWorld()->GetMapName());
         if(auto* M=LiveVolumeCoreMesh->GetMaterial(0))
             Report->SetStringField(TEXT("base_material"),M->GetMaterial()->GetPathName());
@@ -10075,6 +10107,14 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
         Report->SetNumberField(TEXT("maximum_transport_speed_mps"),MaximumSpeed);
         Report->SetNumberField(TEXT("cpu_foam_phase_seconds"),FoamWaterClock.TargetSeconds());
         Report->SetNumberField(TEXT("committed_solver_seconds"),WaterAdapter->GetCommittedStepSeconds());
+        Report->SetBoolField(TEXT("uses_committed_water_clock"),bFoamUsesCommittedClock);
+        Report->SetNumberField(TEXT("foam_clock_origin_seconds"),FoamWaterClock.Origin);
+        Report->SetNumberField(TEXT("foam_field_committed_seconds"),FoamWaterClock.Last);
+        FLinearColor Clock=FLinearColor::Black;bool ClockPresent=false;
+        if(auto* Material=Cast<UMaterialInstanceDynamic>(LiveVolumeCoreMesh->GetMaterial(0)))
+            ClockPresent=Material->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("RaftSimCPUFoamClock")),Clock);
+        Report->SetBoolField(TEXT("material_clock_present"),ClockPresent);
+        Report->SetNumberField(TEXT("material_clock_error_seconds"),FMath::Abs(double(Clock.R)+double(Clock.G)-FoamWaterClock.TargetSeconds()));
         FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
         const bool Saved=FFileHelper::SaveStringToFile(Json,*TransportAuditPath);
         UE_LOG(LogTemp,Display,TEXT("CurvedFoamTransportAudit shape=%d moving=%d nonfinite=%d error=%g saved=%d"),int32(ShapeValid),Moving,NonFinite,MaximumError,int32(Saved));

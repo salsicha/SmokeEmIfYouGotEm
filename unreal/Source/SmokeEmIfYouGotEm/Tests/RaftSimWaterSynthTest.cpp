@@ -17,7 +17,9 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
         EAutomationTestFlags::ProductFilter)
 
-namespace
+// Keep these scene helpers scoped in unity builds; SampleRate must not become
+// a global declaration that shadows another test's local/parameter names.
+namespace RaftSimWaterSynthScenes
 {
 constexpr int32 SampleRate = 48000;
 constexpr int32 Block = 512;
@@ -140,6 +142,7 @@ float Peak(const TArray<float>& Samples)
 
 bool FRaftSimWaterSynthScenesTest::RunTest(const FString& Parameters)
 {
+    using namespace RaftSimWaterSynthScenes;
     const FString OutputDir = FPaths::Combine(
         FPaths::ProjectSavedDir(), TEXT("RaftSimValidation"), TEXT("audio"), TEXT("water-synth"));
     TMap<FString, TArray<float>> Rendered;

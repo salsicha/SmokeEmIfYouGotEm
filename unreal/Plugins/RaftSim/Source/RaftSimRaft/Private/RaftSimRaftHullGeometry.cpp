@@ -22,29 +22,65 @@ bool ARaftSimRaftActor::BindIsolatedFeatureHull(URaftSimChronoRuntimeAdapter* Ru
     const TWeakObjectPtr<ARaftSimRaftActor> WeakThis(this);
     const auto SnapshotCache=MakeShared<RaftSimHullPrepareCache::FCache>();
     const bool bCacheExactShape=true;
+    const bool bReferenceRestKey=FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceRestKey"));
+    // Actual same-input AND same-module scene controls measured byte-comparison
+    // reuse slower than assignment. Keep original copies in normal play.
+    const bool bReferenceSnapshotCopy=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimExactSnapshotCopy")) ||
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceSnapshotCopy"));
     const bool Bound=Runtime->SetHullGeometryProvider(
-        [WeakThis,SnapshotCache,bCacheExactShape](const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out)
+        [WeakThis,SnapshotCache,bCacheExactShape,bReferenceSnapshotCopy,bReferenceRestKey](const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out)
         {
             auto* Self=WeakThis.Get();if(!Self || !Self->RaftVisual || !Self->RaftAdapter)return false;
             const double Started=FPlatformTime::Seconds();
             const RaftSimRaftMesh::FRaftSimRaftVisualCondition C={Self->RaftAdapter->GetFlexiblePressureFraction(),
                 Self->RaftAdapter->GetFlexibleFabricIntegrity(),Self->RaftCondition.PermanentCreaseAmplitudeM};
             const auto T=Self->RaftVisual->GetRelativeTransform();
-            if(bCacheExactShape && Self->bUsingProductionRaftRestMesh && Self->GetActorScale3D()==FVector::OneVector &&
-                SnapshotCache->Matches(Self->ProductionRaftRestSections,Self->TubeRadiusM,Segments,C,T))
+            bool Cached=false;
             {
-                Self->SharedHullPreparedSegments=Segments;Self->SharedHullPreparedCondition=C;
-                Self->SharedHullPreparedSections=SnapshotCache->Prepared;Out=SnapshotCache->Hull;
+                CSV_SCOPED_TIMING_STAT(RaftSimHull,PreparedKeyValidation);
+                Cached=bCacheExactShape && Self->bUsingProductionRaftRestMesh && Self->GetActorScale3D()==FVector::OneVector &&
+                    SnapshotCache->Matches(Self->ProductionRaftRestSections,Self->TubeRadiusM,Segments,C,T,bReferenceRestKey);
+            }
+            const bool SealedKey=!bReferenceRestKey && SnapshotCache->HasSealedRestKey(Self->ProductionRaftRestSections);
+            CSV_CUSTOM_STAT(RaftSimHull,RestKeySealedChecks,int32(SealedKey),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimHull,RestKeyReferenceChecks,int32(!SealedKey),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimHull,PreparedCacheHits,int32(Cached),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimHull,PreparedCacheMisses,int32(!Cached),ECsvCustomStatOp::Accumulate);
+            if(Cached)
+            {
+                {
+                    CSV_SCOPED_TIMING_STAT(RaftSimHull,PreparedSnapshotCopy);
+                    Self->SharedHullPreparedSegments=Segments;Self->SharedHullPreparedCondition=C;
+                    RaftSimHullPrepareCache::FCopyCounts Copies;
+                    if(bReferenceSnapshotCopy)
+                    {Self->SharedHullPreparedSections=SnapshotCache->Prepared;Out=SnapshotCache->Hull;Copies.Assigned=5*SnapshotCache->Prepared.Num()+3;}
+                    else
+                    {
+                        RaftSimHullPrepareCache::CopyPreparedIfChanged(SnapshotCache->Prepared,Self->SharedHullPreparedSections,Copies);
+                        RaftSimHullPrepareCache::CopyHullIfChanged(SnapshotCache->Hull,Out,Copies);
+                    }
+                    CSV_CUSTOM_STAT(RaftSimHull,PreparedArraysAssigned,Copies.Assigned,ECsvCustomStatOp::Accumulate);
+                    CSV_CUSTOM_STAT(RaftSimHull,PreparedArraysRetained,Copies.Retained,ECsvCustomStatOp::Accumulate);
+                }
                 const double Ms=(FPlatformTime::Seconds()-Started)*1000.;++Self->SharedHullPrepareCount;
                 Self->SharedHullPrepareTotalMs+=Ms;Self->SharedHullPrepareMaximumMs=FMath::Max(Self->SharedHullPrepareMaximumMs,Ms);
+                CSV_SCOPED_TIMING_STAT(RaftSimHull,PreparedSnapshotValidation);
                 return Out.IsValid();
             }
-            const bool Valid=Self->PrepareSharedHullGeometry(Segments,Out);
-            if(Valid && bCacheExactShape)SnapshotCache->Remember(Self->ProductionRaftRestSections,Self->TubeRadiusM,Segments,C,T,Self->SharedHullPreparedSections,Out);
+            bool Valid=false;
+            {
+                CSV_SCOPED_TIMING_STAT(RaftSimHull,PreparedSnapshotDeformExport);
+                Valid=Self->PrepareSharedHullGeometry(Segments,Out);
+            }
+            if(Valid && bCacheExactShape)
+            {
+                CSV_SCOPED_TIMING_STAT(RaftSimHull,PreparedSnapshotRemember);
+                SnapshotCache->Remember(Self->ProductionRaftRestSections,Self->TubeRadiusM,Segments,C,T,Self->SharedHullPreparedSections,Out);
+            }
             return Valid;
         },
         [WeakThis](){if(auto* Self=WeakThis.Get())Self->CommitSharedHullGeometry();});
-    if(!Bound)UE_LOG(LogTemp,Error,TEXT("Isolated production hull export refused: rest_sections=%d visual=%d"),ProductionRaftRestSections.Num(),int32(RaftVisual!=nullptr));
+    if(!Bound)UE_LOG(LogTemp,Error,TEXT("Isolated production hull export refused: rest_sections=%d visual=%d"),ProductionRaftRestSections ? ProductionRaftRestSections->GetSections().Num() : 0,int32(RaftVisual!=nullptr));
     return Bound;
 }
 void ARaftSimRaftActor::RefreshIsolatedFeatureHull(){UpdateSharedHullVisual();}
@@ -65,21 +101,56 @@ void ARaftSimRaftActor::ConfigureSharedHullGeometryReview()
     }
     TWeakObjectPtr<ARaftSimRaftActor> WeakThis(this);
     const auto SnapshotCache=MakeShared<RaftSimHullPrepareCache::FCache>();
+    const bool bReferenceRestKey=FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceRestKey"));
+    const bool bReferenceSnapshotCopy=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimExactSnapshotCopy")) ||
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceSnapshotCopy"));
     if(!RaftAdapter->SetHullGeometryProvider(
-        [WeakThis,SnapshotCache](const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out)
+        [WeakThis,SnapshotCache,bReferenceSnapshotCopy,bReferenceRestKey](const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out)
         {
             auto* Self=WeakThis.Get();if(!Self || !Self->RaftAdapter || !Self->RaftVisual)return false;
             const RaftSimRaftMesh::FRaftSimRaftVisualCondition C={Self->RaftAdapter->GetFlexiblePressureFraction(),
                 Self->RaftAdapter->GetFlexibleFabricIntegrity(),Self->RaftCondition.PermanentCreaseAmplitudeM};
             const auto T=Self->RaftVisual->GetRelativeTransform();
-            if(SnapshotCache->Matches(Self->ProductionRaftRestSections,Self->TubeRadiusM,Segments,C,T))
+            bool Cached=false;
             {
-                Self->SharedHullPreparedSegments=Segments;Self->SharedHullPreparedCondition=C;
-                Self->SharedHullPreparedSections=SnapshotCache->Prepared;Out=SnapshotCache->Hull;
-                ++Self->SharedHullPrepareCount;return Out.IsValid();
+                CSV_SCOPED_TIMING_STAT(RaftSimHull,PreparedKeyValidation);
+                Cached=SnapshotCache->Matches(Self->ProductionRaftRestSections,Self->TubeRadiusM,Segments,C,T,bReferenceRestKey);
             }
-            const bool Valid=Self->PrepareSharedHullGeometry(Segments,Out);
-            if(Valid)SnapshotCache->Remember(Self->ProductionRaftRestSections,Self->TubeRadiusM,Segments,C,T,Self->SharedHullPreparedSections,Out);
+            const bool SealedKey=!bReferenceRestKey && SnapshotCache->HasSealedRestKey(Self->ProductionRaftRestSections);
+            CSV_CUSTOM_STAT(RaftSimHull,RestKeySealedChecks,int32(SealedKey),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimHull,RestKeyReferenceChecks,int32(!SealedKey),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimHull,PreparedCacheHits,int32(Cached),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimHull,PreparedCacheMisses,int32(!Cached),ECsvCustomStatOp::Accumulate);
+            if(Cached)
+            {
+                {
+                    CSV_SCOPED_TIMING_STAT(RaftSimHull,PreparedSnapshotCopy);
+                    Self->SharedHullPreparedSegments=Segments;Self->SharedHullPreparedCondition=C;
+                    RaftSimHullPrepareCache::FCopyCounts Copies;
+                    if(bReferenceSnapshotCopy)
+                    {Self->SharedHullPreparedSections=SnapshotCache->Prepared;Out=SnapshotCache->Hull;Copies.Assigned=5*SnapshotCache->Prepared.Num()+3;}
+                    else
+                    {
+                        RaftSimHullPrepareCache::CopyPreparedIfChanged(SnapshotCache->Prepared,Self->SharedHullPreparedSections,Copies);
+                        RaftSimHullPrepareCache::CopyHullIfChanged(SnapshotCache->Hull,Out,Copies);
+                    }
+                    CSV_CUSTOM_STAT(RaftSimHull,PreparedArraysAssigned,Copies.Assigned,ECsvCustomStatOp::Accumulate);
+                    CSV_CUSTOM_STAT(RaftSimHull,PreparedArraysRetained,Copies.Retained,ECsvCustomStatOp::Accumulate);
+                }
+                ++Self->SharedHullPrepareCount;
+                CSV_SCOPED_TIMING_STAT(RaftSimHull,PreparedSnapshotValidation);
+                return Out.IsValid();
+            }
+            bool Valid=false;
+            {
+                CSV_SCOPED_TIMING_STAT(RaftSimHull,PreparedSnapshotDeformExport);
+                Valid=Self->PrepareSharedHullGeometry(Segments,Out);
+            }
+            if(Valid)
+            {
+                CSV_SCOPED_TIMING_STAT(RaftSimHull,PreparedSnapshotRemember);
+                SnapshotCache->Remember(Self->ProductionRaftRestSections,Self->TubeRadiusM,Segments,C,T,Self->SharedHullPreparedSections,Out);
+            }
             return Valid;
         },
         [WeakThis](){if(auto* Self=WeakThis.Get())Self->CommitSharedHullGeometry();}))
@@ -102,7 +173,7 @@ bool ARaftSimRaftActor::PrepareSharedHullGeometry(
     // Permanent crease remains authored condition input, sampled on this clock.
     SharedHullPreparedSegments=Segments;
     SharedHullPreparedCondition={RaftAdapter->GetFlexiblePressureFraction(),RaftAdapter->GetFlexibleFabricIntegrity(),RaftCondition.PermanentCreaseAmplitudeM};
-    RaftSimRaftMesh::DeformProductionRaftRestMesh(ProductionRaftRestSections,TubeRadiusM,SharedHullPreparedSegments,
+    RaftSimRaftMesh::DeformProductionRaftRestMesh(ProductionRaftRestSections->GetSections(),TubeRadiusM,SharedHullPreparedSegments,
         SharedHullPreparedCondition,SharedHullPreparedSections,&ProductionRaftDeformationCache,false);
     const bool Valid=RaftSimRaftMesh::ExportHullGeometry(SharedHullPreparedSections,RaftVisual->GetRelativeTransform(),Out);
     const double Ms=(FPlatformTime::Seconds()-Started)*1000.;
@@ -129,11 +200,22 @@ void ARaftSimRaftActor::UpdateSharedHullVisual()
     // condition or rejected D4 state. Exact vertex equality is checked below.
     const auto& Hull=RaftAdapter->GetHullGeometry();
     const auto Datum=RaftVisual->GetRelativeTransform();
+    static const bool bReferenceRestKey=FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceRestKey"));
     const bool Reuse=SharedHullRenderedCache && SharedHullRenderedCache->Matches(
-        ProductionRaftRestSections,TubeRadiusM,SharedHullPublishedSegments,SharedHullPublishedCondition,Datum) &&
+        ProductionRaftRestSections,TubeRadiusM,SharedHullPublishedSegments,SharedHullPublishedCondition,Datum,bReferenceRestKey) &&
         SharedHullRenderedCache->Hull.VerticesM==Hull.VerticesM && SharedHullRenderedCache->Hull.Faces==Hull.Faces;
-    if(Reuse)ProductionRaftDeformedSections=SharedHullRenderedCache->Prepared;
-    else RaftSimRaftMesh::DeformProductionRaftRestMesh(ProductionRaftRestSections,TubeRadiusM,SharedHullPublishedSegments,
+    if(Reuse)
+    {
+        static const bool bReferenceSnapshotCopy=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimExactSnapshotCopy")) ||
+            FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceSnapshotCopy"));
+        if(bReferenceSnapshotCopy)ProductionRaftDeformedSections=SharedHullRenderedCache->Prepared;
+        else
+        {
+            RaftSimHullPrepareCache::FCopyCounts Copies;
+            RaftSimHullPrepareCache::CopyPreparedIfChanged(SharedHullRenderedCache->Prepared,ProductionRaftDeformedSections,Copies);
+        }
+    }
+    else RaftSimRaftMesh::DeformProductionRaftRestMesh(ProductionRaftRestSections->GetSections(),TubeRadiusM,SharedHullPublishedSegments,
         SharedHullPublishedCondition,ProductionRaftDeformedSections,&ProductionRaftDeformationCache);
     CSV_CUSTOM_STAT(RaftSimHull,ShadingUploads,int32(!Reuse),ECsvCustomStatOp::Set);
     bool Valid=Hull.Sections.Num()==ProductionRaftDeformedSections.Num();

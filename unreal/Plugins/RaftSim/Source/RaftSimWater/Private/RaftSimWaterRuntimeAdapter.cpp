@@ -2304,14 +2304,24 @@ bool URaftSimWaterRuntimeAdapter::RiverToWorldPosition(
 bool URaftSimWaterRuntimeAdapter::GetRiverStationRangeM(
     float& OutMinimumStationM, float& OutMaximumStationM) const
 {
+    double MinimumM=0.,MaximumM=0.;
+    const bool Available=GetExactRiverStationRangeM(MinimumM,MaximumM);
+    OutMinimumStationM=static_cast<float>(MinimumM);
+    OutMaximumStationM=static_cast<float>(MaximumM);
+    return Available;
+}
+
+bool URaftSimWaterRuntimeAdapter::GetExactRiverStationRangeM(
+    double& OutMinimumStationM, double& OutMaximumStationM) const
+{
     if (!HasRiverCoordinateMap() || bCartesianWaterCoordinates)
     {
-        OutMinimumStationM = 0.0f;
-        OutMaximumStationM = 0.0f;
+        OutMinimumStationM = 0.;
+        OutMaximumStationM = 0.;
         return false;
     }
-    OutMinimumStationM = static_cast<float>(RiverCoordinatePoints[0].StationM);
-    OutMaximumStationM = static_cast<float>(RiverCoordinatePoints.Last().StationM);
+    OutMinimumStationM = RiverCoordinatePoints[0].StationM;
+    OutMaximumStationM = RiverCoordinatePoints.Last().StationM;
     return true;
 }
 

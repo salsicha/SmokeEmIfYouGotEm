@@ -22,6 +22,15 @@ struct FRaftSimDetailEntrainment
         return 1.f-U*U*(3.f-2.f*U);
     }
     // Two estimates of the same source do not create additive production.
+    // Captured white pixels describe appearance, not a perpetual bubble source.
+    // Use them only where the current field already has crashing-water activity.
+    // A calm pool cannot be made white by an old photograph or optical mask.
+    static float ObservedBreakingSource(float LocalSource,float Observed)
+    {
+        return Observed*BoundedSmoothStep(.01f,.1f,LocalSource);
+    }
+
+    // Two estimates of the same source do not create additive production.
     // Retain flow-driven rock/wake transitions and the accepted crest source.
     static float MergeBreakingSource(const FVector4f& Flow,float CrestSource)
     {

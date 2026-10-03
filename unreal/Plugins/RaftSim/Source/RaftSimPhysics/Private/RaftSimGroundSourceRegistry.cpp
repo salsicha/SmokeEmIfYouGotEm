@@ -1,11 +1,14 @@
 #include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimTriangleSweep.h"
 #include "RaftSimHullArcPair.h"
+#include "RaftSimFaceOrdering.h"
 #include "LandscapeHeightfieldCollisionComponent.h"
 #include "Chaos/HeightField.h"
 #include <limits>
 #include "CollisionQueryParams.h"
 #include "ProfilingDebugging/CsvProfiler.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 
 CSV_DEFINE_CATEGORY(RaftSimGround,true);
 
@@ -53,6 +56,10 @@ RaftSimSurfaceSweep::FResult FRaftSimGroundSourceRegistry::SweepCapturedSurface(
     TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm,bool bGroupedBroadPhase,const FRaftSimHullArcPath* Arc)
 {
     CSV_SCOPED_TIMING_STAT(RaftSimGround,SurfaceSweep);
+    CSV_CUSTOM_STAT(RaftSimGround,LandscapeGroundTriangles,0,ECsvCustomStatOp::Accumulate);
+    CSV_CUSTOM_STAT(RaftSimGround,LandscapeFaceRefitCalls,0,ECsvCustomStatOp::Accumulate);
+    CSV_CUSTOM_STAT(RaftSimGround,LandscapeRadixOrderQueries,0,ECsvCustomStatOp::Accumulate);
+    CSV_CUSTOM_STAT(RaftSimGround,LandscapeReferenceOrderQueries,0,ECsvCustomStatOp::Accumulate);
     using namespace RaftSimSurfaceSweep;
     FResult Best;
     if(StartCm.IsEmpty() || StartCm.Num()!=EndCm.Num() || Faces.IsEmpty() ||
@@ -87,6 +94,22 @@ RaftSimSurfaceSweep::FResult FRaftSimGroundSourceRegistry::SweepCapturedSurface(
     }
     // Visit the actual Complex Chaos heightfield triangles (including its
     // holes and native diagonal), not a fitted bed or sampled support spheres.
+    // The retained tree caches only connectivity; a query containing actual
+    // terrain triangles refits every original face's endpoint bounds. Empty
+    // Chaos heightfield queries must not pay for a 38344-face refit. The
+    // reference switch/audit is for
+    // same-input qualification, never a different collision model.
+    static const bool ExhaustiveLandscape=FParse::Param(FCommandLine::Get(),TEXT("RaftSimExhaustiveLandscapeFaces"));
+    static const bool AuditLandscapeTree=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLandscapeFaceTreeAudit"));
+    // Exact signed ordering passed same-input original-asset controls and
+    // repeated native full routes in both execution orders. No face, bound,
+    // narrow-phase or contact tie changes. Original Sort is diagnostic-only.
+    static const bool RadixLandscapeOrder=RaftSimFaceOrdering::UsesRadixLandscapeOrder(FCommandLine::Get());
+    const bool UseLandscapeTree=bGroupedBroadPhase && !ExhaustiveLandscape;
+    bool LandscapeTreeReady=false;
+    RaftSimHullArcPair::FQueryDerivatives LandscapeArcDerivatives(Arc);
+    TArray<int32> LandscapeCandidates;
+    TArray<int32> LandscapeOrderingScratch;
     for(const auto& WeakLandscape:Landscapes)
     {
         auto* Landscape=WeakLandscape.Get();if(!Landscape)continue;
@@ -104,14 +127,82 @@ RaftSimSurfaceSweep::FResult FRaftSimGroundSourceRegistry::SweepCapturedSurface(
                 [&](const Chaos::FTriangle& T,int32 GroundFace,int32,int32,int32)
                 {
                     if(Best.Status!=EStatus::Clear && Best.Status!=EStatus::Contact)return;
+                    CSV_CUSTOM_STAT(RaftSimGround,LandscapeGroundTriangles,1,ECsvCustomStatOp::Accumulate);
+                    if(UseLandscapeTree && !LandscapeTreeReady)
+                    {
+                        CSV_SCOPED_TIMING_STAT(RaftSimGround,LandscapeFaceRefit);
+                        CSV_CUSTOM_STAT(RaftSimGround,LandscapeFaceRefitCalls,1,ECsvCustomStatOp::Accumulate);
+                        // The old per-candidate loop converted each vertex
+                        // again for every incident face and ground triangle.
+                        // Refresh the SAME multiplication once per original
+                        // vertex on this query, only after actual ground exists.
+                        LandscapeStartMeters.SetNumUninitialized(StartCm.Num());
+                        LandscapeEndMeters.SetNumUninitialized(EndCm.Num());
+                        for(int32 I=0;I<StartCm.Num();++I)
+                        {
+                            LandscapeStartMeters[I]=StartCm[I]*.01;
+                            LandscapeEndMeters[I]=EndCm[I]*.01;
+                        }
+                        if(!LandscapeMovingFaces.Refit(LandscapeStartMeters,LandscapeEndMeters,Faces,SkinCm*.01,true))
+                        {Best.Status=EStatus::Invalid;return;}
+                        LandscapeTreeReady=true;
+                    }
                     FTriangle Ground;FBox GroundBounds(ForceInit);
                     for(int32 J=0;J<3;++J){Ground.V[J]=Rigid.TransformPosition(FVector(T[J]))*.01;GroundBounds+=Ground.V[J];}
-                    for(int32 I=0;I<Faces.Num();++I)
+                    if(UseLandscapeTree)
                     {
+                        CSV_SCOPED_TIMING_STAT(RaftSimGround,LandscapeFaceQuery);
+                        {
+                            CSV_SCOPED_TIMING_STAT(RaftSimGround,LandscapeFaceTraversal);
+                            LandscapeMovingFaces.GatherCandidates(GroundBounds,LandscapeCandidates);
+                        }
+                        {
+                            CSV_SCOPED_TIMING_STAT(RaftSimGround,LandscapeFaceOrdering);
+                            if(RadixLandscapeOrder)RaftSimFaceOrdering::Radix(LandscapeCandidates,LandscapeOrderingScratch);
+                            else LandscapeCandidates.Sort();
+                        }
+                        CSV_CUSTOM_STAT(RaftSimGround,LandscapeRadixOrderQueries,int32(RadixLandscapeOrder),ECsvCustomStatOp::Accumulate);
+                        CSV_CUSTOM_STAT(RaftSimGround,LandscapeReferenceOrderQueries,int32(!RadixLandscapeOrder),ECsvCustomStatOp::Accumulate);
+                        if(AuditLandscapeTree)
+                        {
+                            TArray<int32> Reference;
+                            for(int32 I=0;I<Faces.Num();++I)
+                            {
+                                FBox FaceBox(ForceInit);
+                                for(int32 J=0;J<3;++J){FaceBox+=StartCm[Faces[I][J]]*.01;FaceBox+=EndCm[Faces[I][J]]*.01;}
+                                if(FaceBox.ExpandBy(SkinCm*.01).Intersect(GroundBounds))Reference.Add(I);
+                            }
+                            if(Reference!=LandscapeCandidates)
+                            {
+                                UE_LOG(LogTemp,Error,TEXT("Landscape original-face tree differs from exhaustive endpoint bounds"));
+                                Best.Status=EStatus::Invalid;return;
+                            }
+                        }
+                    }
+                    const int32 CandidateCount=UseLandscapeTree?LandscapeCandidates.Num():Faces.Num();
+                    CSV_CUSTOM_STAT(RaftSimGround,LandscapeOriginalFaces,Faces.Num(),ECsvCustomStatOp::Accumulate);
+                    CSV_CUSTOM_STAT(RaftSimGround,LandscapeCandidateFaces,CandidateCount,ECsvCustomStatOp::Accumulate);
+                    for(int32 Candidate=0;Candidate<CandidateCount;++Candidate)
+                    {
+                        const int32 I=UseLandscapeTree?LandscapeCandidates[Candidate]:Candidate;
                         FTriangle A,B;FBox FaceBounds(ForceInit);
-                        for(int32 J=0;J<3;++J){A.V[J]=StartCm[Faces[I][J]]*.01;B.V[J]=EndCm[Faces[I][J]]*.01;FaceBounds+=A.V[J];FaceBounds+=B.V[J];}
-                        if(!FaceBounds.ExpandBy(SkinCm*.01).Intersect(GroundBounds))continue;
-                        ++Pairs;if(Arc && RaftSimHullArcPair::Separated(Faces[I],A,Ground,*Arc))continue;
+                        if(UseLandscapeTree)
+                        {
+                            // Candidates already performed this exact expanded
+                            // six-endpoint AABB test, in original face order.
+                            // Do not reconstruct and retest the same enclosure.
+                            for(int32 J=0;J<3;++J)
+                            {A.V[J]=LandscapeStartMeters[Faces[I][J]];B.V[J]=LandscapeEndMeters[Faces[I][J]];}
+                        }
+                        else
+                        {
+                            for(int32 J=0;J<3;++J){A.V[J]=StartCm[Faces[I][J]]*.01;B.V[J]=EndCm[Faces[I][J]]*.01;FaceBounds+=A.V[J];FaceBounds+=B.V[J];}
+                            if(!FaceBounds.ExpandBy(SkinCm*.01).Intersect(GroundBounds))continue;
+                        }
+                        ++Pairs;
+                        if(Arc && (UseLandscapeTree
+                            ? RaftSimHullArcPair::Separated(Faces[I],A,Ground,*Arc,LandscapeArcDerivatives)
+                            : RaftSimHullArcPair::Separated(Faces[I],A,Ground,*Arc)))continue;
                         auto Hit=RaftSimSurfaceSweep::Sweep(A,B,Ground,SkinCm*.01,128,ProvenClearanceCm*.01);
                         Hit.MovingFace=I;Hit.GroundFace=GroundFace;RaftSimHullArcPair::GroundFeature(Hit,Ground);
                         if(Hit.Status!=EStatus::Clear && Hit.Status!=EStatus::Contact){Best=Hit;return;}

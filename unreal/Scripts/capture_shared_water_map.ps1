@@ -7,18 +7,57 @@ No quality overrides, replacement hulls, scripted boat paths or solver opt-ins.
 param(
     [Parameter(Mandatory=$true)][ValidatePattern('^L_[A-Za-z0-9_]+$')][string]$Map,
     [Parameter(Mandatory=$true)][ValidatePattern('^[a-zA-Z0-9_.-]+$')][string]$Label,
-    [ValidateRange(2400,4800)][int]$ProfileFrames=2400,
+    [ValidateRange(2400,9600)][int]$ProfileFrames=2400,
     [ValidateRange(-1,100000)][int]$StationM=-1,
-    [ValidateRange(60,1200)][int]$TimeoutS=900,
-    [ValidateRange(8.25,50)][double]$RecordingStartS=12,
-    [ValidateRange(10,60)][double]$RecordingEndS=22,
-    [ValidateRange(26,90)][double]$FeatureAuditSeconds=26,
+    [ValidateRange(60,2400)][int]$TimeoutS=900,
+    [ValidateRange(8.25,110)][double]$RecordingStartS=12,
+    [ValidateRange(10,119)][double]$RecordingEndS=22,
+    [ValidateRange(26,120)][double]$FeatureAuditSeconds=26,
     [string]$PackagedRoot='',
     [switch]$Overview,
     [switch]$ClearanceAudit,
     [switch]$EddyEntry
 )
 $ErrorActionPreference='Stop'
+function Get-RaftSimCompleteFeatureAudit {
+    param($Audit,[double]$RequestedSeconds,[string]$ExpectedMap)
+    # Read genuine timer receipts only. A longer requested command does not
+    # prove a longer run, and an early CSV exit must not qualify the eddy exit.
+    foreach($field in @('requested_audit_duration_seconds','audit_world_seconds')){
+        $p=$Audit.PSObject.Properties[$field]
+        if($null -eq $p -or $null -eq $p.Value){throw "Native terminal field missing: $field"}
+        $v=[double]$p.Value
+        if([double]::IsNaN($v) -or [double]::IsInfinity($v)){throw 'Nonfinite native terminal time'}
+    }
+    if($Audit.map -ne $ExpectedMap){throw 'Native audit belongs to another map'}
+    if([Math]::Abs([double]$Audit.requested_audit_duration_seconds-$RequestedSeconds) -gt .0001 -or
+        [double]$Audit.audit_world_seconds -lt $RequestedSeconds){throw 'Requested native audit did not complete'}
+    if(@($Audit.actual_boat_motion).Count -lt 2){throw 'Actual boat motion receipts missing'}
+    $previous=-1.0;$maximumGap=0.0
+    foreach($state in $Audit.actual_boat_motion){
+        foreach($field in @('world_seconds','world_x_m','world_y_m','world_z_m','yaw_deg','pitch_deg','roll_deg',
+            'speed_mps','velocity_world_x_mps','velocity_world_y_mps','velocity_world_z_mps')){
+            $p=$state.PSObject.Properties[$field]
+            if($null -eq $p -or $null -eq $p.Value){throw "Native state field missing: $field"}
+            $v=[double]$p.Value
+            if([double]::IsNaN($v) -or [double]::IsInfinity($v)){throw 'Nonfinite native boat state'}
+        }
+        $t=[double]$state.world_seconds
+        if($t -le $previous -or $t -gt [double]$Audit.audit_world_seconds){throw 'Native state times inconsistent'}
+        if($previous -ge 0){$maximumGap=[Math]::Max($maximumGap,$t-$previous)}
+        $previous=$t
+    }
+    # Native sampling is a 0.5-world-second timer. These checks require a
+    # terminal sample and at most two timer intervals, not fixed-step or
+    # render-frame coverage. Do not interpolate missing motion or exempt gaps.
+    if($maximumGap -gt 1.0 -or [double]$Audit.audit_world_seconds-$previous -gt 1.0){
+        throw 'Native timer motion has a missing or incomplete terminal interval'
+    }
+    return [ordered]@{requested_seconds=$RequestedSeconds;terminal_world_seconds=[double]$Audit.audit_world_seconds
+        actual_samples=@($Audit.actual_boat_motion).Count;maximum_sample_gap_seconds=$maximumGap
+        final_sample_world_seconds=$previous;native_timer_duration_complete=$true
+        scope='Actual world-timer states; not fixed-step sampling, pixel or FPS acceptance.'}
+}
 if($RecordingEndS -le $RecordingStartS){throw 'Recording must end after its start'}
 if($RecordingEndS -ge $FeatureAuditSeconds){throw 'Motion audit must extend past the finalized recording'}
 $root=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -51,9 +90,13 @@ if($StationM -ge 0){$commands+=",RaftSim.PlaceAtStation $StationM"}
 if($EddyEntry){$commands+=",RaftSim.EddyEntry $Label"}
 if($Overview){
     # Only a native raft-attached camera; no station walk or crew command.
-    # Ten one-minute screenshot slots keep that command's automatic exit
-    # beyond this bounded CSV run. Screenshot readbacks are diagnostic cost.
-    $commands+=",RaftSim.CaptureRaftSeries 9 10 60 $Label-overview 12 0 12 0"
+    # The native camera command exits three seconds after its last screenshot.
+    # Ten slots ended the slow 9600-frame recording before its CSV could flush.
+    # Use the command's supported maximum200 one-minute slots (last at11949s),
+    # beyond this wrapper's maximum2400s owned timeout. CSV remains the normal
+    # completion path; motion duration/gap and capture-health gates are unchanged.
+    # Screenshot readbacks remain diagnostic cost, never a clean FPS run.
+    $commands+=",RaftSim.CaptureRaftSeries 9 200 60 $Label-overview 12 0 12 0"
 }
 # Optional station setup is a SINGLE placement at 4 s. EddyEntry is a final
 # single verified placement at 8 s. No repeating survey timer is installed.
@@ -120,3 +163,7 @@ $csv=@([regex]::Matches($log,'LogCsvProfiler: Display: Capture Ended\. Writing C
     foam_transport_audit_exists=(Test-Path -LiteralPath "$out/foam-transport.json");videos=$video.FullName
     csv_files=@($csv | ForEach-Object {$_.Groups[1].Value.Trim()})} | ConvertTo-Json -Depth 4
 if($errors.Count -or -not (Test-Path -LiteralPath $feature) -or $video.Count -ne 1 -or $csv.Count -ne 1){throw 'Incomplete or error-bearing map evidence; no acceptance claimed'}
+$audit=Get-Content -LiteralPath $feature -Raw | ConvertFrom-Json
+$receipt['native_timer_duration_observation']=Get-RaftSimCompleteFeatureAudit $audit $FeatureAuditSeconds $Map
+$receipt['feature_motion_sha256']=(Get-FileHash -LiteralPath $feature -Algorithm SHA256).Hash.ToLower()
+$receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath "$out/launch.json" -Encoding UTF8

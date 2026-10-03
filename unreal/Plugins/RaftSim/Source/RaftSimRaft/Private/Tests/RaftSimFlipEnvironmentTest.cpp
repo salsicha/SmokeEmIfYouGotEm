@@ -18,9 +18,12 @@
 #include "RaftSimHullPrepareCache.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimGroundSourceRegistry.h"
+#include "RaftSimFaceOrdering.h"
 #include "Engine/StaticMeshActor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Misc/ScopeExit.h"
+#include <limits>
+#include <type_traits>
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimProductionCapturedRockPin,
@@ -143,6 +146,300 @@ bool FRaftSimHullPrepareCacheTest::RunTest(const FString&)
         TestFalse(FString::Printf(TEXT("same-count changed input invalidates exact cache %d"),Case),Cache.Matches(Source,Radius,D,Condition,Transform));
     }
     TestTrue(TEXT("cached export preserves every original vertex and indexed face"),Cache.Hull.VerticesM==H.VerticesM && Cache.Hull.Faces==H.Faces);
+    auto SignedZero=Rest;SignedZero[0].Vertices[0].X=-0.0;SignedZero[0].UVs[0].X=-0.0;
+    TestTrue(TEXT("byte-different signed zeros retain original exact value equality"),Cache.Matches(SignedZero,.32f,Input,C,T));
+    auto ChangedTangent=Rest;ChangedTangent[0].Tangents[0].TangentX.Z=1.e-9;
+    TestFalse(TEXT("same-count tangent direction edit invalidates bulk key"),Cache.Matches(ChangedTangent,.32f,Input,C,T));
+    auto DifferentCount=Rest;DifferentCount[0].UVs.Add(FVector2D::ZeroVector);
+    TestFalse(TEXT("attribute count changes invalidate bulk key"),Cache.Matches(DifferentCount,.32f,Input,C,T));
+    auto Nonfinite=Rest;Nonfinite[0].Normals[0].X=std::numeric_limits<double>::quiet_NaN();
+    Cache.Remember(Nonfinite,.32f,Input,C,T,Rest,H);
+    TestFalse(TEXT("identical NaN bytes cannot turn unequal normal values into a cache hit"),Cache.Matches(Nonfinite,.32f,Input,C,T));
+    Nonfinite=Rest;Nonfinite[0].UVs[0].X=std::numeric_limits<double>::quiet_NaN();
+    Cache.Remember(Nonfinite,.32f,Input,C,T,Rest,H);
+    TestFalse(TEXT("identical NaN UV bytes preserve original cache refusal"),Cache.Matches(Nonfinite,.32f,Input,C,T));
+    Nonfinite=Rest;Nonfinite[0].Tangents[0].TangentX.Z=std::numeric_limits<double>::quiet_NaN();
+    Cache.Remember(Nonfinite,.32f,Input,C,T,Rest,H);
+    TestFalse(TEXT("identical NaN tangent bytes preserve original cache refusal"),Cache.Matches(Nonfinite,.32f,Input,C,T));
+    Nonfinite=Rest;Nonfinite[0].Normals[0].X=std::numeric_limits<double>::infinity();
+    Cache.Remember(Nonfinite,.32f,Input,C,T,Rest,H);
+    TestTrue(TEXT("nonfinite rest attributes retain legacy equality instead of a new validity rule"),Cache.Matches(Nonfinite,.32f,Input,C,T));
+
+    // Actual production data, not the small cache-invalidation fixture above.
+    // All destination arrays remain independent, including after publication
+    // buffer swaps and same-count edits. Compare EVERY attribute and range.
+    TArray<RaftSimRaftMesh::FMeshData> Original;
+    const auto* Asset=LoadObject<UStaticMesh>(nullptr,TEXT("/Game/RaftSim/Rafts/Production/SM_RaftSim_ProductionPaddleRaft.SM_RaftSim_ProductionPaddleRaft"));
+    if(!TestTrue(TEXT("copy controls load the original production asset"),RaftSimRaftMesh::ExtractProductionRaftRestMesh(Asset,Original)))return false;
+    FRaftSimHullGeometry OriginalHull;
+    if(!TestTrue(TEXT("copy controls export the actual full indexed hull"),RaftSimRaftMesh::ExportHullGeometry(Original,FTransform::Identity,OriginalHull)))return false;
+    TestEqual(TEXT("copy controls retain all production vertices"),OriginalHull.VerticesM.Num(),26610);
+    TestEqual(TEXT("copy controls retain all production faces"),OriginalHull.Faces.Num(),38344);
+    TestEqual(TEXT("copy controls retain all five material sections"),Original.Num(),5);
+    // Use the original asset's actual indexed hull for query/order costs; the
+    // numerical enclosure fixture is not a substitute for this native pilot.
+    FRaftSimEndpointFaceTree OrderingTree;TArray<int32> OrderingScratch;
+    TArray<FVector> OrderingEnd=OriginalHull.VerticesM;
+    for(int32 I=0;I<OrderingEnd.Num();++I)OrderingEnd[I]+=FVector(.02*FMath::Sin(I*.1),.03*FMath::Cos(I*.07),.01);
+    if(!TestTrue(TEXT("actual full production endpoint tree refits for ordering control"),
+        OrderingTree.Refit(OriginalHull.VerticesM,OrderingEnd,OriginalHull.Faces,.00001,true)))return false;
+    FRandomStream OrderingRandom(20261005);
+    for(int32 SizeClass=0;SizeClass<4;++SizeClass)
+    {
+        double ReferenceSeconds=0.,RadixSeconds=0.;int64 CandidateSum=0;int32 Comparisons=0;
+        TArray<TArray<int32>> Inputs;
+        for(int32 Query=0;Query<64;++Query)
+        {
+            const FVector Center=OriginalHull.VerticesM[OrderingRandom.RandRange(0,OriginalHull.VerticesM.Num()-1)];
+            const double Extent=SizeClass==0?.015:SizeClass==1?.15:SizeClass==2?.75:10.;
+            TArray<int32> Unordered;OrderingTree.GatherCandidates(FBox(Center-FVector(Extent),Center+FVector(Extent)),Unordered);
+            Inputs.Add(MoveTemp(Unordered));
+        }
+        for(int32 Pair=0;Pair<256;++Pair)
+        {
+            const auto& InputIds=Inputs[Pair%Inputs.Num()];CandidateSum+=InputIds.Num();
+            auto ReferenceIds=InputIds,RadixIds=InputIds;
+            const auto Run=[&](bool Reference)
+            {
+                const double Begin=FPlatformTime::Seconds();
+                if(Reference)ReferenceIds.Sort();else RaftSimFaceOrdering::Radix(RadixIds,OrderingScratch);
+                const double Elapsed=FPlatformTime::Seconds()-Begin;
+                if(Reference)ReferenceSeconds+=Elapsed;else RadixSeconds+=Elapsed;
+            };
+            Run(Pair%2!=0);Run(Pair%2==0);
+            TestTrue(TEXT("actual original-hull query face IDs and tie order match without tolerance"),ReferenceIds==RadixIds);
+            ++Comparisons;
+        }
+        AddInfo(FString::Printf(TEXT("PRODUCTION_FACE_ORDER_PAIRS class=%d pairs=%d alternating_order=1 vertices=%d faces=%d mean_candidates=%.3f reference_mean_ms=%.9f radix_mean_ms=%.9f exact=1 fps_acceptance=0"),
+            SizeClass,Comparisons,OriginalHull.VerticesM.Num(),OriginalHull.Faces.Num(),double(CandidateSum)/Comparisons,
+            1000.*ReferenceSeconds/Comparisons,1000.*RadixSeconds/Comparisons));
+    }
+    if(!TestTrue(TEXT("production first section has every attribute"),!Original.IsEmpty() &&
+        !Original[0].Vertices.IsEmpty() && !Original[0].Triangles.IsEmpty() && !Original[0].Normals.IsEmpty() &&
+        !Original[0].UVs.IsEmpty() && !Original[0].Tangents.IsEmpty()))return false;
+    using FImmutableRest=RaftSimRaftMesh::FImmutableProductionRestMesh;
+    static_assert(!std::is_copy_assignable_v<FImmutableRest> && !std::is_move_assignable_v<FImmutableRest>);
+    static_assert(std::is_same_v<decltype(std::declval<const FImmutableRest&>().GetSections()),
+        const TArray<RaftSimRaftMesh::FMeshData>&>);
+    auto Import=Original;
+    const RaftSimHullPrepareCache::FRestOwner Owner=MakeShared<const FImmutableRest>(Import);
+    RaftSimHullPrepareCache::FCache Sealed;Sealed.Remember(Owner,.32f,Input,C,T,Original,OriginalHull);
+    bool DeepOwned=true;
+    for(int32 I=0;I<Import.Num();++I)
+    {
+        const auto& A=Import[I];const auto& B=Owner->GetSections()[I];
+        DeepOwned &= RaftSimHullPrepareCache::SameBytes(A.Vertices,B.Vertices) &&
+            RaftSimHullPrepareCache::SameBytes(A.Triangles,B.Triangles) &&
+            RaftSimHullPrepareCache::SameBytes(A.Normals,B.Normals) &&
+            RaftSimHullPrepareCache::SameBytes(A.UVs,B.UVs) &&
+            RaftSimHullPrepareCache::SameBytes(A.Tangents,B.Tangents) &&
+            A.Vertices.GetData()!=B.Vertices.GetData() && A.Triangles.GetData()!=B.Triangles.GetData() &&
+            A.Normals.GetData()!=B.Normals.GetData() && A.UVs.GetData()!=B.UVs.GetData() &&
+            A.Tangents.GetData()!=B.Tangents.GetData();
+    }
+    TestTrue(TEXT("sealed original rest owns all five attributes without importer aliases"),DeepOwned);
+    Import[0].Vertices[0].X+=1.;Import[0].Triangles[0]=Import[0].Triangles[1];
+    Import[0].Normals[0].X+=1.;Import[0].UVs[0].X+=1.;Import[0].Tangents[0].bFlipTangentY=!Import[0].Tangents[0].bFlipTangentY;
+    Import.Reset();
+    TestTrue(TEXT("mutating and freeing the importer cannot alter sealed production geometry"),
+        Sealed.HasSealedRestKey(Owner) && Sealed.Matches(Owner,.32f,Input,C,T) && Sealed.Matches(Owner,.32f,Input,C,T,true));
+    for(int32 Case=0;Case<24;++Case)
+    {
+        auto Source=Original;auto D=Input;auto Condition=C;auto Transform=T;float Radius=.32f;
+        switch(Case)
+        {
+        case 0:Source[0].Vertices[0].X+=1.e-9;break;
+        case 1:Swap(Source[0].Triangles[0],Source[0].Triangles[1]);break;
+        case 2:Source[0].Normals[0].X+=1.e-9;break;
+        case 3:Source[0].UVs[0].X+=1.e-9;break;
+        case 4:Source[0].Tangents[0].TangentX.Z+=1.e-9;break;
+        case 5:Source[0].Tangents[0].bFlipTangentY=!Source[0].Tangents[0].bFlipTangentY;break;
+        case 6:Source[0].UVs.Add(FVector2D::ZeroVector);break;
+        case 7:Source.AddDefaulted();break;
+        case 8:D[0].SegmentId=TEXT("changed");break;
+        case 9:D[0].LocalPositionM.X+=1.e-9;break;
+        case 10:D[0].ContactNormalLocal.Y+=1.e-9;break;
+        case 11:D[0].CompressionM+=1.e-9;break;
+        case 12:D[0].FreeboardLossM+=1.e-9;break;
+        case 13:D[0].IndentationM+=1.e-9;break;
+        case 14:D[0].bWrapping=!D[0].bWrapping;break;
+        case 15:D[0].bPinned=!D[0].bPinned;break;
+        case 16:D[0].bRecovering=!D[0].bRecovering;break;
+        case 17:D.AddDefaulted();break;
+        case 18:Condition.PressureFraction=.99f;break;
+        case 19:Condition.Integrity=.99f;break;
+        case 20:Condition.CreaseAmplitudeM+=1.e-9f;break;
+        case 21:Transform.SetTranslation(FVector(1.e-9,0,0));break;
+        case 22:Transform.SetRotation(FQuat(FVector::UpVector,.01));break;
+        case 23:Radius=.33f;break;
+        }
+        const RaftSimHullPrepareCache::FRestOwner ChangedOwner=Case<8 ? MakeShared<const FImmutableRest>(Source) : Owner;
+        TestFalse(FString::Printf(TEXT("sealed input still rejects every source and dynamics change %d"),Case),Sealed.Matches(ChangedOwner,Radius,D,Condition,Transform));
+        TestEqual(FString::Printf(TEXT("sealed and original key decisions agree %d"),Case),
+            Sealed.Matches(ChangedOwner,Radius,D,Condition,Transform),Sealed.Matches(ChangedOwner,Radius,D,Condition,Transform,true));
+    }
+    auto Scaled=T;Scaled.SetScale3D(FVector(1.01,1,1));
+    TestFalse(TEXT("sealed key still validates component scale"),Sealed.Matches(Owner,.32f,Input,C,Scaled));
+    for(int32 Case=0;Case<5;++Case)
+    {
+        auto Invalid=Original;
+        switch(Case)
+        {
+        case 0:Invalid[0].Vertices[0].X=std::numeric_limits<double>::quiet_NaN();break;
+        case 1:Invalid[0].Normals[0].X=std::numeric_limits<double>::quiet_NaN();break;
+        case 2:Invalid[0].UVs[0].X=std::numeric_limits<double>::quiet_NaN();break;
+        case 3:Invalid[0].Tangents[0].TangentX.X=std::numeric_limits<double>::quiet_NaN();break;
+        case 4:Invalid[0].Normals[0].X=std::numeric_limits<double>::infinity();break;
+        }
+        const RaftSimHullPrepareCache::FRestOwner InvalidOwner=MakeShared<const FImmutableRest>(Invalid);
+        RaftSimHullPrepareCache::FCache InvalidCache;InvalidCache.Remember(InvalidOwner,.32f,Input,C,T,Original,OriginalHull);
+        TestFalse(TEXT("nonfinite rest never takes sealed finite shortcut"),InvalidCache.HasSealedRestKey(InvalidOwner));
+        TestEqual(TEXT("nonfinite sealed keys preserve legacy refusal and infinity equality"),
+            InvalidCache.Matches(InvalidOwner,.32f,Input,C,T),Case==4);
+        TestEqual(TEXT("nonfinite reference and sealed decisions identical"),InvalidCache.Matches(InvalidOwner,.32f,Input,C,T),
+            InvalidCache.Matches(InvalidOwner,.32f,Input,C,T,true));
+    }
+    const RaftSimHullPrepareCache::FRestOwner Replacement=MakeShared<const FImmutableRest>(Original);
+    TestFalse(TEXT("distinct import cannot inherit old owner identity proof"),Sealed.HasSealedRestKey(Replacement));
+    TestTrue(TEXT("equal replacement retains original exact-key semantics"),Sealed.Matches(Replacement,.32f,Input,C,T));
+    auto ZeroRest=Original;ZeroRest[0].UVs[0].X=0.;
+    const RaftSimHullPrepareCache::FRestOwner ZeroOwner=MakeShared<const FImmutableRest>(ZeroRest);
+    RaftSimHullPrepareCache::FCache ZeroCache;ZeroCache.Remember(ZeroOwner,.32f,Input,C,T,Original,OriginalHull);
+    ZeroRest[0].UVs[0].X=-0.;
+    const RaftSimHullPrepareCache::FRestOwner NegativeOwner=MakeShared<const FImmutableRest>(ZeroRest);
+    TestTrue(TEXT("replacement signed zero still uses original value equality"),ZeroCache.Matches(NegativeOwner,.32f,Input,C,T));
+    Sealed.Remember(Original,.32f,Input,C,T,Original,OriginalHull);
+    TestFalse(TEXT("mutable Remember clears the sealed identity proof"),Sealed.HasSealedRestKey(Owner));
+    Sealed.Remember(Owner,.32f,Input,C,T,Original,OriginalHull);
+    double ReferenceKeySeconds=0.,SealedKeySeconds=0.;int32 KeyHits=0;
+    for(int32 Pair=0;Pair<512;++Pair)
+    {
+        const auto RunKey=[&](bool Reference)
+        {
+            const double Begin=FPlatformTime::Seconds();
+            const bool Hit=Sealed.Matches(Owner,.32f,Input,C,T,Reference);
+            const double Elapsed=FPlatformTime::Seconds()-Begin;
+            if(Reference)ReferenceKeySeconds+=Elapsed;else SealedKeySeconds+=Elapsed;
+            KeyHits+=int32(Hit);
+        };
+        RunKey(Pair%2!=0);RunKey(Pair%2==0);
+    }
+    TestEqual(TEXT("all same-input production sealed/reference pairs agree"),KeyHits,1024);
+    TestTrue(TEXT("sealed reuse retains original full hull and all prepared sections"),
+        Sealed.Hull.VerticesM==OriginalHull.VerticesM && Sealed.Hull.Faces==OriginalHull.Faces && Sealed.Prepared.Num()==5);
+    AddInfo(FString::Printf(TEXT("PRODUCTION_REST_KEY_PAIRS pairs=512 alternating_order=1 vertices=%d faces=%d sections=%d reference_mean_ms=%.9f sealed_mean_ms=%.9f exact=1 fps_acceptance=0"),
+        OriginalHull.VerticesM.Num(),OriginalHull.Faces.Num(),Original.Num(),1000.*ReferenceKeySeconds/512.,1000.*SealedKeySeconds/512.));
+    TArray<RaftSimRaftMesh::FMeshData> Destination;FRaftSimHullGeometry DestinationHull;
+    const auto Equal=[&]()
+    {
+        using namespace RaftSimHullPrepareCache;
+        if(Destination.Num()!=Original.Num() || !SameBytes(OriginalHull.VerticesM,DestinationHull.VerticesM) ||
+            !SameBytes(OriginalHull.Faces,DestinationHull.Faces) || !SameBytes(OriginalHull.Sections,DestinationHull.Sections))return false;
+        for(int32 I=0;I<Original.Num();++I)
+        {
+            const auto& A=Original[I];const auto& B=Destination[I];
+            if(!SameBytes(A.Vertices,B.Vertices) || !SameBytes(A.Triangles,B.Triangles) ||
+                !SameBytes(A.Normals,B.Normals) || !SameBytes(A.UVs,B.UVs) || !SameBytes(A.Tangents,B.Tangents))return false;
+            if((!A.Vertices.IsEmpty() && A.Vertices.GetData()==B.Vertices.GetData()) ||
+                (!A.Triangles.IsEmpty() && A.Triangles.GetData()==B.Triangles.GetData()) ||
+                (!A.Normals.IsEmpty() && A.Normals.GetData()==B.Normals.GetData()) ||
+                (!A.UVs.IsEmpty() && A.UVs.GetData()==B.UVs.GetData()) ||
+                (!A.Tangents.IsEmpty() && A.Tangents.GetData()==B.Tangents.GetData()))return false;
+        }
+        return OriginalHull.VerticesM.GetData()!=DestinationHull.VerticesM.GetData() &&
+            OriginalHull.Faces.GetData()!=DestinationHull.Faces.GetData() &&
+            OriginalHull.Sections.GetData()!=DestinationHull.Sections.GetData();
+    };
+    const auto Restore=[&]()
+    {
+        RaftSimHullPrepareCache::FCopyCounts Counts;
+        RaftSimHullPrepareCache::CopyPreparedIfChanged(Original,Destination,Counts);
+        RaftSimHullPrepareCache::CopyHullIfChanged(OriginalHull,DestinationHull,Counts);
+        return Counts;
+    };
+    auto Copies=Restore();
+    TestTrue(TEXT("first full snapshot is deeply assigned with no shared mutable arrays"),Copies.Assigned>0 && Equal());
+    const auto* HeldVertices=DestinationHull.VerticesM.GetData();const auto* HeldPrepared=Destination[0].Vertices.GetData();
+    Copies=Restore();
+    TestEqual(TEXT("byte-identical owned production buffers need no assignment"),Copies.Assigned,0);
+    TestEqual(TEXT("every original hull and render attribute is compared"),Copies.Retained,5*Original.Num()+3);
+    TestTrue(TEXT("identical copy elision preserves both buffer allocations"),HeldVertices==DestinationHull.VerticesM.GetData() && HeldPrepared==Destination[0].Vertices.GetData() && Equal());
+    for(int32 Case=0;Case<10;++Case)
+    {
+        switch(Case)
+        {
+        case 0:Destination[0].Vertices[0].X+=1.e-9;break;
+        case 1:Swap(Destination[0].Triangles[0],Destination[0].Triangles[1]);break;
+        case 2:Destination[0].Normals[0].X+=1.e-9;break;
+        case 3:Destination[0].UVs[0].X+=1.e-9;break;
+        case 4:Destination[0].Tangents[0].bFlipTangentY=!Destination[0].Tangents[0].bFlipTangentY;break;
+        case 5:DestinationHull.VerticesM[0].X+=1.e-9;break;
+        case 6:Swap(DestinationHull.Faces[0].X,DestinationHull.Faces[0].Y);break;
+        case 7:--DestinationHull.Sections[0].VertexCount;break;
+        case 8:Destination[0].UVs.Add(FVector2D::ZeroVector);break;
+        case 9:DestinationHull.VerticesM[0].X=std::numeric_limits<double>::quiet_NaN();break;
+        }
+        Copies=Restore();
+        TestEqual(FString::Printf(TEXT("only the changed original array is assigned %d"),Case),Copies.Assigned,1);
+        TestTrue(FString::Printf(TEXT("all original attributes and independent ownership restored %d"),Case),Equal() && DestinationHull.IsValid());
+    }
+    TArray<RaftSimRaftMesh::FMeshData> Published=Destination;
+    Swap(Published,Destination);Copies=Restore();
+    TestTrue(TEXT("publication buffer swap cannot invalidate byte-identity proof"),Copies.Assigned==0 && Equal());
+    Destination.SetNum(Original.Num()+1);Copies=Restore();
+    TestTrue(TEXT("extra material section is removed, never silently retained"),Equal());
+    Destination.Reset();Copies=Restore();
+    TestTrue(TEXT("empty destination regains all original sections"),Copies.Assigned>0 && Equal());
+    // Same original production arrays in both execution orders. This narrow
+    // operation timing is not whole-frame or packaged-game FPS acceptance.
+    auto ReferencePrepared=Original;auto ReferenceHull=OriginalHull;
+    double ReferenceSeconds=0.,CandidateSeconds=0.;int32 RetainedArrays=0;
+    for(int32 Pair=0;Pair<64;++Pair)
+    {
+        const auto Run=[&](bool Candidate)
+        {
+            const double Begin=FPlatformTime::Seconds();
+            if(Candidate)
+            {
+                const auto Counts=Restore();RetainedArrays+=Counts.Retained;
+                CandidateSeconds+=FPlatformTime::Seconds()-Begin;
+            }
+            else
+            {
+                ReferencePrepared=Original;ReferenceHull=OriginalHull;
+                ReferenceSeconds+=FPlatformTime::Seconds()-Begin;
+            }
+        };
+        Run(Pair%2!=0);Run(Pair%2==0);
+        TestTrue(FString::Printf(TEXT("same-input copy pair preserves every actual attribute %d"),Pair),Equal());
+        bool ReferenceExact=ReferencePrepared.Num()==Original.Num() &&
+            RaftSimHullPrepareCache::SameBytes(ReferenceHull.VerticesM,OriginalHull.VerticesM) &&
+            RaftSimHullPrepareCache::SameBytes(ReferenceHull.Faces,OriginalHull.Faces) &&
+            RaftSimHullPrepareCache::SameBytes(ReferenceHull.Sections,OriginalHull.Sections);
+        for(int32 I=0;ReferenceExact && I<Original.Num();++I)
+        {
+            const auto& A=Original[I];const auto& B=ReferencePrepared[I];
+            ReferenceExact=RaftSimHullPrepareCache::SameBytes(A.Vertices,B.Vertices) &&
+                RaftSimHullPrepareCache::SameBytes(A.Triangles,B.Triangles) &&
+                RaftSimHullPrepareCache::SameBytes(A.Normals,B.Normals) &&
+                RaftSimHullPrepareCache::SameBytes(A.UVs,B.UVs) &&
+                RaftSimHullPrepareCache::SameBytes(A.Tangents,B.Tangents);
+        }
+        TestTrue(FString::Printf(TEXT("reference copy pair preserves every actual attribute %d"),Pair),ReferenceExact);
+    }
+    TestEqual(TEXT("all same-input production pairs retain every exact array"),RetainedArrays,64*(5*Original.Num()+3));
+    AddInfo(FString::Printf(TEXT("PRODUCTION_SNAPSHOT_COPY_PAIRS pairs=64 alternating_order=1 vertices=%d faces=%d sections=%d reference_mean_ms=%.9f candidate_mean_ms=%.9f retained_arrays=%d exact=1 fps_acceptance=0"),
+        OriginalHull.VerticesM.Num(),OriginalHull.Faces.Num(),Original.Num(),1000.*ReferenceSeconds/64.,1000.*CandidateSeconds/64.,RetainedArrays));
+    TArray<FVector> PositiveZero={FVector(0.,0.,0.)},NegativeZero={FVector(-0.,0.,0.)};
+    RaftSimHullPrepareCache::FCopyCounts ZeroCopies;
+    RaftSimHullPrepareCache::CopyArrayIfChanged(PositiveZero,NegativeZero,ZeroCopies);
+    TestTrue(TEXT("signed-zero byte difference takes original assignment"),ZeroCopies.Assigned==1 && RaftSimHullPrepareCache::SameBytes(PositiveZero,NegativeZero));
+    RaftSimHullPrepareCache::FCopyCounts ClearCopies;
+    const TArray<RaftSimRaftMesh::FMeshData> EmptyPrepared;const FRaftSimHullGeometry EmptyHull;
+    RaftSimHullPrepareCache::CopyPreparedIfChanged(EmptyPrepared,Destination,ClearCopies);
+    RaftSimHullPrepareCache::CopyHullIfChanged(EmptyHull,DestinationHull,ClearCopies);
+    TestTrue(TEXT("empty source clears every old section and hull array, preserving validity refusal"),Destination.IsEmpty() &&
+        DestinationHull.VerticesM.IsEmpty() && DestinationHull.Faces.IsEmpty() && DestinationHull.Sections.IsEmpty() && !DestinationHull.IsValid());
     return !HasAnyErrors();
 }
 

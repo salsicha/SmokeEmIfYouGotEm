@@ -3,7 +3,8 @@ Windows PowerShell 5.1 frame audit for a directly launched reference map
 (for example L_Hance), editor-hosted by default or an explicit retained package,
 same CSV rules as
 profile_south_fork_menu_launch_ps5.ps1: rows 30..N-30 are audited against the
-20 FPS desktop goal (50 ms p95; a hitch is any frame over 100 ms).
+20 FPS desktop goal (every audited frame <=50 ms; p95 is diagnostic only).
+This steady-window profile is not a whole-route fly-through.
 
 -StationM performs ONE placement at world time 4 s, then the real raft freely
 integrates. The CSV includes setup and is labeled diagnostic, not a menu launch.
@@ -17,9 +18,15 @@ param(
     [ValidateRange(-1, 100000)][int]$StationM = -1,
     [int]$TimeoutS = 900,
     [string]$PackagedRoot = '',
-    [ValidatePattern('^[a-zA-Z0-9_. ;=-]*$')][string]$DiagnosticExecCmds = ''
+    [ValidatePattern('^[a-zA-Z0-9_. ;=-]*$')][string]$DiagnosticExecCmds = '',
+    [switch]$ExhaustiveLandscapeFaces,
+    [switch]$RigidOnlyMovingFaceTree,
+    [switch]$OriginalFaceTreeAudit,
+    [switch]$RadixLandscapeOrder,
+    [switch]$ReferenceLandscapeOrder
 )
 $ErrorActionPreference = 'Stop'
+if($RadixLandscapeOrder -and $ReferenceLandscapeOrder){throw 'Request one landscape ordering mode'}
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $project = Join-Path $root 'unreal/SmokeEmIfYouGotEm.uproject'
 if(-not (Test-Path -LiteralPath (Join-Path $root "unreal/Content/RaftSim/Maps/$Map.umap") -PathType Leaf)){
@@ -61,6 +68,13 @@ $gameArgs = $projectArguments+@("/Game/RaftSim/Maps/$Map",
     '-ResX=1280', '-ResY=720', '-Windowed', '-RaftSimEphemeralProfile', '-csvCompression=0',
     "`"-abslog=$logFile`"", '-ExitAfterCsvProfiling', "`"-ExecCmds=$commands`"")
 $binaryHash = (Get-FileHash -LiteralPath $gameBinary -Algorithm SHA256).Hash.ToLower()
+$collisionArguments=@()
+if($ExhaustiveLandscapeFaces){$collisionArguments+='-RaftSimExhaustiveLandscapeFaces'}
+if($RigidOnlyMovingFaceTree){$collisionArguments+='-RaftSimRigidOnlyMovingFaceTree'}
+if($OriginalFaceTreeAudit){$collisionArguments+=@('-RaftSimLandscapeFaceTreeAudit','-RaftSimMovingEndpointTreeAudit')}
+if($RadixLandscapeOrder){$collisionArguments+='-RaftSimRadixLandscapeOrder'}
+if($ReferenceLandscapeOrder){$collisionArguments+='-RaftSimReferenceLandscapeOrder'}
+$gameArgs+=$collisionArguments
 $game = Start-Process -FilePath $gameBinary -ArgumentList $gameArgs -WorkingDirectory $workingDirectory -WindowStyle Hidden -PassThru
 if (-not $game.WaitForExit($TimeoutS * 1000)) {
     Stop-Process -Id $game.Id -Force -Confirm:$false
@@ -113,10 +127,17 @@ $result = [ordered]@{
     mean_ms = [Math]::Round(($window | Measure-Object -Average).Average, 3); p95_ms = [Math]::Round($p95, 3)
     max_ms = [Math]::Round(($window | Measure-Object -Maximum).Maximum, 3)
     frames_over_100ms = @($window | Where-Object { $_ -gt 100 }).Count
+    frames_below_20fps = @($window | Where-Object { $_ -gt 50 }).Count
+    minimum_fps = 1000.0 / ($window | Measure-Object -Maximum).Maximum
     game_thread_mean_ms = $(if ($gt.Count) { [Math]::Round(($gt | Measure-Object -Average).Average, 3) } else { $null })
     gpu_mean_ms = $(if ($gpu.Count) { [Math]::Round(($gpu | Measure-Object -Average).Average, 3) } else { $null })
     runtime_errors = $runtimeErrors
-    passes_20fps_goal = ($p95 -le 50.0 -and @($window | Where-Object { $_ -gt 100 }).Count -eq 0 -and $runtimeErrors.Count -eq 0)
+    passes_20fps_goal = (@($window | Where-Object { $_ -gt 50 }).Count -eq 0 -and $runtimeErrors.Count -eq 0)
+    all_map_flythrough_accepted = $false
+    diagnostic_collision_arguments = $collisionArguments
+    diagnostic_radix_landscape_order = [bool]$RadixLandscapeOrder
+    diagnostic_reference_landscape_order = [bool]$ReferenceLandscapeOrder
+    production_collision_defaults = (-not $ExhaustiveLandscapeFaces -and -not $RigidOnlyMovingFaceTree -and -not $OriginalFaceTreeAudit -and -not $ReferenceLandscapeOrder)
 }
 New-Item -ItemType Directory -Force -Path (Split-Path $receipt) | Out-Null
 $result | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $receipt -Encoding UTF8

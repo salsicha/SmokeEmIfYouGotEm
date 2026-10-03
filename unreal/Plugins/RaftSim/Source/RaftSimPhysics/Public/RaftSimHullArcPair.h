@@ -6,12 +6,41 @@
 // never a proxy, enlarged obstacle, relaxed clearance or prescribed rotation.
 namespace RaftSimHullArcPair
 {
-inline bool Separated(const FIntVector& Face,const RaftSimSurfaceSweep::FTriangle& Start,
-    const RaftSimSurfaceSweep::FTriangle& Ground,const FRaftSimHullArcPath& Arc)
+// Owned by ONE synchronous source query. Nothing survives a new pose, shape,
+// interval or ground query. A visited original vertex uses the identical
+// Derivatives operation once, not once per incident face/ground triangle.
+// Lazy allocation/evaluation preserves the old visitation of unused inputs.
+class FQueryDerivatives
+{
+public:
+    explicit FQueryDerivatives(const FRaftSimHullArcPath* InArc):Arc(InArc){}
+    void Read(int32 I,FVector& V,FVector& A)
+    {
+        if(Ready.IsEmpty())
+        {
+            Ready.SetNumZeroed(Arc->Before->VerticesM.Num());
+            Values.SetNumUninitialized(Ready.Num());
+        }
+        if(!Ready[I])
+        {
+            Arc->Derivatives(I,Values[I].Velocity,Values[I].Acceleration);
+            Ready[I]=1;++EvaluatedVertices;
+        }
+        V=Values[I].Velocity;A=Values[I].Acceleration;
+    }
+    int32 EvaluatedVertexCount() const{return EvaluatedVertices;}
+private:
+    struct FValue{FVector Velocity,Acceleration;};
+    const FRaftSimHullArcPath* Arc;
+    TArray<FValue> Values;
+    TArray<uint8> Ready;
+    int32 EvaluatedVertices=0;
+};
+inline bool SeparatedWithDerivatives(const FIntVector& Face,const RaftSimSurfaceSweep::FTriangle& Start,
+    const RaftSimSurfaceSweep::FTriangle& Ground,const FRaftSimHullArcPath& Arc,
+    const RaftSimSurfaceSweep::FTriangle& Velocity,const RaftSimSurfaceSweep::FTriangle& Acceleration)
 {
     using namespace RaftSimHullArcClearance;
-    RaftSimSurfaceSweep::FTriangle Velocity,Acceleration;
-    for(int32 J=0;J<3;++J)Arc.Derivatives(Face[J],Velocity.V[J],Acceleration.V[J]);
     const auto Axis=[&](const FVector& N)
     {return PlaneSeparated(Start,Velocity,Acceleration,Ground,N,Arc.Interval,Arc.JerkBound)
         || PlaneSeparated(Start,Velocity,Acceleration,Ground,-N,Arc.Interval,Arc.JerkBound);};
@@ -31,6 +60,22 @@ inline bool Separated(const FIntVector& Face,const RaftSimSurfaceSweep::FTriangl
                 Arc.State.LinearVelocity,Arc.State.AngularVelocity,Arc.Interval,M,N);
     }
     return Clear;
+}
+// Independent uncached evaluation remains available to same-input native
+// controls and the exhaustive reference source-query path.
+inline bool Separated(const FIntVector& Face,const RaftSimSurfaceSweep::FTriangle& Start,
+    const RaftSimSurfaceSweep::FTriangle& Ground,const FRaftSimHullArcPath& Arc)
+{
+    RaftSimSurfaceSweep::FTriangle Velocity,Acceleration;
+    for(int32 J=0;J<3;++J)Arc.Derivatives(Face[J],Velocity.V[J],Acceleration.V[J]);
+    return SeparatedWithDerivatives(Face,Start,Ground,Arc,Velocity,Acceleration);
+}
+inline bool Separated(const FIntVector& Face,const RaftSimSurfaceSweep::FTriangle& Start,
+    const RaftSimSurfaceSweep::FTriangle& Ground,const FRaftSimHullArcPath& Arc,FQueryDerivatives& Query)
+{
+    RaftSimSurfaceSweep::FTriangle Velocity,Acceleration;
+    for(int32 J=0;J<3;++J)Query.Read(Face[J],Velocity.V[J],Acceleration.V[J]);
+    return SeparatedWithDerivatives(Face,Start,Ground,Arc,Velocity,Acceleration);
 }
 inline void GroundFeature(RaftSimSurfaceSweep::FResult& Hit,const RaftSimSurfaceSweep::FTriangle& Ground)
 {

@@ -185,6 +185,7 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
 
 FRaftSimPhysicsTickOutput URaftSimPhysicsBridgeSubsystem::TickBridge(const FRaftSimPhysicsTickInput& Input)
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimClock,TickBridge);
     // Bound work per rendered frame, not physical elapsed time. Every accepted
     // tick advances water AND raft; a slow frame retains its unprocessed debt.
     // Capacity/lag are measured, never hidden by dropping ticks or enlarging dt.
@@ -218,6 +219,7 @@ void URaftSimPhysicsBridgeSubsystem::RecordContactTelemetryEvent(
 
 bool URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimClock,FixedWaterRaftTick);
     if(bRaftStepFailureLatched)return false;
     if (!WaterRuntime || !RaftRuntime)
     {

@@ -992,6 +992,7 @@ private:
     double LastRefreshRealSeconds = 0.0;
     FRaftSimCommittedWaterClock FoamWaterClock;
     bool bFoamUsesCommittedClock=false;
+    bool bAuthoredRiverFoamClock=false;
     uint64 FoamClockRefreshes=0,FoamClockHolds=0,FoamClockInitializations=0;
     TArray<FBreakingSite> BreakingSites;
     /** One hydraulic jump tracked across refreshes. Detection re-finds and

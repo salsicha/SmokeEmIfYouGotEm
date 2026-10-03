@@ -270,6 +270,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool GetRiverStationRangeM(float& OutMinimumStationM, float& OutMaximumStationM) const;
 
+    /** Exact native authored endpoints. Float rounding can move a boundary
+     * outside ResolveRiverBasis's strict domain; never extrapolate to fix it. */
+    bool GetExactRiverStationRangeM(double& OutMinimumStationM, double& OutMaximumStationM) const;
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
     float GetRiverVerticalDatumM() const { return RiverVerticalDatumM; }
 

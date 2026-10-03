@@ -6,6 +6,36 @@ import math
 from pathlib import Path
 
 
+def validate_native_inputs(entry, motion):
+    """Reject malformed provenance/physics observations before projecting states."""
+    source = entry.get('physical_source')
+    map_name = motion.get('map')
+    if not isinstance(source, str) or not source or not isinstance(map_name, str) or not map_name:
+        raise ValueError('Native physical owner and map required')
+    if f'/{map_name}.{map_name}:' not in source:
+        raise ValueError('Native physical owner belongs to another map')
+    if motion.get('feature_kinematics_enabled') is not True:
+        raise ValueError('Actual shared feature kinematics must be enabled')
+    for field in ('maximum_shared_surface_error_mps', 'dry_became_wet'):
+        value = motion.get(field)
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+            raise ValueError(f'Missing/nonfinite native physical observation: {field}')
+    if motion['dry_became_wet'] != int(motion['dry_became_wet']):
+        raise ValueError('Native dry violations must be an integer count')
+    for field in ('world_seconds', 'owner_hydraulic_x_m', 'owner_hydraulic_y_m',
+                  'owner_direction_x', 'owner_direction_y', 'inferred_radius_m',
+                  'entry_local_x_radius', 'entry_local_y_radius'):
+        value = entry.get(field)
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            raise ValueError(f'Missing/nonfinite native initial condition: {field}')
+    previous = -1.0
+    for state in motion.get('actual_boat_motion', []):
+        time = state.get('world_seconds')
+        if isinstance(time, bool) or not isinstance(time, (int, float)) or not math.isfinite(time) or time <= previous:
+            raise ValueError('All actual native state times must be finite and increasing')
+        previous = time
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--entry', type=Path, required=True)
@@ -16,6 +46,7 @@ def main():
         parser.error('Use a fresh report; preserve earlier evidence')
     entry = json.loads(args.entry.read_text(encoding='utf-8-sig'))
     motion = json.loads(args.motion.read_text(encoding='utf-8-sig'))
+    validate_native_inputs(entry, motion)
     radius = entry['inferred_radius_m']
     dx, dy = entry['owner_direction_x'], entry['owner_direction_y']
     if not math.isfinite(radius) or radius <= 0 or abs(math.hypot(dx, dy)-1) > 1e-5:

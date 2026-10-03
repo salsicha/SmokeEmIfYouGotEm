@@ -390,9 +390,11 @@ bool URaftSimStatefulDetailComponent::UpdateMeanFlow()
             // metres. Never reinterpret absolute Y as a route lateral offset.
             const FVector2D P(double(WindowOriginMeters.X)+X*.5,double(WindowOriginMeters.Y)+Y*.5);
             const float Crest=Water->SampleAcceptedBreakingSource(P);
-            // Photographed/observed whitewater (render-only appearance evidence)
-            // is a third estimate of the same source, not additive production.
-            const float Observed=Water->SampleObservedWhitewaterEntrainmentSource(P);
+            // Appearance evidence may strengthen an active crash, but cannot
+            // create continuing entrainment in calm water. It joins the same
+            // transported/decaying source, never a persistent optical floor.
+            const float Observed=FRaftSimDetailEntrainment::ObservedBreakingSource(
+                FMath::Max(F.W,Crest),Water->SampleObservedWhitewaterEntrainmentSource(P));
             const float Merged=FRaftSimDetailEntrainment::MergeBreakingSource(F,FMath::Max(Crest,Observed));
             Augmented+=Merged>F.W;MaxAdded=FMath::Max(MaxAdded,Merged-F.W);
             MaxCrestSource=FMath::Max(MaxCrestSource,Crest);MaxObservedSource=FMath::Max(MaxObservedSource,Observed);F.W=Merged;

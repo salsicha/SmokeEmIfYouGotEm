@@ -6,7 +6,7 @@ only). This script launches the same Editor-hosted game with the same game
 arguments (project default Boot map, real main-menu scenario command, native
 post-travel CSV hook), confirms Boot -> menu -> FullReach -> one CSV capture in
 order, and reports frame statistics against the current 20 FPS desktop goal
-(50 ms p95; a hitch is any frame over 100 ms). Rows 30..N-30 are audited like the
+(every audited frame <=50 ms; p95 and hitches are descriptive). Rows 30..N-30 are audited like the
 September 26 receipt. No review station, solver override or quality change.
 #>
 param(
@@ -24,7 +24,16 @@ param(
     # Same-build reference only; receipt explicitly identifies the non-default search.
     [switch]$LegacyBreakingSearch,
     # Same v21+ binary, original all-edge detail refinement. Never normal play.
-    [switch]$LegacyDetailEdges
+    [switch]$LegacyDetailEdges,
+    [switch]$ExhaustiveLandscapeFaces,
+    [switch]$RigidOnlyMovingFaceTree,
+    [switch]$OriginalFaceTreeAudit,
+    # Same-build original deep-copy diagnostic; never normal configuration.
+    [switch]$ReferenceSnapshotCopy,
+    # Explicit rejected copy-reuse experiment; not the normal default.
+    [switch]$ExactSnapshotCopy,
+    # Same-build complete original rest-attribute scan instead of sealed ownership.
+    [switch]$ReferenceRestKey
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -67,6 +76,29 @@ function Get-RaftSimDetailEdgeMode([string]$LogText, [bool]$Legacy) {
     }
     @{ selective_enabled = (-not $Legacy); legacy_override = $Legacy; confirmed_reports = $lines.Count }
 }
+function Get-RaftSimRestKeyObservation([string[]]$Header,[string[]]$Rows,[bool]$ReferenceRequested) {
+    $sealed=[Array]::IndexOf($Header,'RaftSimHull/RestKeySealedChecks')
+    $reference=[Array]::IndexOf($Header,'RaftSimHull/RestKeyReferenceChecks')
+    if($sealed -lt 0 -and $reference -lt 0){
+        if($ReferenceRequested){throw 'Rest-key diagnostic requires actual native counters'}
+        return $null
+    }
+    if($sealed -lt 0 -or $reference -lt 0 -or -not $Rows.Count){throw 'Incomplete native rest-key counters'}
+    $sealedSum=0.0;$referenceSum=0.0
+    foreach($row in $Rows){
+        $cells=$row.Split(',');$values=@()
+        foreach($column in @($sealed,$reference)){
+            if($column -ge $cells.Count -or $cells[$column] -eq ''){throw 'Incomplete native rest-key observation'}
+            $value=[double]::Parse($cells[$column],[Globalization.CultureInfo]::InvariantCulture)
+            if([double]::IsNaN($value) -or [double]::IsInfinity($value) -or $value -lt 0 -or $value -ne [math]::Floor($value)){throw 'Invalid native rest-key observation'}
+            $values+=@($value)
+        }
+        $sealedSum+=$values[0];$referenceSum+=$values[1]
+    }
+    if($ReferenceRequested -and ($sealedSum -ne 0 -or $referenceSum -le 0)){throw 'Actual original rest scan not confirmed'}
+    if(-not $ReferenceRequested -and $sealedSum -le 0){throw 'Actual sealed rest-key path not confirmed'}
+    @{audited_frames=$Rows.Count;sealed_checks_sum=$sealedSum;reference_checks_sum=$referenceSum;reference_requested=$ReferenceRequested}
+}
 function Test-RaftSimProfileWorkload($Process) {
     $Process.Name -match '^(UnrealEditor|UnrealBuildTool|SmokeEm|raftsim_cartesian_cook)' -or
     ($Process.Name -in @('dotnet.exe','cmd.exe') -and $Process.CommandLine -match 'UnrealBuildTool|Build\.bat|RunUAT|AutomationTool') -or
@@ -87,6 +119,14 @@ $gameArgs += @(
     '-ExitAfterCsvProfiling')
 if ($LegacyBreakingSearch) { $gameArgs += '-RaftSimLegacyBreakingSearch' }
 if ($LegacyDetailEdges) { $gameArgs += '-RaftSimLegacyDetailEdges' }
+$collisionArguments=@()
+if($ExhaustiveLandscapeFaces){$collisionArguments+='-RaftSimExhaustiveLandscapeFaces'}
+if($RigidOnlyMovingFaceTree){$collisionArguments+='-RaftSimRigidOnlyMovingFaceTree'}
+if($OriginalFaceTreeAudit){$collisionArguments+=@('-RaftSimLandscapeFaceTreeAudit','-RaftSimMovingEndpointTreeAudit')}
+$gameArgs+=$collisionArguments
+if($ReferenceSnapshotCopy){$gameArgs+='-RaftSimReferenceSnapshotCopy'}
+if($ExactSnapshotCopy){$gameArgs+='-RaftSimExactSnapshotCopy'}
+if($ReferenceRestKey){$gameArgs+='-RaftSimReferenceRestKey'}
 if ($review) {
     $gameArgs += @("-RaftSimWaterReviewStation=$ReviewStationM",
         "`"-ExecCmds=$csvCommands,csvprofile STARTFILE=$Label,csvprofile FRAMES=$ProfileFrames`"")
@@ -143,7 +183,9 @@ $times = New-Object System.Collections.Generic.List[double]
 for ($i = 1; $i -lt $footer; $i++) {
     $cells = $lines[$i].Split(',')
     if ($cells.Count -le $frameIndex -or $cells.Count -gt $header.Count) { throw "Malformed CSV row $i" }
-    $times.Add([double]::Parse($cells[$frameIndex], [Globalization.CultureInfo]::InvariantCulture))
+    $elapsed=[double]::Parse($cells[$frameIndex], [Globalization.CultureInfo]::InvariantCulture)
+    if([double]::IsNaN($elapsed) -or [double]::IsInfinity($elapsed) -or $elapsed -le 0){throw 'Finite positive actual elapsed frame time required'}
+    $times.Add($elapsed)
 }
 if ($times.Count -lt $ProfileFrames) { throw "CSV has $($times.Count) frames, expected $ProfileFrames" }
 $window = $times.GetRange(30, $times.Count - 60).ToArray()
@@ -153,6 +195,26 @@ $mean = ($window | Measure-Object -Average).Average
 $max = ($window | Measure-Object -Maximum).Maximum
 $twoFrame = 0.0
 for ($i = 1; $i -lt $window.Count; $i++) { $twoFrame = [Math]::Max($twoFrame, $window[$i] + $window[$i - 1]) }
+$copyObservation=$null
+$assignedColumn=[Array]::IndexOf($header,'RaftSimHull/PreparedArraysAssigned')
+$retainedColumn=[Array]::IndexOf($header,'RaftSimHull/PreparedArraysRetained')
+if($assignedColumn -ge 0 -and $retainedColumn -ge 0){
+    $assignedSum=0.0;$retainedSum=0.0
+    for($row=30;$row -lt $times.Count-30;$row++){
+        $cells=$lines[$row+1].Split(',')
+        foreach($column in @($assignedColumn,$retainedColumn)){
+            if($column -ge $cells.Count -or $cells[$column] -eq ''){throw 'Incomplete native snapshot-copy observation'}
+            $value=[double]::Parse($cells[$column],[Globalization.CultureInfo]::InvariantCulture)
+            if([double]::IsNaN($value) -or [double]::IsInfinity($value) -or $value -lt 0){throw 'Invalid native snapshot-copy observation'}
+        }
+        $assignedSum+=[double]::Parse($cells[$assignedColumn],[Globalization.CultureInfo]::InvariantCulture)
+        $retainedSum+=[double]::Parse($cells[$retainedColumn],[Globalization.CultureInfo]::InvariantCulture)
+    }
+    if($ReferenceSnapshotCopy -and ($retainedSum -ne 0 -or $assignedSum -le 0)){throw 'Actual native original-copy path not confirmed'}
+    if($ExactSnapshotCopy -and -not $ReferenceSnapshotCopy -and $retainedSum -le 0){throw 'Actual experimental reuse path not confirmed'}
+    $copyObservation=@{audited_frames=$window.Count;assigned_sum=$assignedSum;retained_sum=$retainedSum;reference_path_confirmed=([bool]$ReferenceSnapshotCopy);experimental_exact_path_confirmed=([bool]$ExactSnapshotCopy -and -not $ReferenceSnapshotCopy)}
+}elseif($ReferenceSnapshotCopy -or $ExactSnapshotCopy){throw 'Copy diagnostic requires actual native copy counters'}
+$restObservation=Get-RaftSimRestKeyObservation $header $lines[31..($times.Count-30)] ([bool]$ReferenceRestKey)
 $result = [ordered]@{
     schema = 'raftsim.south_fork_menu_launch_frame_audit.v1'; label = $Label
     launch_mode = $(if ($review) { "review_station_$ReviewStationM" } else { 'boot_menu' })
@@ -161,19 +223,29 @@ $result = [ordered]@{
     diagnostic_exec_cmds = $DiagnosticExecCmds
     diagnostic_legacy_breaking_search = [bool]$LegacyBreakingSearch
     diagnostic_legacy_detail_edges = [bool]$LegacyDetailEdges
+    diagnostic_reference_snapshot_copy = [bool]$ReferenceSnapshotCopy
+    diagnostic_exact_snapshot_copy = [bool]$ExactSnapshotCopy
+    diagnostic_reference_rest_key = [bool]$ReferenceRestKey
+    native_rest_key_observation = $restObservation
+    native_snapshot_copy_observation = $copyObservation
     detail_edge_mode = $detailEdgeMode
-    normal_configuration = ($DiagnosticExecCmds -eq '' -and -not $LegacyBreakingSearch -and -not $LegacyDetailEdges)
+    normal_configuration = ($DiagnosticExecCmds -eq '' -and -not $LegacyBreakingSearch -and -not $LegacyDetailEdges -and -not $ReferenceSnapshotCopy -and -not $ExactSnapshotCopy -and -not $ReferenceRestKey -and $collisionArguments.Count -eq 0)
     game_exit_code = $game.ExitCode; csv = $csv; csv_sha256 = (Get-FileHash -LiteralPath $csv -Algorithm SHA256).Hash.ToLower()
     frames_total = $times.Count; audited_rows = "30..$($times.Count - 31)"; audited_frames = $window.Count
     mean_ms = [Math]::Round($mean, 4); p95_ms = [Math]::Round($p95, 4); max_ms = [Math]::Round($max, 4)
     max_consecutive_pair_ms = [Math]::Round($twoFrame, 4); frames_over_100ms = @($window | Where-Object { $_ -gt 100 }).Count
+    frames_below_20fps = @($window | Where-Object { $_ -gt 50 }).Count
+    minimum_fps = 1000.0 / $max
     target_fps = 20; p95_budget_ms = 50; two_frame_hitch_ms = 100
     # Hitch = any single frame over two 50 ms frame budgets (as in the Sept 26 receipt).
     p95_passes = ($p95 -le 50); hitch_passes = (@($window | Where-Object { $_ -gt 100 }).Count -eq 0)
     runtime_error_count = $runtimeErrors.Count; runtime_errors = $runtimeErrors
     runtime_health_passes = ($runtimeErrors.Count -eq 0)
-    healthy_timing_passes = ($runtimeErrors.Count -eq 0 -and $p95 -le 50 -and @($window | Where-Object { $_ -gt 100 }).Count -eq 0)
+    healthy_timing_passes = ($runtimeErrors.Count -eq 0 -and @($window | Where-Object { $_ -gt 50 }).Count -eq 0)
+    all_map_flythrough_accepted = $false
     physical_acceptance = $false
+    diagnostic_collision_arguments = $collisionArguments
+    production_collision_defaults = (-not $ExhaustiveLandscapeFaces -and -not $RigidOnlyMovingFaceTree -and -not $OriginalFaceTreeAudit)
 }
 New-Item -ItemType Directory -Force -Path (Split-Path $receipt) | Out-Null
 $result | ConvertTo-Json | Set-Content -LiteralPath $receipt -Encoding UTF8

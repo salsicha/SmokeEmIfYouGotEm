@@ -4,6 +4,8 @@
 #include "Subsystems/SubsystemCollection.h"
 #include "Misc/AutomationTest.h"
 #include "RaftSimHullArcClearance.h"
+#include "RaftSimHullArcPair.h"
+#include <limits>
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimArcPlaneCertificateTest,"RaftSim.Physics.FullHullArcPlaneCertificate",
@@ -53,6 +55,48 @@ bool FRaftSimArcPlaneCertificateTest::RunTest(const FString&)
     TestFalse(TEXT("rotating edge-axis refuses a genuine crossing interval"),
         RaftSimHullArcClearance::RigidEdgeAxisSeparated(High,Low,FQuat::Identity,FVector::ZeroVector,
             FVector(0,0,-2),FVector::ZeroVector,1.,0,0));
+    // Exact arithmetic/cache qualification, not an alternative playable hull.
+    // CapturedWholeHullBounds and CapturedRockPin retain actual source-query
+    // outcomes and the production asset in the same mandatory native suite.
+    FRaftSimHullGeometry CacheBefore,CacheAfter;
+    CacheBefore.VerticesM={FVector(-1,-1,0),FVector(1,-1,0),FVector(0,1,0),FVector(2,2,.2)};
+    CacheBefore.VerticesM.Add(FVector(std::numeric_limits<double>::quiet_NaN(),0,0));
+    FRandomStream CacheRandom(20261006);
+    for(int32 Case=0;Case<64;++Case)
+    {
+        CacheAfter=CacheBefore;
+        if(Case%2)for(int32 I=0;I<4;++I)CacheAfter.VerticesM[I]+=FVector(.02*I,-.01*I,-.03*I);
+        FRaftSimHullArcPath Path;
+        Path.Before=&CacheBefore;Path.After=&CacheAfter;
+        Path.State.Orientation=FQuat(FRotator(Case*3,Case*7,-Case));
+        Path.State.Position=FVector(0,0,Case%3==0?2.e-9:Case%3==1?.4:-.1);
+        Path.State.LinearVelocity=FVector(.2,-.1,Case%2?-.5:.5);
+        Path.State.AngularVelocity=FVector(.3,Case%4,-.2);
+        Path.Now=.002*(Case%3);Path.Interval=.001*(1+Case%5);Path.Dt=.02;
+        Path.JerkBound=Case%7==0?std::numeric_limits<double>::infinity():100.;
+        RaftSimHullArcPair::FQueryDerivatives Query(&Path);
+        TestEqual(TEXT("fresh query has no retained derivative or unused-input evaluation"),Query.EvaluatedVertexCount(),0);
+        for(int32 Pair=0;Pair<24;++Pair)
+        {
+            const FIntVector Face=Pair%2?FIntVector(2,3,0):FIntVector(0,1,2);
+            FTriangle Start,Ground;
+            for(int32 J=0;J<3;++J)
+            {
+                FVector V,A,CachedV,CachedA;
+                Path.Derivatives(Face[J],V,A);Query.Read(Face[J],CachedV,CachedA);
+                TestTrue(TEXT("query-local derivatives are bit-identical to original arithmetic"),
+                    FMemory::Memcmp(&V,&CachedV,sizeof(FVector))==0 && FMemory::Memcmp(&A,&CachedA,sizeof(FVector))==0);
+                Start.V[J]=Path.State.WorldPoint(FMath::Lerp(CacheBefore.VerticesM[Face[J]],CacheAfter.VerticesM[Face[J]],Path.Now/Path.Dt));
+                Ground.V[J]=Floor.V[J]+FVector(CacheRandom.FRandRange(-2.f,2.f),CacheRandom.FRandRange(-2.f,2.f),CacheRandom.FRandRange(-1.f,1.f));
+            }
+            TestEqual(TEXT("all existing plane/rigid/edge proofs agree with uncached evaluation"),
+                RaftSimHullArcPair::Separated(Face,Start,Ground,Path,Query),
+                RaftSimHullArcPair::Separated(Face,Start,Ground,Path));
+        }
+        TestEqual(TEXT("repeated shared indices evaluate only four visited original vertices"),Query.EvaluatedVertexCount(),4);
+    }
+    RaftSimHullArcPair::FQueryDerivatives Unvisited(nullptr);
+    TestEqual(TEXT("an empty source query does not access an unused arc"),Unvisited.EvaluatedVertexCount(),0);
     return !HasAnyErrors();
 }
 
