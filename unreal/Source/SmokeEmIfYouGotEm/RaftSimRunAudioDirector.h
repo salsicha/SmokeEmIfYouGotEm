@@ -11,7 +11,7 @@ class ARaftSimRaftActor;
 class ARaftSimRunManager;
 class UAudioComponent;
 class USceneComponent;
-class USoundWaveProcedural;
+class URaftSimSynthSoundWave;
 class URaftSimPhysicsBridgeSubsystem;
 
 USTRUCT(BlueprintType)
@@ -23,6 +23,11 @@ struct FRaftSimProductionAudioMixState
     float RiverBed = 0.0f;
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
     float RapidFeatures = 0.0f;
+    /** The loudest whitewater ahead, heard from where it is. */
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
+    float DistantRapid = 0.0f;
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
+    float DistantRapidDistanceMeters = 0.0f;
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
     float FoamAndSpray = 0.0f;
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
@@ -49,10 +54,14 @@ struct FRaftSimProductionAudioMixState
 };
 
 /**
- * Shipping reactive mix. Eight deterministic, project-owned procedural PCM
- * layers provide an offline-safe fallback for river, rapid, spray, paddle,
- * fabric/impact, crew/rescue, canyon ambience, and adaptive music. The same
- * live water/raft telemetry that drives gameplay drives this mix.
+ * Shipping reactive mix. Eight project-owned procedural layers (river, rapid,
+ * spray, paddle, fabric/impact, crew/rescue, canyon ambience, adaptive music)
+ * are synthesized live on the audio render thread (RaftSimSynthVoice): the
+ * water is built from resonating bubbles, turbulence and laps, never from a
+ * looped buffer. The river and rapid layers play from both sides of the boat,
+ * and the loudest whitewater ahead plays from where it is, so a rapid is
+ * heard before it is seen. The same live water and raft telemetry that
+ * drives gameplay drives the mix.
  */
 UCLASS()
 class SMOKEEMIFYOUGOTEM_API ARaftSimRunAudioDirector : public AActor
@@ -74,8 +83,12 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Audio")
     int32 GetProductionLayerCount() const { return LayerWaves.Num(); }
 
+    /** Every layer has a live synth voice playing. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Audio")
-    bool HasQueuedPcmForEveryLayer() const;
+    bool HasStreamingVoiceForEveryLayer() const;
+
+    /** Where the distant-rapid emitter sits (world cm). */
+    FVector GetDistantRapidLocation() const { return DistantLocation; }
 
 protected:
     UPROPERTY()
@@ -97,9 +110,19 @@ protected:
     TObjectPtr<UAudioComponent> AmbienceAudio;
     UPROPERTY()
     TObjectPtr<UAudioComponent> MusicAudio;
-
+    /** Second, decorrelated river and rapid emitters on the starboard side. */
     UPROPERTY()
-    TArray<TObjectPtr<USoundWaveProcedural>> LayerWaves;
+    TObjectPtr<UAudioComponent> RiverAudioStarboard;
+    UPROPERTY()
+    TObjectPtr<UAudioComponent> RapidAudioStarboard;
+    UPROPERTY()
+    TObjectPtr<UAudioComponent> DistantRapidAudio;
+
+    /** The eight mix layers' voices, in layer order. */
+    UPROPERTY()
+    TArray<TObjectPtr<URaftSimSynthSoundWave>> LayerWaves;
+    UPROPERTY()
+    TArray<TObjectPtr<URaftSimSynthSoundWave>> ExtraWaves;
 
     UPROPERTY()
     TObjectPtr<ARaftSimRaftActor> Raft;
@@ -112,20 +135,39 @@ protected:
 
 private:
     void InitializeProductionLayers();
-    void RefillProceduralLayers();
     void UpdateEventEnvelopes(float DeltaSeconds);
+    void UpdateDistantRapid(float DeltaSeconds);
     void ApplyMixToComponents();
+    /** Whitewater at a point, 0..1: aerated (supercritical) flow or broken surface. */
+    float SampleWhitewater(const FVector& WorldCm, float* OutSpeed = nullptr) const;
 
     FRaftSimWaterAudioParameters CurrentParameters;
     FRaftSimProductionAudioMixState MixState;
-    TArray<TArray<uint8>> LayerPcm;
     int32 LastSwimmerCount = 0;
     int32 LastPaddleStrokeCount = 0;
+    int32 LastCrewCatchCount = 0;
+    int32 LastOarCatches[2] = {0, 0};
+    int32 LastOarReleases[2] = {0, 0};
     int32 LastHighSideCount = 0;
     int32 LastRescueCount = 0;
+    int32 LastRockContactCount = 0;
     uint8 LastCrewCommand = 0;
     float PaddleEnvelope = 0.0f;
     float FabricEnvelope = 0.0f;
     float CrewEnvelope = 0.0f;
     float LastAppliedReverb = -1.0f;
+    float LastVerticalSpeed = 0.0f;
+    float SlamCooldown = 0.0f;
+    float Heave = 0.0f;
+    float DistantLevel = 0.0f;
+    float MixLogSeconds = 0.0f;
+    float LocalTurbulence = 0.0f;
+    float HullFlow = 0.0f;
+    float Scrape = 0.0f;
+    float DistantSearchSeconds = 0.0f;
+    float DistantTargetLevel = 0.0f;
+    float DistantTargetIntensity = 0.0f;
+    FVector DistantTarget = FVector::ZeroVector;
+    FVector DistantLocation = FVector::ZeroVector;
+    bool bHasDistantLocation = false;
 };

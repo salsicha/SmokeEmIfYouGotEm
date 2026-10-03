@@ -94,7 +94,7 @@ bool FRaftSimM7TriggerAudio::Update()
     if (Audio != nullptr)
     {
         Test->TestEqual(TEXT("eight authored procedural mix layers"), Audio->GetProductionLayerCount(), 8);
-        Test->TestTrue(TEXT("every production layer contains queued PCM"), Audio->HasQueuedPcmForEveryLayer());
+        Test->TestTrue(TEXT("every production layer streams a live synth voice"), Audio->HasStreamingVoiceForEveryLayer());
     }
     if (Raft != nullptr)
     {
