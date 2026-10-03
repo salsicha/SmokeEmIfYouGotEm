@@ -9,6 +9,7 @@
 #include "RaftSimRunManager.h"
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimTrainingDirector.h"
+#include "RaftSimWildlife.h"
 #include "RaftSimVerticalSliceFrontend.h"
 #include "RaftSimJointReconstructionPreview.h"
 #include "Misc/CommandLine.h"
@@ -125,6 +126,13 @@ void ARaftSimVerticalSliceGameMode::BeginPlay()
     {
         GetWorld()->SpawnActor<ARaftSimRunAudioDirector>(
             ARaftSimRunAudioDirector::StaticClass(), FTransform::Identity);
+    }
+
+    // Each river's wildlife (it stands down on maps with no species table).
+    if (!TActorIterator<ARaftSimWildlifeDirector>(GetWorld()))
+    {
+        GetWorld()->SpawnActor<ARaftSimWildlifeDirector>(
+            ARaftSimWildlifeDirector::StaticClass(), FTransform::Identity);
     }
 
     if (ARaftSimContentLockDirector::IsPerformanceCaptureRequested())
