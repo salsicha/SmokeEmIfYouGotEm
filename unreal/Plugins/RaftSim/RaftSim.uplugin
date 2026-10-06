@@ -33,6 +33,14 @@
     {
       "Name": "PlanarCut",
       "Enabled": true
+    },
+    {
+      "Name": "HairStrands",
+      "Enabled": true
+    },
+    {
+      "Name": "SEIYGECore",
+      "Enabled": true
     }
   ],
   "Modules": [

@@ -1,0 +1,99 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "ProceduralMeshComponent.h"
+
+namespace RaftSimWaterShoreline
+{
+struct FEdge
+{
+    int32 WetVertex, DryVertex, Node;
+    double Crossing;
+    bool bStored=false;
+    FVector2D StoredPosition=FVector2D::ZeroVector;
+};
+struct FBankTriangle
+{
+    uint32 A, B, C;
+    int8 Orientation;
+};
+struct FCurvedBank
+{
+    static constexpr int32 Segments=16;
+    int32 Source[4],Dry,StartNode,EndNode,FirstNode;
+    double Bed[4],Depth[4];
+    FVector2D Points[Segments-1];
+    // Adjacent high banks and certified three-wet candidates use variable
+    // envelopes. Legacy three-wet banks retain the fixed radial topology.
+    int32 PairSide=INDEX_NONE;
+    TArray<FVector2D> PairPoints;
+    TArray<double> PairFractions;
+    bool bCertified=false,bCertifiedForward=false,bConnectivityChanged=false;
+    FVector2D RenderOrigin=FVector2D::ZeroVector;
+    TArray<FVector2D> StoredPositions;
+    TArray<FIntVector> CertifiedTriangles;
+    bool Variable()const{return PairSide!=INDEX_NONE || bCertified;}
+    int32 IntermediateCount() const {return Variable() ? PairPoints.Num() : Segments-1;}
+    FVector2D Point(int32 I) const {return Variable() ? PairPoints[I] : Points[I];}
+    double Fraction(int32 I) const {return Variable() ? PairFractions[I] : double(I+1)/Segments;}
+};
+// Clip the Cartesian lattice in two dimensions. Original vertices plus one
+// shared node per horizontal/vertical edge keep storage below 3N;
+// adjacent cells cannot independently round their shared waterline. Dry islands
+// and disconnected diagonal channels never acquire connecting triangles.
+RAFTSIMRAFT_API bool Build(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
+    TConstArrayView<uint8> Wet, TConstArrayView<uint8> Available,
+    TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
+    TArray<FProcMeshVertex>& OutVertices, TArray<uint32>& OutIndices,
+    TArray<int32>* OutCellOffsets = nullptr, TArray<FEdge>* OutEdges = nullptr,
+    bool bCompactEdges = false, bool bOppositeDryFan = false,
+    bool bCurvedHighBanks = false, TArray<FCurvedBank>* OutCurvedBanks = nullptr,
+    const FVector2D* CertifiedRenderOrigin = nullptr);
+RAFTSIMRAFT_API bool Sample(const FVector2D& PositionXY, int32 Begin, int32 End,
+    TConstArrayView<FProcMeshVertex> Vertices, TConstArrayView<uint32> Indices, FVector& Position,
+    FIntVector* Corners=nullptr,FVector* Weights=nullptr);
+
+// Own this cache together with its output arrays. Exact input identity, not a
+// tolerance or a hash, controls reuse. Moving crossings rewrite exact vertices
+// and recheck every potentially affected triangle, including omitted degenerate
+// triangles. Membership/winding changes, wetness, availability or XY rebuild.
+class RAFTSIMRAFT_API FTopologyCache
+{
+public:
+    bool Update(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
+        TConstArrayView<uint8> Wet, TConstArrayView<uint8> Available,
+        TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
+        TArray<FProcMeshVertex>& Vertices, TArray<uint32>& Indices,
+        TArray<int32>& CellOffsets, bool& bTopologyRebuilt, bool bCompactEdges = false,
+        bool bOppositeDryFan = false, bool bCurvedHighBanks = false,
+        bool bParallelCurves = true,const FVector2D* CertifiedRenderOrigin = nullptr);
+    void Reset();
+    uint64 GetRebuildCount() const { return RebuildCount; }
+    uint64 GetReuseCount() const { return ReuseCount; }
+    int32 GetPreparedCurveReuseCount() const { return PreparedCurveReuseCount; }
+    const TArray<FEdge>& GetEdges() const { return Edges; }
+    const TArray<FCurvedBank>& GetCurvedBanks() const { return CurvedBanks; }
+private:
+    bool UpdateImpl(int32 Nx,int32 Ny,TArray<FProcMeshVertex>&& Source,
+        TConstArrayView<uint8> Wet,TConstArrayView<uint8> Available,
+        TConstArrayView<float> DepthM,TConstArrayView<float> BedM,
+        TArray<FProcMeshVertex>& Vertices,TArray<uint32>& Indices,TArray<int32>& CellOffsets,
+        bool& bTopologyRebuilt,bool bCompactEdges,bool bOppositeDryFan,bool bCurvedHighBanks,
+        bool bParallelCurves,const FVector2D* CertifiedRenderOrigin);
+    int32 CachedNx=0, CachedNy=0, CachedIndexCount=0;
+    bool bCachedCompactEdges=false;
+    bool bCachedOppositeDryFan=false;
+    bool bCachedCurvedHighBanks=false;
+    bool bCachedCertified=false;
+    FVector2D CachedRenderOrigin=FVector2D::ZeroVector;
+    TArray<FVector2D> XY;
+    TArray<uint8> WetMask, AvailableMask;
+    TArray<FEdge> Edges;
+    TArray<FBankTriangle> BankTriangles;
+    TArray<FCurvedBank> CurvedBanks;
+    TArray<uint8> CurveEligibility;
+    TArray<int32> CurveCandidates;
+    uint64 RebuildCount=0, ReuseCount=0;
+    int32 PreparedCurveReuseCount=0;
+};
+}

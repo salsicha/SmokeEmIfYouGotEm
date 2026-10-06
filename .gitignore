@@ -5,7 +5,17 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 .coverage
+.coverage.*
 htmlcov/
+.tox/
+.nox/
+
+# Local environment values may contain credentials; keep shareable templates.
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
 
 # Virtual environments
 .venv/
@@ -16,9 +26,16 @@ build/
 dist/
 *.egg-info/
 # Per-host UE-linkable solver lib (rebuild via unreal/Scripts/build_solver_lib.sh)
-physics/cpp/build-ue/
+unreal/Plugins/SEIYGECore/cpp/build-ue/
+
+# Blender recovery/autosave backups are local-only.
+*.blend[0-9]*
+*.blend~
 
 # Local simulation outputs
+/tmp/
+# Accidental POSIX hook-path artifacts must not be tracked on Windows.
+/dev/null/
 outputs/
 *.telemetry.csv
 pyclaw.log
@@ -30,18 +47,48 @@ unreal/Intermediate/
 unreal/Plugins/*/Binaries/
 unreal/Plugins/*/Intermediate/
 unreal/Saved/
+unreal/.vs/
+unreal/.vsconfig
+unreal/*.sln
+unreal/*.slnx
+
+# Per-machine Unreal editor/agent connections (keep local copies, not in Git).
+/unreal/.mcp.json
+/unreal/.codex/config.toml
+/unreal/.cursor/mcp.json
+/unreal/.gemini/settings.json
+/unreal/.vscode/mcp.json
+
+# Editor workspace state and recovery files, not source or art assets.
+*.suo
+*.vcxproj.user
+*.code-workspace
+*.swp
+*.swo
 
 # Locally regenerated from installed UE sample content; never open-source redistributed.
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuCordilleraCypress*/
 
+# Epic-licensed MetaHuman source/optimized assets may ship only inside cooked builds.
+# The public repository retains the deterministic builders, hashes, and review reports.
+unreal/Content/RaftSim/Characters/Authoring/MetaHumans/
+unreal/Content/RaftSim/Characters/Production/MetaHumans/
+
 graphify-out/
 
 .DS_Store
+Thumbs.db
+Desktop.ini
 
 # Generated diagnostic maps are regenerable and never versioned (release-1.0-plan.md P0.6)
 unreal/Content/RaftSim/Maps/EnvironmentPreviews/
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/
+# Unaccepted, reproducible bed-comparison FBX export; not a shipping source asset.
+/unreal/SourceArt/RaftSim/TroublemakerControlAblation20260916/
+# Regenerable, unaccepted constriction-source geometry export.
+/unreal/SourceArt/RaftSim/TroublemakerConstrictionSource20260918/
 
 # Packaged builds are release artifacts, never repo content (GitHub Releases instead)
 unreal/Packaged/
+*.log

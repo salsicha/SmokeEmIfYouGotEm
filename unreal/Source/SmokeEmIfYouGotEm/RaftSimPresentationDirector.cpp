@@ -1,4 +1,6 @@
 #include "RaftSimPresentationDirector.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+CSV_DEFINE_CATEGORY(RaftSimTickPresentation,true);
 
 #include "Components/DirectionalLightComponent.h"
 #include "Components/ExponentialHeightFogComponent.h"
@@ -7,7 +9,9 @@
 #include "Engine/DirectionalLight.h"
 #include "Engine/ExponentialHeightFog.h"
 #include "Engine/SkyLight.h"
+#include "Engine/World.h"
 #include "EngineUtils.h"
+#include "HAL/IConsoleManager.h"
 #include "RaftSimSaveSubsystem.h"
 
 namespace
@@ -79,26 +83,33 @@ void ARaftSimPresentationDirector::BeginPlay()
     Super::BeginPlay();
     ResolveEnvironmentActors();
 
-    ERaftSimWeatherVariant Initial = ERaftSimWeatherVariant::ClearMorning;
-    if (const URaftSimSaveSubsystem* Save = GetGameInstance()
-            ? GetGameInstance()->GetSubsystem<URaftSimSaveSubsystem>() : nullptr)
+    // Every run opens in the map's authored daylight; T / left-stick click
+    // cycles variants in-run. The former scenario-name hash silently
+    // condemned specific runs to fixed non-authored weather — measured
+    // 2026-08-10: hash("south_fork_upper") selects StormDusk, so South
+    // Fork I always played at a -16-degree, 1.55-intensity dusk sun over
+    // the authored -42/8.2 Sierra morning, and every reviewer session on
+    // the flagship section ran in the dark. Per-scenario weather belongs
+    // in the scenario catalog as an authored field, not in a hash.
+    SetWeatherVariant(ERaftSimWeatherVariant::ClearMorning, true);
+    if (bClearMorningCloudsEnabled &&
+        SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr)
     {
-        if (Save->GetSave() != nullptr)
-        {
-            const FString Id = Save->GetSave()->Selection.ScenarioId.ToString();
-            const uint32 StableScenarioHash = GetTypeHash(Id.ToLower());
-            Initial = static_cast<ERaftSimWeatherVariant>(StableScenarioHash % 3u);
-            if (Save->GetSave()->ActiveGameMode == ERaftSimGameMode::TrainingEddy)
-            {
-                Initial = ERaftSimWeatherVariant::ClearMorning;
-            }
-        }
+        // Capture after ApplyEnvironmentState has made the high clouds
+        // visible. A single coherent cubemap lets water reflect the cloudy
+        // sky without real-time capture time-slicing different cubemap faces
+        // across frames, which appeared as intermittent water flashes.
+        SkyLight->GetLightComponent()->RecaptureSky();
     }
-    SetWeatherVariant(Initial, true);
 }
 
 void ARaftSimPresentationDirector::ResolveEnvironmentActors()
 {
+    bClearMorningCloudsEnabled =
+        GetWorld() != nullptr &&
+        GetWorld()->GetMapName().Contains(
+            TEXT("L_SouthForkAmerican_FullReach"),
+            ESearchCase::IgnoreCase);
     Sun = FindFirst<ADirectionalLight>(GetWorld());
     SkyLight = FindFirst<ASkyLight>(GetWorld());
     HeightFog = FindFirst<AExponentialHeightFog>(GetWorld());
@@ -113,6 +124,11 @@ void ARaftSimPresentationDirector::ResolveEnvironmentActors()
     {
         Sun->GetLightComponent()->SetMobility(EComponentMobility::Movable);
     }
+    if (SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr &&
+        SkyLight->Tags.Contains(TEXT("RaftSimAuthoredSkyFill")))
+    {
+        AuthoredSkyFillIntensity = SkyLight->GetLightComponent()->Intensity;
+    }
     if (SkyLight == nullptr)
     {
         SkyLight = GetWorld()->SpawnActor<ASkyLight>(ASkyLight::StaticClass(), FTransform::Identity);
@@ -120,9 +136,9 @@ void ARaftSimPresentationDirector::ResolveEnvironmentActors()
     if (SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr)
     {
         SkyLight->GetLightComponent()->SetMobility(EComponentMobility::Movable);
-        // Weather changes alter skylight intensity directly. Recapturing the
-        // entire atmosphere and cloud volume every frame added ~3.7 ms on the
-        // Apple M5 reference machine without a visible gameplay benefit.
+        // Cloud visibility is applied below and South Fork performs one
+        // explicit post-visibility recapture in BeginPlay. Continuous capture
+        // time-slices cubemap faces and can flash on broad smooth water.
         SkyLight->GetLightComponent()->SetRealTimeCaptureEnabled(false);
     }
     if (HeightFog == nullptr)
@@ -140,10 +156,19 @@ void ARaftSimPresentationDirector::ResolveEnvironmentActors()
         if (UVolumetricCloudComponent* Cloud =
                 VolumetricCloud->FindComponentByClass<UVolumetricCloudComponent>())
         {
-            Cloud->SetViewSampleCountScale(0.083333f);
-            Cloud->SetReflectionViewSampleCountScale(0.4f);
-            Cloud->SetShadowViewSampleCountScale(0.4f);
-            Cloud->SetShadowReflectionViewSampleCountScale(0.2f);
+            // The former half-resolution budget still produced visibly
+            // stippled cloud edges in the river reflection review. South Fork
+            // uses full view and reflection sampling; other maps retain their
+            // bounded weather-variant budget.
+            const float ViewSamples = bClearMorningCloudsEnabled ? 1.0f : 0.5f;
+            const float ReflectionSamples =
+                bClearMorningCloudsEnabled ? 1.0f : 0.4f;
+            Cloud->SetViewSampleCountScale(ViewSamples);
+            Cloud->SetReflectionViewSampleCountScale(ReflectionSamples);
+            Cloud->SetShadowViewSampleCountScale(
+                bClearMorningCloudsEnabled ? 0.75f : 0.4f);
+            Cloud->SetShadowReflectionViewSampleCountScale(
+                bClearMorningCloudsEnabled ? 0.75f : 0.2f);
         }
     }
 }
@@ -186,6 +211,7 @@ void ARaftSimPresentationDirector::CycleWeatherVariant()
 
 void ARaftSimPresentationDirector::Tick(float DeltaSeconds)
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimTickPresentation,Tick);
     Super::Tick(DeltaSeconds);
     ElapsedSeconds += DeltaSeconds;
     CurrentState.Weather = TargetState.Weather;
@@ -205,17 +231,25 @@ void ARaftSimPresentationDirector::ApplyEnvironmentState()
     if (Sun != nullptr)
     {
         const FRotator CurrentRotation = Sun->GetActorRotation();
+        // SetActorRotation normalizes yaw into (-180, 180], so a raw preset
+        // like StormDusk's -205 can never be read back; interpolating toward
+        // the un-normalized value chased the wrap forever and orbited the
+        // sun around the scene (2026-08-09 playtest, and the mid-orbit
+        // rotation once saved into the South Fork map). Interpolate along
+        // the shortest arc to the normalized-equivalent goal instead.
+        const float YawGoal = CurrentRotation.Yaw +
+            FMath::FindDeltaAngleDegrees(CurrentRotation.Yaw, TargetSunYaw);
         float NewPitch = FMath::FInterpTo(
             CurrentRotation.Pitch, TargetSunPitch, GetWorld()->GetDeltaSeconds(), 0.5f);
         float NewYaw = FMath::FInterpTo(
-            CurrentRotation.Yaw, TargetSunYaw, GetWorld()->GetDeltaSeconds(), 0.5f);
+            CurrentRotation.Yaw, YawGoal, GetWorld()->GetDeltaSeconds(), 0.5f);
         if (FMath::IsNearlyEqual(NewPitch, TargetSunPitch, 0.02f))
         {
             NewPitch = TargetSunPitch;
         }
-        if (FMath::IsNearlyEqual(NewYaw, TargetSunYaw, 0.02f))
+        if (FMath::IsNearlyEqual(NewYaw, YawGoal, 0.02f))
         {
-            NewYaw = TargetSunYaw;
+            NewYaw = YawGoal;
         }
         if (!FMath::IsNearlyEqual(CurrentRotation.Pitch, NewPitch, 0.001f) ||
             !FMath::IsNearlyEqual(CurrentRotation.Yaw, NewYaw, 0.001f))
@@ -235,7 +269,16 @@ void ARaftSimPresentationDirector::ApplyEnvironmentState()
     }
     if (SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr)
     {
-        const float SkyIntensity = FMath::Lerp(0.9f, 0.48f, CurrentState.WeatherWetness);
+        // Preserve the captured-scene fill authored for the South Fork map.
+        // The former 0.9 clear-weather ceiling crushed backlit faces, PPE,
+        // and wet rock into black silhouettes in normal gameplay cameras.
+        // A map may author its own clear-weather fill (RaftSimAuthoredSkyFill):
+        // the Zambezi gorges' shaded walls are lit almost only by the sky, and
+        // at 1.25 they rendered black. Wet weather dims it in proportion.
+        const float ClearSkyIntensity =
+            AuthoredSkyFillIntensity > 0.0f ? AuthoredSkyFillIntensity : 1.25f;
+        const float SkyIntensity = ClearSkyIntensity *
+            FMath::Lerp(1.0f, 0.62f / 1.25f, CurrentState.WeatherWetness);
         SkyLight->GetLightComponent()->SetIntensity(SkyIntensity);
     }
     if (HeightFog != nullptr && HeightFog->GetComponent() != nullptr)
@@ -252,6 +295,10 @@ void ARaftSimPresentationDirector::ApplyEnvironmentState()
         if (UVolumetricCloudComponent* Cloud =
                 VolumetricCloud->FindComponentByClass<UVolumetricCloudComponent>())
         {
+            Cloud->SetVisibility(
+                bClearMorningCloudsEnabled ||
+                    CurrentState.Weather != ERaftSimWeatherVariant::ClearMorning,
+                true);
             Cloud->SetLayerBottomAltitude(
                 FMath::Max(0.5f, CurrentState.CloudLayerHeightKm - 2.0f));
             Cloud->SetLayerHeight(CurrentState.CloudLayerHeightKm);
@@ -275,4 +322,47 @@ FText ARaftSimPresentationDirector::GetWeatherDisplayName() const
 bool ARaftSimPresentationDirector::HasBoundEnvironmentActors() const
 {
     return Sun != nullptr && SkyLight != nullptr && HeightFog != nullptr && VolumetricCloud != nullptr;
+}
+
+bool ARaftSimPresentationDirector::IsCloudLayerVisible() const
+{
+    const UVolumetricCloudComponent* Cloud = VolumetricCloud
+        ? VolumetricCloud->FindComponentByClass<UVolumetricCloudComponent>()
+        : nullptr;
+    return Cloud != nullptr && Cloud->IsVisible();
+}
+
+namespace
+{
+void HandleSetRaftSimWeather(const TArray<FString>& Args, UWorld* World)
+{
+    ARaftSimPresentationDirector* Director = FindFirst<ARaftSimPresentationDirector>(World);
+    if (Director == nullptr)
+    {
+        UE_LOG(LogTemp, Error, TEXT("RaftSim.SetWeather: presentation director unavailable"));
+        return;
+    }
+    const FString Requested = Args.Num() > 0 ? Args[0].ToLower() : TEXT("clear_morning");
+    ERaftSimWeatherVariant Variant = ERaftSimWeatherVariant::ClearMorning;
+    if (Requested == TEXT("overcast") || Requested == TEXT("overcast_afternoon"))
+    {
+        Variant = ERaftSimWeatherVariant::OvercastAfternoon;
+    }
+    else if (Requested == TEXT("storm") || Requested == TEXT("storm_dusk"))
+    {
+        Variant = ERaftSimWeatherVariant::StormDusk;
+    }
+    Director->SetWeatherVariant(Variant, true);
+    UE_LOG(
+        LogTemp,
+        Display,
+        TEXT("RaftSim.SetWeather: %s"),
+        *Director->GetWeatherDisplayName().ToString());
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GSetRaftSimWeatherCommand(
+    TEXT("RaftSim.SetWeather"),
+    TEXT("Select a production weather preset immediately: clear_morning, "
+         "overcast_afternoon, or storm_dusk."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleSetRaftSimWeather));
 }

@@ -1,7 +1,3 @@
-{
-  "available": false,
-  "best_candidate": null,
-  "candidate_count": 0,
-  "passed": false,
-  "reason": "--cpp-solver was not provided."
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:bd6c3dcc5710cf17bf60e8316b162a1f0ba98e018e54a6b2213b464c107f5669
+size 145

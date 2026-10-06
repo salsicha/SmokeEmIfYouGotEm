@@ -10,13 +10,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
+          # The water solvers live in the private SEIYGE_core submodule; the
+          # SEIYGE_CORE_TOKEN secret must be able to read that repository.
+          submodules: recursive
+          token: ${{ secrets.SEIYGE_CORE_TOKEN || github.token }}
       - name: Block oversized non-LFS files and tracked generated maps
         run: python3 Scripts/check_repo_guards.py
+      - name: Block hash-locked source drift not recorded as debt
+        run: python3 Scripts/check_locked_source_gate.py --all
 
   physics-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
+          # The water solvers live in the private SEIYGE_core submodule; the
+          # SEIYGE_CORE_TOKEN secret must be able to read that repository.
+          submodules: recursive
+          token: ${{ secrets.SEIYGE_CORE_TOKEN || github.token }}
       - uses: astral-sh/setup-uv@v4
       - name: Run physics suite
         working-directory: physics
@@ -26,11 +40,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The water solvers live in the private SEIYGE_core submodule; the
+          # SEIYGE_CORE_TOKEN secret must be able to read that repository.
+          submodules: recursive
+          token: ${{ secrets.SEIYGE_CORE_TOKEN || github.token }}
       - name: Configure and build water solver
-        working-directory: physics/cpp
+        working-directory: unreal/Plugins/SEIYGECore/cpp
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build -j
       - name: Run solver unit tests
-        working-directory: physics/cpp
-        run: ctest --test-dir build --output-on-failure || ./build/raftsim_water_tests
+        working-directory: unreal/Plugins/SEIYGECore/cpp
+        run: ctest --test-dir build --output-on-failure --no-tests=error

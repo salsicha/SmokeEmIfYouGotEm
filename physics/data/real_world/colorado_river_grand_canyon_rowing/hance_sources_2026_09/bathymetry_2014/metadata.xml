@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <idinfo>
+    <citation>
+      <citeinfo>
+        <origin>Matt Kaplinski</origin>
+        <origin>Paul E Grams</origin>
+        <origin>Joseph E Hazel, Jr</origin>
+        <origin>Keith Kohl</origin>
+        <origin>Daniel D Buscombe</origin>
+        <origin>Robert B Tusso</origin>
+        <origin>Thomas M Gushue</origin>
+        <pubdate>20250919</pubdate>
+        <title>Channel Mapping of the Colorado River in Grand Canyon National Park, Arizona - April 2014, river miles 61 to 88 — Data</title>
+        <geoform>Raster dataset</geoform>
+        <pubinfo>
+          <pubplace>Flagstaff, AZ</pubplace>
+          <publish>U.S. Geological Survey</publish>
+        </pubinfo>
+        <othercit>Additional information about Originators: Kaplinski, Matt, https://orcid.org/0000-0001-6232-8325; Grams, Paul E, https://orcid.org/0000-0002-0873-0708; Hazel, Joseph E, https://orcid.org/0000-0003-0903-3397; Kohl, Keith, https://orcid.org/0000-0001-6812-0373; Buscombe, Daniel D, https://orcid.org/0000-0001-6217-5584; Tusso, Robert B, https://orcid.org/0000-0001-7541-3713; Gushue, Thomas M, https://orcid.org/0000-0002-7172-2460</othercit>
+        <onlink>https://doi.org/10.5066/P99SSSU6</onlink>
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract>Bathymetric, topographic, and grain-size data were collected in May 2014 along a 27 mile (43.5 kilometer) reach of the Colorado River in Grand Canyon National Park, Arizona. The study reach begins at river mile 61.1, about 0.6 miles (1 kilometer) above the confluence of the Colorado and Little Colorado Rivers and ends at river mile 88.1 at the upstream boundary of the Bright Angel Rapid (Phantom Ranch boat beach). We refer to this reach as Eastern Grand Canyon (EGC) and all products include the EGC abbreviation in the filename. Channel bathymetry was mapped using multibeam and singlebeam echosounders, subaerial topography was mapped using ground-based total-stations, and bed-sediment grain-size data were collected using an underwater digital microscope system. These data were combined to produce a digital elevation model (DEM) and bed-sediment distribution map. This data release contains four items: 1) a DEM of the study reach; 2) a hillshade model of the DEM; 3) a bed sediment distribution map of the study reach; and 4) a shapefile of fiducial polygons used to assess DEM uncertainty. These data were collected by the Southwest Biological Science Center, Grand Canyon Monitoring and Science Center as a component of a larger effort to monitor the status and trends of sand storage along the Colorado River in Grand Canyon National Park.</abstract>
+      <purpose>The long-term goal of the Glen Canyon Dam Adaptive Management program for sediment recourses is to increase and retain the volume, area, and distribution of fine sediment (primarily sand) for ecological, cultural, and recreational purposes. This dataset is a component of an effort to monitor the status and trends of sand storage along the Colorado River in Grand Canyon National Park. Several reports (Kaplinski and others, 2009; 2017; 2022) have been published that document the survey methods and post-processing procedures, digital elevation model production and uncertainty assessment, and procedures for bed-sediment classification.</purpose>
+      <supplinf>Data users should read the entire metadata record and acquire the manuscript identified as the ‘Larger Work Citation’ to have a complete understanding of how these data were created and used. These data are specific to the uses identified above, as described in the ‘Larger Work Citation’, and any other use of these data would be inappropriate. See 'Distribution liability' statements for more information.</supplinf>
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <sngdate>
+          <caldate>201404</caldate>
+        </sngdate>
+      </timeinfo>
+      <current>ground condition</current>
+    </timeperd>
+    <status>
+      <progress>Complete</progress>
+      <update>None planned</update>
+    </status>
+    <spdom>
+      <bounding>
+        <westbc>-112.0909</westbc>
+        <eastbc>-111.7987</eastbc>
+        <northbc>36.2027</northbc>
+        <southbc>36.0431</southbc>
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>ISO 19115 Topic Category</themekt>
+        <themekey>elevation</themekey>
+        <themekey>environment</themekey>
+        <themekey>imageryBaseMapsEarthCover</themekey>
+        <themekey>inlandWaters</themekey>
+      </theme>
+      <theme>
+        <themekt>USGS Thesaurus</themekt>
+        <themekey>adaptive management</themekey>
+        <themekey>bathymetry</themekey>
+        <themekey>bathymetry measurement</themekey>
+        <themekey>digital elevation models</themekey>
+        <themekey>estuarine processes</themekey>
+        <themekey>field inventory and monitoring</themekey>
+        <themekey>grain-size analysis</themekey>
+        <themekey>mathematical modeling</themekey>
+        <themekey>multibeam sonar</themekey>
+        <themekey>remote sensing</themekey>
+        <themekey>sediment transport</themekey>
+        <themekey>sedimentation</themekey>
+        <themekey>topography</themekey>
+        <themekey>topographic maps</themekey>
+      </theme>
+      <theme>
+        <themekt>USGS Metadata Identifier</themekt>
+        <themekey>USGS:5f45276582ce4c3d122516ea</themekey>
+      </theme>
+      <theme>
+        <themekt>USGS information products</themekt>
+        <themekey>data release</themekey>
+      </theme>
+      <theme>
+        <themekt>None</themekt>
+        <themekey>environment</themekey>
+        <themekey>hillshade</themekey>
+        <themekey>uncertainty model</themekey>
+      </theme>
+      <place>
+        <placekt>Geographic Names Information System (GNIS)</placekt>
+        <placekey>Arizona</placekey>
+        <placekey>Colorado River</placekey>
+        <placekey>Diamond Creek</placekey>
+        <placekey>Grand Canyon</placekey>
+        <placekey>Grand Canyon National Park</placekey>
+        <placekey>Lees Ferry</placekey>
+        <placekey>Little Colorado River</placekey>
+        <placekey>Marble Canyon</placekey>
+        <placekey>Paria River</placekey>
+      </place>
+      <place>
+        <placekt>Getty Thesaurus of Geographic Names</placekt>
+        <placekey>Grand Canyon National Park</placekey>
+      </place>
+    </keywords>
+    <accconst>Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty.</accconst>
+    <useconst>These data are marked with a Creative Common CC0 1.0 Universal License. These data are in the public domain and do not have any use constraints. Users are advised to read the dataset's metadata thoroughly to understand appropriate use and data limitations. It is requested that the suggested citation for this USGS data release be included in any publications that reference or utilize these data.</useconst>
+    <ptcontac>
+      <cntinfo>
+        <cntperp>
+          <cntper>Matthew A Kaplinski</cntper>
+          <cntorg>U.S. Geological Survey</cntorg>
+        </cntperp>
+        <cntpos>Physical Scientist</cntpos>
+        <cntaddr>
+          <addrtype>mailing and physical</addrtype>
+          <address>Flagstaff Science Campus, Bldg. 4</address>
+          <city>Flagstaff</city>
+          <state>AZ</state>
+          <postal>86001</postal>
+        </cntaddr>
+        <cntvoice>928-523-9145</cntvoice>
+        <cntemail>mkaplinski@usgs.gov</cntemail>
+      </cntinfo>
+    </ptcontac>
+    <datacred>This work was supported by the Glen Canyon Dam Adaptive Management Program through the U.S. Bureau of Reclamation.</datacred>
+  </idinfo>
+  <dataqual>
+    <attracc>
+      <attraccr>Data users should read each metadata record to understand the formal attribute accuracy tests that were conducted.</attraccr>
+    </attracc>
+    <logic>Data users should read each metadata record to understand the formal logical accuracy tests that were conducted.</logic>
+    <complete>Data set is considered complete for the information presented, as described in the abstract. Users are advised to read the rest of the metadata record and/or the cross referenced Open File Reports carefully for additional details.</complete>
+    <posacc>
+      <horizpa>
+        <horizpar>Data users should read each metadata record to understand the formal horizontal positional accuracy tests were conducted.</horizpar>
+      </horizpa>
+      <vertacc>
+        <vertaccr>Data users should read each metadata record to understand the formal vertical positional accuracy tests were conducted.</vertaccr>
+      </vertacc>
+    </posacc>
+    <lineage>
+      <procstep>
+        <procdesc>Process Steps: Data users should read each metadata record and acquire the manuscript identified as the ‘Larger Work Citation’ to have a complete understanding of how these data were created, processed, and used.</procdesc>
+        <procdate>2025</procdate>
+      </procstep>
+      <procstep>
+        <procdesc>Finalize Data for Dissemination: Data sent to the Southwest Biological Science Center Data Steward for dissemination and preservation per USGS Data Management Policies SM 502.6, SM 502.7, SM 502.8 and SM 502.9 (1 October 2016).</procdesc>
+        <procdate>2025</procdate>
+      </procstep>
+    </lineage>
+  </dataqual>
+  <distinfo>
+    <distrib>
+      <cntinfo>
+        <cntperp>
+          <cntper>GS ScienceBase</cntper>
+          <cntorg>U.S. Geological Survey</cntorg>
+        </cntperp>
+        <cntaddr>
+          <addrtype>mailing and physical</addrtype>
+          <address>Denver Federal Center, Building 810, Mail Stop 302</address>
+          <city>Denver</city>
+          <state>CO</state>
+          <postal>80225</postal>
+        </cntaddr>
+        <cntvoice>1-888-275-8747</cntvoice>
+        <cntemail>sciencebase@usgs.gov</cntemail>
+      </cntinfo>
+    </distrib>
+    <distliab>This work is marked with Creative Commons Zero v1.0 Universal (https://creativecommons.org/publicdomain/zero/1.0/). Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty.</distliab>
+    <stdorder>
+      <digform>
+        <digtinfo>
+          <formname>Digital Data</formname>
+        </digtinfo>
+        <digtopt>
+          <onlinopt>
+            <computer>
+              <networka>
+                <networkr>https://doi.org/10.5066/P99SSSU6</networkr>
+              </networka>
+            </computer>
+          </onlinopt>
+        </digtopt>
+      </digform>
+      <fees>
+      </fees>
+    </stdorder>
+  </distinfo>
+  <metainfo>
+    <metd>20250919</metd>
+    <metc>
+      <cntinfo>
+        <cntperp>
+          <cntper>Matthew A Kaplinski</cntper>
+          <cntorg>U.S. Geological Survey</cntorg>
+        </cntperp>
+        <cntpos>Physical Scientist</cntpos>
+        <cntaddr>
+          <addrtype>mailing and physical</addrtype>
+          <address>Flagstaff Science Campus, Bldg.4</address>
+          <city>Flagstaff</city>
+          <state>AZ</state>
+          <postal>86001</postal>
+        </cntaddr>
+        <cntvoice>928-523-9145</cntvoice>
+        <cntemail>mkaplinski@usgs.gov</cntemail>
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001-1998</metstdv>
+  </metainfo>
+</metadata>

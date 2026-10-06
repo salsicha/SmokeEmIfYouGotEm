@@ -448,7 +448,7 @@ FString GetFirstPartyMaterialRiverAssetName(const FString& RiverId)
     {
         return TEXT("Pacuare");
     }
-    if (RiverId == TEXT("zambezi_batoka_gorge"))
+    if (RiverId == TEXT("zambezi_batoka_gorge") || IsZambeziUpperGorgeRiverId(RiverId))
     {
         return TEXT("Zambezi");
     }

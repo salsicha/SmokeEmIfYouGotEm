@@ -219,7 +219,7 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 
 ### Problem
 
-`physics/cpp/src/solver.cpp` (38,469 lines) contains ~251 fixture-scoped `apply_*` correction functions and ~2,046 `constexpr double k…` tuning constants. The main step function (`ReducedShallowWaterSolver::step_reduced`, around line 30027) checks `*_geoclaw_profile_enabled(scenario_, config_)` and, for fixtures with stored profiles, **skips the dynamics entirely and replays recorded GeoClaw reference data** (embedded arrays such as `kDamBreakGeoclawProfileDepthT3`; also a generic catalog at `physics/data/calibration/milestone18_fixture_geoclaw_profile_catalog.json`). `step_finite_volume_once` similarly branches on `scenario_.fixture_kind`.
+`unreal/Plugins/SEIYGECore/cpp/src/solver.cpp` (38,469 lines) contains ~251 fixture-scoped `apply_*` correction functions and ~2,046 `constexpr double k…` tuning constants. The main step function (`ReducedShallowWaterSolver::step_reduced`, around line 30027) checks `*_geoclaw_profile_enabled(scenario_, config_)` and, for fixtures with stored profiles, **skips the dynamics entirely and replays recorded GeoClaw reference data** (embedded arrays such as `kDamBreakGeoclawProfileDepthT3`; also a generic catalog at `physics/data/calibration/milestone18_fixture_geoclaw_profile_catalog.json`). `step_finite_volume_once` similarly branches on `scenario_.fixture_kind`.
 
 The docs record this honestly (see `docs/custom-cpp-engine-validation-plan.md`, especially the paragraph at line ~123 recording the 40-of-40 GeoClaw/C++ parity gate passing "with fixture-scoped GeoClaw-profile calibrations"), but the consequence is that the 40/40 parity gate is **circular**: it validated profile playback, not the solver. That gate was then used (same doc, line ~23) to "approve live Unreal custom water." Meanwhile the actual Unreal water adapter is still a placeholder returning constant depth 1.0 m (`unreal/Plugins/RaftSim/Source/RaftSimWater/Private/RaftSimWaterRuntimeAdapter.cpp:108-126`), so nothing has shipped on false pretenses yet — but the approval chain is unsound and must be corrected before Unreal water goes live.
 
@@ -253,7 +253,7 @@ Write a short decision memo (in the plan doc or as `docs/water-solver-strategy-d
 ### Problem
 
 - `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp`: **45,664 lines**, 83% of all plugin C++. Real, working procedural-environment tooling (landscape import, material authoring, GeometryScript meshes, foliage, scene captures, 40+ `RaftSim.*` console commands for six rivers) in one file, with a 1-line sibling `RaftSimEditorToolRegistry.cpp` and a 178-line header.
-- `physics/cpp/src/solver.cpp`: 38,469 lines (see Finding 1 — its fate depends on the Option A/B decision, so **sequence solver splitting after Finding 1's decision**).
+- `unreal/Plugins/SEIYGECore/cpp/src/solver.cpp`: 38,469 lines (see Finding 1 — its fate depends on the Option A/B decision, so **sequence solver splitting after Finding 1's decision**).
 - `physics/src/raftsim/milestone18.py`: 9,297 lines / ~250 defs; `milestone16/19/20/21/22.py` similar in kind — code organized by milestone number rather than by function.
 
 ### Step 2.1 — Split RaftSimEditorModule.cpp (highest value, do this one)
@@ -269,8 +269,8 @@ Split in several reviewable commits (one subsystem at a time), not one mega-comm
 
 ### Step 2.2 — solver.cpp (after Finding 1 decision)
 
-- If Option A: most of the file is deleted with the calibration machinery; split the remainder (core stepping, boundaries, feature forcing, IO) into `physics/cpp/src/` files by concern.
-- If Option B: same split, plus move all embedded reference-profile arrays out of source into data files alongside the existing milestone18 catalog. Constraint: deterministic replay hashes recorded in the milestone manifests must not change for retained modes — verify via `physics/tests/test_cpp_water_solver.py` and the comparison harness.
+- If Option A: most of the file is deleted with the calibration machinery; split the remainder (core stepping, boundaries, feature forcing, IO) into `unreal/Plugins/SEIYGECore/cpp/src/` files by concern.
+- If Option B: same split, plus move all embedded reference-profile arrays out of source into data files alongside the existing milestone18 catalog. Constraint: deterministic replay hashes recorded in the milestone manifests must not change for retained modes — verify via `unreal/Plugins/SEIYGECore/python/tests/test_cpp_water_solver.py` and the comparison harness.
 
 ### Step 2.3 — milestone*.py (low priority, policy only)
 

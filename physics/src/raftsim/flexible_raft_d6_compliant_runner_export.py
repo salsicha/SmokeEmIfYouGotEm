@@ -21,15 +21,10 @@ from .flexible_raft_d6_execution_packet import (
 
 
 D6_COMPLIANT_RUNNER_SIDECAR_RELATIVE_PATH = (
-    "physics/reports/d6/compliant/"
-    "flexible_raft_d6_compliant_measured_results.json"
+    "physics/reports/d6/compliant/flexible_raft_d6_compliant_measured_results.json"
 )
-D6_COMPLIANT_RUNNER_SUMMARY_RELATIVE_PATH = (
-    "physics/reports/d6/compliant/summary.json"
-)
-D6_COMPLIANT_RUNNER_REPLAY_DIR_RELATIVE_PATH = (
-    "physics/reports/d6/compliant/replays"
-)
+D6_COMPLIANT_RUNNER_SUMMARY_RELATIVE_PATH = "physics/reports/d6/compliant/summary.json"
+D6_COMPLIANT_RUNNER_REPLAY_DIR_RELATIVE_PATH = "physics/reports/d6/compliant/replays"
 D6_COMPLIANT_RUNNER_SUMMARY_SCHEMA = (
     "raftsim.flexible_raft.d6_compliant_runner_summary.v1"
 )
@@ -78,6 +73,10 @@ def build_flexible_raft_d6_compliant_runner_summary(
         sidecar
     )
     results = sidecar.get("results") if isinstance(sidecar.get("results"), dict) else {}
+    fixture_validity = {
+        report["fixture_id"]: report["valid"]
+        for report in merge_report["fixture_reports"]
+    }
     jobs = []
     for job in execution_packet["execution_jobs"]:
         if job["target_id"] != _COMPLIANT_TARGET_ID:
@@ -88,6 +87,7 @@ def build_flexible_raft_d6_compliant_runner_summary(
         metric_count = (
             len(_flatten_numeric_metrics(metrics)) if isinstance(metrics, dict) else 0
         )
+        ready_for_merge = bool(fixture_validity.get(fixture_id, False))
         jobs.append(
             {
                 "fixture_id": fixture_id,
@@ -104,18 +104,28 @@ def build_flexible_raft_d6_compliant_runner_summary(
                     if isinstance(record, dict)
                     else "missing_result_record"
                 ),
-                "ready_for_sidecar_merge": False,
-                "blocking_reason": "real_compliant_reference_measurement_not_recorded",
+                "ready_for_sidecar_merge": ready_for_merge,
+                "blocking_reason": (
+                    "manual_review_pending"
+                    if ready_for_merge
+                    else "real_compliant_reference_measurement_not_recorded"
+                ),
             }
         )
 
     return {
         "schema": D6_COMPLIANT_RUNNER_SUMMARY_SCHEMA,
         "generated_on": "2026-07-17",
-        "status": "compliant_runner_output_pending_no_measurements_recorded",
+        "status": (
+            "compliant_measurements_recorded_manual_review_pending"
+            if merge_report["can_merge"]
+            else "compliant_runner_output_pending_no_measurements_recorded"
+        ),
         "d6_complete": False,
         "production_promoted": False,
-        "runtime": "ProjectChronoOrReviewedCompliantReference",
+        "runtime": sidecar.get("runtime", "ProjectChronoOrReviewedCompliantReference"),
+        "runtime_id": sidecar.get("runtime_id"),
+        "engine_version": sidecar.get("engine_version"),
         "source_execution_packet_path": D6_EXECUTION_PACKET_RELATIVE_PATH,
         "source_sidecar_schema": sidecar.get("schema"),
         "runner_output_sidecar": D6_COMPLIANT_RUNNER_SIDECAR_RELATIVE_PATH,
@@ -133,13 +143,14 @@ def build_flexible_raft_d6_compliant_runner_summary(
         "promotion_gate": {
             "may_mark_d6_complete": False,
             "may_drive_runtime_gameplay": False,
-            "may_merge_into_measured_results_template": False,
+            "may_merge_into_measured_results_template": merge_report["can_merge"],
             "reason": (
-                "The compliant-reference runner output paths are present and "
-                "schema-compatible, but the committed sidecar is an explicit "
-                "no-measurement placeholder. D6 remains blocked until all "
-                "seven compliant fixture jobs replace the placeholders with "
-                "real measured results."
+                "All seven compliant fixture records are measured and mergeable; "
+                "D6 remains fail-closed until the two-target comparison and manual "
+                "physics/integration/replay/guide-safety review are complete."
+                if merge_report["can_merge"]
+                else "The compliant-reference output paths are schema-compatible, "
+                "but all seven fixtures need real compliant measurements before merge."
             ),
         },
     }
@@ -148,10 +159,8 @@ def build_flexible_raft_d6_compliant_runner_summary(
 def write_flexible_raft_d6_compliant_runner_export(
     repo_root: Path,
 ) -> tuple[Path, Path]:
-    """Write the committed D6 compliant-reference runner sidecar and summary."""
+    """Write placeholders without replacing genuine compliant measurements."""
 
-    sidecar = build_flexible_raft_d6_compliant_runner_sidecar()
-    summary = build_flexible_raft_d6_compliant_runner_summary(sidecar)
     sidecar_path = repo_root / D6_COMPLIANT_RUNNER_SIDECAR_RELATIVE_PATH
     summary_path = repo_root / D6_COMPLIANT_RUNNER_SUMMARY_RELATIVE_PATH
     sidecar_path.parent.mkdir(parents=True, exist_ok=True)
@@ -160,6 +169,20 @@ def write_flexible_raft_d6_compliant_runner_export(
         parents=True,
         exist_ok=True,
     )
+    if sidecar_path.is_file():
+        existing = json.loads(sidecar_path.read_text(encoding="utf-8"))
+        merge_report = build_flexible_raft_d6_compliant_measured_results_merge_report(
+            existing
+        )
+        if merge_report["can_merge"]:
+            _write_json(
+                summary_path,
+                build_flexible_raft_d6_compliant_runner_summary(existing),
+            )
+            return sidecar_path, summary_path
+
+    sidecar = build_flexible_raft_d6_compliant_runner_sidecar()
+    summary = build_flexible_raft_d6_compliant_runner_summary(sidecar)
     _write_json(sidecar_path, sidecar)
     _write_json(summary_path, summary)
     return sidecar_path, summary_path

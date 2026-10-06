@@ -1,12 +1,19 @@
 #include "RaftSimGuidePlayerController.h"
+#include "RaftSimCrewChatter.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Engine/Engine.h"
 #include "EngineUtils.h"
+#include "Framework/Application/IInputProcessor.h"
+#include "Framework/Application/SlateApplication.h"
 #include "GameFramework/PlayerInput.h"
 #include "HighResScreenshot.h"
 #include "InputCoreTypes.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+#include "TimerManager.h"
 #include "RaftSimGuidePawn.h"
 #include "RaftSimPresentationDirector.h"
 #include "RaftSimRaftActor.h"
@@ -15,6 +22,44 @@
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimTrainingDirector.h"
 #include "RaftSimVerticalSliceFrontend.h"
+
+class FRaftSimMouseLookInputProcessor final : public IInputProcessor
+{
+public:
+    explicit FRaftSimMouseLookInputProcessor(
+        ARaftSimGuidePlayerController* InController)
+        : Controller(InController)
+    {
+    }
+
+    virtual void Tick(
+        const float DeltaTime, FSlateApplication& SlateApp,
+        TSharedRef<ICursor> Cursor) override
+    {
+    }
+
+    virtual bool HandleMouseMoveEvent(
+        FSlateApplication& SlateApp, const FPointerEvent& MouseEvent) override
+    {
+        if (ARaftSimGuidePlayerController* PinnedController = Controller.Get())
+        {
+            const auto& CursorDelta = MouseEvent.GetCursorDelta();
+            PinnedController->AccumulateSlateMouseLook(
+                FVector2D(CursorDelta.X, CursorDelta.Y));
+        }
+        // Observe the delta without consuming it. Slate and the game viewport
+        // must remain free to finish their normal mouse routing.
+        return false;
+    }
+
+    virtual const TCHAR* GetDebugName() const override
+    {
+        return TEXT("RaftSimMouseLook");
+    }
+
+private:
+    TWeakObjectPtr<ARaftSimGuidePlayerController> Controller;
+};
 
 namespace
 {
@@ -35,6 +80,49 @@ T* FindActor(UWorld* World)
 void ARaftSimGuidePlayerController::BeginPlay()
 {
     Super::BeginPlay();
+
+#if !UE_BUILD_SHIPPING
+    // Capture gameplay after frontend travel without including boot-only CSV
+    // registrations. An explicit bounded capture avoids depending on the
+    // engine's optional start-on-event support. Neither path changes play.
+    int32 PostTravelCsvFrames = 0;
+    FParse::Value(FCommandLine::Get(), TEXT("RaftSimPostTravelCsvFrames="), PostTravelCsvFrames);
+    const bool bPostTravelCapture = PostTravelCsvFrames > 0 && PostTravelCsvFrames <= 18000;
+    if (IsLocalController() && (bPostTravelCapture ||
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimPostTravelCsvEvent"))))
+    {
+        FTimerHandle ProfileReadyTimer;
+        GetWorldTimerManager().SetTimer(ProfileReadyTimer,
+            FTimerDelegate::CreateWeakLambda(this, [this, bPostTravelCapture, PostTravelCsvFrames]()
+            {
+                UE_LOG(LogTemp, Display, TEXT("RaftSim post-travel CSV event: world=%s world_s=%.3f"),
+                    *GetWorld()->GetPathName(), GetWorld()->GetTimeSeconds());
+                CSV_EVENT_GLOBAL(TEXT("RaftSimPostTravelReady"));
+#if CSV_PROFILER
+                if (bPostTravelCapture && !FCsvProfiler::IsCapturing())
+                {
+                    UE_LOG(LogTemp, Display, TEXT("RaftSim post-travel CSV capture: frames=%d"),
+                        PostTravelCsvFrames);
+                    FCsvProfiler::Get()->BeginCapture(PostTravelCsvFrames);
+                }
+#endif
+            }), 5.0f, false);
+    }
+#endif
+
+    // In embedded PIE, Slate can retain the mouse move while a keyboard
+    // command is held before the game viewport produces MouseX/MouseY. Listen
+    // before widget routing and accumulate without ever consuming the event.
+    if (IsLocalController() && FSlateApplication::IsInitialized())
+    {
+        MouseLookInputProcessor =
+            MakeShared<FRaftSimMouseLookInputProcessor>(this);
+        if (!FSlateApplication::Get().RegisterInputPreProcessor(
+                MouseLookInputProcessor))
+        {
+            MouseLookInputProcessor.Reset();
+        }
+    }
 
     RunHud = CreateWidget<URaftSimRunHudWidget>(this, URaftSimRunHudWidget::StaticClass());
     if (RunHud != nullptr)
@@ -60,6 +148,20 @@ void ARaftSimGuidePlayerController::BeginPlay()
     {
         Guide->BeginScenarioCameraPresentation();
     }
+}
+
+void ARaftSimGuidePlayerController::EndPlay(
+    const EEndPlayReason::Type EndPlayReason)
+{
+    if (MouseLookInputProcessor.IsValid() &&
+        FSlateApplication::IsInitialized())
+    {
+        FSlateApplication::Get().UnregisterInputPreProcessor(
+            MouseLookInputProcessor);
+    }
+    MouseLookInputProcessor.Reset();
+    PendingSlateMouseLook = FVector2D::ZeroVector;
+    Super::EndPlay(EndPlayReason);
 }
 
 void ARaftSimGuidePlayerController::SetupInputComponent()
@@ -88,7 +190,9 @@ void ARaftSimGuidePlayerController::SetupInputComponent()
     InputComponent->BindKey(EKeys::Gamepad_Special_Right, IE_Pressed, this, &ARaftSimGuidePlayerController::TogglePauseMenu);
     InputComponent->BindKey(EKeys::Tab, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleCommandWheel);
     InputComponent->BindKey(EKeys::Tab, IE_Released, this, &ARaftSimGuidePlayerController::CloseCommandWheel);
-    InputComponent->BindKey(EKeys::Gamepad_FaceButton_Left, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleCommandWheel);
+    // X/Square belongs to the pawn's Enhanced Input high-side safety action.
+    // Sharing it with a controller binding also opens the menu on a safety call.
+    InputComponent->BindKey(EKeys::Gamepad_Special_Left, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleCommandWheel);
     InputComponent->BindKey(EKeys::M, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleScoutBoard);
     InputComponent->BindKey(EKeys::Gamepad_DPad_Down, IE_Pressed, this, &ARaftSimGuidePlayerController::HandleGamepadDPadDown);
     InputComponent->BindKey(EKeys::P, IE_Pressed, this, &ARaftSimGuidePlayerController::TogglePhotoMode);
@@ -98,7 +202,7 @@ void ARaftSimGuidePlayerController::SetupInputComponent()
     InputComponent->BindKey(EKeys::BackSpace, IE_Pressed, this, &ARaftSimGuidePlayerController::RestartCheckpoint);
     InputComponent->BindKey(EKeys::Gamepad_FaceButton_Bottom, IE_Pressed, this, &ARaftSimGuidePlayerController::HandleGamepadFaceButtonBottom);
     InputComponent->BindKey(EKeys::Home, IE_Pressed, this, &ARaftSimGuidePlayerController::ReturnToMainMenu);
-    InputComponent->BindKey(EKeys::Gamepad_FaceButton_Right, IE_Pressed, this, &ARaftSimGuidePlayerController::ReturnToMainMenu);
+    InputComponent->BindKey(EKeys::Gamepad_FaceButton_Right, IE_Pressed, this, &ARaftSimGuidePlayerController::HandleGamepadFaceButtonRight);
     InputComponent->BindKey(EKeys::V, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleReview);
     InputComponent->BindKey(EKeys::Gamepad_LeftTrigger, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleReview);
     InputComponent->BindKey(EKeys::C, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleChaseCamera);
@@ -110,13 +214,62 @@ void ARaftSimGuidePlayerController::SetupInputComponent()
     InputComponent->BindKey(EKeys::Three, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandLeft);
     InputComponent->BindKey(EKeys::Four, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandRight);
     InputComponent->BindKey(EKeys::Five, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandStop);
+    InputComponent->BindKey(EKeys::Six, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandSeats);
     InputComponent->BindKey(EKeys::Gamepad_DPad_Up, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandForward);
     InputComponent->BindKey(EKeys::Gamepad_DPad_Left, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandLeft);
     InputComponent->BindKey(EKeys::Gamepad_DPad_Right, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandRight);
-    InputComponent->BindAxisKey(EKeys::MouseX, this, &ARaftSimGuidePlayerController::PhotoLookYaw);
-    InputComponent->BindAxisKey(EKeys::MouseY, this, &ARaftSimGuidePlayerController::PhotoLookPitch);
+    // Do not bind MouseX/MouseY here. The controller input component is above
+    // the pawn's Enhanced Input component, and legacy axis-key bindings
+    // consume their keys by default. Sample the mouse in PostProcessInput so
+    // camera look remains independent of held paddle actions.
     InputComponent->BindAxisKey(EKeys::Gamepad_RightX, this, &ARaftSimGuidePlayerController::PhotoLookYaw);
     InputComponent->BindAxisKey(EKeys::Gamepad_RightY, this, &ARaftSimGuidePlayerController::PhotoLookPitch);
+    // Only shell/navigation keys remain live while paused; crew commands do not.
+    for (FInputKeyBinding& Binding : InputComponent->KeyBindings)
+    {
+        const FKey Key = Binding.Chord.Key;
+        Binding.bExecuteWhenPaused = Key == PauseKey || Key == EKeys::Gamepad_Special_Right ||
+            Key == EKeys::M || Key == EKeys::Gamepad_DPad_Down ||
+            Key == EKeys::P || Key == EKeys::Gamepad_FaceButton_Top ||
+            Key == EKeys::F9 || Key == EKeys::Gamepad_RightTrigger ||
+            Key == EKeys::BackSpace || Key == EKeys::Gamepad_FaceButton_Bottom ||
+            Key == EKeys::Home || Key == EKeys::Gamepad_FaceButton_Right;
+    }
+}
+
+void ARaftSimGuidePlayerController::PostProcessInput(
+    const float DeltaTime, const bool bGamePaused)
+{
+    Super::PostProcessInput(DeltaTime, bGamePaused);
+
+    // Prefer Slate's pre-routing delta in embedded PIE. Standalone and
+    // headless runs fall back to PlayerInput's raw OS accumulator. Never add
+    // both copies of the same hardware movement.
+    const FVector2D SlateMouseDelta = PendingSlateMouseLook;
+    PendingSlateMouseLook = FVector2D::ZeroVector;
+    if (bGamePaused || IsLookInputIgnored())
+    {
+        return;
+    }
+    float MouseDeltaX = 0.0f;
+    float MouseDeltaY = 0.0f;
+    GetInputMouseDelta(MouseDeltaX, MouseDeltaY);
+    if (!SlateMouseDelta.IsNearlyZero())
+    {
+        MouseDeltaX = SlateMouseDelta.X;
+        MouseDeltaY = SlateMouseDelta.Y;
+    }
+    MouseLookYaw(MouseDeltaX);
+    MouseLookPitch(MouseDeltaY);
+}
+
+void ARaftSimGuidePlayerController::AccumulateSlateMouseLook(
+    const FVector2D& Delta)
+{
+    if (IsLocalController())
+    {
+        PendingSlateMouseLook += Delta;
+    }
 }
 
 void ARaftSimGuidePlayerController::ApplySavedSettings()
@@ -187,6 +340,21 @@ void ARaftSimGuidePlayerController::PlayerTick(float DeltaTime)
         RunHud->SetVisibility(ESlateVisibility::HitTestInvisible);
         bRestoreHudAfterCapture = false;
     }
+    if (RunHud != nullptr && !bPauseVisible && !bPhotoMode)
+    {
+        if (const ARaftSimRaftActor* Raft = FindActor<ARaftSimRaftActor>(GetWorld()))
+        {
+            if (!CrewChatter.IsValid())
+            {
+                CrewChatter = MakeShared<FRaftSimCrewChatter>();
+            }
+            FText Line;
+            if (CrewChatter->Tick(*Raft, DeltaTime, Line))
+            {
+                RunHud->ShowSubtitle(Line, 3.4f);
+            }
+        }
+    }
 }
 
 void ARaftSimGuidePlayerController::TogglePauseMenu()
@@ -197,6 +365,8 @@ void ARaftSimGuidePlayerController::TogglePauseMenu()
         return;
     }
     bPauseVisible = !bPauseVisible;
+    bScoutVisible = false;
+    bCommandWheelVisible = false;
     UGameplayStatics::SetGamePaused(this, bPauseVisible);
     if (RunHud)
     {
@@ -279,6 +449,17 @@ void ARaftSimGuidePlayerController::HandleGamepadFaceButtonBottom()
     RestartCheckpoint();
 }
 
+void ARaftSimGuidePlayerController::HandleGamepadFaceButtonRight()
+{
+    // With the crew-call wheel open, B calls everyone back to their seats.
+    if (bCommandWheelVisible)
+    {
+        CommandSeats();
+        return;
+    }
+    ReturnToMainMenu();
+}
+
 void ARaftSimGuidePlayerController::TogglePhotoMode()
 {
     if (!bPhotoMode && bScoutVisible)
@@ -358,7 +539,7 @@ void ARaftSimGuidePlayerController::ApplyCommand(int32 CommandIndex)
     static const ERaftSimCrewCommand Commands[] = {
         ERaftSimCrewCommand::AllForward, ERaftSimCrewCommand::AllBackward,
         ERaftSimCrewCommand::TurnLeft, ERaftSimCrewCommand::TurnRight,
-        ERaftSimCrewCommand::Stop};
+        ERaftSimCrewCommand::Stop, ERaftSimCrewCommand::Seats};
     if (CommandIndex >= 0 && CommandIndex < UE_ARRAY_COUNT(Commands))
     {
         Raft->IssueCrewCommand(Commands[CommandIndex]);
@@ -375,6 +556,25 @@ void ARaftSimGuidePlayerController::CommandBackward() { ApplyCommand(1); }
 void ARaftSimGuidePlayerController::CommandLeft() { ApplyCommand(2); }
 void ARaftSimGuidePlayerController::CommandRight() { ApplyCommand(3); }
 void ARaftSimGuidePlayerController::CommandStop() { ApplyCommand(4); }
+void ARaftSimGuidePlayerController::CommandSeats() { ApplyCommand(5); }
+
+void ARaftSimGuidePlayerController::MouseLookYaw(float Value)
+{
+    if (FMath::Abs(Value) <= KINDA_SMALL_NUMBER || bPauseVisible || bScoutVisible)
+    {
+        return;
+    }
+    AddYawInput(Value * (bPhotoMode ? 0.5f : 1.0f));
+}
+
+void ARaftSimGuidePlayerController::MouseLookPitch(float Value)
+{
+    if (FMath::Abs(Value) <= KINDA_SMALL_NUMBER || bPauseVisible || bScoutVisible)
+    {
+        return;
+    }
+    AddPitchInput(Value * (bPhotoMode ? -0.5f : 1.0f));
+}
 
 void ARaftSimGuidePlayerController::PhotoLookYaw(float Value)
 {

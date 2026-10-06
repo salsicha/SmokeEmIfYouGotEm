@@ -1044,19 +1044,7 @@ bool FRaftSimEditorModule::CaptureZambeziBatokaBasaltCorridorComparison(
     return bAllCaptured && bReportSaved;
 }
 
-struct FZambeziBatokaVisualMorphologyStats
-{
-    int32 VisualTileCount = 0;
-    int64 TotalVertexCount = 0;
-    int64 ModifiedVertexCount = 0;
-    int64 ProtectedRiverCorridorVertexCount = 0;
-    int64 RejectedLowSlopeVertexCount = 0;
-    double AbsoluteOffsetSumCm = 0.0;
-    float MinimumOffsetCm = TNumericLimits<float>::Max();
-    float MaximumOffsetCm = TNumericLimits<float>::Lowest();
-};
-
-bool ApplyZambeziBatokaVisualTerrainTreatment(
+bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
     UWorld* World,
     UMaterialInterface* TerrainReviewMaterial,
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
@@ -1070,7 +1058,23 @@ bool ApplyZambeziBatokaVisualTerrainTreatment(
     }
 
     FZambeziBatokaVisualMorphologyStats LocalStats;
+    constexpr float ShorelineDryBufferCm = 2800.0f;
+    constexpr float NearBankMorphologyReachBeyondWaterCm = 14800.0f;
+    constexpr float NearBankRoundedSlopeMaskStart = 0.055f;
+    constexpr float NearBankRoundedSlopeMaskEnd = 0.34f;
+    constexpr float MorphologyOffsetClampCm = 280.0f;
+    constexpr float UpperCliffMorphologyOffsetClampCm = 440.0f;
+    constexpr float UpperCliffHorizontalReliefClampCm = 520.0f;
+    constexpr float UpperCliffMorphologyStartAboveWaterCm = 600.0f;
+    constexpr float UpperCliffMorphologyFullStrengthAboveWaterCm = 1800.0f;
+    const float ActiveWaterHalfWidthCm =
+        GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec);
+    LocalStats.ProtectedShorelineRadiusCm =
+        ActiveWaterHalfWidthCm + ShorelineDryBufferCm;
+    LocalStats.FullStrengthMorphologyRadiusCm =
+        ActiveWaterHalfWidthCm + NearBankMorphologyReachBeyondWaterCm;
     TArray<FVector2D> CenterlineWorldPoints;
+    TArray<float> CenterlineSurfaceZCm;
     if (bApplyVisualMorphology)
     {
         TArray<FRaftSimLandscapeCandidateCenterlinePoint> Centerline;
@@ -1078,21 +1082,28 @@ bool ApplyZambeziBatokaVisualTerrainTreatment(
         {
             return false;
         }
-        for (int32 Index = 0; Index < Centerline.Num(); Index += 2)
+        for (int32 Index = 0; Index < Centerline.Num(); ++Index)
         {
             const float Progress = Centerline.Num() > 1
                 ? static_cast<float>(Index) / static_cast<float>(Centerline.Num() - 1)
                 : 0.0f;
             CenterlineWorldPoints.Add(
                 SampleLandscapeCandidateCenterlineWorld(Candidate, Centerline, Progress));
+            if (!Centerline[Index].bHasConditionedVisualSurface)
+            {
+                OutSummary += TEXT(
+                    "Batoka V17 requires the source-conditioned visual water profile.\n");
+                return false;
+            }
+            CenterlineSurfaceZCm.Add(
+                Centerline[Index].ConditionedVisualSurfaceNormalized *
+                Candidate.TargetReliefCm);
         }
-        if (CenterlineWorldPoints.IsEmpty() ||
-            !CenterlineWorldPoints.Last().Equals(
-                SampleLandscapeCandidateCenterlineWorld(Candidate, Centerline, 1.0f),
-                1.0f))
+        if (CenterlineWorldPoints.Num() < 2)
         {
-            CenterlineWorldPoints.Add(
-                SampleLandscapeCandidateCenterlineWorld(Candidate, Centerline, 1.0f));
+            OutSummary += TEXT(
+                "Batoka V17 requires at least two source-aligned centerline points.\n");
+            return false;
         }
     }
 
@@ -1112,18 +1123,30 @@ bool ApplyZambeziBatokaVisualTerrainTreatment(
             continue;
         }
         MeshComponent->SetMaterial(0, TerrainReviewMaterial);
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaWorldAlignedTerrain"));
         ++LocalStats.VisualTileCount;
         if (!bApplyVisualMorphology)
         {
             continue;
         }
+        Actor->Tags.AddUnique(TEXT("RaftSimProceduralVisualMorphology"));
+        Actor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+        Actor->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaOrganicMorphologyV17"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaHeightAwareFacetReconstructionV17"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaUpperDryScarpInfillV17"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaExposureSafeScarpV18"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaNormalOrientedDryScarpReliefV20"));
+        Actor->Tags.AddUnique(TEXT("RaftSimCoarseSourceSelfShadowSuppressed"));
+        Actor->Tags.AddUnique(TEXT("RaftSimProtectedShorelineBuffer"));
+        MeshComponent->SetCastShadow(false);
 
         FProcMeshSection* Section = MeshComponent->GetProcMeshSection(0);
         if (!Section || Section->ProcVertexBuffer.IsEmpty() ||
             Section->ProcIndexBuffer.IsEmpty() || Section->bEnableCollision)
         {
             OutSummary += FString::Printf(
-                TEXT("Batoka V13 refused to condition invalid or collision-enabled visual tile %s.\n"),
+                TEXT("Batoka V17 refused to condition invalid or collision-enabled visual tile %s.\n"),
                 *Actor->GetActorLabel());
             return false;
         }
@@ -1140,27 +1163,198 @@ bool ApplyZambeziBatokaVisualTerrainTreatment(
         {
             Triangles.Add(static_cast<int32>(Index));
         }
-        const TArray<FVector> SourceNormals = ComputePreviewMeshNormals(Vertices, Triangles);
+        int32 GridRowSize = 0;
+        if (Vertices.Num() >= 2)
+        {
+            const float FirstRowY = Vertices[0].Y;
+            while (GridRowSize < Vertices.Num() &&
+                   FMath::IsNearlyEqual(
+                       Vertices[GridRowSize].Y,
+                       FirstRowY,
+                       0.1f))
+            {
+                ++GridRowSize;
+            }
+        }
+        if (GridRowSize < 2 || Vertices.Num() % GridRowSize != 0)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Batoka V17 refused non-grid visual tile %s.\n"),
+                *Actor->GetActorLabel());
+            return false;
+        }
         const FTransform ActorTransform = Actor->GetActorTransform();
+        TArray<float> CenterlineDistancesCm;
+        TArray<float> HeightsAboveCenterlineWaterCm;
+        TArray<float> ShorelineProtectionFades;
+        CenterlineDistancesCm.SetNumUninitialized(Vertices.Num());
+        HeightsAboveCenterlineWaterCm.SetNumUninitialized(Vertices.Num());
+        ShorelineProtectionFades.SetNumUninitialized(Vertices.Num());
+        for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
+        {
+            const FVector WorldPosition = ActorTransform.TransformPosition(Vertices[VertexIndex]);
+            const FVector2D WorldPosition2D(WorldPosition.X, WorldPosition.Y);
+            float MinimumCenterlineDistanceSquared = TNumericLimits<float>::Max();
+            float ClosestCenterlineSurfaceZCm = CenterlineSurfaceZCm[0];
+            for (int32 SegmentIndex = 1;
+                 SegmentIndex < CenterlineWorldPoints.Num();
+                 ++SegmentIndex)
+            {
+                const FVector2D SegmentStart = CenterlineWorldPoints[SegmentIndex - 1];
+                const FVector2D SegmentDelta =
+                    CenterlineWorldPoints[SegmentIndex] - SegmentStart;
+                const float SegmentLengthSquared = SegmentDelta.SizeSquared();
+                const float SegmentProgress = SegmentLengthSquared > KINDA_SMALL_NUMBER
+                    ? FMath::Clamp(
+                          FVector2D::DotProduct(
+                              WorldPosition2D - SegmentStart,
+                              SegmentDelta) /
+                              SegmentLengthSquared,
+                          0.0f,
+                          1.0f)
+                    : 0.0f;
+                const FVector2D ClosestCenterlinePoint =
+                    SegmentStart + SegmentDelta * SegmentProgress;
+                const float CandidateDistanceSquared =
+                    FVector2D::DistSquared(WorldPosition2D, ClosestCenterlinePoint);
+                if (CandidateDistanceSquared < MinimumCenterlineDistanceSquared)
+                {
+                    MinimumCenterlineDistanceSquared = CandidateDistanceSquared;
+                    ClosestCenterlineSurfaceZCm = FMath::Lerp(
+                        CenterlineSurfaceZCm[SegmentIndex - 1],
+                        CenterlineSurfaceZCm[SegmentIndex],
+                        SegmentProgress);
+                }
+            }
+            CenterlineDistancesCm[VertexIndex] =
+                FMath::Sqrt(MinimumCenterlineDistanceSquared);
+            HeightsAboveCenterlineWaterCm[VertexIndex] =
+                WorldPosition.Z - ClosestCenterlineSurfaceZCm;
+            ShorelineProtectionFades[VertexIndex] = SmoothPreviewStep(
+                LocalStats.ProtectedShorelineRadiusCm,
+                LocalStats.FullStrengthMorphologyRadiusCm,
+                CenterlineDistancesCm[VertexIndex]);
+        }
+
+        // The 30 m source DEM is sampled more densely for this visual overlay.
+        // Its piecewise-linear facets otherwise cast a regular comb of
+        // self-shadows at river-eye distance. Low-pass only the non-colliding
+        // steep render surface, preserve exact tile seams and the dry-bank
+        // buffer, and cap the whole-reach reconstruction to 3.2 m. Inside the
+        // protected horizontal radius, reconstruction is permitted only on
+        // rock at least 6 m above local water and reaches full strength at 18 m.
+        const int32 GridRowCount = Vertices.Num() / GridRowSize;
+        const TArray<FVector> UnreconstructedVertices = Vertices;
+        const TArray<FVector> UnreconstructedNormals =
+            ComputePreviewGridHeightfieldNormals(Vertices, GridRowSize);
+        TArray<float> FilteredHeights;
+        FilteredHeights.Reserve(Vertices.Num());
+        for (const FVector& Vertex : Vertices)
+        {
+            FilteredHeights.Add(Vertex.Z);
+        }
+        TArray<float> NextFilteredHeights;
+        NextFilteredHeights.SetNumUninitialized(Vertices.Num());
+        constexpr int32 ReconstructionPassCount = 6;
+        for (int32 PassIndex = 0;
+             PassIndex < ReconstructionPassCount;
+             ++PassIndex)
+        {
+            for (int32 GridY = 0; GridY < GridRowCount; ++GridY)
+            {
+                for (int32 GridX = 0; GridX < GridRowSize; ++GridX)
+                {
+                    const int32 Center = GridY * GridRowSize + GridX;
+                    const int32 Left =
+                        GridY * GridRowSize + FMath::Max(GridX - 1, 0);
+                    const int32 Right = GridY * GridRowSize +
+                        FMath::Min(GridX + 1, GridRowSize - 1);
+                    const int32 Down =
+                        FMath::Max(GridY - 1, 0) * GridRowSize + GridX;
+                    const int32 Up =
+                        FMath::Min(GridY + 1, GridRowCount - 1) * GridRowSize + GridX;
+                    NextFilteredHeights[Center] =
+                        (FilteredHeights[Center] * 4.0f +
+                         FilteredHeights[Left] + FilteredHeights[Right] +
+                         FilteredHeights[Down] + FilteredHeights[Up]) /
+                        8.0f;
+                }
+            }
+            Swap(FilteredHeights, NextFilteredHeights);
+        }
+        for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
+        {
+            const int32 GridX = VertexIndex % GridRowSize;
+            const float TileSeamDistance = static_cast<float>(FMath::Min(
+                GridX,
+                GridRowSize - 1 - GridX));
+            const float TileSeamFade =
+                SmoothPreviewStep(0.0f, 5.0f, TileSeamDistance);
+            const float Steepness = 1.0f - FMath::Clamp(
+                UnreconstructedNormals[VertexIndex].Z,
+                0.0f,
+                1.0f);
+            const float UpperCliffReconstructionFade = SmoothPreviewStep(
+                UpperCliffMorphologyStartAboveWaterCm,
+                UpperCliffMorphologyFullStrengthAboveWaterCm,
+                HeightsAboveCenterlineWaterCm[VertexIndex]);
+            const float ReconstructionProtectionFade = FMath::Max(
+                ShorelineProtectionFades[VertexIndex],
+                UpperCliffReconstructionFade);
+            const float ReconstructionMask =
+                ReconstructionProtectionFade * TileSeamFade *
+                SmoothPreviewStep(0.08f, 0.52f, Steepness) * 0.88f;
+            const float ReconstructionOffsetCm = FMath::Clamp(
+                FilteredHeights[VertexIndex] -
+                    UnreconstructedVertices[VertexIndex].Z,
+                -320.0f,
+                320.0f) * ReconstructionMask;
+            if (FMath::Abs(ReconstructionOffsetCm) <= 0.5f)
+            {
+                continue;
+            }
+            Vertices[VertexIndex].Z += ReconstructionOffsetCm;
+            ++LocalStats.ReconstructedVertexCount;
+            if (CenterlineDistancesCm[VertexIndex] <
+                LocalStats.ProtectedShorelineRadiusCm)
+            {
+                ++LocalStats.ReconstructedInsideProtectedRadiusVertexCount;
+                LocalStats.MinimumReconstructedInsideRadiusHeightAboveWaterCm =
+                    FMath::Min(
+                        LocalStats.MinimumReconstructedInsideRadiusHeightAboveWaterCm,
+                        HeightsAboveCenterlineWaterCm[VertexIndex]);
+            }
+            LocalStats.AbsoluteReconstructionOffsetSumCm +=
+                FMath::Abs(ReconstructionOffsetCm);
+            LocalStats.MaximumAbsoluteReconstructionOffsetCm = FMath::Max(
+                LocalStats.MaximumAbsoluteReconstructionOffsetCm,
+                FMath::Abs(ReconstructionOffsetCm));
+        }
+        const TArray<FVector> SourceNormals =
+            ComputePreviewGridHeightfieldNormals(Vertices, GridRowSize);
+
         for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
         {
             ++LocalStats.TotalVertexCount;
-            const FVector WorldPosition = ActorTransform.TransformPosition(Vertices[VertexIndex]);
-            float MinimumCenterlineDistanceSquared = TNumericLimits<float>::Max();
-            for (const FVector2D& CenterlinePoint : CenterlineWorldPoints)
-            {
-                MinimumCenterlineDistanceSquared = FMath::Min(
-                    MinimumCenterlineDistanceSquared,
-                    FVector2D::DistSquared(
-                        FVector2D(WorldPosition.X, WorldPosition.Y),
-                        CenterlinePoint));
-            }
-            const float CenterlineDistanceCm = FMath::Sqrt(MinimumCenterlineDistanceSquared);
-            const float RiverProtectionFade = SmoothPreviewStep(
-                22000.0f,
-                65000.0f,
-                CenterlineDistanceCm);
-            if (RiverProtectionFade <= KINDA_SMALL_NUMBER)
+            const FVector WorldPosition =
+                ActorTransform.TransformPosition(Vertices[VertexIndex]);
+            const float CenterlineDistanceCm = CenterlineDistancesCm[VertexIndex];
+            const float ShorelineProtectionFade =
+                ShorelineProtectionFades[VertexIndex];
+            // Horizontal distance alone protected the whole first cliff face in
+            // V15, including dry rock tens of metres above the water. Preserve
+            // that protection through the spray/wet-bank zone, then admit a
+            // bounded render-only morphology fade from 6-18 m above the local
+            // conditioned surface. The hidden source Landscape remains the
+            // collision, placement, and hydraulic authority.
+            const float UpperCliffMorphologyFade = SmoothPreviewStep(
+                UpperCliffMorphologyStartAboveWaterCm,
+                UpperCliffMorphologyFullStrengthAboveWaterCm,
+                HeightsAboveCenterlineWaterCm[VertexIndex]);
+            const float MorphologyProtectionFade = FMath::Max(
+                ShorelineProtectionFade,
+                UpperCliffMorphologyFade);
+            if (MorphologyProtectionFade <= KINDA_SMALL_NUMBER)
             {
                 ++LocalStats.ProtectedRiverCorridorVertexCount;
                 continue;
@@ -1170,7 +1364,25 @@ bool ApplyZambeziBatokaVisualTerrainTreatment(
                 SourceNormals[VertexIndex].Z,
                 0.0f,
                 1.0f);
-            const float ScarpMask = SmoothPreviewStep(0.12f, 0.62f, Steepness);
+            const float FarScarpMask = SmoothPreviewStep(0.12f, 0.62f, Steepness);
+            const float NearBankEnvelope = 1.0f - SmoothPreviewStep(
+                LocalStats.FullStrengthMorphologyRadiusCm,
+                36000.0f,
+                CenterlineDistanceCm);
+            const float RoundedNearBankScarpMask =
+                SmoothPreviewStep(
+                    NearBankRoundedSlopeMaskStart,
+                    NearBankRoundedSlopeMaskEnd,
+                    Steepness) *
+                NearBankEnvelope * 0.82f;
+            const float ProtectedUpperCliffBlend =
+                UpperCliffMorphologyFade * (1.0f - ShorelineProtectionFade);
+            const float UpperCliffScarpMask =
+                SmoothPreviewStep(0.035f, 0.24f, Steepness) *
+                NearBankEnvelope * ProtectedUpperCliffBlend;
+            const float ScarpMask = FMath::Max(
+                FMath::Max(FarScarpMask, RoundedNearBankScarpMask),
+                UpperCliffScarpMask);
             const float TalusMask =
                 SmoothPreviewStep(0.08f, 0.30f, Steepness) *
                 (1.0f - SmoothPreviewStep(0.55f, 0.78f, Steepness));
@@ -1181,87 +1393,211 @@ bool ApplyZambeziBatokaVisualTerrainTreatment(
             }
 
             const FVector2D BroadCoordinates(
-                WorldPosition.X * 0.000018f,
-                WorldPosition.Y * 0.000018f);
+                WorldPosition.X * 0.000012f,
+                WorldPosition.Y * 0.000012f);
             const float BroadVariation = FMath::PerlinNoise2D(BroadCoordinates);
-            const float LayerHeightCm = 1100.0f + BroadVariation * 260.0f;
+            const float SecondaryVariation = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.000041f + 37.0f,
+                    WorldPosition.Y * 0.000041f - 19.0f));
+            const float LayerHeightCm = FMath::Clamp(
+                2050.0f + BroadVariation * 620.0f +
+                    SecondaryVariation * 310.0f,
+                1250.0f,
+                3100.0f);
             const float LayerPhaseCm = FMath::PerlinNoise2D(
                 FVector2D(
-                    WorldPosition.X * 0.000043f + 19.0f,
-                    WorldPosition.Y * 0.000043f - 7.0f)) *
-                360.0f;
+                    WorldPosition.X * 0.000027f + 19.0f,
+                    WorldPosition.Y * 0.000027f - 7.0f)) *
+                620.0f;
             const float LayerCoordinate =
                 (WorldPosition.Z + LayerPhaseCm) / LayerHeightCm;
             const float LayerFloor = FMath::FloorToFloat(LayerCoordinate);
             const float LayerFraction = LayerCoordinate - LayerFloor;
             const float ConditionedLayerFraction = SmoothPreviewStep(
-                0.28f,
-                0.72f,
+                0.16f,
+                0.84f,
                 LayerFraction);
             const float TerracedWorldZ =
                 (LayerFloor + ConditionedLayerFraction) * LayerHeightCm - LayerPhaseCm;
             const float TerraceOffsetCm =
-                (TerracedWorldZ - WorldPosition.Z) * 0.82f;
+                (TerracedWorldZ - WorldPosition.Z) * 0.34f;
 
-            const float JointNoise = FMath::PerlinNoise2D(
+            const float JointNoiseBroad = FMath::PerlinNoise2D(
                 FVector2D(
-                    WorldPosition.X * 0.000031f - 5.0f,
-                    WorldPosition.Y * 0.000031f + 13.0f));
+                    WorldPosition.X * 0.000013f - 5.0f,
+                    WorldPosition.Y * 0.000013f + 13.0f));
+            const float JointNoiseLocal = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.000057f + 43.0f,
+                    WorldPosition.Y * 0.000057f - 31.0f));
+            const float JointWarp =
+                JointNoiseBroad * 1.25f + JointNoiseLocal * 0.48f;
             const float PrimaryJointCoordinate =
-                (WorldPosition.X * 0.78f + WorldPosition.Y * 0.62f) / 9200.0f +
-                JointNoise * 0.62f;
+                (WorldPosition.X * 0.73f + WorldPosition.Y * 0.68f) / 12500.0f +
+                JointWarp;
             const float PrimaryJointFraction =
                 PrimaryJointCoordinate - FMath::FloorToFloat(PrimaryJointCoordinate);
             const float PrimaryJointDistance = FMath::Min(
                 PrimaryJointFraction,
                 1.0f - PrimaryJointFraction);
             const float PrimaryJointMask =
-                1.0f - SmoothPreviewStep(0.015f, 0.085f, PrimaryJointDistance);
+                1.0f - SmoothPreviewStep(0.012f, 0.065f, PrimaryJointDistance);
             const float SecondaryJointCoordinate =
-                (WorldPosition.X * -0.44f + WorldPosition.Y * 0.90f) / 14800.0f -
-                JointNoise * 0.38f;
+                (WorldPosition.X * -0.51f + WorldPosition.Y * 0.86f) / 18700.0f -
+                JointWarp * 0.63f;
             const float SecondaryJointFraction =
                 SecondaryJointCoordinate - FMath::FloorToFloat(SecondaryJointCoordinate);
             const float SecondaryJointDistance = FMath::Min(
                 SecondaryJointFraction,
                 1.0f - SecondaryJointFraction);
             const float SecondaryJointMask =
-                1.0f - SmoothPreviewStep(0.01f, 0.055f, SecondaryJointDistance);
+                1.0f - SmoothPreviewStep(0.01f, 0.048f, SecondaryJointDistance);
             const float JointRecessCm =
-                -(PrimaryJointMask * 120.0f + SecondaryJointMask * 65.0f);
+                -(PrimaryJointMask * 62.0f + SecondaryJointMask * 34.0f);
+
+            const float ErosionBroad = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.000052f + 7.0f,
+                    WorldPosition.Y * 0.000052f - 41.0f));
+            const float ErosionLocal = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.00019f - 53.0f,
+                    WorldPosition.Y * 0.00019f + 17.0f));
+            const float ErosionOffsetCm =
+                ErosionBroad * 72.0f + ErosionLocal * 28.0f;
+
+            // Two long, incommensurate fields add broad dry-scarp shoulders and
+            // shallow gullies that the 30 m DEM cannot resolve. They affect only
+            // upper rock inside the horizontal bank buffer and remain below the
+            // V17 4.4 m presentation cap.
+            const float UpperButtressBroad = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.0000067f + 11.0f,
+                    WorldPosition.Y * 0.0000067f - 29.0f));
+            const float UpperButtressLocal = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.000017f - 47.0f,
+                    WorldPosition.Y * 0.000017f + 23.0f));
+            const float UpperButtressSignalCm =
+                UpperButtressBroad * 165.0f + UpperButtressLocal * 92.0f;
+            const float UpperButtressOffsetCm =
+                UpperButtressSignalCm * UpperCliffScarpMask;
 
             const float TalusBroad = FMath::PerlinNoise2D(
                 FVector2D(
-                    WorldPosition.X * 0.00012f + 31.0f,
-                    WorldPosition.Y * 0.00012f - 23.0f));
+                    WorldPosition.X * 0.000075f + 31.0f,
+                    WorldPosition.Y * 0.000075f - 23.0f));
             const float TalusFine = FMath::PerlinNoise2D(
                 FVector2D(
-                    WorldPosition.X * 0.00038f - 17.0f,
-                    WorldPosition.Y * 0.00038f + 29.0f));
+                    WorldPosition.X * 0.00021f - 17.0f,
+                    WorldPosition.Y * 0.00021f + 29.0f));
             const float TalusOffsetCm =
-                (TalusBroad * 92.0f + TalusFine * 46.0f) * TalusMask;
+                (TalusBroad * 68.0f + TalusFine * 26.0f) * TalusMask;
+            const float EffectiveMorphologyOffsetClampCm = FMath::Lerp(
+                MorphologyOffsetClampCm,
+                UpperCliffMorphologyOffsetClampCm,
+                ProtectedUpperCliffBlend);
             const float OffsetCm = FMath::Clamp(
-                RiverProtectionFade *
-                    (ScarpMask * (TerraceOffsetCm + JointRecessCm) + TalusOffsetCm),
-                -450.0f,
-                450.0f);
-            if (FMath::Abs(OffsetCm) <= 0.5f)
+                MorphologyProtectionFade *
+                    (ScarpMask *
+                         (TerraceOffsetCm + JointRecessCm + ErosionOffsetCm) +
+                     TalusOffsetCm + UpperButtressOffsetCm),
+                -EffectiveMorphologyOffsetClampCm,
+                EffectiveMorphologyOffsetClampCm);
+
+            // A height-only offset cannot create readable facade depth on the
+            // rounded 30 m DEM wall. V20 projects the same deterministic dry-
+            // scarp signals onto the horizontal component of the source normal.
+            // It never changes Z, collision, hydraulics, or source authority.
+            // Fade all tile edges so independently generated render tiles remain
+            // watertight, and stay below half the 12.5 m dense-grid spacing.
+            const int32 GridX = VertexIndex % GridRowSize;
+            const int32 GridY = VertexIndex / GridRowSize;
+            const float TileSeamDistanceVertices = static_cast<float>(FMath::Min(
+                FMath::Min(GridX, GridRowSize - 1 - GridX),
+                FMath::Min(GridY, GridRowCount - 1 - GridY)));
+            const float NormalReliefTileSeamFade = SmoothPreviewStep(
+                0.0f,
+                5.0f,
+                TileSeamDistanceVertices);
+            const FVector WorldSourceNormal = ActorTransform.TransformVectorNoScale(
+                SourceNormals[VertexIndex]).GetSafeNormal();
+            const FVector HorizontalSourceNormal = FVector(
+                WorldSourceNormal.X,
+                WorldSourceNormal.Y,
+                0.0f).GetSafeNormal();
+            const float DryScarpNormalReliefMask =
+                UpperCliffMorphologyFade * ScarpMask;
+            const float HorizontalReliefSignalCm =
+                TerraceOffsetCm * 1.15f + JointRecessCm * 3.10f +
+                ErosionOffsetCm * 0.80f + UpperButtressSignalCm * 1.45f;
+            const float HorizontalReliefCm = HorizontalSourceNormal.IsNearlyZero()
+                ? 0.0f
+                : FMath::Clamp(
+                      NormalReliefTileSeamFade * DryScarpNormalReliefMask *
+                          HorizontalReliefSignalCm,
+                      -UpperCliffHorizontalReliefClampCm,
+                      UpperCliffHorizontalReliefClampCm);
+            if (FMath::Abs(OffsetCm) <= 0.5f &&
+                FMath::Abs(HorizontalReliefCm) <= 0.5f)
             {
                 continue;
             }
 
             const FVector LocalOffset = ActorTransform.InverseTransformVectorNoScale(
-                FVector(0.0f, 0.0f, OffsetCm));
+                FVector(0.0f, 0.0f, OffsetCm) +
+                HorizontalSourceNormal * HorizontalReliefCm);
             Vertices[VertexIndex] += LocalOffset;
             ++LocalStats.ModifiedVertexCount;
+            if (CenterlineDistanceCm <= LocalStats.FullStrengthMorphologyRadiusCm)
+            {
+                ++LocalStats.NearBankModifiedVertexCount;
+            }
+            if (CenterlineDistanceCm < LocalStats.ProtectedShorelineRadiusCm)
+            {
+                ++LocalStats.UpperCliffModifiedInsideProtectedRadiusVertexCount;
+                LocalStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm =
+                    FMath::Min(
+                        LocalStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm,
+                        HeightsAboveCenterlineWaterCm[VertexIndex]);
+            }
             LocalStats.AbsoluteOffsetSumCm += FMath::Abs(OffsetCm);
+            LocalStats.MinimumModifiedCenterlineDistanceCm = FMath::Min(
+                LocalStats.MinimumModifiedCenterlineDistanceCm,
+                CenterlineDistanceCm);
             LocalStats.MinimumOffsetCm = FMath::Min(LocalStats.MinimumOffsetCm, OffsetCm);
             LocalStats.MaximumOffsetCm = FMath::Max(LocalStats.MaximumOffsetCm, OffsetCm);
+            if (FMath::Abs(HorizontalReliefCm) > 0.5f)
+            {
+                ++LocalStats.NormalReliefVertexCount;
+                LocalStats.AbsoluteHorizontalReliefSumCm +=
+                    FMath::Abs(HorizontalReliefCm);
+                LocalStats.MaximumAbsoluteHorizontalReliefCm = FMath::Max(
+                    LocalStats.MaximumAbsoluteHorizontalReliefCm,
+                    FMath::Abs(HorizontalReliefCm));
+                if (CenterlineDistanceCm < LocalStats.ProtectedShorelineRadiusCm)
+                {
+                    ++LocalStats.NormalReliefInsideProtectedRadiusVertexCount;
+                    LocalStats.MinimumNormalReliefInsideRadiusHeightAboveWaterCm =
+                        FMath::Min(
+                            LocalStats.MinimumNormalReliefInsideRadiusHeightAboveWaterCm,
+                            HeightsAboveCenterlineWaterCm[VertexIndex]);
+                }
+            }
         }
 
-        const TArray<FVector> ConditionedNormals = ComputePreviewMeshNormals(
-            Vertices,
-            Triangles);
+        TArray<FVector> ConditionedNormals =
+            ComputePreviewGridHeightfieldNormals(Vertices, GridRowSize);
+        for (int32 VertexIndex = 0;
+             VertexIndex < ConditionedNormals.Num();
+             ++VertexIndex)
+        {
+            ConditionedNormals[VertexIndex] = FMath::Lerp(
+                ConditionedNormals[VertexIndex],
+                SourceNormals[VertexIndex],
+                0.24f).GetSafeNormal();
+        }
         MeshComponent->UpdateMeshSection(
             0,
             Vertices,
@@ -1276,8 +1612,8 @@ bool ApplyZambeziBatokaVisualTerrainTreatment(
         *OutStats = LocalStats;
     }
     OutSummary += FString::Printf(
-        TEXT("Applied the transient Batoka %s treatment to %d dense visual-terrain tiles; collision and source Landscape were not changed.\n"),
-        bApplyVisualMorphology ? TEXT("V13 morphology plus V12 world-aligned material")
+        TEXT("Applied the Batoka %s treatment to %d dense visual-terrain tiles; collision and source Landscape were not changed.\n"),
+        bApplyVisualMorphology ? TEXT("V18 exposure-safe height-aware morphology plus world-aligned organic material")
                                : TEXT("V12 world-aligned material"),
         LocalStats.VisualTileCount);
     return LocalStats.VisualTileCount == 4;
@@ -1678,11 +2014,33 @@ bool FRaftSimEditorModule::CaptureZambeziBatokaVisualMorphologyComparison(
         Object->SetNumberField(TEXT("total_vertex_count"), Stats.TotalVertexCount);
         Object->SetNumberField(TEXT("modified_vertex_count"), Stats.ModifiedVertexCount);
         Object->SetNumberField(
+            TEXT("near_bank_modified_vertex_count"),
+            Stats.NearBankModifiedVertexCount);
+        Object->SetNumberField(
+            TEXT("upper_cliff_modified_inside_protected_radius_vertex_count"),
+            Stats.UpperCliffModifiedInsideProtectedRadiusVertexCount);
+        Object->SetNumberField(
+            TEXT("minimum_upper_cliff_modified_inside_radius_height_above_water_cm"),
+            Stats.UpperCliffModifiedInsideProtectedRadiusVertexCount > 0
+                ? Stats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm
+                : 0.0);
+        Object->SetNumberField(
             TEXT("protected_river_corridor_vertex_count"),
             Stats.ProtectedRiverCorridorVertexCount);
         Object->SetNumberField(
             TEXT("rejected_low_slope_vertex_count"),
             Stats.RejectedLowSlopeVertexCount);
+        Object->SetNumberField(
+            TEXT("protected_shoreline_radius_cm"),
+            Stats.ProtectedShorelineRadiusCm);
+        Object->SetNumberField(
+            TEXT("full_strength_morphology_radius_cm"),
+            Stats.FullStrengthMorphologyRadiusCm);
+        Object->SetNumberField(
+            TEXT("minimum_modified_centerline_distance_cm"),
+            Stats.ModifiedVertexCount > 0
+                ? Stats.MinimumModifiedCenterlineDistanceCm
+                : 0.0);
         Object->SetNumberField(
             TEXT("minimum_offset_cm"),
             Stats.ModifiedVertexCount > 0 ? Stats.MinimumOffsetCm : 0.0);
@@ -1693,6 +2051,26 @@ bool FRaftSimEditorModule::CaptureZambeziBatokaVisualMorphologyComparison(
             TEXT("mean_absolute_offset_cm"),
             Stats.ModifiedVertexCount > 0
                 ? Stats.AbsoluteOffsetSumCm / Stats.ModifiedVertexCount
+                : 0.0);
+        Object->SetNumberField(
+            TEXT("normal_relief_vertex_count"),
+            Stats.NormalReliefVertexCount);
+        Object->SetNumberField(
+            TEXT("normal_relief_inside_protected_radius_vertex_count"),
+            Stats.NormalReliefInsideProtectedRadiusVertexCount);
+        Object->SetNumberField(
+            TEXT("minimum_normal_relief_inside_radius_height_above_water_cm"),
+            Stats.NormalReliefInsideProtectedRadiusVertexCount > 0
+                ? Stats.MinimumNormalReliefInsideRadiusHeightAboveWaterCm
+                : 0.0);
+        Object->SetNumberField(
+            TEXT("maximum_absolute_horizontal_relief_cm"),
+            Stats.MaximumAbsoluteHorizontalReliefCm);
+        Object->SetNumberField(
+            TEXT("mean_absolute_horizontal_relief_cm"),
+            Stats.NormalReliefVertexCount > 0
+                ? Stats.AbsoluteHorizontalReliefSumCm /
+                      Stats.NormalReliefVertexCount
                 : 0.0);
         return Object;
     };

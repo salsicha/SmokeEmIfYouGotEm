@@ -152,7 +152,7 @@ public:
     FString Schema = TEXT("raftsim.unreal.feature_tuning_editor.v1");
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|FeatureTuning")
-    FString FeatureForcingDefaults = TEXT("physics/config/feature_forcing_defaults.json");
+    FString FeatureForcingDefaults = TEXT("unreal/Plugins/SEIYGECore/python/config/feature_forcing_defaults.json");
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|FeatureTuning")
     FString FlowPresets = TEXT("physics/data/real_world/south_fork_american_chili_bar/flow_presets.json");

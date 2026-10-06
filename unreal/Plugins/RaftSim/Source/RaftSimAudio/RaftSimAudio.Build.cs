@@ -5,6 +5,6 @@ public class RaftSimAudio : ModuleRules
     public RaftSimAudio(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "AudioMixer", "RaftSimCore" });
+        PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "AudioMixer", "AudioExtensions", "RaftSimCore" });
     }
 }

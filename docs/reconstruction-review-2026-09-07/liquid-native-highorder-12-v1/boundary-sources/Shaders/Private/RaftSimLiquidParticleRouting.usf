@@ -1,0 +1,58 @@
+#include "/Engine/Public/Platform.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidPhysicalFrame.ush"
+uint Capacity;
+uint SourceOwner;
+uint Owners;
+uint FloatStride;
+uint IntStride;
+uint FloatComponents;
+uint IntComponents;
+uint PositionOffset;
+uint CountOffset;
+uint ResidualOuterBoundary;
+int2 ParentCells;
+float3 LowerWorldCm;
+float3 AxisX;
+float3 AxisY;
+float2 SpacingCm;
+Buffer<float> Floats;
+Buffer<int> Integers;
+RWBuffer<uint> NativeCounts;
+StructuredBuffer<int4> Bounds;
+RWStructuredBuffer<uint> Words;
+RWStructuredBuffer<uint4> Routes;
+RWStructuredBuffer<uint> Counts;
+
+[numthreads(64,1,1)]
+void MainCS(uint3 Id:SV_DispatchThreadID)
+{
+    uint i=Id.x,n=NativeCounts[CountOffset];
+    if(i==0) { Counts[Owners+2]=n;if(n>Capacity) InterlockedAdd(Counts[Owners+1],n-Capacity); }
+    if(i>=Capacity) return;
+    Routes[i]=uint4(0xffffffff,SourceOwner,i,0);
+    [loop] for(uint c=0;c<FloatComponents;++c) Words[c*Capacity+i]=i<n?asuint(Floats[c*FloatStride+i]):0;
+    [loop] for(uint c=0;c<IntComponents;++c) Words[(FloatComponents+c)*Capacity+i]=i<n?asuint(Integers[c*IntStride+i]):0;
+    if(i>=n) return;
+    float3 p=float3(Floats[PositionOffset*FloatStride+i],Floats[(PositionOffset+1)*FloatStride+i],Floats[(PositionOffset+2)*FloatStride+i]);
+    if(!all(isfinite(p))) { Routes[i].w=4;InterlockedAdd(Counts[Owners+1],1);return; }
+    FDFVector3 physicalDF=RaftSimLiquidPhysicalPointDF(p,LowerWorldCm,AxisX,AxisY);
+    float2 physical=DFDemote(physicalDF).xy;
+    float2 extent=float2(ParentCells)*SpacingCm;
+    // Keep the rotated residual when testing the physical exterior. Demotion
+    // can round a genuine outward endpoint back onto the closed outer face.
+    bool outside=any(physical<0)||any(physical>extent);
+    if(ResidualOuterBoundary) outside=any(DFLess(physicalDF,0).xy)||any(DFGreater(physicalDF,float3(extent,0)).xy);
+    if(outside) { Routes[i].w=2;InterlockedAdd(Counts[Owners],1);return; }
+    [loop] for(uint owner=0;owner<Owners;++owner)
+    {
+        int4 b=Bounds[owner];
+        // Internal cuts are half-open; only the physical parent's outer edge
+        // is closed. Avoid the same cell-coordinate rounding at internal cuts.
+        bool2 upper=physical<float2(b.zw)*SpacingCm;
+        upper.x=upper.x || (b.z==ParentCells.x && physical.x<=b.z*SpacingCm.x);
+        upper.y=upper.y || (b.w==ParentCells.y && physical.y<=b.w*SpacingCm.y);
+        if(all(physical>=float2(b.xy)*SpacingCm)&&all(upper))
+        { Routes[i]=uint4(owner,SourceOwner,i,1);InterlockedAdd(Counts[owner],1);return; }
+    }
+    Routes[i].w=4;InterlockedAdd(Counts[Owners+1],1);
+}

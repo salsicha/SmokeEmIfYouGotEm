@@ -1,0 +1,139 @@
+#include "/Engine/Public/Platform.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidPhysicalFrame.ush"
+uint Capacity;
+uint SourceOwner;
+uint Owners;
+uint PositionOffset;
+uint StepStartOffset;
+uint FloatComponents;
+uint IntComponents;
+uint TraceEnabled;
+uint NativeStep;
+uint ResidualOuterBoundary;
+int2 ParentCells;
+float3 LowerWorldCm;
+float3 AxisX;
+float3 AxisY;
+float2 SpacingCm;
+float HeightCm;
+int4 BedOffsets;
+int4 BedCounts;
+StructuredBuffer<float2> BedKnots;
+StructuredBuffer<float3> FaceRows;
+StructuredBuffer<uint> Words;
+StructuredBuffer<uint> SourceCounts;
+StructuredBuffer<uint4> Routes;
+RWStructuredBuffer<uint4> Records;
+RWStructuredBuffer<uint> Counts;
+RWStructuredBuffer<uint> FirstRejection;
+
+FDFVector3 PointDF(uint offset,uint i)
+{
+    float3 p=asfloat(uint3(Words[offset*Capacity+i],Words[(offset+1)*Capacity+i],Words[(offset+2)*Capacity+i]));
+    return RaftSimLiquidPhysicalPointDF(p,LowerWorldCm,AxisX,AxisY);
+}
+
+void RememberRejection(uint i,uint reason,float3 a,float3 b,float3 profile)
+{
+    if(!TraceEnabled) return;
+    uint previous;
+    InterlockedCompareExchange(FirstRejection[0],0,NativeStep,previous);
+    if(previous!=0) return;
+    // Exactly one rejected particle in the first failing native step wins.
+    // Later owners/steps cannot overwrite it; dispatch dependencies complete
+    // these writes before the stopped-simulation readback.
+    FirstRejection[1]=1;FirstRejection[2]=SourceOwner;FirstRejection[3]=i;
+    FirstRejection[4]=reason;FirstRejection[5]=FloatComponents;FirstRejection[6]=IntComponents;
+    FirstRejection[7]=PositionOffset;FirstRejection[8]=StepStartOffset;
+    uint4 record=Records[i],route=Routes[i];
+    FirstRejection[9]=record.y;FirstRejection[10]=record.z;FirstRejection[11]=record.w;
+    FirstRejection[12]=Capacity;FirstRejection[13]=SourceCounts[Owners+2];FirstRejection[14]=record.x;
+    FirstRejection[15]=ResidualOuterBoundary;
+    for(uint k=0;k<4;++k) FirstRejection[16+k]=route[k];
+    float3 extent=float3(float2(ParentCells)*SpacingCm,HeightCm);
+    for(uint k=0;k<3;++k) {
+        FirstRejection[20+k]=asuint(a[k]);FirstRejection[23+k]=asuint(b[k]);
+        FirstRejection[26+k]=asuint(LowerWorldCm[k]);FirstRejection[29+k]=asuint(AxisX[k]);
+        FirstRejection[32+k]=asuint(AxisY[k]);FirstRejection[35+k]=asuint(extent[k]);
+        FirstRejection[38+k]=asuint(profile[k]);
+    }
+    FirstRejection[44]=asuint(SpacingCm.x);FirstRejection[45]=asuint(SpacingCm.y);
+    FirstRejection[46]=ParentCells.x;FirstRejection[47]=ParentCells.y;
+    for(uint k=0;k<FloatComponents+IntComponents;++k) FirstRejection[64+k]=Words[k*Capacity+i];
+}
+
+[numthreads(64,1,1)]
+void MainCS(uint3 Id:SV_DispatchThreadID)
+{
+    uint i=Id.x,n=SourceCounts[Owners+2];
+    if(i==0) { Counts[7]=n;if(n>Capacity) InterlockedAdd(Counts[6],n-Capacity); }
+    if(i>=max(Capacity,1u)) return;
+    Records[i]=uint4(0,0xffffffff,0xffffffff,0);
+    if(i>=Capacity || i>=n) return;
+    uint4 route=Routes[i];
+    FDFVector3 aDF=PointDF(StepStartOffset,i),bDF=PointDF(PositionOffset,i);
+    float3 a=DFDemote(aDF),b=DFDemote(bDF);
+    float3 extent=float3(float2(ParentCells)*SpacingCm,HeightCm);
+    bool3 aOutside=(a<0)|(a>extent),bOutside=(b<0)|(b>extent),bAbove=b>extent;
+    if(ResidualOuterBoundary)
+    {
+        aOutside=DFLess(aDF,0)|DFGreater(aDF,extent);
+        bAbove=DFGreater(bDF,extent);bOutside=DFLess(bDF,0)|bAbove;
+    }
+    // No invented previous endpoint, outside birth, nonfinite state or stale
+    // source index can authorize an exit. Auxiliary payload is never touched.
+    if(route.y!=SourceOwner || route.z!=i || !all(isfinite(a)) || !all(isfinite(b)) ||
+        any(aOutside) || (route.w!=1 && route.w!=2))
+    { Records[i].x=8;InterlockedAdd(Counts[6],1);RememberRejection(i,1,a,b,0);return; }
+    bool xyInside=!any(bOutside.xy);
+    if((xyInside && (route.w!=1 || route.x>=Owners)) || (!xyInside && (route.w!=2 || route.x!=0xffffffff)))
+    { Records[i].x=8;InterlockedAdd(Counts[6],1);RememberRejection(i,2,a,b,0);return; }
+    if(xyInside && !bOutside.z)
+    { Records[i].x=1;InterlockedAdd(Counts[0],1);return; }
+    float3 delta=b-a;float first=2;uint face=0xffffffff;bool tied=false;
+    // First outward intersection with the full 3D box. A floor/roof crossing
+    // cannot be misreported as a later horizontal outlet crossing.
+    [unroll] for(uint axis=0;axis<3;++axis)
+    {
+        if(!bOutside[axis]) continue;
+        uint candidate=2*axis+(bAbove[axis]?1:0);
+        float t=((candidate&1)?extent[axis]-a[axis]:-a[axis])/delta[axis];
+        if(ResidualOuterBoundary)
+        {
+            FDFScalar start=DFGetComponent(aDF,axis);
+            FDFScalar distance=DFSubtract(DFTwoSum((candidate&1)?extent[axis]:0.f,0.f),start);
+            t=DFDemote(DFDivide(distance,DFSubtract(DFGetComponent(bDF,axis),start)));
+        }
+        float tolerance=8*1.192092896e-7;
+        if(t<first-tolerance) { first=t;face=candidate;tied=false; }
+        else if(abs(t-first)<=tolerance) tied=true;
+    }
+    Records[i]=uint4(4,face,0xffffffff,asuint(first));
+    if(tied || face>=4 || !isfinite(first) || first<0 || first>1)
+    { InterlockedAdd(Counts[5],1);RememberRejection(i,4,a,b,0);return; }
+    float3 hit=a+first*delta;
+    if(ResidualOuterBoundary) hit=DFDemote(DFAdd(aDF,DFMultiply(DFSubtract(bDF,aDF),first)));
+    uint tangent=face<2?1:0;
+    uint column=min(uint(max(floor(hit[tangent]/SpacingCm[tangent]),0)),uint(ParentCells[tangent]-1));
+    uint offset=face==0?0:face==1?ParentCells.y:face==2?2*ParentCells.y:2*ParentCells.y+ParentCells.x;
+    uint row=offset+column;Records[i].z=row;float3 profile=FaceRows[row];
+    if(BedCounts[face]>0)
+    {
+        // The finite-volume row still owns stage and signed discharge. Bed
+        // contact is pointwise: preserve every original terrain triangle edge.
+        uint low=BedOffsets[face],high=low+BedCounts[face]-1;
+        while(high-low>1)
+        {
+            uint mid=(low+high)/2;
+            if(hit[tangent]<BedKnots[mid].x) high=mid;else low=mid;
+        }
+        float2 aBed=BedKnots[low],bBed=BedKnots[high];
+        profile.x=lerp(aBed.y,bBed.y,saturate((hit[tangent]-aBed.x)/(bBed.x-aBed.x)));
+    }
+    float z=hit.z+LowerWorldCm.z;
+    // Use the SAME outgoing row condition as the pressure-stage boundary.
+    // Above-stage spray may exit over a wet opening; below-bed leaks may not.
+    if(profile.z>=0 || profile.y<=profile.x || z<=profile.x)
+    { InterlockedAdd(Counts[5],1);RememberRejection(i,(profile.z>=0?8:0)|(profile.y<=profile.x?16:0)|(z<=profile.x?32:0),a,b,profile);return; }
+    Records[i].x=2;InterlockedAdd(Counts[1+face],1);
+}

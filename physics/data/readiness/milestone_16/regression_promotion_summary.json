@@ -1,8 +1,3 @@
-{
-  "entry_count": 98,
-  "geoclaw_cpp_fixture_count": 40,
-  "passed": true,
-  "raft_artifact_count": 50,
-  "source_report": "reports/milestone16/regression_promotion_manifest.json",
-  "summary_version": "raftsim.milestone16.readiness_summary.v0"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:77022075c30757d9962e6d9c6bb7c5d9d4c28db6d383aa4f4e6e9a6fe4e272de
+size 254

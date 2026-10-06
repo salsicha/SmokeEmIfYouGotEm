@@ -13,10 +13,8 @@ authors = [
 ]
 dependencies = [
   "numpy>=1.26",
-  # PNG/texture generation across raftsim modules; >=12.3 for Image.get_flattened_data
-  # (exercised by the test suite). Was previously pulled in only implicitly via the
-  # plot extra's matplotlib, which broke fresh checkouts.
-  "pillow>=12.3",
+  # >=12.3 for Image.get_flattened_data, exercised by the test suite.
+  "Pillow>=12.3",
 ]
 
 # Installed by `uv run`/`uv sync` by default so `uv run pytest -q` works on a
@@ -47,5 +45,6 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+# The SEIYGE core submodule (core/) provides the water solvers, their scripts and test helpers.
+pythonpath = ["src", "scripts", "../unreal/Plugins/SEIYGECore/python/src", "../unreal/Plugins/SEIYGECore/python/scripts", "../unreal/Plugins/SEIYGECore/python/tests"]
 addopts = "-ra"

@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from ..milestone18 import build_milestone18_pin_release_fixture_report
+from ..milestone18_pin_release import (build_milestone18_pin_release_fixture_report)
 
 
 def main(argv: list[str] | None = None) -> int:

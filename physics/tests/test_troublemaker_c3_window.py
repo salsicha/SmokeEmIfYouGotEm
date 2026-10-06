@@ -20,6 +20,12 @@ from raftsim.troublemaker_c3_window import (
     load_flow_bands,
     troublemaker_solver_config,
 )
+from raftsim.south_fork_full_hydraulics import (
+    _build_scenario,
+    _flow_bands,
+    _rapid_records,
+    _troublemaker_s_bend_centerline_m,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCENARIO_ROOT = REPO_ROOT / SCENARIO_ROOT_RELATIVE
@@ -106,6 +112,40 @@ def test_bed_geometry_expresses_headline_features(committed_packages):
     slot = region((p.sneak_x[0] + 10.0, p.sneak_x[1] - 10.0), p.sneak_y)
     berm = region((p.sneak_x[0] + 10.0, p.sneak_x[1] - 10.0), p.sneak_berm_y)
     assert float(np.median(berm)) - float(np.median(slot)) > 0.5
+
+
+def test_full_reach_troublemaker_is_hole_then_right_then_left() -> None:
+    """The production cook must preserve the visually reviewed S sequence."""
+
+    rapid = next(
+        item for item in _rapid_records(REPO_ROOT) if item["name"] == "Troublemaker"
+    )
+    rapid_station = float(rapid["station_m"])
+    stations = rapid_station + np.asarray([-8.0, 34.0, 84.0, 150.0])
+    offsets = _troublemaker_s_bend_centerline_m(stations, rapid_station)
+    assert abs(float(offsets[0])) < 0.05  # the main hole remains centered
+    assert float(offsets[1]) < -8.5  # current turns river-right
+    assert float(offsets[2]) > 7.0  # then crosses sharply river-left
+    assert abs(float(offsets[3])) < 0.05  # and rejoins the runout
+
+    scenario, _, _ = _build_scenario(
+        REPO_ROOT, rapid, _flow_bands(REPO_ROOT)["median_runnable"]
+    )
+    x_axis = scenario.grid.x_coordinates()
+    y_axis = scenario.grid.y_coordinates()
+    for station, expected_y in zip(stations[1:3], offsets[1:3], strict=True):
+        column = int(np.argmin(np.abs(x_axis - station)))
+        wet_rows = scenario.initial_state.depth[:, column] > 0.025
+        assert wet_rows.any()
+        wet_center_y = float(np.average(y_axis[wet_rows]))
+        assert np.sign(wet_center_y) == np.sign(expected_y)
+
+    # The initialized current follows the same two turns instead of pointing
+    # straight down an abstract rectangular solver strip.
+    right_column = int(np.argmin(np.abs(x_axis - (rapid_station + 14.0))))
+    left_column = int(np.argmin(np.abs(x_axis - (rapid_station + 58.0))))
+    assert float(np.min(scenario.initial_state.v[:, right_column])) < -0.2
+    assert float(np.max(scenario.initial_state.v[:, left_column])) > 0.2
 
 
 def test_generation_is_deterministic(committed_packages):

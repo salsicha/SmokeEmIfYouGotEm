@@ -238,7 +238,7 @@ def build_jolt_smoke_harness_export(
     contract: dict[str, Any],
     *,
     source_contract_path: str = "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
-    manifest_output_path: str = "physics/cpp/tests/jolt_smoke_harness_manifest.json",
+    manifest_output_path: str = "unreal/Plugins/SEIYGECore/cpp/tests/jolt_smoke_harness_manifest.json",
     summary_output_path: str = "physics/reports/milestone19/jolt/summary.json",
     replay_output_dir: str = "physics/reports/milestone19/jolt/replays",
 ) -> JoltSmokeHarnessExport:
@@ -279,10 +279,10 @@ def build_jolt_smoke_harness_export(
             "native_target": {
                 "runtime": JOLT_RUNTIME_ID,
                 "cmake_target": "raftsim_jolt_smoke_harness",
-                "source": "physics/cpp/tools/jolt_smoke_harness.cpp",
+                "source": "unreal/Plugins/SEIYGECore/cpp/tools/jolt_smoke_harness.cpp",
                 "sdk_dependency_status": "not_vendored_placeholder_path",
                 "execution": (
-                    "raftsim_jolt_smoke_harness physics/cpp/tests/jolt_smoke_harness_manifest.json"
+                    "raftsim_jolt_smoke_harness unreal/Plugins/SEIYGECore/cpp/tests/jolt_smoke_harness_manifest.json"
                 ),
             },
             "source_contract": source_contract_path,
@@ -355,7 +355,7 @@ def build_jolt_smoke_harness_export(
         "global_pass_gates": shared["global_pass_gates"],
         "native_harness": {
             "cmake_target": "raftsim_jolt_smoke_harness",
-            "source": "physics/cpp/tools/jolt_smoke_harness.cpp",
+            "source": "unreal/Plugins/SEIYGECore/cpp/tools/jolt_smoke_harness.cpp",
             "manifest": manifest_output_path,
             "sdk_dependency_status": "not_vendored_placeholder_path",
             "summary": summary_output_path,

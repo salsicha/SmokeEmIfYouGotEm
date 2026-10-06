@@ -2,11 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RaftSimCartesianWaterRegions.h"
 
 #include "RaftSimRiverWaterStreamingActor.generated.h"
 
 class ARaftSimRaftActor;
 class ARaftSimRiverWaterConfig;
+class ULevel;
 class URaftSimWaterRuntimeAdapter;
 
 /**
@@ -24,6 +26,7 @@ public:
     ARaftSimRiverWaterStreamingActor();
 
     virtual void BeginPlay() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     virtual void Tick(float DeltaSeconds) override;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Streaming")
@@ -32,7 +35,13 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Streaming")
     FString GetActiveFieldsDirectory() const { return ActiveFieldsDirectory; }
 
+    // Synchronous game-thread coverage request from the actual detail consumer.
+    // The ordinary periodic raft controller cannot guarantee its full halo.
+    bool EnsureDetailSourceCoverage(URaftSimWaterRuntimeAdapter* ConsumerWater,const FBox2D& RequiredBoundsM);
+
 private:
+    friend class FRaftSimCartesianStreamingActorTest;
+    friend class FRaftSimDetailNativeHandoffTest;
     struct FSourceWindow
     {
         FString FieldsDirectory;
@@ -45,19 +54,36 @@ private:
 
     bool LoadStreamingManifest();
     const FSourceWindow* SelectSource(float StationM) const;
-    bool UpdateWaterWindow(bool bForce);
+    bool UpdateWaterWindow(bool bForce,const FBox2D* RequiredSourceBoundsM=nullptr);
     void ApplyStaticFlowBandVisibility() const;
+    void ApplyStaticFlowBandVisibilityToActor(AActor* Actor) const;
+    void HandleLevelAddedToWorld(ULevel* Level, UWorld* World);
 
     UPROPERTY()
     TObjectPtr<ARaftSimRaftActor> Raft;
 
     UPROPERTY()
     TObjectPtr<ARaftSimRiverWaterConfig> RiverConfig;
+    // Config values cached at BeginPlay: the placed config actor lives in a
+    // world-partition cell near the put-in and unloads once the raft travels
+    // far enough — dereferencing it per tick silently froze window recentres
+    // at a streaming-dependent distance (2026-08-14).
+    FName CachedFlowBand;
+    bool bCachedLiveSolverOwnsRuntimeRendering = false;
+    bool bCachedSouthForkSingleSurface = false;
+    FDelegateHandle LevelAddedToWorldHandle;
+    float TimeSinceVisibilityReapplySeconds = 0.0f;
+    float CachedMovingWindowAdvanceM = 80.0f;
+    float CachedMovingWindowStationExtentM = 320.0f;
+    float CachedMovingWindowLateralExtentM = 80.0f;
 
     UPROPERTY()
     TObjectPtr<URaftSimWaterRuntimeAdapter> WaterAdapter;
 
     TArray<FSourceWindow> SourceWindows;
+    FRaftSimCartesianWaterRegions CartesianRegions;
+    bool bCartesianStreaming = false;
+    FVector2D LastCartesianCenterM = FVector2D::ZeroVector;
     FString TransitFieldsDirectory;
     FString ActiveFieldsDirectory;
     float LastWindowCenterStationM = -BIG_NUMBER;

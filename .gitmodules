@@ -1,0 +1,3 @@
+[submodule "unreal/Plugins/SEIYGECore"]
+	path = unreal/Plugins/SEIYGECore
+	url = https://github.com/salsicha/SEIYGE_core.git

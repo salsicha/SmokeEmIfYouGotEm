@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -113,7 +114,7 @@ def finalize_south_fork_hlod_manifest(
 
     evidence = {
         "schema": "raftsim.unreal.south_fork_hlod_evidence.v1",
-        "generated_on": "2026-07-19",
+        "generated_on": datetime.now(UTC).date().isoformat(),
         "map": MAP_PACKAGE,
         "strategy": (
             "terminal_instancing_with_nanite_source_geometry_and_no_merged_atlas_parent"

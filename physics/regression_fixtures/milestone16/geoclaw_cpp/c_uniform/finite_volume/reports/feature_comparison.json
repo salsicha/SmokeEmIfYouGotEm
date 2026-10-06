@@ -1,7 +1,3 @@
-{
-  "comparisons": [],
-  "feature_count": 0,
-  "max_abs_strength_delta": 0.0,
-  "max_location_delta": 0.0,
-  "scenario_id": "uniform_channel_seed_16"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:312f5f4953f091965b95a0f89528642bdf10dec20424e4f4a7d65a9cc8ba5e0b
+size 157

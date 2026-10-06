@@ -4,11 +4,24 @@
 #include "GameFramework/Actor.h"
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimVerticalSliceFrontend.h"
+#include "RaftSimRunCoordinateProvider.h"
 
 #include "RaftSimRunManager.generated.h"
 
 class ARaftSimRaftActor;
 class ARaftSimEncounterVolume;
+class URaftSimWaterRuntimeAdapter;
+class ARaftSimRiverWaterConfig;
+
+/** Game-thread observation: station and the exact actor pose used to obtain it.
+ * Not persisted, and not a replacement for the latest physics state. */
+struct FRaftSimRunProgressSample
+{
+    FVector WorldPositionCm = FVector::ZeroVector;
+    double WorldTimeSeconds = 0.;
+    float StationM = 0.f;
+    bool bValid = false;
+};
 
 /** Lifecycle of a scored rapid run. */
 UENUM(BlueprintType)
@@ -28,7 +41,7 @@ enum class ERaftSimRunState : uint8
  * is exercisable in the test tank.
  */
 UCLASS()
-class SMOKEEMIFYOUGOTEM_API ARaftSimRunManager : public AActor
+class SMOKEEMIFYOUGOTEM_API ARaftSimRunManager : public AActor, public IRaftSimRunCoordinateProvider
 {
     GENERATED_BODY()
 
@@ -59,6 +72,8 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Run")
     float GetCurrentStationM() const { return CurrentStationM; }
 
+    const FRaftSimRunProgressSample& GetLastProgressSample() const { return LastProgressSample; }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Run")
     float GetProgressFraction() const;
 
@@ -78,7 +93,25 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Run")
     void RestartRun();
 
-    /** Scenario id used as the save key (e.g. "troublemaker"). */
+    /** Optional global descent axis, distinct from a rapid's local solver grid.
+     * Empty preserves the existing single-map behavior. Set on the map's run
+     * manager before BeginPlay; invalid nonempty paths never fall back locally. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Run")
+    FString ProgressCoordinateMapPath;
+
+    bool ConfigureProgressCoordinateMap(const FString& Path);
+    static bool BuildStationStartTransform(
+        const URaftSimWaterRuntimeAdapter* Progress, URaftSimWaterRuntimeAdapter* Water,
+        float StationM, FTransform& OutTransform);
+    static bool SeedCartesianCheckpointWater(const ARaftSimRiverWaterConfig* Config,
+        URaftSimWaterRuntimeAdapter* Water, FTransform& Checkpoint);
+    const URaftSimWaterRuntimeAdapter* GetProgressCoordinates(
+        const URaftSimWaterRuntimeAdapter* HydraulicCoordinates) const override;
+    bool WorldToRunCoordinates(const FVector& WorldPositionCm,
+        const URaftSimWaterRuntimeAdapter* HydraulicCoordinates,
+        FVector2D& OutStationLateralM, FVector& OutTangent, FVector& OutLeft) const override;
+
+    /** Scenario id used as the save key (e.g. "south_fork_full_descent"). */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Run")
     FName ScenarioId = TEXT("test_tank_run");
 
@@ -96,12 +129,19 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Run")
     float FinishStationM = -1.0f;
 
+    /** Station-bounded rivers never finish at legacy world-X/volume markers,
+     * or while their progress coordinate is unavailable. */
+    bool HasCrossedFinish(bool bHasStation, float StationM, float WorldX,
+        bool bFinishVolumeOverlap) const;
+
 protected:
     void StartRun();
     void FinishRun();
     void AccumulateSignals(float DeltaSeconds);
-    bool SampleRiverStation(float& OutStationM, FVector* OutTangent = nullptr) const;
+    bool SampleRiverStation(float& OutStationM, FVector* OutTangent = nullptr,
+        FVector* OutSamplePositionCm = nullptr) const;
     void TryRestoreSessionCheckpoint();
+    bool PrepareCheckpointReset(FTransform& Destination);
     void RecordCheckpointIfNeeded();
 
     UPROPERTY()
@@ -109,6 +149,17 @@ protected:
 
     UPROPERTY()
     TObjectPtr<ARaftSimRaftActor> Raft;
+
+    UPROPERTY(Transient)
+    TObjectPtr<URaftSimWaterRuntimeAdapter> ProgressCoordinates;
+
+    struct FProgressAxisPoint
+    {
+        double StationM = 0;
+        FVector2D PositionM = FVector2D::ZeroVector;
+    };
+    TArray<FProgressAxisPoint> ProgressAxis;
+    TMap<FIntPoint, TArray<int32>> ProgressAxisIndex;
 
     UPROPERTY()
     TArray<TObjectPtr<ARaftSimEncounterVolume>> Volumes;
@@ -124,6 +175,7 @@ protected:
     ERaftSimMedal AwardedMedal = ERaftSimMedal::None;
     FText AfterActionSummary;
     float CurrentStationM = 0.0f;
+    FRaftSimRunProgressSample LastProgressSample;
     float FurthestStationM = 0.0f;
     float LastCheckpointStationM = -BIG_NUMBER;
     float GhostSampleRemaining = 0.0f;

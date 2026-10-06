@@ -1,0 +1,302 @@
+#include "RaftSimHullContact.h"
+#include "RaftSimPhysicsBridgeSubsystem.h"
+#include "Engine/GameInstance.h"
+#include "Subsystems/SubsystemCollection.h"
+#include "Misc/AutomationTest.h"
+#include "RaftSimHullArcClearance.h"
+#include "RaftSimHullArcPair.h"
+#include "Components/StaticMeshComponent.h"
+#include <limits>
+
+#if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimArcPlaneCertificateTest,"RaftSim.Physics.FullHullArcPlaneCertificate",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimArcPlaneCertificateTest::RunTest(const FString&)
+{
+    using namespace RaftSimSurfaceSweep;
+    const FTriangle Floor{{FVector(-100,-100,0),FVector(100,-100,0),FVector(0,100,0)}};
+    FRaftSimHullGeometry H;H.VerticesM={FVector(0,0,-1),FVector(0,0,-1),FVector(0,0,-1)};
+    auto After=H;FRaftSimFlexRigidState S;S.Position=FVector(0,0,1.+2.e-9);S.AngularVelocity=FVector(0,3.,0);
+    const auto Certificate=[&](const FRaftSimFlexRigidState& Body,const FRaftSimHullGeometry& A,const FRaftSimHullGeometry& B,double Interval)
+    {
+        const double W=Body.AngularVelocity.Length();double Radius=0.,ShapeSpeed=0.;
+        for(int32 I=0;I<3;++I){Radius=FMath::Max(Radius,FMath::Max(A.VerticesM[I].Length(),B.VerticesM[I].Length()));ShapeSpeed=FMath::Max(ShapeSpeed,(B.VerticesM[I]-A.VerticesM[I]).Length()/Interval);}
+        FRaftSimHullArcPath Path{Body,&A,&B,0.,Interval,Interval,W*W*W*Radius+3.*W*W*ShapeSpeed};
+        FTriangle Start,Velocity,Acceleration;
+        for(int32 I=0;I<3;++I){Start.V[I]=Body.WorldPoint(A.VerticesM[I]);Path.Derivatives(I,Velocity.V[I],Acceleration.V[I]);}
+        return RaftSimHullArcClearance::PlaneSeparated(Start,Velocity,Acceleration,Floor,FVector::UpVector,Interval,Path.JerkBound);
+    };
+    TestTrue(TEXT("neutral support curving away has a certified whole interval"),Certificate(S,H,After,.001));
+    for(int32 I=0;I<=1000;++I)
+    {auto Exact=S;RaftSimSweptGround::Advance(Exact,I*.001/1000.);TestTrue(TEXT("independent exact arc stays clear for certified interval"),Exact.WorldPoint(H.VerticesM[0]).Z>0.);}
+    for(auto& P:H.VerticesM)P=FVector(1,0,0);After=H;S.Position=FVector(0,0,2.e-9);
+    TestFalse(TEXT("a genuinely closing vertex is not certified clear"),Certificate(S,H,After,.001));
+    S.Position.Z=.1;S.AngularVelocity=FVector(0,PI,0);
+    TestFalse(TEXT("clear chord endpoints do not hide interior arc penetration"),Certificate(S,H,After,1.));
+    auto Middle=S;RaftSimSweptGround::Advance(Middle,.5);
+    TestTrue(TEXT("rejected arc counterexample actually crosses plane"),Middle.WorldPoint(H.VerticesM[0]).Z<0.);
+    S.AngularVelocity=FVector::ZeroVector;S.Position.Z=.001;
+    for(auto& P:H.VerticesM)P=FVector::ZeroVector;After=H;for(auto& P:After.VerticesM)P.Z=-.002;
+    TestFalse(TEXT("prescribed deformation into rock cannot be discarded"),Certificate(S,H,After,.01));
+    S.Position.Z=2.e-9;for(auto& P:After.VerticesM)P.Z=.002;
+    TestTrue(TEXT("actual separating deformation can be certified"),Certificate(S,H,After,.01));
+    const FTriangle Source{{FVector(-1,-1,0),FVector(1,-1,0),FVector(0,1,0)}};
+    const FTriangle Corner{{FVector(.5,0,1.e-5),FVector(2,0,1),FVector(.5,2,1)}};
+    TestTrue(TEXT("inverse rigid frame certifies supported static corner over full interval"),
+        RaftSimHullArcClearance::RigidFaceSeparated(Source,Corner,FQuat::Identity,FVector::ZeroVector,
+            FVector::ZeroVector,FVector(0,1,0),.001));
+    TestFalse(TEXT("inverse rigid frame refuses genuinely entering corner"),
+        RaftSimHullArcClearance::RigidFaceSeparated(Source,Corner,FQuat::Identity,FVector::ZeroVector,
+            FVector::ZeroVector,FVector(0,-1,0),.001));
+    const FTriangle High{{FVector(-1,-1,0),FVector(1,-1,0),FVector(0,1,0)}};
+    const FTriangle Low{{FVector(-1,-1,-1),FVector(0,1,-1),FVector(1,-1,-1)}};
+    TestTrue(TEXT("rotating edge-axis proves separated actual triangles over a short interval"),
+        RaftSimHullArcClearance::RigidEdgeAxisSeparated(High,Low,FQuat::Identity,FVector::ZeroVector,
+            FVector::ZeroVector,FVector(0,1,0),.001,0,0));
+    TestFalse(TEXT("rotating edge-axis refuses a genuine crossing interval"),
+        RaftSimHullArcClearance::RigidEdgeAxisSeparated(High,Low,FQuat::Identity,FVector::ZeroVector,
+            FVector(0,0,-2),FVector::ZeroVector,1.,0,0));
+    // Exact arithmetic/cache qualification, not an alternative playable hull.
+    // CapturedWholeHullBounds and CapturedRockPin retain actual source-query
+    // outcomes and the production asset in the same mandatory native suite.
+    FRaftSimHullGeometry CacheBefore,CacheAfter;
+    CacheBefore.VerticesM={FVector(-1,-1,0),FVector(1,-1,0),FVector(0,1,0),FVector(2,2,.2)};
+    CacheBefore.VerticesM.Add(FVector(std::numeric_limits<double>::quiet_NaN(),0,0));
+    FRandomStream CacheRandom(20261006);
+    for(int32 Case=0;Case<64;++Case)
+    {
+        CacheAfter=CacheBefore;
+        if(Case%2)for(int32 I=0;I<4;++I)CacheAfter.VerticesM[I]+=FVector(.02*I,-.01*I,-.03*I);
+        FRaftSimHullArcPath Path;
+        Path.Before=&CacheBefore;Path.After=&CacheAfter;
+        Path.State.Orientation=FQuat(FRotator(Case*3,Case*7,-Case));
+        Path.State.Position=FVector(0,0,Case%3==0?2.e-9:Case%3==1?.4:-.1);
+        Path.State.LinearVelocity=FVector(.2,-.1,Case%2?-.5:.5);
+        Path.State.AngularVelocity=FVector(.3,Case%4,-.2);
+        Path.Now=.002*(Case%3);Path.Interval=.001*(1+Case%5);Path.Dt=.02;
+        Path.JerkBound=Case%7==0?std::numeric_limits<double>::infinity():100.;
+        RaftSimHullArcPair::FQueryDerivatives Query(&Path);
+        TestEqual(TEXT("fresh query has no retained derivative or unused-input evaluation"),Query.EvaluatedVertexCount(),0);
+        for(int32 Pair=0;Pair<24;++Pair)
+        {
+            const FIntVector Face=Pair%2?FIntVector(2,3,0):FIntVector(0,1,2);
+            FTriangle Start,Ground;
+            for(int32 J=0;J<3;++J)
+            {
+                FVector V,A,CachedV,CachedA;
+                Path.Derivatives(Face[J],V,A);Query.Read(Face[J],CachedV,CachedA);
+                TestTrue(TEXT("query-local derivatives are bit-identical to original arithmetic"),
+                    FMemory::Memcmp(&V,&CachedV,sizeof(FVector))==0 && FMemory::Memcmp(&A,&CachedA,sizeof(FVector))==0);
+                Start.V[J]=Path.State.WorldPoint(FMath::Lerp(CacheBefore.VerticesM[Face[J]],CacheAfter.VerticesM[Face[J]],Path.Now/Path.Dt));
+                Ground.V[J]=Floor.V[J]+FVector(CacheRandom.FRandRange(-2.f,2.f),CacheRandom.FRandRange(-2.f,2.f),CacheRandom.FRandRange(-1.f,1.f));
+            }
+            TestEqual(TEXT("all existing plane/rigid/edge proofs agree with uncached evaluation"),
+                RaftSimHullArcPair::Separated(Face,Start,Ground,Path,Query),
+                RaftSimHullArcPair::Separated(Face,Start,Ground,Path));
+        }
+        TestEqual(TEXT("repeated shared indices evaluate only four visited original vertices"),Query.EvaluatedVertexCount(),4);
+    }
+    RaftSimHullArcPair::FQueryDerivatives Unvisited(nullptr);
+    TestEqual(TEXT("an empty source query does not access an unused arc"),Unvisited.EvaluatedVertexCount(),0);
+    return !HasAnyErrors();
+}
+
+namespace
+{
+FRaftSimHullGeometry Plate()
+{
+    FRaftSimHullGeometry H;H.VerticesM={FVector(-.6,-.4,-.2),FVector(.6,-.4,-.2),FVector(0,.7,-.2)};
+    H.Faces={FIntVector(0,1,2)};H.Sections={{0,3,0,1}};return H;
+}
+RaftSimSurfaceSweep::FResult FloorQuery(TConstArrayView<FVector> A,TConstArrayView<FVector> B,
+    TConstArrayView<FIntVector> Faces,double Skin,double Clearance)
+{
+    using namespace RaftSimSurfaceSweep;
+    const FTriangle Ground{{FVector(-100,-100,0),FVector(100,-100,0),FVector(0,100,0)}};
+    FResult Best;Best.Status=EStatus::Clear;Best.Time=1.;
+    for(int32 I=0;I<Faces.Num();++I)
+    {
+        FTriangle Start,End;for(int32 J=0;J<3;++J){Start.V[J]=A[Faces[I][J]]*.01;End.V[J]=B[Faces[I][J]]*.01;}
+        auto Hit=Sweep(Start,End,Ground,Skin*.01,128,Clearance*.01);Hit.MovingFace=I;Hit.GroundFace=0;
+        if(Hit.Status!=EStatus::Clear && Hit.Status!=EStatus::Contact)return Hit;
+        if(Hit.Status==EStatus::Contact && (Best.Status==EStatus::Clear || Hit.Time<Best.Time))Best=Hit;
+    }
+    return Best;
+}
+double Kinetic(const FRaftSimFlexRigidState& S)
+{return .5*(220.*S.LinearVelocity.SizeSquared()+100.*S.AngularVelocity.SizeSquared());}
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimHullResponseTest,"RaftSim.Physics.FullHullResponse",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimHullResponseTest::RunTest(const FString&)
+{
+    const auto Hull=Plate();const FVector Inertia(100,100,100);
+    for(const FVector Spin:{FVector::ZeroVector,FVector(.15,-.12,.2)})
+    {
+        FRaftSimFlexRigidState S;S.Position=FVector(0,0,.4);S.LinearVelocity=FVector(.2,.1,-3);S.AngularVelocity=Spin;
+        int32 Impulses=0;
+        for(int32 Step=0;Step<600;++Step)
+        {
+            const auto Before=S;constexpr double Dt=1./120.;S.LinearVelocity.Z-=9.81*Dt;
+            const double InitialEnergy=Kinetic(S);RaftSimSweptGround::Advance(S,Dt);
+            const auto R=RaftSimHullContact::Integrate(S,Before,Hull,Hull,220.,Inertia,Dt,FloorQuery);
+            if(!TestTrue(FString::Printf(TEXT("full surface consumes sustained step %d: %s"),Step,*R.Failure),R.bCompleted))return false;
+            Impulses+=R.Impulses;
+            TestTrue(TEXT("entire substep consumed"),FMath::Abs(R.ConsumedSeconds-Dt)<1.e-12);
+            TestTrue(TEXT("rigid contact does not create kinetic energy"),Kinetic(S)<=InitialEnergy+1.e-8);
+            TestTrue(TEXT("rigid shape has zero prescribed work"),R.PrescribedShapeWorkJ==0.);
+            TestTrue(TEXT("impulse energy ledger closes"),FMath::Abs(R.KineticChangeJ+R.DissipatedJ)<1.e-8);
+            for(const auto& V:Hull.VerticesM)TestTrue(TEXT("every final hull vertex stays above plane"),S.WorldPoint(V).Z>=-1.e-9);
+        }
+        TestTrue(TEXT("sustained support actually applies impulses"),Impulses>0);
+        AddInfo(FString::Printf(TEXT("full hull sustained support spin=%s steps=600 impulses=%d"),*Spin.ToString(),Impulses));
+    }
+    auto Expanded=Hull;for(auto& V:Expanded.VerticesM)V.Z-=.02;
+    FRaftSimFlexRigidState Before;Before.Position=FVector(0,0,.20001);auto S=Before;
+    constexpr double Dt=.01;RaftSimSweptGround::Advance(S,Dt);
+    const auto Expansion=RaftSimHullContact::Integrate(S,Before,Hull,Expanded,220.,Inertia,Dt,FloorQuery);
+    TestTrue(FString::Printf(TEXT("moving shape completes: %s"),*Expansion.Failure),Expansion.bCompleted);
+    TestTrue(TEXT("prescribed expansion work is exposed"),Expansion.PrescribedShapeWorkJ>0.);
+    TestTrue(TEXT("deforming contact work balances kinetic change and dissipation"),
+        FMath::Abs(Expansion.KineticChangeJ-Expansion.PrescribedShapeWorkJ+Expansion.DissipatedJ)<1.e-8);
+    for(const auto& V:Expanded.VerticesM)TestTrue(TEXT("deformed endpoint above ground"),S.WorldPoint(V).Z>=-1.e-9);
+    AddInfo(FString::Printf(TEXT("prescribed deformation: work_j=%.17g dissipated_j=%.17g kinetic_change_j=%.17g impulses=%d"),
+        Expansion.PrescribedShapeWorkJ,Expansion.DissipatedJ,Expansion.KineticChangeJ,Expansion.Impulses));
+    // Metadata must neither alter the response nor credit an unhit component.
+    auto* Owner=NewObject<UStaticMeshComponent>();
+    auto WithOwner=Before;RaftSimSweptGround::Advance(WithOwner,Dt);
+    const FRaftSimHullGroundQuery OwnedQuery=[Owner](auto A,auto B,auto F,double Skin,double Clearance)
+    {auto Hit=FloorQuery(A,B,F,Skin,Clearance);Hit.GroundComponent=Owner;return Hit;};
+    const auto Owned=RaftSimHullContact::Integrate(WithOwner,Before,Hull,Expanded,220.,Inertia,Dt,OwnedQuery);
+    TestTrue(TEXT("owner receipt preserves exact physical response"),Owned.bCompleted &&
+        WithOwner.Position==S.Position && WithOwner.Orientation==S.Orientation &&
+        WithOwner.LinearVelocity==S.LinearVelocity && WithOwner.AngularVelocity==S.AngularVelocity);
+    TestEqual(TEXT("same number of physical impulses with provenance"),Owned.Impulses,Expansion.Impulses);
+    TestEqual(TEXT("one actual contacted component"),Owned.OwnerImpulses.Num(),1);
+    if(Owned.OwnerImpulses.Num()==1)
+    {
+        TestTrue(TEXT("query owner survives manifold response"),Owned.OwnerImpulses[0].Key.Get()==Owner);
+        TestEqual(TEXT("every actual impulse attributed"),Owned.OwnerImpulses[0].Value,uint64(Owned.Impulses));
+    }
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimHullArcAndFailureTest,"RaftSim.Physics.FullHullArcAndFailure",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimHullArcAndFailureTest::RunTest(const FString&)
+{
+    auto Hull=Plate();Hull.VerticesM[0]=FVector::ZeroVector;auto After=Hull;After.VerticesM[1]+=FVector(.03,.02,.01);
+    FRaftSimFlexRigidState Before;Before.Position=FVector(0,0,10);Before.LinearVelocity=FVector(1,0,0);Before.AngularVelocity=FVector(0,3,0);
+    constexpr double Dt=.02;auto Predicted=Before;RaftSimSweptGround::Advance(Predicted,Dt);
+    int32 Queries=0,Samples=0;
+    const FRaftSimHullGroundQuery Clear=[&](TConstArrayView<FVector> A,TConstArrayView<FVector> B,TConstArrayView<FIntVector>,double Skin,double Clearance)
+    {
+        ++Queries;const double T0=A[0].X*.01,T1=B[0].X*.01;
+        for(int32 Sample=0;Sample<=100;++Sample)
+        {
+            const double F=Sample/100.,T=FMath::Lerp(T0,T1,F);
+            auto Exact=Before;RaftSimSweptGround::Advance(Exact,T);
+            for(int32 I=0;I<A.Num();++I)
+            {
+                const FVector V=Exact.WorldPoint(FMath::Lerp(Hull.VerticesM[I],After.VerticesM[I],T/Dt));
+                const double Error=(V-FMath::Lerp(A[I],B[I],F)*.01).Length();
+                TestTrue(TEXT("actual rotating/deforming path enclosed by reported chord bound"),Error<=Skin*.01-1.e-5+1.e-12);
+                TestTrue(TEXT("query safety clearance encloses curved path"),Error<Clearance*.01);
+                ++Samples;
+            }
+        }
+        RaftSimSurfaceSweep::FResult R;R.Status=RaftSimSurfaceSweep::EStatus::Clear;return R;
+    };
+    auto S=Predicted;const auto R=RaftSimHullContact::Integrate(S,Before,Hull,After,220.,FVector(100),Dt,Clear);
+    TestTrue(TEXT("bounded curved path completes"),R.bCompleted && Queries>1 && R.MaximumCurveBoundM<=1.250000001e-6);
+    TestTrue(TEXT("no-contact pose agrees with exact arc"),(S.Position-Predicted.Position).Length()<1.e-12 && S.Orientation.Equals(Predicted.Orientation,1.e-12));
+    const FRaftSimHullGroundArcQuery WholeClear=[&](auto A,auto B,auto F,double Skin,double Clearance,const FRaftSimHullArcPath&)
+        {return Clear(A,B,F,Skin,Clearance);};
+    S=Predicted;Queries=0;
+    const auto Flight=RaftSimHullContact::Integrate(S,Before,Hull,After,220.,FVector(100),Dt,Clear,WholeClear);
+    TestTrue(TEXT("full curved/deforming clear flight uses one enclosed query"),Flight.bCompleted && Queries==1);
+    TestTrue(TEXT("clear flight preserves exact integrated arc"),(S.Position-Predicted.Position).Length()<1.e-12 && S.Orientation.Equals(Predicted.Orientation,1.e-12));
+    // A whole-flight refusal cannot become accepted time or a pose write.
+    const FRaftSimHullGroundArcQuery WholeRefuse=[](auto,auto,auto,double,double,const FRaftSimHullArcPath&)
+        {return RaftSimSurfaceSweep::FResult();};
+    S=Predicted;const auto FlightRefused=RaftSimHullContact::Integrate(S,Before,Hull,After,220.,FVector(100),Dt,Clear,WholeRefuse);
+    TestTrue(TEXT("unresolved full-flight proof falls back and still refuses"),!FlightRefused.bCompleted && S.Position==Predicted.Position && S.Orientation==Predicted.Orientation);
+    int32 Calls=0;
+    const FRaftSimHullGroundQuery Refuse=[&](TConstArrayView<FVector>,TConstArrayView<FVector>,TConstArrayView<FIntVector>,double,double)
+    {RaftSimSurfaceSweep::FResult X;X.Status=++Calls==1?RaftSimSurfaceSweep::EStatus::Clear:RaftSimSurfaceSweep::EStatus::Unresolved;return X;};
+    S=Predicted;const auto Failed=RaftSimHullContact::Integrate(S,Before,Hull,After,220.,FVector(100),Dt,Refuse);
+    TestTrue(TEXT("partial refusal does not claim completed time"),!Failed.bCompleted && Failed.ConsumedSeconds>0. && Failed.ConsumedSeconds<Dt);
+    TestTrue(TEXT("partial refusal never assigns caller state"),S.Position==Predicted.Position && S.Orientation==Predicted.Orientation && S.LinearVelocity==Predicted.LinearVelocity);
+    AddInfo(FString::Printf(TEXT("curved path independent samples=%d queries=%d maximum_bound_m=%.17g"),Samples,Queries,R.MaximumCurveBoundM));
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimHullAdapterIntegrationTest,"RaftSim.Physics.FullHullAdapterIntegration",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimHullAdapterIntegrationTest::RunTest(const FString&)
+{
+    auto* Adapter=NewObject<URaftSimChronoRuntimeAdapter>();FRaftSimRaftBodyConfig Body;
+    Body.MassKg=220;Adapter->ConfigureRaftBody(Body);
+    FRaftSimFlexParameters Params;Params.MassKg=220;Params.PassengerCount=0;Params.GuideMassKg=0;
+    Adapter->ConfigureFlexibleRaftModel(Params,{});
+    Adapter->SetWaterSurfaceSampler([](const FVector&,float&){return false;});
+    Adapter->SetGroundSurfaceSampler([](const FVector&,float& Z,FVector& N){Z=100000;N=FVector::UpVector;return true;});
+    int32 Commits=0,SphereCalls=0;
+    TestTrue(TEXT("full source initializes"),Adapter->SetHullGeometryProvider([](const auto&,FRaftSimHullGeometry& H){H=Plate();return true;},[&]{++Commits;}));
+    Adapter->SetHullGroundQuery(FloorQuery);
+    Adapter->SetGroundSphereSweep([&](const FVector&,const FVector&,double,FHitResult&){++SphereCalls;return false;});
+    FRaftSimRaftKinematicState State;State.WorldTransform.SetTranslation(FVector(0,0,40));State.LinearVelocityMetersPerSecond=FVector(0,0,-3);
+    Adapter->SetKinematicState(State);
+    TestTrue(TEXT("full-hull adapter step succeeds"),Adapter->StepRaftDynamics(1.f/120.f));
+    TestTrue(TEXT("adapter actually ran full-hull response"),Adapter->GetLastHullContact().bCompleted && Adapter->GetLastHullContact().Queries>0);
+    TestEqual(TEXT("sphere fallback never invoked"),SphereCalls,0);
+    TestTrue(TEXT("legacy roof-height projection disabled"),Adapter->GetKinematicState().WorldTransform.GetTranslation().Z<40.);
+    TestEqual(TEXT("successful step publishes exact hull"),Commits,2);
+    const auto Published=Adapter->GetKinematicState();const uint64 Revision=Adapter->GetHullGeometryRevision();
+    Adapter->SetHullGroundQuery([](TConstArrayView<FVector>,TConstArrayView<FVector>,TConstArrayView<FIntVector>,double,double){return RaftSimSurfaceSweep::FResult();});
+    AddExpectedError(TEXT("Full-hull ground review rejected"),EAutomationExpectedErrorFlags::Contains,1);
+    TestFalse(TEXT("refused surface query fails adapter step"),Adapter->StepRaftDynamics(1.f/120.f));
+    TestTrue(TEXT("refused step preserves published pose"),Adapter->GetKinematicState().WorldTransform.Equals(Published.WorldTransform,0.));
+    TestEqual(TEXT("refused step preserves hull revision"),Adapter->GetHullGeometryRevision(),Revision);
+    TestEqual(TEXT("refused step does not invoke commit"),Commits,2);
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimRaftFailureClockTest,"RaftSim.Clock.RaftFailureLatch",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimRaftFailureClockTest::RunTest(const FString&)
+{
+    auto* Instance=NewObject<UGameInstance>();auto* Bridge=NewObject<URaftSimPhysicsBridgeSubsystem>(Instance);
+    FSubsystemCollection<UGameInstanceSubsystem> Collection;Bridge->Initialize(Collection);
+    FRaftSimWaterRuntimeConfig Config;Config.bRequireAcceptedReportManifest=false;Config.AcceptedReportSetManifestPath.Reset();Config.bEnableDeterministicCapture=false;
+    const float Dt=1.f/60.f;Bridge->ConfigureBridge(Config,FRaftSimRaftBodyConfig(),FRaftSimWaterRaftCouplingPolicy(),Dt,Dt*.5f);
+    auto* Raft=Bridge->GetRaftRuntime();auto* Water=Bridge->GetWaterRuntime();
+    Raft->ConfigureFlexibleRaftModel(FRaftSimFlexParameters(),{});
+    if(!Water->ConfigureDevTankWindow(FVector2D::ZeroVector,4,4,.5,0,1)){Bridge->Deinitialize();return false;}
+    int32 Prepares=0;
+    Raft->SetHullGeometryProvider([&](const auto&,FRaftSimHullGeometry&){++Prepares;return false;},[]{});
+    AddExpectedError(TEXT("Shared hull geometry rejected"),EAutomationExpectedErrorFlags::Contains,1);
+    AddExpectedError(TEXT("Raft fixed substep refused"),EAutomationExpectedErrorFlags::Contains,1);
+    FRaftSimPhysicsTickInput Input;Input.FrameDeltaSeconds=Dt;
+    const auto First=Bridge->TickBridge(Input);const double WaterAfter=Water->GetCommittedStepSeconds();const int32 CallsAfter=Prepares;
+    TestTrue(TEXT("raft failure exposed"),First.bFixedTickFailed);
+    TestEqual(TEXT("no failed coupled tick committed"),First.CommittedPhysicsFrame,0);
+    TestEqual(TEXT("first failed tick retains time debt"),First.SimulationBacklogSeconds,double(Dt));
+    TestEqual(TEXT("partial water advance explicitly observable"),WaterAfter,double(Dt));
+    const auto Second=Bridge->TickBridge(Input);
+    TestTrue(TEXT("failure latches across rendered frames"),Second.bFixedTickFailed);
+    TestEqual(TEXT("failed request not replayed"),Prepares,CallsAfter);
+    TestEqual(TEXT("water not double advanced by retry"),Water->GetCommittedStepSeconds(),WaterAfter);
+    TestEqual(TEXT("new elapsed time also retained"),Second.SimulationBacklogSeconds,2.*double(Dt));
+    Bridge->ConfigureBridge(Config,FRaftSimRaftBodyConfig(),FRaftSimWaterRaftCouplingPolicy(),Dt,Dt*.5f);
+    Water->ConfigureDevTankWindow(FVector2D::ZeroVector,4,4,.5,0,1);
+    // Reconfiguring the body drops its hull source, and production full-hull
+    // contact refuses a raft without one. Bind a valid source, as the raft
+    // actor does after every configure, so only the latch is under test.
+    TestTrue(TEXT("valid hull source binds after reconfigure"),
+        Raft->SetHullGeometryProvider([](const auto&,FRaftSimHullGeometry& H){H=Plate();return true;},[]{}));
+    TestFalse(TEXT("explicit reconfigure clears failure latch"),Bridge->TickBridge(Input).bFixedTickFailed);
+    Bridge->Deinitialize();return true;
+}
+#endif

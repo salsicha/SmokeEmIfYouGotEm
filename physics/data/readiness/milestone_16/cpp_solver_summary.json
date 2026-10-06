@@ -1,9 +1,3 @@
-{
-  "failed_count": 0,
-  "passed": true,
-  "passed_count": 40,
-  "run_count": 40,
-  "scenario_count": 20,
-  "source_report": "reports/milestone16/cpp_solver_runs.json",
-  "summary_version": "raftsim.milestone16.readiness_summary.v0"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:ed1a332fb377e1c36551eb08ebf1286f1ee09a45439e56f57e55614bb58cc488
+size 242

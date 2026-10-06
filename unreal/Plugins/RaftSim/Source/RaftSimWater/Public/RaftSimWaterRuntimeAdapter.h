@@ -166,6 +166,14 @@ struct FRaftSimWaterSample
     bool bWet = false;
 };
 
+/** Deterministic sub-grid rapid displacement shared by rendering and raft support. */
+struct FRaftSimWaterStandingWave
+{
+    float DisplacementMeters = 0.0f;
+    float StationSlope = 0.0f;
+    float LateralSlope = 0.0f;
+};
+
 UCLASS(BlueprintType)
 class RAFTSIMWATER_API URaftSimWaterRuntimeAdapter : public UObject
 {
@@ -200,19 +208,29 @@ public:
     bool ConfigureRiverWindow(
         const FString& CookedFieldsManifestDir, const FString& BandId,
         FVector2D WindowCenterM, FVector2D WindowExtentM,
-        float RoughnessManning = 0.041f);
+        float RoughnessManning = 0.041f,
+        bool bRecenterHydraulicCrux = true);
 
     /**
      * Load a globally stationed river crop and, when a live crop already
      * exists, transfer every overlapping water cell and preserve solver time.
-     * A non-overlapping replacement is rejected so gameplay cannot silently
-     * reset the river during a descent.
+     * A non-overlapping replacement (the raft teleported or restored far
+     * away) reboots the window cold at the new station with a logged
+     * warning; during a continuous descent windows always overlap, so
+     * ordinary gameplay never resets silently.
      */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool ConfigureMovingRiverWindow(
         const FString& CookedFieldsManifestDir, const FString& BandId,
         FVector2D WindowCenterM, FVector2D WindowExtentM,
         float RoughnessManning = 0.041f);
+
+    /** Checkpoint preparation is transactional: reject a dry/unavailable
+     * destination before replacing the active window or handoff statistics. */
+    bool ConfigureMovingRiverWindowValidated(
+        const FString& CookedFieldsManifestDir, const FString& BandId,
+        FVector2D WindowCenterM, FVector2D WindowExtentM, float RoughnessManning,
+        TOptional<FVector2D> RequiredWetPositionM);
 
     /**
      * Bind a dense station/lateral -> curved-world coordinate map. Once bound,
@@ -225,7 +243,19 @@ public:
     bool ConfigureRiverCoordinateMap(const FString& CoordinateMapPath);
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
-    bool HasRiverCoordinateMap() const { return RiverCoordinatePoints.Num() >= 2; }
+    bool HasRiverCoordinateMap() const { return bCartesianWaterCoordinates || RiverCoordinatePoints.Num() >= 2; }
+
+    bool HasCartesianWaterCoordinates() const { return bCartesianWaterCoordinates; }
+    /** Read-only live hydraulic bounds; the shared render baseline does not expand them. */
+    bool GetLiveWaterFieldBoundsM(FBox2D& OutBounds) const;
+    bool GetCartesianWaterBoundsM(FBox2D& OutBounds) const
+    {
+        if (!bCartesianWaterCoordinates) return false;
+        OutBounds = CartesianWaterBoundsM;
+        return true;
+    }
+
+    double GetRiverWorldYSign() const { return HasRiverCoordinateMap() ? RiverWorldYSign : 1.0; }
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool WorldToRiverCoordinates(
@@ -239,6 +269,10 @@ public:
     /** Inclusive station domain authored by the bound coordinate map. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool GetRiverStationRangeM(float& OutMinimumStationM, float& OutMaximumStationM) const;
+
+    /** Exact native authored endpoints. Float rounding can move a boundary
+     * outside ResolveRiverBasis's strict domain; never extrapolate to fix it. */
+    bool GetExactRiverStationRangeM(double& OutMinimumStationM, double& OutMaximumStationM) const;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
     float GetRiverVerticalDatumM() const { return RiverVerticalDatumM; }
@@ -270,11 +304,319 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
     float GetSimTimeSeconds() const { return static_cast<float>(SimTimeSeconds); }
 
+    /** Unrounded sum of successfully committed water requests, continuous across spatial handoffs.
+     *  Distinct from the native field's local clock, which restarts on a cold spatial boot. */
+    double GetCommittedStepSeconds() const { return SimTimeSeconds; }
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool StepWater(float DeltaSeconds);
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool SampleWaterAtWorldPosition(const FVector& WorldPosition, FRaftSimWaterSample& OutSample) const;
+
+    /**
+     * Configure the solver-derived surface terms used by the visible live
+     * river, then sampled by raft support. D3/overwash keeps its existing
+     * water field and does not receive these amplified support terms.
+     */
+    void ConfigureRaftSupportSurface(
+        bool bEnabled,
+        float SurfaceSmoothingStrength,
+        float StandingWaveScale,
+        float HydraulicReliefScale);
+
+    // Game-thread support only: false means unavailable (use the existing
+    // analytic path), true supplies current carrier height or clipped-dry.
+    // Raw solver wetness, depth, velocity and D3/overwash remain independent.
+    using FCarrierSupportSampler = TFunction<bool(const FVector&, float&, bool&)>;
+    void SetRaftSupportCarrierSampler(UObject* Owner, FCarrierSupportSampler Sampler);
+    void ClearRaftSupportCarrierSampler(const UObject* Owner);
+
+    /** Mirror the raft-local GPU heightfield into ridden support. The shader
+     * still owns sub-grid rendering, but this analytic twin prevents the raft
+     * from passing through a visible crest. */
+    void ConfigureRaftSupportLocalFluid(
+        bool bEnabled,
+        float Strength,
+        FVector2D AdvectedDistanceMeters)
+    {
+        bRaftSupportLocalFluidEnabled = bEnabled;
+        RaftSupportLocalFluidStrength = FMath::Clamp(Strength, 0.0f, 1.0f);
+        RaftSupportLocalFluidAdvectionMeters = AdvectedDistanceMeters;
+    }
+
+    /** One breaking-water site mirrored from the presentation surface. */
+    struct FSupportBreakingSite
+    {
+        FVector2D RiverCoordinatesMeters = FVector2D::ZeroVector;
+        float Intensity = 0.0f;
+        /** Negative selects the legacy fixed-lift profile. Otherwise this is
+         * the already faded unresolved crest height, independent of foam. */
+        float PhysicalCrestHeightMeters = -1.0f;
+        float PhysicalCrestLengthMeters = 3.0f;
+        float SpillingFraction = 1.0f;
+        /** Spatial evaluation: distant owners must not change this point's
+         * overlap cap. False retains the legacy global-owner cap. */
+        bool bLocalEnvelopeCap = false;
+        /** Unit downstream vector in hydraulic XY; legacy station grids use +X. */
+        FVector2D FlowDirection = FVector2D(1.,0.);
+    };
+
+    /** Cooked obstruction footprint shared by the visible solver carrier and
+     * rigid raft support. Coordinates use the active hydraulic frame:
+     * (station, river-left) or Cartesian (east, north), in metres. */
+    struct FSupportBoulderFootprint
+    {
+        FVector2D RiverCoordinatesMeters = FVector2D::ZeroVector;
+        float RadiusMeters = 0.75f;
+        /** Stable owner direction sampled once around the obstruction. Zero
+         * retains the legacy local-current frame for independent fixtures. */
+        FVector2D FlowDirection = FVector2D::ZeroVector;
+        /** Existing physical component receipt; empty for legacy fixtures.
+         * Wake radius remains an authored/inferred scale, not a new collider. */
+        FString PhysicalSource;
+    };
+
+    void ConfigureRaftSupportBoulderFootprints(
+        TConstArrayView<FSupportBoulderFootprint> Footprints);
+    /** Reduced-order feature currents, shared by surface transport and hull
+     * interaction. Raw solver samples and cooked evidence remain unchanged. */
+    void ConfigureFeatureKinematics(bool bEnabled) { bFeatureKinematicsEnabled = bEnabled; }
+    bool HasFeatureKinematics() const { return bFeatureKinematicsEnabled; }
+    void ConfigureFeatureBoulderFootprints(TConstArrayView<FSupportBoulderFootprint> Footprints)
+    {
+        FeatureBoulderFootprints.Reset(Footprints.Num());
+        FeatureBoulderFootprints.Append(Footprints.GetData(),Footprints.Num());
+    }
+    FVector ComputeFeatureVelocityAtRiverCoordinates(const FVector2D& P,
+        const FVector2D& BaseVelocity, float DepthM, float DepthFraction = 1.0f) const;
+    TConstArrayView<FSupportBoulderFootprint> GetFeatureBoulderFootprints() const
+    { return FeatureBoulderFootprints; }
+    /** Read-only diagnostic view of the same rendered breaking-site owners
+     * used by hull circulation. No synthetic sites or raw-field mutation. */
+    TConstArrayView<FSupportBreakingSite> GetFeatureBreakingSites() const
+    { return RaftSupportBreakingSites; }
+    using FFeatureSurfaceTransportSampler=TFunction<bool(const FVector2D&,FVector2D&,float&)>;
+    void SetFeatureSurfaceTransportSampler(UObject* Owner,FFeatureSurfaceTransportSampler Sampler)
+    {FeatureSurfaceTransportOwner=Owner;FeatureSurfaceTransportSampler=MoveTemp(Sampler);}
+    FVector SampleFeatureSurfaceVelocity(const FVector2D& P,const FVector2D& Base,float DepthM) const;
+    bool SampleRaftInteractionWaterAtWorldPosition(const FVector& P, FRaftSimWaterSample& Out);
+    int32 GetRaftSupportBoulderFootprintCount() const
+    {
+        return RaftSupportBoulderFootprints.Num();
+    }
+
+    /** Signed rolling Y-wake displacement (X) and crest foam (Y). */
+    static FVector2D ComputeCoupledBoulderWakePresentation(
+        float DownstreamMeters,
+        float AcrossMeters,
+        float BoulderRadiusMeters,
+        float WaterSpeedMetersPerSecond,
+        float PhaseSeconds);
+
+    /** Positive upstream pressure pillow around a boulder nose. */
+    static float ComputeCoupledBoulderPillowDisplacementMeters(
+        float DownstreamMeters,
+        float AcrossMeters,
+        float BoulderRadiusMeters,
+        float WaterSpeedMetersPerSecond);
+
+    /** Strongest configured pillow/Y-wake term at one hydraulic coordinate.
+     * FlowDirection is unit downstream in that frame, not world XY. */
+    float ComputeConfiguredBoulderSupportDisplacementMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        float WaterSpeedMetersPerSecond,
+        float PhaseSeconds,
+        const FVector2D& FlowDirection = FVector2D(1., 0.)) const;
+
+    /**
+     * Station-indexed mirror of the authored band-water bake: absolute baked
+     * surface elevation and hydraulic band energy per (station row, lateral
+     * column). Lets rigid support carry the baked sculpt delta and the same
+     * halved energetic WPO term the legacy detail-overlay water renders, so
+     * the first rapid no longer draws above the ridden surface.
+     */
+    struct FSupportBandField
+    {
+        int32 Width = 0;
+        float LateralOriginM = 0.0f;
+        float LateralSpacingM = 1.0f;
+        TArray<float> RowStationsM;
+        TArray<float> ElevationAbsM;
+        TArray<float> Energy;
+        TArray<uint8> Wet;
+
+        bool IsValid() const
+        {
+            const int32 Cells = Width * RowStationsM.Num();
+            return Width > 1 && RowStationsM.Num() > 1 &&
+                ElevationAbsM.Num() == Cells && Energy.Num() == Cells &&
+                Wet.Num() == Cells;
+        }
+        void Reset()
+        {
+            *this = FSupportBandField();
+        }
+        /** Bilinear sample; false when out of range or any corner is dry. */
+        bool Sample(
+            float StationM,
+            float LateralM,
+            float& OutElevationAbsM,
+            float& OutEnergy) const;
+    };
+
+    /** Load the cooked support band field written by the editor export. */
+    bool LoadRaftSupportBandFieldFromFile(const FString& AbsolutePath);
+
+    /**
+     * Load the full-reach, terrain-clipped seed used only to continue the
+     * visible river beyond a smaller moving hydraulic crop. This field never
+     * participates in buoyancy, force, contact, or gameplay sampling.
+     */
+    bool LoadPresentationBaselineFieldFromFile(const FString& AbsolutePath);
+
+    /**
+     * Sample the render-only full-reach baseline in station/lateral space.
+     * Returns false outside its organic wet mask. Velocity and depth are
+     * conservative presentation values derived from its cooked energy field;
+     * the live solver remains authoritative wherever its crop is valid.
+     */
+    bool SamplePresentationBaselineFieldAtRiverCoordinates(
+        FVector2D StationLateralM, FRaftSimWaterSample& OutSample,bool bCacheAtlasStencil=false) const;
+
+    /**
+     * Optional render-only observed-whitewater field in station/lateral
+     * space, in the RSBF v1 layout; its energy channel holds the whitewater
+     * fraction (0-1) photographed at the cooked flow. Appearance evidence
+     * only: it never reaches buoyancy, forces, contact or gameplay.
+     */
+    bool LoadObservedWhitewaterFieldFromFile(const FString& AbsolutePath);
+    bool HasObservedWhitewaterField() const { return ObservedWhitewaterField.IsValid(); }
+    /** Observed whitewater fraction; 0 outside the field or its wet mask. */
+    float SampleObservedWhitewaterAtRiverCoordinates(FVector2D StationLateralM) const;
+    /** Gain of the observed fraction as a breaking (entrainment) source for
+     * the GPU moving detail; 0 (default) keeps the detail's own sources. */
+    void SetObservedWhitewaterEntrainmentGain(float Gain)
+    {
+        ObservedWhitewaterEntrainmentGain = FMath::Clamp(Gain, 0.0f, 1.0f);
+    }
+    /** Observed entrainment source in [0,1]; 0 without a field or gain. */
+    float SampleObservedWhitewaterEntrainmentSource(const FVector2D& RiverCoordinatesMeters) const
+    {
+        return ObservedWhitewaterEntrainmentGain > 0.0f
+            ? ObservedWhitewaterEntrainmentGain * SampleObservedWhitewaterAtRiverCoordinates(RiverCoordinatesMeters)
+            : 0.0f;
+    }
+
+    /**
+     * Flow-warped presentation wave clock pushed by the visible water surface
+     * each frame. The coupled swell and band phases consume it so they stay
+     * paired with the rendered WPO when waves accelerate in fast water.
+     * Negative means unset; world seconds are used as the fallback.
+     */
+    void SetPresentationWaveClockSeconds(float Seconds)
+    {
+        PresentationWaveClockSeconds = Seconds;
+    }
+
+    /**
+     * Mirror the visible carrier's accepted breaking sites into raft support
+     * so the ridden surface rises with the rendered crest, dip, and tailwater
+     * train instead of leaving them render-only ("the boat submerges as it
+     * approaches the rapid"). StationSpacingMeters is the presentation vertex
+     * spacing the crest/dip/tail profile is authored against.
+     */
+    void ConfigureRaftSupportBreakingSites(
+        TConstArrayView<FSupportBreakingSite> Sites,
+        float CrestLiftMeters,
+        float StationSpacingMeters);
+
+    // Same dimensionless crest source as the visible macro carrier. This is
+    // an empirical entrainment potential, not measured bubble production.
+    // No wet/depth assumption: the detail owner must apply its wet-cell mask.
+    float SampleAcceptedBreakingSource(const FVector2D& RiverCoordinatesMeters) const;
+
+    /** Sample the same live crest/hole surface used by the visible carrier. */
+    bool SampleRaftSupportSurfaceAtWorldPosition(
+        const FVector& WorldPosition,
+        FRaftSimWaterSample& OutSample) const;
+    bool IsRaftSupportSurfaceEnabled() const
+    {
+        return bRaftSupportSurfaceEnabled;
+    }
+    float GetRaftSupportSurfaceSmoothingStrength() const
+    {
+        return RaftSupportSurfaceSmoothingStrength;
+    }
+    float GetRaftSupportStandingWaveScale() const
+    {
+        return RaftSupportStandingWaveScale;
+    }
+    float GetRaftSupportHydraulicReliefScale() const
+    {
+        return RaftSupportHydraulicReliefScale;
+    }
+
+    static FRaftSimWaterStandingWave ComputeCoupledStandingWave(
+        const FVector2D& RiverCoordinatesMeters,
+        float SpeedMetersPerSecond,
+        float DepthMeters);
+
+    static float ComputeCoupledLocalFluidHeightfieldMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        const FVector2D& AdvectedDistanceMeters,
+        float SpeedMetersPerSecond,
+        float DepthMeters,
+        float WaveClockSeconds,
+        float Strength,
+        float HydraulicFeatureEnergy = 0.0f);
+
+    /** Converts bounded solver-resolved surface relief into irregular rapid
+     * lobes. Shared by the visible carrier and raft support so a hydraulic
+     * ledge can energize local crests without turning calm reaches into chop. */
+    static float ComputeCoupledHydraulicFeatureEnergy(
+        const FVector2D& RiverCoordinatesMeters,
+        float HydraulicReliefMeters);
+
+    /** Standing crest/hole relief driven by a sustained downstream surface
+     * fall over the shared 12 m analysis span. Unlike curvature relief this
+     * remains active through the face of a smoothed rapid ramp. */
+    static float ComputeCoupledRapidGradeWaveMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        float UpstreamFarSurfaceHeightMeters,
+        float DownstreamFarSurfaceHeightMeters,
+        float SpeedMetersPerSecond);
+
+    static float ComputeCoupledHydraulicReliefMeters(
+        float CenterSurfaceHeightMeters,
+        float UpstreamFarSurfaceHeightMeters,
+        float UpstreamNearSurfaceHeightMeters,
+        float DownstreamNearSurfaceHeightMeters,
+        float DownstreamFarSurfaceHeightMeters,
+        float SpeedMetersPerSecond,
+        float DepthMeters);
+
+    static float ComputeCoupledSmoothedSurfaceHeightMeters(
+        float CenterSurfaceHeightMeters,
+        float UpstreamSurfaceHeightMeters,
+        float DownstreamSurfaceHeightMeters,
+        float RiverRightSurfaceHeightMeters,
+        float RiverLeftSurfaceHeightMeters,
+        float Strength);
+
+    /** Local undular/jump scale minus the rise already resolved by the solver.
+     * X is additional crest height, Y is the authored depth-scaled face length.
+     * This is a bounded subgrid reconstruction, not an additional fluid solver. */
+    static FVector2D ComputeHydraulicCrestDimensionsMeters(
+        float UpstreamDepthMeters, float UpstreamFroude, float ResolvedRiseMeters);
+
+    static float ComputeCoupledBreakingReliefMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        TConstArrayView<FSupportBreakingSite> Sites,
+        float CrestLiftMeters,
+        float StationSpacingMeters,
+        float* OutCrestFoam = nullptr,
+        float GlobalOwnerCapMeters = 0.0f);
 
     /**
      * Sample the live solver directly in station/lateral coordinates. This is
@@ -294,6 +636,9 @@ public:
      */
     bool SampleWaterFieldAtRiverCoordinates(
         FVector2D StationLateralM, FRaftSimWaterSample& OutSample) const;
+
+    /** Actual native field clock, not elapsed presentation time or requested step sum. */
+    bool GetLiveFieldTimeSeconds(double& OutSeconds) const;
 
     /** Resolve repository-relative source data in editor and staged NonUFS data in builds. */
     static FString ResolveRuntimeDataPath(const FString& Path);
@@ -339,9 +684,51 @@ private:
         FVector& OutWorldLeftNormal) const;
 
     TArray<FRiverCoordinatePoint> RiverCoordinatePoints;
+    bool bCartesianWaterCoordinates = false;
+    FBox2D CartesianWaterBoundsM;
     TMap<FIntPoint, TArray<int32>> RiverSpatialHash;
+    /**
+     * Consecutive raft probes are only a few metres apart. Preserve the exact
+     * ruled-corridor inverse, but seed it from the previous segment instead of
+     * rebuilding a several-hundred-segment broad phase for every tube probe.
+     * Mutable is safe here because all runtime water sampling is game-thread
+     * authority; distant queries automatically fall back to the spatial hash.
+     */
+    mutable int32 LastWorldToRiverSegment = INDEX_NONE;
+    mutable FVector2D LastWorldToRiverPositionM = FVector2D::ZeroVector;
+    mutable bool bHasLastWorldToRiverQuery = false;
     float RiverVerticalDatumM = 0.0f;
+    // Coordinate-map source remains metric ENU. Captured geographic scenes
+    // use -1 to map north to Unreal -Y without reversing source river-left.
+    // Legacy maps omit this and retain their existing +Y convention.
+    double RiverWorldYSign = 1.0;
     FString RiverCoordinateMapPath;
 
+    bool bRaftSupportSurfaceEnabled = false;
+    TWeakObjectPtr<UObject> RaftSupportCarrierOwner;
+    FCarrierSupportSampler RaftSupportCarrierSampler;
+    float RaftSupportSurfaceSmoothingStrength = 0.0f;
+    float RaftSupportStandingWaveScale = 0.0f;
+    float RaftSupportHydraulicReliefScale = 0.0f;
+    bool bRaftSupportLocalFluidEnabled = false;
+    float RaftSupportLocalFluidStrength = 0.0f;
+    FVector2D RaftSupportLocalFluidAdvectionMeters = FVector2D::ZeroVector;
+    TArray<FSupportBreakingSite> RaftSupportBreakingSites;
+    TArray<FSupportBoulderFootprint> RaftSupportBoulderFootprints;
+    bool bFeatureKinematicsEnabled = false;
+    TWeakObjectPtr<UObject> FeatureSurfaceTransportOwner;
+    FFeatureSurfaceTransportSampler FeatureSurfaceTransportSampler;
+    TArray<FSupportBoulderFootprint> FeatureBoulderFootprints;
+    float RaftSupportBreakingCrestLiftMeters = 0.0f;
+    float RaftSupportBreakingStationSpacingMeters = 1.0f;
+    FSupportBandField RaftSupportBandField;
+    FSupportBandField PresentationBaselineField;
+    FSupportBandField ObservedWhitewaterField;
+    float ObservedWhitewaterEntrainmentGain = 0.0f;
+    float PresentationWaveClockSeconds = -1.0f;
+
+#if RAFTSIM_HAS_LIVE_SOLVER
     TUniquePtr<FRaftSimLiveWaterWindow> LiveWindow;
+    FVector2D LastFixedWindowExtentM = FVector2D::ZeroVector;
+#endif
 };

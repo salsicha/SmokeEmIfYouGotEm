@@ -5,7 +5,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from ..profiling import profile_probe_export_runs, profile_raft_coupling_runs
+from ..profiling import (profile_probe_export_runs)
+from ..raft_coupling_profiling import (profile_raft_coupling_runs)
 from ..pyclaw_reference import PyClawRunConfig, canonical_pyclaw_scenarios
 from ..scenario2_5d import (
     FixtureScenario2_5DParameters,

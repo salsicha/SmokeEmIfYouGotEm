@@ -1,4 +1,17 @@
 #include "RaftSimPhysicsBridgeSubsystem.h"
+#include "RaftSimGroundSourceRegistry.h"
+#include "RaftSimGroundContactAudit.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "Misc/Paths.h"
+
+#include "EngineUtils.h"
+#include "LandscapeProxy.h"
+#include "Components/StaticMeshComponent.h"
+#include "CollisionQueryParams.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+
+CSV_DEFINE_CATEGORY(RaftSimClock,true);
 
 void URaftSimPhysicsBridgeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -9,6 +22,8 @@ void URaftSimPhysicsBridgeSubsystem::Initialize(FSubsystemCollectionBase& Collec
 
 void URaftSimPhysicsBridgeSubsystem::Deinitialize()
 {
+    // Release the contact registry's world delegates before subsystem teardown.
+    if (RaftRuntime) { RaftRuntime->SetHullGroundArcQuery({}); RaftRuntime->SetHullGroundQuery({}); RaftRuntime->SetGroundSphereSweep({}); RaftRuntime->SetGroundContactObserver({}); RaftRuntime->SetGroundSurfaceSampler({}); }
     WaterRuntime = nullptr;
     RaftRuntime = nullptr;
     Super::Deinitialize();
@@ -29,7 +44,8 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
     AuthorityIntegrationPolicy.WaterAuthority = TEXT("custom_cxx_shallow_water_solver");
     AuthorityIntegrationPolicy.bChaosMayDriveScoringCriticalPhysics = false;
     AuthorityIntegrationPolicy.bRenderTickMayAdvanceAuthority = false;
-    AccumulatedSeconds = 0.0f;
+    FixedClock.Reset();
+    bRaftStepFailureLatched=false;
     PhysicsFrame = 0;
     LastOutput = FRaftSimPhysicsTickOutput();
 
@@ -57,7 +73,7 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
                     if (Water->HasLiveWindow())
                     {
                         FRaftSimWaterSample Sample;
-                        if (Water->SampleWaterAtWorldPosition(WorldPositionCm, Sample)
+                        if (Water->SampleRaftSupportSurfaceAtWorldPosition(WorldPositionCm, Sample)
                             && Sample.bWet)
                         {
                             OutWaterSurfaceZCm = Sample.SurfaceHeightMeters * 100.0f;
@@ -69,19 +85,128 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
                 OutWaterSurfaceZCm = 0.0f;
                 return true;
             });
+
+        // The custom raft state is kinematic to Unreal, so QueryOnly hull
+        // collision cannot resolve Landscape contact. Supply authoritative
+        // height-field data to the selected reduced runtime instead. Physical
+        // source Landscapes take precedence; maps without one use solver bed.
+        const auto GroundSources=MakeShared<FRaftSimGroundSourceRegistry>(GetWorld());
+        RaftRuntime->SetGroundContactObserver({});
+        RaftRuntime->SetGroundSphereSweep({});
+        RaftRuntime->SetHullGroundQuery({});
+        RaftRuntime->SetHullGroundArcQuery({});
+        RaftRuntime->SetHullGroundQuery([GroundSources](auto A,auto B,auto Faces,double Skin,double Clearance)
+            {return GroundSources->SweepCapturedSurface(A,B,Faces,Skin,Clearance);});
+        RaftRuntime->SetHullGroundArcQuery([GroundSources](auto A,auto B,auto Faces,double Skin,double Clearance,const FRaftSimHullArcPath& Arc)
+            {return GroundSources->SweepCapturedSurface(A,B,Faces,Skin,Clearance,true,&Arc);});
+        UE_LOG(LogTemp,Display,TEXT("Production full-hull contact: original indexed raft against captured triangles and Complex landscape; physical capsize, no pose transition"));
+#if !UE_BUILD_SHIPPING
+        if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimFullHullGroundReview")))
+        {
+            RaftRuntime->SetHullGroundQuery([GroundSources](TConstArrayView<FVector> A,TConstArrayView<FVector> B,
+                TConstArrayView<FIntVector> Faces,double Skin,double Clearance)
+            {return GroundSources->SweepCapturedSurface(A,B,Faces,Skin,Clearance);});
+            UE_LOG(LogTemp,Display,TEXT("Full-hull ground review enabled: every authored face, bounded rotating/deforming sweeps; no six-sphere or height-projection fallback"));
+        }
+        if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimContinuousGroundReview")))
+        {
+            RaftRuntime->SetGroundSphereSweep([GroundSources](const FVector& A,const FVector& B,double Radius,FHitResult& Hit)
+            { return GroundSources->SweepCapturedSphere(A,B,Radius,Hit); });
+            UE_LOG(LogTemp,Display,TEXT("Continuous ground review enabled: six swept tube supports; source mesh unchanged; rotation chord limit 0.005 rad"));
+        }
+        FString ContactAuditPath;
+        if(FParse::Value(FCommandLine::Get(),TEXT("RaftSimGroundContactAudit="),ContactAuditPath))
+        {
+            if(FPaths::FileExists(ContactAuditPath))
+            { UE_LOG(LogTemp,Error,TEXT("Refusing to overwrite existing ground contact evidence: %s"),*ContactAuditPath); }
+            else
+            {
+                const auto Audit=MakeShared<FRaftSimGroundContactAudit>(GetWorld(),GroundSources,ContactAuditPath);
+                RaftRuntime->SetGroundContactObserver([Audit](const FRaftSimGroundContactObservation& O){Audit->Record(O);});
+            }
+        }
+#endif
+        RaftRuntime->SetGroundSurfaceSampler(
+            [WeakWater, GroundSources](
+                const FVector& WorldPositionCm,
+                float& OutGroundZCm,
+                FVector& OutGroundNormal) -> bool
+            {
+                double PhysicalGroundZCm=0.;
+                if (GroundSources->SampleGround(WorldPositionCm,PhysicalGroundZCm,OutGroundNormal))
+                {
+                    OutGroundZCm=float(PhysicalGroundZCm);
+                    return true;
+                }
+
+                if (URaftSimWaterRuntimeAdapter* Water = WeakWater.Get();
+                    Water != nullptr && Water->HasLiveWindow())
+                {
+                    FRaftSimWaterSample Sample;
+                    if (Water->SampleWaterAtWorldPosition(
+                            WorldPositionCm, Sample))
+                    {
+                        OutGroundZCm = Sample.BedHeightMeters * 100.0f;
+                        OutGroundNormal = FVector::UpVector;
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+        // D3 needs velocity as well as surface elevation, and a single raft-
+        // center sample cannot represent a lateral, crest, or seam crossing.
+        // Bind the same authoritative water adapter as a per-segment field;
+        // the raft adapter chooses the deformed tube sample positions.
+        RaftRuntime->SetFlexibleWaterFieldSampler(
+            [WeakWater](
+                const FVector& WorldPositionCm,
+                FRaftSimFlexUniformWater& OutWater) -> bool
+            {
+                OutWater = FRaftSimFlexUniformWater{};
+                OutWater.bWet = false;
+                URaftSimWaterRuntimeAdapter* Water = WeakWater.Get();
+                if (Water == nullptr || !Water->HasLiveWindow())
+                {
+                    return false;
+                }
+                FRaftSimWaterSample Sample;
+                if (!Water->SampleRaftInteractionWaterAtWorldPosition(WorldPositionCm, Sample))
+                {
+                    return false;
+                }
+                OutWater.SurfaceHeightM = Sample.SurfaceHeightMeters;
+                OutWater.VelocityMps = Sample.VelocityMetersPerSecond;
+                OutWater.bWet = Sample.bWet;
+                return true;
+            });
     }
 }
 
 FRaftSimPhysicsTickOutput URaftSimPhysicsBridgeSubsystem::TickBridge(const FRaftSimPhysicsTickInput& Input)
 {
-    AccumulatedSeconds += FMath::Max(Input.FrameDeltaSeconds, 0.0f);
-
-    while (AccumulatedSeconds + KINDA_SMALL_NUMBER >= WaterStepSeconds)
+    CSV_SCOPED_TIMING_STAT(RaftSimClock,TickBridge);
+    // Bound work per rendered frame, not physical elapsed time. Every accepted
+    // tick advances water AND raft; a slow frame retains its unprocessed debt.
+    // Capacity/lag are measured, never hidden by dropping ticks or enlarging dt.
+    int32 Completed=0;
+    LastOutput.bFixedTickFailed=!FixedClock.Advance(double(Input.FrameDeltaSeconds),double(WaterStepSeconds),
+        FMath::Clamp(Input.MaximumFixedTicks,1,4),
+        [this]{return RunOneFixedWaterTick();},Completed);
+    LastOutput.FixedTicksThisFrame=Completed;
+    LastOutput.SimulationBacklogSeconds=FixedClock.BacklogSeconds;
+    CSV_CUSTOM_STAT(RaftSimClock,RequestedSeconds,FixedClock.RequestedSeconds,ECsvCustomStatOp::Set);
+    CSV_CUSTOM_STAT(RaftSimClock,CommittedSeconds,FixedClock.CommittedSeconds,ECsvCustomStatOp::Set);
+    CSV_CUSTOM_STAT(RaftSimClock,BacklogSeconds,FixedClock.BacklogSeconds,ECsvCustomStatOp::Set);
+    CSV_CUSTOM_STAT(RaftSimClock,FixedTicks,Completed,ECsvCustomStatOp::Set);
+    CSV_CUSTOM_STAT(RaftSimClock,Failed,int32(LastOutput.bFixedTickFailed),ECsvCustomStatOp::Set);
+    if(WaterRuntime)
     {
-        RunOneFixedWaterTick();
-        AccumulatedSeconds -= WaterStepSeconds;
+        double NativeSeconds=0;
+        if(WaterRuntime->GetLiveFieldTimeSeconds(NativeSeconds))
+            CSV_CUSTOM_STAT(RaftSimClock,NativeFieldSeconds,NativeSeconds,ECsvCustomStatOp::Set);
+        CSV_CUSTOM_STAT(RaftSimClock,WaterCommittedSeconds,WaterRuntime->GetCommittedStepSeconds(),ECsvCustomStatOp::Set);
     }
-
     return LastOutput;
 }
 
@@ -93,23 +218,31 @@ void URaftSimPhysicsBridgeSubsystem::RecordContactTelemetryEvent(
     RefreshContactRuntimeSummary();
 }
 
-void URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
+bool URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimClock,FixedWaterRaftTick);
+    if(bRaftStepFailureLatched)return false;
     if (!WaterRuntime || !RaftRuntime)
     {
-        return;
+        return false;
     }
 
     if (!WaterRuntime->StepWater(WaterStepSeconds))
     {
-        return;
+        return false;
     }
 
     const int32 Substeps = FMath::Max(1, FMath::CeilToInt(WaterStepSeconds / ChronoSubstepSeconds));
     const float ActualSubstep = WaterStepSeconds / static_cast<float>(Substeps);
     for (int32 SubstepIndex = 0; SubstepIndex < Substeps; ++SubstepIndex)
     {
-        RaftRuntime->StepRaftDynamics(ActualSubstep);
+        if(!RaftRuntime->StepRaftDynamics(ActualSubstep))
+        {
+            bRaftStepFailureLatched=true;
+            LastOutput.RaftState=RaftRuntime->GetKinematicState();
+            UE_LOG(LogTemp,Error,TEXT("Raft fixed substep refused: substep=%d/%d; partial water tick latched, no clock commit or retry until reconfigure"),SubstepIndex+1,Substeps);
+            return false;
+        }
     }
 
     ++PhysicsFrame;
@@ -118,6 +251,7 @@ void URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
     LastOutput.RaftState = RaftRuntime->GetKinematicState();
     LastOutput.WaterSamplesApplied = 0;
     RefreshContactRuntimeSummary();
+    return true;
 }
 
 void URaftSimPhysicsBridgeSubsystem::RefreshContactRuntimeSummary()

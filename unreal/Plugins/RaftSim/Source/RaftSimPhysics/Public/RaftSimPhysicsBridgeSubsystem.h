@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimContactMaterials.h"
+#include "RaftSimFixedStepClock.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 
@@ -46,6 +47,11 @@ struct FRaftSimPhysicsTickInput
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Physics")
     int32 DeterministicFrame = 0;
+
+    // Upper bound on fixed water/raft ticks this frame, clamped to 1..4. A
+    // lower bound defers whole ticks to later frames; debt is never dropped.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Physics")
+    int32 MaximumFixedTicks = 4;
 };
 
 USTRUCT(BlueprintType)
@@ -58,6 +64,15 @@ struct FRaftSimPhysicsTickOutput
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
     float SimTimeSeconds = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
+    double SimulationBacklogSeconds = 0.0;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
+    int32 FixedTicksThisFrame = 0;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
+    bool bFixedTickFailed = false;
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
     FRaftSimRaftKinematicState RaftState;
@@ -98,6 +113,7 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Physics")
     const FRaftSimPhysicsTickOutput& GetLastOutput() const { return LastOutput; }
+    float GetWaterStepSeconds() const { return WaterStepSeconds; }
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Physics")
     const FRaftSimRaftAuthorityIntegrationPolicy& GetAuthorityIntegrationPolicy() const
@@ -107,6 +123,12 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Physics")
     void RecordContactTelemetryEvent(const FRaftSimRaftContactTelemetryEvent& Event);
+
+    bool IsRaftStepFailureLatched() const { return bRaftStepFailureLatched; }
+    /** A checkpoint restore replaces the whole raft state, so the refused
+     *  partial tick is abandoned rather than replayed; stepping resumes from
+     *  the restored state. */
+    void ClearRaftStepFailureAfterRestore() { bRaftStepFailureLatched = false; }
 
 private:
     UPROPERTY()
@@ -132,9 +154,12 @@ private:
     float ChronoSubstepSeconds = 1.0f / 120.0f;
     FRaftSimWaterRaftCouplingPolicy CouplingPolicy;
     FRaftSimRaftAuthorityIntegrationPolicy AuthorityIntegrationPolicy;
-    float AccumulatedSeconds = 0.0f;
+    FRaftSimFixedStepClock FixedClock;
     int32 PhysicsFrame = 0;
+    // Water/earlier raft substeps may already have advanced at refusal. Never
+    // replay that partially advanced tick or claim rollback; require reconfigure.
+    bool bRaftStepFailureLatched = false;
 
-    void RunOneFixedWaterTick();
+    bool RunOneFixedWaterTick();
     void RefreshContactRuntimeSummary();
 };

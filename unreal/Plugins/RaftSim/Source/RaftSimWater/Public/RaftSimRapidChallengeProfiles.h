@@ -1,0 +1,144 @@
+#pragma once
+#include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterFeatureKinematics.h"
+
+// Authored gameplay reconstruction, NOT surveyed hydraulics or extra solver
+// forcing. Positions follow the committed observed_rapids catalogues. These
+// named features must share the existing render/foam/hull crest and roller
+// kernels: never a boat-only force or a class-dependent flip probability.
+// Sources: hance_observed_rapids.json (Emilio's / Giants / bottom hole) and
+// batoka_run_observed_rapids.json (Director's / Crease / Land of the Giants).
+namespace RaftSimRapidChallengeProfiles
+{
+struct FFeature
+{
+    double Station, Lateral, AngleDegrees;
+    float Height, Length, Spill;
+};
+// Conservative projection of the EXISTING compact relief footprint. This is
+// for observation coverage, not a new navigation gate or a boat-only force.
+inline bool OverlapsReach(const FFeature& F,double Start,double Finish)
+{
+    const double A=FMath::DegreesToRadians(F.AngleDegrees);
+    const double C=FMath::Cos(A),S=FMath::Sin(A),L=FMath::Clamp(F.Length,2.f,7.f);
+    const double X0=-3.*L*C,X1=7.*L*C,W=12.*FMath::Abs(S);
+    return F.Station+FMath::Max(X0,X1)+W>=Start && F.Station+FMath::Min(X0,X1)-W<=Finish;
+}
+inline bool InsideReliefFootprint(const FFeature& F,const FVector2D& P)
+{
+    const double A=FMath::DegreesToRadians(F.AngleDegrees),C=FMath::Cos(A),S=FMath::Sin(A);
+    const FVector2D R=P-FVector2D(F.Station,F.Lateral);
+    const double Along=R.X*C+R.Y*S,Across=-R.X*S+R.Y*C,L=FMath::Clamp(F.Length,2.f,7.f);
+    return FMath::Abs(Across)<=12. && Along>=-3.*L && Along<=7.*L;
+}
+inline bool HasProfile(const FString& Map)
+{
+    return RaftSimWaterFeatureKinematics::IsPlayableRiver(Map) &&
+        (Map.EndsWith(TEXT("L_Hance")) || Map.EndsWith(TEXT("L_Zambezi")) ||
+         Map.EndsWith(TEXT("L_UpperHuacas")) || Map.EndsWith(TEXT("L_Terminator")) ||
+         Map.EndsWith(TEXT("L_LavaCanyon")) || Map.EndsWith(TEXT("L_Colorado_BadgerCreek")) ||
+         Map.EndsWith(TEXT("L_Colorado_HouseRock")));
+}
+inline TArray<FFeature> BuildFeatures(const FString& Map)
+{
+    if(!HasProfile(Map))return {};
+    TArray<FFeature> Result;
+    if(Map.EndsWith(TEXT("L_Colorado_HouseRock")))
+    {
+        // GoRafting House Rock: debris fan pushes toward left-side bottom
+        // hydraulics; a shallow right passage remains, with a real risk of
+        // bank contact if overdone. USGS's registered 2021 drop is 730-1000 m.
+        // Dimensions are authored hypotheses, not surveyed individual holes.
+        // The negative diagonal normal produces a LEFTWARD near-surface
+        // return in the same kernel used by hulls, visible relief and foam.
+        Result={{842,6,-30,.8f,4.f,.75f},
+                {882,10,0,1.2f,3.f,1.f},{882,16,0,1.2f,3.f,1.f},
+                {910,10,0,1.1f,3.f,1.f},{910,16,0,1.1f,3.f,1.f}};
+        for(double Station:{948.,972.})
+            for(double Lateral:{-6.,0.,6.})
+                Result.Add({Station,Lateral,0.,.75f,4.f,.4f});
+    }
+    if(Map.EndsWith(TEXT("L_Colorado_BadgerCreek")))
+    {
+        // GoRafting's Badger entry describes an upper-right hydraulic and
+        // a tongue to its left followed by waves. USGS 2021 profile locates
+        // this drop at roughly 750-1000 m in the registered construction
+        // window. Footprints/amplitudes BELOW are authored hypotheses at
+        // 8000 cfs, not surveyed obstacle dimensions or class acceptance.
+        // Preserve the broad left tongue; do not manufacture a slalom.
+        Result={{790,-24,0,1.f,3.f,1.f},{790,-18,0,1.f,3.f,1.f}};
+        for(int32 Wave=0;Wave<5;++Wave)
+            for(double Lateral:{-6.,0.,6.})
+                Result.Add({842.+24.*Wave,Lateral,0.,.75f,4.f,.40f});
+    }
+    if(Map.EndsWith(TEXT("L_Hance")))Result = {
+        {755,-13,0,1.0f,3.f,1.f},{755,-7,0,1.0f,3.f,1.f},
+        {850,-10,35,.8f,4.f,.65f},{850,-4,35,.8f,4.f,.65f},
+        {895,-4,0,.65f,3.f,.8f},{895,3,0,.65f,3.f,.8f}};
+    if(Map.EndsWith(TEXT("L_Zambezi")))
+    {
+        Result={
+        // The near-surface roller opposes this normal. A negative normal
+        // angle therefore pushes river-left, toward the catalogued Crease.
+        // Using +35 for this normal reversed the documented leftward shove.
+        {6140,-18,-35,1.1f,4.f,.85f},{6140,-12,-35,1.1f,4.f,.85f},
+        {6180,19,0,1.1f,3.f,1.f},{6180,25,0,1.1f,3.f,1.f}};
+        // The catalogue describes a 36 m-wide six-wave train. One centre
+        // site only supplied a 9.6 m-wide roller and let the -12 m control
+        // bypass its physical current. Tile the EXISTING shared kernel
+        // across an authored approximation of that width; retain its local
+        // crest cap, depth/wet gates and compact pool release.
+        for(int32 Wave=0;Wave<6;++Wave)
+            for(double Lateral:{-12.,-6.,0.,6.,12.})
+                Result.Add({6360.+16.*Wave,Lateral,0.,.9f,5.f,.45f});
+    }
+#include "RaftSimNamedRapidProfiles.inl"
+    return Result;
+}
+// Called by both the production surface refresh and the native boat driver.
+// Do not allocate/copy the whole river catalogue every physics/render frame.
+inline const TArray<FFeature>& Features(const FString& Map)
+{
+    static const TArray<FFeature> Empty;
+    if(!HasProfile(Map))return Empty;
+    static const TArray<FFeature> Hance=BuildFeatures(TEXT("L_Hance"));
+    static const TArray<FFeature> Zambezi=BuildFeatures(TEXT("L_Zambezi"));
+    static const TArray<FFeature> Pacuare=BuildFeatures(TEXT("L_UpperHuacas"));
+    static const TArray<FFeature> Futa=BuildFeatures(TEXT("L_Terminator"));
+    static const TArray<FFeature> Chilko=BuildFeatures(TEXT("L_LavaCanyon"));
+    static const TArray<FFeature> Badger=BuildFeatures(TEXT("L_Colorado_BadgerCreek"));
+    static const TArray<FFeature> HouseRock=BuildFeatures(TEXT("L_Colorado_HouseRock"));
+    if(Map.EndsWith(TEXT("L_Hance")))return Hance;
+    if(Map.EndsWith(TEXT("L_Zambezi")))return Zambezi;
+    if(Map.EndsWith(TEXT("L_UpperHuacas")))return Pacuare;
+    if(Map.EndsWith(TEXT("L_Terminator")))return Futa;
+    if(Map.EndsWith(TEXT("L_Colorado_BadgerCreek")))return Badger;
+    if(Map.EndsWith(TEXT("L_Colorado_HouseRock")))return HouseRock;
+    return Chilko;
+}
+
+template<typename FSampler>
+inline int32 Append(const FString& Map, const FBox2D& VisibleBounds,
+    FSampler&& Sample, TArray<URaftSimWaterRuntimeAdapter::FSupportBreakingSite>& Sites)
+{
+    int32 Added=0;
+    for(const auto& F:Features(Map))
+    {
+        const FVector2D P(F.Station,F.Lateral);
+        if(!VisibleBounds.ExpandBy(40.).IsInside(P))continue;
+        FRaftSimWaterSample W;
+        if(!Sample(P,W) || !W.bWet || !FMath::IsFinite(W.DepthMeters) || W.DepthMeters<.35f ||
+            W.VelocityMetersPerSecond.ContainsNaN() || W.VelocityMetersPerSecond.X<.75f)continue;
+        // Replace a local detector duplicate, do not pile a second crest on
+        // top. All unrelated measured/live sites are retained.
+        Sites.RemoveAll([&](const auto& S){return (S.RiverCoordinatesMeters-P).SizeSquared()<9.;});
+        auto& S=Sites.AddDefaulted_GetRef();S.RiverCoordinatesMeters=P;
+        const double A=FMath::DegreesToRadians(F.AngleDegrees);
+        S.FlowDirection=FVector2D(FMath::Cos(A),FMath::Sin(A));
+        S.Intensity=1.f;S.PhysicalCrestHeightMeters=FMath::Min(F.Height,.6f*W.DepthMeters);
+        S.PhysicalCrestLengthMeters=F.Length;S.SpillingFraction=F.Spill;
+        S.bLocalEnvelopeCap=true;++Added;
+    }
+    return Added;
+}
+}

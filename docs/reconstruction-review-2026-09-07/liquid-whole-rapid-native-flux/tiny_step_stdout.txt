@@ -1,0 +1,15 @@
+scenario_id=survey_final_state_flux_audit
+solver=raftsim_water_cpp_v1
+solver_mode=finite_volume
+boundary_mode=scenario
+flux_scheme=hll
+spatial_order=2
+disable_fixture_calibrations=true
+steps=1
+frames=2
+solve_and_capture_seconds=0.01104
+export_seconds=0.783426
+output=docs\reconstruction-review-2026-09-07\liquid-whole-rapid-native-flux\tiny_step\survey_final_state_flux_audit
+validation_passed=true
+mass_relative_drift=2.3357e-12
+max_velocity=5.42649

@@ -1,7 +1,63 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "GameFramework/GameModeBase.h"
+#include "GameFramework/WorldSettings.h"
+#include "RaftSimRaftActor.h"
+#include "RaftSimRiverWaterConfig.h"
+#include "RaftSimRockObstacleActor.h"
+#include "RaftSimWaterSurfaceActor.h"
+#include "UObject/UnrealType.h"
+
 namespace RaftSimEditorEnvironment
 {
+namespace
+{
+// Evidence-based Hance reach: cooked stations 0-2512 m (2 m cells), upstream
+// (east) end first. The imagery whitewater starts near station 680 m.
+constexpr float kColoradoHanceLaunchStationM = 520.0f;
+constexpr float kColoradoHanceReachStationM = 2512.0f;
+constexpr float HanceProgress(float StationM) { return StationM / kColoradoHanceReachStationM; }
+// Evidence-based Pacuare Huacas-Pinball reach (scenario stations, 2 m grid).
+// Launch in the calm pool above Upper Huacas (cooked depth > 1 m across
+// 26 m, < 1 m/s); the first rapid starts near 400 m.
+constexpr float kPacuareHuacasLaunchStationM = 280.0f;
+constexpr float kPacuareHuacasReachStationM = 2328.0f;
+constexpr float PacuareProgress(float StationM) { return StationM / kPacuareHuacasReachStationM; }
+// Evidence-based Futaleufu Terminator reach (scenario stations, 2 m grid).
+constexpr float kFutaleufuTerminatorLaunchStationM = 750.0f;
+constexpr float kFutaleufuTerminatorReachStationM = 2392.0f;
+constexpr float FutaleufuProgress(float StationM) { return StationM / kFutaleufuTerminatorReachStationM; }
+// Evidence-based Chilko Lava Canyon reach (scenario stations, 2 m grid).
+// Launch 200 m above Bidwell Rapid, whose Sentinel-2 whitewater and 4.7 m
+// LiDAR surface drop sit at stations 750-1000 (inside the launch window).
+constexpr float kChilkoLavaCanyonLaunchStationM = 600.0f;
+constexpr float kChilkoLavaCanyonReachStationM = 3978.0f;
+constexpr float ChilkoProgress(float StationM) { return StationM / kChilkoLavaCanyonReachStationM; }
+// Evidence-based Zambezi upper gorge: evidence stations along the Sentinel-2
+// low-water midline (the local centreline and the run-progress map share
+// them). The launch is the export's checked start (calm, >= 1 m deep, inside
+// a valid Cartesian live-window rectangle; terrain manifest `launch`).
+constexpr float kZambeziUpperGorgeLaunchStationM = 212.7f;
+constexpr float kZambeziUpperGorgeFinishStationM = 3382.0f;
+// Render-only observed whitewater (photographed whitewater plus each reach's
+// observed-rapid catalogue) floors every wet vertex's displayed foam at this
+// gain x the layer's whitewater fraction. Overhead renders of the Terminator
+// core (layer 0.71-0.74 in view) put the share of mostly-white 16 px blocks
+// at 0.51 with no layer, 0.71 at 0.2, 0.91 at 0.45 and 0.97 at the former
+// 0.9 (one white sheet); about 0.25 matches the photographed share and keeps
+// the dark tongues between the white (observed-rapids-2026-09-29.md).
+constexpr float kObservedWhitewaterDisplayGain = 0.25f;
+// Observed whitewater as a breaking source of the GPU moving detail (the
+// Cartesian upper gorge, whose core ignores the vertex floor).
+constexpr float kObservedWhitewaterEntrainmentGain = 0.6f;
+float CenterlineProgress(const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points, float StationM)
+{
+    return Points.Num() < 2 ? 0.0f : FMath::Clamp(
+        (StationM - Points[0].StationMeters) /
+            FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f);
+}
+}
+
 FString GetLandscapeCandidateCaptureRelativePath(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     const FString& CaptureId)
@@ -65,6 +121,8 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     ALandscape* Landscape,
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     UMaterialInterface* WaterMaterial,
+    const FRaftSimPreviewImage* SolverVisualizationFields,
+    UMaterialInterface* SolverFoamMaterial,
     FString& OutSummary)
 {
     if (!World || !Landscape || !WaterMaterial)
@@ -83,7 +141,23 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     TArray<float> ConditionedSurfaceWorldZ;
     int32 ConditionedProfileCenterCount = 0;
     const bool bChilkoSourceScale =
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") &&
+        Candidate.HorizontalSpanXCm > 1000000.0f;
+    const FRaftSimLandscapeCandidateWaterSettings WaterSettings =
+        GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
+    const bool bUseSolverVisualizationFields =
+        Candidate.bUseSolverVisualizationFields &&
+        WaterSettings.SolverFieldEnable > 0.5f &&
+        SolverVisualizationFields &&
+        SolverVisualizationFields->IsValid() &&
+        SolverFoamMaterial;
+    const bool bColoradoHancePresentation =
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+    const bool bFutaleufuTerminatorPresentation =
+        Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    const bool bChilkoLavaCanyonPresentation =
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+    const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     const float CenterSampleSpacingCm = bChilkoSourceScale ? 500.0f : 100.0f;
     for (int32 SegmentIndex = 0; SegmentIndex + 1 < SourcePoints.Num(); ++SegmentIndex)
     {
@@ -98,7 +172,7 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
             const float T = static_cast<float>(Step) / static_cast<float>(Steps);
             const FVector2D Local = FMath::Lerp(A.LocalCm, B.LocalCm, T);
             Centers.Add(FVector2D(
-                -5800.0f + Local.X,
+                LandscapeMinX + Local.X,
                 -Candidate.HorizontalSpanYCm * 0.5f + Local.Y));
             StationsCm.Add(FMath::Lerp(A.StationMeters, B.StationMeters, T) * 100.0f);
             if (A.bHasConditionedVisualSurface && B.bHasConditionedVisualSurface)
@@ -107,7 +181,8 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                     FMath::Lerp(
                         A.ConditionedVisualSurfaceNormalized,
                         B.ConditionedVisualSurfaceNormalized,
-                        T) * Candidate.TargetReliefCm);
+                        T) * Candidate.TargetReliefCm +
+                    Candidate.WorldVerticalOffsetCm);
                 ++ConditionedProfileCenterCount;
             }
             else
@@ -122,13 +197,14 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     }
     const FRaftSimLandscapeCandidateCenterlinePoint& Last = SourcePoints.Last();
     Centers.Add(FVector2D(
-        -5800.0f + Last.LocalCm.X,
+        LandscapeMinX + Last.LocalCm.X,
         -Candidate.HorizontalSpanYCm * 0.5f + Last.LocalCm.Y));
     StationsCm.Add(Last.StationMeters * 100.0f);
     if (Last.bHasConditionedVisualSurface)
     {
         ConditionedSurfaceWorldZ.Add(
-            Last.ConditionedVisualSurfaceNormalized * Candidate.TargetReliefCm);
+            Last.ConditionedVisualSurfaceNormalized * Candidate.TargetReliefCm +
+            Candidate.WorldVerticalOffsetCm);
         ++ConditionedProfileCenterCount;
     }
     else
@@ -140,14 +216,21 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         ConditionedSurfaceWorldZ.Add(TerrainZ + 140.0f);
     }
 
-    const int32 CrossSteps = bChilkoSourceScale ? 16 : 32;
+    const int32 CrossSteps = bChilkoSourceScale
+        ? 16
+        : FMath::Max(8, WaterSettings.RibbonCrossSectionSteps);
     TArray<FVector> Vertices;
     TArray<FVector2D> UVs;
     TArray<FLinearColor> VertexColors;
+    TArray<FLinearColor> SolverFoamVertexColors;
     TArray<int32> Triangles;
     Vertices.Reserve(Centers.Num() * (CrossSteps + 1));
     UVs.Reserve(Centers.Num() * (CrossSteps + 1));
     VertexColors.Reserve(Centers.Num() * (CrossSteps + 1));
+    if (bUseSolverVisualizationFields)
+    {
+        SolverFoamVertexColors.Reserve(Centers.Num() * (CrossSteps + 1));
+    }
     for (int32 CenterIndex = 0; CenterIndex < Centers.Num(); ++CenterIndex)
     {
         const FVector2D Previous = Centers[FMath::Max(0, CenterIndex - 1)];
@@ -155,6 +238,7 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         const FVector2D Tangent = (Next - Previous).GetSafeNormal();
         const FVector2D Normal(-Tangent.Y, Tangent.X);
         const float HalfWidth = GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec) *
+            (bUseSolverVisualizationFields ? WaterSettings.RenderWidthScale : 1.0f) *
             (0.92f + 0.10f * FMath::Sin(StationsCm[CenterIndex] * 0.00031f));
         const float SurfaceZ = ConditionedSurfaceWorldZ[CenterIndex] +
             Candidate.PreviewSpec.FlowWaterLevelOffsetCm;
@@ -162,17 +246,124 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         {
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
             const float Lateral = FMath::Lerp(-HalfWidth, HalfWidth, V);
+            const float SolverU = StationsCm[CenterIndex] /
+                FMath::Max(StationsCm.Last(), 1.0f);
+            const float SolverLateralV = FMath::GetMappedRangeValueClamped(
+                FVector2D(
+                    Candidate.SolverVisualizationLateralMinM,
+                    Candidate.SolverVisualizationLateralMaxM),
+                FVector2D(0.0f, 1.0f),
+                Lateral * 0.01f);
+            const float SolverPersistenceStepU = 4.0f /
+                FMath::Max(StationsCm.Last() * 0.01f, 1.0f);
+            const float SolverLateralStepV = 4.0f / FMath::Max(
+                Candidate.SolverVisualizationLateralMaxM -
+                    Candidate.SolverVisualizationLateralMinM,
+                1.0f);
+            const FLinearColor SolverField = bUseSolverVisualizationFields
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      SolverU,
+                      1.0f - SolverLateralV)
+                : FLinearColor::Black;
+            const FLinearColor SolverFieldUpstream4M = bUseSolverVisualizationFields
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      FMath::Clamp(SolverU - SolverPersistenceStepU, 0.0f, 1.0f),
+                      1.0f - SolverLateralV)
+                : FLinearColor::Black;
+            const FLinearColor SolverFieldUpstream8M = bUseSolverVisualizationFields
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      FMath::Clamp(SolverU - SolverPersistenceStepU * 2.0f, 0.0f, 1.0f),
+                      1.0f - SolverLateralV)
+                : FLinearColor::Black;
+            const FLinearColor SolverFieldDownstream4M =
+                bUseSolverVisualizationFields && bColoradoHancePresentation
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      FMath::Clamp(SolverU + SolverPersistenceStepU, 0.0f, 1.0f),
+                      1.0f - SolverLateralV)
+                : SolverField;
+            const FLinearColor SolverFieldRiverRight4M =
+                bUseSolverVisualizationFields && bColoradoHancePresentation
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      SolverU,
+                      1.0f - FMath::Clamp(
+                          SolverLateralV - SolverLateralStepV, 0.0f, 1.0f))
+                : SolverField;
+            const FLinearColor SolverFieldRiverLeft4M =
+                bUseSolverVisualizationFields && bColoradoHancePresentation
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      SolverU,
+                      1.0f - FMath::Clamp(
+                          SolverLateralV + SolverLateralStepV, 0.0f, 1.0f))
+                : SolverField;
+            const float MinimumHanceFilterDepthNormalized =
+                0.03f / FMath::Max(
+                    Candidate.SolverVisualizationDepthCapM, 0.01f);
+            const bool bUseHanceSubcellFilter =
+                bUseSolverVisualizationFields && bColoradoHancePresentation &&
+                SolverField.R > MinimumHanceFilterDepthNormalized &&
+                SolverFieldUpstream4M.R > MinimumHanceFilterDepthNormalized &&
+                SolverFieldDownstream4M.R > MinimumHanceFilterDepthNormalized &&
+                SolverFieldRiverRight4M.R > MinimumHanceFilterDepthNormalized &&
+                SolverFieldRiverLeft4M.R > MinimumHanceFilterDepthNormalized;
+            const FLinearColor SolverPresentationField = bUseHanceSubcellFilter
+                ? SolverField * 0.44f +
+                      (SolverFieldUpstream4M + SolverFieldDownstream4M +
+                          SolverFieldRiverRight4M + SolverFieldRiverLeft4M) * 0.14f
+                : SolverField;
+            const float SolverDepthM = SolverPresentationField.R *
+                Candidate.SolverVisualizationDepthCapM;
+            const float SolverSpeedMps = SolverPresentationField.G *
+                Candidate.SolverVisualizationSpeedCapMps;
+            const float SolverFroude = SolverPresentationField.B *
+                Candidate.SolverVisualizationFroudeCap;
+            const float SolverPersistentSpeedMps = FMath::Max3(
+                SolverSpeedMps,
+                SolverFieldUpstream4M.G * Candidate.SolverVisualizationSpeedCapMps * 0.94f,
+                SolverFieldUpstream8M.G * Candidate.SolverVisualizationSpeedCapMps * 0.84f);
+            const float SolverPersistentFroude = FMath::Max3(
+                SolverFroude,
+                SolverFieldUpstream4M.B * Candidate.SolverVisualizationFroudeCap * 0.94f,
+                SolverFieldUpstream8M.B * Candidate.SolverVisualizationFroudeCap * 0.84f);
             const float EdgeT = FMath::Abs(V - 0.5f) * 2.0f;
+            const float ReliefEdgeEnvelope = 1.0f -
+                SmoothPreviewStep(0.68f, 1.0f, EdgeT);
+            const float SolverHydraulicPresence = bUseSolverVisualizationFields
+                ? SmoothPreviewStep(0.03f, 0.16f, SolverDepthM)
+                : 0.0f;
+            const float SolverSurfaceReliefCm = bUseSolverVisualizationFields
+                ? (SolverPresentationField.A - 0.5f) * 2.0f *
+                      Candidate.SolverVisualizationSurfaceReliefCapM * 100.0f *
+                      WaterSettings.SolverSurfaceReliefScale * SolverHydraulicPresence *
+                      ReliefEdgeEnvelope
+                : 0.0f;
+            const float SolverHydraulicAerationT = bUseSolverVisualizationFields
+                ? SmoothPreviewStep(0.60f, 1.10f, SolverPersistentFroude) *
+                      SmoothPreviewStep(0.65f, 2.10f, SolverPersistentSpeedMps) *
+                      SolverHydraulicPresence
+                : 0.0f;
             const float FlowCueScale = Candidate.PreviewSpec.FlowCurrentCueScale;
-            const float WaveEnvelope = 1.0f - EdgeT * 0.48f;
+            const float WaveEnvelope = ReliefEdgeEnvelope;
+            const float SolverAnalyticChopScale = bUseSolverVisualizationFields
+                ? WaterSettings.AnalyticChopScale
+                : 1.0f;
+            const float CrossCurrentPhase =
+                FMath::PerlinNoise2D(FVector2D(
+                    StationsCm[CenterIndex] * 0.00043f,
+                    Lateral * 0.00071f)) * 1.85f;
+            const float CrossCurrentChop =
+                WaterSettings.CrossCurrentChopAmplitudeCm *
+                FMath::Sin(
+                    StationsCm[CenterIndex] * 0.0023f -
+                    Lateral * 0.0067f + CrossCurrentPhase);
             const float Wave = FlowCueScale * WaveEnvelope * (
                 12.0f * FMath::Sin(StationsCm[CenterIndex] * 0.0041f + Lateral * 0.011f) +
                 5.0f * FMath::Sin(StationsCm[CenterIndex] * 0.0107f - Lateral * 0.021f) +
-                2.5f * FMath::Sin(StationsCm[CenterIndex] * 0.0183f + Lateral * 0.037f));
+                2.5f * FMath::Sin(StationsCm[CenterIndex] * 0.0183f + Lateral * 0.037f) +
+                CrossCurrentChop) * SolverAnalyticChopScale;
             Vertices.Add(FVector(
                 Centers[CenterIndex].X + Normal.X * Lateral,
                 Centers[CenterIndex].Y + Normal.Y * Lateral,
-                SurfaceZ + Wave));
+                SurfaceZ + Wave + SolverSurfaceReliefCm));
             UVs.Add(FVector2D(StationsCm[CenterIndex] / 8000.0f, V));
             FLinearColor Deep = Candidate.PreviewSpec.bDesertCanyon
                 ? FMath::Lerp(
@@ -204,15 +395,127 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                 FMath::Pow(EdgeT, 1.8f));
             const float BreakerSignal =
                 CurrentThread * 0.52f + FineCurrent * 0.28f + CrestCue * 0.20f;
-            const float Breaker = FlowCueScale * WaveEnvelope *
-                SmoothPreviewStep(0.72f, 0.92f, BreakerSignal) * 0.72f;
+            const float EmbeddedAerationBreakup = SmoothPreviewStep(
+                0.70f,
+                0.91f,
+                BreakerSignal * 0.72f +
+                    (FMath::PerlinNoise2D(FVector2D(
+                         StationsCm[CenterIndex] * 0.0047f,
+                         Lateral * 0.0093f)) * 0.5f + 0.5f) * 0.28f);
+            const float EmbeddedAeration = bUseSolverVisualizationFields
+                ? WaterSettings.EmbeddedAerationWeight *
+                      SmoothPreviewStep(0.75f, 2.80f, SolverPersistentSpeedMps) *
+                      SolverHydraulicPresence * EmbeddedAerationBreakup *
+                      ReliefEdgeEnvelope
+                : 0.0f;
+            const float Breaker = bUseSolverVisualizationFields
+                ? SolverHydraulicAerationT * WaterSettings.SolverFroudeAerationWeight
+                : FlowCueScale * WaveEnvelope *
+                      SmoothPreviewStep(0.72f, 0.92f, BreakerSignal) * 0.72f;
+            const float CombinedBreaker = FMath::Max(Breaker, EmbeddedAeration);
+            if (bUseSolverVisualizationFields)
+            {
+                const float DepthColorT = SmoothPreviewStep(0.20f, 2.60f, SolverDepthM) *
+                    WaterSettings.SolverDepthColorWeight * SolverHydraulicPresence;
+                const float SpeedColorT = SmoothPreviewStep(0.60f, 3.40f, SolverSpeedMps) *
+                    0.18f * SolverHydraulicPresence;
+                SurfaceColor = FMath::Lerp(
+                    SurfaceColor,
+                    WaterSettings.SolverDeepWaterTint,
+                    DepthColorT);
+                SurfaceColor = FMath::Lerp(
+                    SurfaceColor,
+                    FLinearColor(0.10f, 0.30f, 0.24f),
+                    SpeedColorT);
+            }
             SurfaceColor = FMath::Lerp(
                 SurfaceColor,
-                Candidate.PreviewSpec.bDesertCanyon
+                bUseSolverVisualizationFields
+                    ? WaterSettings.SolverAerationTint
+                    : Candidate.PreviewSpec.bDesertCanyon
                     ? FLinearColor(0.72f, 0.68f, 0.58f)
                     : FLinearColor(0.75f, 0.84f, 0.80f),
-                Breaker);
+                CombinedBreaker);
+            if (bColoradoHancePresentation && bUseSolverVisualizationFields)
+            {
+                // Suspended sediment makes Hance less transparent than the
+                // clear-water runs, but the V1 opaque card was not plausible.
+                // Alpha follows only the already sampled solver depth, wet-bank
+                // edge, and aeration. It never changes geometry, wetness,
+                // collision, bathymetry, hydraulics, or raft forces.
+                const float DepthOpacityT = SmoothPreviewStep(
+                    0.20f, 2.90f, SolverDepthM);
+                const float BankTransmission = FMath::Lerp(
+                    1.0f,
+                    0.42f,
+                    SmoothPreviewStep(0.70f, 1.0f, EdgeT));
+                const float WaterOpacity = FMath::Lerp(
+                    0.46f, 0.76f, DepthOpacityT) * BankTransmission;
+                SurfaceColor.A = FMath::Lerp(
+                    WaterOpacity, 0.93f, CombinedBreaker);
+            }
+            if (bFutaleufuTerminatorPresentation &&
+                bUseSolverVisualizationFields)
+            {
+                // The V3 capture ribbon is transmitting rather than an opaque
+                // card. CPU-authored alpha follows the already sampled local
+                // depth, fades through the wet-bank edge, and becomes nearly
+                // opaque only in solver-conditioned aeration. It changes no
+                // geometry, wet mask, collision, or runtime force input.
+                const float DepthOpacityT = SmoothPreviewStep(
+                    0.18f, 2.80f, SolverDepthM);
+                const float BankTransmission = FMath::Lerp(
+                    1.0f,
+                    0.48f,
+                    SmoothPreviewStep(0.72f, 1.0f, EdgeT));
+                const float WaterOpacity = FMath::Lerp(
+                    0.44f, 0.80f, DepthOpacityT) * BankTransmission;
+                SurfaceColor.A = FMath::Lerp(
+                    WaterOpacity, 0.93f, CombinedBreaker);
+            }
+            if (bChilkoLavaCanyonPresentation &&
+                bUseSolverVisualizationFields)
+            {
+                // Clear glacial water remains more transmitting than the
+                // shared cold-water V2 card. Alpha uses only local depth,
+                // wet-bank feather, and solver aeration already sampled here.
+                const float DepthOpacityT = SmoothPreviewStep(
+                    0.16f, 2.60f, SolverDepthM);
+                const float BankTransmission = FMath::Lerp(
+                    1.0f,
+                    0.44f,
+                    SmoothPreviewStep(0.72f, 1.0f, EdgeT));
+                const float WaterOpacity = FMath::Lerp(
+                    0.38f, 0.72f, DepthOpacityT) * BankTransmission;
+                SurfaceColor.A = FMath::Lerp(
+                    WaterOpacity, 0.91f, CombinedBreaker);
+            }
             VertexColors.Add(SurfaceColor);
+            if (bUseSolverVisualizationFields)
+            {
+                const float FoamNoiseA = FMath::PerlinNoise2D(FVector2D(
+                    StationsCm[CenterIndex] * 0.0065f + SolverFroude * 1.7f,
+                    Lateral * 0.0120f + SolverSpeedMps * 2.3f)) * 0.5f + 0.5f;
+                const float FoamNoiseB = FMath::PerlinNoise2D(FVector2D(
+                    StationsCm[CenterIndex] * 0.0170f - Lateral * 0.0040f + 19.7f,
+                    Lateral * 0.0290f + SolverFroude * 3.1f - 7.4f)) * 0.5f + 0.5f;
+                const float FoamBreakup = SmoothPreviewStep(
+                    bColoradoHancePresentation ? 0.42f : 0.34f,
+                    bColoradoHancePresentation ? 0.74f : 0.70f,
+                    FMath::Clamp(FoamNoiseA * 0.68f + FoamNoiseB * 0.32f, 0.0f, 1.0f));
+                const float FoamBaseCoverage =
+                    bColoradoHancePresentation ? 0.22f : 0.28f;
+                const float FoamBreakupCoverage = 1.0f - FoamBaseCoverage;
+                const float FoamGain = bColoradoHancePresentation ? 0.96f : 0.94f;
+                const float FoamOpacity = FMath::Clamp(
+                    SolverHydraulicAerationT *
+                        (FoamBaseCoverage + FoamBreakup * FoamBreakupCoverage) *
+                        FoamGain,
+                    0.0f,
+                    bColoradoHancePresentation ? 0.82f : 0.94f);
+                SolverFoamVertexColors.Add(
+                    FLinearColor(0.86f, 0.92f, 0.88f, FoamOpacity));
+            }
         }
     }
     const int32 RowSize = CrossSteps + 1;
@@ -235,16 +538,26 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
     for (FVector& Normal : Normals)
     {
-        Normal = FMath::Lerp(Normal, FVector::UpVector, 0.24f).GetSafeNormal();
+        Normal = FMath::Lerp(
+            Normal,
+            FVector::UpVector,
+            bColoradoHancePresentation
+                ? WaterSettings.RenderNormalUpBlend
+                : 0.24f).GetSafeNormal();
     }
     OutSummary += FString::Printf(
-        TEXT("Built source-aligned physical river ribbon with %d center samples at %.1f m spacing (%d using the manifest-recorded conditioned visual surface), %d cross steps, bounded render-only current relief below 20 centimetres, and sparse flow-scaled breaker coloration across %.1f m.\n"),
+        TEXT("Built source-aligned physical river ribbon with %d center samples at %.1f m spacing (%d using the manifest-recorded conditioned visual surface), %d cross steps, bounded render-only current relief below %.1f centimetres, and %s breaker coloration across %.1f m.\n"),
         Centers.Num(),
         CenterSampleSpacingCm * 0.01f,
         ConditionedProfileCenterCount,
         CrossSteps,
+        Candidate.SolverVisualizationSurfaceReliefCapM * 100.0f *
+            WaterSettings.SolverSurfaceReliefScale,
+        bUseSolverVisualizationFields
+            ? TEXT("cooked-field-derived")
+            : TEXT("sparse flow-scaled analytic"),
         Last.StationMeters);
-    return AddPreviewProceduralMeshActor(
+    AActor* WaterActor = AddPreviewProceduralMeshActor(
         World,
         FString::Printf(
             TEXT("RaftSim_PhysicalCorridorRiverRibbon_%s"),
@@ -257,6 +570,104 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         WaterMaterial,
         &VertexColors,
         false);
+    if (WaterActor)
+    {
+        WaterActor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+        WaterActor->Tags.AddUnique(TEXT("RaftSimPhysicalCorridorWater"));
+        if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            WaterActor->Tags.AddUnique(TEXT("RaftSimZambeziDefaultLitWater"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimSingleLayerWaterCaptureRejected"));
+        }
+        else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+        {
+            WaterActor->Tags.AddUnique(TEXT("RaftSimPacuareDefaultLitWater"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimSingleLayerWaterCaptureRejected"));
+        }
+        else if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+        {
+            WaterActor->Tags.AddUnique(TEXT("RaftSimColoradoHanceDefaultLitWater"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimCpuAuthoredCookedFieldColor"));
+            WaterActor->Tags.AddUnique(
+                TEXT("RaftSimColoradoHanceSubcellSmoothedWaterV1"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimRenderOnlyHydraulicSmoothing"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
+        }
+        else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            WaterActor->Tags.AddUnique(TEXT("RaftSimFutaleufuDefaultLitWater"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimCpuAuthoredCookedFieldColor"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimColdWaterCpuChopV2"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimColdWaterEmbeddedAerationV2"));
+        }
+        else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+        {
+            WaterActor->Tags.AddUnique(TEXT("RaftSimChilkoDefaultLitWater"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimCpuAuthoredCookedFieldColor"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimColdWaterCpuChopV2"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimColdWaterEmbeddedAerationV2"));
+        }
+    }
+    if (bUseSolverVisualizationFields &&
+        SolverFoamVertexColors.Num() == Vertices.Num())
+    {
+        TArray<FVector> SolverFoamVertices = Vertices;
+        for (int32 VertexIndex = 0; VertexIndex < SolverFoamVertices.Num(); ++VertexIndex)
+        {
+            SolverFoamVertices[VertexIndex] += Normals[VertexIndex] * 1.4f;
+        }
+        AActor* FoamActor = AddPreviewProceduralMeshActor(
+            World,
+            FString::Printf(
+                TEXT("RaftSim_SolverFieldFoam_%s"),
+                *Candidate.PreviewSpec.RiverId),
+            SolverFoamVertices,
+            Triangles,
+            Normals,
+            UVs,
+            FLinearColor(0.86f, 0.92f, 0.88f, 0.0f),
+            SolverFoamMaterial,
+            &SolverFoamVertexColors,
+            false);
+        if (FoamActor)
+        {
+            FoamActor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+            FoamActor->Tags.AddUnique(TEXT("RaftSimSolverFieldFoam"));
+            FoamActor->Tags.AddUnique(TEXT("RaftSimCaptureOnlyWater"));
+            if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+            {
+                FoamActor->Tags.AddUnique(
+                    TEXT("RaftSimPacuareUpperHuacasSolverVisualization"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimPacuareCaptureOnlyWater"));
+            }
+            else if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+            {
+                FoamActor->Tags.AddUnique(
+                    TEXT("RaftSimColoradoHanceSolverVisualization"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimColoradoHanceCaptureOnlyWater"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimColoradoHanceLaceFoamV1"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
+            }
+            else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+            {
+                FoamActor->Tags.AddUnique(
+                    TEXT("RaftSimChilkoLavaCanyonSolverVisualization"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimChilkoCaptureOnlyWater"));
+            }
+            else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+            {
+                FoamActor->Tags.AddUnique(
+                    TEXT("RaftSimFutaleufuTerminatorSolverVisualization"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimFutaleufuCaptureOnlyWater"));
+            }
+        }
+    }
+    return WaterActor;
 }
 
 AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
@@ -296,7 +707,7 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
         return nullptr;
     }
 
-    constexpr float LandscapeMinX = -5800.0f;
+    const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     const float LandscapeMaxX = LandscapeMinX + Candidate.HorizontalSpanXCm;
     const float LandscapeMinY = -Candidate.HorizontalSpanYCm * 0.5f;
     const float LandscapeMaxY = Candidate.HorizontalSpanYCm * 0.5f;
@@ -370,7 +781,13 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
                 SourceLinear.R = FMath::Max(SourceLinear.R, 0.012f);
                 SourceLinear.G = FMath::Max(SourceLinear.G, 0.012f);
                 SourceLinear.B = FMath::Max(SourceLinear.B, 0.012f);
-                SourceLinear.A = 1.0f;
+                // Batoka's adaptive near-field mesh authors the only approved
+                // wet-bank red channel. Keep the coarse source-terrain tiles at zero
+                // so the shared material cannot turn the full gorge wet.
+                if (bZambezi)
+                {
+                    SourceLinear.R = 0.0f;
+                }
                 VertexColors.Add(SourceLinear);
             }
         }
@@ -387,10 +804,17 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
             }
         }
 
-        TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+        TArray<FVector> Normals = bZambezi
+            ? ComputePreviewGridHeightfieldNormals(Vertices, RowSize)
+            : ComputePreviewMeshNormals(Vertices, Triangles);
         if (bRockCanyon || bFutaleufu)
         {
-            const float RenderReliefCapCm = bZambezi ? 420.0f : (bFutaleufu ? 240.0f : 180.0f);
+            // The earlier Batoka overlay sampled a 12 m noise octave on a
+            // 12.5 m grid and amplified it by more than four metres. That
+            // near-Nyquist displacement exposed the grid as regular ribs in
+            // gameplay. Keep only resolvable 40-150 m basalt-scale relief in
+            // geometry; the world-aligned material owns sub-grid detail.
+            const float RenderReliefCapCm = bZambezi ? 220.0f : (bFutaleufu ? 240.0f : 180.0f);
             for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
             {
                 const float Steepness = 1.0f - FMath::Clamp(Normals[VertexIndex].Z, 0.0f, 1.0f);
@@ -404,21 +828,29 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
                 }
                 const FVector& Vertex = Vertices[VertexIndex];
                 const float BroadFacet = FMath::PerlinNoise2D(
-                    FVector2D(Vertex.X * 0.00024f, Vertex.Y * 0.00024f));
+                    FVector2D(
+                        Vertex.X * (bZambezi ? 0.000065f : 0.00024f),
+                        Vertex.Y * (bZambezi ? 0.000065f : 0.00024f)));
                 const float LocalFracture = FMath::PerlinNoise2D(
-                    FVector2D(Vertex.X * 0.00082f + 17.0f, Vertex.Y * 0.00082f - 9.0f));
+                    FVector2D(
+                        Vertex.X * (bZambezi ? 0.00020f : 0.00082f) + 17.0f,
+                        Vertex.Y * (bZambezi ? 0.00020f : 0.00082f) - 9.0f));
                 const float Strata = FMath::Sin(
-                    Vertex.Z * 0.0115f + Vertex.X * 0.00031f - Vertex.Y * 0.00019f);
+                    Vertex.Z * (bZambezi ? 0.0028f : 0.0115f) +
+                    Vertex.X * (bZambezi ? 0.00011f : 0.00031f) -
+                    Vertex.Y * (bZambezi ? 0.00007f : 0.00019f));
                 const float ReliefCm = FMath::Clamp(
                     SteepReliefT *
-                        (BroadFacet * (bZambezi ? 230.0f : (bFutaleufu ? 135.0f : 105.0f)) +
-                         LocalFracture * (bZambezi ? 125.0f : (bFutaleufu ? 88.0f : 62.0f)) +
-                         Strata * (bZambezi ? 82.0f : (bFutaleufu ? 55.0f : 38.0f))),
+                        (BroadFacet * (bZambezi ? 125.0f : (bFutaleufu ? 135.0f : 105.0f)) +
+                         LocalFracture * (bZambezi ? 65.0f : (bFutaleufu ? 88.0f : 62.0f)) +
+                         Strata * (bZambezi ? 35.0f : (bFutaleufu ? 55.0f : 38.0f))),
                     -RenderReliefCapCm,
                     RenderReliefCapCm);
                 Vertices[VertexIndex].Z += ReliefCm;
             }
-            Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+            Normals = bZambezi
+                ? ComputePreviewGridHeightfieldNormals(Vertices, RowSize)
+                : ComputePreviewMeshNormals(Vertices, Triangles);
         }
         for (int32 VertexIndex = 0; VertexIndex < Normals.Num(); ++VertexIndex)
         {
@@ -474,6 +906,1768 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
         TotalTriangleCount,
         TargetGridSpacingCm * 0.01f);
     return FirstActor;
+}
+
+bool AddZambeziAdaptiveNearFieldTerrain(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    UMaterialInterface* TerrainMaterial,
+    FZambeziAdaptiveNearFieldTerrainStats& OutStats,
+    FString& OutSummary)
+{
+    OutStats = FZambeziAdaptiveNearFieldTerrainStats();
+    if (!World || !Landscape || !TerrainMaterial ||
+        Candidate.PreviewSpec.RiverId != TEXT("zambezi_batoka_gorge"))
+    {
+        return false;
+    }
+
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint> Centerline;
+    if (!LoadLandscapeCandidateLocalCenterline(Candidate, Centerline, OutSummary) ||
+        Centerline.Num() < 2 || Centerline.Last().StationMeters <= 1000.0f)
+    {
+        OutSummary += TEXT(
+            "Zambezi adaptive near-field terrain requires at least one kilometre "
+            "of source-aligned centerline.\n");
+        return false;
+    }
+
+    FRaftSimPreviewImage SourceAlbedo;
+    if (!LoadPreviewPngImage(Candidate.PreviewSpec.AerialDrapeImage, SourceAlbedo))
+    {
+        OutSummary += TEXT(
+            "Zambezi adaptive near-field terrain could not load the source-conditioned "
+            "albedo image.\n");
+        return false;
+    }
+
+    struct FDenseTerrainTile
+    {
+        AActor* Actor = nullptr;
+        FProcMeshSection* Section = nullptr;
+        int32 RowSize = 0;
+        int32 RowCount = 0;
+        float FirstX = 0.0f;
+        float FirstY = 0.0f;
+        float StepX = 0.0f;
+        float StepY = 0.0f;
+        float MinimumX = 0.0f;
+        float MaximumX = 0.0f;
+        float MinimumY = 0.0f;
+        float MaximumY = 0.0f;
+    };
+
+    TArray<FDenseTerrainTile> DenseTiles;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor || !Actor->GetActorLabel().StartsWith(
+                TEXT("RaftSim_PhysicalCorridorDenseSourceTerrainTile_")))
+        {
+            continue;
+        }
+        UProceduralMeshComponent* Component =
+            Actor->FindComponentByClass<UProceduralMeshComponent>();
+        FProcMeshSection* Section = Component
+            ? Component->GetProcMeshSection(0)
+            : nullptr;
+        if (!Section || Section->ProcVertexBuffer.Num() < 4)
+        {
+            continue;
+        }
+
+        int32 RowSize = 0;
+        const float FirstRowY = Section->ProcVertexBuffer[0].Position.Y;
+        while (RowSize < Section->ProcVertexBuffer.Num() &&
+               FMath::IsNearlyEqual(
+                   Section->ProcVertexBuffer[RowSize].Position.Y,
+                   FirstRowY,
+                   0.1f))
+        {
+            ++RowSize;
+        }
+        if (RowSize < 2 || Section->ProcVertexBuffer.Num() % RowSize != 0)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Zambezi adaptive terrain refused non-grid source tile %s.\n"),
+                *Actor->GetActorLabel());
+            return false;
+        }
+        const int32 RowCount = Section->ProcVertexBuffer.Num() / RowSize;
+        if (RowCount < 2)
+        {
+            return false;
+        }
+
+        const FVector First = FVector(Section->ProcVertexBuffer[0].Position);
+        const FVector LastX = FVector(
+            Section->ProcVertexBuffer[RowSize - 1].Position);
+        const FVector LastY = FVector(
+            Section->ProcVertexBuffer[(RowCount - 1) * RowSize].Position);
+        FDenseTerrainTile& Tile = DenseTiles.AddDefaulted_GetRef();
+        Tile.Actor = Actor;
+        Tile.Section = Section;
+        Tile.RowSize = RowSize;
+        Tile.RowCount = RowCount;
+        Tile.FirstX = First.X;
+        Tile.FirstY = First.Y;
+        Tile.StepX = (LastX.X - First.X) / static_cast<float>(RowSize - 1);
+        Tile.StepY = (LastY.Y - First.Y) / static_cast<float>(RowCount - 1);
+        Tile.MinimumX = FMath::Min(First.X, LastX.X);
+        Tile.MaximumX = FMath::Max(First.X, LastX.X);
+        Tile.MinimumY = FMath::Min(First.Y, LastY.Y);
+        Tile.MaximumY = FMath::Max(First.Y, LastY.Y);
+        if (FMath::Abs(Tile.StepX) < 1.0f || FMath::Abs(Tile.StepY) < 1.0f)
+        {
+            OutSummary += TEXT(
+                "Zambezi adaptive terrain found an invalid dense-tile sample spacing.\n");
+            return false;
+        }
+    }
+    if (DenseTiles.Num() != 4)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Zambezi adaptive terrain requires all four conditioned dense tiles; found %d.\n"),
+            DenseTiles.Num());
+        return false;
+    }
+
+    auto SampleDenseTerrainWorldZ = [&DenseTiles](
+                                        const FVector2D& WorldPoint,
+                                        float& OutWorldZ)
+    {
+        for (const FDenseTerrainTile& Tile : DenseTiles)
+        {
+            const FTransform Transform = Tile.Actor->GetActorTransform();
+            const FVector LocalPoint = Transform.InverseTransformPosition(
+                FVector(WorldPoint.X, WorldPoint.Y, Transform.GetLocation().Z));
+            if (LocalPoint.X < Tile.MinimumX - 0.5f ||
+                LocalPoint.X > Tile.MaximumX + 0.5f ||
+                LocalPoint.Y < Tile.MinimumY - 0.5f ||
+                LocalPoint.Y > Tile.MaximumY + 0.5f)
+            {
+                continue;
+            }
+            const float GridX = (LocalPoint.X - Tile.FirstX) / Tile.StepX;
+            const float GridY = (LocalPoint.Y - Tile.FirstY) / Tile.StepY;
+            const int32 X0 = FMath::Clamp(
+                FMath::FloorToInt(GridX), 0, Tile.RowSize - 2);
+            const int32 Y0 = FMath::Clamp(
+                FMath::FloorToInt(GridY), 0, Tile.RowCount - 2);
+            const float FracX = FMath::Clamp(GridX - static_cast<float>(X0), 0.0f, 1.0f);
+            const float FracY = FMath::Clamp(GridY - static_cast<float>(Y0), 0.0f, 1.0f);
+            const int32 A = Y0 * Tile.RowSize + X0;
+            const int32 B = A + 1;
+            const int32 C = (Y0 + 1) * Tile.RowSize + X0;
+            const int32 D = C + 1;
+            const float LowerZ = FMath::Lerp(
+                Tile.Section->ProcVertexBuffer[A].Position.Z,
+                Tile.Section->ProcVertexBuffer[B].Position.Z,
+                FracX);
+            const float UpperZ = FMath::Lerp(
+                Tile.Section->ProcVertexBuffer[C].Position.Z,
+                Tile.Section->ProcVertexBuffer[D].Position.Z,
+                FracX);
+            const float LocalZ = FMath::Lerp(LowerZ, UpperZ, FracY);
+            OutWorldZ = Transform.TransformPosition(
+                FVector(LocalPoint.X, LocalPoint.Y, LocalZ)).Z;
+            return true;
+        }
+        return false;
+    };
+
+    constexpr float StartStationM = 0.0f;
+    constexpr float EndStationM = 1000.0f;
+    // V2 resolves the source-missing guide-eye bank at 2.5 m, then moves only
+    // interior presentation vertices by less than one quarter of a cell. The
+    // non-colliding mesh can therefore break the regular DEM tessellation
+    // without changing the source Landscape's collision or height authority.
+    constexpr float LongitudinalSpacingCm = 250.0f;
+    constexpr float LateralSpacingCm = 250.0f;
+    constexpr float MaximumStationJitterCm = 55.0f;
+    constexpr float MaximumLateralJitterCm = 42.0f;
+    constexpr float OuterBankDistanceCm = 60000.0f;
+    constexpr float SurfaceLiftCm = 3.0f;
+    constexpr float MaximumDryShorelineInfillCm = 180.0f;
+    constexpr float MaximumUpperDryScarpRefinementCm = 440.0f;
+    constexpr float UpperDryScarpRefinementStartAboveWaterCm = 600.0f;
+    constexpr float UpperDryScarpRefinementFullStrengthAboveWaterCm = 1800.0f;
+    const float ActiveWaterHalfWidthCm =
+        GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec);
+    const float InnerBankDistanceCm = ActiveWaterHalfWidthCm + 300.0f;
+    const int32 LongitudinalStepCount = FMath::RoundToInt(
+        (EndStationM - StartStationM) * 100.0f / LongitudinalSpacingCm);
+    const int32 LateralStepCount = FMath::RoundToInt(
+        (OuterBankDistanceCm - InnerBankDistanceCm) / LateralSpacingCm);
+    const int32 RowSize = LateralStepCount + 1;
+    const int32 RowCount = LongitudinalStepCount + 1;
+    OutStats.LongitudinalSpacingCm = LongitudinalSpacingCm;
+    OutStats.LateralSpacingCm = LateralSpacingCm;
+
+    const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
+    const float LandscapeMinY = -Candidate.HorizontalSpanYCm * 0.5f;
+    const float RouteStartStation = Centerline[0].StationMeters;
+    const float RouteStationSpan =
+        Centerline.Last().StationMeters - RouteStartStation;
+    for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
+    {
+        const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+        TArray<FVector> Vertices;
+        TArray<FVector2D> Uvs;
+        TArray<FLinearColor> VertexColors;
+        TArray<int32> Triangles;
+        TArray<float> WaterSurfaceZ;
+        TArray<float> RefinementFades;
+        TArray<bool> RenderableVertices;
+        const int32 VertexCapacity = RowSize * RowCount;
+        Vertices.Reserve(VertexCapacity);
+        Uvs.Reserve(VertexCapacity);
+        VertexColors.Reserve(VertexCapacity);
+        WaterSurfaceZ.Reserve(VertexCapacity);
+        RefinementFades.Reserve(VertexCapacity);
+        RenderableVertices.Reserve(VertexCapacity);
+        Triangles.Reserve(LongitudinalStepCount * LateralStepCount * 6);
+
+        for (int32 StationIndex = 0;
+             StationIndex <= LongitudinalStepCount;
+             ++StationIndex)
+        {
+            const float StationT = static_cast<float>(StationIndex) /
+                static_cast<float>(LongitudinalStepCount);
+            const float StationM = FMath::Lerp(
+                StartStationM, EndStationM, StationT);
+            const float Progress = FMath::Clamp(
+                (StationM - RouteStartStation) / RouteStationSpan,
+                0.0f,
+                1.0f);
+            FVector2D Tangent;
+            const FVector2D Center = SampleLandscapeCandidateCenterlineWorld(
+                Candidate,
+                Centerline,
+                Progress,
+                &Tangent);
+            const FVector2D BankNormal(-Tangent.Y, Tangent.X);
+            float ConditionedWaterZ = 0.0f;
+            if (!SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
+                    Candidate,
+                    Centerline,
+                    Progress,
+                    ConditionedWaterZ))
+            {
+                OutSummary += TEXT(
+                    "Zambezi adaptive terrain requires the conditioned visual water profile.\n");
+                return false;
+            }
+
+            for (int32 LateralIndex = 0;
+                 LateralIndex <= LateralStepCount;
+                 ++LateralIndex)
+            {
+                const float LateralT = static_cast<float>(LateralIndex) /
+                    static_cast<float>(LateralStepCount);
+                const float BankDistanceCm = FMath::Lerp(
+                    InnerBankDistanceCm, OuterBankDistanceCm, LateralT);
+                const float PlanarJitterFade =
+                    SmoothPreviewStep(0.0f, 2000.0f, StationM * 100.0f) *
+                    (1.0f - SmoothPreviewStep(
+                        EndStationM * 100.0f - 2000.0f,
+                        EndStationM * 100.0f,
+                        StationM * 100.0f)) *
+                    FMath::Sin(PI * LateralT);
+                const FVector2D JitterCoordinate(
+                    StationM * 0.071f + Side * 17.0f,
+                    BankDistanceCm * 0.00023f - Side * 29.0f);
+                const float StationJitterCm = PlanarJitterFade *
+                    MaximumStationJitterCm * FMath::PerlinNoise2D(
+                        JitterCoordinate);
+                const float LateralJitterCm = PlanarJitterFade *
+                    MaximumLateralJitterCm * FMath::PerlinNoise2D(FVector2D(
+                        JitterCoordinate.Y * 1.73f + 41.0f,
+                        JitterCoordinate.X * 0.67f - 37.0f));
+                const float PlanarJitterCm = FVector2D(
+                    StationJitterCm, LateralJitterCm).Size();
+                if (PlanarJitterCm > 0.5f)
+                {
+                    ++OutStats.PlanarJitteredVertexCount;
+                    OutStats.MaximumPlanarJitterCm = FMath::Max(
+                        OutStats.MaximumPlanarJitterCm,
+                        PlanarJitterCm);
+                }
+                const FVector2D WorldPoint =
+                    Center + Tangent * StationJitterCm +
+                    BankNormal * (Side * (BankDistanceCm + LateralJitterCm));
+                float DenseTerrainZ = 0.0f;
+                const bool bSampled = SampleDenseTerrainWorldZ(
+                    WorldPoint, DenseTerrainZ);
+                const float ShorelineRiseT = SmoothPreviewStep(
+                    InnerBankDistanceCm,
+                    InnerBankDistanceCm + 3000.0f,
+                    BankDistanceCm);
+                const float RequiredDryHeightCm = FMath::Lerp(
+                    35.0f, 130.0f, ShorelineRiseT);
+                const float ExistingDryHeightCm =
+                    DenseTerrainZ - ConditionedWaterZ;
+                const float DryInfillCm = bSampled
+                    ? FMath::Clamp(
+                          RequiredDryHeightCm - ExistingDryHeightCm,
+                          0.0f,
+                          MaximumDryShorelineInfillCm)
+                    : 0.0f;
+                const bool bRenderable = bSampled &&
+                    ExistingDryHeightCm + DryInfillCm >= 30.0f;
+                if (DryInfillCm > 0.5f)
+                {
+                    ++OutStats.DryShorelineInfillVertexCount;
+                    OutStats.MaximumDryShorelineInfillCm = FMath::Max(
+                        OutStats.MaximumDryShorelineInfillCm,
+                        DryInfillCm);
+                }
+
+                Vertices.Add(FVector(
+                    WorldPoint.X,
+                    WorldPoint.Y,
+                    DenseTerrainZ + DryInfillCm + SurfaceLiftCm));
+                const float SourceU = FMath::Clamp(
+                    (WorldPoint.X - LandscapeMinX) /
+                        Candidate.HorizontalSpanXCm,
+                    0.0f,
+                    1.0f);
+                const float SourceV = FMath::Clamp(
+                    1.0f -
+                        (WorldPoint.Y - LandscapeMinY) /
+                            Candidate.HorizontalSpanYCm,
+                    0.0f,
+                    1.0f);
+                Uvs.Add(FVector2D(SourceU, SourceV));
+                const FLinearColor SourceSrgb =
+                    SourceAlbedo.SampleRawBilinear(SourceU, SourceV);
+                const FColor SourceColor8(
+                    static_cast<uint8>(FMath::Clamp(
+                        FMath::RoundToInt(SourceSrgb.R * 255.0f), 0, 255)),
+                    static_cast<uint8>(FMath::Clamp(
+                        FMath::RoundToInt(SourceSrgb.G * 255.0f), 0, 255)),
+                    static_cast<uint8>(FMath::Clamp(
+                        FMath::RoundToInt(SourceSrgb.B * 255.0f), 0, 255)),
+                    0);
+                VertexColors.Add(FLinearColor::FromSRGBColor(SourceColor8));
+                WaterSurfaceZ.Add(ConditionedWaterZ);
+                const float StationEdgeFade =
+                    SmoothPreviewStep(0.0f, 8000.0f, StationM * 100.0f) *
+                    (1.0f - SmoothPreviewStep(
+                        EndStationM * 100.0f - 8000.0f,
+                        EndStationM * 100.0f,
+                        StationM * 100.0f));
+                const float LateralEdgeFade = SmoothPreviewStep(
+                        InnerBankDistanceCm + 400.0f,
+                        InnerBankDistanceCm + 3600.0f,
+                        BankDistanceCm) *
+                    (1.0f - SmoothPreviewStep(
+                        OuterBankDistanceCm - 8000.0f,
+                        OuterBankDistanceCm,
+                        BankDistanceCm));
+                RefinementFades.Add(
+                    StationEdgeFade * LateralEdgeFade *
+                    SmoothPreviewStep(80.0f, 500.0f,
+                        ExistingDryHeightCm + DryInfillCm));
+                RenderableVertices.Add(bRenderable);
+            }
+        }
+
+        const TArray<FVector> BaseNormals =
+            ComputePreviewGridHeightfieldNormals(Vertices, RowSize);
+        for (int32 VertexIndex = 0;
+             VertexIndex < Vertices.Num();
+             ++VertexIndex)
+        {
+            if (!RenderableVertices[VertexIndex])
+            {
+                continue;
+            }
+            const FVector& Position = Vertices[VertexIndex];
+            const float Steepness = 1.0f - FMath::Clamp(
+                BaseNormals[VertexIndex].Z, 0.0f, 1.0f);
+            const float SlopeResponse = FMath::Lerp(
+                0.28f,
+                1.0f,
+                SmoothPreviewStep(0.035f, 0.48f, Steepness));
+            // Domain warping prevents the three geomorphic bands from sharing
+            // the regular source-grid axes. The broad term follows weathered
+            // gorge mass, the middle term breaks basalt-scale faces, and the
+            // fine term gives talus-sized normal variation. A narrow paired
+            // joint network cuts rather than raises isolated ridges.
+            const float WarpX = FMath::PerlinNoise2D(FVector2D(
+                Position.X * 0.00017f + Side * 7.0f,
+                Position.Y * 0.00017f - Side * 13.0f));
+            const float WarpY = FMath::PerlinNoise2D(FVector2D(
+                Position.X * 0.00021f - Side * 19.0f,
+                Position.Y * 0.00021f + Side * 23.0f));
+            const FVector2D WarpedPosition(
+                Position.X + WarpX * 4200.0f,
+                Position.Y + WarpY * 4200.0f);
+            const float BroadErosion = FMath::PerlinNoise2D(
+                FVector2D(
+                    WarpedPosition.X * 0.00012f + Side * 17.0f,
+                    WarpedPosition.Y * 0.00012f - Side * 11.0f));
+            const float LocalFracture = FMath::PerlinNoise2D(
+                FVector2D(
+                    WarpedPosition.X * 0.00047f - Side * 29.0f,
+                    WarpedPosition.Y * 0.00047f + Side * 23.0f));
+            const float FineTalus = FMath::PerlinNoise2D(
+                FVector2D(
+                    WarpedPosition.X * 0.00108f + 41.0f,
+                    WarpedPosition.Y * 0.00108f - 37.0f));
+            const float JointA = FMath::Abs(FMath::Sin(
+                WarpedPosition.X * 0.00119f +
+                WarpedPosition.Y * 0.00061f + BroadErosion * 1.7f));
+            const float JointB = FMath::Abs(FMath::Sin(
+                WarpedPosition.X * -0.00073f +
+                WarpedPosition.Y * 0.00131f - LocalFracture * 1.3f));
+            const float JointCut = -24.0f *
+                FMath::Pow(1.0f - FMath::Min(JointA, JointB), 5.0f);
+            const float BaseRefinementCm = RefinementFades[VertexIndex] * SlopeResponse *
+                (BroadErosion * 72.0f + LocalFracture * 43.0f +
+                 FineTalus * 19.0f + JointCut);
+            const float PreRefinementDryHeightCm =
+                Position.Z - WaterSurfaceZ[VertexIndex];
+            const float UpperDryScarpFade = RefinementFades[VertexIndex] *
+                SmoothPreviewStep(
+                    UpperDryScarpRefinementStartAboveWaterCm,
+                    UpperDryScarpRefinementFullStrengthAboveWaterCm,
+                    PreRefinementDryHeightCm);
+            const float UpperDryScarpSignalCm = SlopeResponse *
+                (BroadErosion * 240.0f + LocalFracture * 150.0f +
+                 FineTalus * 55.0f + JointCut * 2.8f);
+            const float EffectiveRefinementClampCm = FMath::Lerp(
+                135.0f,
+                MaximumUpperDryScarpRefinementCm,
+                UpperDryScarpFade);
+            float RefinementCm = FMath::Clamp(
+                BaseRefinementCm + UpperDryScarpFade * UpperDryScarpSignalCm,
+                -EffectiveRefinementClampCm,
+                EffectiveRefinementClampCm);
+            const float MinimumRefinementCm =
+                WaterSurfaceZ[VertexIndex] + 30.0f - Position.Z;
+            RefinementCm = FMath::Max(RefinementCm, MinimumRefinementCm);
+            const float AppliedUpperDryScarpRefinementCm =
+                RefinementCm - FMath::Clamp(
+                    BaseRefinementCm,
+                    -135.0f,
+                    135.0f);
+            Vertices[VertexIndex].Z += RefinementCm;
+            if (FMath::Abs(RefinementCm) > 0.5f)
+            {
+                ++OutStats.RefinedVertexCount;
+                OutStats.MaximumAbsoluteRefinementCm = FMath::Max(
+                    OutStats.MaximumAbsoluteRefinementCm,
+                    FMath::Abs(RefinementCm));
+            }
+            if (UpperDryScarpFade > KINDA_SMALL_NUMBER &&
+                FMath::Abs(AppliedUpperDryScarpRefinementCm) > 0.5f)
+            {
+                ++OutStats.UpperDryScarpRefinedVertexCount;
+                OutStats.MaximumAbsoluteUpperDryScarpRefinementCm = FMath::Max(
+                    OutStats.MaximumAbsoluteUpperDryScarpRefinementCm,
+                    FMath::Abs(AppliedUpperDryScarpRefinementCm));
+                OutStats.MinimumUpperDryScarpHeightAboveWaterCm = FMath::Min(
+                    OutStats.MinimumUpperDryScarpHeightAboveWaterCm,
+                    PreRefinementDryHeightCm);
+            }
+            OutStats.MinimumRenderedHeightAboveWaterCm = FMath::Min(
+                OutStats.MinimumRenderedHeightAboveWaterCm,
+                Vertices[VertexIndex].Z - WaterSurfaceZ[VertexIndex]);
+
+            // The conditioned surface is already sampled at this station. Use
+            // its local height to author a bounded procedural wet stain into
+            // vertex alpha rather than adding a rectangular shoreline overlay.
+            // Two incommensurate noise fields break the edge while the mask is
+            // still explicit about having no measured wet-bank authority.
+            const float DryHeightAboveWaterCm =
+                Vertices[VertexIndex].Z - WaterSurfaceZ[VertexIndex];
+            const float BroadWetEdge = FMath::PerlinNoise2D(FVector2D(
+                Vertices[VertexIndex].X * 0.00031f + Side * 13.0f,
+                Vertices[VertexIndex].Y * 0.00031f - Side * 19.0f));
+            const float FineWetEdge = FMath::PerlinNoise2D(FVector2D(
+                Vertices[VertexIndex].X * 0.00117f - Side * 31.0f,
+                Vertices[VertexIndex].Y * 0.00117f + Side * 37.0f));
+            const float WetStainCeilingCm = FMath::Clamp(
+                250.0f + BroadWetEdge * 55.0f + FineWetEdge * 24.0f,
+                175.0f,
+                325.0f);
+            const float WetMask = 1.0f - SmoothPreviewStep(
+                45.0f,
+                WetStainCeilingCm,
+                DryHeightAboveWaterCm);
+            VertexColors[VertexIndex].R = WetMask;
+            if (WetMask > 0.02f)
+            {
+                ++OutStats.WetBankVertexCount;
+                OutStats.MaximumWetBankMask = FMath::Max(
+                    OutStats.MaximumWetBankMask,
+                    WetMask);
+                OutStats.MaximumWetBankHeightAboveWaterCm = FMath::Max(
+                    OutStats.MaximumWetBankHeightAboveWaterCm,
+                    DryHeightAboveWaterCm);
+            }
+        }
+
+        for (int32 StationIndex = 0;
+             StationIndex < LongitudinalStepCount;
+             ++StationIndex)
+        {
+            for (int32 LateralIndex = 0;
+                 LateralIndex < LateralStepCount;
+                 ++LateralIndex)
+            {
+                const int32 A = StationIndex * RowSize + LateralIndex;
+                const int32 B = A + 1;
+                const int32 C = (StationIndex + 1) * RowSize + LateralIndex;
+                const int32 D = C + 1;
+                if (!RenderableVertices[A] || !RenderableVertices[B] ||
+                    !RenderableVertices[C] || !RenderableVertices[D])
+                {
+                    continue;
+                }
+                ++OutStats.TopologyCandidateCellCount;
+                const FVector2D A2(Vertices[A].X, Vertices[A].Y);
+                const FVector2D B2(Vertices[B].X, Vertices[B].Y);
+                const FVector2D C2(Vertices[C].X, Vertices[C].Y);
+                const FVector2D D2(Vertices[D].X, Vertices[D].Y);
+                const float CrossAbc = FVector2D::CrossProduct(
+                    B2 - A2, C2 - A2);
+                const float CrossBdc = FVector2D::CrossProduct(
+                    D2 - B2, C2 - B2);
+                const float AreaAbcCm2 = FMath::Abs(CrossAbc) * 0.5f;
+                const float AreaBdcCm2 = FMath::Abs(CrossBdc) * 0.5f;
+                constexpr float kMinimumPlanarTriangleAreaCm2 = 2500.0f;
+                const bool bExpectedWinding =
+                    CrossAbc * Side < 0.0f && CrossBdc * Side < 0.0f;
+                if (!bExpectedWinding ||
+                    AreaAbcCm2 < kMinimumPlanarTriangleAreaCm2 ||
+                    AreaBdcCm2 < kMinimumPlanarTriangleAreaCm2)
+                {
+                    ++OutStats.TopologyRejectedCellCount;
+                    continue;
+                }
+                OutStats.MinimumPlanarCellAreaCm2 = FMath::Min(
+                    OutStats.MinimumPlanarCellAreaCm2,
+                    FMath::Min(AreaAbcCm2, AreaBdcCm2));
+                if (Side < 0.0f)
+                {
+                    Triangles.Append({A, C, B, B, C, D});
+                }
+                else
+                {
+                    Triangles.Append({A, B, C, B, D, C});
+                }
+            }
+        }
+        if (Triangles.IsEmpty())
+        {
+            OutSummary += TEXT(
+                "Zambezi adaptive near-field terrain produced no dry bank triangles.\n");
+            return false;
+        }
+
+        const TArray<FVector> Normals = ComputePreviewMeshNormals(
+            Vertices, Triangles);
+        AActor* Actor = AddPreviewProceduralMeshActor(
+            World,
+            FString::Printf(
+                TEXT("RaftSim_ZambeziAdaptiveNearFieldTerrainV2_%sBank"),
+                Side < 0.0f ? TEXT("Left") : TEXT("Right")),
+            Vertices,
+            Triangles,
+            Normals,
+            Uvs,
+            Candidate.PreviewSpec.TerrainColor,
+            TerrainMaterial,
+            &VertexColors,
+            false);
+        if (!Actor)
+        {
+            return false;
+        }
+        Actor->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+        Actor->Tags.AddUnique(TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV2"));
+        Actor->Tags.AddUnique(TEXT("RaftSimIrregularPlanarTopologyV2"));
+        Actor->Tags.AddUnique(TEXT("RaftSimDomainWarpedGeomorphicReliefV2"));
+        Actor->Tags.AddUnique(TEXT("RaftSimAdaptiveUpperDryScarpReliefV20"));
+        Actor->Tags.AddUnique(TEXT("RaftSimSourceConditionedTerrain"));
+        Actor->Tags.AddUnique(TEXT("RaftSimProceduralInfill"));
+        Actor->Tags.AddUnique(TEXT("RaftSimProtectedDryShoreline"));
+        Actor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+        Actor->Tags.AddUnique(TEXT("RaftSimNearFieldSelfShadowSuppressed"));
+        Actor->Tags.AddUnique(TEXT("RaftSimConditionedWaterlineWetBankV1"));
+        Actor->Tags.AddUnique(TEXT("RaftSimVertexRedWetBankMask"));
+        Actor->Tags.AddUnique(TEXT("RaftSimProceduralWetBankNoMeasuredAuthority"));
+        if (UProceduralMeshComponent* Component =
+                Actor->FindComponentByClass<UProceduralMeshComponent>())
+        {
+            Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            Component->SetCastShadow(false);
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV2"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimIrregularPlanarTopologyV2"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimDomainWarpedGeomorphicReliefV2"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimAdaptiveUpperDryScarpReliefV20"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNonCollisionRenderSurface"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNearFieldSelfShadowSuppressed"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimConditionedWaterlineWetBankV1"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimVertexRedWetBankMask"));
+            ++OutStats.ShadowSuppressedActorCount;
+            if (Component->GetCollisionEnabled() != ECollisionEnabled::NoCollision)
+            {
+                ++OutStats.CollisionEnabledActorCount;
+            }
+        }
+        ++OutStats.ActorCount;
+        OutStats.VertexCount += Vertices.Num();
+        OutStats.TriangleCount += Triangles.Num() / 3;
+    }
+
+    OutSummary += FString::Printf(
+        TEXT("Built %d source-conditioned Zambezi adaptive near-field V2 bank actors "
+             "over stations %.0f-%.0f m: %lld vertices, %lld triangles, %.1f m grid, "
+             "%lld irregular-plan vertices (maximum jitter %.2f m, minimum triangle "
+             "area %.3f m2), %lld/%lld curved-offset cells rejected for inverted or "
+             "sub-0.25m2 topology, %lld bounded refinement vertices (maximum %.2f m), "
+             "%lld dry-shoreline "
+             "infill vertices (maximum %.2f m), minimum rendered clearance %.2f m; "
+             "%lld upper dry-scarp vertices received V20 facade refinement "
+             "(maximum %.2f m; minimum source height %.2f m above local water); "
+             "%lld vertices carry a bounded conditioned-waterline wet-bank mask "
+             "(maximum mask %.3f, maximum affected dry height %.2f m); "
+             "collision remains disabled and overlay self-shadow is suppressed "
+             "after the rejected shadow-wedge bracket.\n"),
+        OutStats.ActorCount,
+        StartStationM,
+        EndStationM,
+        OutStats.VertexCount,
+        OutStats.TriangleCount,
+        LongitudinalSpacingCm * 0.01f,
+        OutStats.PlanarJitteredVertexCount,
+        OutStats.MaximumPlanarJitterCm * 0.01f,
+        OutStats.MinimumPlanarCellAreaCm2 * 0.0001f,
+        OutStats.TopologyRejectedCellCount,
+        OutStats.TopologyCandidateCellCount,
+        OutStats.RefinedVertexCount,
+        OutStats.MaximumAbsoluteRefinementCm * 0.01f,
+        OutStats.DryShorelineInfillVertexCount,
+        OutStats.MaximumDryShorelineInfillCm * 0.01f,
+        OutStats.MinimumRenderedHeightAboveWaterCm * 0.01f,
+        OutStats.UpperDryScarpRefinedVertexCount,
+        OutStats.MaximumAbsoluteUpperDryScarpRefinementCm * 0.01f,
+        OutStats.MinimumUpperDryScarpHeightAboveWaterCm * 0.01f,
+        OutStats.WetBankVertexCount,
+        OutStats.MaximumWetBankMask,
+        OutStats.MaximumWetBankHeightAboveWaterCm * 0.01f);
+    return OutStats.ActorCount == 2 && OutStats.VertexCount >= 160000 &&
+        OutStats.TriangleCount >= 240000 &&
+        OutStats.PlanarJitteredVertexCount > 0 &&
+        OutStats.MaximumPlanarJitterCm <= 70.0f &&
+        OutStats.MinimumPlanarCellAreaCm2 >= 2500.0f &&
+        OutStats.TopologyCandidateCellCount > 0 &&
+        OutStats.TopologyRejectedCellCount * 20 <=
+            OutStats.TopologyCandidateCellCount &&
+        OutStats.RefinedVertexCount > 0 &&
+        OutStats.UpperDryScarpRefinedVertexCount > 0 &&
+        OutStats.MinimumUpperDryScarpHeightAboveWaterCm + 0.5f >=
+            UpperDryScarpRefinementStartAboveWaterCm &&
+        OutStats.MaximumAbsoluteUpperDryScarpRefinementCm <=
+            MaximumUpperDryScarpRefinementCm + 0.5f &&
+        OutStats.WetBankVertexCount > 0 &&
+        OutStats.MaximumWetBankMask > 0.5f &&
+        OutStats.MaximumWetBankHeightAboveWaterCm <= 325.5f &&
+        OutStats.MinimumRenderedHeightAboveWaterCm >= 29.5f &&
+        OutStats.MaximumAbsoluteRefinementCm <=
+            MaximumUpperDryScarpRefinementCm + 0.5f &&
+        OutStats.MaximumDryShorelineInfillCm <=
+            MaximumDryShorelineInfillCm + 0.5f &&
+        OutStats.ShadowSuppressedActorCount == 2 &&
+        OutStats.CollisionEnabledActorCount == 0;
+}
+
+bool AddLandscapeCandidateScenarioMarkers(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary)
+{
+    if (Candidate.ScenarioRelativePath.IsEmpty())
+    {
+        return true;
+    }
+    if (!World || !Landscape)
+    {
+        return false;
+    }
+
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint> SourcePoints;
+    if (!LoadLandscapeCandidateLocalCenterline(Candidate, SourcePoints, OutSummary) ||
+        SourcePoints.Num() < 2)
+    {
+        return false;
+    }
+
+    const FString ScenarioPath = FPaths::ConvertRelativePathToFull(
+        FPaths::Combine(GetRepoRoot(), Candidate.ScenarioRelativePath));
+    FString ScenarioText;
+    if (!FFileHelper::LoadFileToString(ScenarioText, *ScenarioPath))
+    {
+        OutSummary += FString::Printf(TEXT("Could not read scenario %s.\n"), *ScenarioPath);
+        return false;
+    }
+    TSharedPtr<FJsonObject> ScenarioRoot;
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ScenarioText);
+    if (!FJsonSerializer::Deserialize(Reader, ScenarioRoot) || !ScenarioRoot.IsValid())
+    {
+        OutSummary += FString::Printf(TEXT("Could not parse scenario %s.\n"), *ScenarioPath);
+        return false;
+    }
+    if (ScenarioRoot->GetStringField(TEXT("river_id")) != Candidate.PreviewSpec.RiverId ||
+        ScenarioRoot->GetBoolField(TEXT("production_promoted")))
+    {
+        OutSummary += TEXT("Scenario river mismatch or unsafe production-promotion flag.\n");
+        return false;
+    }
+    const TArray<TSharedPtr<FJsonValue>>* RapidValues = nullptr;
+    if (!ScenarioRoot->TryGetArrayField(TEXT("rapids"), RapidValues) || !RapidValues ||
+        RapidValues->Num() < 1)
+    {
+        OutSummary += TEXT("Scenario has no rapid marker definitions.\n");
+        return false;
+    }
+
+    UStaticMesh* ConeMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Cone.Cone"));
+    if (!ConeMesh)
+    {
+        OutSummary += TEXT("Could not load the engine cone used for scenario markers.\n");
+        return false;
+    }
+    const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
+    const float LandscapeMinY = -Candidate.HorizontalSpanYCm * 0.5f;
+    float PreviousStationM = -1.0f;
+    int32 SpawnedCount = 0;
+    for (const TSharedPtr<FJsonValue>& RapidValue : *RapidValues)
+    {
+        const TSharedPtr<FJsonObject> Rapid = RapidValue ? RapidValue->AsObject() : nullptr;
+        if (!Rapid.IsValid())
+        {
+            return false;
+        }
+        const float StationM = static_cast<float>(Rapid->GetNumberField(TEXT("station_m")));
+        if (StationM < PreviousStationM || StationM > SourcePoints.Last().StationMeters)
+        {
+            OutSummary += TEXT("Scenario rapid stations are not monotonic or leave the candidate centerline.\n");
+            return false;
+        }
+        PreviousStationM = StationM;
+
+        FVector2D LocalCm = SourcePoints.Last().LocalCm;
+        FVector2D Tangent = FVector2D(1.0f, 0.0f);
+        for (int32 PointIndex = 0; PointIndex + 1 < SourcePoints.Num(); ++PointIndex)
+        {
+            const FRaftSimLandscapeCandidateCenterlinePoint& A = SourcePoints[PointIndex];
+            const FRaftSimLandscapeCandidateCenterlinePoint& B = SourcePoints[PointIndex + 1];
+            if (StationM > B.StationMeters)
+            {
+                continue;
+            }
+            const float SpanM = FMath::Max(B.StationMeters - A.StationMeters, KINDA_SMALL_NUMBER);
+            const float Alpha = FMath::Clamp((StationM - A.StationMeters) / SpanM, 0.0f, 1.0f);
+            LocalCm = FMath::Lerp(A.LocalCm, B.LocalCm, Alpha);
+            Tangent = (B.LocalCm - A.LocalCm).GetSafeNormal();
+            break;
+        }
+        const FVector2D WorldXY(LandscapeMinX + LocalCm.X, LandscapeMinY + LocalCm.Y);
+        const float TerrainZ = Landscape->GetHeightAtLocation(
+            FVector(WorldXY.X, WorldXY.Y, 0.0f),
+            EHeightfieldSource::Editor).Get(0.0f);
+        const FString RapidNumber = Rapid->GetStringField(TEXT("rapid_number"));
+        const FString DisplayName = Rapid->GetStringField(TEXT("display_name"));
+        const bool bMandatoryPortage = Rapid->GetBoolField(TEXT("mandatory_commercial_portage"));
+
+        AStaticMeshActor* MarkerActor = World->SpawnActor<AStaticMeshActor>(
+            FVector(WorldXY.X, WorldXY.Y, TerrainZ + 650.0f),
+            FRotator::ZeroRotator);
+        if (!MarkerActor)
+        {
+            return false;
+        }
+        UStaticMeshComponent* MarkerMesh = MarkerActor->GetStaticMeshComponent();
+        MarkerMesh->SetStaticMesh(ConeMesh);
+        MarkerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        MarkerMesh->SetWorldScale3D(FVector(4.0f, 4.0f, 12.0f));
+        MarkerMesh->SetCastShadow(false);
+        MarkerActor->SetActorHiddenInGame(true);
+        MarkerActor->SetActorLabel(FString::Printf(
+            TEXT("RaftSim_ZambeziRapid_%s_%s"),
+            *RapidNumber,
+            *DisplayName.Replace(TEXT(" "), TEXT("_"))));
+        MarkerActor->Tags.Add(TEXT("RaftSimScenarioMarker"));
+        MarkerActor->Tags.Add(TEXT("RaftSimZambeziRun"));
+        if (bMandatoryPortage)
+        {
+            MarkerActor->Tags.Add(TEXT("RaftSimMandatoryPortage"));
+        }
+
+        UTextRenderComponent* Label = NewObject<UTextRenderComponent>(MarkerActor);
+        Label->SetupAttachment(MarkerMesh);
+        Label->SetText(FText::FromString(FString::Printf(
+            TEXT("%s  %s%s"),
+            *RapidNumber,
+            *DisplayName,
+            bMandatoryPortage ? TEXT("  PORTAGE") : TEXT(""))));
+        Label->SetTextRenderColor(bMandatoryPortage ? FColor::Red : FColor(255, 170, 45));
+        Label->SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
+        Label->SetWorldSize(1100.0f);
+        Label->SetRelativeLocation(FVector(0.0f, 0.0f, 150.0f));
+        Label->SetRelativeRotation(FRotator(-90.0f, FMath::RadiansToDegrees(
+            FMath::Atan2(Tangent.Y, Tangent.X)), 0.0f));
+        Label->SetHiddenInGame(true);
+        Label->RegisterComponent();
+        ++SpawnedCount;
+    }
+    OutSummary += FString::Printf(
+        TEXT("Added %d review-gated Zambezi scenario rapid markers from %s; map labels are editor-only and Rapid 9 carries the mandatory-portage tag.\n"),
+        SpawnedCount,
+        *Candidate.ScenarioRelativePath);
+    return SpawnedCount == RapidValues->Num();
+}
+
+namespace
+{
+// A Cartesian map needs its own run manager (the game mode's fallback has no
+// progress map, and a Cartesian hydraulic map is never used for progress) and
+// the South Fork-style live surface: one 224 m square at the solver's cells.
+// The run manager lives in the game module, so it is loaded by class path and
+// configured through reflection.
+bool AddZambeziUpperGorgeCartesianRunActors(
+    UWorld* World, const FVector& LaunchCm, const FRotator& LaunchRotation, FName RunTag, FString& OutSummary)
+{
+    UClass* RunManagerClass = LoadClass<AActor>(nullptr, TEXT("/Script/SmokeEmIfYouGotEm.RaftSimRunManager"));
+    AActor* RunManager = RunManagerClass
+        ? World->SpawnActor<AActor>(RunManagerClass, FTransform(LaunchRotation, LaunchCm + FVector(0.0, 0.0, 600.0)))
+        : nullptr;
+    if (!RunManager)
+    {
+        OutSummary += TEXT("Could not spawn RaftSimRunManager for the Zambezi upper gorge.\n");
+        return false;
+    }
+    FStrProperty* ProgressPath = FindFProperty<FStrProperty>(RunManagerClass, TEXT("ProgressCoordinateMapPath"));
+    FNameProperty* ScenarioId = FindFProperty<FNameProperty>(RunManagerClass, TEXT("ScenarioId"));
+    FFloatProperty* StartStation = FindFProperty<FFloatProperty>(RunManagerClass, TEXT("StartStationM"));
+    FFloatProperty* FinishStation = FindFProperty<FFloatProperty>(RunManagerClass, TEXT("FinishStationM"));
+    if (!ProgressPath || !ScenarioId || !StartStation || !FinishStation)
+    {
+        OutSummary += TEXT("RaftSimRunManager lacks the progress-map, scenario or station properties.\n");
+        return false;
+    }
+    ProgressPath->SetPropertyValue_InContainer(RunManager,
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_upper_gorge_evidence_2025/"
+             "cartesian_runtime/progress_coordinate_map.json"));
+    ScenarioId->SetPropertyValue_InContainer(RunManager, FName(TEXT("zambezi_upper_gorge_challenge")));
+    StartStation->SetPropertyValue_InContainer(RunManager, kZambeziUpperGorgeLaunchStationM);
+    FinishStation->SetPropertyValue_InContainer(RunManager, kZambeziUpperGorgeFinishStationM);
+    RunManager->SetActorLabel(TEXT("RaftSim_ZambeziUpperGorge_RunManager"));
+    RunManager->Tags.AddUnique(RunTag);
+
+    ARaftSimWaterSurfaceActor* Surface = World->SpawnActor<ARaftSimWaterSurfaceActor>(
+        ARaftSimWaterSurfaceActor::StaticClass(), FTransform::Identity);
+    if (!Surface)
+    {
+        OutSummary += TEXT("Could not place the Zambezi upper-gorge live water surface.\n");
+        return false;
+    }
+    // Protected editor properties, set as the South Fork assembly script does.
+    UClass* SurfaceClass = Surface->GetClass();
+    FFloatProperty* Spacing = FindFProperty<FFloatProperty>(SurfaceClass, TEXT("VertexSpacingMeters"));
+    FIntProperty* Subdivision = FindFProperty<FIntProperty>(SurfaceClass, TEXT("RiverPresentationSubdivision"));
+    FFloatProperty* GridLength = FindFProperty<FFloatProperty>(SurfaceClass, TEXT("CurvedGridLengthMeters"));
+    FFloatProperty* GridWidth = FindFProperty<FFloatProperty>(SurfaceClass, TEXT("CurvedGridWidthMeters"));
+    FBoolProperty* FixedGrid = FindFProperty<FBoolProperty>(SurfaceClass, TEXT("bFixedCurvedGrid"));
+    if (!Spacing || !Subdivision || !GridLength || !GridWidth || !FixedGrid)
+    {
+        OutSummary += TEXT("ARaftSimWaterSurfaceActor lacks the spacing or grid properties.\n");
+        return false;
+    }
+    Spacing->SetPropertyValue_InContainer(Surface, 2.0f);
+    Subdivision->SetPropertyValue_InContainer(Surface, 2);
+    GridLength->SetPropertyValue_InContainer(Surface, 224.0f);
+    GridWidth->SetPropertyValue_InContainer(Surface, 224.0f);
+    FixedGrid->SetPropertyValue_InContainer(Surface, false);
+    Surface->SetActorLabel(TEXT("RaftSim_ZambeziUpperGorge_LiveWaterSurface"));
+    Surface->Tags.AddUnique(RunTag);
+    OutSummary += FString::Printf(
+        TEXT("Placed the Zambezi upper-gorge run manager (progress stations %.0f-%.0f m) and the 224 m Cartesian live surface.\n"),
+        kZambeziUpperGorgeLaunchStationM, kZambeziUpperGorgeFinishStationM);
+    return true;
+}
+}
+
+bool AddLandscapeCandidateRunnableGameplay(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary)
+{
+    if (!World || !Landscape)
+    {
+        return false;
+    }
+    const bool bZambezi =
+        Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+    const bool bPacuare = Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+    const bool bColoradoHance =
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+    const bool bChilkoLavaCanyon =
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+    const bool bFutaleufuTerminator =
+        Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    // Cartesian (map-aligned) live water: the hydraulic frame is east/north,
+    // not a river station, so run progress uses a separate curved map.
+    const bool bZambeziUpperGorge = IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
+    const bool bReachLocalRun =
+        bPacuare || bColoradoHance || bChilkoLavaCanyon || bFutaleufuTerminator;
+    const bool bSolverOwnedRuntimeWater = bReachLocalRun || bZambezi || bZambeziUpperGorge;
+    if (!bZambezi && !bPacuare && !bColoradoHance && !bChilkoLavaCanyon &&
+        !bFutaleufuTerminator && !bZambeziUpperGorge)
+    {
+        return true;
+    }
+
+    FString RuntimeConfigLabel;
+    FString CookedFieldsDir;
+    FName FlowBand;
+    FVector2D WindowCenterM;
+    float WindowExtentM = 0.0f;
+    FString CoordinateMapPath;
+    FName RunTag;
+    FString PlayerRaftLabel;
+    FString DisplayName;
+    if (bPacuare)
+    {
+        // Evidence-based Huacas-Pinball reach (IGN 1:5,000 contours and
+        // banks, 2014-2017 orthophoto, OSM chainage; inferred bed at the 45
+        // m3/s planning discharge); see
+        // docs/reconstruction-review-2026-09-07/pacuare-huacas-evidence.md.
+        RuntimeConfigLabel = TEXT("RaftSim_PacuareUpperHuacas_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/pacuare_river_costa_rica/"
+                 "scenario_huacas_evidence_2017/cooked_flow_fields");
+        FlowBand = FName(TEXT("rainfed_runnable_45cms"));
+        WindowCenterM = FVector2D(kPacuareHuacasLaunchStationM, 0.0f);
+        WindowExtentM = 480.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/"
+                 "huacas_evidence_2017/huacas_evidence_runtime_coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimPacuareUpperHuacasRun"));
+        PlayerRaftLabel = TEXT("RaftSim_PacuareUpperHuacas_PlayerRaft");
+        DisplayName = TEXT("Pacuare Upper Huacas");
+    }
+    else if (bColoradoHance)
+    {
+        // Evidence-based 2.5 km geographic reach (2021 DEM and imagery at
+        // ~8,000 cfs, 2014 sonar pools, labelled inferred rapid bed); see
+        // docs/reconstruction-review-2026-09-07/colorado-hance-evidence.md.
+        RuntimeConfigLabel = TEXT("RaftSim_ColoradoHance_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/"
+                 "scenario_hance_evidence_2021/cooked_flow_fields");
+        FlowBand = FName(TEXT("steady_8000cfs_2021"));
+        WindowCenterM = FVector2D(kColoradoHanceLaunchStationM, 0.0f);
+        WindowExtentM = 480.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/"
+                 "hance_evidence_2021/hance_evidence_runtime_coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimColoradoHanceRun"));
+        PlayerRaftLabel = TEXT("RaftSim_ColoradoHance_PlayerRaft");
+        DisplayName = TEXT("Colorado Hance");
+    }
+    else if (bChilkoLavaCanyon)
+    {
+        // Evidence-based Lava Canyon reach (LidarBC 2023 1 m terrain and
+        // flight-day water surface, Sentinel-2 whitewater, HYDAT flows;
+        // inferred bed calibrated to the LiDAR surface, run at the 93 m3/s
+        // lake-outlet flow of the drape image); see
+        // docs/reconstruction-review-2026-09-07/chilko-lava-canyon-evidence.md.
+        RuntimeConfigLabel = TEXT("RaftSim_ChilkoLavaCanyon_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/chilko_river_bc/"
+                 "scenario_lava_canyon_evidence_2023/cooked_flow_fields");
+        FlowBand = FName(TEXT("summer_runnable_93cms"));
+        WindowCenterM = FVector2D(kChilkoLavaCanyonLaunchStationM, 0.0f);
+        WindowExtentM = 480.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/"
+                 "lava_canyon_evidence_2023_runtime_coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimChilkoLavaCanyonRun"));
+        PlayerRaftLabel = TEXT("RaftSim_ChilkoLavaCanyon_PlayerRaft");
+        DisplayName = TEXT("Chilko Lava Canyon");
+    }
+    else if (bFutaleufuTerminator)
+    {
+        // Evidence-based Terminator reach (Sentinel-2 10 m wetted extent and
+        // whitewater, Copernicus GLO-30 terrain and edited water surface, OSM
+        // chainage; inferred bed at the 400 m3/s planning discharge); see
+        // docs/reconstruction-review-2026-09-07/futaleufu-terminator-evidence.md.
+        RuntimeConfigLabel = TEXT("RaftSim_FutaleufuTerminator_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/futaleufu_river_chile/"
+                 "scenario_terminator_evidence_2026/cooked_flow_fields");
+        FlowBand = FName(TEXT("high_runnable_400cms"));
+        WindowCenterM = FVector2D(kFutaleufuTerminatorLaunchStationM, 0.0f);
+        WindowExtentM = 480.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
+                 "terminator_evidence_2026/terminator_evidence_runtime_coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimFutaleufuTerminatorRun"));
+        PlayerRaftLabel = TEXT("RaftSim_FutaleufuTerminator_PlayerRaft");
+        DisplayName = TEXT("Futaleufu Terminator");
+    }
+    else if (bZambeziUpperGorge)
+    {
+        // Evidence-based upper gorge on a map-aligned 2 m Cartesian cook
+        // (Sentinel-2 low-water extent and whitewater, GLO-30 terrain, ZRA
+        // flow of the image day; inferred bed and gorge walls); see
+        // docs/reconstruction-review-2026-09-07/zambezi-upper-gorge-evidence.md.
+        // Cartesian startup reads only the coordinate map, the streaming
+        // manifest and the band; the raft's position selects the window.
+        RuntimeConfigLabel = TEXT("RaftSim_ZambeziUpperGorge_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_upper_gorge_evidence_2025/"
+                 "cartesian_runtime/region_upper_gorge");
+        FlowBand = FName(TEXT("low_water_283cms"));
+        WindowCenterM = FVector2D::ZeroVector;
+        WindowExtentM = 224.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_upper_gorge_evidence_2025/"
+                 "cartesian_runtime/coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimZambeziUpperGorgeRun"));
+        PlayerRaftLabel = TEXT("RaftSim_ZambeziUpperGorge_PlayerRaft");
+        DisplayName = TEXT("Zambezi Upper Gorge");
+    }
+    else
+    {
+        RuntimeConfigLabel = TEXT("RaftSim_Zambezi_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+                 "scenario_zambezi_run/runtime/cooked_flow_fields");
+        FlowBand = FName(TEXT("normal_big_water"));
+        WindowCenterM = FVector2D(15000.0f, 0.0f);
+        WindowExtentM = 32000.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+                 "scenario_zambezi_run/runtime/river_coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimZambeziRun"));
+        PlayerRaftLabel = TEXT("RaftSim_Zambezi_PlayerRaft");
+        DisplayName = TEXT("Zambezi");
+    }
+
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint> Points;
+    if (!LoadLandscapeCandidateLocalCenterline(Candidate, Points, OutSummary) ||
+        Points.Num() < 2)
+    {
+        return false;
+    }
+
+    // Hance launches in the measured pool above the rapid (station 520 m of
+    // the 2.5 km evidence reach; the whitewater begins near 680 m), so a run
+    // covers the entry, the main rapid, the calm run and the lower rapid.
+    // Lava Canyon retains its independently reviewed station-228 m approach.
+    // These values change scenario framing only; cooked hydraulics, wet
+    // masks, collision, and raft forces are not synthesized or modified.
+    const float StartProgress = bColoradoHance
+        ? FMath::Clamp(kColoradoHanceLaunchStationM /
+              FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f)
+        : bPacuare
+        ? FMath::Clamp(kPacuareHuacasLaunchStationM /
+              FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f)
+        : bFutaleufuTerminator
+        ? FMath::Clamp(kFutaleufuTerminatorLaunchStationM /
+              FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f)
+        : bChilkoLavaCanyon
+        ? FMath::Clamp(kChilkoLavaCanyonLaunchStationM /
+              FMath::Max(Points.Last().StationMeters - Points[0].StationMeters, 1.0f), 0.0f, 1.0f)
+        : bZambeziUpperGorge
+        ? CenterlineProgress(Points, kZambeziUpperGorgeLaunchStationM)
+        : (bReachLocalRun ? 0.04f : 0.0025f);
+    FVector2D StartTangent2D(1.0f, 0.0f);
+    const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
+        Candidate,
+        Points,
+        StartProgress,
+        &StartTangent2D);
+    float SurfaceWorldZ = 0.0f;
+    if (!SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
+            Candidate,
+            Points,
+            StartProgress,
+            SurfaceWorldZ))
+    {
+        SurfaceWorldZ = Landscape->GetHeightAtLocation(
+            FVector(StartXY.X, StartXY.Y, 0.0f),
+            EHeightfieldSource::Editor).Get(0.0f) + 140.0f;
+    }
+    SurfaceWorldZ += Candidate.PreviewSpec.FlowWaterLevelOffsetCm;
+    const FVector StartTangent(StartTangent2D.X, StartTangent2D.Y, 0.0f);
+    const FRotator StartRotation = StartTangent.Rotation();
+
+    UClass* RuntimeGameMode = LoadClass<AGameModeBase>(
+        nullptr,
+        TEXT("/Script/SmokeEmIfYouGotEm.RaftSimVerticalSliceGameMode"));
+    if (!RuntimeGameMode)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not load RaftSimVerticalSliceGameMode for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
+    World->GetWorldSettings()->DefaultGameMode = RuntimeGameMode;
+
+    ARaftSimRiverWaterConfig* WaterConfig =
+        World->SpawnActor<ARaftSimRiverWaterConfig>(
+            ARaftSimRiverWaterConfig::StaticClass(),
+            FTransform::Identity);
+    if (!WaterConfig)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not spawn the runtime water config for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
+    WaterConfig->SetActorLabel(RuntimeConfigLabel);
+    WaterConfig->CookedFieldsDir = CookedFieldsDir;
+    WaterConfig->FlowBand = FlowBand;
+    WaterConfig->WindowCenterM = WindowCenterM;
+    WaterConfig->WindowExtentM = WindowExtentM;
+    WaterConfig->bRecenterHydraulicCrux = false;
+    WaterConfig->CoordinateMapPath = CoordinateMapPath;
+    // The 30 km Zambezi run cannot simulate its whole 5999 x 25 cell corridor
+    // every 1/60 s tick (~20 ms per step never keeps real time). Crop the same
+    // cooked field around the raft and re-centre it every 80 m instead.
+    WaterConfig->bEnableMovingWindowStreaming =
+        bZambezi || bColoradoHance || bPacuare || bFutaleufuTerminator || bChilkoLavaCanyon || bZambeziUpperGorge;
+    if (bColoradoHance)
+    {
+        // 2.5 km x 160 m at 2 m is 101,817 cells; crop 480 m of it around
+        // the raft (240 x 81 cells) and draw the whole cooked lateral span.
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/"
+                 "scenario_hance_evidence_2021/runtime/moving_water_streaming.json");
+        WaterConfig->WindowCenterM = FVector2D(kColoradoHanceLaunchStationM, 0.0f);
+        WaterConfig->MovingWindowStationExtentM = 480.0f;
+        WaterConfig->MovingWindowLateralExtentM = 160.0f;
+        WaterConfig->MovingWindowAdvanceM = 80.0f;
+        WaterConfig->LivePresentationWidthM = 160.0f;
+        WaterConfig->bEnableCookedFarFieldWater = true;
+        // No cooked-field indicator places the whitewater where the 2021
+        // imagery shows it (best matched-area IoU 0.14, Froude 0.07;
+        // audit_hance_whitewater_indicators.py). The photographed extent at
+        // the same flow floors the displayed foam (appearance evidence,
+        // export_hance_observed_whitewater.py), so the generic Froude onset
+        // stays at its default and the lace/patch floors can mass the white
+        // where the photo has it (with the broad Froude foam alone, 0.3 had
+        // turned the whole rapid into one sheet).
+        WaterConfig->LiveFoamFroudeOnset = 0.78f;
+        WaterConfig->LiveFoamFroudeRamp = 1.25f;
+        WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
+        WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
+    }
+    if (bPacuare)
+    {
+        // 2.33 km x 96 m at 2 m: crop 480 m around the raft and draw the
+        // whole cooked lateral span, with the cooked far field beyond it.
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/pacuare_river_costa_rica/"
+                 "scenario_huacas_evidence_2017/runtime/moving_water_streaming.json");
+        WaterConfig->WindowCenterM = FVector2D(kPacuareHuacasLaunchStationM, 0.0f);
+        WaterConfig->MovingWindowStationExtentM = 480.0f;
+        WaterConfig->MovingWindowLateralExtentM = 96.0f;
+        WaterConfig->MovingWindowAdvanceM = 80.0f;
+        WaterConfig->LivePresentationWidthM = 96.0f;
+        WaterConfig->bEnableCookedFarFieldWater = true;
+        // As at Hance: the orthophoto whitewater floors the displayed foam
+        // (the 2 m cooked field under-places it), Froude onset at default.
+        WaterConfig->LiveFoamFroudeOnset = 0.78f;
+        WaterConfig->LiveFoamFroudeRamp = 1.25f;
+        WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
+        WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
+    }
+    if (bChilkoLavaCanyon)
+    {
+        // 3.98 km x 56 m at 2 m: crop 480 m around the raft and draw the
+        // whole cooked lateral span, with the cooked far field beyond it. The
+        // Sentinel-2 whitewater (10 m, four dates) floors the displayed foam.
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/chilko_river_bc/"
+                 "scenario_lava_canyon_evidence_2023/runtime/moving_water_streaming.json");
+        WaterConfig->WindowCenterM = FVector2D(kChilkoLavaCanyonLaunchStationM, 0.0f);
+        WaterConfig->MovingWindowStationExtentM = 480.0f;
+        WaterConfig->MovingWindowLateralExtentM = 56.0f;
+        WaterConfig->MovingWindowAdvanceM = 80.0f;
+        WaterConfig->LivePresentationWidthM = 56.0f;
+        WaterConfig->bEnableCookedFarFieldWater = true;
+        WaterConfig->LiveFoamFroudeOnset = 0.78f;
+        WaterConfig->LiveFoamFroudeRamp = 1.25f;
+        WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
+        WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
+    }
+    if (bFutaleufuTerminator)
+    {
+        // 2.39 km x 96 m at 2 m: crop 480 m around the raft and draw the
+        // whole cooked lateral span, with the cooked far field beyond it. The
+        // Sentinel-2 whitewater (10 m, three dates) floors the displayed foam.
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/futaleufu_river_chile/"
+                 "scenario_terminator_evidence_2026/runtime/moving_water_streaming.json");
+        WaterConfig->WindowCenterM = FVector2D(kFutaleufuTerminatorLaunchStationM, 0.0f);
+        WaterConfig->MovingWindowStationExtentM = 480.0f;
+        WaterConfig->MovingWindowLateralExtentM = 96.0f;
+        WaterConfig->MovingWindowAdvanceM = 80.0f;
+        WaterConfig->LivePresentationWidthM = 96.0f;
+        WaterConfig->bEnableCookedFarFieldWater = true;
+        WaterConfig->LiveFoamFroudeOnset = 0.78f;
+        WaterConfig->LiveFoamFroudeRamp = 1.25f;
+        WaterConfig->LiveWhitewaterLaceFloor = 0.30f;
+        WaterConfig->LiveWhitewaterPatchOutsideFloor = 0.10f;
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
+    }
+    if (bZambeziUpperGorge)
+    {
+        // 224 m square live windows re-centred every 64 m inside the export's
+        // valid-centre rectangles; the shared atlas draws the cooked water
+        // beyond the window (far field).
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_upper_gorge_evidence_2025/"
+                 "cartesian_runtime/streaming_manifest.json");
+        WaterConfig->MovingWindowStationExtentM = 224.0f;
+        WaterConfig->MovingWindowLateralExtentM = 224.0f;
+        WaterConfig->MovingWindowAdvanceM = 64.0f;
+        WaterConfig->LivePresentationWidthM = 224.0f;
+        WaterConfig->LivePresentationLengthM = 224.0f;
+        WaterConfig->bEnableCookedFarFieldWater = true;
+        // Observed whitewater (render-only appearance evidence): Sentinel-2
+        // whitewater plus the observed-rapid catalogue, as a Cartesian raster
+        // (export_cartesian_observed_whitewater.py) that floors displayed foam.
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
+        // This map's live core draws the GPU moving detail's foam, so the same
+        // layer also joins the detail's breaking source. Overhead renders at
+        // Morning Glory and Stairway: 0.5 keeps the lace texture, 0.9 is one
+        // white sheet through Stairway; 0.6 matches the photographed rapids.
+        WaterConfig->ObservedWhitewaterEntrainmentGain = kObservedWhitewaterEntrainmentGain;
+    }
+    if (bZambezi)
+    {
+        WaterConfig->StreamingManifestPath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+                 "scenario_zambezi_run/runtime/moving_water_streaming.json");
+        WaterConfig->WindowCenterM = FVector2D(320.0f, 0.0f);
+        WaterConfig->MovingWindowStationExtentM = 640.0f;
+        WaterConfig->MovingWindowLateralExtentM = 250.0f;
+        WaterConfig->MovingWindowAdvanceM = 80.0f;
+        // The procedural reference field breaks weakly at most of its 25
+        // rapids; the observed-rapid catalogue's expected whitewater
+        // (export_zambezi_run_observed_whitewater.py) floors the displayed foam.
+        WaterConfig->ObservedWhitewaterGain = kObservedWhitewaterDisplayGain;
+        // Under the strong dry-season sun the shared exposure lifted the
+        // black basalt walls to light grey-brown and clipped the foam; half a
+        // stop darker keeps the foam white and the walls dark.
+        WaterConfig->PresentationExposureBiasOffset = -0.5f;
+    }
+    WaterConfig->bMapProvidesTerrain = true;
+    WaterConfig->bLiveSolverOwnsRuntimeRendering = bSolverOwnedRuntimeWater;
+    if (bPacuare)
+    {
+        WaterConfig->bEnforceTaggedHeightFogPresentation = true;
+        WaterConfig->RuntimeHeightFogActorTag =
+            TEXT("RaftSimLayeredRainforestHumidity");
+        WaterConfig->RuntimeHeightFogDensity = 0.0075f;
+        WaterConfig->bRuntimeVolumetricFogEnabled = false;
+        // A wet-cell-clipped transmitting core replaces the opaque rainforest
+        // carrier as the river body. The low-coverage Default Lit surface is
+        // retained only for solver geometry normals and a soft bank feather.
+        WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveVolumeCoreMaterialOverride =
+            LoadOrCreatePacuareUpperHuacasLiveWaterInstance(OutSummary);
+        WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Textures/"
+                 "T_RaftSim_PacuareUpperHuacasWaterV1_FlowNormal."
+                 "T_RaftSim_PacuareUpperHuacasWaterV1_FlowNormal"));
+        WaterConfig->LiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Textures/"
+                 "T_RaftSim_PacuareUpperHuacasWaterV1_FoamLace."
+                 "T_RaftSim_PacuareUpperHuacasWaterV1_FoamLace"));
+        if (!WaterConfig->LiveVolumeCoreMaterialOverride ||
+            !WaterConfig->LiveWaterFlowNormalTexture ||
+            !WaterConfig->LiveWaterFoamLaceTexture)
+        {
+            OutSummary += TEXT(
+                "Pacuare Upper Huacas live-water assets are incomplete.\n");
+            return false;
+        }
+        WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
+        WaterConfig->LiveSurfaceSpecular = 0.30f;
+        WaterConfig->LiveSurfaceRoughness = 0.33f;
+        WaterConfig->LiveSkyReflectionStrength = 0.30f;
+        WaterConfig->LiveRippleStrength = 0.30f;
+        WaterConfig->LiveFoamIntensity = 0.62f;
+        WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
+        WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.62f;
+        WaterConfig->LivePresentationStandingWaveScale = 0.78f;
+        WaterConfig->LivePresentationHydraulicReliefScale = 0.78f;
+        WaterConfig->LiveRapidFoamFocusStart = 0.10f;
+        WaterConfig->LiveRapidFoamFocusEnd = 0.66f;
+        WaterConfig->LiveRapidFoamCoverageGain = 0.86f;
+        WaterConfig->LiveSurfaceBankBlendMeters = 4.0f;
+        WaterConfig->LiveShallowSurfaceColor =
+            FLinearColor(0.035f, 0.130f, 0.095f, 1.0f);
+        WaterConfig->LiveDeepSurfaceColor =
+            FLinearColor(0.008f, 0.033f, 0.024f, 1.0f);
+        WaterConfig->LiveReflectedSkyColor =
+            FLinearColor(0.095f, 0.180f, 0.160f, 1.0f);
+        WaterConfig->LiveWaterScattering =
+            FLinearColor(0.00016f, 0.00024f, 0.00018f, 0.0f);
+        WaterConfig->LiveWaterAbsorption =
+            FLinearColor(0.0070f, 0.0035f, 0.0055f, 0.0f);
+        WaterConfig->LiveRiverbedColorScale =
+            FLinearColor(0.12f, 0.16f, 0.09f, 0.0f);
+        WaterConfig->LiveShallowWaterOpacity = 0.46f;
+        WaterConfig->LiveDeepWaterOpacity = 0.72f;
+        WaterConfig->LiveFoamWaterOpacity = 0.88f;
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimPacuareTransmittingWaterV1"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
+    }
+    else if (bColoradoHance)
+    {
+        // A solver-clipped transmitting core supplies the sediment-bearing
+        // river body. The existing Default Lit mesh becomes a low-coverage
+        // hydraulic detail skin, retaining geometry normals and lace foam
+        // without reading as an opaque stepped card.
+        WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveVolumeCoreMaterialOverride =
+            LoadOrCreateColoradoHanceLiveWaterInstance(OutSummary);
+        WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                 "T_RaftSim_ColoradoHanceWaterV1_FlowNormal."
+                 "T_RaftSim_ColoradoHanceWaterV1_FlowNormal"));
+        WaterConfig->LiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                 "T_RaftSim_ColoradoHanceWaterV1_FoamLace."
+                 "T_RaftSim_ColoradoHanceWaterV1_FoamLace"));
+        if (!WaterConfig->LiveVolumeCoreMaterialOverride ||
+            !WaterConfig->LiveWaterFlowNormalTexture ||
+            !WaterConfig->LiveWaterFoamLaceTexture)
+        {
+            OutSummary += TEXT(
+                "Colorado Hance river-local live-water assets are incomplete.\n");
+            return false;
+        }
+        WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
+        WaterConfig->LiveSurfaceSpecular = 0.30f;
+        WaterConfig->LiveSurfaceRoughness = 0.32f;
+        WaterConfig->LiveSkyReflectionStrength = 0.26f;
+        WaterConfig->LiveRippleStrength = 0.24f;
+        WaterConfig->LiveFoamIntensity = 0.55f;
+        WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
+        WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.72f;
+        WaterConfig->LivePresentationStandingWaveScale = 0.55f;
+        WaterConfig->LivePresentationHydraulicReliefScale = 0.55f;
+        WaterConfig->LiveRapidFoamFocusStart = 0.30f;
+        WaterConfig->LiveRapidFoamFocusEnd = 0.82f;
+        WaterConfig->LiveRapidFoamCoverageGain = 0.82f;
+        WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
+        WaterConfig->LiveShallowSurfaceColor =
+            FLinearColor(0.070f, 0.110f, 0.080f, 1.0f);
+        WaterConfig->LiveDeepSurfaceColor =
+            FLinearColor(0.018f, 0.038f, 0.028f, 1.0f);
+        WaterConfig->LiveReflectedSkyColor =
+            FLinearColor(0.12f, 0.17f, 0.18f, 1.0f);
+    }
+    else if (bChilkoLavaCanyon)
+    {
+        // The wet-cell-clipped core owns optical depth while a low-coverage
+        // live skin preserves solver geometry and bank feather. River-local
+        // textures add sub-grid detail only after solver wetness/aeration.
+        WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveVolumeCoreMaterialOverride =
+            LoadOrCreateChilkoLavaCanyonLiveWaterInstance(OutSummary);
+        WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Textures/"
+                 "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal."
+                 "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal"));
+        WaterConfig->LiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Textures/"
+                 "T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace."
+                 "T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace"));
+        if (!WaterConfig->LiveVolumeCoreMaterialOverride ||
+            !WaterConfig->LiveWaterFlowNormalTexture ||
+            !WaterConfig->LiveWaterFoamLaceTexture)
+        {
+            OutSummary += TEXT(
+                "Chilko river-local live-water assets are incomplete.\n");
+            return false;
+        }
+        WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
+        // Preserve water's dielectric F0 while replacing the former polished
+        // sheet response with a turbulent Lava Canyon roughness/ripple range.
+        // The lower fallback sky term affects presentation only; it does not
+        // alter solver wetness, geometry, sampling, buoyancy, or raft forces.
+        WaterConfig->LiveSurfaceSpecular = 0.18f;
+        WaterConfig->LiveSurfaceRoughness = 0.42f;
+        WaterConfig->LiveSkyReflectionStrength = 0.05f;
+        WaterConfig->LiveRippleStrength = 0.72f;
+        WaterConfig->LiveFoamIntensity = 0.56f;
+        WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
+        WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.58f;
+        WaterConfig->LivePresentationStandingWaveScale = 0.78f;
+        WaterConfig->LivePresentationHydraulicReliefScale = 0.78f;
+        WaterConfig->LiveRapidFoamFocusStart = 0.12f;
+        WaterConfig->LiveRapidFoamFocusEnd = 0.72f;
+        WaterConfig->LiveRapidFoamCoverageGain = 0.90f;
+        WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
+        WaterConfig->bEnableLivePresentationBankNaturalism = true;
+        WaterConfig->LivePresentationBankNaturalismAmplitudeMeters = 0.90f;
+        // Glacial-flour water: Sentinel-2 on the route centreline reads
+        // green-dominant on every image date, R/G 0.61-0.67 and B/G 0.82-0.89
+        // (evidence/sentinel2_water_colour.json). These terms were fitted in
+        // three render iterations until an overhead capture of the live water
+        // (60 m above station 600 m) read R/G 0.65, B/G 0.85 in linear light;
+        // absorption is highest in red and lowest in green. Render-only.
+        WaterConfig->LiveShallowSurfaceColor =
+            FLinearColor(0.069f, 0.075f, 0.080f, 1.0f);
+        WaterConfig->LiveDeepSurfaceColor =
+            FLinearColor(0.012f, 0.020f, 0.021f, 1.0f);
+        WaterConfig->LiveReflectedSkyColor =
+            FLinearColor(0.025f, 0.050f, 0.075f, 1.0f);
+        WaterConfig->LiveWaterScattering =
+            FLinearColor(0.00015f, 0.00016f, 0.00018f, 0.0f);
+        WaterConfig->LiveWaterAbsorption =
+            FLinearColor(0.0080f, 0.0040f, 0.0045f, 0.0f);
+        WaterConfig->LiveRiverbedColorScale =
+            FLinearColor(0.088f, 0.085f, 0.086f, 0.0f);
+        WaterConfig->LiveShallowWaterOpacity = 0.36f;
+        WaterConfig->LiveOpticalDepthResponseExponent = 0.25f;
+        WaterConfig->LiveDeepWaterOpacity = 0.84f;
+        WaterConfig->LiveFoamWaterOpacity = 0.86f;
+        WaterConfig->bEnforceTaggedDirectionalLightPresentation = true;
+        WaterConfig->RuntimeDirectionalLightActorTag =
+            TEXT("RaftSimColdWaterHighlightNaturalismV1");
+        WaterConfig->RuntimeDirectionalLightIntensity = 2.90f;
+        WaterConfig->RuntimeDirectionalLightRotation =
+            FRotator(-50.0f, 55.0f, 0.0f);
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimChilkoTransmittingWaterV2"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimChilkoLocalizedReflectionWaterV3"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterHighlightNaturalismV1"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterDepthAttenuationV2"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterNonlinearOpticalDepthV1"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
+    }
+    else if (bFutaleufuTerminator)
+    {
+        // Terminator has the same reviewed cold-water sheet defect as Chilko
+        // and five interior solver breaking sites. Its bank-clipped volume
+        // core supplies optical depth while this low-coverage skin retains
+        // geometric normals, rapid colour response, and the soft bank edge.
+        WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveVolumeCoreMaterialOverride =
+            LoadOrCreateFutaleufuTerminatorLiveWaterInstance(OutSummary);
+        WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+                 "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal."
+                 "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal"));
+        WaterConfig->LiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+                 "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace."
+                 "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace"));
+        if (!WaterConfig->LiveVolumeCoreMaterialOverride ||
+            !WaterConfig->LiveWaterFlowNormalTexture ||
+            !WaterConfig->LiveWaterFoamLaceTexture)
+        {
+            OutSummary += TEXT(
+                "Futaleufu river-local live-water assets are incomplete.\n");
+            return false;
+        }
+        WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
+        // Match Terminator's direct-light and capture fallback energy to the
+        // accepted turbulent cold-water bracket. This changes presentation
+        // only; the cooked field still owns wetness, geometry and forces.
+        WaterConfig->LiveSurfaceSpecular = 0.18f;
+        WaterConfig->LiveSurfaceRoughness = 0.42f;
+        WaterConfig->LiveSkyReflectionStrength = 0.05f;
+        WaterConfig->LiveRippleStrength = 0.72f;
+        WaterConfig->LiveFoamIntensity = 0.58f;
+        WaterConfig->LiveRapidFoamFocusStart = 0.08f;
+        WaterConfig->LiveRapidFoamFocusEnd = 0.58f;
+        WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
+        WaterConfig->bEnableLivePresentationBankNaturalism = true;
+        WaterConfig->LivePresentationBankNaturalismAmplitudeMeters = 0.90f;
+        WaterConfig->LiveShallowSurfaceColor =
+            FLinearColor(0.008f, 0.055f, 0.130f, 1.0f);
+        WaterConfig->LiveDeepSurfaceColor =
+            FLinearColor(0.001f, 0.014f, 0.050f, 1.0f);
+        WaterConfig->LiveReflectedSkyColor =
+            FLinearColor(0.018f, 0.080f, 0.160f, 1.0f);
+        // Preserve dark bed detail in shallows while using the solver depth
+        // channel to absorb the broad, pale deep-water sheet. These values
+        // affect only Single Layer Water transmission; cooked depth, wetness,
+        // surface geometry, collision, and raft forces remain authoritative.
+        WaterConfig->LiveWaterScattering =
+            FLinearColor(0.000035f, 0.000070f, 0.000110f, 0.0f);
+        WaterConfig->LiveWaterAbsorption =
+            FLinearColor(0.0120f, 0.0080f, 0.0060f, 0.0f);
+        WaterConfig->LiveRiverbedColorScale =
+            FLinearColor(0.055f, 0.075f, 0.090f, 0.0f);
+        WaterConfig->LiveShallowWaterOpacity = 0.36f;
+        WaterConfig->LiveOpticalDepthResponseExponent = 0.25f;
+        WaterConfig->LiveDeepWaterOpacity = 0.86f;
+        WaterConfig->LiveFoamWaterOpacity = 0.88f;
+        WaterConfig->bEnforceTaggedDirectionalLightPresentation = true;
+        WaterConfig->RuntimeDirectionalLightActorTag =
+            TEXT("RaftSimColdWaterHighlightNaturalismV1");
+        WaterConfig->RuntimeDirectionalLightIntensity = 2.40f;
+        WaterConfig->RuntimeDirectionalLightRotation =
+            FRotator(-50.0f, 30.0f, 0.0f);
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterHighlightNaturalismV1"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterDepthAttenuationV2"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterNonlinearOpticalDepthV1"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
+    }
+    else if (bZambezi || bZambeziUpperGorge)
+    {
+        // A transmitting wet-cell core replaces the opaque physical-corridor
+        // card during play. The cooked Zambezi field still owns geometry,
+        // wet/dry, stationing, forces, and foam masks; these river-local assets
+        // contribute only sediment-water optics and sub-grid surface breakup.
+        // The upper gorge loads L_Zambezi's saved instance (never rebuilds it).
+        WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveVolumeCoreMaterialOverride = bZambeziUpperGorge
+            ? LoadObject<UMaterialInterface>(nullptr,
+                  TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
+                       "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2.MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2"))
+            : LoadOrCreateZambeziBatokaLiveWaterV2Instance(OutSummary);
+        WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Textures/"
+                 "T_RaftSim_ZambeziBatokaWaterV1_FlowNormal."
+                 "T_RaftSim_ZambeziBatokaWaterV1_FlowNormal"));
+        WaterConfig->LiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Textures/"
+                 "T_RaftSim_ZambeziBatokaWaterV1_FoamLace."
+                 "T_RaftSim_ZambeziBatokaWaterV1_FoamLace"));
+        if (!WaterConfig->LiveVolumeCoreMaterialOverride ||
+            !WaterConfig->LiveWaterFlowNormalTexture ||
+            !WaterConfig->LiveWaterFoamLaceTexture)
+        {
+            OutSummary += TEXT(
+                "Zambezi Batoka river-local live-water assets are incomplete.\n");
+            return false;
+        }
+        WaterConfig->LiveSurfaceCalmCoverage = 0.0f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.06f;
+        WaterConfig->LiveSurfaceSpecular = 0.15f;
+        WaterConfig->LiveSurfaceRoughness = 0.66f;
+        WaterConfig->LiveSkyReflectionStrength = 0.055f;
+        WaterConfig->LiveRippleStrength = 0.48f;
+        WaterConfig->LiveFoamIntensity = 0.64f;
+        WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
+        WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.62f;
+        WaterConfig->LivePresentationStandingWaveScale = 0.82f;
+        WaterConfig->LivePresentationHydraulicReliefScale = 0.82f;
+        WaterConfig->LiveRapidFoamFocusStart = 0.10f;
+        WaterConfig->LiveRapidFoamFocusEnd = 0.66f;
+        WaterConfig->LiveRapidFoamCoverageGain = 0.92f;
+        // The transmitting core now consumes the same smooth vertex-alpha
+        // coverage as the detail skin. Three sampled cells provide a visible
+        // 0-to-1 transition instead of terminating the optical body as a hard
+        // rectangular polygon against either bank.
+        WaterConfig->LiveSurfaceBankBlendMeters = 7.5f;
+        WaterConfig->LiveShallowSurfaceColor =
+            FLinearColor(0.058f, 0.095f, 0.050f, 1.0f);
+        WaterConfig->LiveDeepSurfaceColor =
+            FLinearColor(0.013f, 0.030f, 0.016f, 1.0f);
+        WaterConfig->LiveReflectedSkyColor =
+            FLinearColor(0.030f, 0.052f, 0.064f, 1.0f);
+        WaterConfig->LiveWaterScattering =
+            FLinearColor(0.00018f, 0.00015f, 0.00009f, 0.0f);
+        WaterConfig->LiveWaterAbsorption =
+            FLinearColor(0.0060f, 0.0038f, 0.0068f, 0.0f);
+        WaterConfig->LiveRiverbedColorScale =
+            FLinearColor(0.17f, 0.14f, 0.085f, 0.0f);
+        WaterConfig->LiveShallowWaterOpacity = 0.42f;
+        WaterConfig->LiveDeepWaterOpacity = 0.64f;
+        WaterConfig->LiveFoamWaterOpacity = 0.84f;
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimZambeziTransmittingWaterV2"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimOpacityFeatheredVolumeEdgeV2"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimRestrainedSolarGlareV2"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimZambeziLocalizedReflectionWaterV18"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
+    }
+    // Shared rapid-water contract for every physical river: a half-metre
+    // bounded carrier plus a 100 m raft-local GPU heightfield. Both deform the
+    // solver-owned surface; neither adds another water sheet.
+    // The Cartesian upper gorge follows the South Fork Cartesian carrier: one
+    // placed surface at the solver's 2 m cells, subdivided twice.
+    WaterConfig->bEnableLiveRapidSurfaceRefinement = !bZambeziUpperGorge;
+    // The geographic Hance strip spans the whole 160 m cooked lateral range;
+    // at 1 m its 38,801-vertex refresh cost 19 ms mean (41 ms p95) of game
+    // thread. 1.5 m (17k vertices) still samples each 2 m solver cell.
+    WaterConfig->LiveRapidSurfaceSubdivision = bZambeziUpperGorge
+        ? 1
+        : ((bColoradoHance || bPacuare || bFutaleufuTerminator || bChilkoLavaCanyon) ? 2 : 6);
+    WaterConfig->bEnableLiveRaftLocalFluidHeightfield = true;
+    WaterConfig->LiveRaftLocalFluidWindowMeters = 100.0f;
+    WaterConfig->LiveRaftLocalFluidHeightfieldStrength = 0.65f;
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimHalfMeterRapidCarrierV1"));
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimRaftLocalGpuFluidV2"));
+    WaterConfig->Tags.AddUnique(RunTag);
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimGlobalRiverStationAuthority"));
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimSafeLaunchApron"));
+    if (bColoradoHance)
+    {
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColoradoHanceRapidApproachLaunchV1"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColoradoHanceSubcellSmoothedWaterV1"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimRenderOnlyHydraulicSmoothing"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimColoradoHanceLaceFoamV1"));
+    }
+    if (bSolverOwnedRuntimeWater)
+    {
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering"));
+    }
+
+    // Author the launch at loaded hydrostatic equilibrium instead of dropping
+    // the raft from above the surface. The reduced body saturates over one
+    // tube diameter and provides 3.4x weight at full immersion, so the calm
+    // tube-center waterline is 2R / 3.4 below the sampled surface. Starting at
+    // +58 cm caused an underdamped first plunge, false deck-water retention,
+    // and a capsize before the guide could issue a command.
+    constexpr float LaunchTubeRadiusCm = 28.0f;
+    constexpr float LaunchBuoyancyWeightMultiple = 3.4f;
+    constexpr float LaunchHydrostaticOffsetCm =
+        -(2.0f * LaunchTubeRadiusCm) / LaunchBuoyancyWeightMultiple;
+    ARaftSimRaftActor* Raft = World->SpawnActor<ARaftSimRaftActor>(
+        ARaftSimRaftActor::StaticClass(),
+        FTransform(
+            StartRotation,
+            FVector(StartXY.X, StartXY.Y, SurfaceWorldZ + LaunchHydrostaticOffsetCm)));
+    if (!Raft)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not spawn the player raft for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
+    Raft->SetActorLabel(PlayerRaftLabel);
+    Raft->Tags.AddUnique(RunTag);
+    Raft->Tags.AddUnique(TEXT("RaftSimReferenceRunnable"));
+    if (bColoradoHance)
+    {
+        Raft->Tags.AddUnique(
+            TEXT("RaftSimColoradoHanceRapidApproachLaunchV1"));
+    }
+    else if (bChilkoLavaCanyon)
+    {
+        Raft->Tags.AddUnique(TEXT("RaftSimChilkoRapidApproachLaunchV1"));
+    }
+    if (bZambeziUpperGorge &&
+        !AddZambeziUpperGorgeCartesianRunActors(
+            World, FVector(StartXY.X, StartXY.Y, SurfaceWorldZ), StartRotation, RunTag, OutSummary))
+    {
+        return false;
+    }
+
+    bool bPlayerStartPositioned = false;
+    for (TActorIterator<APlayerStart> It(World); It; ++It)
+    {
+        if (It->GetActorLabel() != TEXT("RaftSim_GuideSeat_PlayerStart"))
+        {
+            continue;
+        }
+        It->SetActorLocationAndRotation(
+            FVector(StartXY.X, StartXY.Y, SurfaceWorldZ + 170.0f) -
+                StartTangent * 500.0f,
+            StartRotation);
+        It->Tags.AddUnique(RunTag);
+        bPlayerStartPositioned = true;
+        break;
+    }
+    if (!bPlayerStartPositioned)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not position the player start for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
+
+    if (bSolverOwnedRuntimeWater)
+    {
+        // The authored ribbon is used for deterministic editor captures. In
+        // gameplay, hide it so the solver-driven ARaftSimWaterSurfaceActor is
+        // the only visible surface and the same cooked field owns forces and
+        // hydraulics.
+        const FString RibbonLabel = FString::Printf(
+            TEXT("RaftSim_PhysicalCorridorRiverRibbon_%s"),
+            *Candidate.PreviewSpec.RiverId);
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!It->GetActorLabel().Contains(RibbonLabel) &&
+                !It->Tags.Contains(TEXT("RaftSimCaptureOnlyWater")))
+            {
+                continue;
+            }
+            It->SetActorHiddenInGame(true);
+            It->Tags.AddUnique(TEXT("RaftSimCaptureOnlyStaticWater"));
+            It->Tags.AddUnique(TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering"));
+        }
+    }
+
+    OutSummary += FString::Printf(
+        TEXT("Added reference-runnable %s gameplay at station %.1f m: "
+             "live cooked-field water, player raft, player start, and vertical-slice "
+             "game mode; terrain, flow calibration, and production art remain review-gated.\n"),
+        *DisplayName,
+        bZambeziUpperGorge ? kZambeziUpperGorgeLaunchStationM : Points.Last().StationMeters * StartProgress);
+    return true;
 }
 
 void RepositionLandscapeCandidatePhysicalCameras(
@@ -547,10 +2741,38 @@ void RepositionLandscapeCandidatePhysicalCameras(
             return;
         }
     };
-    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+    if (IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId))
     {
-        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.365f, 230.0f, 150.0f);
-        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.450f, 0.565f, 175.0f, 125.0f);
+        // The straight westward run below the launch (evidence stations
+        // 414-700 m; the hairpins elsewhere put the gorge wall in view).
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            CenterlineProgress(Points, 430.0f), CenterlineProgress(Points, 550.0f), 300.0f, 105.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+            CenterlineProgress(Points, 470.0f), CenterlineProgress(Points, 590.0f), 170.0f, 85.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        // Above Bidwell Rapid looking into its entry (station metres).
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), ChilkoProgress(620.0f), ChilkoProgress(620.0f + 120.0f), 300.0f, 105.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), ChilkoProgress(620.0f + 40.0f), ChilkoProgress(620.0f + 160.0f), 170.0f, 85.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+    {
+        // Above the Terminator looking into its entry (station metres).
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), FutaleufuProgress(900.0f), FutaleufuProgress(900.0f + 120.0f), 300.0f, 105.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), FutaleufuProgress(900.0f + 40.0f), FutaleufuProgress(900.0f + 160.0f), 170.0f, 85.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+    {
+        // Above Upper Huacas looking into its entry (station metres).
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), PacuareProgress(300.0f), PacuareProgress(300.0f + 100.0f), 260.0f, 105.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), PacuareProgress(300.0f + 40.0f), PacuareProgress(300.0f + 140.0f), 170.0f, 85.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+    {
+        // Pool above the rapid looking into the entry (station metres).
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), HanceProgress(560.0f), HanceProgress(680.0f), 260.0f, 105.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), HanceProgress(600.0f), HanceProgress(700.0f), 170.0f, 85.0f);
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
     {
@@ -559,32 +2781,59 @@ void RepositionLandscapeCandidatePhysicalCameras(
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
     {
-        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.815f, 0.825f, 330.0f, 170.0f);
-        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.644f, 0.654f, 270.0f, 160.0f);
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.143333f, 0.243333f, 330.0f, 170.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.178333f, 0.278333f, 270.0f, 160.0f);
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
     {
-        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.254f, 280.0f, 150.0f);
-        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.420f, 0.424f, 210.0f, 125.0f);
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.383f, 0.483f, 330.0f, 170.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.418f, 0.518f, 270.0f, 160.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+    {
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.405f, 0.490f, 420.0f, 145.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.445f, 0.505f, 285.0f, 125.0f);
     }
     else
     {
         SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.365f, 330.0f, 180.0f);
         SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.275f, 0.390f, 270.0f, 165.0f);
     }
-    SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.530f, 0.645f, 275.0f, 165.0f);
+    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+    {
+        SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), HanceProgress(740.0f), HanceProgress(830.0f), 185.0f, 90.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+    {
+        SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.430f, 0.515f, 330.0f, 130.0f);
+    }
+    else
+    {
+        const bool bChilko =
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+        const bool bFutaleufu =
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+        SetCamera(
+            TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"),
+            bChilko ? 0.438f : (bFutaleufu ? 0.198333f : 0.530f),
+            bChilko ? 0.538f : (bFutaleufu ? 0.298333f : 0.645f),
+            bChilko ? 270.0f : 275.0f,
+            bChilko ? 160.0f : 165.0f);
+    }
     for (TActorIterator<APlayerStart> It(World); It; ++It)
     {
         if (It->GetActorLabel() == TEXT("RaftSim_GuideSeat_PlayerStart"))
         {
-            It->SetActorLocation(RiverLocation(0.032f, 120.0f));
+            It->SetActorLocation(RiverLocation(
+                Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ? HanceProgress(500.0f) : 0.032f, 120.0f));
         }
     }
     for (TActorIterator<ASphereReflectionCapture> It(World); It; ++It)
     {
         if (It->GetActorLabel() == TEXT("RaftSim_RiverCorridorReflectionCapture"))
         {
-            It->SetActorLocation(RiverLocation(0.09f, 520.0f));
+            It->SetActorLocation(RiverLocation(
+                Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ? HanceProgress(760.0f) : 0.09f, 520.0f));
         }
     }
 }

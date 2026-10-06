@@ -3,12 +3,17 @@
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Blueprint/WidgetTree.h"
+#include "Components/Button.h"
+#include "Components/InputComponent.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "ProceduralMeshComponent.h"
 #include "ImageUtils.h"
 #include "Framework/Application/SlateApplication.h"
+#include "InputKeyEventArgs.h"
+#include "Input/Events.h"
 #include "RaftSimGuidePawn.h"
 #include "RaftSimRaftActor.h"
 #include "../RaftSimGuidePlayerController.h"
@@ -20,6 +25,7 @@
 #include "RaftSimMainMenuWidget.h"
 #include "Tests/AutomationCommon.h"
 #include "UnrealClient.h"
+#include "RaftSimCaptureViewportGuard.h"
 
 #if WITH_AUTOMATION_TESTS
 
@@ -61,6 +67,19 @@ bool FRaftSimM6ProgressionMigrationTest::RunTest(const FString&)
     Save->Settings.MotionIntensity = -4.0f;
     URaftSimSaveSubsystem::NormalizeSave(Save);
 
+    URaftSimVerticalSliceSaveGame* RapidSave = NewObject<URaftSimVerticalSliceSaveGame>();
+    RapidSave->Selection.ScenarioId = TEXT("troublemaker_challenge");
+    RapidSave->CompletedScenarioIds.Add(TEXT("troublemaker_challenge"));
+    URaftSimSaveSubsystem::NormalizeSave(RapidSave);
+    TestEqual(TEXT("retired rapid selection returns to its parent river"),
+        RapidSave->Selection.ScenarioId, FName(TEXT("south_fork_full_descent")));
+    TestTrue(TEXT("historical rapid completion is preserved"),
+        RapidSave->CompletedScenarioIds.Contains(TEXT("troublemaker_challenge")));
+    TestFalse(TEXT("rapid completion does not complete the river"),
+        RapidSave->CompletedScenarioIds.Contains(TEXT("south_fork_full_descent")));
+    TestFalse(TEXT("retired rapid is no longer selectable"),
+        RapidSave->UnlockedScenarioIds.Contains(TEXT("troublemaker_challenge")));
+
     TestEqual(TEXT("legacy save upgraded to current additive schema"),
         Save->SaveVersion, URaftSimSaveSubsystem::CurrentSaveVersion);
     TestEqual(TEXT("UI scale clamped"), Save->Settings.UiScale, 1.5f);
@@ -70,6 +89,17 @@ bool FRaftSimM6ProgressionMigrationTest::RunTest(const FString&)
         Save->InputBindings.Contains(TEXT("Pause")) &&
         Save->InputBindings.Contains(TEXT("PaddleStroke")) &&
         Save->InputBindings.Contains(TEXT("RescueThrowLine")));
+    const TArray<FRaftSimCareerScenarioDefinition> InitialCatalog =
+        URaftSimProgressionLibrary::GetScenarioCatalog();
+    TestEqual(TEXT("fresh and migrated profiles expose every catalogued run"),
+        Save->UnlockedScenarioIds.Num(), InitialCatalog.Num());
+    for (const FRaftSimCareerScenarioDefinition& Scenario : InitialCatalog)
+    {
+        TestTrue(
+            FString::Printf(TEXT("run '%s' is available without a license gate"),
+                *Scenario.ScenarioId.ToString()),
+            Save->UnlockedScenarioIds.Contains(Scenario.ScenarioId));
+    }
 
     FRaftSimRunResult Result;
     Result.GameMode = ERaftSimGameMode::GuidedDescent;
@@ -82,7 +112,7 @@ bool FRaftSimM6ProgressionMigrationTest::RunTest(const FString&)
     const ERaftSimMedal UpperMedal = URaftSimSaveSubsystem::ApplyRunResult(Save, Result);
     TestEqual(TEXT("clean authentic result earns gold"),
         static_cast<int32>(UpperMedal), static_cast<int32>(ERaftSimMedal::Gold));
-    TestTrue(TEXT("first gold unlocks Trip Leader section"),
+    TestTrue(TEXT("Trip Leader section remains available after first gold"),
         Save->UnlockedScenarioIds.Contains(TEXT("south_fork_coloma")));
 
     Result.ScenarioId = TEXT("south_fork_coloma");
@@ -90,7 +120,7 @@ bool FRaftSimM6ProgressionMigrationTest::RunTest(const FString&)
     URaftSimSaveSubsystem::ApplyRunResult(Save, Result);
     TestEqual(TEXT("two gold runs promote Senior Guide"),
         static_cast<int32>(Save->LicenseTier), static_cast<int32>(ERaftSimLicenseTier::SeniorGuide));
-    TestTrue(TEXT("gorge and lower sections unlock together"),
+    TestTrue(TEXT("gorge and lower sections remain available"),
         Save->UnlockedScenarioIds.Contains(TEXT("south_fork_gorge")) &&
         Save->UnlockedScenarioIds.Contains(TEXT("south_fork_lower")));
 
@@ -102,7 +132,7 @@ bool FRaftSimM6ProgressionMigrationTest::RunTest(const FString&)
     URaftSimSaveSubsystem::ApplyRunResult(Save, Result);
     TestEqual(TEXT("four gold sections promote Expedition Guide"),
         static_cast<int32>(Save->LicenseTier), static_cast<int32>(ERaftSimLicenseTier::ExpeditionGuide));
-    TestTrue(TEXT("full descent and bonus runs unlock"),
+    TestTrue(TEXT("full descent and bonus runs remain available"),
         Save->UnlockedScenarioIds.Contains(TEXT("south_fork_full_descent")) &&
         Save->UnlockedScenarioIds.Contains(TEXT("terminator_challenge")));
 
@@ -124,8 +154,17 @@ bool FRaftSimM6CareerCatalogTest::RunTest(const FString&)
 {
     const TArray<FRaftSimCareerScenarioDefinition> Catalog =
         URaftSimProgressionLibrary::GetScenarioCatalog();
-    TestTrue(TEXT("training, campaign, full run, and five bonus slices are catalogued"),
+    TestTrue(
+        TEXT("training, South Fork campaign, four other river slices, and Zambezi are catalogued"),
         Catalog.Num() >= 11);
+    FRaftSimCareerScenarioDefinition RetiredRapid;
+    TestFalse(TEXT("Troublemaker is not a standalone scenario"),
+        URaftSimProgressionLibrary::FindScenario(TEXT("troublemaker_challenge"), RetiredRapid));
+    for (const FRaftSimCareerScenarioDefinition& Scenario : Catalog)
+    {
+        TestFalse(TEXT("no scenario launches only the bounded South Fork rapid"),
+            Scenario.LevelName == FName(TEXT("/Game/RaftSim/Maps/L_SouthFork_Troublemaker")));
+    }
     TArray<FRaftSimCareerScenarioDefinition> Sections;
     FRaftSimCareerScenarioDefinition FullDescent;
     int32 TrainingCount = 0;
@@ -145,9 +184,22 @@ bool FRaftSimM6CareerCatalogTest::RunTest(const FString&)
         TestEqual(FString::Printf(TEXT("section %d uses continuous full-reach map"), Index + 1),
             Sections[Index].LevelName, FName(TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach")));
     }
-    TestTrue(TEXT("full descent spans authored playable reach"),
-        FullDescent.bFullDescent && FullDescent.StartStationM <= 120.0f &&
-        FullDescent.FinishStationM >= 48900.0f);
+    TestTrue(TEXT("full descent stays inside reconstructed 33334.146m source route"),
+        FullDescent.bFullDescent && FullDescent.StartStationM == 120.0f &&
+        FullDescent.FinishStationM == 33280.0f &&
+        Sections[0].StartStationM == FullDescent.StartStationM &&
+        Sections.Last().FinishStationM == FullDescent.FinishStationM);
+    FRaftSimCareerScenarioDefinition Zambezi;
+    TestTrue(
+        TEXT("Zambezi reference run is catalogued"),
+        URaftSimProgressionLibrary::FindScenario(TEXT("zambezi_reference_run"), Zambezi));
+    TestEqual(
+        TEXT("Zambezi reference run opens the source-scale Batoka Gorge map"),
+        Zambezi.LevelName,
+        FName(TEXT("/Game/RaftSim/Maps/L_Zambezi")));
+    TestTrue(
+        TEXT("Zambezi reference run spans Rapids 1-25 to Mukuni Beach (Rapid 25 observed at ~28.3 km)"),
+        Zambezi.StartStationM == 0.0f && Zambezi.FinishStationM >= 28900.0f);
     TestEqual(TEXT("assist gold cap deterministic"),
         static_cast<int32>(URaftSimProgressionLibrary::CalculateMedal(0.98f, 0.98f, true)),
         static_cast<int32>(ERaftSimMedal::Silver));
@@ -191,6 +243,28 @@ bool FRaftSimAssertM6RuntimeShell::Update()
     }
     URaftSimRunHudWidget* Hud = Controller->GetRunHud();
     Test->TestTrue(TEXT("runtime HUD is attached to viewport"), Hud->IsInViewport());
+    Controller->TogglePauseMenu();
+    Test->TestTrue(TEXT("pause panel stops the river"), UGameplayStatics::IsGamePaused(World));
+    int32 ActionCount = 0;
+    UButton* Resume = nullptr;
+    Hud->WidgetTree->ForEachWidget([&](UWidget* Widget)
+    {
+        if (auto* Button = Cast<UButton>(Widget))
+        {
+            ++ActionCount;
+            if (!Resume) Resume = Button;
+        }
+    });
+    Test->TestEqual(TEXT("pause panel has four actionable buttons"), ActionCount, 4);
+    if (Resume) Resume->OnClicked.Broadcast();
+    Test->TestFalse(TEXT("clicking Resume resumes the actual world"), UGameplayStatics::IsGamePaused(World));
+    for (FKey Key : {EKeys::Gamepad_Special_Right, EKeys::M, EKeys::P})
+    {
+        Test->TestTrue(TEXT("shell navigation works while paused"),
+            Controller->InputComponent->KeyBindings.ContainsByPredicate(
+                [Key](const FInputKeyBinding& Binding)
+                { return Binding.Chord.Key == Key && Binding.bExecuteWhenPaused; }));
+    }
     Hud->ShowOverlay(ERaftSimHudOverlay::CommandWheel);
     Test->TestEqual(TEXT("command wheel visible"),
         static_cast<int32>(Hud->GetVisibleOverlay()),
@@ -207,6 +281,10 @@ bool FRaftSimAssertM6RuntimeShell::Update()
     ARaftSimGuidePawn* Guide = Cast<ARaftSimGuidePawn>(Controller->GetPawn());
     Test->TestTrue(TEXT("rescue actions retain keyboard/gamepad parity"),
         Guide != nullptr && Guide->HasCompleteRescueInputBindings());
+    Test->TestTrue(TEXT("saved forward binding preserves S back paddle"),
+        Guide != nullptr && Guide->HasPaddleStrokeKeyBinding(EKeys::S, true));
+    Test->TestTrue(TEXT("mouse look is independent of held paddle actions"),
+        Guide != nullptr && Guide->UsesIndependentMouseLook());
 
     ARaftSimRouteGhostActor* Ghost = World->SpawnActor<ARaftSimRouteGhostActor>(
         ARaftSimRouteGhostActor::StaticClass(), FTransform::Identity);
@@ -254,6 +332,104 @@ bool FRaftSimCaptureM6Shell::Update()
     return true;
 }
 
+class FRaftSimVerifyM6HeldPaddleMouseLook final : public IAutomationLatentCommand
+{
+public:
+    explicit FRaftSimVerifyM6HeldPaddleMouseLook(FAutomationTestBase* InTest)
+        : Test(InTest)
+    {
+    }
+
+    virtual bool Update() override
+    {
+        ARaftSimGuidePlayerController* Controller = Cast<ARaftSimGuidePlayerController>(
+            UGameplayStatics::GetPlayerController(FindM6GameWorld(), 0));
+        if (Controller == nullptr)
+        {
+            Test->AddError(TEXT("Cannot verify held-paddle mouse look without controller"));
+            return true;
+        }
+
+        if (!bInjected)
+        {
+            if (!FSlateApplication::IsInitialized())
+            {
+                Test->AddError(TEXT("Cannot verify PIE mouse look without Slate"));
+                return true;
+            }
+            InitialYaw = Controller->GetControlRotation().Yaw;
+            InitialSeatYaw = SeatYaw(Controller);
+            FVector InitialViewLocation;
+            FRotator InitialViewRotation;
+            Controller->GetPlayerViewPoint(InitialViewLocation, InitialViewRotation);
+            InitialViewYaw = InitialViewRotation.Yaw;
+            StartSeconds = FPlatformTime::Seconds();
+            Controller->InputKey(FInputKeyEventArgs::CreateSimulated(
+                EKeys::W, IE_Pressed, 1.0f));
+            InjectSlateMouseMove();
+            bInjected = true;
+            return false;
+        }
+
+        const float YawDelta = FMath::Abs(FMath::FindDeltaAngleDegrees(
+            InitialYaw - InitialSeatYaw, Controller->GetControlRotation().Yaw - SeatYaw(Controller)));
+        FVector ViewLocation;
+        FRotator ViewRotation;
+        Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+        const float ViewYawDelta = FMath::Abs(FMath::FindDeltaAngleDegrees(
+            InitialViewYaw - InitialSeatYaw, ViewRotation.Yaw - SeatYaw(Controller)));
+        if (YawDelta > 0.1f && ViewYawDelta > 0.1f)
+        {
+            Test->TestTrue(TEXT("PIE mouse pans rendered camera while W is held"), true);
+            Controller->InputKey(FInputKeyEventArgs::CreateSimulated(
+                EKeys::W, IE_Released, 0.0f));
+            return true;
+        }
+        if (FPlatformTime::Seconds() - StartSeconds > 1.0)
+        {
+            Test->AddError(FString::Printf(
+                TEXT("mouse did not pan rendered camera while W was held "
+                     "(control yaw delta %.2f, view yaw delta %.2f)"),
+                YawDelta, ViewYawDelta));
+            Controller->InputKey(FInputKeyEventArgs::CreateSimulated(
+                EKeys::W, IE_Released, 0.0f));
+            return true;
+        }
+
+        // Keep supplying the same pre-widget-routing mouse event generated by
+        // a real embedded PIE session while W remains pressed.
+        InjectSlateMouseMove();
+        return false;
+    }
+
+private:
+    static float SeatYaw(const APlayerController* Controller)
+    {
+        // A turning raft must not pass the mouse-input test by itself.
+        const APawn* Pawn = Controller->GetPawn();
+        const AActor* Seat = Pawn ? Pawn->GetAttachParentActor() : nullptr;
+        return Seat ? Seat->GetActorRotation().Yaw : 0.f;
+    }
+
+    static void InjectSlateMouseMove()
+    {
+        const FVector2D PreviousPosition(
+            FSlateApplication::Get().GetCursorPos());
+        const FVector2D Delta(12.0f, 0.0f);
+        const FPointerEvent MouseMove(
+            0, PreviousPosition + Delta, PreviousPosition, Delta,
+            TSet<FKey>(), FModifierKeysState());
+        FSlateApplication::Get().ProcessMouseMoveEvent(MouseMove);
+    }
+
+    FAutomationTestBase* Test = nullptr;
+    bool bInjected = false;
+    float InitialYaw = 0.0f;
+    float InitialSeatYaw = 0.0f;
+    float InitialViewYaw = 0.0f;
+    double StartSeconds = 0.0;
+};
+
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
     FRaftSimOpenM6FullReach, FAutomationTestBase*, Test);
 bool FRaftSimOpenM6FullReach::Update()
@@ -293,6 +469,16 @@ bool FRaftSimAssertM6MainMenu::Update()
         return true;
     }
     Test->TestTrue(TEXT("main menu is in viewport"), Menu->IsInViewport());
+    Menu->DismissIntro();
+    Test->TestFalse(TEXT("intro is dismissible"), Menu->IsIntroVisible());
+    Test->TestTrue(TEXT("all river and training buttons survive restyling"), Menu->GetRunButtonCount() >= 7);
+    Menu->ShowScreen(ERaftSimMenuScreen::Settings);
+    Test->TestTrue(TEXT("settings focus targets a visible enabled control"),
+        Menu->GetDefaultFocusWidget() && Menu->GetDefaultFocusWidget()->IsVisible() &&
+        Menu->GetDefaultFocusWidget()->GetIsEnabled());
+    Menu->ShowScreen(ERaftSimMenuScreen::Career);
+    Test->TestNotNull(TEXT("career screen has a focus target"), Menu->GetDefaultFocusWidget());
+    Menu->ShowScreen(ERaftSimMenuScreen::Main);
     Test->TestFalse(TEXT("main menu resolves a persisted/default scenario"),
         Menu->GetSelectedScenarioId().IsNone());
     TArray<FColor> Pixels;
@@ -353,7 +539,9 @@ bool FRaftSimM6RuntimeShellTest::RunTest(const FString&)
 {
     AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank"));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.5f));
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimEnsureCaptureViewport(this));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertM6RuntimeShell(this));
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimVerifyM6HeldPaddleMouseLook(this));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.75f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimCaptureM6Shell(this));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.0f));
@@ -374,6 +562,7 @@ bool FRaftSimM6MainMenuRenderTest::RunTest(const FString&)
 {
     AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimBoot"));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.5f));
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimEnsureCaptureViewport(this));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertM6MainMenu(this));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.5f));
     return true;

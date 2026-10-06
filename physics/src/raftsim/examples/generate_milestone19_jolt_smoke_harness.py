@@ -18,7 +18,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--manifest-output",
         type=Path,
-        default=Path("physics/cpp/tests/jolt_smoke_harness_manifest.json"),
+        default=Path("unreal/Plugins/SEIYGECore/cpp/tests/jolt_smoke_harness_manifest.json"),
     )
     parser.add_argument(
         "--report-dir",

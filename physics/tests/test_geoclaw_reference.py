@@ -9,7 +9,7 @@ import pytest
 from raftsim.comparison import compare_dual_solver_diagnostics, compare_dual_solver_fields
 from raftsim.dual_solver import CppSolverRunResult
 from raftsim.examples.compare_cpp_to_geoclaw_reference import main as compare_cpp_geoclaw_main
-from raftsim.examples.run_geoclaw_reference import main as geoclaw_main
+from seiyge_core.examples.run_geoclaw_reference import main as geoclaw_main
 from raftsim.geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
     GEOCLAW_CANONICAL_SUITE_SCHEMA,
@@ -518,8 +518,8 @@ def test_geoclaw_cli_runs_existing_export_with_normalization(monkeypatch, tmp_pa
         calls["normalize"] = (export_dir, output_dir, config.num_output_times)
         return FakeNormalizedResult()
 
-    monkeypatch.setattr("raftsim.examples.run_geoclaw_reference.run_geoclaw_export", fake_run)
-    monkeypatch.setattr("raftsim.examples.run_geoclaw_reference.normalize_geoclaw_fixed_grid_output", fake_normalize)
+    monkeypatch.setattr("seiyge_core.examples.run_geoclaw_reference.run_geoclaw_export", fake_run)
+    monkeypatch.setattr("seiyge_core.examples.run_geoclaw_reference.normalize_geoclaw_fixed_grid_output", fake_normalize)
 
     exit_code = geoclaw_main(["--run-export", str(tmp_path / "export"), "--num-output-times", "2"])
     output = capsys.readouterr().out

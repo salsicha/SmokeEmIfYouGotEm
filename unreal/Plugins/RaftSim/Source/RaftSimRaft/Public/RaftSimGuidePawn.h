@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "InputCoreTypes.h"
+#include "RaftSimSeatedHeading.h"
 
 #include "RaftSimGuidePawn.generated.h"
 
@@ -10,6 +11,7 @@ class ARaftSimRaftActor;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
+class UEnhancedInputLocalPlayerSubsystem;
 class USceneComponent;
 struct FInputActionValue;
 
@@ -115,10 +117,14 @@ class RAFTSIMRAFT_API ARaftSimGuidePawn : public APawn
 
 public:
     ARaftSimGuidePawn();
+    friend class FRaftSimInputContextIsolationTest;
+    friend class FRaftSimOarCommandParityTest;
 
     virtual void Tick(float DeltaSeconds) override;
     virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& OutResult) override;
     virtual void BeginPlay() override;
+    virtual void PostInitializeComponents() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|GuideCamera")
@@ -138,6 +144,12 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|GuideCamera")
     USceneComponent* GetPaddleAnchor() const { return PaddleAnchor; }
+
+    /** False in shipping play: the seated guide avatar owns the sole paddle. */
+    bool HasFirstPersonPaddleViewModel() const
+    {
+        return FirstPersonPaddleShaft || FirstPersonPaddleBlade || FirstPersonPaddleGrip;
+    }
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|GuideCamera")
     USceneComponent* GetRaftBowReferenceAnchor() const { return RaftBowReferenceAnchor; }
@@ -184,6 +196,12 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Input")
     bool HasCompleteRescueInputBindings() const;
 
+    /** True when the paddle-stroke action retains this signed key mapping. */
+    bool HasPaddleStrokeKeyBinding(FKey Key, bool bNegated) const;
+
+    /** Mouse axes bypass the paddle-command Enhanced Input context. */
+    bool UsesIndependentMouseLook() const;
+
     /** Apply a saved flat-screen key binding without removing gamepad parity. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Input")
     bool ApplyRuntimeKeyBinding(FName ActionId, FKey NewKey);
@@ -191,13 +209,22 @@ public:
 protected:
     float GetEffectiveMotionIntensity() const;
     void UpdateComfortCamera(float DeltaSeconds);
+    void UpdateSeatedHeading();
     void UpdateChaseCamera();
 
     void HandlePaddleStroke(const FInputActionValue& Value);
     void HandleTurnStroke(const FInputActionValue& Value);
+    void InitializeGuideComponents();
+    void HandleGuideSteer(const FInputActionValue& Value);
     void HandleLook(const FInputActionValue& Value);
     void HandleHighSide(const FInputActionValue& Value);
     void HandleGuideCommand(FName CommandActionName);
+    /** Oar rig: turn the held stroke, draw and steer inputs into the two
+     * oars' intents each frame. */
+    void UpdateOarInputs();
+    /** Records one held rowing axis; true when the raft is a rowed oar rig
+     * (the input then rows instead of calling the crew). */
+    bool RecordOarAxis(int32 Axis, float Value);
     void HandleRescueTargetSelect(const FInputActionValue& Value);
     void HandleRescueReach(const FInputActionValue& Value);
     void HandleRescueThrowLine(const FInputActionValue& Value);
@@ -208,6 +235,8 @@ protected:
     /** Mapping context and actions are generated assets under /Game/RaftSim/Input. */
     UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
     TObjectPtr<UInputMappingContext> DefaultMappingContext;
+    // Remember the registration owner even after unpossession.
+    TWeakObjectPtr<UEnhancedInputLocalPlayerSubsystem> RegisteredInputSubsystem;
 
     UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
     TObjectPtr<UInputAction> PaddleStrokeAction;
@@ -236,6 +265,20 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
     TArray<TObjectPtr<UInputAction>> GuideCommandActions;
 
+    /**
+     * The guide's own stern draw/pry (mouse buttons). Runtime-transient by
+     * design: GActionSpecs mirrors the Milestone 23 input contract, so this
+     * action is created in code and mapped into the loaded IMC at runtime,
+     * the same pattern as the rescue-key fallback.
+     */
+    UPROPERTY()
+    TObjectPtr<UInputAction> GuideSteerAction;
+
+    /** F9 debug screen-recording toggle; runtime-transient like the
+     * steer action so no generated input asset is required. */
+    UPROPERTY()
+    TObjectPtr<UInputAction> ToggleRecordingAction;
+
     UPROPERTY()
     TObjectPtr<ARaftSimRaftActor> AttachedRaft;
 
@@ -245,8 +288,21 @@ protected:
 
     float LastStrokeTimeSeconds = -1.0f;
 
+    /** The steering blade is independent of voice calls: its own cooldown. */
+    float LastSteerTimeSeconds = -1.0f;
+
+    /** Oar rig rowing axes (stroke W/S, pivot A/D, single-oar steer mouse
+     * buttons) and when each last fired; Enhanced Input fires them every
+     * frame while held. */
+    float OarAxisValues[3] = {0.0f, 0.0f, 0.0f};
+    double OarAxisTimes[3] = {-1.0, -1.0, -1.0};
+
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Guide")
     ERaftSimGuideMobilityMode MobilityMode = ERaftSimGuideMobilityMode::InRaft;
+
+    /** Hysteretic over-the-shoulder state: while true, the guide avatar's
+     * body is hidden from the possessed first-person view. */
+    bool bGuideRearGlanceBodyHidden = false;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<USceneComponent> Root;
@@ -268,6 +324,21 @@ protected:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<USceneComponent> PaddleAnchor;
+
+    // First-person guide paddle riding PaddleAnchor: the anchors existed
+    // from the pawn's creation with nothing attached, so the guide's own
+    // strokes fired audio and impulse with no visible paddle (reported in
+    // three consecutive playtests). Geometry is built in BeginPlay; the
+    // anchor is swept in Tick from the raft's guide-stroke state.
+    UPROPERTY()
+    TObjectPtr<class UProceduralMeshComponent> FirstPersonPaddleShaft;
+    UPROPERTY()
+    TObjectPtr<class UProceduralMeshComponent> FirstPersonPaddleBlade;
+    UPROPERTY()
+    TObjectPtr<class UProceduralMeshComponent> FirstPersonPaddleGrip;
+
+    void BuildFirstPersonPaddle();
+    void UpdateFirstPersonPaddle(float DeltaSeconds);
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<USceneComponent> RaftContextAnchor;
@@ -297,6 +368,9 @@ protected:
     FRaftSimGuideCameraRuntimeState CameraRuntimeState;
 
     bool bChaseCameraAllowed = false;
+    FRaftSimSeatedHeading SeatedHeading;
+    double InitialSeatedPawnYaw = 0.;
+    bool bInitialSeatedHeadingPending = true;
     FVector PreviousRaftVelocityMps = FVector::ZeroVector;
     float IntroCameraRemaining = 0.0f;
     float IntroCameraDuration = 4.0f;

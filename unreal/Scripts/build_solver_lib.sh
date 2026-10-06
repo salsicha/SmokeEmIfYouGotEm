@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build the raftsim_water static library for linking into the RaftSimWater
-# module (release-1.0-plan.md §5 A-1). Output: physics/cpp/build-ue/libraftsim_water.a
+# module (release-1.0-plan.md §5 A-1). Output: unreal/Plugins/SEIYGECore/cpp/build-ue/libraftsim_water.a
 #
 # The archive must match the C++ runtime UE links on each platform:
 #   - macOS: AppleClang + libc++ (system defaults).
@@ -11,7 +11,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-BUILD_DIR="$REPO_ROOT/physics/cpp/build-ue"
+BUILD_DIR="$REPO_ROOT/unreal/Plugins/SEIYGECore/cpp/build-ue"
 
 CMAKE_ARGS=(
   -DCMAKE_BUILD_TYPE=Release
@@ -70,7 +70,7 @@ case "$(uname -s)" in
     ;;
 esac
 
-cmake -S "$REPO_ROOT/physics/cpp" -B "$BUILD_DIR" "${CMAKE_ARGS[@]}"
+cmake -S "$REPO_ROOT/unreal/Plugins/SEIYGECore/cpp" -B "$BUILD_DIR" "${CMAKE_ARGS[@]}"
 cmake --build "$BUILD_DIR" --target raftsim_water -j
 
 echo "Built: $BUILD_DIR/libraftsim_water.a"

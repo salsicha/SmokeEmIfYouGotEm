@@ -121,6 +121,10 @@ struct RAFTSIMPHYSICS_API FRaftSimFlexCrewAction
     int32 HighSideDirection = 0;
     bool bBrace = false;
     bool bRecovery = false;
+    // Production whole-person transfer, metres in the raft frame. Legacy
+    // calibration actions retain their per-seat lean when this is false.
+    bool bUseCrewTransfer = false;
+    FVector CrewTransferOffsetM = FVector::ZeroVector;
 };
 
 struct RAFTSIMPHYSICS_API FRaftSimFlexSeatTelemetry
@@ -237,6 +241,10 @@ struct RAFTSIMPHYSICS_API FRaftSimFlexOverwashSolve
     double TotalRetainedWaterMassKg = 0.0;
     double RetainedWaterRollMomentNm = 0.0;
     double RetainedWaterPitchMomentNm = 0.0;
+    /** Destabilizing side-load magnitude from dynamic pressure on the
+     * overtopped face (production coupling term; zero when the caller leaves
+     * DynamicPressureRollLeverM at its reference default of 0). */
+    double OvertoppingDynamicRollMomentNm = 0.0;
     double ReferenceFlipThresholdNm = 0.0;
     double ReferenceFlipMarginNm = 0.0;
     bool bReferenceFlipRisk = false;
@@ -355,8 +363,12 @@ RAFTSIMPHYSICS_API FRaftSimFlexSeatLoadSolve SolveSeatLoadCoupledTubeD2(
     double BraceDownforceFraction = 0.08,
     double RecoveryDownforceFraction = 0.04);
 
-// evaluate_overwash_flip_d3 (flexible_raft_d3.py) with the synthetic uniform
-// water field used by the D6 fixture inputs.
+// evaluate_overwash_flip_d3 (flexible_raft_d3.py). The uniform descriptor
+// preserves the deterministic D6 fixture contract. Runtime callers may also
+// supply segment-keyed live samples; missing segment samples use Water.
+// DynamicPressureRollLeverM opts production callers into the overtopped-face
+// dynamic-pressure side load (see the implementation comment); the 0 default
+// keeps every reference fixture identical to the Python model.
 RAFTSIMPHYSICS_API FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
     const FRaftSimFlexSeatLoadSolve& SeatTubeSolve,
     const FRaftSimFlexUniformWater& Water,
@@ -367,7 +379,12 @@ RAFTSIMPHYSICS_API FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
     double FluxCoefficient = 0.65,
     double DrainageRatePerS = 0.55,
     double WaterDensityKgM3 = 1000.0,
-    double GravityMps2 = 9.81);
+    double GravityMps2 = 9.81,
+    const TMap<FString, FRaftSimFlexUniformWater>* WaterBySegment = nullptr,
+    double MaximumIncomingSpeedMps = TNumericLimits<double>::Max(),
+    double MaximumOvertoppingDepthM = TNumericLimits<double>::Max(),
+    double MaximumRetainedVolumePerSegmentM3 = TNumericLimits<double>::Max(),
+    double DynamicPressureRollLeverM = 0.0);
 
 // evaluate_rock_contact_wrap_pin_d4 (flexible_raft_d4.py).
 RAFTSIMPHYSICS_API FRaftSimFlexRockContactSolve EvaluateRockContactWrapPinD4(

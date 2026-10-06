@@ -50,12 +50,34 @@ bool FRaftSimEditorModule::TickPhotorealEnvironmentAutomationStartup(float)
 
     if (bCreateLandscapeImportCandidateMapsOnStartup)
     {
-        bSucceeded &= CreateLandscapeImportCandidateMaps(Summary);
+        bSucceeded &= CreateLandscapeImportCandidateMaps(
+            Summary,
+            LandscapeImportCandidateRiverFilter);
+    }
+
+    if (bCreatePhotorealRiverWaterMaterialOnStartup)
+    {
+        bSucceeded &= RaftSimPhotorealMaterials::CreatePhotorealRiverWaterMaterial(Summary);
+    }
+
+    if (bCreateLiveRiverSurfaceMaterialOnStartup)
+    {
+        bSucceeded &= RaftSimPhotorealMaterials::CreateLiveRiverSurfaceMaterial(Summary);
+    }
+
+    if (bCreateWaterVfxMaterialOnStartup)
+    {
+        bSucceeded &= RaftSimPhotorealMaterials::CreateWaterVfxMaterial(Summary);
     }
 
     if (bCreateSouthForkFullReachEnvironmentOnStartup)
     {
         bSucceeded &= CreateSouthForkFullReachEnvironment(Summary);
+    }
+
+    if (bCaptureSouthForkFullReachEnvironmentOnStartup)
+    {
+        bSucceeded &= CaptureSouthForkFullReachEnvironment(Summary);
     }
 
     if (bCreateZambeziBatokaBasaltFamilyOnStartup)
@@ -287,7 +309,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             SourceTextureAssetsByKey,
             OutSummary,
             RiverIdFilter);
-    bAllSucceeded &= CreateSolverVisualizationFieldTextureAssets(OutSummary);
+    if (RiverIdFilter.IsEmpty())
+    {
+        bAllSucceeded &= CreateSolverVisualizationFieldTextureAssets(OutSummary);
+    }
+    else
+    {
+        OutSummary += TEXT(
+            "Reusing reviewed shared solver-field textures for filtered river generation.\n");
+    }
     FAssetCompilingManager::Get().FinishAllCompilation();
     if (GShaderCompilingManager)
     {
@@ -330,7 +360,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
 
         FRaftSimLandscapeImportCandidateResult Result;
         const bool bMapBuilt = bSourceContractsPresent &&
-            BuildLandscapeImportCandidateMap(Candidate, Result, OutSummary);
+            BuildLandscapeImportCandidateMap(
+                Candidate,
+                Result,
+                OutSummary,
+                !RiverIdFilter.IsEmpty());
 
         FString GuideSeatCapturePath = GetLandscapeCandidateCaptureRelativePath(
             Candidate,
@@ -358,7 +392,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             OutSummary);
         FString SolverRapidCapturePath;
         bool bSolverRapidCaptured = true;
-        if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
+        const bool bHasRiverSpecificSolverVisualization =
+            Candidate.bUseSolverVisualizationFields &&
+            (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ||
+             !Candidate.SolverVisualizationFieldRelativePath.IsEmpty());
+        if (bHasRiverSpecificSolverVisualization)
         {
             SolverRapidCapturePath = GetLandscapeCandidateCaptureRelativePath(
                 Candidate,
@@ -393,6 +431,27 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         }
         FRaftSimLandscapeCandidateWaterSettings WaterSettings =
             GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
+        // Mirror BuildLandscapeImportCandidateMap's material rule
+        // (bDisableSolverVisualizationFieldsInMaterial) so the manifest
+        // records the water material actually built.
+        if ((Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
+             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") ||
+             IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId)) &&
+            (!Candidate.bUseSolverVisualizationFields ||
+             !Candidate.SolverVisualizationFieldRelativePath.IsEmpty()))
+        {
+            // These reach-local packed fields are already sampled into capture
+            // geometry and vertex colours. Their materials must not re-sample
+            // the shared South Fork fallback texture on top of those results.
+            WaterSettings.SolverFieldEnable = 0.0f;
+            WaterSettings.SolverMacroNormalWeight = 0.0f;
+            WaterSettings.SolverDepthColorWeight = 0.0f;
+            WaterSettings.SolverFieldRoughnessWeight = 0.0f;
+            WaterSettings.SolverFroudeAerationWeight = 0.0f;
+            WaterSettings.SolverSpeedVisualGain = 0.0f;
+            WaterSettings.SolverFroudeVisualGain = 0.0f;
+        }
         if (!Candidate.bUseSolverVisualizationFields &&
             Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
         {
@@ -423,10 +482,216 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             (Candidate.LandscapeSize - 1) /
             (CandidateNumSubsections * CandidateSubsectionSizeQuads);
         const bool bHasSolverVisualizationFields =
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") &&
-            Candidate.bUseSolverVisualizationFields;
+            bHasRiverSpecificSolverVisualization;
+        const bool bPacuareSolverVisualization =
+            bHasSolverVisualizationFields &&
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+        const bool bColoradoHanceSolverVisualization =
+            bHasSolverVisualizationFields &&
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+        const bool bChilkoLavaCanyonSolverVisualization =
+            bHasSolverVisualizationFields &&
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+        const bool bFutaleufuTerminatorSolverVisualization =
+            bHasSolverVisualizationFields &&
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+        const FString CandidateSolverVisualizationManifest =
+            bPacuareSolverVisualization
+            ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                   "pacuare_upper_huacas_rainfed_visualization_manifest.json")
+            : (bColoradoHanceSolverVisualization
+                   ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                          "colorado_hance_moderate_visualization_manifest.json")
+                   : (bChilkoLavaCanyonSolverVisualization
+                          ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                                 "chilko_lava_canyon_median_visualization_manifest.json")
+                          : (bFutaleufuTerminatorSolverVisualization
+                                 ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                                        "futaleufu_terminator_median_visualization_manifest.json")
+                                 : GetSolverVisualizationFieldManifestRelativePath())));
         const bool bHasManifestConditionedPhysicalChannel =
             Candidate.bPhysicalScaleSourceCorridor;
+        const bool bUsesOpaqueVolumetricVegetation =
+            Result.bDressingUsesOpaqueVolumetricVegetation;
+        const bool bUsesZambeziDefaultLitWater =
+            Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge") ||
+            IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
+        const bool bUsesPacuareRainforestDefaultLitWater =
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+        const bool bUsesColoradoHanceDefaultLitWater =
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+        const bool bUsesFutaleufuTerminatorDefaultLitWater =
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+        const bool bUsesChilkoLavaCanyonDefaultLitWater =
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+        const bool bUsesSingleLayerWater = false;
+        const bool bUsesTransmittingDefaultLitWater =
+            bUsesColoradoHanceDefaultLitWater ||
+            bUsesFutaleufuTerminatorDefaultLitWater ||
+            bUsesChilkoLavaCanyonDefaultLitWater;
+        // The evidence-based Pacuare Huacas Landscape takes its colour from the
+        // orthophoto drape; the organic rainforest palette is only built when
+        // that texture is absent (mirrors LoadOrCreateLandscapeCandidateMaterial).
+        const bool bUsesPacuareEvidenceDrape =
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare") &&
+            LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/PacuareRun/Terrain/T_RaftSim_PacuareHuacas_EvidenceDrape."
+                     "T_RaftSim_PacuareHuacas_EvidenceDrape")) != nullptr;
+        const bool bUsesPacuareOrganicRainforestSurface =
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare") && !bUsesPacuareEvidenceDrape;
+        const bool bUsesSouthForkOrganicFoothillSurface =
+            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork");
+        // The evidence-based Hance Landscape takes its colour from the 2021
+        // orthophoto drape (see LoadOrCreateLandscapeCandidateMaterial); the
+        // organic palette is only built when that texture is absent.
+        const bool bUsesColoradoEvidenceDrape =
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river") &&
+            LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/T_RaftSim_ColoradoHance_EvidenceDrape."
+                     "T_RaftSim_ColoradoHance_EvidenceDrape")) != nullptr;
+        const bool bUsesColoradoOrganicHanceSurface =
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !bUsesColoradoEvidenceDrape;
+        // The evidence-based Futaleufu Terminator Landscape takes its colour
+        // from the Sentinel-2 drape; the organic temperate palette is only
+        // built when that texture is absent.
+        const bool bUsesFutaleufuEvidenceDrape =
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") &&
+            LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/FutaleufuRun/Terrain/T_RaftSim_FutaleufuTerminator_EvidenceDrape."
+                     "T_RaftSim_FutaleufuTerminator_EvidenceDrape")) != nullptr;
+        const bool bUsesFutaleufuOrganicTemperateSurface =
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") && !bUsesFutaleufuEvidenceDrape;
+        // The evidence-based Chilko Lava Canyon Landscape takes its colour
+        // from the Sentinel-2 drape likewise.
+        const bool bUsesChilkoEvidenceDrape =
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") &&
+            LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/ChilkoRun/Terrain/T_RaftSim_ChilkoLavaCanyon_EvidenceDrape."
+                     "T_RaftSim_ChilkoLavaCanyon_EvidenceDrape")) != nullptr;
+        const bool bUsesChilkoOrganicLavaCanyonSurface =
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") && !bUsesChilkoEvidenceDrape;
+        // The Zambezi upper gorge takes its colour from its Sentinel-2 drape.
+        const bool bUsesZambeziUpperGorgeEvidenceDrape =
+            IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId) &&
+            LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/ZambeziRun/Terrain/T_RaftSim_ZambeziUpperGorge_EvidenceDrape."
+                     "T_RaftSim_ZambeziUpperGorge_EvidenceDrape")) != nullptr;
+        const bool bUsesDefaultLitLandscape =
+            bUsesSouthForkOrganicFoothillSurface ||
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") ||
+            IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
+        const bool bUsesReachLocalReferenceGameplay =
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") ||
+            IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
+        const FString WaterMaterialParentPath = bUsesZambeziDefaultLitWater
+            ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_DefaultLitWater")
+            : (bUsesPacuareRainforestDefaultLitWater
+                   ? TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater")
+                   : (bUsesColoradoHanceDefaultLitWater
+                          ? TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Materials/M_RaftSim_Colorado_HanceDefaultLitWater")
+                          : (bUsesFutaleufuTerminatorDefaultLitWater
+                          ? TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater")
+                          : (bUsesChilkoLavaCanyonDefaultLitWater
+                                 ? TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_Chilko_LavaCanyonDefaultLitWater")
+                                 : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate")))));
+        const FString WaterSingleLayerParameterKeyPrefix =
+            bUsesSingleLayerWater
+            ? TEXT("water_single_layer")
+            : bUsesTransmittingDefaultLitWater
+            ? TEXT("water_transmission")
+            : TEXT("water_inactive_single_layer");
+        const FString WaterSingleLayerParametersJson = FString::Printf(
+            TEXT("      \"%s_refraction_ior\": %.6f,\n")
+            TEXT("      \"%s_phase_g\": %.6f,\n")
+            TEXT("      \"%s_scattering_coefficients_per_cm\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"%s_absorption_coefficients_per_cm\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"%s_color_scale_behind_water\": [%.6f, %.6f, %.6f],\n"),
+            *WaterSingleLayerParameterKeyPrefix,
+            WaterSettings.RefractionIor,
+            *WaterSingleLayerParameterKeyPrefix,
+            WaterSettings.PhaseG,
+            *WaterSingleLayerParameterKeyPrefix,
+            WaterSettings.ScatteringCoefficients.R,
+            WaterSettings.ScatteringCoefficients.G,
+            WaterSettings.ScatteringCoefficients.B,
+            *WaterSingleLayerParameterKeyPrefix,
+            WaterSettings.AbsorptionCoefficients.R,
+            WaterSettings.AbsorptionCoefficients.G,
+            WaterSettings.AbsorptionCoefficients.B,
+            *WaterSingleLayerParameterKeyPrefix,
+            WaterSettings.ColorScaleBehindWater.R,
+            WaterSettings.ColorScaleBehindWater.G,
+            WaterSettings.ColorScaleBehindWater.B);
+        const FString WaterNormalProjectionManifestJson = bUsesZambeziDefaultLitWater
+            ? TEXT(
+                  "      \"water_normal_primary_uv_tiling\": [2.400000, 6.200000],\n"
+                  "      \"water_normal_secondary_uv_tiling\": [4.100000, 10.300000],\n"
+                  "      \"water_normal_secondary_coordinate_policy\": \"uv_axes_swapped_for_cross_current_breakup\",\n")
+            : bUsesColoradoHanceDefaultLitWater
+            ? TEXT(
+                  "      \"water_normal_primary_uv_tiling\": [0.570000, 1.590000],\n"
+                  "      \"water_normal_secondary_uv_tiling\": [1.190000, 2.830000],\n"
+                  "      \"water_normal_secondary_coordinate_policy\": \"shared_uv_axes_opposed_flow\",\n")
+            : TEXT(
+                  "      \"water_normal_primary_uv_tiling\": [0.730000, 2.150000],\n"
+                  "      \"water_normal_secondary_uv_tiling\": [1.110000, 3.300000],\n"
+                  "      \"water_normal_secondary_coordinate_policy\": \"shared_uv_axes\",\n");
+        const FString WaterNormalSamplingPolicy =
+            bUsesColoradoHanceDefaultLitWater
+            ? TEXT("river_local_mirrored_dual_scale_uv_samples")
+            : TEXT("half_period_dual_sample_crossfade_prevents_frac_tile_boundaries");
+        const FString DressingSourceSpeciesJson = bUsesOpaqueVolumetricVegetation
+            ? TEXT("[]")
+            : TEXT("[\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"]");
+        const FString DressingConvertedSpeciesJson =
+            bUsesOpaqueVolumetricVegetation
+            ? ((bUsesFutaleufuOrganicTemperateSurface ||
+                bUsesChilkoOrganicLavaCanyonSurface)
+                   ? FString::Printf(
+                         TEXT("[\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"]"),
+                         *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingBroadleafVariantAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingConiferVariantAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingShrubAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingShrubVariantAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingUnderstoryVariantAssetPath))
+                   : FString::Printf(
+                         TEXT("[\"%s\", \"%s\", \"%s\", \"%s\"]"),
+                         *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingShrubAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath)))
+            : TEXT("[\"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\"]");
+        const FString DefaultBroadleafMaterialAsset = FString::Printf(
+            TEXT("/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Broadleaf_BiomeFoliageCandidate"),
+            *RiverAssetName);
+        const FString DefaultConiferMaterialAsset = FString::Printf(
+            TEXT("/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Conifer_BiomeFoliageCandidate"),
+            *RiverAssetName);
+        const FString DefaultUnderstoryMaterialAsset = FString::Printf(
+            TEXT("/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Understory_BiomeFoliageCandidate"),
+            *RiverAssetName);
+        const FString PacuareWaterDecisionJson = bUsesPacuareRainforestDefaultLitWater
+            ? TEXT(
+                  "      \"water_single_layer_capture_decision\": \"rejected_on_pacuare_after_direct_material_isolation_and_procedural_reference_infill_bathymetry_bracket\",\n"
+                  "      \"water_single_layer_failure_artifact\": \"hard_near_camera_horizontal_depth_composition_band\",\n"
+                  "      \"water_conditioned_bathymetry_bracket_status\": \"rejected_did_not_remove_foreground_band_or_river_right_white_patch\",\n"
+                  "      \"water_conditioned_bathymetry_active\": false,\n"
+                  "      \"water_conditioned_bathymetry_authority\": \"none_rejected_procedural_reference_infill_was_never_collision_solver_survey_or_promoted_geometry\",\n")
+            : TEXT(
+                  "      \"water_single_layer_capture_decision\": \"not_re_evaluated_by_pacuare_bracket\",\n"
+                  "      \"water_single_layer_failure_artifact\": null,\n"
+                  "      \"water_conditioned_bathymetry_bracket_status\": \"not_active_for_river\",\n"
+                  "      \"water_conditioned_bathymetry_active\": false,\n"
+                  "      \"water_conditioned_bathymetry_authority\": \"none\",\n");
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -470,7 +735,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"horizontal_span_x_cm\": %.3f,\n")
             TEXT("      \"horizontal_span_y_cm\": %.3f,\n")
             TEXT("      \"target_relief_cm\": %.3f,\n")
+            TEXT("      \"world_vertical_offset_cm\": %.3f,\n")
+            TEXT("      \"source_aligned_centerline\": \"%s\",\n")
+            TEXT("      \"terrain_render_authority\": \"%s\",\n")
+            TEXT("      \"runnable_gameplay_status\": \"%s\",\n")
             TEXT("      \"landscape_material_status\": \"source_conditioned_macro_zones_plus_first_party_close_range_detail_review_candidate\",\n")
+            TEXT("      \"landscape_material_shading_model\": \"%s\",\n")
+            TEXT("      \"landscape_material_organic_surface_status\": \"%s\",\n")
+            TEXT("      \"landscape_material_organic_world_noise_scales_per_cm\": %s,\n")
+            TEXT("      \"landscape_material_geometry_authority_status\": \"shade_only_no_world_position_offset_no_collision_or_solver_change\",\n")
             TEXT("      \"landscape_material_texture_asset_count\": 7,\n")
             TEXT("      \"landscape_material_zone_parameter\": \"SourceConditionedMaterialZones\",\n")
             TEXT("      \"landscape_material_zone_semantics\": \"rgb_r_terrain_wet_bank_g_vegetation_b_visible_water\",\n")
@@ -506,21 +779,98 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_external_review_pine_asset_root\": \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K\",\n")
             TEXT("      \"landscape_dressing_external_review_pine_assets\": [\"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_a_LOD0\", \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_b_LOD0\", \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_c_LOD0\"],\n")
             TEXT("      \"landscape_dressing_external_review_pine_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json\",\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_authority\": \"rights_reviewed_cc0_structure_analogs_only_no_native_species_ecology_geography_collision_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_mesh_count\": %d,\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_asset_root\": \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K\",\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json\",\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_assets\": [\"SM_FirSapling_fir_sapling_a\", \"SM_FirSapling_fir_sapling_b\", \"SM_FirSapling_fir_sapling_c\", \"SM_Fern02_fern_02_a\", \"SM_Fern02_fern_02_b\", \"SM_Fern02_fern_02_c\", \"SM_Fern02_fern_02_d\"],\n")
+            TEXT("      \"landscape_dressing_futaleufu_medium_fir_canopy_excluded\": true,\n")
+            TEXT("      \"landscape_dressing_futaleufu_project_owned_canopy_preserved\": true,\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_authority\": \"rights_reviewed_cc0_generic_fern_morphology_analogs_only_no_pacuare_species_ecology_geography_collision_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_mesh_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_target_instance_count\": 3640,\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_asset_root\": \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K\",\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json\",\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_assets\": [\"SM_Fern02_fern_02_a\", \"SM_Fern02_fern_02_b\", \"SM_Fern02_fern_02_c\", \"SM_Fern02_fern_02_d\"],\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_project_owned_canopy_preserved\": true,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_authority\": \"project_owned_procedural_infill_source_landscape_grounded_no_species_ecology_terrain_collision_water_hydraulic_bathymetric_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_mesh_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_deterministic_seed\": 18437,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_minimum_centerline_distance_cm\": %.3f,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_forms\": [\"folded_leaf_litter_a\", \"folded_leaf_litter_b\", \"buttress_root_a\", \"deadwood_a\"],\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_placement_contract\": \"deterministic_32_candidate_full_route_both_bank_source_landscape_search_outside_complete_visible_water_and_protected_solver_strip_with_dry_height_slope_and_centerline_gates\",\n")
             TEXT("      \"landscape_dressing_external_review_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_external_review_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json\",\n")
             TEXT("      \"landscape_dressing_external_review_broadleaf_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_external_review_broadleaf_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json\",\n")
             TEXT("      \"landscape_dressing_external_review_conifer_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_external_review_conifer_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json\",\n")
-            TEXT("      \"landscape_dressing_source_species_skeletal_assets\": [\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"],\n")
-            TEXT("      \"landscape_dressing_converted_species_static_assets\": [\"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\"],\n")
+            TEXT("      \"landscape_dressing_source_species_skeletal_assets\": %s,\n")
+            TEXT("      \"landscape_dressing_converted_species_static_assets\": %s,\n")
             TEXT("      \"landscape_dressing_broadleaf_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_conifer_asset\": \"%s\",\n")
-            TEXT("      \"landscape_dressing_shrub_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\",\n")
-            TEXT("      \"landscape_dressing_understory_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\",\n")
+            TEXT("      \"landscape_dressing_shrub_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_understory_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_broadleaf_variant_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_conifer_variant_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_shrub_variant_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_understory_variant_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_temperate_morphology_mesh_count\": %d,\n")
             TEXT("      \"landscape_dressing_trunk_asset\": null,\n")
             TEXT("      \"landscape_dressing_instance_implementation\": \"%s\",\n")
             TEXT("      \"landscape_dressing_boulder_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_authority\": \"presentation_only_procedural_source_gap_fill_no_lithology_collision_bathymetry_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_minimum_centerline_distance_cm\": %.3f,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_target_height_range_m\": [0.22, 2.60],\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_placement_contract\": \"deterministic_72_candidate_source_landscape_search_across_both_full_route_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_authority\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_minimum_centerline_distance_cm\": %.3f,\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_placement_contract\": \"deterministic_64_candidate_source_landscape_search_across_both_full_route_dry_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_authority\": \"presentation_only_procedural_source_gap_fill_no_lithology_collision_bathymetry_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_minimum_centerline_distance_cm\": %.3f,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_target_height_range_m\": [0.10, 1.40],\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_placement_contract\": \"deterministic_48_candidate_source_landscape_search_across_both_full_route_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_authority\": \"presentation_only_procedural_source_gap_fill_no_species_ecology_survey_collision_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_minimum_centerline_distance_cm\": %.3f,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_target_height_range_m\": [0.36, 1.10],\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_placement_contract\": \"deterministic_48_candidate_source_landscape_search_across_both_full_route_dry_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_authority\": \"presentation_only_generic_rock_analog_no_lithology_collision_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_target_height_range_m\": [0.95, 5.20],\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_placement_contract\": \"deterministic_128_candidate_search_approximately_118m_to_993m_downstream_with_full_route_clearance_dry_height_and_hard_slope_gates\",\n")
             TEXT("      \"landscape_dressing_foliage_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_canopy_tree_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_understory_instance_count\": %d,\n")
@@ -530,9 +880,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_foliage_material_asset_count\": %d,\n")
             TEXT("      \"landscape_dressing_foliage_material_bound_slot_count\": %d,\n")
             TEXT("      \"landscape_dressing_native_foliage_material_fallback_slot_count\": %d,\n")
-            TEXT("      \"landscape_dressing_broadleaf_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Broadleaf_BiomeFoliageCandidate\",\n")
-            TEXT("      \"landscape_dressing_conifer_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Conifer_BiomeFoliageCandidate\",\n")
-            TEXT("      \"landscape_dressing_understory_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Understory_BiomeFoliageCandidate\",\n")
+            TEXT("      \"landscape_dressing_broadleaf_material_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_conifer_material_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_understory_material_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_broadleaf_front_tint\": [%.6f, %.6f, %.6f],\n")
             TEXT("      \"landscape_dressing_broadleaf_back_tint\": [%.6f, %.6f, %.6f],\n")
             TEXT("      \"landscape_dressing_broadleaf_transmission_tint\": [%.6f, %.6f, %.6f],\n")
@@ -548,14 +898,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_conifer_mesh_nanite_enabled\": %s,\n")
             TEXT("      \"landscape_dressing_understory_mesh_nanite_enabled\": %s,\n")
             TEXT("      \"landscape_dressing_promotion_status\": \"%s\",\n")
+            TEXT("%s")
             TEXT("      \"water_material_status\": \"%s\",\n")
             TEXT("      \"water_material_asset\": \"%s\",\n")
-            TEXT("      \"water_material_parent\": \"/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate\",\n")
-            TEXT("      \"water_shading_model\": \"DefaultLit\",\n")
-            TEXT("      \"water_blend_mode\": \"Opaque\",\n")
-            TEXT("      \"water_custom_output\": \"none_surface_only_solver_conditioned_shading\",\n")
-            TEXT("      \"water_volume_parameter_status\": \"inactive_single_layer_evaluation_values_retained_in_manifest_only\",\n")
-            TEXT("      \"water_normal_source\": \"river_specific_first_party_normal_atlas_plus_optional_validated_cpp_solver_macro_normal\",\n")
+            TEXT("      \"water_material_parent\": \"%s\",\n")
+            TEXT("      \"water_shading_model\": \"%s\",\n")
+            TEXT("      \"water_blend_mode\": \"%s\",\n")
+            TEXT("      \"water_custom_output\": \"%s\",\n")
+            TEXT("      \"water_volume_parameter_status\": \"%s\",\n")
+            TEXT("      \"water_normal_source\": \"river_specific_first_party_normal_atlas_or_standalone_texture_plus_cpu_authored_reach_local_or_validated_shader_solver_field\",\n")
             TEXT("      \"water_solver_visualization_field_status\": \"%s\",\n")
             TEXT("      \"water_solver_visualization_field_manifest\": \"%s\",\n")
             TEXT("      \"water_solver_visualization_field_texture_count\": %d,\n")
@@ -587,21 +938,19 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"water_specular\": %.6f,\n")
             TEXT("      \"water_surface_opacity\": %.6f,\n")
             TEXT("      \"water_normal_intensity\": %.6f,\n")
-            TEXT("      \"water_normal_atlas_sampling_policy\": \"half_period_dual_sample_crossfade_prevents_frac_tile_boundaries\",\n")
-            TEXT("      \"water_normal_atlas_phase_offset\": 0.500000,\n")
-            TEXT("      \"water_inactive_single_layer_refraction_ior\": %.6f,\n")
-            TEXT("      \"water_inactive_single_layer_phase_g\": %.6f,\n")
-            TEXT("      \"water_inactive_single_layer_scattering_coefficients_per_cm\": [%.6f, %.6f, %.6f],\n")
-            TEXT("      \"water_inactive_single_layer_absorption_coefficients_per_cm\": [%.6f, %.6f, %.6f],\n")
-            TEXT("      \"water_inactive_single_layer_color_scale_behind_water\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"water_surface_variation_strength\": %.6f,\n")
+            TEXT("      \"water_normal_atlas_sampling_policy\": \"%s\",\n")
+            TEXT("      \"water_normal_atlas_phase_offset\": %.6f,\n")
+            TEXT("%s")
+            TEXT("%s")
             TEXT("      \"water_render_width_scale\": %.6f,\n")
             TEXT("      \"water_render_normal_up_blend\": %.6f,\n")
             TEXT("      \"water_render_displacement_scale\": %.6f,\n")
             TEXT("      \"water_near_camera_synthetic_wedge_fill_enabled\": false,\n")
             TEXT("      \"water_near_camera_synthetic_wedge_fill_policy\": \"disabled_for_solver_surface_water_candidates_legacy_diagnostic_branch_retained\",\n")
             TEXT("      \"water_geometry_authority\": \"custom_cpp_solver_informed_ribbon_geometry_and_vertex_flow_cues_no_visual_forcing_authority\",\n")
-            TEXT("      \"waterbody_dependency\": \"none_default_lit_solver_surface_runs_on_generated_procedural_mesh_ribbon\",\n")
-            TEXT("      \"water_reflection_capture_policy\": \"default_lit_surface_uses_movable_skylight_runtime_corridor_sphere_capture_screen_space_reflections_and_bounded_fresnel_sky_fill\",\n")
+            TEXT("      \"waterbody_dependency\": \"%s\",\n")
+            TEXT("      \"water_reflection_capture_policy\": \"%s\",\n")
             TEXT("      \"water_material_promotion_status\": \"review_only_requires_visual_guide_solver_hazard_and_performance_validation\",\n")
             TEXT("      \"material_usage_contract\": \"%s\",\n")
             TEXT("      \"material_bound_component_count\": %d,\n")
@@ -613,7 +962,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"nanite_material_audit_error_count\": %d,\n")
             TEXT("      \"nanite_representation_status\": \"%s\",\n")
             TEXT("      \"capture_shader_warmup_policy\": \"render_then_finish_compilation_recreate_landscape_components_render_again\",\n")
-            TEXT("      \"promotion_status\": \"review_gated_isolated_candidate_not_enabled_for_gameplay_or_active_previews\"\n")
+            TEXT("      \"promotion_status\": \"%s\"\n")
             TEXT("    }"),
             Index == 0 ? TEXT("") : TEXT(",\n"),
             *EscapeRaftSimJsonString(Candidate.PreviewSpec.RiverId),
@@ -625,11 +974,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             *EscapeRaftSimJsonString(GuideSeatCapturePath),
             *EscapeRaftSimJsonString(RiverEyeCapturePath),
             *EscapeRaftSimJsonString(SolverRapidCapturePath),
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
+            bHasRiverSpecificSolverVisualization
                 ? (bSolverRapidCaptured
-                       ? (bHasSolverVisualizationFields
-                              ? TEXT("captured_at_validated_median_field_high_froude_approach")
-                              : TEXT("captured_physical_corridor_midreach_geometry_review_without_solver_field"))
+                       ? (bPacuareSolverVisualization
+                              ? TEXT("captured_at_upper_huacas_cooked_field_hydraulic_crux")
+                              : TEXT("captured_at_validated_median_field_high_froude_approach"))
                        : TEXT("solver_rapid_capture_failed"))
                 : TEXT("not_available_without_river_specific_validated_solver_field"),
             bCandidateSucceeded ? TEXT("captured_source_landscape_import_candidate") : TEXT("candidate_generation_or_capture_failed"),
@@ -671,6 +1020,59 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.HorizontalSpanXCm,
             Candidate.HorizontalSpanYCm,
             Candidate.TargetReliefCm,
+            Candidate.WorldVerticalOffsetCm,
+            *EscapeRaftSimJsonString(Candidate.LocalCenterlineRelativePath),
+            Candidate.bUseDensePhysicalTerrainRenderSurface
+                ? TEXT("hidden_landscape_collision_and_height_query_plus_noncolliding_dense_render_tiles")
+                : TEXT("visible_reach_local_landscape_owns_rendering_collision_and_height_queries"),
+            bUsesReachLocalReferenceGameplay
+                ? (Candidate.PreviewSpec.RiverId == TEXT("pacuare")
+                       ? TEXT("reference_runnable_upper_huacas_live_cooked_water_player_raft_and_game_mode")
+                       : (Candidate.PreviewSpec.RiverId == TEXT("colorado_river")
+                              ? TEXT("reference_runnable_colorado_hance_live_cooked_water_player_raft_and_game_mode")
+                              : (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator")
+                                     ? TEXT("reference_runnable_futaleufu_terminator_live_cooked_water_player_raft_and_game_mode")
+                                     : (IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId)
+                                            ? TEXT("reference_runnable_zambezi_upper_gorge_live_cartesian_water_player_raft_and_game_mode")
+                                            : TEXT("reference_runnable_chilko_lava_canyon_live_cooked_water_player_raft_and_game_mode")))))
+                : (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge")
+                       ? TEXT("reference_runnable_full_corridor_live_cooked_water_player_raft_and_game_mode")
+                       : TEXT("capture_candidate_only")),
+            bUsesDefaultLitLandscape
+                ? TEXT("DefaultLit")
+                : TEXT("Unlit"),
+            bUsesSouthForkOrganicFoothillSurface
+                ? TEXT("south_fork_v1_three_scale_world_space_dry_grass_oak_litter_granitic_soil_and_slope_aware_weathered_granite_response")
+                : (bUsesPacuareOrganicRainforestSurface
+                ? TEXT("pacuare_v1_three_scale_world_space_canopy_soil_moss_leaf_litter_and_slope_aware_wet_rock_response")
+                : bUsesPacuareEvidenceDrape
+                ? TEXT("pacuare_huacas_evidence_2014_2017_orthophoto_drape_sentinel2_fill_albedo_scaled_no_procedural_palette")
+                : (bUsesColoradoEvidenceDrape
+                       ? TEXT("colorado_hance_evidence_2021_orthophoto_drape_albedo_scaled_no_procedural_palette")
+                       : bUsesColoradoOrganicHanceSurface
+                       ? TEXT("colorado_hance_v1_four_scale_world_space_sandy_bench_weathered_iron_cliff_dark_rock_talus_and_fine_grain_response")
+                       : bUsesFutaleufuEvidenceDrape
+                       ? TEXT("futaleufu_terminator_evidence_sentinel2_10m_drape_albedo_scaled_no_procedural_palette")
+                       : bUsesChilkoEvidenceDrape
+                       ? TEXT("chilko_lava_canyon_evidence_sentinel2_10m_drape_albedo_scaled_no_procedural_palette")
+                       : bUsesZambeziUpperGorgeEvidenceDrape
+                       ? TEXT("zambezi_upper_gorge_evidence_sentinel2_10m_drape_albedo_scaled_no_procedural_palette")
+                       : (bUsesFutaleufuOrganicTemperateSurface
+                       ? TEXT("futaleufu_v1_three_scale_world_space_forest_floor_moss_leaf_litter_and_slope_aware_wet_granite_response")
+                       : (bUsesChilkoOrganicLavaCanyonSurface
+                              ? TEXT("chilko_v2_dual_projection_seven_scale_world_space_open_bench_dry_grass_mineral_soil_slope_aware_basalt_scree_and_contrasted_nonrepeating_wet_bank_silt_gravel_oxide_response")
+                              : TEXT("not_enabled_for_this_river"))))),
+            bUsesSouthForkOrganicFoothillSurface
+                ? TEXT("[0.000130, 0.000730, 0.003100]")
+                : (bUsesPacuareOrganicRainforestSurface
+                ? TEXT("[0.000210, 0.000950, 0.003500]")
+                : (bUsesColoradoOrganicHanceSurface
+                       ? TEXT("[0.000140, 0.000530, 0.002300, 0.006800]")
+                       : (bUsesFutaleufuOrganicTemperateSurface
+                       ? TEXT("[0.000180, 0.000710, 0.004200]")
+                       : (bUsesChilkoOrganicLavaCanyonSurface
+                              ? TEXT("[0.000160, 0.000590, 0.002700, 0.007900, 0.000910, 0.003470, 0.015700]")
+                              : TEXT("[]"))))),
             MaterialSettings.MacroMappingScale,
             MaterialSettings.DetailMappingScale,
             MaterialSettings.DetailAlbedoWeight,
@@ -688,7 +1090,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             MaterialSettings.WetBankColorScale.G,
             MaterialSettings.WetBankColorScale.B,
             Result.bDressingValidated
-                ? (Result.DressingExternalRockMeshCount == 6
+                ? (bUsesOpaqueVolumetricVegetation
+                       ? TEXT("source_mask_placed_project_owned_opaque_volumetric_vegetation_and_rock_dressing_captured")
+                       : bUsesColoradoOrganicHanceSurface
+                       ? TEXT("source_grounded_project_owned_opaque_hance_dryland_ground_cover_shrubs_and_rock_dressing_captured_zero_legacy_pve_instances")
+                       : Result.DressingExternalRockMeshCount == 6
                        ? TEXT("source_mask_placed_complete_pve_species_and_rights_reviewed_rock_comparison_captured")
                        : TEXT("source_mask_placed_complete_pve_species_and_dense_irregular_rock_evaluation_captured"))
                 : TEXT("dressing_generation_or_validation_failed"),
@@ -699,7 +1105,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingSourceSkeletalMeshCount,
             Result.DressingConvertedStaticMeshCount,
             Result.DressingExternalReviewAssetCount,
-            Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
+            Result.DressingExternalRockMeshCount == 6 &&
+                    Result.DressingFutaleufuScannedUnderstoryMeshCount == 7
+                ? TEXT("rights_reviewed_cc0_six_rock_plus_seven_small_fir_and_fern_understory_analogs_loaded_with_explicit_materials")
+                : Result.DressingExternalRockMeshCount == 6 &&
+                        Result.DressingPacuareScannedFernMeshCount == 4
+                ? TEXT("rights_reviewed_cc0_six_rock_plus_four_scanned_fern_morphology_analogs_loaded_with_explicit_materials")
+                : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("rights_reviewed_cc0_six_rock_and_three_pine_sets_loaded_with_explicit_materials_for_isolated_south_fork_visual_comparison")
                 : (Result.DressingExternalRockMeshCount == 6
                        ? TEXT("rights_reviewed_cc0_six_rock_set_loaded_with_explicit_materials_for_isolated_river_visual_comparison")
@@ -718,6 +1130,32 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.bDressingExternalPineMaterialsValidated
                 ? TEXT("three_meshes_physical_scale_nanite_and_materials_validated_sparse_visual_comparison_only")
                 : TEXT("no_reviewed_pine_asset_selected_for_this_river"),
+            Result.DressingFutaleufuScannedUnderstoryMeshCount > 0
+                ? (Result.bDressingFutaleufuScannedUnderstoryMaterialsValidated
+                       ? TEXT("seven_small_fir_and_fern_meshes_nanite_and_material_validated_for_source_grounded_near_bank_review_candidate")
+                       : TEXT("scanned_understory_loaded_but_material_or_nanite_validation_failed"))
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingFutaleufuScannedUnderstoryMeshCount,
+            Result.DressingFutaleufuScannedUnderstoryInstanceCount,
+            Result.DressingPacuareScannedFernMeshCount > 0
+                ? (Result.bDressingPacuareScannedFernMaterialsValidated
+                       ? TEXT("four_scanned_fern_meshes_nanite_and_material_validated_for_source_grounded_near_bank_review_candidate")
+                       : TEXT("scanned_fern_meshes_loaded_but_material_or_nanite_validation_failed"))
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingPacuareScannedFernMeshCount,
+            Result.DressingPacuareScannedFernInstanceCount,
+            Result.DressingPacuareForestFloorMeshCount == 4 &&
+                    Result.DressingPacuareForestFloorInstanceCount >= 2970
+                ? TEXT("four_project_owned_opaque_forest_floor_meshes_source_grounded_and_screened")
+                : (Result.DressingPacuareForestFloorMeshCount > 0
+                       ? TEXT("forest_floor_assets_or_placement_validation_failed")
+                       : TEXT("not_enabled_for_this_river")),
+            Result.DressingPacuareForestFloorMeshCount,
+            Result.DressingPacuareForestFloorTargetInstanceCount,
+            Result.DressingPacuareForestFloorInstanceCount,
+            Result.DressingPacuareForestFloorRejectedPlacementCount,
+            Result.DressingPacuareForestFloorMinimumCenterlineDistanceCm,
+            Result.DressingPacuareForestFloorMaximumSlopeDegrees,
             *EscapeRaftSimJsonString(
                 Result.bDressingExternalConiferReviewAssetLoaded
                     ? Result.DressingConiferAssetPath
@@ -730,9 +1168,28 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 Result.bDressingExternalConiferReviewAssetLoaded
                     ? Result.DressingConiferAssetPath
                     : FString()),
+            *DressingSourceSpeciesJson,
+            *DressingConvertedSpeciesJson,
             *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
             *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
-            Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
+            *EscapeRaftSimJsonString(Result.DressingShrubAssetPath),
+            *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath),
+            *EscapeRaftSimJsonString(Result.DressingBroadleafVariantAssetPath),
+            *EscapeRaftSimJsonString(Result.DressingConiferVariantAssetPath),
+            *EscapeRaftSimJsonString(Result.DressingShrubVariantAssetPath),
+            *EscapeRaftSimJsonString(Result.DressingUnderstoryVariantAssetPath),
+            (bUsesFutaleufuOrganicTemperateSurface ||
+             bUsesChilkoOrganicLavaCanyonSurface)
+                ? 8
+                : 0,
+            bUsesFutaleufuOrganicTemperateSurface &&
+                    Result.DressingFutaleufuScannedUnderstoryMeshCount == 7
+                ? TEXT("project_owned_opaque_volumetric_nanite_canopy_plus_rights_reviewed_cc0_small_fir_and_fern_near_bank_hierarchical_instancing_plus_river_specific_rock_dressing")
+                : bUsesOpaqueVolumetricVegetation
+                ? TEXT("project_owned_opaque_volumetric_nanite_species_hierarchical_instancing_plus_river_specific_rock_dressing")
+                : bUsesColoradoOrganicHanceSurface
+                ? TEXT("project_owned_opaque_hance_dryland_ground_cover_and_shrub_hierarchical_instancing_zero_legacy_pve_instances_plus_dense_irregular_procedural_boulders")
+                : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("complete_pve_species_hierarchical_instancing_plus_rights_reviewed_six_variant_nanite_rock_and_sparse_three_variant_pine_hierarchical_instancing")
                 : (Result.DressingExternalRockMeshCount == 6
                        ? TEXT("complete_pve_species_hierarchical_instancing_plus_rights_reviewed_six_variant_nanite_rock_hierarchical_instancing")
@@ -741,6 +1198,52 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("complete_pve_shrub_understory_plus_rights_reviewed_broadleaf_and_fir_hierarchical_instancing_and_dense_irregular_procedural_boulders")
                        : TEXT("complete_pve_species_skeletal_to_static_conversion_plus_hierarchical_instancing_and_dense_irregular_procedural_boulders"))),
             Result.DressingBoulderInstanceCount,
+            Result.DressingTemperateWaterlineTargetInstanceCount > 0
+                ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_organic_waterline_structure_v1_captured")
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingTemperateWaterlineTargetInstanceCount,
+            Result.DressingTemperateWaterlineInstanceCount,
+            Result.DressingTemperateWaterlineRejectedPlacementCount,
+            Result.DressingTemperateWaterlineMinimumCenterlineDistanceCm,
+            Result.DressingTemperateWaterlineMaximumSlopeDegrees,
+            Result.DressingTemperateNearBankTargetInstanceCount > 0
+                ? (bUsesFutaleufuOrganicTemperateSurface &&
+                           Result.DressingFutaleufuScannedUnderstoryInstanceCount > 0
+                       ? TEXT("source_grounded_mixed_cc0_scanned_fern_sapling_and_procedural_shrub_ecology_v5_captured")
+                       : TEXT("source_grounded_dry_bank_grass_forb_shrub_ecology_v4_captured"))
+                : TEXT("not_enabled_for_this_river"),
+            bUsesFutaleufuOrganicTemperateSurface &&
+                    Result.DressingFutaleufuScannedUnderstoryInstanceCount > 0
+                ? TEXT("presentation_only_mixed_rights_reviewed_cc0_structure_analogs_and_procedural_source_gap_fill_no_native_species_ecology_survey_collision_hydraulic_or_raft_force_authority")
+                : TEXT("presentation_only_procedural_source_gap_fill_no_species_survey_collision_hydraulic_or_raft_force_authority"),
+            Result.DressingTemperateNearBankTargetInstanceCount,
+            Result.DressingTemperateNearBankInstanceCount,
+            Result.DressingTemperateNearBankRejectedPlacementCount,
+            Result.DressingTemperateNearBankMinimumCenterlineDistanceCm,
+            Result.DressingTemperateNearBankMaximumSlopeDegrees,
+            Result.DressingChilkoOrganicShorelineGravelTargetInstanceCount > 0
+                ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_full_runnable_reach_sorted_scale_organic_shoreline_gravel_v3_captured")
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingChilkoOrganicShorelineGravelTargetInstanceCount,
+            Result.DressingChilkoOrganicShorelineGravelInstanceCount,
+            Result.DressingChilkoOrganicShorelineGravelRejectedPlacementCount,
+            Result.DressingChilkoOrganicShorelineGravelMinimumCenterlineDistanceCm,
+            Result.DressingChilkoOrganicShorelineGravelMaximumSlopeDegrees,
+            Result.DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount > 0
+                ? TEXT("source_grounded_full_runnable_reach_muted_short_meadow_ground_cover_v3_captured")
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount,
+            Result.DressingChilkoOrganicShorelineGroundCoverInstanceCount,
+            Result.DressingChilkoOrganicShorelineGroundCoverRejectedPlacementCount,
+            Result.DressingChilkoOrganicShorelineGroundCoverMinimumCenterlineDistanceCm,
+            Result.DressingChilkoOrganicShorelineGroundCoverMaximumSlopeDegrees,
+            Result.DressingRunnableLaunchTalusTargetInstanceCount > 0
+                ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_launch_talus_captured")
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingRunnableLaunchTalusTargetInstanceCount,
+            Result.DressingRunnableLaunchTalusInstanceCount,
+            Result.DressingRunnableLaunchTalusRejectedPlacementCount,
+            Result.DressingRunnableLaunchTalusMaximumSlopeDegrees,
             Result.DressingFoliageInstanceCount,
             Result.DressingCanopyTreeInstanceCount,
             Result.DressingUnderstoryInstanceCount,
@@ -749,14 +1252,35 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? TEXT("water_and_vegetation_masks_loaded_and_used_for_candidate_selection")
                 : TEXT("required_source_masks_missing"),
             Result.bDressingFoliageMaterialsValidated
-                ? TEXT("three_river_specific_texture_preserving_two_sided_foliage_slots_bound_one_complete_species_native_material_retained")
+                ? (bUsesOpaqueVolumetricVegetation
+                       ? (bUsesZambeziDefaultLitWater
+                              ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_five_volumetric_morphology_meshes_no_alpha_cards")
+                              : bUsesChilkoOrganicLavaCanyonSurface
+                              ? TEXT("one_project_owned_opaque_parent_plus_one_chilko_only_muted_ground_cover_instance_bound_to_eight_volumetric_morphology_meshes_no_alpha_cards")
+                              : bUsesFutaleufuOrganicTemperateSurface
+                              ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_eight_volumetric_morphology_meshes_no_alpha_cards")
+                              : TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_four_volumetric_species_no_alpha_cards"))
+                       : bUsesColoradoOrganicHanceSurface
+                       ? TEXT("three_legacy_pve_material_assets_retained_with_zero_instances_plus_one_project_owned_opaque_one_sided_hance_dryland_material_bound_to_ground_cover_and_shrub_forms")
+                       : TEXT("three_river_specific_texture_preserving_two_sided_foliage_slots_bound_one_complete_species_native_material_retained"))
                 : TEXT("foliage_material_generation_or_binding_failed"),
             Result.DressingFoliageMaterialAssetCount,
             Result.DressingFoliageMaterialBoundSlotCount,
             Result.DressingNativeFoliageMaterialFallbackSlotCount,
-            *RiverAssetName,
-            *RiverAssetName,
-            *RiverAssetName,
+            *EscapeRaftSimJsonString(
+                bUsesOpaqueVolumetricVegetation
+                    ? Result.DressingFoliageMaterialAssetPath
+                    : DefaultBroadleafMaterialAsset),
+            *EscapeRaftSimJsonString(
+                bUsesOpaqueVolumetricVegetation
+                    ? Result.DressingFoliageMaterialAssetPath
+                    : DefaultConiferMaterialAsset),
+            *EscapeRaftSimJsonString(
+                bUsesOpaqueVolumetricVegetation
+                    ? (!Result.DressingUnderstoryFoliageMaterialAssetPath.IsEmpty()
+                           ? Result.DressingUnderstoryFoliageMaterialAssetPath
+                           : Result.DressingFoliageMaterialAssetPath)
+                    : DefaultUnderstoryMaterialAsset),
             FoliageSettings.BroadleafFrontTint.R,
             FoliageSettings.BroadleafFrontTint.G,
             FoliageSettings.BroadleafFrontTint.B,
@@ -781,7 +1305,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.bDressingBroadleafMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingConiferMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingUnderstoryMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
-            Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
+            bUsesOpaqueVolumetricVegetation
+                ? TEXT("opaque_volumetric_procedural_fallback_removes_alpha_card_artifacts_but_requires_species_ecology_guide_visual_and_performance_review")
+                : bUsesColoradoOrganicHanceSurface
+                ? TEXT("opaque_hance_dryland_gap_fill_replaces_the_legacy_bench_band_but_requires_exact_species_ecology_guide_visual_and_performance_review")
+                : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("rights_reviewed_rock_and_pine_visual_comparison_only_not_geology_ecology_guide_performance_or_gameplay_promoted")
                 : (Result.DressingExternalRockMeshCount == 6
                        ? TEXT("rights_reviewed_rock_visual_comparison_only_not_geology_ecology_guide_performance_or_gameplay_promoted")
@@ -789,17 +1317,53 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                            Result.bDressingExternalConiferReviewAssetLoaded
                        ? TEXT("rights_reviewed_broadleaf_analog_and_fir_visual_comparison_only_not_species_guide_performance_or_gameplay_promoted")
                        : TEXT("complete_pve_sample_species_geometry_evaluation_only_requires_biome_specific_pve_exports_production_rock_asset_guide_and_performance_review"))),
+            *PacuareWaterDecisionJson,
             Result.bSolverSurfaceWaterMaterialBound
-                ? TEXT("solver_surface_default_lit_candidate_bound_and_captured")
+                ? (bUsesZambeziDefaultLitWater
+                       ? TEXT("zambezi_default_lit_moving_surface_candidate_bound_after_single_layer_capture_rejection")
+                       : (bUsesPacuareRainforestDefaultLitWater
+                              ? TEXT("pacuare_rainforest_default_lit_candidate_bound_after_single_layer_capture_rejection")
+                              : (bUsesColoradoHanceDefaultLitWater
+                                     ? TEXT("colorado_hance_transmitting_default_lit_river_local_normal_candidate_bound_cpu_depth_bank_opacity_and_cooked_field_color")
+                                     : (bUsesFutaleufuTerminatorDefaultLitWater
+                                     ? TEXT("futaleufu_terminator_transmitting_default_lit_river_local_normal_candidate_bound_cpu_depth_bank_opacity_and_cooked_field_color")
+                                     : (bUsesChilkoLavaCanyonDefaultLitWater
+                                            ? TEXT("chilko_lava_canyon_transmitting_default_lit_river_local_normal_candidate_bound_cpu_depth_bank_opacity_and_cooked_field_color")
+                                            : TEXT("solver_surface_default_lit_candidate_bound_and_captured"))))))
                 : TEXT("solver_surface_water_generation_or_binding_failed"),
             *EscapeRaftSimJsonString(Result.WaterMaterialPath),
+            *EscapeRaftSimJsonString(WaterMaterialParentPath),
+            bUsesSingleLayerWater ? TEXT("SingleLayerWater") : TEXT("DefaultLit"),
+            bUsesTransmittingDefaultLitWater
+                ? TEXT("Translucent")
+                : TEXT("Opaque"),
+            bUsesSingleLayerWater
+                ? TEXT("SingleLayerWaterMaterialOutput_scattering_absorption_phase_and_behind_water_scale")
+                : (bUsesTransmittingDefaultLitWater
+                       ? TEXT("none_default_lit_depth_bank_transmission_and_physical_ior")
+                       : TEXT("none_surface_only_solver_conditioned_shading")),
+            bUsesSingleLayerWater
+                ? TEXT("active_on_zambezi_isolated_parent")
+                : bUsesTransmittingDefaultLitWater
+                ? TEXT("active_default_lit_transmission_parameters_and_refraction")
+                : TEXT("inactive_single_layer_evaluation_values_retained_in_manifest_only"),
             bHasSolverVisualizationFields
-                ? TEXT("validated_cpp_solver_visualization_fields_bound_review_only")
+                ? (bPacuareSolverVisualization
+                       ? TEXT("pacuare_cooked_field_capture_visualization_bound_review_only_not_production_promoted")
+                       : bColoradoHanceSolverVisualization
+                       ? TEXT("colorado_hance_cooked_field_capture_visualization_bound_review_only_not_production_promoted")
+                       : bChilkoLavaCanyonSolverVisualization
+                       ? TEXT("chilko_lava_canyon_cooked_field_capture_visualization_bound_review_only_not_production_promoted")
+                       : bFutaleufuTerminatorSolverVisualization
+                       ? TEXT("futaleufu_terminator_cooked_field_capture_visualization_bound_review_only_not_production_promoted")
+                       : TEXT("validated_cpp_solver_visualization_fields_bound_review_only"))
                 : (Candidate.bPhysicalScaleSourceCorridor
                        ? TEXT("disabled_for_physical_corridor_until_solver_grid_georeferencing_is_validated")
                        : TEXT("not_available_for_river_no_cross_river_field_reuse")),
-            *EscapeRaftSimJsonString(GetSolverVisualizationFieldManifestRelativePath()),
-            bHasSolverVisualizationFields ? 2 : 0,
+            *EscapeRaftSimJsonString(CandidateSolverVisualizationManifest),
+            bHasSolverVisualizationFields
+                ? (!Candidate.SolverVisualizationFieldRelativePath.IsEmpty() ? 1 : 2)
+                : 0,
             bHasSolverVisualizationFields ? TEXT("0") : TEXT("null"),
             WaterSettings.SolverFieldEnable,
             WaterSettings.SolverMacroNormalWeight,
@@ -809,14 +1373,19 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             WaterSettings.SolverSpeedVisualGain,
             WaterSettings.SolverFroudeVisualGain,
             WaterSettings.SolverSurfaceReliefScale,
-            WaterSettings.SolverSurfaceReliefScale * 400.0f,
-            bHasSolverVisualizationFields ? 0.42f : 1.0f,
+            Candidate.SolverVisualizationSurfaceReliefCapM * 100.0f *
+                WaterSettings.SolverSurfaceReliefScale,
+            bHasSolverVisualizationFields ? 0.22f : 1.0f,
             bHasSolverVisualizationFields
-                ? TEXT("validated_speed_froude_masked_noncolliding_translucent_surface_bound")
+                ? (!Candidate.SolverVisualizationFieldRelativePath.IsEmpty()
+                       ? TEXT("capture_only_cooked_speed_froude_masked_noncolliding_surface_bound_hidden_in_game")
+                       : TEXT("validated_speed_froude_masked_noncolliding_translucent_surface_bound"))
                 : (Candidate.bPhysicalScaleSourceCorridor
                        ? TEXT("disabled_until_physical_corridor_solver_grid_georeferencing_is_validated")
                        : TEXT("not_available_without_river_specific_validated_solver_field")),
-            bHasSolverVisualizationFields ? 0.72f : 0.0f,
+            bHasSolverVisualizationFields
+                ? (!Candidate.SolverVisualizationFieldRelativePath.IsEmpty() ? 0.94f : 0.72f)
+                : 0.0f,
             bHasSolverVisualizationFields ? 1.4f : 0.0f,
             Result.WaterMaterialBoundComponentCount,
             WaterSettings.BaseColorScale,
@@ -831,22 +1400,24 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             WaterSettings.ReflectionTint.B,
             WaterSettings.Roughness,
             WaterSettings.Specular,
-            1.0f,
+            (bUsesSingleLayerWater || bUsesTransmittingDefaultLitWater)
+                ? WaterSettings.Opacity
+                : 1.0f,
             WaterSettings.NormalIntensity,
-            WaterSettings.RefractionIor,
-            WaterSettings.PhaseG,
-            WaterSettings.ScatteringCoefficients.R,
-            WaterSettings.ScatteringCoefficients.G,
-            WaterSettings.ScatteringCoefficients.B,
-            WaterSettings.AbsorptionCoefficients.R,
-            WaterSettings.AbsorptionCoefficients.G,
-            WaterSettings.AbsorptionCoefficients.B,
-            WaterSettings.ColorScaleBehindWater.R,
-            WaterSettings.ColorScaleBehindWater.G,
-            WaterSettings.ColorScaleBehindWater.B,
+            WaterSettings.SurfaceVariationStrength,
+            *WaterNormalSamplingPolicy,
+            bUsesColoradoHanceDefaultLitWater ? 0.0f : 0.5f,
+            *WaterNormalProjectionManifestJson,
+            *WaterSingleLayerParametersJson,
             WaterSettings.RenderWidthScale,
             WaterSettings.RenderNormalUpBlend,
             WaterSettings.RenderDisplacementScale,
+            bUsesSingleLayerWater
+                ? TEXT("none_single_layer_water_runs_on_generated_procedural_mesh_ribbon")
+                : TEXT("none_default_lit_solver_surface_runs_on_generated_procedural_mesh_ribbon"),
+            bUsesSingleLayerWater
+                ? TEXT("single_layer_water_uses_movable_skylight_runtime_corridor_sphere_capture_screen_space_reflections_volume_transmission_and_bounded_fresnel_sky_fill")
+                : TEXT("default_lit_surface_uses_movable_skylight_runtime_corridor_sphere_capture_screen_space_reflections_and_bounded_fresnel_sky_fill"),
             Candidate.bEnableLandscapeNanite
                 ? TEXT("nanite_and_static_lighting")
                 : TEXT("static_lighting_non_nanite_physical_corridor_review"),
@@ -861,7 +1432,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? (Result.bNaniteRepresentationBuilt
                        ? TEXT("enabled_and_built_up_to_date")
                        : TEXT("enabled_candidate_build_failed_or_stale"))
-                : TEXT("disabled_for_physical_corridor_after_captured_nanite_hole_regression"));
+                : TEXT("disabled_for_physical_corridor_after_captured_nanite_hole_regression"),
+            bUsesReachLocalReferenceGameplay || bUsesZambeziDefaultLitWater
+                ? TEXT("reference_runnable_gameplay_photoreal_and_production_promotion_review_gated")
+                : TEXT("review_gated_isolated_candidate_not_enabled_for_gameplay_or_active_previews"));
     }
 
     const FString Manifest = FString::Printf(

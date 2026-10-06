@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Win32-ninja"
+	tests="3"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="Strix"
+	time="0"
+	timestamp="2026-09-07T07:11:13"
+	>
+	<testcase name="water_wet_dry_shoreline" classname="water_wet_dry_shoreline" time="0.10812" status="run">
+		<properties/>
+		<system-out>raftsim_water_tests passed for analytic_wet_dry_shoreline
+</system-out>
+	</testcase>
+	<testcase name="water_lake_at_rest_balance" classname="water_lake_at_rest_balance" time="0.0669435" status="run">
+		<properties/>
+		<system-out>raftsim_water_tests passed for analytic_lake_at_rest_balance
+</system-out>
+	</testcase>
+	<testcase name="water_transcritical_bump" classname="water_transcritical_bump" time="0.0671814" status="run">
+		<properties/>
+		<system-out>raftsim_water_tests passed for analytic_transcritical_bump
+</system-out>
+	</testcase>
+</testsuite>

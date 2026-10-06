@@ -45,14 +45,26 @@ bool FRaftSimWaterRegressionImportManifestTest::RunTest(const FString& Parameter
     TestEqual(TEXT("automation_module"), Root->GetStringField(TEXT("automation_module")), FString(TEXT("RaftSimAutomation")));
     TestEqual(TEXT("total_fixture_count"), Root->GetIntegerField(TEXT("total_fixture_count")), 109);
 
+    // The live-field comparison mode is declared only once the report-set
+    // lock passes (blocked on solver parity since d9727606a; mirrors
+    // physics/tests/test_milestone20.py).
+    const TSharedPtr<FJsonObject>* Lock = nullptr;
+    const bool bLockPassed = Root->TryGetObjectField(TEXT("accepted_report_set_lock"), Lock)
+        && Lock != nullptr && (*Lock)->GetBoolField(TEXT("passed"));
+    const int32 ExpectedModeCount = bLockPassed ? 2 : 1;
     const TArray<TSharedPtr<FJsonValue>>* ComparisonModes = nullptr;
     if (!Root->TryGetArrayField(TEXT("comparison_modes"), ComparisonModes)
         || ComparisonModes == nullptr
-        || ComparisonModes->Num() != 2)
+        || ComparisonModes->Num() != ExpectedModeCount)
     {
-        AddError(TEXT("Water regression import manifest must declare two comparison modes."));
+        AddError(FString::Printf(TEXT("Water regression import manifest must declare %d comparison mode(s)."), ExpectedModeCount));
         return false;
     }
+    TestEqual(TEXT("replay comparison mode"), (*ComparisonModes)[0]->AsString(),
+        FString(TEXT("replayed_water_field_vs_calibrated_cpp_output")));
+    TestEqual(TEXT("status follows the report-set lock"), Root->GetStringField(TEXT("status")),
+        FString(bLockPassed ? TEXT("ready_for_unreal_automation_execution")
+                            : TEXT("live_water_blocked_replay_fixtures_available")));
 
     const TSharedPtr<FJsonObject>* SourceMilestones = nullptr;
     if (!Root->TryGetObjectField(TEXT("source_milestones"), SourceMilestones)

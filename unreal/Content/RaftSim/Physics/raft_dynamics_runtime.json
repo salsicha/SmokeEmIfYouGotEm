@@ -1,35 +1,3 @@
-{
-  "schema": "raftsim.unreal.raft_dynamics_runtime.v1",
-  "selected_runtime": "CustomReducedRigidBody",
-  "fallback_runtime": "CustomReducedRigidBody",
-  "candidate_runtimes": [
-    "UnrealChaos",
-    "Jolt",
-    "ProjectChrono",
-    "CustomReducedRigidBody"
-  ],
-  "evaluation_manifest": "chaos_jolt_runtime_evaluation.json",
-  "authority_selection_report": "physics/reports/milestone19/runtime_authority_selection.json",
-  "unreal_adapter": {
-    "module": "RaftSimPhysics",
-    "class": "URaftSimChronoRuntimeAdapter",
-    "body_config_struct": "FRaftSimRaftBodyConfig",
-    "kinematic_state_struct": "FRaftSimRaftKinematicState"
-  },
-  "default_raft": {
-    "mass_kg": 170.0,
-    "length_m": 4.2,
-    "width_m": 2.0,
-    "tube_radius_m": 0.32,
-    "inertia_tensor_kg_m2": [220.0, 620.0, 700.0],
-    "enable_compliant_contacts": true
-  },
-  "runtime_policy": {
-    "chaos_role": "default_unreal_integrated_visual_and_non_authoritative_physics_pending_measured_fixture_results",
-    "jolt_role": "candidate_authoritative_raft_contact_swimmer_gameplay_island_pending_measured_fixture_results",
-    "chrono_role": "high_fidelity_reference_and_optional_research_backend",
-    "custom_reduced_role": "selected_vertical_slice_fallback_using_the_shared_water_query_and_telemetry_schema",
-    "unreal_role": "render_interpolated_state_and_forward_deterministic_inputs"
-  },
-  "status": "custom_reduced_fallback_selected_pending_measured_chaos_jolt_fixture_results"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:0e49bcf9b44233d92b26a189b7ecd15f8964ef24d1a713352fed50d18496b1d9
+size 1498

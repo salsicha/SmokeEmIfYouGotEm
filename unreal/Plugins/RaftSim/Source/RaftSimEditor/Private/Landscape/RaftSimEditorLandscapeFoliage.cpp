@@ -1,7 +1,9 @@
-#include "Environment/RaftSimEditorEnvironmentInternal.h"
+#include "Landscape/RaftSimEditorLandscapeFoliageInternal.h"
 
 namespace RaftSimEditorEnvironment
 {
+using namespace LandscapeFoliage;
+
 UMaterialInstanceConstant* LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const TCHAR* FoliageType,
@@ -243,6 +245,44 @@ bool ValidateLandscapeCandidateReviewedPineMaterials(UStaticMesh* Mesh)
     return bHasNeedles && bHasWood;
 }
 
+bool ValidateFutaleufuScannedUnderstoryMaterials(UStaticMesh* Mesh)
+{
+    if (!Mesh || !Mesh->IsNaniteEnabled() ||
+        Mesh->GetStaticMaterials().IsEmpty())
+    {
+        return false;
+    }
+
+    const bool bFirSapling = Mesh->GetName().StartsWith(TEXT("SM_FirSapling_"));
+    const bool bFern = Mesh->GetName().StartsWith(TEXT("SM_Fern02_"));
+    if (!bFirSapling && !bFern)
+    {
+        return false;
+    }
+
+    bool bHasExpectedMaterial = false;
+    for (int32 MaterialIndex = 0;
+         MaterialIndex < Mesh->GetStaticMaterials().Num();
+         ++MaterialIndex)
+    {
+        UMaterialInterface* Material = Mesh->GetMaterial(MaterialIndex);
+        if (!Material)
+        {
+            return false;
+        }
+        const FString MaterialPath = Material->GetPathName();
+        if (!MaterialPath.Contains(
+                TEXT("/FutaleufuTemperateForestSet_1K/")))
+        {
+            return false;
+        }
+        bHasExpectedMaterial |= bFirSapling
+            ? MaterialPath.Contains(TEXT("M_FirSapling_"))
+            : MaterialPath.Contains(TEXT("M_Fern02_Fronds"));
+    }
+    return bHasExpectedMaterial;
+}
+
 FBox GetLandscapeCandidateEffectiveMeshBounds(UStaticMesh* Mesh)
 {
     if (!Mesh)
@@ -350,58 +390,58 @@ UStaticMesh* LoadOrCreateLandscapeCandidatePveStaticMesh(
     return ConvertedMesh;
 }
 
-                                             
- 
-                               
-                               
-                            
-                                         
-                                                    
-                                                
-                                          
-                                   
-                                      
-                                           
-                                            
-                                 
-                                           
-                                           
-                                         
-                                              
-                                              
-                                              
-                                               
-                                                
-                                                    
-                                                             
-                                       
-                                            
-                                                   
-                                                     
-                                                   
-                                                      
-                                                    
-                                               
-                                            
-                                                         
-                                            
-                                                         
-                                                             
-                                                              
-                                                           
-                                                            
-                                        
-                                                                                             
-                                      
-                                                                                       
-                                    
-                              
-                                               
-                                                  
-                                            
-                                            
-                                                  
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 bool AddLandscapeCandidateBiomeDressing(
     UWorld* World,
@@ -426,9 +466,21 @@ bool AddLandscapeCandidateBiomeDressing(
 
     const bool bSouthFork = Candidate.PreviewSpec.RiverId == TEXT("american_south_fork");
     const bool bZambezi = Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+    // The upper gorge shares the Zambezi rock set and opaque vegetation family
+    // (loaded, never rebuilt) but none of the 30 km run's camera layers.
+    const bool bZambeziUpperGorge = IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
+    const bool bZambeziVegetation = bZambezi || bZambeziUpperGorge;
+    const bool bPacuare = Candidate.PreviewSpec.RiverId == TEXT("pacuare");
     const bool bFutaleufu = Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    const bool bChilko =
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+    const bool bColoradoHance =
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+    const bool bOpaqueTemperate = bFutaleufu || bChilko;
+    const bool bUsesOpaqueVolumetricVegetation =
+        bZambeziVegetation || bPacuare || bOpaqueTemperate;
     TArray<UStaticMesh*> ReviewedRockMeshes;
-    if (bSouthFork || bZambezi || bFutaleufu)
+    if (bSouthFork || bZambeziVegetation || bPacuare || bFutaleufu || bChilko)
     {
         for (int32 RockIndex = 1; RockIndex <= 6; ++RockIndex)
         {
@@ -498,49 +550,327 @@ bool AddLandscapeCandidateBiomeDressing(
         }
     }
 
-    for (const TCHAR* SourcePath :
-         {BroadleafSourcePath, ConiferSourcePath, ShrubSourcePath, UnderstorySourcePath})
+    TArray<UStaticMesh*> FutaleufuScannedUnderstoryMeshes;
+    if ((bFutaleufu || bPacuare) &&
+        !RaftSimPhotorealMaterials::
+            PromoteReviewedScannedUnderstoryMaterials(OutSummary))
     {
-        OutResult.DressingSourceSkeletalMeshCount +=
-            LoadObject<USkeletalMesh>(nullptr, SourcePath) ? 1 : 0;
+        return false;
+    }
+    if (bFutaleufu)
+    {
+        static const TCHAR* AssetNames[] = {
+            TEXT("SM_FirSapling_fir_sapling_a"),
+            TEXT("SM_FirSapling_fir_sapling_b"),
+            TEXT("SM_FirSapling_fir_sapling_c"),
+            TEXT("SM_Fern02_fern_02_a"),
+            TEXT("SM_Fern02_fern_02_b"),
+            TEXT("SM_Fern02_fern_02_c"),
+            TEXT("SM_Fern02_fern_02_d")};
+        for (const TCHAR* AssetName : AssetNames)
+        {
+            const FString ObjectPath = FString::Printf(
+                TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/%s.%s"),
+                AssetName,
+                AssetName);
+            if (UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath))
+            {
+                FutaleufuScannedUnderstoryMeshes.Add(Mesh);
+            }
+        }
+        OutResult.DressingFutaleufuScannedUnderstoryMeshCount =
+            FutaleufuScannedUnderstoryMeshes.Num();
+        OutResult.DressingExternalReviewAssetCount +=
+            FutaleufuScannedUnderstoryMeshes.Num();
+        OutResult.bDressingFutaleufuScannedUnderstoryMaterialsValidated =
+            FutaleufuScannedUnderstoryMeshes.Num() == 7 &&
+            Algo::AllOf(
+                FutaleufuScannedUnderstoryMeshes,
+                [](UStaticMesh* Mesh)
+                {
+                    return ValidateFutaleufuScannedUnderstoryMaterials(Mesh);
+                });
+        if (!OutResult.bDressingFutaleufuScannedUnderstoryMaterialsValidated)
+        {
+            OutSummary += FString::Printf(
+                TEXT("%s scanned near-bank understory loaded %d/7 meshes or failed material/Nanite validation.\n"),
+                *Candidate.PreviewSpec.RiverId,
+                FutaleufuScannedUnderstoryMeshes.Num());
+            return false;
+        }
     }
 
-    UStaticMesh* BroadleafTreeMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
-        World,
-        BroadleafSourcePath,
-        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static"),
-        OutSummary);
-    UStaticMesh* ConiferTreeMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
-        World,
-        ConiferSourcePath,
-        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static"),
-        OutSummary);
-    UStaticMesh* ShrubMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
-        World,
-        ShrubSourcePath,
-        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static"),
-        OutSummary);
-    UStaticMesh* UnderstoryMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
-        World,
-        UnderstorySourcePath,
-        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static"),
-        OutSummary);
-    for (UStaticMesh* Mesh : {BroadleafTreeMesh, ConiferTreeMesh, ShrubMesh, UnderstoryMesh})
+    TArray<UStaticMesh*> PacuareScannedFernMeshes;
+    if (bPacuare)
+    {
+        static const TCHAR* AssetNames[] = {
+            TEXT("SM_Fern02_fern_02_a"),
+            TEXT("SM_Fern02_fern_02_b"),
+            TEXT("SM_Fern02_fern_02_c"),
+            TEXT("SM_Fern02_fern_02_d")};
+        for (const TCHAR* AssetName : AssetNames)
+        {
+            const FString ObjectPath = FString::Printf(
+                TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/%s.%s"),
+                AssetName,
+                AssetName);
+            if (UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath))
+            {
+                PacuareScannedFernMeshes.Add(Mesh);
+            }
+        }
+        OutResult.DressingPacuareScannedFernMeshCount =
+            PacuareScannedFernMeshes.Num();
+        OutResult.DressingExternalReviewAssetCount +=
+            PacuareScannedFernMeshes.Num();
+        OutResult.bDressingPacuareScannedFernMaterialsValidated =
+            PacuareScannedFernMeshes.Num() == 4 &&
+            Algo::AllOf(
+                PacuareScannedFernMeshes,
+                [](UStaticMesh* Mesh)
+                {
+                    return Mesh &&
+                        Mesh->GetName().StartsWith(TEXT("SM_Fern02_")) &&
+                        ValidateFutaleufuScannedUnderstoryMaterials(Mesh);
+                });
+        if (!OutResult.bDressingPacuareScannedFernMaterialsValidated)
+        {
+            OutSummary += FString::Printf(
+                TEXT("%s scanned fern morphology loaded %d/4 meshes or failed material/Nanite validation.\n"),
+                *Candidate.PreviewSpec.RiverId,
+                PacuareScannedFernMeshes.Num());
+            return false;
+        }
+    }
+
+    UStaticMesh* BroadleafTreeMesh = nullptr;
+    UStaticMesh* ConiferTreeMesh = nullptr;
+    UStaticMesh* ShrubMesh = nullptr;
+    UStaticMesh* UnderstoryMesh = nullptr;
+    UStaticMesh* ZambeziGroundCoverMeshB = nullptr;
+    UStaticMesh* TemperateBroadleafTreeMeshB = nullptr;
+    UStaticMesh* TemperateConiferTreeMeshB = nullptr;
+    UStaticMesh* TemperateShrubMeshB = nullptr;
+    UStaticMesh* TemperateUnderstoryMeshB = nullptr;
+    TArray<UStaticMesh*> PacuareForestFloorMeshes;
+    UMaterialInterface* ZambeziOpaqueVegetationMaterial = nullptr;
+    UMaterialInterface* PacuareOpaqueRainforestVegetationMaterial = nullptr;
+    UMaterialInterface* TemperateOpaqueVegetationMaterial = nullptr;
+    UMaterialInterface* ChilkoMutedGroundCoverMaterial = nullptr;
+    UStaticMesh* HanceDrylandShrubMeshA = nullptr;
+    UStaticMesh* HanceDrylandShrubMeshB = nullptr;
+    UStaticMesh* HanceDrylandGroundCoverMeshA = nullptr;
+    UStaticMesh* HanceDrylandGroundCoverMeshB = nullptr;
+    UMaterialInterface* HanceDrylandVegetationMaterial = nullptr;
+    if (bZambeziVegetation)
+    {
+        const bool bZambeziVegetationReady = bZambeziUpperGorge
+            ? LoadZambeziOpaqueVegetationAssets(
+                  BroadleafTreeMesh,
+                  ConiferTreeMesh,
+                  ShrubMesh,
+                  UnderstoryMesh,
+                  ZambeziGroundCoverMeshB,
+                  ZambeziOpaqueVegetationMaterial,
+                  OutSummary)
+            : CreateZambeziOpaqueVegetationAssets(
+                  World,
+                  BroadleafTreeMesh,
+                  ConiferTreeMesh,
+                  ShrubMesh,
+                  UnderstoryMesh,
+                  ZambeziGroundCoverMeshB,
+                  ZambeziOpaqueVegetationMaterial,
+                  OutSummary);
+        if (!bZambeziVegetationReady)
+        {
+            return false;
+        }
+        OutResult.DressingBroadleafAssetPath = BroadleafTreeMesh->GetPathName();
+        OutResult.DressingConiferAssetPath = ConiferTreeMesh->GetPathName();
+        OutResult.DressingShrubAssetPath = ShrubMesh->GetPathName();
+        OutResult.DressingUnderstoryAssetPath = UnderstoryMesh->GetPathName();
+        OutResult.DressingFoliageMaterialAssetPath =
+            ZambeziOpaqueVegetationMaterial->GetPathName();
+        OutResult.bDressingUsesOpaqueVolumetricVegetation = true;
+    }
+    else if (bPacuare)
+    {
+        if (!CreatePacuareOpaqueRainforestVegetationAssets(
+                World,
+                BroadleafTreeMesh,
+                ConiferTreeMesh,
+                ShrubMesh,
+                UnderstoryMesh,
+                PacuareOpaqueRainforestVegetationMaterial,
+                OutSummary))
+        {
+            return false;
+        }
+        if (!CreatePacuareForestFloorAssets(
+                World,
+                PacuareOpaqueRainforestVegetationMaterial,
+                PacuareForestFloorMeshes,
+                OutSummary))
+        {
+            return false;
+        }
+        OutResult.DressingPacuareForestFloorMeshCount =
+            PacuareForestFloorMeshes.Num();
+        OutResult.DressingBroadleafAssetPath = BroadleafTreeMesh->GetPathName();
+        OutResult.DressingConiferAssetPath = ConiferTreeMesh->GetPathName();
+        OutResult.DressingShrubAssetPath = ShrubMesh->GetPathName();
+        OutResult.DressingUnderstoryAssetPath = UnderstoryMesh->GetPathName();
+        OutResult.DressingFoliageMaterialAssetPath =
+            PacuareOpaqueRainforestVegetationMaterial->GetPathName();
+        OutResult.bDressingUsesOpaqueVolumetricVegetation = true;
+    }
+    else if (bOpaqueTemperate)
+    {
+        if (!CreateTemperateOpaqueVegetationAssets(
+                World,
+                BroadleafTreeMesh,
+                TemperateBroadleafTreeMeshB,
+                ConiferTreeMesh,
+                TemperateConiferTreeMeshB,
+                ShrubMesh,
+                TemperateShrubMeshB,
+                UnderstoryMesh,
+                TemperateUnderstoryMeshB,
+                TemperateOpaqueVegetationMaterial,
+                OutSummary))
+        {
+            return false;
+        }
+        OutResult.DressingBroadleafAssetPath = BroadleafTreeMesh->GetPathName();
+        OutResult.DressingConiferAssetPath = ConiferTreeMesh->GetPathName();
+        OutResult.DressingShrubAssetPath = ShrubMesh->GetPathName();
+        OutResult.DressingUnderstoryAssetPath = UnderstoryMesh->GetPathName();
+        OutResult.DressingBroadleafVariantAssetPath =
+            TemperateBroadleafTreeMeshB->GetPathName();
+        OutResult.DressingConiferVariantAssetPath =
+            TemperateConiferTreeMeshB->GetPathName();
+        OutResult.DressingShrubVariantAssetPath =
+            TemperateShrubMeshB->GetPathName();
+        OutResult.DressingUnderstoryVariantAssetPath =
+            TemperateUnderstoryMeshB->GetPathName();
+        OutResult.DressingFoliageMaterialAssetPath =
+            TemperateOpaqueVegetationMaterial->GetPathName();
+        OutResult.bDressingUsesOpaqueVolumetricVegetation = true;
+        if (bChilko)
+        {
+            ChilkoMutedGroundCoverMaterial =
+                CreateChilkoMutedGroundCoverMaterial(
+                    TemperateOpaqueVegetationMaterial,
+                    OutSummary);
+            if (!ChilkoMutedGroundCoverMaterial)
+            {
+                return false;
+            }
+            OutResult.DressingUnderstoryFoliageMaterialAssetPath =
+                ChilkoMutedGroundCoverMaterial->GetPathName();
+        }
+    }
+    else
+    {
+        for (const TCHAR* SourcePath :
+             {BroadleafSourcePath, ConiferSourcePath, ShrubSourcePath, UnderstorySourcePath})
+        {
+            OutResult.DressingSourceSkeletalMeshCount +=
+                LoadObject<USkeletalMesh>(nullptr, SourcePath) ? 1 : 0;
+        }
+
+        BroadleafTreeMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
+            World,
+            BroadleafSourcePath,
+            TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static"),
+            OutSummary);
+        ConiferTreeMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
+            World,
+            ConiferSourcePath,
+            TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static"),
+            OutSummary);
+        ShrubMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
+            World,
+            ShrubSourcePath,
+            TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static"),
+            OutSummary);
+        UnderstoryMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
+            World,
+            UnderstorySourcePath,
+            TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static"),
+            OutSummary);
+    }
+    TArray<UStaticMesh*> ConvertedSpeciesMeshes = {
+        BroadleafTreeMesh,
+        ConiferTreeMesh,
+        ShrubMesh,
+        UnderstoryMesh};
+    if (bOpaqueTemperate)
+    {
+        ConvertedSpeciesMeshes.Append({
+            TemperateBroadleafTreeMeshB,
+            TemperateConiferTreeMeshB,
+            TemperateShrubMeshB,
+            TemperateUnderstoryMeshB});
+    }
+    for (UStaticMesh* Mesh : ConvertedSpeciesMeshes)
     {
         OutResult.DressingAssetCount += Mesh ? 1 : 0;
         OutResult.DressingConvertedStaticMeshCount += Mesh ? 1 : 0;
     }
-    OutResult.DressingAssetCount += ReviewedRockMeshes.Num() + ReviewedPineMeshes.Num();
-    OutResult.bDressingAssetsLoaded =
-        OutResult.DressingSourceSkeletalMeshCount == 4 &&
-        OutResult.DressingConvertedStaticMeshCount == 4;
+    OutResult.DressingAssetCount += ReviewedRockMeshes.Num() +
+        ReviewedPineMeshes.Num() + FutaleufuScannedUnderstoryMeshes.Num() +
+        PacuareScannedFernMeshes.Num() + PacuareForestFloorMeshes.Num();
+    if (bColoradoHance)
+    {
+        if (!CreateHanceOpaqueDrylandVegetationAssets(
+                World,
+                HanceDrylandShrubMeshA,
+                HanceDrylandShrubMeshB,
+                HanceDrylandGroundCoverMeshA,
+                HanceDrylandGroundCoverMeshB,
+                HanceDrylandVegetationMaterial,
+                OutSummary))
+        {
+            return false;
+        }
+        OutResult.DressingAssetCount += 4;
+        OutResult.DressingShrubAssetPath =
+            HanceDrylandShrubMeshA->GetPathName();
+        OutResult.DressingShrubVariantAssetPath =
+            HanceDrylandShrubMeshB->GetPathName();
+        OutResult.DressingUnderstoryAssetPath =
+            HanceDrylandGroundCoverMeshA->GetPathName();
+        OutResult.DressingUnderstoryVariantAssetPath =
+            HanceDrylandGroundCoverMeshB->GetPathName();
+    }
+    OutResult.bDressingAssetsLoaded = bUsesOpaqueVolumetricVegetation
+        ? OutResult.DressingSourceSkeletalMeshCount == 0 &&
+            OutResult.DressingConvertedStaticMeshCount ==
+                (bOpaqueTemperate ? 8 : 4) &&
+            ValidateZambeziOpaqueVegetationMaterial(
+                bZambeziVegetation
+                    ? ZambeziOpaqueVegetationMaterial
+                    : (bPacuare
+                           ? PacuareOpaqueRainforestVegetationMaterial
+                           : TemperateOpaqueVegetationMaterial)) &&
+            (!bPacuare ||
+             (PacuareForestFloorMeshes.Num() == 4 &&
+              Algo::AllOf(PacuareForestFloorMeshes, [](UStaticMesh* Mesh)
+              {
+                  return Mesh && Mesh->IsNaniteEnabled();
+              })))
+        : OutResult.DressingSourceSkeletalMeshCount == 4 &&
+            OutResult.DressingConvertedStaticMeshCount == 4;
     if (!OutResult.bDressingAssetsLoaded)
     {
         OutSummary += FString::Printf(
-            TEXT("Landscape biome dressing for %s loaded %d/4 source and %d/4 converted species meshes.\n"),
+            TEXT("Landscape biome dressing for %s loaded %d source and %d/%d converted species meshes.\n"),
             *Candidate.PreviewSpec.RiverId,
             OutResult.DressingSourceSkeletalMeshCount,
-            OutResult.DressingConvertedStaticMeshCount);
+            OutResult.DressingConvertedStaticMeshCount,
+            bOpaqueTemperate ? 8 : 4);
         return false;
     }
 
@@ -557,9 +887,40 @@ bool AddLandscapeCandidateBiomeDressing(
     {
         OutSummary += FString::Printf(
             TEXT("%s uses the rights-reviewed CC0 rock set only as an isolated river-specific visual "
-                 "evaluation; rejected tree candidates remain excluded and no geology, lifelike, or "
-                 "gameplay promotion is implied.\n"),
+                 "evaluation. Rejected tree candidates and the evaluated alpha-card savanna pack "
+                 "remain excluded; four project-owned opaque volumetric vegetation forms replace "
+                 "the PVE cards without claiming exact species, lifelike, or gameplay promotion.\n"),
             *Candidate.PreviewSpec.RiverId);
+    }
+    else if (bPacuare)
+    {
+        OutSummary += TEXT(
+            "Pacuare replaces the repeated PVE alpha-card banks with two "
+            "project-owned solid canopy forms plus opaque riparian shrub and "
+            "ground-cover meshes. Four solid folded-leaf, root, and deadwood "
+            "forms add bounded source-grounded forest-floor structure. The "
+            "source-mask and slope-screened family is "
+            "procedural rainforest infill, not exact species, ecology, or "
+            "photoreal approval.\n");
+    }
+    else if (bOpaqueTemperate)
+    {
+        OutSummary += FString::Printf(
+            TEXT("%s replaces repeated alpha-card PVE banks with eight project-owned "
+                 "opaque volumetric temperate meshes: two deterministic morphologies "
+                 "for each conifer, broadleaf, shrub, and ground-cover form. The family is procedural infill, "
+                 "not exact-species or photoreal approval.\n"),
+            *Candidate.PreviewSpec.RiverId);
+    }
+    else if (bColoradoHance)
+    {
+        OutSummary += TEXT(
+            "Colorado Hance retains its four legacy PVE evaluation assets for "
+            "compatibility but places zero legacy instances; two project-owned "
+            "opaque dryland forms provide the countable ground-cover and shrub "
+            "layers without the former horizontal PVE bench band. The added "
+            "family is procedural gap fill, not exact-species, "
+            "ecology, surveyed-terrain, or photoreal approval.\n");
     }
 
     OutResult.bDressingBoulderMeshNaniteEnabled =
@@ -569,15 +930,21 @@ bool AddLandscapeCandidateBiomeDressing(
             return Mesh && Mesh->IsNaniteEnabled();
         });
     OutResult.bDressingBroadleafMeshNaniteEnabled =
-        BroadleafTreeMesh->IsNaniteEnabled() && ShrubMesh->IsNaniteEnabled();
+        BroadleafTreeMesh->IsNaniteEnabled() && ShrubMesh->IsNaniteEnabled() &&
+        (!bOpaqueTemperate ||
+         (TemperateBroadleafTreeMeshB->IsNaniteEnabled() &&
+          TemperateShrubMeshB->IsNaniteEnabled()));
     OutResult.bDressingConiferMeshNaniteEnabled =
         ConiferTreeMesh->IsNaniteEnabled() &&
+        (!bOpaqueTemperate || TemperateConiferTreeMeshB->IsNaniteEnabled()) &&
         (ReviewedPineMeshes.IsEmpty() ||
          Algo::AllOf(ReviewedPineMeshes, [](UStaticMesh* Mesh)
          {
              return Mesh && Mesh->IsNaniteEnabled();
          }));
-    OutResult.bDressingUnderstoryMeshNaniteEnabled = UnderstoryMesh->IsNaniteEnabled();
+    OutResult.bDressingUnderstoryMeshNaniteEnabled =
+        UnderstoryMesh->IsNaniteEnabled() &&
+        (!bOpaqueTemperate || TemperateUnderstoryMeshB->IsNaniteEnabled());
 
     FRaftSimPreviewImage WaterMask;
     FRaftSimPreviewImage VegetationMask;
@@ -599,53 +966,88 @@ bool AddLandscapeCandidateBiomeDressing(
     const FRaftSimEnvironmentPreviewSpec& Spec = Candidate.PreviewSpec;
     const FRaftSimLandscapeCandidateFoliageSettings FoliageSettings =
         GetLandscapeCandidateFoliageSettings(Spec.RiverId);
-    UMaterialInstanceConstant* BroadleafFoliageMaterial =
-        LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
-            Spec,
-            TEXT("Broadleaf"),
-            TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Materials/MI_LeafTree_01_Foliage.MI_LeafTree_01_Foliage"),
-            FoliageSettings.BroadleafFrontTint,
-            FoliageSettings.BroadleafBackTint,
-            FoliageSettings.BroadleafTransmissionTint,
-            FoliageSettings.RoughnessStrength,
-            FoliageSettings.NormalStrength,
-            OutSummary);
-    UMaterialInstanceConstant* ConiferFoliageMaterial =
-        LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
-            Spec,
-            TEXT("Conifer"),
-            TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/Materials/MI_Conifer_Foliage_01.MI_Conifer_Foliage_01"),
-            FoliageSettings.ConiferFrontTint,
-            FoliageSettings.ConiferBackTint,
-            FoliageSettings.ConiferTransmissionTint,
-            FoliageSettings.RoughnessStrength,
-            FoliageSettings.NormalStrength,
-            OutSummary);
-    UMaterialInstanceConstant* UnderstoryFoliageMaterial =
-        LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
-            Spec,
-            TEXT("Understory"),
-            TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/Materials/MI_PVE_Plant_01.MI_PVE_Plant_01"),
-            FoliageSettings.BroadleafFrontTint,
-            FoliageSettings.BroadleafBackTint,
-            FoliageSettings.BroadleafTransmissionTint,
-            FoliageSettings.RoughnessStrength,
-            FoliageSettings.NormalStrength,
-            OutSummary);
-    OutResult.DressingFoliageMaterialAssetCount =
-        (BroadleafFoliageMaterial ? 1 : 0) +
-        (ConiferFoliageMaterial ? 1 : 0) +
-        (UnderstoryFoliageMaterial ? 1 : 0);
-    if (OutResult.DressingFoliageMaterialAssetCount != 3)
+    UMaterialInterface* OpaqueVegetationMaterial = bZambeziVegetation
+        ? ZambeziOpaqueVegetationMaterial
+        : (bPacuare
+               ? PacuareOpaqueRainforestVegetationMaterial
+               : TemperateOpaqueVegetationMaterial);
+    UMaterialInterface* BroadleafFoliageMaterial = OpaqueVegetationMaterial;
+    UMaterialInterface* ConiferFoliageMaterial = OpaqueVegetationMaterial;
+    UMaterialInterface* UnderstoryFoliageMaterial = OpaqueVegetationMaterial;
+    if (bChilko)
+    {
+        UnderstoryFoliageMaterial = ChilkoMutedGroundCoverMaterial;
+    }
+    if (!bUsesOpaqueVolumetricVegetation)
+    {
+        BroadleafFoliageMaterial =
+            LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
+                Spec,
+                TEXT("Broadleaf"),
+                TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Materials/MI_LeafTree_01_Foliage.MI_LeafTree_01_Foliage"),
+                FoliageSettings.BroadleafFrontTint,
+                FoliageSettings.BroadleafBackTint,
+                FoliageSettings.BroadleafTransmissionTint,
+                FoliageSettings.RoughnessStrength,
+                FoliageSettings.NormalStrength,
+                OutSummary);
+        ConiferFoliageMaterial =
+            LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
+                Spec,
+                TEXT("Conifer"),
+                TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/Materials/MI_Conifer_Foliage_01.MI_Conifer_Foliage_01"),
+                FoliageSettings.ConiferFrontTint,
+                FoliageSettings.ConiferBackTint,
+                FoliageSettings.ConiferTransmissionTint,
+                FoliageSettings.RoughnessStrength,
+                FoliageSettings.NormalStrength,
+                OutSummary);
+        UnderstoryFoliageMaterial =
+            LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
+                Spec,
+                TEXT("Understory"),
+                TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/Materials/MI_PVE_Plant_01.MI_PVE_Plant_01"),
+                FoliageSettings.BroadleafFrontTint,
+                FoliageSettings.BroadleafBackTint,
+                FoliageSettings.BroadleafTransmissionTint,
+                FoliageSettings.RoughnessStrength,
+                FoliageSettings.NormalStrength,
+                OutSummary);
+    }
+    OutResult.DressingFoliageMaterialAssetCount = (bUsesOpaqueVolumetricVegetation
+        ? (OpaqueVegetationMaterial ? 1 : 0) +
+            (bChilko && ChilkoMutedGroundCoverMaterial ? 1 : 0)
+        : (BroadleafFoliageMaterial ? 1 : 0) +
+            (ConiferFoliageMaterial ? 1 : 0) +
+            (UnderstoryFoliageMaterial ? 1 : 0)) +
+        (bColoradoHance && HanceDrylandVegetationMaterial ? 1 : 0);
+    const int32 ExpectedFoliageMaterialAssetCount =
+        (bUsesOpaqueVolumetricVegetation ? (bChilko ? 2 : 1) : 3) +
+        (bColoradoHance ? 1 : 0);
+    if (OutResult.DressingFoliageMaterialAssetCount !=
+        ExpectedFoliageMaterialAssetCount)
     {
         OutSummary += FString::Printf(
-            TEXT("Landscape biome dressing for %s loaded %d/3 required foliage materials.\n"),
+            TEXT("Landscape biome dressing for %s loaded %d/%d required foliage materials.\n"),
             *Spec.RiverId,
-            OutResult.DressingFoliageMaterialAssetCount);
+            OutResult.DressingFoliageMaterialAssetCount,
+            ExpectedFoliageMaterialAssetCount);
         return false;
     }
     const FString BroadleafComponentName =
-        Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
+        bZambeziVegetation
+            ? FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueRiparianTree_%s"),
+                  *Candidate.PreviewSpec.RiverId)
+            : bPacuare
+            ? FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_PacuareOpaqueCanopyA_%s"),
+                  *Candidate.PreviewSpec.RiverId)
+            : bOpaqueTemperate
+            ? FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueBroadleaf_%s"),
+                  *Candidate.PreviewSpec.RiverId)
+            : Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
             ? FString::Printf(
                   TEXT("RaftSim_LandscapeCandidate_ReviewedBroadleaf_%s"),
                   *Candidate.PreviewSpec.RiverId)
@@ -657,9 +1059,22 @@ bool AddLandscapeCandidateBiomeDressing(
             World,
             BroadleafTreeMesh,
             BroadleafComponentName,
-            true);
+            true,
+            bUsesOpaqueVolumetricVegetation ? OpaqueVegetationMaterial : nullptr);
     const FString ConiferComponentName =
-        Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
+        bZambeziVegetation
+            ? FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueUmbrellaTree_%s"),
+                  *Candidate.PreviewSpec.RiverId)
+            : bPacuare
+            ? FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_PacuareOpaqueCanopyB_%s"),
+                  *Candidate.PreviewSpec.RiverId)
+            : bOpaqueTemperate
+            ? FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueConifer_%s"),
+                  *Candidate.PreviewSpec.RiverId)
+            : Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
             ? FString::Printf(
                   TEXT("RaftSim_LandscapeCandidate_ReviewedFirConifer_%s"),
                   *Candidate.PreviewSpec.RiverId)
@@ -671,19 +1086,234 @@ bool AddLandscapeCandidateBiomeDressing(
             World,
             ConiferTreeMesh,
             ConiferComponentName,
-            true);
+            true,
+            bUsesOpaqueVolumetricVegetation ? OpaqueVegetationMaterial : nullptr);
     UHierarchicalInstancedStaticMeshComponent* ShrubInstances =
         AddLandscapeCandidateInstancedMeshComponent(
             World,
             ShrubMesh,
-            FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveWholeShrub_%s"), *Candidate.PreviewSpec.RiverId),
-            true);
+            bZambeziVegetation
+                ? FString::Printf(
+                      TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueThornScrub_%s"),
+                      *Candidate.PreviewSpec.RiverId)
+                : bPacuare
+                ? FString::Printf(
+                      TEXT("RaftSim_LandscapeCandidate_PacuareOpaqueRiparianShrub_%s"),
+                      *Candidate.PreviewSpec.RiverId)
+                : bOpaqueTemperate
+                ? FString::Printf(
+                      TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueShrub_%s"),
+                      *Candidate.PreviewSpec.RiverId)
+                : FString::Printf(
+                      TEXT("RaftSim_LandscapeCandidate_PveWholeShrub_%s"),
+                      *Candidate.PreviewSpec.RiverId),
+            true,
+            bUsesOpaqueVolumetricVegetation ? OpaqueVegetationMaterial : nullptr);
     UHierarchicalInstancedStaticMeshComponent* UnderstoryInstances =
         AddLandscapeCandidateInstancedMeshComponent(
             World,
             UnderstoryMesh,
-            FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveWholeUnderstory_%s"), *Candidate.PreviewSpec.RiverId),
-            true);
+            bZambeziVegetation
+                ? FString::Printf(
+                      TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueGroundCover_%s"),
+                      *Candidate.PreviewSpec.RiverId)
+                : bPacuare
+                ? FString::Printf(
+                      TEXT("RaftSim_LandscapeCandidate_PacuareOpaqueGroundCover_%s"),
+                      *Candidate.PreviewSpec.RiverId)
+                : bOpaqueTemperate
+                ? FString::Printf(
+                      TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueGroundCover_%s"),
+                      *Candidate.PreviewSpec.RiverId)
+                : FString::Printf(
+                      TEXT("RaftSim_LandscapeCandidate_PveWholeUnderstory_%s"),
+                      *Candidate.PreviewSpec.RiverId),
+            true,
+            bUsesOpaqueVolumetricVegetation ? UnderstoryFoliageMaterial : nullptr);
+    UHierarchicalInstancedStaticMeshComponent* TemperateBroadleafTreeInstancesB =
+        bOpaqueTemperate
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              TemperateBroadleafTreeMeshB,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueBroadleafB_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              TemperateOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* TemperateConiferTreeInstancesB =
+        bOpaqueTemperate
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              TemperateConiferTreeMeshB,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueConiferB_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              TemperateOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* TemperateShrubInstancesB =
+        bOpaqueTemperate
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              TemperateShrubMeshB,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueShrubB_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              TemperateOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* TemperateUnderstoryInstancesB =
+        bOpaqueTemperate
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              TemperateUnderstoryMeshB,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueGroundCoverB_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              bChilko
+                  ? ChilkoMutedGroundCoverMaterial
+                  : TemperateOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* HanceDrylandGroundCoverInstancesA =
+        bColoradoHance
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              HanceDrylandGroundCoverMeshA,
+              TEXT("RaftSim_LandscapeCandidate_HanceDrylandGroundCoverA"),
+              false,
+              HanceDrylandVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* HanceDrylandGroundCoverInstancesB =
+        bColoradoHance
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              HanceDrylandGroundCoverMeshB,
+              TEXT("RaftSim_LandscapeCandidate_HanceDrylandGroundCoverB"),
+              false,
+              HanceDrylandVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* HanceDrylandShrubInstancesA =
+        bColoradoHance
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              HanceDrylandShrubMeshA,
+              TEXT("RaftSim_LandscapeCandidate_HanceDrylandShrubA"),
+              true,
+              HanceDrylandVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* HanceDrylandShrubInstancesB =
+        bColoradoHance
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              HanceDrylandShrubMeshB,
+              TEXT("RaftSim_LandscapeCandidate_HanceDrylandShrubB"),
+              true,
+              HanceDrylandVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* ZambeziBankMosaicInstances =
+        bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              UnderstoryMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziOrganicBankMosaic_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziCameraRiparianTreeInstances = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              BroadleafTreeMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziCameraRiparianTree_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziCameraUmbrellaTreeInstances = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              ConiferTreeMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziCameraUmbrellaTree_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziCameraThornScrubInstances = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              ShrubMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziCameraThornScrub_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziRunnableLaunchGroundCoverInstances = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              UnderstoryMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziRunnableLaunchGroundCover_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              false,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziRunnableLaunchGroundCoverInstancesB = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              ZambeziGroundCoverMeshB,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziRunnableLaunchGroundCoverB_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              false,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziRunnableLaunchRiparianTreeInstances = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              BroadleafTreeMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziRunnableLaunchRiparianTree_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              false,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziRunnableLaunchUmbrellaTreeInstances = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              ConiferTreeMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziRunnableLaunchUmbrellaTree_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              false,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziRunnableLaunchThornScrubInstances = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              ShrubMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziRunnableLaunchThornScrub_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              false,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    // Grey granite (Futaleufu) and dark basalt (Chilko) instead of the scan's
+    // mossy tan on the reach's reviewed rock; nullptr keeps the scan material.
+    UMaterialInterface* ReachRockMaterial = LoadReachRockMaterial(Candidate.PreviewSpec.RiverId, OutSummary);
     TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedRockInstances;
     for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
     {
@@ -694,7 +1324,182 @@ bool AddLandscapeCandidateBiomeDressing(
                 TEXT("RaftSim_LandscapeCandidate_ReviewedRock%02d_%s"),
                 RockIndex + 1,
                 *Candidate.PreviewSpec.RiverId),
-            true));
+            true,
+            ReachRockMaterial));
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        TemperateWaterlineStructureInstances;
+    if (bOpaqueTemperate)
+    {
+        for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
+        {
+            TemperateWaterlineStructureInstances.Add(
+                AddLandscapeCandidateInstancedMeshComponent(
+                    World,
+                    ReviewedRockMeshes[RockIndex],
+                    FString::Printf(
+                        TEXT("RaftSim_LandscapeCandidate_TemperateWaterlineStructureRock%02d_%s"),
+                        RockIndex + 1,
+                        *Candidate.PreviewSpec.RiverId),
+                    true,
+                    ReachRockMaterial));
+        }
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        ChilkoOrganicShorelineGravelInstances;
+    if (bChilko)
+    {
+        for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
+        {
+            ChilkoOrganicShorelineGravelInstances.Add(
+                AddLandscapeCandidateInstancedMeshComponent(
+                    World,
+                    ReviewedRockMeshes[RockIndex],
+                    FString::Printf(
+                        TEXT("RaftSim_LandscapeCandidate_ChilkoOrganicShorelineGravelRock%02d_%s"),
+                        RockIndex + 1,
+                        *Candidate.PreviewSpec.RiverId),
+                    true,
+                    ReachRockMaterial));
+        }
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        ChilkoOrganicShorelineGroundCoverInstances;
+    if (bChilko)
+    {
+        ChilkoOrganicShorelineGroundCoverInstances = {
+            AddLandscapeCandidateInstancedMeshComponent(
+                World,
+                UnderstoryMesh,
+                FString::Printf(
+                    TEXT("RaftSim_LandscapeCandidate_ChilkoOrganicShorelineGroundCoverA_%s"),
+                    *Candidate.PreviewSpec.RiverId),
+                false,
+                ChilkoMutedGroundCoverMaterial),
+            AddLandscapeCandidateInstancedMeshComponent(
+                World,
+                TemperateUnderstoryMeshB,
+                FString::Printf(
+                    TEXT("RaftSim_LandscapeCandidate_ChilkoOrganicShorelineGroundCoverB_%s"),
+                    *Candidate.PreviewSpec.RiverId),
+                false,
+                ChilkoMutedGroundCoverMaterial)};
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        PacuareOrganicShorelineRockInstances;
+    if (bPacuare)
+    {
+        for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
+        {
+            PacuareOrganicShorelineRockInstances.Add(
+                AddLandscapeCandidateInstancedMeshComponent(
+                    World,
+                    ReviewedRockMeshes[RockIndex],
+                    FString::Printf(
+                        TEXT("RaftSim_LandscapeCandidate_PacuareOrganicShorelineRock%02d_%s"),
+                        RockIndex + 1,
+                        *Candidate.PreviewSpec.RiverId),
+                    true));
+        }
+    }
+    UHierarchicalInstancedStaticMeshComponent*
+        PacuareOrganicShorelineGroundCoverInstances = bPacuare
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              UnderstoryMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_PacuareOrganicShorelineGroundCover_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              false,
+              PacuareOpaqueRainforestVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        PacuareOrganicShorelineShrubInstances = bPacuare
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              ShrubMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_PacuareOrganicShorelineShrub_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              PacuareOpaqueRainforestVegetationMaterial)
+        : nullptr;
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        PacuareScannedFernInstances;
+    for (int32 MeshIndex = 0;
+         MeshIndex < PacuareScannedFernMeshes.Num();
+         ++MeshIndex)
+    {
+        PacuareScannedFernInstances.Add(
+            AddLandscapeCandidateInstancedMeshComponent(
+                World,
+                PacuareScannedFernMeshes[MeshIndex],
+                FString::Printf(
+                    TEXT("RaftSim_LandscapeCandidate_PacuareScannedFern%02d_%s"),
+                    MeshIndex + 1,
+                    *Candidate.PreviewSpec.RiverId),
+                false));
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        PacuareForestFloorInstances;
+    for (int32 MeshIndex = 0;
+         MeshIndex < PacuareForestFloorMeshes.Num();
+         ++MeshIndex)
+    {
+        PacuareForestFloorInstances.Add(
+            AddLandscapeCandidateInstancedMeshComponent(
+                World,
+                PacuareForestFloorMeshes[MeshIndex],
+                FString::Printf(
+                    TEXT("RaftSim_LandscapeCandidate_PacuareForestFloor%02d_%s"),
+                    MeshIndex + 1,
+                    *Candidate.PreviewSpec.RiverId),
+                MeshIndex >= 2,
+                PacuareOpaqueRainforestVegetationMaterial));
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        ZambeziRunnableLaunchTalusInstances;
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        ZambeziDryScarpOutcropInstances;
+    UMaterialInstanceConstant* ZambeziRunnableLaunchTalusMaterial = bZambezi
+        ? LoadOrCreateZambeziRunnableLaunchTalusMaterial(OutSummary)
+        : nullptr;
+    if (bZambezi)
+    {
+        for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
+        {
+            UHierarchicalInstancedStaticMeshComponent* TalusComponent =
+                AddLandscapeCandidateInstancedMeshComponent(
+                    World,
+                    ReviewedRockMeshes[RockIndex],
+                    FString::Printf(
+                        TEXT("RaftSim_LandscapeCandidate_ZambeziRunnableLaunchTalusRock%02d_%s"),
+                        RockIndex + 1,
+                        *Candidate.PreviewSpec.RiverId),
+                    true,
+                    ZambeziRunnableLaunchTalusMaterial);
+            if (TalusComponent)
+            {
+                TalusComponent->SetNumCustomDataFloats(1);
+            }
+            ZambeziRunnableLaunchTalusInstances.Add(TalusComponent);
+
+            UHierarchicalInstancedStaticMeshComponent* OutcropComponent =
+                AddLandscapeCandidateInstancedMeshComponent(
+                    World,
+                    ReviewedRockMeshes[RockIndex],
+                    FString::Printf(
+                        TEXT("RaftSim_LandscapeCandidate_ZambeziDryScarpOutcropRock%02d_%s"),
+                        RockIndex + 1,
+                        *Candidate.PreviewSpec.RiverId),
+                    false,
+                    ZambeziRunnableLaunchTalusMaterial);
+            if (OutcropComponent)
+            {
+                OutcropComponent->SetNumCustomDataFloats(1);
+            }
+            ZambeziDryScarpOutcropInstances.Add(OutcropComponent);
+        }
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedPineInstances;
     for (int32 PineIndex = 0; PineIndex < ReviewedPineMeshes.Num(); ++PineIndex)
@@ -708,451 +1513,1061 @@ bool AddLandscapeCandidateBiomeDressing(
                 *Candidate.PreviewSpec.RiverId),
             true));
     }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        FutaleufuScannedUnderstoryInstances;
+    for (int32 MeshIndex = 0;
+         MeshIndex < FutaleufuScannedUnderstoryMeshes.Num();
+         ++MeshIndex)
+    {
+        FutaleufuScannedUnderstoryInstances.Add(
+            AddLandscapeCandidateInstancedMeshComponent(
+                World,
+                FutaleufuScannedUnderstoryMeshes[MeshIndex],
+                FString::Printf(
+                    TEXT("RaftSim_LandscapeCandidate_FutaleufuScannedUnderstory%02d_%s"),
+                    MeshIndex + 1,
+                    *Candidate.PreviewSpec.RiverId),
+                MeshIndex < 3));
+    }
     if (!BroadleafTreeInstances || !ConiferTreeInstances ||
         !ShrubInstances || !UnderstoryInstances ||
+        (bOpaqueTemperate &&
+         (!TemperateBroadleafTreeInstancesB ||
+          !TemperateConiferTreeInstancesB ||
+          !TemperateShrubInstancesB ||
+          !TemperateUnderstoryInstancesB)) ||
+        (bColoradoHance &&
+         (!HanceDrylandGroundCoverInstancesA ||
+          !HanceDrylandGroundCoverInstancesB ||
+          !HanceDrylandShrubInstancesA ||
+          !HanceDrylandShrubInstancesB)) ||
+        (bZambezi && !ZambeziBankMosaicInstances) ||
+        (bZambezi &&
+         (!ZambeziCameraRiparianTreeInstances ||
+          !ZambeziCameraUmbrellaTreeInstances ||
+          !ZambeziCameraThornScrubInstances ||
+          !ZambeziRunnableLaunchGroundCoverInstances ||
+          !ZambeziRunnableLaunchGroundCoverInstancesB ||
+          !ZambeziRunnableLaunchRiparianTreeInstances ||
+          !ZambeziRunnableLaunchUmbrellaTreeInstances ||
+          !ZambeziRunnableLaunchThornScrubInstances ||
+          !ZambeziRunnableLaunchTalusMaterial)) ||
         Algo::AnyOf(ReviewedRockInstances, [](UHierarchicalInstancedStaticMeshComponent* Component)
         {
             return Component == nullptr;
         }) ||
+        Algo::AnyOf(
+            TemperateWaterlineStructureInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
+        Algo::AnyOf(
+            ChilkoOrganicShorelineGravelInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
+        Algo::AnyOf(
+            ChilkoOrganicShorelineGroundCoverInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
+        Algo::AnyOf(
+            PacuareOrganicShorelineRockInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
+        (bPacuare &&
+         (!PacuareOrganicShorelineGroundCoverInstances ||
+          !PacuareOrganicShorelineShrubInstances)) ||
+        Algo::AnyOf(
+            PacuareScannedFernInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
+        Algo::AnyOf(
+            PacuareForestFloorInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
+        Algo::AnyOf(
+            ZambeziRunnableLaunchTalusInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
         Algo::AnyOf(ReviewedPineInstances, [](UHierarchicalInstancedStaticMeshComponent* Component)
         {
             return Component == nullptr;
-        }))
+        }) ||
+        Algo::AnyOf(
+            FutaleufuScannedUnderstoryInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            })
+        )
     {
         OutSummary += FString::Printf(
             TEXT("Failed to create one or more Landscape biome dressing instance components for %s.\n"),
             *Candidate.PreviewSpec.RiverId);
         return false;
     }
-    OutResult.DressingFoliageMaterialBoundSlotCount =
-        BindLandscapeCandidateFoliageMaterial(
+    if (bFutaleufu)
+    {
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             FutaleufuScannedUnderstoryInstances)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimFutaleufuTerminatorRun"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimFutaleufuScannedNearBankUnderstoryV1"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimRightsReviewedCC0UnderstoryAnalog"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNoHydraulicAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimFutaleufuScannedNearBankUnderstoryV1"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOutsideProtectedSolverStrip"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNonCollisionRenderSurface"));
+        }
+    }
+    if (bColoradoHance)
+    {
+        const TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
+            HanceDrylandGroundCoverInstancesA,
+            HanceDrylandGroundCoverInstancesB,
+            HanceDrylandShrubInstancesA,
+            HanceDrylandShrubInstancesB};
+        for (UHierarchicalInstancedStaticMeshComponent* Component : Components)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimColoradoHanceRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimHanceOpaqueDrylandVegetationV2"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralVegetationFallback"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimOfficialReferenceConstrainedProceduralGapFill"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNoEcologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNoGeographyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNoHydraulicAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimHanceOpaqueDrylandVegetationV2"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOutsideProtectedSolverStrip"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNonCollisionRenderSurface"));
+        }
+        const TArray<UHierarchicalInstancedStaticMeshComponent*>
+            GroundCoverComponents = {
+                HanceDrylandGroundCoverInstancesA,
+                HanceDrylandGroundCoverInstancesB};
+        for (UHierarchicalInstancedStaticMeshComponent* GroundCover :
+             GroundCoverComponents)
+        {
+            GroundCover->SetCastShadow(false);
+            GroundCover->ComponentTags.AddUnique(
+                TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+        }
+    }
+    if (bOpaqueTemperate || bPacuare)
+    {
+        TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
             BroadleafTreeInstances,
-            BroadleafTreeMesh,
-            BroadleafFoliageMaterial) +
-        BindLandscapeCandidateFoliageMaterial(
             ConiferTreeInstances,
-            ConiferTreeMesh,
-            ConiferFoliageMaterial) +
-        BindLandscapeCandidateFoliageMaterial(
             ShrubInstances,
-            ShrubMesh,
-            BroadleafFoliageMaterial) +
-        BindLandscapeCandidateFoliageMaterial(
+            UnderstoryInstances};
+        if (bOpaqueTemperate)
+        {
+            Components.Append({
+                TemperateBroadleafTreeInstancesB,
+                TemperateConiferTreeInstancesB,
+                TemperateShrubInstancesB,
+                TemperateUnderstoryInstancesB});
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component : Components)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimOpaqueVolumetricVegetation"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralVegetationFallback"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSlopeScreenedPlacement"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(
+                    bPacuare
+                        ? TEXT("RaftSimPacuareUpperHuacasRun")
+                        : (bChilko
+                               ? TEXT("RaftSimChilkoLavaCanyonRun")
+                               : TEXT("RaftSimFutaleufuTerminatorRun")));
+                if (bPacuare)
+                {
+                    Owner->Tags.AddUnique(
+                        TEXT("RaftSimPacuareOpaqueRainforestV1"));
+                    Owner->Tags.AddUnique(
+                        TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                }
+                if (bOpaqueTemperate)
+                {
+                    Owner->Tags.AddUnique(
+                        TEXT("RaftSimTemperateBankEcologyV4"));
+                    Owner->Tags.AddUnique(
+                        TEXT("RaftSimTemperateMorphologyVariantFamily"));
+                }
+            }
+            if (Component)
+            {
+                // Solid procedural lobes are a fail-closed replacement for
+                // rejected alpha cards, not transmissive leaf clusters. Their
+                // aggregate canopy shadows otherwise form a near-black bank
+                // wall, so this fallback family does not cast scene shadows.
+                Component->SetCastShadow(false);
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimOpaqueVolumetricVegetation"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimNonCollisionRenderSurface"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimOpaqueFallbackShadowSuppressed"));
+                if (bPacuare)
+                {
+                    Component->ComponentTags.AddUnique(
+                        TEXT("RaftSimPacuareOpaqueRainforestV1"));
+                }
+                if (bOpaqueTemperate)
+                {
+                    Component->ComponentTags.AddUnique(
+                        TEXT("RaftSimTemperateBankEcologyV4"));
+                    Component->ComponentTags.AddUnique(
+                        TEXT("RaftSimTemperateMorphologyVariantFamily"));
+                }
+            }
+        }
+        UnderstoryInstances->SetCastShadow(false);
+        TArray<UHierarchicalInstancedStaticMeshComponent*> GroundCoverComponents = {
+            UnderstoryInstances};
+        if (bOpaqueTemperate)
+        {
+            TemperateUnderstoryInstancesB->SetCastShadow(false);
+            GroundCoverComponents.Add(TemperateUnderstoryInstancesB);
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* GroundCoverComponent :
+             GroundCoverComponents)
+        {
+            if (AActor* GroundOwner = GroundCoverComponent
+                    ? GroundCoverComponent->GetOwner()
+                    : nullptr)
+            {
+                GroundOwner->Tags.AddUnique(TEXT("RaftSimOrganicBankGroundCover"));
+                GroundOwner->Tags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+                if (bChilko)
+                {
+                    GroundOwner->Tags.AddUnique(
+                        TEXT("RaftSimChilkoMutedGroundCoverV3"));
+                }
+            }
+            GroundCoverComponent->ComponentTags.AddUnique(
+                TEXT("RaftSimOrganicBankGroundCover"));
+            if (bChilko)
+            {
+                GroundCoverComponent->ComponentTags.AddUnique(
+                    TEXT("RaftSimChilkoMutedGroundCoverV3"));
+            }
+        }
+    }
+    if (bOpaqueTemperate)
+    {
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             TemperateWaterlineStructureInstances)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(
+                    bChilko
+                        ? TEXT("RaftSimChilkoLavaCanyonRun")
+                        : TEXT("RaftSimFutaleufuTerminatorRun"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimTemperateWaterlineStructureV1"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimProceduralSourceGapFill"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimRightsReviewedCC0RockAnalog"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimTemperateWaterlineStructureV1"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimNonCollisionRenderSurface"));
+            }
+        }
+    }
+    if (bChilko)
+    {
+        auto TagChilkoShorelineComponent = [](
+            UHierarchicalInstancedStaticMeshComponent* Component,
+            FName FamilyTag)
+        {
+            if (!Component)
+            {
+                return;
+            }
+            if (AActor* Owner = Component->GetOwner())
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimChilkoLavaCanyonRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimChilkoOrganicShorelineV2"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimChilkoShorelineNaturalismV3"));
+                Owner->Tags.AddUnique(FamilyTag);
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralSourceGapFill"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimChilkoOrganicShorelineV2"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimChilkoShorelineNaturalismV3"));
+            Component->ComponentTags.AddUnique(FamilyTag);
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOutsideProtectedSolverStrip"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNonCollisionRenderSurface"));
+        };
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ChilkoOrganicShorelineGravelInstances)
+        {
+            TagChilkoShorelineComponent(
+                Component,
+                TEXT("RaftSimChilkoShorelineGravel"));
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimRightsReviewedCC0RockAnalog"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimChilkoSortedGravelScaleV3"));
+            }
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ChilkoOrganicShorelineGroundCoverInstances)
+        {
+            TagChilkoShorelineComponent(
+                Component,
+                TEXT("RaftSimChilkoShorelineGroundCover"));
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimOrganicBankGroundCover"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimChilkoMutedGroundCoverV3"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOrganicBankGroundCover"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimChilkoMutedGroundCoverV3"));
+        }
+    }
+    if (bPacuare)
+    {
+        auto TagPacuareShorelineComponent = [](
+            UHierarchicalInstancedStaticMeshComponent* Component,
+            FName FamilyTag)
+        {
+            if (!Component)
+            {
+                return;
+            }
+            if (AActor* Owner = Component->GetOwner())
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimPacuareUpperHuacasRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimPacuareOrganicShorelineV1"));
+                Owner->Tags.AddUnique(FamilyTag);
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralSourceGapFill"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimPacuareOrganicShorelineV1"));
+            Component->ComponentTags.AddUnique(FamilyTag);
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOutsideProtectedSolverStrip"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNonCollisionRenderSurface"));
+        };
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             PacuareOrganicShorelineRockInstances)
+        {
+            TagPacuareShorelineComponent(
+                Component,
+                TEXT("RaftSimPacuareShorelineMossRock"));
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimRightsReviewedCC0RockAnalog"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+            }
+        }
+        TagPacuareShorelineComponent(
+            PacuareOrganicShorelineGroundCoverInstances,
+            TEXT("RaftSimPacuareShorelineGroundCover"));
+        TagPacuareShorelineComponent(
+            PacuareOrganicShorelineShrubInstances,
+            TEXT("RaftSimPacuareShorelineShrub"));
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             PacuareScannedFernInstances)
+        {
+            TagPacuareShorelineComponent(
+                Component,
+                TEXT("RaftSimPacuareShorelineGroundCover"));
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimPacuareScannedFernUnderstoryV1"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimRightsReviewedCC0UnderstoryAnalog"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOrganicBankGroundCover"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimPacuareScannedFernUnderstoryV1"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            Component->SetCastShadow(false);
+        }
+        for (int32 ComponentIndex = 0;
+             ComponentIndex < PacuareForestFloorInstances.Num();
+             ++ComponentIndex)
+        {
+            UHierarchicalInstancedStaticMeshComponent* Component =
+                PacuareForestFloorInstances[ComponentIndex];
+            const FName FamilyTag = ComponentIndex < 2
+                ? FName(TEXT("RaftSimPacuareFoldedLeafLitter"))
+                : (ComponentIndex == 2
+                       ? FName(TEXT("RaftSimPacuareButtressRoot"))
+                       : FName(TEXT("RaftSimPacuareDeadwood")));
+            TagPacuareShorelineComponent(Component, FamilyTag);
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimPacuareForestFloorV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralInfill"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNoTerrainCollisionOrWaterAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimPacuareForestFloorV1"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimProceduralInfill"));
+            if (ComponentIndex < 2)
+            {
+                Component->SetCastShadow(false);
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            }
+        }
+        const TArray<UHierarchicalInstancedStaticMeshComponent*>
+            PacuareEcologyComponents = {
+                PacuareOrganicShorelineGroundCoverInstances,
+                PacuareOrganicShorelineShrubInstances};
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             PacuareEcologyComponents)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOrganicBankGroundCover"));
+            }
+        }
+        PacuareOrganicShorelineGroundCoverInstances->SetCastShadow(false);
+        if (AActor* Owner =
+                PacuareOrganicShorelineGroundCoverInstances->GetOwner())
+        {
+            Owner->Tags.AddUnique(
+                TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+        }
+        PacuareOrganicShorelineGroundCoverInstances->ComponentTags.AddUnique(
+            TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+    }
+    if (bZambezi)
+    {
+        const TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
+            BroadleafTreeInstances,
+            ConiferTreeInstances,
+            ShrubInstances,
             UnderstoryInstances,
+            ZambeziBankMosaicInstances,
+            ZambeziCameraRiparianTreeInstances,
+            ZambeziCameraUmbrellaTreeInstances,
+            ZambeziCameraThornScrubInstances,
+            ZambeziRunnableLaunchGroundCoverInstances,
+            ZambeziRunnableLaunchGroundCoverInstancesB,
+            ZambeziRunnableLaunchRiparianTreeInstances,
+            ZambeziRunnableLaunchUmbrellaTreeInstances,
+            ZambeziRunnableLaunchThornScrubInstances};
+        const TArray<UStaticMesh*> Meshes = {
+            BroadleafTreeMesh,
+            ConiferTreeMesh,
+            ShrubMesh,
             UnderstoryMesh,
-            UnderstoryFoliageMaterial);
-    if (OutResult.bDressingExternalConiferReviewAssetLoaded)
-    {
-        OutResult.DressingFoliageMaterialBoundSlotCount +=
-            OutResult.bDressingExternalConiferMaterialsValidated ? 1 : 0;
+            UnderstoryMesh,
+            BroadleafTreeMesh,
+            ConiferTreeMesh,
+            ShrubMesh,
+            UnderstoryMesh,
+            ZambeziGroundCoverMeshB,
+            BroadleafTreeMesh,
+            ConiferTreeMesh,
+            ShrubMesh};
+        for (UHierarchicalInstancedStaticMeshComponent* Component : Components)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziOpaqueVegetation"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOpaqueVolumetricVegetation"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralVegetationFallback"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSlopeScreenedPlacement"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimZambeziOpaqueVegetation"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimNonCollisionRenderSurface"));
+            }
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ZambeziRunnableLaunchTalusInstances)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimRunnableLaunchTalusV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziBasaltAnalogMaterialV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProjectOwnedMineralRetone"));
+                Owner->Tags.AddUnique(TEXT("RaftSimRightsReviewedCC0RockAnalog"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralGeologyFallback"));
+                Owner->Tags.AddUnique(TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimDryBankPlacement"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSlopeScreenedPlacement"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimConditionedWaterlineWetBankV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimPerInstanceConditionedWaterline"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralWetBankNoMeasuredAuthority"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimRunnableLaunchTalusV1"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimZambeziBasaltAnalogMaterialV1"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimNonCollisionRenderSurface"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimConditionedWaterlineWetBankV1"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimPerInstanceConditionedWaterline"));
+            }
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ZambeziDryScarpOutcropInstances)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziDryScarpOutcropV20"));
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziBasaltAnalogMaterialV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProjectOwnedMineralRetone"));
+                Owner->Tags.AddUnique(TEXT("RaftSimRightsReviewedCC0RockAnalog"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralGeologyFallback"));
+                Owner->Tags.AddUnique(TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimUpperDryScarpPlacement"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSlopeScreenedPlacement"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimPerInstanceConditionedWaterline"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimZambeziDryScarpOutcropV20"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimNonCollisionRenderSurface"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimPerInstanceConditionedWaterline"));
+            }
+        }
+        if (AActor* MosaicOwner = ZambeziBankMosaicInstances
+                ? ZambeziBankMosaicInstances->GetOwner()
+                : nullptr)
+        {
+            MosaicOwner->Tags.AddUnique(TEXT("RaftSimOrganicBankMosaic"));
+            MosaicOwner->Tags.AddUnique(TEXT("RaftSimCameraVisibleBankCover"));
+        }
+        if (ZambeziBankMosaicInstances)
+        {
+            UnderstoryInstances->SetCastShadow(false);
+            ZambeziBankMosaicInstances->SetCastShadow(false);
+            ZambeziBankMosaicInstances->ComponentTags.AddUnique(
+                TEXT("RaftSimOrganicBankMosaic"));
+            ZambeziBankMosaicInstances->ComponentTags.AddUnique(
+                TEXT("RaftSimCameraVisibleBankCover"));
+        }
+        const TArray<UHierarchicalInstancedStaticMeshComponent*>
+            CameraWoodyComponents = {
+                ZambeziCameraRiparianTreeInstances,
+                ZambeziCameraUmbrellaTreeInstances,
+                ZambeziCameraThornScrubInstances};
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             CameraWoodyComponents)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimCameraVisibleWoodyEcology"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOrganicWoodyBankLayer"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimWoodySlopeCeiling24Degrees"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimCameraVisibleWoodyEcology"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimOrganicWoodyBankLayer"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimWoodySlopeCeiling24Degrees"));
+            }
+        }
+        const TArray<UHierarchicalInstancedStaticMeshComponent*>
+            RunnableLaunchComponents = {
+                ZambeziRunnableLaunchGroundCoverInstances,
+                ZambeziRunnableLaunchGroundCoverInstancesB,
+                ZambeziRunnableLaunchRiparianTreeInstances,
+                ZambeziRunnableLaunchUmbrellaTreeInstances,
+                ZambeziRunnableLaunchThornScrubInstances};
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             RunnableLaunchComponents)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimRunnableLaunchBankEcologyV1"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimZambeziLowerEnergyLaunchEcologyV18"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimZambeziElevationStratifiedEcologyV19"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimEcologyStratumCustomDataV1"));
+            }
+            if (Component)
+            {
+                Component->SetCullDistances(0, 120000);
+                Component->SetNumCustomDataFloats(1);
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimRunnableLaunchBankEcologyV1"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimZambeziLowerEnergyLaunchEcologyV18"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimZambeziElevationStratifiedEcologyV19"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimEcologyStratumCustomDataV1"));
+            }
+        }
+        const TArray<UHierarchicalInstancedStaticMeshComponent*>
+            RunnableLaunchGroundCoverComponents = {
+                ZambeziRunnableLaunchGroundCoverInstances,
+                ZambeziRunnableLaunchGroundCoverInstancesB};
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             RunnableLaunchGroundCoverComponents)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimRunnableLaunchBankCover"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimOrganicGroundCoverMorphologyV2"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimRunnableLaunchBankCover"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimOrganicGroundCoverMorphologyV2"));
+            }
+        }
+        const TArray<UHierarchicalInstancedStaticMeshComponent*>
+            RunnableLaunchWoodyComponents = {
+                ZambeziRunnableLaunchRiparianTreeInstances,
+                ZambeziRunnableLaunchUmbrellaTreeInstances,
+                ZambeziRunnableLaunchThornScrubInstances};
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             RunnableLaunchWoodyComponents)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimRunnableLaunchWoodyEcology"));
+                Owner->Tags.AddUnique(TEXT("RaftSimWoodySlopeCeiling34Degrees"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimRunnableLaunchWoodyShadowSuppressed"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimZambeziLaunchCameraFaceMosaicV19"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimRunnableLaunchWoodyEcology"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimWoodySlopeCeiling34Degrees"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimRunnableLaunchWoodyShadowSuppressed"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimZambeziLaunchCameraFaceMosaicV19"));
+            }
+        }
+        OutResult.DressingFoliageMaterialBoundSlotCount = 0;
+        for (UStaticMesh* Mesh : Meshes)
+        {
+            OutResult.DressingFoliageMaterialBoundSlotCount +=
+                Mesh && Mesh->GetStaticMaterials().Num() == 1 &&
+                    Mesh->GetMaterial(0) == ZambeziOpaqueVegetationMaterial
+                ? 1
+                : 0;
+        }
+        OutResult.DressingNativeFoliageMaterialFallbackSlotCount = 0;
+        OutResult.bDressingFoliageMaterialsValidated =
+            OutResult.DressingFoliageMaterialBoundSlotCount == 13 &&
+            ValidateZambeziOpaqueVegetationMaterial(
+                ZambeziOpaqueVegetationMaterial) &&
+            Algo::AllOf(
+                Components,
+                [ZambeziOpaqueVegetationMaterial](
+                    UHierarchicalInstancedStaticMeshComponent* Component)
+                {
+                    return Component &&
+                        Component->GetCollisionEnabled() ==
+                            ECollisionEnabled::NoCollision &&
+                        Component->GetMaterial(0) ==
+                            ZambeziOpaqueVegetationMaterial;
+                });
     }
-    if (OutResult.bDressingExternalBroadleafReviewAssetLoaded)
+    else if (bOpaqueTemperate || bPacuare || bZambeziUpperGorge)
     {
-        OutResult.DressingFoliageMaterialBoundSlotCount +=
-            OutResult.bDressingExternalBroadleafMaterialsValidated ? 1 : 0;
+        // The upper gorge has only the four shared Zambezi forms (none of the
+        // 30 km run's camera or launch layers), so it takes the generic check.
+        TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
+            BroadleafTreeInstances,
+            ConiferTreeInstances,
+            ShrubInstances,
+            UnderstoryInstances};
+        TArray<UStaticMesh*> Meshes = {
+            BroadleafTreeMesh,
+            ConiferTreeMesh,
+            ShrubMesh,
+            UnderstoryMesh};
+        if (bOpaqueTemperate)
+        {
+            Components.Append({
+                TemperateBroadleafTreeInstancesB,
+                TemperateConiferTreeInstancesB,
+                TemperateShrubInstancesB,
+                TemperateUnderstoryInstancesB});
+            Meshes.Append({
+                TemperateBroadleafTreeMeshB,
+                TemperateConiferTreeMeshB,
+                TemperateShrubMeshB,
+                TemperateUnderstoryMeshB});
+        }
+        OutResult.DressingFoliageMaterialBoundSlotCount = 0;
+        for (UStaticMesh* Mesh : Meshes)
+        {
+            OutResult.DressingFoliageMaterialBoundSlotCount +=
+                Mesh && Mesh->GetStaticMaterials().Num() == 1 &&
+                    Mesh->GetMaterial(0) == OpaqueVegetationMaterial
+                ? 1
+                : 0;
+        }
+        OutResult.DressingNativeFoliageMaterialFallbackSlotCount = 0;
+        UMaterialInstanceConstant* ChilkoGroundCoverInstance =
+            Cast<UMaterialInstanceConstant>(ChilkoMutedGroundCoverMaterial);
+        FLinearColor ChilkoGroundCoverColorScale = FLinearColor::Black;
+        float ChilkoGroundCoverShadowFillScale = 0.0f;
+        const bool bChilkoGroundCoverMaterialValidated = !bChilko ||
+            (ChilkoGroundCoverInstance &&
+             ChilkoGroundCoverInstance->Parent == OpaqueVegetationMaterial &&
+             ChilkoGroundCoverInstance->GetVectorParameterValue(
+                 FMaterialParameterInfo(TEXT("VegetationColorScale")),
+                 ChilkoGroundCoverColorScale) &&
+             ChilkoGroundCoverInstance->GetScalarParameterValue(
+                 FMaterialParameterInfo(TEXT("VegetationShadowFillScale")),
+                 ChilkoGroundCoverShadowFillScale) &&
+             ChilkoGroundCoverColorScale.Equals(
+                 FLinearColor(0.62f, 0.38f, 0.24f, 1.0f),
+                 0.001f) &&
+             FMath::IsNearlyEqual(
+                 ChilkoGroundCoverShadowFillScale,
+                 0.28f,
+                 0.001f));
+        OutResult.bDressingFoliageMaterialsValidated =
+            OutResult.DressingFoliageMaterialBoundSlotCount ==
+                (bOpaqueTemperate ? 8 : 4) &&
+            ValidateZambeziOpaqueVegetationMaterial(
+                OpaqueVegetationMaterial) &&
+            bChilkoGroundCoverMaterialValidated &&
+            Algo::AllOf(
+                Components,
+                [bChilko,
+                 OpaqueVegetationMaterial,
+                 ChilkoMutedGroundCoverMaterial,
+                 UnderstoryInstances,
+                 TemperateUnderstoryInstancesB](
+                    UHierarchicalInstancedStaticMeshComponent* Component)
+                {
+                    UMaterialInterface* ExpectedMaterial =
+                        bChilko &&
+                            (Component == UnderstoryInstances ||
+                             Component == TemperateUnderstoryInstancesB)
+                        ? ChilkoMutedGroundCoverMaterial
+                        : OpaqueVegetationMaterial;
+                    return Component &&
+                        Component->GetCollisionEnabled() ==
+                            ECollisionEnabled::NoCollision &&
+                        Component->GetMaterial(0) ==
+                            ExpectedMaterial;
+                }) &&
+            (!bPacuare ||
+             (PacuareOrganicShorelineGroundCoverInstances &&
+              PacuareOrganicShorelineGroundCoverInstances->GetCollisionEnabled() ==
+                  ECollisionEnabled::NoCollision &&
+              PacuareOrganicShorelineGroundCoverInstances->GetMaterial(0) ==
+                  OpaqueVegetationMaterial &&
+              PacuareOrganicShorelineShrubInstances &&
+              PacuareOrganicShorelineShrubInstances->GetCollisionEnabled() ==
+                  ECollisionEnabled::NoCollision &&
+              PacuareOrganicShorelineShrubInstances->GetMaterial(0) ==
+                  OpaqueVegetationMaterial &&
+              PacuareScannedFernInstances.Num() == 4 &&
+              Algo::AllOf(
+                  PacuareScannedFernInstances,
+                  [](UHierarchicalInstancedStaticMeshComponent* Component)
+                  {
+                      return Component &&
+                          Component->GetCollisionEnabled() ==
+                              ECollisionEnabled::NoCollision &&
+                          ValidateFutaleufuScannedUnderstoryMaterials(
+                              Component->GetStaticMesh());
+                  })));
     }
-    OutResult.DressingNativeFoliageMaterialFallbackSlotCount =
-        FMath::Max(0, 4 - OutResult.DressingFoliageMaterialBoundSlotCount);
-    OutResult.bDressingFoliageMaterialsValidated =
-        OutResult.DressingFoliageMaterialBoundSlotCount >= 3 &&
-        (!OutResult.bDressingExternalBroadleafReviewAssetLoaded ||
-         OutResult.bDressingExternalBroadleafMaterialsValidated) &&
-        (!OutResult.bDressingExternalConiferReviewAssetLoaded ||
-         OutResult.bDressingExternalConiferMaterialsValidated);
+    else
+    {
+        OutResult.DressingFoliageMaterialBoundSlotCount =
+            BindLandscapeCandidateFoliageMaterial(
+                BroadleafTreeInstances,
+                BroadleafTreeMesh,
+                BroadleafFoliageMaterial) +
+            BindLandscapeCandidateFoliageMaterial(
+                ConiferTreeInstances,
+                ConiferTreeMesh,
+                ConiferFoliageMaterial) +
+            BindLandscapeCandidateFoliageMaterial(
+                ShrubInstances,
+                ShrubMesh,
+                BroadleafFoliageMaterial) +
+            BindLandscapeCandidateFoliageMaterial(
+                UnderstoryInstances,
+                UnderstoryMesh,
+                UnderstoryFoliageMaterial);
+        if (OutResult.bDressingExternalConiferReviewAssetLoaded)
+        {
+            OutResult.DressingFoliageMaterialBoundSlotCount +=
+                OutResult.bDressingExternalConiferMaterialsValidated ? 1 : 0;
+        }
+        if (OutResult.bDressingExternalBroadleafReviewAssetLoaded)
+        {
+            OutResult.DressingFoliageMaterialBoundSlotCount +=
+                OutResult.bDressingExternalBroadleafMaterialsValidated ? 1 : 0;
+        }
+        OutResult.DressingNativeFoliageMaterialFallbackSlotCount =
+            FMath::Max(0, 4 - OutResult.DressingFoliageMaterialBoundSlotCount);
+        OutResult.bDressingFoliageMaterialsValidated =
+            OutResult.DressingFoliageMaterialBoundSlotCount >= 3 &&
+            (!OutResult.bDressingExternalBroadleafReviewAssetLoaded ||
+             OutResult.bDressingExternalBroadleafMaterialsValidated) &&
+            (!OutResult.bDressingExternalConiferReviewAssetLoaded ||
+             OutResult.bDressingExternalConiferMaterialsValidated);
+    }
+    if (bColoradoHance)
+    {
+        const bool bHanceOpaqueDrylandValidated =
+            ValidateZambeziOpaqueVegetationMaterial(
+                HanceDrylandVegetationMaterial) &&
+            HanceDrylandShrubMeshA &&
+            HanceDrylandShrubMeshA->GetStaticMaterials().Num() == 1 &&
+            HanceDrylandShrubMeshA->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial &&
+            HanceDrylandShrubMeshB &&
+            HanceDrylandShrubMeshB->GetStaticMaterials().Num() == 1 &&
+            HanceDrylandShrubMeshB->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial &&
+            HanceDrylandGroundCoverMeshA &&
+            HanceDrylandGroundCoverMeshA->GetStaticMaterials().Num() == 1 &&
+            HanceDrylandGroundCoverMeshA->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial &&
+            HanceDrylandGroundCoverMeshB &&
+            HanceDrylandGroundCoverMeshB->GetStaticMaterials().Num() == 1 &&
+            HanceDrylandGroundCoverMeshB->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial &&
+            HanceDrylandGroundCoverInstancesA->GetCollisionEnabled() ==
+                ECollisionEnabled::NoCollision &&
+            HanceDrylandGroundCoverInstancesA->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial &&
+            HanceDrylandGroundCoverInstancesB->GetCollisionEnabled() ==
+                ECollisionEnabled::NoCollision &&
+            HanceDrylandGroundCoverInstancesB->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial &&
+            HanceDrylandShrubInstancesA->GetCollisionEnabled() ==
+                ECollisionEnabled::NoCollision &&
+            HanceDrylandShrubInstancesA->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial &&
+            HanceDrylandShrubInstancesB->GetCollisionEnabled() ==
+                ECollisionEnabled::NoCollision &&
+            HanceDrylandShrubInstancesB->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial;
+        OutResult.DressingFoliageMaterialBoundSlotCount +=
+            bHanceOpaqueDrylandValidated ? 4 : 0;
+        OutResult.bDressingFoliageMaterialsValidated &=
+            bHanceOpaqueDrylandValidated;
+    }
     if (!OutResult.bDressingFoliageMaterialsValidated)
     {
         OutSummary += FString::Printf(
-            TEXT("Landscape biome dressing for %s bound %d foliage slots; expected at least three complete-species leaf slots.\n"),
+            TEXT("Landscape biome dressing for %s bound %d foliage slots; material contract failed.\n"),
             *Spec.RiverId,
             OutResult.DressingFoliageMaterialBoundSlotCount);
         return false;
     }
 
-    const bool bRainforest = Spec.bHasWaterfalls;
-    const bool bZambeziWoodland = Spec.RiverId == TEXT("zambezi_batoka_gorge");
-    TArray<FRaftSimLandscapeCandidateCenterlinePoint> PhysicalCenterline;
-    if (!LoadLandscapeCandidateLocalCenterline(Candidate, PhysicalCenterline, OutSummary))
-    {
-        return false;
-    }
-    const bool bPhysicalCorridor = Candidate.bPhysicalScaleSourceCorridor && PhysicalCenterline.Num() >= 2;
-    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
-    const float LandscapeHalfWidth = Candidate.HorizontalSpanYCm * 0.5f;
-    const float MaxBankOffset = bPhysicalCorridor
-        ? FMath::Min(18000.0f, LandscapeHalfWidth - 220.0f)
-        : FMath::Max(ActiveRiverHalfWidth + 300.0f, LandscapeHalfWidth - 220.0f);
-    auto ResolveLogicalRiverPoint =
-        [&Candidate, &PhysicalCenterline, bPhysicalCorridor](float LogicalX, float LateralOffset)
-    {
-        if (!bPhysicalCorridor)
-        {
-            return FVector2D(
-                LogicalX,
-                GetPreviewRiverCenterY(Candidate.PreviewSpec, LogicalX) + LateralOffset);
-        }
-        const float Progress = FMath::Clamp((LogicalX + 2500.0f) / 27900.0f, 0.0f, 1.0f);
-        FVector2D Tangent;
-        const FVector2D Center = SampleLandscapeCandidateCenterlineWorld(
-            Candidate,
-            PhysicalCenterline,
-            Progress,
-            &Tangent);
-        const FVector2D Normal(-Tangent.Y, Tangent.X);
-        return Center + Normal * LateralOffset;
-    };
-    auto GetLandscapeHeight = [Landscape, &Spec](float X, float Y)
-    {
-        return Landscape->GetHeightAtLocation(FVector(X, Y, 0.0f), EHeightfieldSource::Editor)
-            .Get(Spec.FlowWaterLevelOffsetCm - 24.0f);
-    };
-    auto AddGroundedInstance = [](UHierarchicalInstancedStaticMeshComponent* Component,
-                                  UStaticMesh* Mesh,
-                                  const FVector2D& GroundLocation,
-                                  float GroundZ,
-                                  const FRotator& Rotation,
-                                  const FVector& Scale)
-    {
-        const FBox Bounds = GetLandscapeCandidateEffectiveMeshBounds(Mesh);
-        const float GroundedPivotZ = GroundZ - Bounds.Min.Z * Scale.Z;
-        Component->AddInstance(
-            FTransform(
-                Rotation,
-                FVector(GroundLocation.X, GroundLocation.Y, GroundedPivotZ),
-                Scale),
-            true);
-    };
-
-    const int32 BoulderCount = bPhysicalCorridor
-        ? 180
-        : (Spec.bDesertCanyon ? 62 : (bRainforest ? 48 : 44));
-    for (int32 BoulderIndex = 0; BoulderIndex < BoulderCount; ++BoulderIndex)
-    {
-        const float T = (static_cast<float>(BoulderIndex) + 0.5f) / static_cast<float>(BoulderCount);
-        const float Phase = static_cast<float>(BoulderIndex) * 1.6180339f;
-        const float Side = (BoulderIndex % 2 == 0) ? -1.0f : 1.0f;
-        const bool bChannelRock = BoulderIndex % 9 == 0;
-        const float BaseX = FMath::Lerp(
-            bPhysicalCorridor ? 5000.0f : -1600.0f,
-            25500.0f,
-            T) + 180.0f * FMath::Sin(Phase);
-        const float BaseOffset = bChannelRock
-            ? ActiveRiverHalfWidth * (0.62f + 0.24f * FMath::Abs(FMath::Sin(Phase * 0.77f)))
-            : FMath::Lerp(
-                  ActiveRiverHalfWidth + (bPhysicalCorridor && BaseX < 3200.0f ? 900.0f : 260.0f),
-                  MaxBankOffset * 0.78f,
-                  FMath::Pow(FMath::Abs(FMath::Sin(Phase * 0.43f)), 0.72f));
-
-        const FVector2D BasePoint = ResolveLogicalRiverPoint(BaseX, Side * BaseOffset);
-        float BestX = BasePoint.X;
-        float BestY = BasePoint.Y;
-        float BestScore = -1000.0f;
-        for (int32 CandidateIndex = 0; CandidateIndex < 7; ++CandidateIndex)
-        {
-            const float CandidateX = BaseX +
-                155.0f * FMath::Sin(Phase * 0.61f + static_cast<float>(CandidateIndex) * 1.17f);
-            const float CandidateOffset = FMath::Clamp(
-                BaseOffset + 135.0f * FMath::Sin(Phase + static_cast<float>(CandidateIndex) * 0.93f),
-                ActiveRiverHalfWidth * 0.20f,
-                MaxBankOffset);
-            const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
-                CandidateX,
-                Side * CandidateOffset);
-            const float CandidateWorldX = CandidatePoint.X;
-            const float CandidateWorldY = CandidatePoint.Y;
-            const float WaterT = bPhysicalCorridor
-                ? FMath::Clamp(1.0f - CandidateOffset / FMath::Max(1.0f, ActiveRiverHalfWidth), 0.0f, 1.0f)
-                : SamplePreviewMaskAtWorld(Spec, &WaterMask, CandidateWorldX, CandidateWorldY);
-            const float VegetationT = bPhysicalCorridor
-                ? SmoothPreviewStep(ActiveRiverHalfWidth + 400.0f, MaxBankOffset, CandidateOffset)
-                : SamplePreviewMaskAtWorld(Spec, &VegetationMask, CandidateWorldX, CandidateWorldY);
-            const float TargetWaterT = bChannelRock ? 0.68f : 0.20f;
-            const float Score = 1.0f - FMath::Abs(WaterT - TargetWaterT) -
-                VegetationT * (bChannelRock ? 0.12f : 0.34f) +
-                0.06f * FMath::Sin(Phase + static_cast<float>(CandidateIndex));
-            if (Score > BestScore)
-            {
-                BestScore = Score;
-                BestX = CandidateWorldX;
-                BestY = CandidateWorldY;
-            }
-        }
-
-        const float TargetBoulderHeightCm = bPhysicalCorridor
-            ? (65.0f + 18.0f * static_cast<float>(BoulderIndex % 6)) *
-                (bChannelRock ? 1.05f : 1.0f)
-            : (Spec.bDesertCanyon
-                   ? 82.0f + 20.0f * static_cast<float>(BoulderIndex % 5)
-                   : (bRainforest ? 74.0f + 18.0f * static_cast<float>(BoulderIndex % 5)
-                                  : 66.0f + 16.0f * static_cast<float>(BoulderIndex % 5))) *
-                (bChannelRock ? 0.72f : 1.0f);
-        const float BoulderScaleZ = TargetBoulderHeightCm / 100.0f;
-        if (ReviewedRockMeshes.Num() == 6 && ReviewedRockInstances.Num() == 6)
-        {
-            const int32 VariantIndex = BoulderIndex % ReviewedRockMeshes.Num();
-            UStaticMesh* RockMesh = ReviewedRockMeshes[VariantIndex];
-            const float MeshHeightCm = FMath::Max(
-                1.0f,
-                GetLandscapeCandidateEffectiveMeshBounds(RockMesh).GetSize().Z);
-            const float UniformScale = TargetBoulderHeightCm / MeshHeightCm;
-            AddGroundedInstance(
-                ReviewedRockInstances[VariantIndex],
-                RockMesh,
-                FVector2D(BestX, BestY),
-                GetLandscapeHeight(BestX, BestY),
-                FRotator(
-                    bChannelRock ? -5.0f : 2.0f * FMath::Sin(Phase),
-                    static_cast<float>((BoulderIndex * 47) % 360),
-                    3.0f * FMath::Cos(Phase * 0.73f)),
-                FVector(
-                    UniformScale * (0.92f + 0.07f * static_cast<float>(BoulderIndex % 4)),
-                    UniformScale * (0.88f + 0.06f * static_cast<float>((BoulderIndex + 2) % 5)),
-                    UniformScale));
-        }
-        else
-        {
-            const FLinearColor BoulderColor = FMath::Lerp(
-                ScalePreviewColor(Spec.RockColor, Spec.bDesertCanyon ? 0.70f : 0.52f),
-                ScalePreviewColor(Spec.WaterColor, 0.28f),
-                bChannelRock ? 0.24f : (bRainforest ? 0.16f : 0.10f));
-            AActor* BoulderActor = AddPreviewIrregularRockActor(
-                World,
-                FString::Printf(TEXT("RaftSim_LandscapeCandidate_IrregularBoulder_%03d_%s"), BoulderIndex, *Spec.RiverId),
-                FVector(BestX, BestY, GetLandscapeHeight(BestX, BestY)),
-                static_cast<float>((BoulderIndex * 47) % 360),
-                FVector(
-                    BoulderScaleZ * (1.15f + 0.08f * static_cast<float>(BoulderIndex % 4)),
-                    BoulderScaleZ * (0.76f + 0.07f * static_cast<float>((BoulderIndex + 2) % 5)),
-                    BoulderScaleZ),
-                BoulderColor,
-                BoulderIndex + 42000);
-            if (BoulderActor)
-            {
-                if (UProceduralMeshComponent* BoulderComponent =
-                        BoulderActor->FindComponentByClass<UProceduralMeshComponent>())
-                {
-                    BoulderComponent->SetCastShadow(true);
-                    BoulderComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-                }
-            }
-        }
-        ++OutResult.DressingBoulderInstanceCount;
-    }
-
-    const int32 FoliageClusterCount = bPhysicalCorridor
-        ? (bZambeziWoodland ? 5600 : (Spec.bDesertCanyon ? 800 : 12000))
-        : (Spec.bDesertCanyon ? 110 : (bRainforest ? 420 : 260));
-    for (int32 ClusterIndex = 0; ClusterIndex < FoliageClusterCount; ++ClusterIndex)
-    {
-        const float T = (static_cast<float>(ClusterIndex) + 0.5f) /
-            static_cast<float>(FoliageClusterCount);
-        const float Phase = static_cast<float>(ClusterIndex) * 1.3247179f;
-        const float Side = (ClusterIndex % 2 == 0) ? -1.0f : 1.0f;
-        const float BaseX = FMath::Lerp(-2500.0f, 25400.0f, T) + 230.0f * FMath::Sin(Phase * 0.71f);
-        const float BaseOffset = FMath::Lerp(
-            ActiveRiverHalfWidth + (Spec.bDesertCanyon ? 260.0f : 180.0f),
-            MaxBankOffset,
-            FMath::Pow(FMath::Abs(FMath::Sin(Phase * 0.47f)), bRainforest ? 0.42f : 0.66f));
-
-        const FVector2D BasePoint = ResolveLogicalRiverPoint(BaseX, Side * BaseOffset);
-        float BestX = BasePoint.X;
-        float BestY = BasePoint.Y;
-        float BestScore = -1000.0f;
-        for (int32 CandidateIndex = 0; CandidateIndex < 8; ++CandidateIndex)
-        {
-            const float CandidateX = BaseX +
-                190.0f * FMath::Sin(Phase + static_cast<float>(CandidateIndex) * 1.07f);
-            const float NearCameraMinimumOffset = CandidateX < 2600.0f
-                ? ActiveRiverHalfWidth + (bRainforest ? 860.0f : (Spec.bDesertCanyon ? 720.0f : 660.0f))
-                : ActiveRiverHalfWidth + 120.0f;
-            const float CandidateOffset = FMath::Clamp(
-                BaseOffset + 210.0f * FMath::Sin(Phase * 0.69f + static_cast<float>(CandidateIndex) * 0.89f),
-                NearCameraMinimumOffset,
-                MaxBankOffset);
-            const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
-                CandidateX,
-                Side * CandidateOffset);
-            const float CandidateWorldX = CandidatePoint.X;
-            const float CandidateWorldY = CandidatePoint.Y;
-            const float WaterT = bPhysicalCorridor
-                ? FMath::Clamp(1.0f - CandidateOffset / FMath::Max(1.0f, ActiveRiverHalfWidth), 0.0f, 1.0f)
-                : SamplePreviewMaskAtWorld(Spec, &WaterMask, CandidateWorldX, CandidateWorldY);
-            const float VegetationT = bPhysicalCorridor
-                ? SmoothPreviewStep(ActiveRiverHalfWidth + 500.0f, MaxBankOffset, CandidateOffset)
-                : SamplePreviewMaskAtWorld(Spec, &VegetationMask, CandidateWorldX, CandidateWorldY);
-            const float Score = VegetationT *
-                    (bRainforest ? 1.85f : (bZambeziWoodland ? 1.22f : (Spec.bDesertCanyon ? 0.58f : 1.34f))) -
-                WaterT * 1.18f +
-                0.07f * FMath::Sin(Phase + static_cast<float>(CandidateIndex) * 0.83f);
-            if (Score > BestScore)
-            {
-                BestScore = Score;
-                BestX = CandidateWorldX;
-                BestY = CandidateWorldY;
-            }
-        }
-
-        UStaticMesh* SpeciesMesh = UnderstoryMesh;
-        UHierarchicalInstancedStaticMeshComponent* SpeciesInstances = UnderstoryInstances;
-        bool bCanopyTree = false;
-        float TargetHeightCm = 100.0f;
-        const bool bNearEvidenceCamera = !bPhysicalCorridor && BaseX < 3800.0f;
-        if (bNearEvidenceCamera && !Spec.bDesertCanyon)
-        {
-            if (ClusterIndex % 2 == 0)
-            {
-                SpeciesMesh = ShrubMesh;
-                SpeciesInstances = ShrubInstances;
-                TargetHeightCm = bRainforest
-                    ? 220.0f + 28.0f * static_cast<float>(ClusterIndex % 5)
-                    : 185.0f + 24.0f * static_cast<float>(ClusterIndex % 5);
-            }
-            else
-            {
-                TargetHeightCm = bRainforest
-                    ? 128.0f + 18.0f * static_cast<float>(ClusterIndex % 5)
-                    : 104.0f + 15.0f * static_cast<float>(ClusterIndex % 5);
-            }
-        }
-        else if (bZambeziWoodland)
-        {
-            const int32 SpeciesSelector = ClusterIndex % 8;
-            if (SpeciesSelector <= 4)
-            {
-                SpeciesMesh = BroadleafTreeMesh;
-                SpeciesInstances = BroadleafTreeInstances;
-                TargetHeightCm = 720.0f + 72.0f * static_cast<float>(ClusterIndex % 7);
-                bCanopyTree = true;
-            }
-            else if (SpeciesSelector <= 6)
-            {
-                SpeciesMesh = ShrubMesh;
-                SpeciesInstances = ShrubInstances;
-                TargetHeightCm = 190.0f + 28.0f * static_cast<float>(ClusterIndex % 6);
-            }
-            else
-            {
-                TargetHeightCm = 96.0f + 15.0f * static_cast<float>(ClusterIndex % 5);
-            }
-        }
-        else if (Spec.bDesertCanyon)
-        {
-            if (ClusterIndex % 3 == 0)
-            {
-                SpeciesMesh = ShrubMesh;
-                SpeciesInstances = ShrubInstances;
-                TargetHeightCm = 165.0f + 24.0f * static_cast<float>(ClusterIndex % 6);
-            }
-            else
-            {
-                TargetHeightCm = 88.0f + 13.0f * static_cast<float>(ClusterIndex % 5);
-            }
-        }
-        else if (bRainforest)
-        {
-            const int32 SpeciesSelector = ClusterIndex % 5;
-            if (SpeciesSelector <= 2)
-            {
-                SpeciesMesh = BroadleafTreeMesh;
-                SpeciesInstances = BroadleafTreeInstances;
-                TargetHeightCm = 980.0f + 105.0f * static_cast<float>(ClusterIndex % 7);
-                bCanopyTree = true;
-            }
-            else if (SpeciesSelector == 3)
-            {
-                SpeciesMesh = ShrubMesh;
-                SpeciesInstances = ShrubInstances;
-                TargetHeightCm = 260.0f + 38.0f * static_cast<float>(ClusterIndex % 6);
-            }
-            else
-            {
-                TargetHeightCm = 145.0f + 22.0f * static_cast<float>(ClusterIndex % 6);
-            }
-        }
-        else
-        {
-            const int32 SpeciesSelector = ClusterIndex % (bPhysicalCorridor ? 20 : 5);
-            if (bPhysicalCorridor && SpeciesSelector == 0 &&
-                ReviewedPineMeshes.Num() == 3 && ReviewedPineInstances.Num() == 3)
-            {
-                const int32 PineVariant = (ClusterIndex / 20) % ReviewedPineMeshes.Num();
-                SpeciesMesh = ReviewedPineMeshes[PineVariant];
-                SpeciesInstances = ReviewedPineInstances[PineVariant];
-                TargetHeightCm = 1350.0f + 95.0f * static_cast<float>((ClusterIndex / 20) % 6);
-                bCanopyTree = true;
-            }
-            else if (!bPhysicalCorridor && SpeciesSelector == 0)
-            {
-                SpeciesMesh = ConiferTreeMesh;
-                SpeciesInstances = ConiferTreeInstances;
-                TargetHeightCm = 940.0f + 92.0f * static_cast<float>(ClusterIndex % 6);
-                bCanopyTree = true;
-            }
-            else if (SpeciesSelector == (bPhysicalCorridor ? 19 : 4))
-            {
-                SpeciesMesh = ShrubMesh;
-                SpeciesInstances = ShrubInstances;
-                TargetHeightCm = 225.0f + 32.0f * static_cast<float>(ClusterIndex % 6);
-            }
-            else
-            {
-                SpeciesMesh = BroadleafTreeMesh;
-                SpeciesInstances = BroadleafTreeInstances;
-                TargetHeightCm = 690.0f + 68.0f * static_cast<float>(ClusterIndex % 6);
-                bCanopyTree = true;
-            }
-        }
-
-        const float MeshHeightCm = FMath::Max(
-            1.0f,
-            GetLandscapeCandidateEffectiveMeshBounds(SpeciesMesh).GetSize().Z);
-        const float UniformScale = TargetHeightCm / MeshHeightCm;
-        const FVector SpeciesScale(
-            UniformScale * (0.88f + 0.04f * static_cast<float>(ClusterIndex % 5)),
-            UniformScale * (0.90f + 0.035f * static_cast<float>((ClusterIndex + 2) % 5)),
-            UniformScale);
-        AddGroundedInstance(
-            SpeciesInstances,
-            SpeciesMesh,
-            FVector2D(BestX, BestY),
-            GetLandscapeHeight(BestX, BestY),
-            FRotator(
-                1.4f * FMath::Sin(Phase * 0.73f),
-                static_cast<float>((ClusterIndex * 137) % 360),
-                1.2f * FMath::Cos(Phase * 0.61f)),
-            SpeciesScale);
-        ++OutResult.DressingFoliageInstanceCount;
-        if (bCanopyTree)
-        {
-            ++OutResult.DressingCanopyTreeInstanceCount;
-        }
-        else
-        {
-            ++OutResult.DressingUnderstoryInstanceCount;
-        }
-    }
-
-    OutResult.bDressingValidated =
-        OutResult.DressingBoulderInstanceCount == BoulderCount &&
-        OutResult.DressingFoliageInstanceCount == FoliageClusterCount &&
-        ((Spec.bDesertCanyon && !bZambeziWoodland) ||
-         OutResult.DressingCanopyTreeInstanceCount > 0) &&
-        OutResult.DressingUnderstoryInstanceCount > 0 &&
-        OutResult.bDressingFoliageMaterialsValidated;
-    OutSummary += FString::Printf(
-        TEXT("Landscape biome dressing for %s: %d %s, %d foliage instances (%d canopy, %d understory), %d river-specific PVE foliage slots; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d understory=%d.\n"),
-        *Spec.RiverId,
-        OutResult.DressingBoulderInstanceCount,
-        ReviewedRockMeshes.Num() == 6
-            ? TEXT("rights-reviewed six-variant Nanite rock instances")
-            : TEXT("dense irregular procedural boulders"),
-        OutResult.DressingFoliageInstanceCount,
-        OutResult.DressingCanopyTreeInstanceCount,
-        OutResult.DressingUnderstoryInstanceCount,
-        OutResult.DressingFoliageMaterialBoundSlotCount,
-        OutResult.bDressingBoulderMeshNaniteEnabled,
-        OutResult.bDressingBroadleafMeshNaniteEnabled,
-        OutResult.bDressingConiferMeshNaniteEnabled,
-        OutResult.bDressingUnderstoryMeshNaniteEnabled);
-    return OutResult.bDressingValidated;
+    return AddLandscapeCandidatePlacements({
+        World,
+        Landscape,
+        Candidate,
+        OutResult,
+        OutSummary,
+        bPacuare,
+        bFutaleufu,
+        bChilko,
+        bColoradoHance,
+        bOpaqueTemperate,
+        bUsesOpaqueVolumetricVegetation,
+        ReviewedRockMeshes,
+        ReviewedPineMeshes,
+        FutaleufuScannedUnderstoryMeshes,
+        PacuareScannedFernMeshes,
+        BroadleafTreeMesh,
+        ConiferTreeMesh,
+        ShrubMesh,
+        UnderstoryMesh,
+        ZambeziGroundCoverMeshB,
+        TemperateBroadleafTreeMeshB,
+        TemperateConiferTreeMeshB,
+        TemperateShrubMeshB,
+        TemperateUnderstoryMeshB,
+        PacuareForestFloorMeshes,
+        HanceDrylandShrubMeshA,
+        HanceDrylandShrubMeshB,
+        HanceDrylandGroundCoverMeshA,
+        HanceDrylandGroundCoverMeshB,
+        WaterMask,
+        VegetationMask,
+        Spec,
+        BroadleafTreeInstances,
+        ConiferTreeInstances,
+        ShrubInstances,
+        UnderstoryInstances,
+        TemperateBroadleafTreeInstancesB,
+        TemperateConiferTreeInstancesB,
+        TemperateShrubInstancesB,
+        TemperateUnderstoryInstancesB,
+        HanceDrylandGroundCoverInstancesA,
+        HanceDrylandGroundCoverInstancesB,
+        HanceDrylandShrubInstancesA,
+        HanceDrylandShrubInstancesB,
+        ZambeziBankMosaicInstances,
+        ZambeziCameraRiparianTreeInstances,
+        ZambeziCameraUmbrellaTreeInstances,
+        ZambeziCameraThornScrubInstances,
+        ZambeziRunnableLaunchGroundCoverInstances,
+        ZambeziRunnableLaunchGroundCoverInstancesB,
+        ZambeziRunnableLaunchRiparianTreeInstances,
+        ZambeziRunnableLaunchUmbrellaTreeInstances,
+        ZambeziRunnableLaunchThornScrubInstances,
+        ReviewedRockInstances,
+        TemperateWaterlineStructureInstances,
+        ChilkoOrganicShorelineGravelInstances,
+        ChilkoOrganicShorelineGroundCoverInstances,
+        PacuareOrganicShorelineRockInstances,
+        PacuareOrganicShorelineGroundCoverInstances,
+        PacuareOrganicShorelineShrubInstances,
+        PacuareScannedFernInstances,
+        PacuareForestFloorInstances,
+        ZambeziRunnableLaunchTalusInstances,
+        ZambeziDryScarpOutcropInstances,
+        ReviewedPineInstances,
+        FutaleufuScannedUnderstoryInstances});
 }
 } // namespace RaftSimEditorEnvironment

@@ -1,17 +1,3 @@
-{
-  "schema": "raftsim.dem_relief_preview.v1",
-  "status": "generated_preview_only_not_production_heightfield",
-  "source_id": "usgs_3dep_lees_ferry_corridor_sample_512",
-  "provider": "USGS 3D Elevation Program ImageServer",
-  "input_dem": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif",
-  "output_relief": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png",
-  "processing": {
-    "output_size_px": 1024,
-    "height_percentiles": "2_to_98",
-    "relief": "slope_aware_normalized_grayscale_preview"
-  },
-  "caveats": [
-    "Preview relief is sampled into procedural geometry only.",
-    "Full terrain import still requires clipping, reprojection, conditioning, and Unreal heightfield or landscape import."
-  ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:dd903ed1ec7745648f9fe2475017793fa8d79574dc61690b2a89547217078a20
+size 869

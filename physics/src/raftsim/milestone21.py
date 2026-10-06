@@ -25,7 +25,7 @@ FEATURE_TUNING_EDITOR_PATH = "unreal/Content/RaftSim/River/feature_tuning_editor
 SOUTH_FORK_EDITOR_PASS_PATH = "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json"
 COLORADO_ROWING_ROUTE_PATH = "unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json"
 ROUND_TRIP_VALIDATION_PATH = "unreal/Content/RaftSim/River/round_trip_validation.json"
-FEATURE_FORCING_DEFAULTS_PATH = "physics/config/feature_forcing_defaults.json"
+FEATURE_FORCING_DEFAULTS_PATH = "unreal/Plugins/SEIYGECore/python/config/feature_forcing_defaults.json"
 RAPID_REVIEW_FLOW_DIFFICULTY_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/rapid_review_flow_difficulty_mapping.json"
 )
@@ -44,7 +44,7 @@ SOUTH_FORK_WORKFLOW_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/rapid_review_editor_workflow.json"
 )
 TRACEABLE_RIVER_DATA_ASSETS_PATH = "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
-GEOSPATIAL_FORMAT_CONTRACT_PATH = "physics/config/geospatial_format_contract.json"
+GEOSPATIAL_FORMAT_CONTRACT_PATH = "unreal/Plugins/SEIYGECore/python/config/geospatial_format_contract.json"
 SOUTH_FORK_SOURCE_MANIFEST_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json"
 )

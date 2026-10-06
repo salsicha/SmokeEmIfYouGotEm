@@ -24,6 +24,7 @@
 #include "Components/SkyLightComponent.h"
 #include "Components/SphereReflectionCaptureComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "Components/SkyAtmosphereComponent.h"
 #include "Dom/JsonObject.h"
 #include "UDynamicMesh.h"
@@ -154,6 +155,8 @@
 #include "Widgets/Views/SListView.h"
 #include "Widgets/SWindow.h"
 
+class UMaterialParameterCollection;
+
 DECLARE_LOG_CATEGORY_EXTERN(LogRaftSimEditorEnvironment, Log, All);
 
 namespace RaftSimEditorEnvironment
@@ -167,14 +170,24 @@ struct FRaftSimLandscapeImportCandidateSpec
     FString HeightfieldManifestRelativePath;
     FString ImportContractRelativePath;
     FString LocalCenterlineRelativePath;
+    FString ScenarioRelativePath;
+    FString SolverVisualizationFieldRelativePath;
     FString MapPackagePath;
     int32 LandscapeSize = 1009;
     float HorizontalSpanXCm = 32300.0f;
     float HorizontalSpanYCm = 5500.0f;
     float TargetReliefCm = 1000.0f;
+    float WorldVerticalOffsetCm = 0.0f;
     bool bApplyPreviewAnalyticChannelBurn = true;
     bool bUseSolverVisualizationFields = true;
+    float SolverVisualizationDepthCapM = 6.0f;
+    float SolverVisualizationSpeedCapMps = 10.0f;
+    float SolverVisualizationFroudeCap = 7.0f;
+    float SolverVisualizationSurfaceReliefCapM = 4.0f;
+    float SolverVisualizationLateralMinM = -19.0f;
+    float SolverVisualizationLateralMaxM = 19.0f;
     bool bPhysicalScaleSourceCorridor = false;
+    bool bUseDensePhysicalTerrainRenderSurface = true;
     bool bEnableLandscapeNanite = true;
 };
 
@@ -212,6 +225,7 @@ struct FRaftSimLandscapeCandidateWaterSettings
     float Specular = 0.45f;
     float Opacity = 0.30f;
     float NormalIntensity = 0.62f;
+    float SurfaceVariationStrength = 0.0f;
     float RefractionIor = 1.333f;
     float PhaseG = 0.15f;
     float VertexTintWeight = 0.65f;
@@ -227,6 +241,10 @@ struct FRaftSimLandscapeCandidateWaterSettings
     float SolverSpeedVisualGain = 1.50f;
     float SolverFroudeVisualGain = 3.00f;
     float SolverSurfaceReliefScale = 0.09f;
+    int32 RibbonCrossSectionSteps = 32;
+    float AnalyticChopScale = 0.22f;
+    float CrossCurrentChopAmplitudeCm = 0.0f;
+    float EmbeddedAerationWeight = 0.0f;
     FLinearColor SurfaceTint = FLinearColor(0.025f, 0.115f, 0.095f, 0.0f);
     FLinearColor SolverDeepWaterTint = FLinearColor(0.012f, 0.072f, 0.060f, 0.0f);
     FLinearColor SolverAerationTint = FLinearColor(0.74f, 0.82f, 0.76f, 0.0f);
@@ -663,6 +681,30 @@ struct FRaftSimLandscapeImportCandidateResult
     int32 NaniteMaterialAuditErrorCount = 0;
     int32 DressingAssetCount = 0;
     int32 DressingBoulderInstanceCount = 0;
+    int32 DressingTemperateWaterlineTargetInstanceCount = 0;
+    int32 DressingTemperateWaterlineInstanceCount = 0;
+    int32 DressingTemperateWaterlineRejectedPlacementCount = 0;
+    float DressingTemperateWaterlineMinimumCenterlineDistanceCm = 0.0f;
+    float DressingTemperateWaterlineMaximumSlopeDegrees = 0.0f;
+    int32 DressingTemperateNearBankTargetInstanceCount = 0;
+    int32 DressingTemperateNearBankInstanceCount = 0;
+    int32 DressingTemperateNearBankRejectedPlacementCount = 0;
+    float DressingTemperateNearBankMinimumCenterlineDistanceCm = 0.0f;
+    float DressingTemperateNearBankMaximumSlopeDegrees = 0.0f;
+    int32 DressingChilkoOrganicShorelineGravelTargetInstanceCount = 0;
+    int32 DressingChilkoOrganicShorelineGravelInstanceCount = 0;
+    int32 DressingChilkoOrganicShorelineGravelRejectedPlacementCount = 0;
+    float DressingChilkoOrganicShorelineGravelMinimumCenterlineDistanceCm = 0.0f;
+    float DressingChilkoOrganicShorelineGravelMaximumSlopeDegrees = 0.0f;
+    int32 DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount = 0;
+    int32 DressingChilkoOrganicShorelineGroundCoverInstanceCount = 0;
+    int32 DressingChilkoOrganicShorelineGroundCoverRejectedPlacementCount = 0;
+    float DressingChilkoOrganicShorelineGroundCoverMinimumCenterlineDistanceCm = 0.0f;
+    float DressingChilkoOrganicShorelineGroundCoverMaximumSlopeDegrees = 0.0f;
+    int32 DressingRunnableLaunchTalusTargetInstanceCount = 0;
+    int32 DressingRunnableLaunchTalusInstanceCount = 0;
+    int32 DressingRunnableLaunchTalusRejectedPlacementCount = 0;
+    float DressingRunnableLaunchTalusMaximumSlopeDegrees = 0.0f;
     int32 DressingFoliageInstanceCount = 0;
     int32 DressingTrunkInstanceCount = 0;
     int32 DressingCanopyTreeInstanceCount = 0;
@@ -684,6 +726,18 @@ struct FRaftSimLandscapeImportCandidateResult
     bool bDressingExternalRockMaterialsValidated = false;
     int32 DressingExternalPineMeshCount = 0;
     bool bDressingExternalPineMaterialsValidated = false;
+    int32 DressingFutaleufuScannedUnderstoryMeshCount = 0;
+    int32 DressingFutaleufuScannedUnderstoryInstanceCount = 0;
+    bool bDressingFutaleufuScannedUnderstoryMaterialsValidated = false;
+    int32 DressingPacuareScannedFernMeshCount = 0;
+    int32 DressingPacuareScannedFernInstanceCount = 0;
+    bool bDressingPacuareScannedFernMaterialsValidated = false;
+    int32 DressingPacuareForestFloorMeshCount = 0;
+    int32 DressingPacuareForestFloorTargetInstanceCount = 0;
+    int32 DressingPacuareForestFloorInstanceCount = 0;
+    int32 DressingPacuareForestFloorRejectedPlacementCount = 0;
+    float DressingPacuareForestFloorMinimumCenterlineDistanceCm = 0.0f;
+    float DressingPacuareForestFloorMaximumSlopeDegrees = 0.0f;
     bool bDressingExternalBroadleafReviewAssetLoaded = false;
     bool bDressingExternalBroadleafMaterialsValidated = false;
     bool bDressingExternalConiferReviewAssetLoaded = false;
@@ -692,6 +746,17 @@ struct FRaftSimLandscapeImportCandidateResult
         TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static");
     FString DressingConiferAssetPath =
         TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static");
+    FString DressingShrubAssetPath =
+        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static");
+    FString DressingUnderstoryAssetPath =
+        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static");
+    FString DressingBroadleafVariantAssetPath;
+    FString DressingConiferVariantAssetPath;
+    FString DressingShrubVariantAssetPath;
+    FString DressingUnderstoryVariantAssetPath;
+    FString DressingFoliageMaterialAssetPath;
+    FString DressingUnderstoryFoliageMaterialAssetPath;
+    bool bDressingUsesOpaqueVolumetricVegetation = false;
     bool bDressingValidated = false;
     FString WaterMaterialPath;
     int32 WaterMaterialBoundComponentCount = 0;
@@ -745,6 +810,25 @@ inline constexpr int32 FutaleufuCoigueLeavesPerTertiaryBranch = 4;
 inline constexpr int32 FutaleufuCoigueAttachedLeavesPerBranchlet =
     FutaleufuCoigueMainLeavesPerBranchlet +
     FutaleufuCoigueTertiaryBranchesPerBranchlet * FutaleufuCoigueLeavesPerTertiaryBranch;
+
+// The Zambezi upper-gorge evidence reach (Boiling Pot to Stairway to Heaven,
+// Cartesian live water; L_ZambeziUpperGorge) is a separate candidate beside
+// the 30 km L_Zambezi. It owns its generated assets (names derive from this
+// id) but reuses the Zambezi look settings, textures and materials, which it
+// only loads.
+inline const TCHAR* const ZambeziUpperGorgeRiverId = TEXT("zambezi_upper_gorge");
+
+inline bool IsZambeziUpperGorgeRiverId(const FString& RiverId)
+{
+    return RiverId == ZambeziUpperGorgeRiverId;
+}
+
+// River id whose per-river look settings (water, capture, foliage, material)
+// apply: the upper gorge uses the Zambezi ones.
+inline FString ResolveLookSettingsRiverId(const FString& RiverId)
+{
+    return IsZambeziUpperGorgeRiverId(RiverId) ? FString(TEXT("zambezi_batoka_gorge")) : RiverId;
+}
 
 FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const FString& RiverId);
 
@@ -828,6 +912,9 @@ FVector2D SampleLandscapeCandidateCenterlineWorld(
     float Progress,
     FVector2D* OutTangent = nullptr);
 
+float GetLandscapeCandidateWorldMinX(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate);
+
 bool SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points,
@@ -874,6 +961,28 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     FString& OutSummary);
 
+/** Two drifting world-position projections and the noise mask that picks
+ * between them, so a world-aligned wall rock never repeats on a lattice. */
+struct FRaftSimWallRockBreakup
+{
+    UMaterialExpression* PositionA = nullptr;
+    UMaterialExpression* PositionB = nullptr;
+    UMaterialExpression* Blend = nullptr;
+};
+
+FRaftSimWallRockBreakup BuildWallRockBreakup(UMaterial* Material);
+
+/** One world-aligned (triplanar) sample of a wall rock texture; WorldPosition
+ * may be null for the engine's own. Returns the call; OutIndex its XYZ output. */
+UMaterialExpression* AddWorldAlignedWallRock(UMaterial* Material, UTexture2D* Texture, EMaterialSamplerType SamplerType,
+                                             const TCHAR* Name, float TileCm, bool bNormal,
+                                             UMaterialExpression* WorldPosition, int32& OutIndex);
+
+/** A wall rock texture sampled from both breakup projections and blended. */
+UMaterialExpression* AddBrokenUpWallRock(UMaterial* Material, const FRaftSimWallRockBreakup& Breakup, UTexture2D* Texture,
+                                         EMaterialSamplerType SamplerType, const TCHAR* Name, float TileCm, bool bNormal,
+                                         int32& OutIndex);
+
 UMaterialInterface* LoadOrCreatePreviewVertexColorMaterial();
 
 UMaterialInterface* LoadOrCreatePreviewTerrainVertexColorMaterial();
@@ -883,11 +992,160 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     bool bBatokaTerrainIntegratedReview = false,
     bool bBatokaWorldAlignedReview = false);
 
+UMaterialExpression* BuildBatokaOrganicBasaltBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor,
+    UMaterialExpression* PrimaryMacroAlbedo,
+    int32 PrimaryMacroOutputIndex,
+    UMaterialExpression* SecondaryMacroAlbedo,
+    int32 SecondaryMacroOutputIndex,
+    UMaterialExpression* DetailAlbedo,
+    int32 DetailOutputIndex);
+
+UMaterialExpression* BuildBatokaOrganicBasaltColorCoverage(
+    UMaterial* Material,
+    UMaterialExpression* RockSlopeMask);
+
+UMaterialExpression* BuildPacuareOrganicRainforestBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor);
+
+UMaterialExpression* BuildSouthForkOrganicFoothillBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor,
+    float DefaultPaletteWeight);
+
+UMaterialExpression* BuildColoradoOrganicHanceBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor);
+
+UMaterialExpression* BuildFutaleufuOrganicTemperateBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor);
+
+UMaterialExpression* BuildChilkoOrganicLavaCanyonBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor,
+    UMaterialExpression* RotatedDetailAlbedo,
+    UMaterialExpression* WetBankMask);
+
+struct FZambeziBatokaVisualMorphologyStats
+{
+    int32 VisualTileCount = 0;
+    int64 TotalVertexCount = 0;
+    int64 ModifiedVertexCount = 0;
+    int64 NearBankModifiedVertexCount = 0;
+    int64 ReconstructedVertexCount = 0;
+    int64 ReconstructedInsideProtectedRadiusVertexCount = 0;
+    int64 UpperCliffModifiedInsideProtectedRadiusVertexCount = 0;
+    int64 NormalReliefVertexCount = 0;
+    int64 NormalReliefInsideProtectedRadiusVertexCount = 0;
+    int64 ProtectedRiverCorridorVertexCount = 0;
+    int64 RejectedLowSlopeVertexCount = 0;
+    double AbsoluteOffsetSumCm = 0.0;
+    double AbsoluteReconstructionOffsetSumCm = 0.0;
+    double AbsoluteHorizontalReliefSumCm = 0.0;
+    float ProtectedShorelineRadiusCm = 0.0f;
+    float FullStrengthMorphologyRadiusCm = 0.0f;
+    float MinimumModifiedCenterlineDistanceCm = TNumericLimits<float>::Max();
+    float MinimumOffsetCm = TNumericLimits<float>::Max();
+    float MaximumOffsetCm = TNumericLimits<float>::Lowest();
+    float MaximumAbsoluteReconstructionOffsetCm = 0.0f;
+    float MaximumAbsoluteHorizontalReliefCm = 0.0f;
+    float MinimumReconstructedInsideRadiusHeightAboveWaterCm =
+        TNumericLimits<float>::Max();
+    float MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm =
+        TNumericLimits<float>::Max();
+    float MinimumNormalReliefInsideRadiusHeightAboveWaterCm =
+        TNumericLimits<float>::Max();
+};
+
+struct FZambeziAdaptiveNearFieldTerrainStats
+{
+    int32 ActorCount = 0;
+    int64 VertexCount = 0;
+    int64 TriangleCount = 0;
+    int64 DryShorelineInfillVertexCount = 0;
+    int64 RefinedVertexCount = 0;
+    int64 UpperDryScarpRefinedVertexCount = 0;
+    int64 PlanarJitteredVertexCount = 0;
+    int64 TopologyCandidateCellCount = 0;
+    int64 TopologyRejectedCellCount = 0;
+    int64 WetBankVertexCount = 0;
+    int32 ShadowSuppressedActorCount = 0;
+    int32 CollisionEnabledActorCount = 0;
+    float LongitudinalSpacingCm = 0.0f;
+    float LateralSpacingCm = 0.0f;
+    float MaximumDryShorelineInfillCm = 0.0f;
+    float MinimumRenderedHeightAboveWaterCm = TNumericLimits<float>::Max();
+    float MaximumAbsoluteRefinementCm = 0.0f;
+    float MaximumAbsoluteUpperDryScarpRefinementCm = 0.0f;
+    float MinimumUpperDryScarpHeightAboveWaterCm = TNumericLimits<float>::Max();
+    float MaximumPlanarJitterCm = 0.0f;
+    float MinimumPlanarCellAreaCm2 = TNumericLimits<float>::Max();
+    float MaximumWetBankMask = 0.0f;
+    float MaximumWetBankHeightAboveWaterCm = 0.0f;
+};
+
+bool ApplyZambeziBatokaVisualTerrainTreatment(
+    UWorld* World,
+    UMaterialInterface* TerrainMaterial,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    bool bApplyVisualMorphology,
+    FZambeziBatokaVisualMorphologyStats* OutStats,
+    FString& OutSummary);
+
 UMaterialInterface* LoadOrCreatePreviewTranslucentColorMaterial();
 
 UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial();
 
-UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSummary);
+UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
+    FString& OutSummary,
+    bool bUseSingleLayerWater = false,
+    bool bUseIsolatedZambeziParent = false);
+
+UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary);
+
+// Isolated per-river parent; preserves the shared water's physical interfaces.
+UMaterial* LoadOrCreateCurrentGradientWaterParent(
+    UMaterial* Shared, const FString& Path, const FString& RiverLabel,
+    float FoamCutoff, float NormalStrength, FString& Summary,
+    bool bPreserveFoamCutoff = false);
+
+UMaterialInstanceConstant* LoadOrCreatePacuareUpperHuacasLiveWaterInstance(
+    FString& OutSummary);
+
+UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary);
+
+UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
+    FString& OutSummary);
+
+UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary);
+
+UMaterialInstanceConstant* LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
+    FString& OutSummary);
+
+UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary);
+
+UMaterialInstanceConstant* LoadOrCreateColoradoHanceLiveWaterInstance(
+    FString& OutSummary);
+
+UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterV2Instance(
+    FString& OutSummary);
+
+bool CaptureColoradoHanceWaterReview(FString& OutSummary);
+
+/**
+ * Write the station-indexed support band fields (baked water elevation + band
+ * energy per flow band) beside the cooked flow fields, for rigid raft support
+ * to mirror the authored band water at runtime.
+ */
+bool ExportSouthForkSupportBandFields(FString& OutSummary);
+
+UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
+    FString& OutSummary);
+
+UMaterialInterface* LoadOrCreateReadableRaftFloorMaterial(FString& OutSummary);
 
 UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& OutSummary);
 
@@ -1024,6 +1282,13 @@ UMaterialInstanceDynamic* CreatePreviewColorMaterial(UObject* Outer, const FLine
 UMaterialInstanceDynamic* CreatePreviewTranslucentColorMaterial(UObject* Outer, const FLinearColor& Color, float Opacity);
 
 TArray<FVector> ComputePreviewMeshNormals(const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
+
+/** Smooth normals for a row-major heightfield grid. Central differences avoid
+ * the alternating diagonal bias produced by triangle-averaged normals on the
+ * coarse visual terrain overlay. */
+TArray<FVector> ComputePreviewGridHeightfieldNormals(
+    const TArray<FVector>& Vertices,
+    int32 RowSize);
 
 bool LoadPreviewPngImage(const FString& RelativePath, FRaftSimPreviewImage& OutImage);
 
@@ -2086,9 +2351,31 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     ALandscape* Landscape,
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     UMaterialInterface* WaterMaterial,
+    const FRaftSimPreviewImage* SolverVisualizationFields,
+    UMaterialInterface* SolverFoamMaterial,
     FString& OutSummary);
 
 AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary);
+
+bool AddZambeziAdaptiveNearFieldTerrain(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    UMaterialInterface* TerrainMaterial,
+    FZambeziAdaptiveNearFieldTerrainStats& OutStats,
+    FString& OutSummary);
+
+bool AddLandscapeCandidateScenarioMarkers(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary);
+
+bool AddLandscapeCandidateRunnableGameplay(
     UWorld* World,
     ALandscape* Landscape,
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
@@ -2103,7 +2390,473 @@ void RepositionLandscapeCandidatePhysicalCameras(
 bool BuildLandscapeImportCandidateMap(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     FRaftSimLandscapeImportCandidateResult& OutResult,
+    FString& OutSummary,
+    bool bReuseSharedSolverPresentationAssets = false);
+
+float ComputeSouthForkInferredFarFieldReliefM(
+    double WorldXM,
+    double WorldYM,
+    float SourceSlope);
+
+struct FSouthForkBankMicroreliefSample
+{
+    bool bEligible = false;
+    float VerticalDisplacementCm = 0.0f;
+    float CombinedFade = 0.0f;
+};
+
+FSouthForkBankMicroreliefSample ComputeSouthForkBankMicroreliefSample(
+    double WorldXM,
+    double WorldYM,
+    float StationM,
+    float LateralM,
+    float SourceSlope,
+    float WetMask,
+    float PatchEdgeDistanceM);
+
+TSharedRef<FJsonObject> BuildSouthForkBankMicroreliefManifest();
+
+float ComputeSouthForkFarFieldCorridorReliefWeight(
+    const FRaftSimPreviewImage& CorridorExclusionMask,
+    int32 Row,
+    int32 Column);
+
+FLinearColor DecodeSouthForkPreviewSrgbColor(const FLinearColor& Encoded);
+float DecodeSouthForkHeightM(
+    uint16 Encoded,
+    double MinimumM,
+    double MaximumM);
+
+FLinearColor CompleteSouthForkShorelinePresentation(
+    FLinearColor HydraulicPresentation,
+    float ShorelineDepthM,
+    int64& InOutCompletionVertexCount);
+
+bool ConditionSouthForkDryWaterSurfaceRow(
+    const TArray<FLinearColor>& SourceHydraulicPresentation,
+    TArray<float>& InOutSurfaceElevationsM,
+    int32& OutLeftWetColumn,
+    int32& OutRightWetColumn);
+
+bool PrepareSouthForkWaterSurfaceRow(
+    const TArray<uint16>& EncodedSurfaceHeights,
+    const TArray<FLinearColor>& SourceHydraulicPresentation,
+    int32 Width,
+    int32 Row,
+    double MinimumElevationM,
+    double MaximumElevationM,
+    TArray<float>& OutSurfaceElevationsM,
+    TArray<FLinearColor>& OutHydraulicPresentation,
+    int32& OutLeftWetColumn,
+    int32& OutRightWetColumn);
+
+bool ShouldEmitSouthForkShorelineCell(
+    const FLinearColor& I0,
+    const FLinearColor& I1,
+    const FLinearColor& I2,
+    const FLinearColor& I3,
+    float I0ShorelineDepthM,
+    float I1ShorelineDepthM,
+    float I2ShorelineDepthM,
+    float I3ShorelineDepthM,
+    int64& InOutTransitionCellCount);
+
+bool RefineSouthForkWaterPresentationGrid(
+    int32 SubdivisionFactor,
+    int32& InOutWidth,
+    int32& InOutHeight,
+    TArray<FVector>& InOutVertices,
+    TArray<FVector2D>& InOutUvs,
+    TArray<FLinearColor>& InOutColors,
+    TArray<float>& InOutShorelineDepthsM);
+
+bool SmoothSouthForkWaterVisibilityLongitudinally(
+    int32 Radius,
+    int32 Width,
+    int32 Height,
+    TArray<FLinearColor>& InOutHydraulicPresentation);
+
+bool BuildSouthForkTerrainClippedWaterGeometry(
+    const TArray<FVector>& GridVertices,
+    const TArray<FVector2D>& GridUvs,
+    const TArray<FLinearColor>& GridColors,
+    const TArray<float>& GridShorelineDepthsM,
+    int32 GridWidth,
+    int32 GridHeight,
+    TArray<FVector>& OutVertices,
+    TArray<int32>& OutTriangles,
+    TArray<FVector2D>& OutUvs,
+    TArray<FLinearColor>& OutColors,
+    TArray<FVector>& OutNormals,
+    TArray<FProcMeshTangent>& OutTangents,
+    int64& InOutTransitionCellCount);
+
+bool ApplySouthForkWaterPresentationMicroRelief(
+    TArray<FVector>& InOutVertices,
+    const TArray<FVector2D>& Uvs,
+    const TArray<FLinearColor>& HydraulicPresentation,
+    const TArray<float>& ShorelineDepthsM,
+    float& OutMaximumAbsoluteDisplacementCm);
+
+struct FSouthForkAeratedWaterOverlaySample
+{
+    float Opacity = 0.0f;
+    float VerticalDisplacementCm = 0.0f;
+    FLinearColor Color = FLinearColor::Transparent;
+};
+
+FSouthForkAeratedWaterOverlaySample ComputeSouthForkAeratedWaterOverlaySample(
+    const FLinearColor& HydraulicPresentation,
+    float ShorelineDepthM,
+    float StationM,
+    float LateralM);
+
+bool BuildSouthForkRefinedWhitewaterOverlayGeometry(
+    const TArray<FVector>& BaseVertices,
+    const TArray<FVector2D>& BaseUvs,
+    const TArray<FLinearColor>& BaseHydraulicPresentation,
+    const TArray<float>& BaseShorelineDepthsM,
+    int32 BaseWidth,
+    int32 BaseHeight,
+    TArray<FVector>& OutVertices,
+    TArray<int32>& OutTriangles,
+    TArray<FVector2D>& OutUvs,
+    TArray<FLinearColor>& OutColors,
+    int32& OutWidth,
+    int32& OutHeight);
+
+UTexture2D* LoadSouthForkTerrainMacroTextureForReuse(
+    const FString& TileId,
+    FString& OutSummary);
+
+UMaterialInstanceConstant* CreateSouthForkTerrainMaterialInstance(
+    const FString& TileId,
+    UMaterialInterface* Parent,
+    UTexture2D* SourceMacroTexture,
+    bool bUseCorridorEdgeBlend,
+    FString& OutSummary);
+
+bool ConfigureSouthForkFarFieldTerrainActor(AStaticMeshActor* Actor);
+
+bool CreateSouthForkGeneratedCanopyAssets(
+    UWorld* World,
+    UStaticMesh*& OutPonderosaMeshA,
+    UStaticMesh*& OutPonderosaMeshB,
+    UStaticMesh*& OutPonderosaMeshC,
+    UStaticMesh*& OutInteriorLiveOakMesh,
+    UStaticMesh*& OutWhiteAlderMesh,
+    UStaticMesh*& OutDeerbrushMesh,
+    FString& OutSummary);
+
+bool FindSouthForkMedianWaterSurfaceLocalZCm(
+    UWorld* World,
+    const FVector2D& WorldLocationM,
+    float& OutSurfaceLocalZCm);
+
+void ConfigureSouthForkSettledSourceCaptureVisibility(
+    UWorld* World,
+    TArray<TPair<TWeakObjectPtr<UPrimitiveComponent>, bool>>& OutVisibilityStates,
+    FString& OutSummary);
+
+void RestoreSouthForkSettledSourceCaptureVisibility(
+    const TArray<TPair<TWeakObjectPtr<UPrimitiveComponent>, bool>>& VisibilityStates);
+
+bool ConfigureSouthForkTerrainDetailV2Review(
+    UWorld* World,
+    TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>&
+        OutMaterialStates,
+    FString& OutSummary);
+
+void RestoreSouthForkTerrainDetailV2Review(
+    const TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>&
+        MaterialStates);
+
+struct FSouthForkShoreRockReviewComponentState
+{
+    TWeakObjectPtr<UHierarchicalInstancedStaticMeshComponent> Component;
+    TWeakObjectPtr<UStaticMesh> OriginalMesh;
+    TArray<FTransform> OriginalWorldTransforms;
+    TArray<TWeakObjectPtr<UMaterialInterface>> OriginalOverrideMaterials;
+};
+
+bool ConfigureSouthForkPolyHavenShoreRockReview(
+    UWorld* World,
+    TArray<FSouthForkShoreRockReviewComponentState>& OutStates,
+    FString& OutSummary);
+
+void RestoreSouthForkPolyHavenShoreRockReview(
+    const TArray<FSouthForkShoreRockReviewComponentState>& States);
+
+bool ConfigureSouthForkDerivedBankMorphologyReview(
+    UWorld* World,
+    TArray<TWeakObjectPtr<AActor>>& OutActors,
+    FString& OutSummary);
+
+bool ConfigureSouthForkScannedBankKitReview(
+    UWorld* World,
+    TArray<TWeakObjectPtr<AActor>>& OutActors,
+    FString& OutSummary);
+
+bool ConfigureSouthForkMeatGrinderHeroReview(
+    UWorld* World,
+    TArray<TWeakObjectPtr<AActor>>& OutActors,
+    FString& OutSummary);
+
+bool ConfigureSouthForkDisplacedGravelBarReview(
+    UWorld* World,
+    TArray<TWeakObjectPtr<AActor>>& OutActors,
+    FString& OutSummary);
+
+void RestoreSouthForkDerivedBankMorphologyReview(
+    const TArray<TWeakObjectPtr<AActor>>& Actors);
+
+bool ConfigureSouthForkFullReachReviewLayers(
+    UWorld* World,
+    TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>&
+        OutTerrainMaterialStates,
+    TArray<FSouthForkShoreRockReviewComponentState>& OutRockStates,
+    TArray<TWeakObjectPtr<AActor>>& OutDerivedBankActors,
+    FString& OutSummary);
+
+void RestoreSouthForkFullReachReviewLayers(
+    const TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>&
+        TerrainMaterialStates,
+    const TArray<FSouthForkShoreRockReviewComponentState>& RockStates,
+    const TArray<TWeakObjectPtr<AActor>>& DerivedBankActors);
+
+bool CaptureSouthForkView(
+    UWorld* World,
+    const FString& CaptureId,
+    const FVector& CameraLocation,
+    const FRotator& CameraRotation,
+    FString& OutRelativePath,
+    FString& OutSummary);
+
+bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary);
+
+TSharedRef<FJsonObject> BuildSouthForkInferredFarFieldReliefManifest();
+
+struct FSouthForkBoulderPresentationFootprint
+{
+    float StationM = 0.0f;
+    float LateralM = 0.0f;
+    float RadiusM = 0.0f;
+};
+
+UMaterialInterface* BuildSouthForkBoulderDressingMaterial(FString& OutSummary);
+
+bool LoadSouthForkProductionRockPresentation(
+    UStaticMesh*& OutMesh,
+    UMaterialInterface*& OutMaterial,
+    FString& OutSummary);
+
+bool LoadSouthForkProductionWaterPresentation(
+    UMaterialInterface*& InOutMaterial,
+    FString& OutSummary);
+
+bool CreateSouthForkShoreCobbleAssets(
+    UWorld* World,
+    UMaterialInterface* Material,
+    bool bReuseExistingAssets,
+    UStaticMesh* (&OutMeshes)[3],
+    FString& OutSummary);
+
+void CreateSouthForkShoreCobbleComponents(
+    AActor* Owner,
+    USceneComponent* Root,
+    UStaticMesh* const* Meshes,
+    UHierarchicalInstancedStaticMeshComponent* (&OutComponents)[3]);
+
+int32 AddSouthForkShoreCobbleInstances(
+    UHierarchicalInstancedStaticMeshComponent* const* Components,
+    const FVector& GroundLocation,
+    const FVector2D& LeftNormal,
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope);
+
+int32 AddSouthForkBankUnderstoryInstance(
+    UHierarchicalInstancedStaticMeshComponent* Understory,
+    const FVector& GroundLocation,
+    const FVector2D& LeftNormal,
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope,
+    const FLinearColor& SourceDensity);
+
+struct FSouthForkGroundCoverPlacement
+{
+    bool bAccepted = false;
+    int32 ClusterCount = 0;
+    float BaseScale = 1.0f;
+};
+
+bool CreateSouthForkGroundCoverAssets(
+    UWorld* World,
+    bool bReuseExistingAssets,
+    UStaticMesh*& OutGrassTuftMesh,
+    UMaterialInterface*& OutGrassMaterial,
+    FString& OutSummary);
+
+FSouthForkGroundCoverPlacement ComputeSouthForkGroundCoverPlacement(
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope,
+    const FLinearColor& SourceDensity,
+    const FVector& GroundLocation);
+
+int32 AddSouthForkGroundCoverInstances(
+    UHierarchicalInstancedStaticMeshComponent* GroundCover,
+    const FVector& GroundLocation,
+    const FVector& GroundNormal,
+    const FVector2D& LeftNormal,
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope,
+    const FLinearColor& SourceDensity);
+
+int32 AddSouthForkScannedGroundCoverInstances(
+    UHierarchicalInstancedStaticMeshComponent* const* GroundCoverComponents,
+    int32 GroundCoverComponentCount,
+    const FVector& GroundLocation,
+    const FVector& GroundNormal,
+    const FVector2D& LeftNormal,
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope,
+    const FLinearColor& SourceDensity);
+
+FVector GetSouthForkScannedGroundCoverScaleCalibration(int32 VariantIndex);
+
+TArray<FVector> BuildSouthForkSmoothedTerrainPresentationNormals(
+    const TArray<FVector>& Vertices,
+    int32 Width,
+    int32 Height,
+    int32 Radius);
+
+void SelectSouthForkDetailedFoliage(
+    UHierarchicalInstancedStaticMeshComponent* const* Conifers,
+    UHierarchicalInstancedStaticMeshComponent* Broadleaf,
+    UHierarchicalInstancedStaticMeshComponent* Riparian,
+    UHierarchicalInstancedStaticMeshComponent* Understory,
+    const FLinearColor& SourceDensity,
+    float LateralM,
+    int32 CoordinateIndex,
+    int32 Column,
+    UHierarchicalInstancedStaticMeshComponent*& OutTarget,
+    float& OutProbability,
+    float& OutBaseScale);
+
+bool ShouldSuppressSouthForkBoulderPresentation(
+    const TArray<FSouthForkBoulderPresentationFootprint>& AcceptedFootprints,
+    float StationM,
+    float LateralM,
+    float RadiusM);
+
+struct FSouthForkFullReachBuildMetrics
+{
+    int32 TerrainTileCount = 0;
+    int32 BankMicroreliefPatchCount = 0;
+    int32 WaterTileCount = 0;
+    int32 WhitewaterFoamActorCount = 0;
+    int32 TerminalVisualWaterActorCount = 0;
+    int32 FarFieldPatchCount = 0;
+    int32 FoliageInstanceCount = 0;
+    int32 FarFieldFoliageInstanceCount = 0;
+    int32 FarFieldDetailedPineInstanceCount = 0;
+    int32 FarFieldPineCardInstanceCount = 0;
+    int32 BoulderInstanceCount = 0;
+    int32 BoulderOverlapSuppressedInstanceCount = 0;
+    int32 ScenicRockInstanceCount = 0;
+    int32 ShoreCobbleInstanceCount = 0;
+    int32 GroundCoverInstanceCount = 0;
+    int32 Cc0ScannedGroundCoverInstanceCount = 0;
+    int32 SprayMistInstanceCount = 0;
+    int32 InfrastructureActorCount = 0;
+    int32 ReflectionProbeCount = 0;
+    int32 StableActorIdentityCount = 0;
+    int64 TerrainTriangleCount = 0;
+    int64 BankMicroreliefVertexCount = 0;
+    int64 BankMicroreliefTriangleCount = 0;
+    float BankMicroreliefMaximumDisplacementCm = 0.0f;
+    int64 WaterTriangleCount = 0;
+    int64 WhitewaterFoamTriangleCount = 0;
+    int64 ProceduralShorelineCompletionVertexCount = 0;
+    int64 ProceduralShorelineTransitionCellCount = 0;
+    int64 TerminalVisualWaterTriangleCount = 0;
+    int64 FarFieldTriangleCount = 0;
+    TArray<float> MedianCenterWaterLocalZCm;
+};
+
+TArray<FProcMeshTangent> BuildSouthForkFlowTangents(
+    const TArray<FVector>& Vertices,
+    int32 Width,
+    int32 Height);
+
+UStaticMesh* CreateSouthForkMeshAsset(
+    UWorld* World,
+    const FString& AssetPackagePath,
+    const FString& Label,
+    const TArray<FVector>& Vertices,
+    const TArray<int32>& Triangles,
+    const TArray<FVector>& Normals,
+    const TArray<FVector2D>& UVs,
+    const TArray<FLinearColor>& VertexColors,
+    const TArray<FProcMeshTangent>& Tangents,
+    UMaterialInterface* Material,
+    bool bEnableNanite,
+    bool bComplexCollision,
+    FString& OutSummary,
+    bool bPreserveNaniteFallbackTopology = false);
+
+AStaticMeshActor* PlaceSouthForkStaticMeshActor(
+    UWorld* World,
+    UStaticMesh* Mesh,
+    UMaterialInterface* Material,
+    const FString& Label,
+    const FTransform& Transform,
+    FName Tag,
+    ECollisionEnabled::Type Collision);
+
+void ConfigureSouthForkSingleLayerWaterActor(AStaticMeshActor* Actor);
+
+UStaticMesh* LoadSouthForkStaticMeshAsset(const FString& AssetPackagePath);
+
+void LogStaticMeshVertexColorSummary(const FString& Label, UStaticMesh* Mesh);
+
+UTexture2D* CreateSouthForkTerrainMacroTexture(
+    const FString& TileId,
+    const FString& SourceRelativePath,
+    FString& OutSummary);
+
+bool WriteSouthForkFullReachBuildManifest(
+    UWorld* World,
+    const FSouthForkFullReachBuildMetrics& Metrics,
+    bool bReuseExistingDetailedMeshes,
+    bool bAllCapturesSaved,
+    const TArray<FString>& CapturePaths,
     FString& OutSummary);
 
 bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString& OutSummary);
 } // namespace RaftSimEditorEnvironment
+
+namespace RaftSimPhotorealMaterials
+{
+bool BuildSouthForkWaterTextureAssets();
+bool BuildPacuareUpperHuacasWaterTextureAssets();
+bool BuildColoradoHanceWaterTextureAssets();
+bool BuildFutaleufuTerminatorWaterTextureAssets();
+bool BuildChilkoLavaCanyonWaterTextureAssets();
+bool BuildZambeziBatokaWaterTextureAssets();
+bool BuildCrewSkinTextureAssets();
+bool BuildEquipmentTextileTextureAssets();
+bool PromoteReviewedScannedUnderstoryMaterials(FString& OutSummary);
+bool CreatePhotorealRiverWaterMaterial(FString& OutSummary);
+bool CreateLiveRiverSurfaceMaterial(FString& OutSummary);
+bool CreateWaterVfxMaterial(FString& OutSummary);
+}

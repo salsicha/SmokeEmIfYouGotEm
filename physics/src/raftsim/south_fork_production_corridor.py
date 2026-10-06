@@ -406,12 +406,21 @@ def _write_source_material_maps(
     }
 
 
-def build_south_fork_chili_bar_production_corridor(repo_root: Path) -> dict[str, object]:
-    """Validate source exports and generate physical-scale Unreal corridor inputs."""
+def build_south_fork_chili_bar_production_corridor(
+    repo_root: Path, output_dir: Path | None = None
+) -> dict[str, object]:
+    """Validate source exports and generate physical-scale Unreal corridor inputs.
+
+    Sources are always read from the committed corridor root. Outputs are
+    written there too by default (the evidence-machine regeneration flow);
+    tests pass ``output_dir`` so regeneration never mutates the repo tree.
+    Recorded manifest paths stay canonical either way.
+    """
 
     repo_root = repo_root.resolve()
     corridor_root = repo_root / CORRIDOR_RELATIVE_ROOT
-    derived_root = corridor_root / "derived"
+    output_root = output_dir.resolve() if output_dir is not None else corridor_root
+    derived_root = output_root / "derived"
     derived_root.mkdir(parents=True, exist_ok=True)
     dem_path = corridor_root / DEM_RELATIVE_PATH
     naip_path = corridor_root / NAIP_RELATIVE_PATH
@@ -435,7 +444,7 @@ def build_south_fork_chili_bar_production_corridor(repo_root: Path) -> dict[str,
     heightfield_path = derived_root / "south_fork_chili_bar_reach_heightfield_2017.png"
     hillshade_path = derived_root / "south_fork_chili_bar_reach_hillshade_2048.png"
     alignment_path = derived_root / "south_fork_chili_bar_reach_naip_centerline_2048.png"
-    centerline_path = corridor_root / "centerline_local.json"
+    centerline_path = output_root / "centerline_local.json"
 
     source_centerline = _load_reach_centerline(repo_root)
     source_centerline_mercator = [
@@ -539,7 +548,7 @@ def build_south_fork_chili_bar_production_corridor(repo_root: Path) -> dict[str,
         "bounds_epsg3857": [xmin, ymin, xmax, ymax],
         "ground_span_m_approx": [ground_width_m, ground_height_m],
         "unreal_landscape": {
-            "heightfield": str(heightfield_path.relative_to(repo_root)),
+            "heightfield": str(CORRIDOR_RELATIVE_ROOT / "derived" / heightfield_path.name),
             "heightfield_size_px": [LANDSCAPE_SIZE, LANDSCAPE_SIZE],
             "horizontal_span_cm": [ground_width_m * 100.0, ground_height_m * 100.0],
             "xy_scale_cm_per_quad": [
@@ -600,29 +609,29 @@ def build_south_fork_chili_bar_production_corridor(repo_root: Path) -> dict[str,
         },
         "derived_artifacts": {
             "heightfield": {
-                "path": str(heightfield_path.relative_to(repo_root)),
+                "path": str(CORRIDOR_RELATIVE_ROOT / "derived" / heightfield_path.name),
                 "sha256": _sha256(heightfield_path),
                 "dimensions": [LANDSCAPE_SIZE, LANDSCAPE_SIZE],
                 "pixel_format": "16_bit_grayscale_png",
             },
             "hillshade": {
-                "path": str(hillshade_path.relative_to(repo_root)),
+                "path": str(CORRIDOR_RELATIVE_ROOT / "derived" / hillshade_path.name),
                 "sha256": _sha256(hillshade_path),
                 "dimensions": [2048, 1445],
             },
             "centerline_alignment_preview": {
-                "path": str(alignment_path.relative_to(repo_root)),
+                "path": str(CORRIDOR_RELATIVE_ROOT / "derived" / alignment_path.name),
                 "sha256": _sha256(alignment_path),
                 "dimensions": [2048, 1445],
             },
             "local_centerline": {
-                "path": str(centerline_path.relative_to(repo_root)),
+                "path": str(CORRIDOR_RELATIVE_ROOT / "centerline_local.json"),
                 "sha256": _sha256(centerline_path),
                 "point_count": len(local_points),
             },
             "source_material_maps": {
                 key: {
-                    "path": str(path.relative_to(repo_root)),
+                    "path": str(CORRIDOR_RELATIVE_ROOT / "derived" / path.name),
                     "sha256": _sha256(path),
                     "dimensions": [2048, 2048],
                 }
@@ -637,6 +646,6 @@ def build_south_fork_chili_bar_production_corridor(repo_root: Path) -> dict[str,
             "Pass art, hazard readability, seasonal flow, desktop, and VR review before production promotion.",
         ],
     }
-    manifest_path = corridor_root / "manifest.json"
+    manifest_path = output_root / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest

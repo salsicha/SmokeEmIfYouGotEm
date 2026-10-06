@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from ..milestone16 import run_milestone16_raft_coupling_validation
+from ..milestone16_raft_coupling import (run_milestone16_raft_coupling_validation)
 
 
 def main(argv: list[str] | None = None) -> int:

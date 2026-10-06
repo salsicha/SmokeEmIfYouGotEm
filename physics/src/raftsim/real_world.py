@@ -5,31 +5,63 @@ from __future__ import annotations
 import json
 import math
 from datetime import date, timedelta
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Literal
 
 import numpy as np
 
-from .cascading import (
-    CaliforniaPoolDropParameters2_5D,
-    CascadingScenarioPackage2_5D,
-    DropTransitionMetadata2_5D,
-    ReachMetadata2_5D,
-    generate_california_pool_drop_cascading_scenario2_5d,
-    write_unreal_cascading_corridor_metadata,
-)
-from .scenario2_5d import (
-    BoundaryCondition2_5D,
-    Feature2_5D,
-    GridSpec2_5D,
-    InitialWaterState2_5D,
-    Probe2_5D,
-    RaftParameters2_5D,
-    Scenario2_5D,
-    ScenarioMetadata2_5D,
-)
+from .cascading import write_unreal_cascading_corridor_metadata
 from .schema_versions import SOURCE_MANIFEST_SCHEMA_VERSION
+# Names other modules import from here.
+from dataclasses import replace  # noqa: F401
+from .cascading import (  # noqa: F401
+    CaliforniaPoolDropParameters2_5D, CascadingScenarioPackage2_5D, DropTransitionMetadata2_5D,
+    ReachMetadata2_5D, generate_california_pool_drop_cascading_scenario2_5d,
+)
+from .scenario2_5d import (  # noqa: F401
+    BoundaryCondition2_5D, Feature2_5D, GridSpec2_5D, InitialWaterState2_5D, Probe2_5D,
+    RaftParameters2_5D, Scenario2_5D, ScenarioMetadata2_5D,
+)
+# Seed-scenario generators live with the solver (SEIYGE core); re-exported here.
+from .real_world_scenarios import (
+    DifficultyPreset,
+    SOURCE_MANIFEST_FILE,
+    DISCHARGE_CFS_TO_M3S,
+    BoundsWGS84,
+    CandidateRiverSection,
+    CenterlineStation,
+    ChannelIndicator,
+    RapidCandidate,
+    FlowBand,
+    PlayerSelection,
+    SolverParameterPreset,
+    default_candidate_river_inventory,
+    south_fork_american_section,
+    south_fork_american_centerline_stations,
+    extract_channel_indicators,
+    identify_candidate_rapids,
+    south_fork_american_flow_bands,
+    default_player_selections,
+    adaptive_solver_parameters,
+    generate_real_world_scenario2_5d,
+    generate_south_fork_american_cascading_scenario2_5d,
+    generate_south_fork_american_cascading_seed_scenarios,
+    _south_fork_cascading_seed,
+    _south_fork_cascading_difficulty,
+    _south_fork_cascading_reaches,
+    _south_fork_cascading_drop_transition,
+    _source_station_for_solver_station,
+    _interp_indicator_value,
+    _interp_centerline_value,
+    _flow_band_by_name,
+    _indicator_signals,
+    _rapid_candidate_from_cluster,
+    _features_from_rapid_candidates,
+    _real_world_probes,
+    _feature_influence,
+    _clamp01,
+)
 
 DataCategory = Literal[
     "elevation",
@@ -41,7 +73,6 @@ DataCategory = Literal[
     "derived_source_masks",
     "derived_heightfield_candidate",
 ]
-DifficultyPreset = Literal["beginner", "intermediate", "advanced", "expert"]
 SourceStatus = Literal[
     "planned",
     "metadata_ready",
@@ -54,7 +85,6 @@ SourceStatus = Literal[
 RapidReviewLayerKind = Literal["raster", "vector", "table", "manifest", "annotation", "reference"]
 RapidReviewPanelKind = Literal["map", "profile", "hydrology", "evidence", "annotation_form"]
 
-SOURCE_MANIFEST_FILE = "source_manifest.json"
 CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION = "raftsim.candidate_river_inventory.v0"
 CANDIDATE_RIVER_INVENTORY_FILE = "candidate_river_inventory.json"
 COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION = "raftsim.course_elevation_extraction.v0"
@@ -312,40 +342,7 @@ PACUARE_SENTINEL_20240224_DRAFT_BANK_SCL_16PHR_IMAGE_FILE = (
 )
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
-DISCHARGE_CFS_TO_M3S = 0.028316846592
 DIFFICULTY_PRESETS: tuple[DifficultyPreset, ...] = ("beginner", "intermediate", "advanced", "expert")
-
-
-@dataclass(frozen=True, slots=True)
-class BoundsWGS84:
-    min_lon: float
-    min_lat: float
-    max_lon: float
-    max_lat: float
-
-    def to_json_dict(self) -> dict[str, float]:
-        return asdict(self)
-
-
-@dataclass(frozen=True, slots=True)
-class CandidateRiverSection:
-    river_id: str
-    river_name: str
-    section_id: str
-    section_name: str
-    region: str
-    country: str
-    bounds_wgs84: BoundsWGS84
-    difficulty_range: tuple[str, ...]
-    playable_reason: str
-    data_priorities: tuple[str, ...]
-    gauge_candidates: tuple[str, ...] = ()
-    notes: str = ""
-
-    def to_json_dict(self) -> dict[str, object]:
-        data = asdict(self)
-        data["bounds_wgs84"] = self.bounds_wgs84.to_json_dict()
-        return data
 
 
 @dataclass(frozen=True, slots=True)
@@ -373,58 +370,6 @@ class RemoteFetchSpec:
     target_artifact: str
     status: SourceStatus
     notes: str
-
-    def to_json_dict(self) -> dict[str, object]:
-        return asdict(self)
-
-
-@dataclass(frozen=True, slots=True)
-class CenterlineStation:
-    station_m: float
-    lon: float
-    lat: float
-    elevation_m: float
-    channel_width_m: float
-    roughness_indicator: float
-    boulder_density: float
-    imagery_whitewater_texture: float
-    bend_score: float
-    guide_note_score: float = 0.0
-    access_score: float = 0.0
-
-    def to_json_dict(self) -> dict[str, object]:
-        return asdict(self)
-
-
-@dataclass(frozen=True, slots=True)
-class ChannelIndicator:
-    station_m: float
-    lon: float
-    lat: float
-    elevation_m: float
-    channel_width_m: float
-    left_bank_offset_m: float
-    right_bank_offset_m: float
-    gradient: float
-    constriction_score: float
-    roughness_score: float
-    rapid_score: float
-    signals: tuple[str, ...] = ()
-
-    def to_json_dict(self) -> dict[str, object]:
-        return asdict(self)
-
-
-@dataclass(frozen=True, slots=True)
-class RapidCandidate:
-    rapid_id: str
-    start_station_m: float
-    end_station_m: float
-    peak_station_m: float
-    score: float
-    suggested_labels: tuple[str, ...]
-    signals: tuple[str, ...]
-    confidence: float
 
     def to_json_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -622,27 +567,6 @@ class RapidReviewEditorWorkflow:
 
 
 @dataclass(frozen=True, slots=True)
-class FlowBand:
-    flow_band: str
-    season: str
-    percentile_range: tuple[float, float]
-    discharge_cfs: float
-    stage_ft: float | None
-    runnable: bool
-    notes: str
-    confidence: float
-
-    @property
-    def discharge_m3s(self) -> float:
-        return self.discharge_cfs * DISCHARGE_CFS_TO_M3S
-
-    def to_json_dict(self) -> dict[str, object]:
-        data = asdict(self)
-        data["discharge_m3s"] = self.discharge_m3s
-        return data
-
-
-@dataclass(frozen=True, slots=True)
 class RapidReviewFlowDifficultyMapping:
     river_id: str
     section_id: str
@@ -668,49 +592,6 @@ class RapidReviewFlowDifficultyMapping:
             "parameter_matrix": list(self.parameter_matrix),
             "review_requirements": list(self.review_requirements),
             "provenance": self.provenance,
-        }
-
-
-@dataclass(frozen=True, slots=True)
-class PlayerSelection:
-    region: str
-    river_id: str
-    section_id: str
-    season: str
-    flow_band: str
-    difficulty: DifficultyPreset
-    raft_setup: str
-
-    def to_json_dict(self) -> dict[str, object]:
-        return asdict(self)
-
-
-@dataclass(frozen=True, slots=True)
-class SolverParameterPreset:
-    selection: PlayerSelection
-    boundary_inflow_m3s: float
-    outflow_stage_bias_m: float
-    initial_depth_m: float
-    downstream_velocity_mps: float
-    downstream_momentum_scale: float
-    roughness_manning_n: float
-    aeration_turbulence_scale: float
-    hole_retention_strength: float
-    wave_train_strength: float
-    eddy_line_shear: float
-    boil_strength: float
-    shallow_hazard_threshold_m: float
-    hazard_activation_scale: float
-    raft_drag_coefficient_scale: float
-    paddle_catch_scale: float
-    damping_scale: float
-    confidence_score: float
-    notes: str = ""
-
-    def to_json_dict(self) -> dict[str, object]:
-        return {
-            "selection": self.selection.to_json_dict(),
-            **{key: value for key, value in asdict(self).items() if key != "selection"},
         }
 
 
@@ -766,130 +647,6 @@ class CandidateRiverInventoryPackage:
             "next_review_actions": list(self.next_review_actions),
             "provenance": self.provenance,
         }
-
-
-def default_candidate_river_inventory() -> tuple[CandidateRiverSection, ...]:
-    """Return the first-pass river inventory for real-world playable sections."""
-
-    return (
-        CandidateRiverSection(
-            river_id="american_south_fork",
-            river_name="South Fork American River",
-            section_id="chili_bar_to_coloma",
-            section_name="Chili Bar to Coloma",
-            region="California Sierra Nevada",
-            country="US",
-            bounds_wgs84=BoundsWGS84(-120.90, 38.74, -120.72, 38.83),
-            difficulty_range=("class_ii", "class_iii"),
-            playable_reason="Commercially important training-to-intermediate run with clear access, named rapids, gauge context, and varied channel geometry.",
-            data_priorities=("3dep_lidar_dem", "3dhp_nhd_flowlines", "naip_imagery", "nwis_gauge_11445500", "osm_access"),
-            gauge_candidates=("USGS 11445500 South Fork American River near Lotus, CA",),
-            notes="Representative Milestone 9 seed section; coordinates are planning bounds and must be verified before production extraction.",
-        ),
-        CandidateRiverSection(
-            river_id="colorado_grand_canyon_rowing",
-            river_name="Colorado River",
-            section_id="lees_ferry_to_diamond_creek",
-            section_name="Grand Canyon Rowing Route",
-            region="Arizona Grand Canyon",
-            country="US",
-            bounds_wgs84=BoundsWGS84(-113.55, 35.75, -111.55, 36.95),
-            difficulty_range=("class_iii", "class_v"),
-            playable_reason="Second runnable river target with oar-rig rowing, large-volume current reading, canyon pacing, and longer rescue windows.",
-            data_priorities=("usgs_gauge_09380000", "usgs_gauge_09402500", "nps_permit_context", "3dep_dem_research", "guide_reference_review"),
-            gauge_candidates=(
-                "USGS 09380000 Colorado River at Lees Ferry, AZ",
-                "USGS 09402500 Colorado River near Grand Canyon, AZ",
-            ),
-            notes="Second real-world target after the South Fork baseline; source manifest and planning flow bands are drafted in Milestone 21.",
-        ),
-        CandidateRiverSection(
-            river_id="pacuare",
-            river_name="Pacuare River",
-            section_id="lower_pacuare_planning_corridor",
-            section_name="Lower Pacuare Planning Corridor",
-            region="Costa Rica Caribbean slope",
-            country="CR",
-            bounds_wgs84=BoundsWGS84(-83.75, 9.72, -83.42, 10.12),
-            difficulty_range=("class_iii", "class_iv"),
-            playable_reason="Third runnable river target with tropical rainforest whitewater, rain-fed flow variability, steep-walled gorges, and a distinct international rafting biome.",
-            data_priorities=(
-                "dem_source_research",
-                "osm_hydrography_access",
-                "costa_rica_hydrology_gauge_search",
-                "sinac_protected_area_review",
-                "guide_reference_review",
-                "field_media_rights_review",
-            ),
-            gauge_candidates=("Costa Rica hydrology gauge search for the Rio Pacuare basin",),
-            notes="Third runnable river target after South Fork American and Colorado rowing; planning bounds, source manifest, flow bands, and guide annotations must be replaced with reviewed Costa Rica data before solver generation.",
-        ),
-        CandidateRiverSection(
-            river_id="youghiogheny_lower",
-            river_name="Youghiogheny River",
-            section_id="ohiopyle_to_bruner_run",
-            section_name="Lower Yough",
-            region="Pennsylvania Laurel Highlands",
-            country="US",
-            bounds_wgs84=BoundsWGS84(-79.53, 39.83, -79.43, 39.91),
-            difficulty_range=("class_iii", "class_iv"),
-            playable_reason="Classic technical pool-drop section with many named rapids and strong guide/reference availability.",
-            data_priorities=("3dep_lidar_dem", "3dhp_nhd_flowlines", "naip_imagery", "nwis_gauge_search", "guide_reference_review"),
-            gauge_candidates=("USGS/NWIS Ohiopyle-area gauge search",),
-        ),
-        CandidateRiverSection(
-            river_id="arkansas_browns_canyon",
-            river_name="Arkansas River",
-            section_id="browns_canyon",
-            section_name="Browns Canyon",
-            region="Colorado Rockies",
-            country="US",
-            bounds_wgs84=BoundsWGS84(-106.15, 38.67, -105.95, 38.83),
-            difficulty_range=("class_iii", "class_iv"),
-            playable_reason="High-value mountain whitewater corridor with seasonal snowmelt variability and strong public-land geodata coverage.",
-            data_priorities=("3dep_lidar_dem", "3dhp_nhd_flowlines", "naip_imagery", "nwis_gauge_search", "seasonal_snowmelt_context"),
-            gauge_candidates=("USGS/NWIS Arkansas River Browns Canyon-area gauge search",),
-        ),
-        CandidateRiverSection(
-            river_id="nantahala",
-            river_name="Nantahala River",
-            section_id="nantahala_gorge",
-            section_name="Nantahala Gorge",
-            region="North Carolina Appalachians",
-            country="US",
-            bounds_wgs84=BoundsWGS84(-83.72, 35.27, -83.55, 35.36),
-            difficulty_range=("class_ii", "class_iii"),
-            playable_reason="Accessible training river with repeatable dam-release flows, narrow gorge banks, and useful beginner/intermediate difficulty mapping.",
-            data_priorities=("3dep_lidar_dem", "3dhp_nhd_flowlines", "naip_imagery", "release_schedule_research", "osm_access"),
-            gauge_candidates=("USGS/NWIS Nantahala Gorge-area gauge search",),
-        ),
-        CandidateRiverSection(
-            river_id="new_river_gorge",
-            river_name="New River",
-            section_id="new_river_gorge",
-            section_name="New River Gorge",
-            region="West Virginia Appalachians",
-            country="US",
-            bounds_wgs84=BoundsWGS84(-81.15, 37.78, -80.95, 38.08),
-            difficulty_range=("class_iii", "class_iv"),
-            playable_reason="Large-volume river with iconic rapids, broad flow ranges, canyon visuals, and strong future UE5 photoreal corridor value.",
-            data_priorities=("3dep_lidar_dem", "3dhp_nhd_flowlines", "naip_imagery", "nwis_gauge_search", "rapid_guide_reference_review"),
-            gauge_candidates=("USGS/NWIS New River Gorge-area gauge search",),
-        ),
-        CandidateRiverSection(
-            river_id="gauley_upper",
-            river_name="Gauley River",
-            section_id="upper_gauley",
-            section_name="Upper Gauley",
-            region="West Virginia Appalachians",
-            country="US",
-            bounds_wgs84=BoundsWGS84(-80.96, 38.19, -80.82, 38.27),
-            difficulty_range=("class_iv", "class_v"),
-            playable_reason="Expert-flow stretch with release-driven seasonal difficulty, powerful hydraulics, and future high-consequence validation value.",
-            data_priorities=("3dep_lidar_dem", "3dhp_nhd_flowlines", "naip_imagery", "release_schedule_research", "nwis_gauge_search"),
-            gauge_candidates=("USGS/NWIS Gauley River release/gauge search",),
-        ),
-    )
 
 
 def build_candidate_river_inventory_package(
@@ -4249,117 +4006,6 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
     }
 
 
-def south_fork_american_section() -> CandidateRiverSection:
-    return default_candidate_river_inventory()[0]
-
-
-def south_fork_american_centerline_stations() -> tuple[CenterlineStation, ...]:
-    """Return a tiny fixture-like station set for the representative data package.
-
-    Values are intentionally coarse seed data. Production data must replace these
-    with extracted GIS/lidar/imagery measurements recorded in the source manifest.
-    """
-
-    return (
-        CenterlineStation(0.0, -120.8730, 38.7600, 304.0, 26.0, 0.22, 0.18, 0.10, 0.12, access_score=0.70),
-        CenterlineStation(450.0, -120.8650, 38.7640, 299.2, 24.0, 0.28, 0.25, 0.18, 0.28),
-        CenterlineStation(920.0, -120.8580, 38.7685, 291.0, 18.0, 0.62, 0.55, 0.55, 0.44, guide_note_score=0.60),
-        CenterlineStation(1370.0, -120.8500, 38.7730, 286.0, 30.0, 0.24, 0.20, 0.16, 0.25),
-        CenterlineStation(1880.0, -120.8420, 38.7765, 278.0, 17.0, 0.70, 0.68, 0.62, 0.38, guide_note_score=0.55),
-        CenterlineStation(2360.0, -120.8330, 38.7800, 274.8, 33.0, 0.18, 0.16, 0.12, 0.18),
-        CenterlineStation(2920.0, -120.8235, 38.7850, 265.2, 20.0, 0.58, 0.50, 0.44, 0.70, guide_note_score=0.45),
-        CenterlineStation(3470.0, -120.8140, 38.7900, 258.0, 23.0, 0.36, 0.32, 0.28, 0.34),
-        CenterlineStation(4050.0, -120.8040, 38.7960, 249.0, 19.0, 0.66, 0.58, 0.58, 0.60, guide_note_score=0.50),
-        CenterlineStation(4630.0, -120.7930, 38.8030, 244.5, 29.0, 0.26, 0.22, 0.18, 0.20),
-        CenterlineStation(5200.0, -120.7820, 38.8100, 238.0, 27.0, 0.30, 0.26, 0.20, 0.16, access_score=0.60),
-    )
-
-
-def extract_channel_indicators(stations: tuple[CenterlineStation, ...]) -> tuple[ChannelIndicator, ...]:
-    """Derive stationing, banks, width, gradient, constriction, and roughness indicators."""
-
-    if len(stations) < 3:
-        raise ValueError("At least three centerline stations are required.")
-    ordered = tuple(sorted(stations, key=lambda station: station.station_m))
-    station_values = np.asarray([station.station_m for station in ordered], dtype=np.float64)
-    elevations = np.asarray([station.elevation_m for station in ordered], dtype=np.float64)
-    widths = np.asarray([station.channel_width_m for station in ordered], dtype=np.float64)
-    if np.any(np.diff(station_values) <= 0.0):
-        raise ValueError("Centerline station distances must be strictly increasing.")
-
-    median_width = float(np.median(widths))
-    indicators: list[ChannelIndicator] = []
-    for index, station in enumerate(ordered):
-        previous_index = max(0, index - 1)
-        next_index = min(len(ordered) - 1, index + 1)
-        distance = max(station_values[next_index] - station_values[previous_index], 1.0)
-        gradient = max(0.0, (elevations[previous_index] - elevations[next_index]) / distance)
-
-        local_widths = widths[max(0, index - 2) : min(len(widths), index + 3)]
-        local_reference_width = max(float(np.percentile(local_widths, 75)), median_width, 1.0)
-        constriction = _clamp01((local_reference_width - station.channel_width_m) / local_reference_width)
-
-        roughness = _clamp01(
-            0.34 * station.roughness_indicator
-            + 0.24 * station.boulder_density
-            + 0.20 * station.imagery_whitewater_texture
-            + 0.12 * station.bend_score
-            + 0.10 * station.guide_note_score
-        )
-        gradient_score = _clamp01(gradient / 0.020)
-        rapid_score = _clamp01(
-            0.33 * gradient_score
-            + 0.22 * constriction
-            + 0.20 * roughness
-            + 0.12 * station.imagery_whitewater_texture
-            + 0.08 * station.boulder_density
-            + 0.05 * station.guide_note_score
-        )
-        signals = _indicator_signals(station, gradient, constriction, roughness, rapid_score)
-        half_width = station.channel_width_m * 0.5
-        indicators.append(
-            ChannelIndicator(
-                station_m=station.station_m,
-                lon=station.lon,
-                lat=station.lat,
-                elevation_m=station.elevation_m,
-                channel_width_m=station.channel_width_m,
-                left_bank_offset_m=half_width,
-                right_bank_offset_m=-half_width,
-                gradient=gradient,
-                constriction_score=constriction,
-                roughness_score=roughness,
-                rapid_score=rapid_score,
-                signals=signals,
-            )
-        )
-    return tuple(indicators)
-
-
-def identify_candidate_rapids(
-    indicators: tuple[ChannelIndicator, ...],
-    *,
-    threshold: float = 0.42,
-) -> tuple[RapidCandidate, ...]:
-    """Cluster rapid candidates from slope, constriction, roughness, imagery, and guide signals."""
-
-    if not indicators:
-        return ()
-    ordered = tuple(sorted(indicators, key=lambda indicator: indicator.station_m))
-    candidates: list[RapidCandidate] = []
-    active: list[ChannelIndicator] = []
-    for indicator in ordered:
-        if indicator.rapid_score >= threshold:
-            active.append(indicator)
-            continue
-        if active:
-            candidates.append(_rapid_candidate_from_cluster(len(candidates) + 1, active))
-            active = []
-    if active:
-        candidates.append(_rapid_candidate_from_cluster(len(candidates) + 1, active))
-    return tuple(candidates)
-
-
 def default_manual_rapid_review_labels() -> tuple[RapidReviewLabel, ...]:
     return (
         RapidReviewLabel("pool", "water_state", "Recovery or staging pool with low gradient and lower velocity.", ("pool", "recovery")),
@@ -4375,47 +4021,6 @@ def default_manual_rapid_review_labels() -> tuple[RapidReviewLabel, ...]:
         RapidReviewLabel("access_point", "logistics", "Put-in, take-out, trail, road, or scout access.", ("access", "logistics"), False),
         RapidReviewLabel("boulder_garden", "bedform", "Cluster of exposed or submerged rocks that drives roughness and collision hazards.", ("rock", "roughness")),
         RapidReviewLabel("constriction", "geometry", "Narrowed channel that accelerates flow and can produce stronger waves or holes.", ("constriction", "velocity")),
-    )
-
-
-def south_fork_american_flow_bands() -> tuple[FlowBand, ...]:
-    """Return preliminary flow bands for the representative section.
-
-    These are seed values for software integration. Milestone 10 must replace or
-    calibrate them using pulled NWIS/NWPS/StreamStats records and domain review.
-    """
-
-    return (
-        FlowBand(
-            flow_band="low_runnable",
-            season="late_summer_low_water",
-            percentile_range=(0.10, 0.35),
-            discharge_cfs=900.0,
-            stage_ft=None,
-            runnable=True,
-            notes="Lower training-oriented flow; expect exposed rocks, shallows, and slower recovery from mistakes.",
-            confidence=0.30,
-        ),
-        FlowBand(
-            flow_band="median_runnable",
-            season="summer_commercial",
-            percentile_range=(0.35, 0.70),
-            discharge_cfs=1600.0,
-            stage_ft=None,
-            runnable=True,
-            notes="Default validation band for intermediate commercial-style runs.",
-            confidence=0.35,
-        ),
-        FlowBand(
-            flow_band="high_runnable",
-            season="spring_runoff_or_release",
-            percentile_range=(0.70, 0.90),
-            discharge_cfs=3000.0,
-            stage_ft=None,
-            runnable=True,
-            notes="Higher consequence preset with stronger holes, wave trains, eddy-line shear, and faster raft response.",
-            confidence=0.25,
-        ),
     )
 
 
@@ -5496,6 +5101,47 @@ def build_south_fork_flow_band_review(
 def build_player_selection_model() -> dict[str, object]:
     section = south_fork_american_section()
     flow_bands = south_fork_american_flow_bands()
+    zambezi_region = {
+        "region": "Zambia–Zimbabwe Batoka Gorge",
+        "rivers": [
+            {
+                "river_id": "zambezi_batoka_gorge",
+                "river_name": "Zambezi River",
+                "portfolio_role": "runnable_river",
+                "runnable": True,
+                "runnable_tier": "reference_free_run",
+                "sections": [
+                    {
+                        "section_id": "boiling_pot_to_mukuni_beach_reference_run",
+                        "section_name": "Batoka Gorge: Rapids 1–25",
+                        "scenario_id": "zambezi_reference_run",
+                        "scenario": (
+                            "physics/data/real_world/zambezi_batoka_gorge/"
+                            "scenario_zambezi_run/scenario.json"
+                        ),
+                        "map_package": (
+                            "/Game/RaftSim/Maps/L_Zambezi"
+                        ),
+                        "difficulty_range": ["class_iii_reference", "class_v_reference"],
+                        "seasons": ["normal_big_water_reference"],
+                        "flow_bands": [
+                            {
+                                "flow_band": "normal_big_water",
+                                "relative_flow": "reference",
+                                "runnable": True,
+                                "procedural_runtime_seed": True,
+                                "requires_validation_before_production_hydraulic_fidelity": True,
+                            }
+                        ],
+                        "difficulty_presets": ["full_reference_run_1_to_25"],
+                        "raft_setups": ["standard_14ft_paddle_raft"],
+                        "crew_setups": ["ai_training_crew", "experienced_ai_crew"],
+                        "data_confidence": 0.18,
+                    }
+                ],
+            }
+        ],
+    }
     return {
         "regions": [
             {
@@ -5520,76 +5166,10 @@ def build_player_selection_model() -> dict[str, object]:
                         ],
                     }
                 ],
-            }
+            },
+            zambezi_region,
         ]
     }
-
-
-def default_player_selections() -> tuple[PlayerSelection, ...]:
-    section = south_fork_american_section()
-    return tuple(
-        PlayerSelection(
-            region=section.region,
-            river_id=section.river_id,
-            section_id=section.section_id,
-            season=band.season,
-            flow_band=band.flow_band,
-            difficulty=difficulty,
-            raft_setup="standard_14ft_paddle_raft",
-        )
-        for band, difficulty in (
-            (south_fork_american_flow_bands()[0], "beginner"),
-            (south_fork_american_flow_bands()[1], "intermediate"),
-            (south_fork_american_flow_bands()[2], "advanced"),
-        )
-    )
-
-
-def adaptive_solver_parameters(
-    selection: PlayerSelection,
-    *,
-    flow_bands: tuple[FlowBand, ...] | None = None,
-    representative_width_m: float = 24.0,
-) -> SolverParameterPreset:
-    """Map river + season + flow + difficulty into shallow-water and raft parameters."""
-
-    bands = flow_bands or south_fork_american_flow_bands()
-    flow_band = next((band for band in bands if band.flow_band == selection.flow_band), None)
-    if flow_band is None:
-        raise ValueError(f"Unknown flow band: {selection.flow_band}")
-    difficulty_scale = {
-        "beginner": 0.82,
-        "intermediate": 1.0,
-        "advanced": 1.18,
-        "expert": 1.35,
-    }[selection.difficulty]
-    median_discharge = next((band.discharge_cfs for band in bands if band.flow_band == "median_runnable"), flow_band.discharge_cfs)
-    flow_factor = max(0.35, flow_band.discharge_cfs / max(median_discharge, 1.0))
-    depth = 0.72 + 0.52 * math.sqrt(flow_factor)
-    inflow_m3s = flow_band.discharge_m3s
-    velocity = inflow_m3s / max(representative_width_m * depth, 1.0)
-    confidence = _clamp01(flow_band.confidence * (0.92 if selection.difficulty == "expert" else 1.0))
-    return SolverParameterPreset(
-        selection=selection,
-        boundary_inflow_m3s=inflow_m3s,
-        outflow_stage_bias_m=0.08 * (flow_factor - 1.0),
-        initial_depth_m=depth,
-        downstream_velocity_mps=velocity * difficulty_scale,
-        downstream_momentum_scale=flow_factor * difficulty_scale,
-        roughness_manning_n=0.034 + 0.007 * min(flow_factor, 1.6),
-        aeration_turbulence_scale=flow_factor * difficulty_scale,
-        hole_retention_strength=0.55 * flow_factor * difficulty_scale,
-        wave_train_strength=0.70 * math.sqrt(flow_factor) * difficulty_scale,
-        eddy_line_shear=0.60 * flow_factor * difficulty_scale,
-        boil_strength=0.40 * flow_factor * difficulty_scale,
-        shallow_hazard_threshold_m=max(0.18, 0.32 / math.sqrt(flow_factor)),
-        hazard_activation_scale=0.65 * difficulty_scale * (1.12 if flow_factor > 1.2 else 1.0),
-        raft_drag_coefficient_scale=1.0 + 0.10 * (flow_factor - 1.0),
-        paddle_catch_scale=max(0.75, 1.0 + 0.06 * (flow_factor - 1.0)),
-        damping_scale=max(0.70, 1.0 - 0.08 * (flow_factor - 1.0)),
-        confidence_score=confidence,
-        notes="Seed mapping for validation against PyClaw and custom C++ solver; tune with pulled gauge history and reviewed terrain.",
-    )
 
 
 def build_rapid_review_flow_difficulty_mapping(
@@ -5793,296 +5373,6 @@ def build_rapid_review_editor_workflow(
             "Every accepted annotation records rights/provenance before it can feed validation or Unreal data assets.",
             "Guidebook text, third-party imagery, and field media remain referenced through manifests unless redistribution rights are explicit.",
         ),
-    )
-
-
-def generate_real_world_scenario2_5d(
-    selection: PlayerSelection | None = None,
-    *,
-    nx: int = 72,
-    ny: int = 32,
-    dx: float = 4.0,
-    dy: float = 2.0,
-    duration: float = 8.0,
-    pyclaw_reference_min_depth_m: float = 0.01,
-) -> Scenario2_5D:
-    """Generate a small solver-neutral scenario from the representative real-world package."""
-
-    if pyclaw_reference_min_depth_m < 0.0:
-        raise ValueError("pyclaw_reference_min_depth_m must be non-negative.")
-    chosen = selection or default_player_selections()[1]
-    centerline = south_fork_american_centerline_stations()
-    indicators = extract_channel_indicators(centerline)
-    rapid_candidates = identify_candidate_rapids(indicators)
-    preset = adaptive_solver_parameters(chosen, representative_width_m=float(np.mean([s.channel_width_m for s in centerline])))
-
-    grid = GridSpec2_5D(nx=nx, ny=ny, dx=dx, dy=dy, origin_x=0.0, origin_y=-0.5 * (ny - 1) * dy)
-    x, y = grid.meshgrid()
-    xs = grid.x_coordinates()
-    x_span = max(float(xs[-1] - xs[0]), dx)
-    station_min = centerline[0].station_m
-    station_max = centerline[-1].station_m
-    station_grid = station_min + (x / max(x_span, 1.0)) * (station_max - station_min)
-
-    station_values = np.asarray([station.station_m for station in centerline], dtype=np.float64)
-    elevations = np.asarray([station.elevation_m for station in centerline], dtype=np.float64)
-    widths = np.asarray([station.channel_width_m for station in centerline], dtype=np.float64)
-    roughness = np.asarray([station.roughness_indicator for station in centerline], dtype=np.float64)
-    bends = np.asarray([station.bend_score for station in centerline], dtype=np.float64)
-
-    width_grid = np.interp(station_grid, station_values, widths)
-    roughness_grid = np.interp(station_grid, station_values, roughness)
-    bend_grid = np.interp(station_grid, station_values, bends)
-    elevation_profile = np.interp(station_grid, station_values, elevations)
-
-    normalized_x = x / max(x_span, 1.0)
-    center_offset = 4.8 * np.sin(2.25 * math.tau * normalized_x) + 1.5 * np.sin(5.0 * math.tau * normalized_x)
-    lateral = y - center_offset
-    half_width = width_grid * 0.5
-    wet_channel = np.abs(lateral) <= half_width
-
-    bank_fraction = np.abs(lateral) / np.maximum(half_width, 1.0)
-    depth = preset.initial_depth_m * np.maximum(0.24, 1.0 - 0.42 * bank_fraction**2)
-    depth *= 1.0 + 0.11 * roughness_grid
-    depth = np.where(wet_channel, depth, 0.0)
-
-    surface_eta = preset.initial_depth_m - (elevation_profile[0, 0] - elevation_profile) * 0.018
-    bank_lift = preset.initial_depth_m + 0.65 + 0.20 * np.maximum(bank_fraction - 1.0, 0.0)
-    bed = np.where(wet_channel, surface_eta - depth, surface_eta + bank_lift)
-
-    tangent_y = np.gradient(center_offset[0, :], dx)[np.newaxis, :]
-    tangent_scale = np.sqrt(1.0 + tangent_y**2)
-    tangent_x = 1.0 / tangent_scale
-    tangent_y = tangent_y / tangent_scale
-    constriction_speedup = float(np.median(widths)) / np.maximum(width_grid, 1.0)
-    speed = preset.downstream_velocity_mps * np.sqrt(constriction_speedup) * (1.0 + 0.10 * roughness_grid)
-    bank_slowdown = np.maximum(0.30, 1.0 - 0.55 * bank_fraction**2)
-    u = np.where(wet_channel, tangent_x * speed * bank_slowdown, 0.0)
-    v = np.where(wet_channel, tangent_y * speed * bank_slowdown + 0.10 * preset.eddy_line_shear * bend_grid, 0.0)
-
-    features = _features_from_rapid_candidates(rapid_candidates, grid, station_min, station_max, preset)
-    for feature in features:
-        influence = _feature_influence(feature, x, y)
-        if feature.kind == "constriction":
-            u *= 1.0 + 0.16 * feature.strength * influence
-        elif feature.kind == "wave_train":
-            wave = np.sin((x - feature.center[0]) * 0.42)
-            depth = np.maximum(0.0, depth + 0.08 * feature.strength * wave * influence)
-            u *= 1.0 + 0.08 * feature.strength * np.abs(wave) * influence
-        elif feature.kind == "hole":
-            u -= tangent_x * 0.20 * feature.strength * influence
-            depth += 0.10 * feature.strength * influence
-        elif feature.kind == "rock":
-            obstacle = influence > 0.55
-            depth = np.where(obstacle, 0.0, depth)
-            u = np.where(obstacle, 0.0, u)
-            v = np.where(obstacle, 0.0, v)
-        elif feature.kind == "lateral":
-            v += 0.22 * feature.strength * influence
-
-    bed = np.where(depth > 1.0e-6, bed, surface_eta + bank_lift)
-    if pyclaw_reference_min_depth_m > 0.0:
-        shallow_reference_mask = depth <= pyclaw_reference_min_depth_m
-        depth = np.maximum(depth, pyclaw_reference_min_depth_m)
-        u = np.where(shallow_reference_mask, 0.0, u)
-        v = np.where(shallow_reference_mask, 0.0, v)
-        bed = np.where(shallow_reference_mask, surface_eta - depth, bed)
-    state = InitialWaterState2_5D.from_depth_velocity(bed, depth, u, v)
-    boundaries = (
-        BoundaryCondition2_5D("west", "inflow", depth=preset.initial_depth_m, velocity=(preset.downstream_velocity_mps, 0.0), metadata={"flow_band": chosen.flow_band}),
-        BoundaryCondition2_5D("east", "outflow", stage=preset.initial_depth_m + preset.outflow_stage_bias_m, metadata={"flow_band": chosen.flow_band}),
-        BoundaryCondition2_5D("south", "bank"),
-        BoundaryCondition2_5D("north", "bank"),
-    )
-    metadata = ScenarioMetadata2_5D(
-        scenario_id=f"{chosen.river_id}_{chosen.section_id}_{chosen.flow_band}_{chosen.difficulty}",
-        scenario_type="real_world",
-        seed=9,
-        generator="raftsim.real_world",
-        generator_version="milestone_9_seed.v0",
-        description="Representative real-world 2.5D seed scenario built from source-manifest, centerline, rapid candidate, and seasonal flow presets.",
-        river_id=chosen.river_id,
-        section_id=chosen.section_id,
-        coordinate_reference_system="local meters from source_manifest EPSG:4326 planning bounds",
-        source_manifest=SOURCE_MANIFEST_FILE,
-        gauge_source="USGS 11445500 South Fork American River near Lotus, CA",
-        season_preset=chosen.season,
-        flow_percentile=float(np.mean(_flow_band_by_name(chosen.flow_band).percentile_range)),
-        flow_band=chosen.flow_band,
-        difficulty_preset=chosen.difficulty,
-        confidence_score=preset.confidence_score,
-        provenance={
-            "source_manifest": SOURCE_MANIFEST_FILE,
-            "source_package": "physics/data/real_world/south_fork_american_chili_bar",
-            "flow_preset_confidence": preset.confidence_score,
-            "rapid_candidate_count": len(rapid_candidates),
-            "pyclaw_reference_min_depth_m": pyclaw_reference_min_depth_m,
-        },
-    )
-    return Scenario2_5D(
-        metadata=metadata,
-        grid=grid,
-        fixed_dt=1.0 / 60.0,
-        duration=duration,
-        bed=bed,
-        initial_state=state,
-        boundaries=boundaries,
-        features=features,
-        probes=_real_world_probes(grid, rapid_candidates, station_min, station_max),
-        raft=RaftParameters2_5D(drag_coefficient=1.25 * preset.raft_drag_coefficient_scale),
-        roughness=preset.roughness_manning_n,
-    )
-
-
-def generate_south_fork_american_cascading_scenario2_5d(
-    selection: PlayerSelection | None = None,
-    *,
-    nx: int = 112,
-    ny: int = 40,
-    dx: float = 4.0,
-    dy: float = 2.0,
-    duration: float = 8.0,
-) -> CascadingScenarioPackage2_5D:
-    """Generate a South Fork American pool-drop cascading seed package."""
-
-    chosen = selection or default_player_selections()[1]
-    section = south_fork_american_section()
-    centerline = south_fork_american_centerline_stations()
-    indicators = extract_channel_indicators(centerline)
-    rapid_candidates = identify_candidate_rapids(indicators)
-    representative_width = float(np.mean([station.channel_width_m for station in centerline]))
-    preset = adaptive_solver_parameters(chosen, representative_width_m=representative_width)
-    median_discharge = _flow_band_by_name("median_runnable").discharge_cfs
-    flow_discharge = _flow_band_by_name(chosen.flow_band).discharge_cfs
-    flow_factor = max(0.35, flow_discharge / max(median_discharge, 1.0))
-    cascade_params = CaliforniaPoolDropParameters2_5D(
-        seed=_south_fork_cascading_seed(chosen),
-        nx=nx,
-        ny=ny,
-        dx=dx,
-        dy=dy,
-        base_width=representative_width * (0.92 + 0.04 * min(flow_factor, 1.8)),
-        base_depth=preset.initial_depth_m,
-        inflow_speed=preset.downstream_velocity_mps,
-        difficulty=_south_fork_cascading_difficulty(chosen, flow_factor),
-        duration=duration,
-    )
-    base = generate_california_pool_drop_cascading_scenario2_5d(cascade_params)
-    station_min = centerline[0].station_m
-    station_max = centerline[-1].station_m
-    reaches = _south_fork_cascading_reaches(
-        base.reaches,
-        base.scenario.grid,
-        indicators,
-        rapid_candidates,
-        station_min,
-        station_max,
-    )
-    drop_transitions = tuple(
-        _south_fork_cascading_drop_transition(
-            transition,
-            base.scenario.grid,
-            centerline,
-            rapid_candidates,
-            preset,
-            chosen,
-            station_min,
-            station_max,
-        )
-        for transition in base.drop_transitions
-    )
-    metadata = ScenarioMetadata2_5D(
-        scenario_id=f"{chosen.river_id}_{chosen.section_id}_{chosen.flow_band}_{chosen.difficulty}_cascading",
-        scenario_type="real_world",
-        seed=cascade_params.seed,
-        generator="raftsim.real_world.cascading",
-        generator_version="milestone_15_sfa_seed.v0",
-        description=(
-            "South Fork American seed cascading package with variable pool/drop reaches, "
-            "source-station metadata, and rapid/drop transition annotations."
-        ),
-        river_id=section.river_id,
-        section_id=section.section_id,
-        coordinate_reference_system="local meters from source_manifest EPSG:4326 planning bounds",
-        source_manifest=SOURCE_MANIFEST_FILE,
-        gauge_source="USGS 11445500 South Fork American River near Lotus, CA",
-        season_preset=chosen.season,
-        flow_percentile=float(np.mean(_flow_band_by_name(chosen.flow_band).percentile_range)),
-        flow_band=chosen.flow_band,
-        difficulty_preset=chosen.difficulty,
-        confidence_score=preset.confidence_score,
-        provenance={
-            "source_manifest": SOURCE_MANIFEST_FILE,
-            "source_package": "physics/data/real_world/south_fork_american_chili_bar",
-            "base_generator": "raftsim.cascading.generate_california_pool_drop_cascading_scenario2_5d",
-            "rapid_candidate_count": len(rapid_candidates),
-            "reach_sequence": "pool,tongue,drop,wave_train,eddy_recovery,boulder_garden,pool",
-            "flow_preset_confidence": preset.confidence_score,
-        },
-    )
-    boundaries = (
-        BoundaryCondition2_5D(
-            "west",
-            "inflow",
-            depth=preset.initial_depth_m,
-            velocity=(preset.downstream_velocity_mps, 0.0),
-            metadata={"flow_band": chosen.flow_band, "discharge_m3s": preset.boundary_inflow_m3s},
-        ),
-        BoundaryCondition2_5D(
-            "east",
-            "outflow",
-            stage=preset.initial_depth_m + preset.outflow_stage_bias_m,
-            metadata={"flow_band": chosen.flow_band},
-        ),
-        BoundaryCondition2_5D("south", "bank"),
-        BoundaryCondition2_5D("north", "bank"),
-    )
-    source_features = _features_from_rapid_candidates(
-        rapid_candidates,
-        base.scenario.grid,
-        station_min,
-        station_max,
-        preset,
-    )
-    scenario = replace(
-        base.scenario,
-        metadata=metadata,
-        boundaries=boundaries,
-        features=(*base.scenario.features, *source_features),
-        raft=RaftParameters2_5D(drag_coefficient=1.25 * preset.raft_drag_coefficient_scale),
-        roughness=preset.roughness_manning_n,
-    )
-    return CascadingScenarioPackage2_5D(
-        scenario=scenario,
-        reaches=reaches,
-        drop_transitions=drop_transitions,
-        pool_controls=base.pool_controls,
-        reach_local_grids=base.reach_local_grids,
-        reach_id_grid=base.reach_id_grid,
-        drop_transition_id_grid=base.drop_transition_id_grid,
-    )
-
-
-def generate_south_fork_american_cascading_seed_scenarios(
-    *,
-    nx: int = 112,
-    ny: int = 40,
-    dx: float = 4.0,
-    dy: float = 2.0,
-    duration: float = 8.0,
-) -> tuple[CascadingScenarioPackage2_5D, ...]:
-    """Generate low, median, and high runnable South Fork cascading seed packages."""
-
-    return tuple(
-        generate_south_fork_american_cascading_scenario2_5d(
-            selection,
-            nx=nx,
-            ny=ny,
-            dx=dx,
-            dy=dy,
-            duration=duration,
-        )
-        for selection in default_player_selections()
     )
 
 
@@ -6765,304 +6055,6 @@ def _rapid_review_guide_notes(candidate: RapidCandidate) -> tuple[str, ...]:
     return tuple(notes)
 
 
-def _south_fork_cascading_seed(selection: PlayerSelection) -> int:
-    flow_seed = {
-        "low_runnable": 101,
-        "median_runnable": 202,
-        "high_runnable": 303,
-    }[selection.flow_band]
-    difficulty_seed = {
-        "beginner": 7,
-        "intermediate": 13,
-        "advanced": 19,
-        "expert": 29,
-    }[selection.difficulty]
-    return 1500 + flow_seed + difficulty_seed
-
-
-def _south_fork_cascading_difficulty(selection: PlayerSelection, flow_factor: float) -> float:
-    base = {
-        "beginner": 0.32,
-        "intermediate": 0.54,
-        "advanced": 0.74,
-        "expert": 0.88,
-    }[selection.difficulty]
-    return _clamp01(base + 0.12 * (flow_factor - 1.0))
-
-
-def _south_fork_cascading_reaches(
-    reaches: tuple[ReachMetadata2_5D, ...],
-    grid: GridSpec2_5D,
-    indicators: tuple[ChannelIndicator, ...],
-    rapid_candidates: tuple[RapidCandidate, ...],
-    station_min: float,
-    station_max: float,
-) -> tuple[ReachMetadata2_5D, ...]:
-    updated: list[ReachMetadata2_5D] = []
-    for reach in reaches:
-        source_start = _source_station_for_solver_station(grid, reach.station_start, station_min, station_max)
-        source_end = _source_station_for_solver_station(grid, reach.station_end, station_min, station_max)
-        source_mid = (source_start + source_end) * 0.5
-        roughness = _interp_indicator_value(indicators, "roughness_score", source_mid)
-        boulder_density = _interp_centerline_value(south_fork_american_centerline_stations(), "boulder_density", source_mid)
-        overlapping_candidates = tuple(
-            candidate.rapid_id
-            for candidate in rapid_candidates
-            if candidate.end_station_m >= source_start and candidate.start_station_m <= source_end
-        )
-        metadata = {
-            **reach.metadata,
-            "river_id": "american_south_fork",
-            "section_id": "chili_bar_to_coloma",
-            "source_station_start_m": source_start,
-            "source_station_end_m": source_end,
-            "source_gradient_start": _interp_indicator_value(indicators, "gradient", source_start),
-            "source_gradient_end": _interp_indicator_value(indicators, "gradient", source_end),
-            "source_channel_width_start_m": _interp_indicator_value(indicators, "channel_width_m", source_start),
-            "source_channel_width_end_m": _interp_indicator_value(indicators, "channel_width_m", source_end),
-            "source_roughness_score": roughness,
-            "source_rapid_candidates": ",".join(overlapping_candidates),
-        }
-        updated.append(
-            replace(
-                reach,
-                bed_roughness=max(reach.bed_roughness, 0.032 + 0.026 * roughness),
-                boulder_density=max(reach.boulder_density, _clamp01(boulder_density)),
-                confidence_score=min(reach.confidence_score, 0.60),
-                metadata=metadata,
-            )
-        )
-    return tuple(updated)
-
-
-def _south_fork_cascading_drop_transition(
-    transition: DropTransitionMetadata2_5D,
-    grid: GridSpec2_5D,
-    centerline: tuple[CenterlineStation, ...],
-    rapid_candidates: tuple[RapidCandidate, ...],
-    preset: SolverParameterPreset,
-    selection: PlayerSelection,
-    station_min: float,
-    station_max: float,
-) -> DropTransitionMetadata2_5D:
-    source_crest = _source_station_for_solver_station(grid, transition.crest_station, station_min, station_max)
-    nearest = min(rapid_candidates, key=lambda candidate: abs(candidate.peak_station_m - source_crest)) if rapid_candidates else None
-    source_fall = 0.0
-    rapid_id = ""
-    candidate_tags: tuple[str, ...] = ()
-    if nearest is not None:
-        rapid_id = nearest.rapid_id
-        candidate_tags = nearest.suggested_labels
-        fallback_window = max(120.0, (station_max - station_min) * 0.035)
-        fall_start = max(station_min, min(nearest.start_station_m, nearest.peak_station_m - fallback_window))
-        fall_end = min(station_max, max(nearest.end_station_m, nearest.peak_station_m + fallback_window))
-        upstream_elevation = _interp_centerline_value(centerline, "elevation_m", fall_start)
-        downstream_elevation = _interp_centerline_value(centerline, "elevation_m", fall_end)
-        source_fall = max(0.0, upstream_elevation - downstream_elevation)
-    hazard_tags = tuple(sorted(set((*transition.hazard_tags, *candidate_tags))))
-    metadata = {
-        **transition.metadata,
-        "river_id": selection.river_id,
-        "section_id": selection.section_id,
-        "flow_band": selection.flow_band,
-        "difficulty": selection.difficulty,
-        "source_rapid_id": rapid_id,
-        "source_crest_station_m": source_crest,
-        "source_elevation_fall_m": source_fall,
-        "gauge_source": "USGS 11445500 South Fork American River near Lotus, CA",
-    }
-    return replace(
-        transition,
-        recirculation_risk=max(transition.recirculation_risk, min(1.0, preset.hole_retention_strength * 0.46)),
-        aeration_proxy=max(transition.aeration_proxy, min(1.0, preset.aeration_turbulence_scale * 0.42)),
-        turbulence_proxy=max(transition.turbulence_proxy, min(1.0, preset.aeration_turbulence_scale * 0.48)),
-        hazard_tags=hazard_tags,
-        metadata=metadata,
-    )
-
-
-def _source_station_for_solver_station(
-    grid: GridSpec2_5D,
-    solver_station: float,
-    station_min: float,
-    station_max: float,
-) -> float:
-    solver_start = float(grid.x_coordinates()[0])
-    solver_end = float(grid.x_coordinates()[-1])
-    fraction = (solver_station - solver_start) / max(solver_end - solver_start, 1.0)
-    return station_min + _clamp01(fraction) * (station_max - station_min)
-
-
-def _interp_indicator_value(indicators: tuple[ChannelIndicator, ...], field_name: str, station_m: float) -> float:
-    stations = np.asarray([indicator.station_m for indicator in indicators], dtype=np.float64)
-    values = np.asarray([float(getattr(indicator, field_name)) for indicator in indicators], dtype=np.float64)
-    return float(np.interp(station_m, stations, values))
-
-
-def _interp_centerline_value(centerline: tuple[CenterlineStation, ...], field_name: str, station_m: float) -> float:
-    stations = np.asarray([station.station_m for station in centerline], dtype=np.float64)
-    values = np.asarray([float(getattr(station, field_name)) for station in centerline], dtype=np.float64)
-    return float(np.interp(station_m, stations, values))
-
-
-def _flow_band_by_name(flow_band: str) -> FlowBand:
-    for band in south_fork_american_flow_bands():
-        if band.flow_band == flow_band:
-            return band
-    raise ValueError(f"Unknown flow band: {flow_band}")
-
-
-def _indicator_signals(
-    station: CenterlineStation,
-    gradient: float,
-    constriction: float,
-    roughness: float,
-    rapid_score: float,
-) -> tuple[str, ...]:
-    signals: list[str] = []
-    if gradient >= 0.012:
-        signals.append("dem_slope")
-    if constriction >= 0.18:
-        signals.append("constriction")
-    if station.boulder_density >= 0.45:
-        signals.append("boulder_density")
-    if station.imagery_whitewater_texture >= 0.40:
-        signals.append("foam_whitewater_texture")
-    if station.bend_score >= 0.55:
-        signals.append("bend_or_lateral_candidate")
-    if station.guide_note_score >= 0.45:
-        signals.append("guide_note")
-    if station.access_score >= 0.50:
-        signals.append("access_point")
-    if roughness >= 0.45:
-        signals.append("roughness")
-    if rapid_score >= 0.55:
-        signals.append("high_score")
-    return tuple(signals)
-
-
-def _rapid_candidate_from_cluster(index: int, cluster: list[ChannelIndicator]) -> RapidCandidate:
-    peak = max(cluster, key=lambda indicator: indicator.rapid_score)
-    all_signals = sorted({signal for indicator in cluster for signal in indicator.signals})
-    labels: list[str] = []
-    if "constriction" in all_signals:
-        labels.append("constriction")
-    if "boulder_density" in all_signals:
-        labels.append("boulder_garden")
-    if "foam_whitewater_texture" in all_signals:
-        labels.append("wave_train")
-    if "bend_or_lateral_candidate" in all_signals:
-        labels.append("lateral")
-    if "guide_note" in all_signals:
-        labels.append("manual_review_required")
-    if not labels:
-        labels.append("riffle")
-    confidence = _clamp01(0.25 + 0.55 * peak.rapid_score + 0.04 * len(all_signals))
-    return RapidCandidate(
-        rapid_id=f"rapid_candidate_{index:02d}",
-        start_station_m=cluster[0].station_m,
-        end_station_m=cluster[-1].station_m,
-        peak_station_m=peak.station_m,
-        score=peak.rapid_score,
-        suggested_labels=tuple(labels),
-        signals=tuple(all_signals),
-        confidence=confidence,
-    )
-
-
-def _features_from_rapid_candidates(
-    rapid_candidates: tuple[RapidCandidate, ...],
-    grid: GridSpec2_5D,
-    station_min: float,
-    station_max: float,
-    preset: SolverParameterPreset,
-) -> tuple[Feature2_5D, ...]:
-    features: list[Feature2_5D] = []
-    x_min = float(grid.x_coordinates()[0])
-    x_max = float(grid.x_coordinates()[-1])
-    station_span = max(station_max - station_min, 1.0)
-    for candidate in rapid_candidates:
-        x = x_min + (candidate.peak_station_m - station_min) / station_span * (x_max - x_min)
-        base_strength = max(0.2, candidate.score) * preset.hazard_activation_scale
-        feature_kind = "wave_train"
-        if "constriction" in candidate.suggested_labels:
-            feature_kind = "constriction"
-        elif "boulder_garden" in candidate.suggested_labels:
-            feature_kind = "rock"
-        elif "lateral" in candidate.suggested_labels:
-            feature_kind = "lateral"
-        features.append(
-            Feature2_5D(
-                kind=feature_kind,  # type: ignore[arg-type]
-                center=(float(x), 0.0),
-                radius=4.0 if feature_kind == "rock" else 7.0,
-                strength=float(base_strength),
-                length=float(max(10.0, (candidate.end_station_m - candidate.start_station_m) * (x_max - x_min) / station_span)),
-                width=16.0,
-                metadata={
-                    "rapid_id": candidate.rapid_id,
-                    "source": "real_world_rapid_candidate",
-                    "confidence": candidate.confidence,
-                    "signals": ",".join(candidate.signals),
-                },
-            )
-        )
-        if "wave_train" in candidate.suggested_labels and feature_kind != "wave_train":
-            features.append(
-                Feature2_5D(
-                    kind="wave_train",
-                    center=(float(min(x + 8.0, x_max)), 0.0),
-                    radius=7.0,
-                    strength=float(base_strength * preset.wave_train_strength),
-                    length=18.0,
-                    width=15.0,
-                    metadata={"rapid_id": candidate.rapid_id, "source": "paired_wave_train"},
-                )
-            )
-        if candidate.score >= 0.58:
-            features.append(
-                Feature2_5D(
-                    kind="hole",
-                    center=(float(min(x + 4.0, x_max)), 0.0),
-                    radius=5.0,
-                    strength=float(base_strength * preset.hole_retention_strength),
-                    length=10.0,
-                    width=12.0,
-                    metadata={"rapid_id": candidate.rapid_id, "source": "high_score_hole_proxy"},
-                )
-            )
-    return tuple(features)
-
-
-def _real_world_probes(
-    grid: GridSpec2_5D,
-    rapid_candidates: tuple[RapidCandidate, ...],
-    station_min: float,
-    station_max: float,
-) -> tuple[Probe2_5D, ...]:
-    probes: list[Probe2_5D] = [
-        Probe2_5D("put_in_center", (grid.x_coordinates()[2], 0.0)),
-        Probe2_5D("mid_run_center", (grid.center[0], 0.0)),
-        Probe2_5D("take_out_center", (grid.x_coordinates()[-3], 0.0)),
-        Probe2_5D("mid_cross_section", (grid.center[0], 0.0), kind="cross_section", normal=(0.0, 1.0), length=(grid.ny - 2) * grid.dy),
-    ]
-    x_min = float(grid.x_coordinates()[0])
-    x_max = float(grid.x_coordinates()[-1])
-    station_span = max(station_max - station_min, 1.0)
-    for candidate in rapid_candidates[:4]:
-        x = x_min + (candidate.peak_station_m - station_min) / station_span * (x_max - x_min)
-        probes.append(Probe2_5D(f"{candidate.rapid_id}_probe", (float(x), 0.0), metadata={"rapid_id": candidate.rapid_id}))
-    return tuple(probes)
-
-
-def _feature_influence(feature: Feature2_5D, x: np.ndarray, y: np.ndarray) -> np.ndarray:
-    scale_x = max(feature.length * 0.5, feature.radius, 1.0)
-    scale_y = max(feature.width * 0.5, feature.radius, 1.0)
-    dx = (x - feature.center[0]) / scale_x
-    dy = (y - feature.center[1]) / scale_y
-    return np.exp(-(dx**2 + dy**2))
-
-
 def _rapid_candidates_geojson(
     candidates: tuple[RapidCandidate, ...],
     indicators: tuple[ChannelIndicator, ...],
@@ -7099,6 +6091,3 @@ def _write_json(path: Path, data: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
-
-def _clamp01(value: float) -> float:
-    return max(0.0, min(1.0, float(value)))

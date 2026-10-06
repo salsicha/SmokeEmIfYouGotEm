@@ -1,30 +1,3 @@
-{
-  "cpp": {
-    "command": [],
-    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_slope/reduced/cpp_solver/sloping_manning_channel_seed_16/manifest.json",
-    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_slope/reduced/cpp_solver/sloping_manning_channel_seed_16",
-    "returncode": 0,
-    "runtime_seconds": 0.28929929199875914,
-    "stderr": "",
-    "stdout": "",
-    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_slope/reduced/cpp_solver/sloping_manning_channel_seed_16/validation.json"
-  },
-  "geoclaw": {
-    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_slope/normalized/manifest.json",
-    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_slope/normalized",
-    "runtime_seconds": 0.9289153329991677,
-    "seconds_per_simulated_second": 0.15481922216652796,
-    "solver": "geoclaw",
-    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_slope/normalized/validation.json"
-  },
-  "runtime": {
-    "cpp_runtime_seconds": 0.28929929199875914,
-    "cpp_seconds_per_simulated_second": 0.04821654866645986,
-    "geoclaw_runtime_seconds": 0.9289153329991677,
-    "geoclaw_seconds_per_simulated_second": 0.15481922216652796,
-    "simulated_duration_seconds": 6.0
-  },
-  "scenario_id": "sloping_manning_channel_seed_16",
-  "scenario_json": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_slope/shared_scenario/scenario.json",
-  "scenario_package": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_slope/shared_scenario"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:6886075d88770b32ddaf404b6234b47807dfa4338c896656930e40bbcc2e3725
+size 1672

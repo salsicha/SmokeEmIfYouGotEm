@@ -1,6 +1,15 @@
 # Zambezi And Futaleufu Photoreal Goal
 
-> Active priority decision, July 14, 2026: Zambezi Batoka Gorge and Futaleufu are the immediate photoreal environment goal. Zambezi returns from backlog as an additional active environment target, while runnable and lifelike promotion remains blocked until authoritative full-reach centerline, high-resolution terrain, route, guide, and review evidence are attached. Chilko remains in the five-river runnable portfolio through `docs/chilko-futaleufu-photoreal-goal.md`.
+> Status update, August 1, 2026: Zambezi Batoka Gorge and Futaleufu remain the immediate photoreal environment goal. Zambezi is restored as the sixth runnable environment in a clearly labeled reference Free Run, and its feature-tagged procedural flow field now activates the live rapid VFX stack without losing global station registration. Lifelike and production-hydraulic promotion remain blocked until authoritative full-reach centerline, high-resolution terrain, bathymetry, route, guide, and review evidence are attached. Chilko remains in the runnable portfolio through `docs/chilko-futaleufu-photoreal-goal.md`.
+
+> Futaleufú update, August 4, 2026: `L_Terminator` now mixes seven
+> rights-reviewed CC0 small-fir and fern structure analogs into 1,440 of 1,800
+> screened near-bank placements while retaining procedural gap fill and the
+> complete project-owned canopy. Medium-fir canopy use remains rejected. The
+> editor, focused native contracts, and all six runnable maps pass, but the
+> candidate remains non-photoreal and non-authoritative for native species,
+> ecology, geography, hydraulics, or performance. See
+> `futaleufu_scanned_understory_v1_review.json` for hashes and open gates.
 
 ## Objective
 
@@ -9,7 +18,7 @@ Make these two priority river environments photorealistic in Unreal:
 - Zambezi River, Batoka Gorge, from Boiling Pot to Mukuni Beach: a photoreal big-water basalt gorge run below Victoria Falls.
 - Futaleufu River, Chile, from Rio Azul Swinging Bridge to The Pasarela: a photoreal Patagonian turquoise big-water run with boulder gardens and forested Andean valley walls.
 
-Futaleufu is required by the active five-river runnable goal. Zambezi is an additional active environment target whose runnable promotion remains source-blocked. For both rivers, completion means lifelike in-engine guide-seat and river-eye captures at reviewed seasonal flows, backed by source-traceable terrain, hydrography, materials, foliage, water, atmosphere, named hazards, and accepted art, guide, geospatial, rights, hazard-readability, desktop, and VR review. Source-data packages, generated maps, or technically valid screenshots alone do not complete the goal.
+Futaleufu and Zambezi are both part of the active six-river runnable goal. Zambezi's reference Free Run is playable now, but its production-fidelity promotion remains source- and review-blocked. For both rivers, completion means lifelike in-engine guide-seat and river-eye captures at reviewed seasonal flows, backed by source-traceable terrain, hydrography, materials, foliage, water, atmosphere, named hazards, and accepted art, guide, geospatial, rights, hazard-readability, desktop, and VR review. Source-data packages, generated maps, or technically valid screenshots alone do not complete the goal.
 
 ## Current Evidence And Blockers
 
@@ -23,7 +32,7 @@ Fresh offscreen Unreal captures prove that the Futaleufu river ribbon, cameras, 
 
 - Zambezi's current OSM route is a low-precision international-boundary trace rather than a surveyed centerline; its 30 m DSM cannot resolve the narrow gorge floor and the current bounded visual conditioning reaches a review-gated 218.8192 m maximum cut.
 - Coarse channel geometry still needs higher-resolution terrain, surveyed sections, lidar/photogrammetry, or guide-reviewed first-party field reconstruction before close river-level approval.
-- Generic Procedural Vegetation Editor species, sparse or ecologically inaccurate silhouettes, and no approved river-specific species/age/density libraries.
+- Zambezi's opaque procedural fallback and Futaleufu's retained review foliage remain sparse or ecologically incomplete, with no approved river-specific species/age/density libraries.
 - Shared fallback near-field detail textures instead of unique reviewed Zambezi basalt and Futaleufu granite/temperate-rainforest material sets.
 - Review water shading without production reflection, refraction, foam, spray, mist, wet-bank transitions, or live solver-derived surface fields.
 - No approved low/normal/high seasonal-flow capture set, guide/art/geospatial/rights review, or measured desktop/VR performance evidence.
@@ -37,6 +46,8 @@ The July 11 terrain-projection pass corrected the north-up source-drape UV on th
 A river-specific trial of the already isolated Poly Haven `Tree Small 02`, fir, and pine assets was rendered and rejected in the same pass. Zambezi became overexposed with repeated sparse crowns, while Futaleufu's conifers collapsed into bare vertical silhouettes at gameplay distance. Those substitutions were removed before the final captures. The existing PVE trees remain temporary blockers, and neither the rejected tree assets nor the retained rock comparison is ecology, geology, lifelike, performance, or gameplay promoted.
 
 A second Zambezi canopy experiment now proves the full rights-reviewed external-tree intake path with Poly Haven `Jacaranda Tree`: eleven source files are hash-locked, the isolated UE 5.8 import has a grounded 19.47 m Nanite mesh with explicit branch/trunk/leaf materials, and the measured FBX contains 3,133,049 source triangles despite the publisher page's `312K` label. The visual comparison is rejected and preserved in `polyhaven_jacaranda_tree_visual_comparison_review.json`: leaf cards render as an obstructive black/yellow mass, the terrain falls back to a bright white appearance, distant crowns repeat, and the structure analog has no Batoka species approval. The default map generator and regenerated candidate manifest contain no Jacaranda reference; the restored rock/PVE baseline again passes all five map checks with zero errors and warnings. The next Zambezi foliage acquisition must provide multiple rights-cleared, distance-stable southern African gorge woodland species and material variants, not another single-tree substitution.
+
+The active Zambezi map now removes that restored PVE baseline as well. A separate evaluation of the CC0 [3TD Africa Savanna Pack v1.0](https://opengameart.org/content/3td-africa-savanna-pack-v10) found that its tree, bush, and ground-cover foliage still depends on transparent branch sheets, so it was rejected before project intake and remains only in temporary evaluation storage. The map generator instead authors four project-owned solid-mesh fallbacks—riparian tree, umbrella tree, thorn scrub, and savanna ground cover—with one opaque, one-sided vertex-colour material. Their deterministic 2,100/1,400/1,400/700 HISM split totals 5,600 non-colliding instances; a wide-bank 12 m-baseline slope screen and launch setback keep them off cliff faces, the navigable channel, and the canonical start views. Saved-map schema v4 verifies the exact families, counts, material, tags, collision state, and absence of legacy Zambezi PVE actors, while the focused Zambezi river-map PIE test passes. This closes the active alpha-card/floating-triangle defect only: the synthetic forms, sparse launch vista, unreviewed species/ecology, material simplicity, and missing measured desktop/VR evidence still block photoreal or production promotion.
 
 The first multi-strata Futaleufu foliage intake now validates ten isolated Poly Haven meshes: three 5.89-8.81 m medium firs, three 0.74-1.30 m small firs, and four 0.21-0.43 m fern clumps, backed by 21 hash-locked sources, 18 textures, five explicit materials, grounded pivots, and Nanite. The experiment also fixed a shared import defect: idempotent sampler repair now classifies texture names containing `Alpha` as masks, preventing Metal from substituting the default material. A clean-start comparison then proved the set itself is not a corridor-scale improvement: medium fir needles collapse into pale branch silhouettes, saplings/ferns disappear at river-camera distance, and replacing 9,600 PVE placements reduces continuous green slope breakup. `polyhaven_futaleufu_temperate_forest_set_visual_comparison_review.json` rejects promotion, the default generator excludes the set, and the restored baseline passes 12 zero-error/zero-warning map checks. The next canopy acquisition must prioritize multiple adult, dense, distance-stable Patagonian broadleaf or reviewed Nothofagus-family variants; the validated sapling and fern assets are only candidates for closer near-bank strata.
 
@@ -138,6 +149,73 @@ V11 completes and rejects the first continuous-terrain material experiment. `Raf
 V12 closes the projection defect without promoting the scene. `RaftSim.CaptureZambeziBatokaWorldAlignedTerrainComparison` maps macro color, normal, roughness, and AO plus detail color, normal, and roughness through Unreal's world-aligned functions at the same exposed 50 m and 2.4 m scales; the review material uses world-space normal output. Exact-camera evidence shows consistent scale across differently oriented banks and removes the worst V11 top-down stretching. `zambezi_batoka_v12_world_aligned_visual_review.json` retains that graph only as the technical projection basis. The environment remains rejected because the 30 m DSM and 12.5 m render sampling produce rounded masses rather than stepped scarps and talus, the generic brown source is not Batoka lithology, and foliage, water, atmosphere, and lighting remain blockout quality. Further material-weight tuning is now prohibited as a substitute for morphology: higher-resolution reviewed terrain is the next gating input.
 
 V13 tests and rejects the remaining bounded procedural fallback instead of silently enlarging it. `RaftSim.CaptureZambeziBatokaVisualMorphologyComparison` keeps the V12 material, protects the first 220 m around the source centerline with a fade to 650 m, and applies render-only elevation-conditioned flow breaks, two irregular joint families, and talus-scale breakup under a 4.5 m absolute cap. Each comparison accounts for all 1,631,500 visual vertices: 76,403 are river-protected, 1,471,404 fail the slope mask, and 69,987 move by a mean absolute 29.35 cm with -3.94 m/+2.93 m extrema. The exact cameras change 5.22 and 7.84 percent of pixels, but mean channel deltas are only 0.19 and 0.25 levels and the rounded silhouette is effectively unchanged. `zambezi_batoka_v13_visual_morphology_visual_review.json` therefore rejects the pass. Increasing displacement enough to fabricate scarps would invent unsupported walls and banks, so the next legitimate input is rights-cleared higher-resolution terrain: feasibility Vol.3 only if its coverage index intersects the game reach, or a commercially licensed stereo/field-capture product with full reach coverage and complete datum, accuracy, derivative-use, and attribution metadata.
+
+V14 does not overturn that photoreal rejection or promote procedural terrain as
+geographic truth. For the runnable reference-free-run map, it moves the same
+render-only treatment onto the visibly rounded dry lower banks while keeping a
+hard 100 m centreline protection radius around the 72 m active-water
+half-width. The widest generated water edge therefore retains at least 26.56 m
+of untouched shoreline; morphology fades in from 100-220 m, broadens only the
+near-bank rounded-slope mask, and keeps the V13 4.5 m displacement cap. Map
+generation now fails unless four collision-off terrain tiles and at least one
+conditioned dry near-bank vertex are present. Protection distance is measured
+to the full 209-point source-aligned polyline rather than sparse point samples.
+The generated map moved 90,926 of 1,631,500 render vertices, including 18,277
+inside the 220 m near-bank envelope; its nearest conditioned vertex is 102.63 m
+from the polyline. It does so without changing the hidden Copernicus Landscape,
+collision, height queries,
+water geometry, hydraulics, raft contact, rapid stationing, or gameplay. This is
+a bounded runnable-map presentation improvement; rights-cleared higher-resolution
+terrain and external visual/geology review remain the production-photoreal gates.
+
+V16 keeps V15 morphology and closes the runnable material's brightest tan-wall
+failure without treating shader work as terrain authority. The retained 50 m
+world-aligned Aerial Rocks 02 macro is cross-blended with an incommensurate
+83 m projection through a deterministic low-frequency field; a separate field
+adds bounded mineral-value variation, Rock037 detail moves from 2.4 m to 4.8 m
+with reduced color/normal/roughness weights, and explicit blue-gray basalt plus
+brown weathering parameters cover the broad rounded walls that the legacy
+steep-slope mask missed. In the matched gameplay terrain mask, mean luminance
+drops from 0.7061 to 0.6448 and mean saturation from 0.3255 to 0.3003, while
+adjacent luminance variation rises from 0.00758 to 0.01115 and no terrain pixel
+falls below 0.18. `zambezi_organic_basalt_surface_v16_review.json` retains the
+graph, exact defaults, hashes, rejected weaker brackets, and external gates.
+The source Landscape, four render meshes, V15 displacement, shoreline buffer,
+collision, water, solver, route, hazards, and raft forces are unchanged. This
+is a runnable visual improvement, not photoreal or Batoka-lithology promotion:
+the sun-facing wall remains rounded and bright, and higher-resolution terrain,
+reach-specific geology, authentic ecology, guide/art review, and platform gates
+remain open.
+
+The runnable Zambezi reference now has a separate live-hydraulics acceptance
+layer. Its 30 km cooked field is regenerated at 5 m downstream resolution, and
+each of the 25 PDF-derived rapid records produces a bounded feature-tagged
+control plus a 3 m presentation-sampled Froude transition. The full-corridor
+water actor preserves global river stations instead of applying the legacy
+single-rapid crux recentering. The focused MacEditor PIE gate loads the saved
+map successfully, detects nine breaking sites in the launch window, creates a
+ready 19-component production Niagara pool, and requires nonzero live roller
+and rapid-aerosol activity. Rapid 9 remains visualization-only and a mandatory
+commercial portage. This closes runnable runtime registration, not hydraulic or
+visual fidelity: an offscreen chase-camera diagnostic still shows flat bright
+water, coarse 30 m canyon forms, sparse ecology, and presentation failures in
+the raft/crew composition. The transition geometry is procedural reference
+infill and cannot support guide lines, navigation, seasonal, or real-world
+hydraulic claims.
+
+The August 3 V2 gameplay-water pass addresses the most visible launch-water
+edge and glare defects without changing that authority boundary. The shared
+raft-transmitting Single Layer Water parent now consumes the smooth wet-cell
+coverage already stored in live-core vertex alpha, while Zambezi expands its
+render-only bank blend from 4.5 m to 7.5 m and reduces the live detail skin,
+reflection, and specular response. Matched 1280x720 captures at the same raft
+transform retain all live solver counts; the measured water fraction above
+0.90 luminance falls from 7.3201 to 1.2097 percent and the sampled right-bank
+p99 vertical edge falls 14.8 percent. This is retained only as a technical
+optical improvement. The source DEM and wet-cell sampling remain too coarse for
+lifelike bank geometry, and all guide, geospatial, rights, seasonal-flow,
+hydraulic, geology/ecology/art, water/VFX, raft/character, and platform gates
+remain open in `zambezi_live_transmitting_water_v2_review.json`.
 
 The project-owned Futaleufu coigue family now has a separate far-corridor runtime representation and a 512-tree HISM review map. The full eight-form closeup family remains intact at 350.87 MiB; deterministic one-in-six far-card meshes plus the structural trunks reduce the final runtime far family to 19.33 MiB, 435,064 vertices, and 223,592 triangles, a 94.492 percent resource reduction. The corrected benchmark keeps crowns registered to their trunks, but it remains a technical candidate: the neutral stand is too dark and regular, has no mixed native ecology or corridor masks, and lacks near/mid/far transition, wind, packaged desktop, and on-device VR evidence. `futaleufu_native_canopy_coigue_v12_runtime_lod_review.json` keeps corridor substitution and production promotion closed.
 
@@ -274,3 +352,19 @@ Cordilleran-cypress V42 establishes the geometry fidelity upper bound without cl
 Cordilleran-cypress V43 completes the first isolation step without weakening those blockers. It reuses V42's exact mesh, source parent materials, fixed camera, and frontlit/backlit bracket, then compares a no-shadow single component, a no-shadow material-ID bark/foliage split, and the same split with bark-only shadowing. Identical source-coverage temporal parameters are applied to both controls. Single/split no-shadow parity passes the declared independent-TAA tolerance at 0.9972/0.9870 front/back IoU, 0.99983x/0.99996x area, 0.99994x/0.99977x overlap luminance, and 0.149/0.546 mean channel delta. Bark-only shadowing worsens every measured source-agreement dimension under both lights, proving that material identity cannot recover the source trunk-versus-foliage component provenance lost by the merge. Preserve `futaleufu_cordillera_cypress_v43_merged_component_parity_review.json` and its contact sheet as rejection evidence. The next exact-geometry control must preserve source trunk and all foliage-instance ownership separately; only after that bracket is understood should triangle reduction and inverse temporal handoff proceed. No corridor, family, performance, hazard-readability, or photoreal promotion follows from V43.
 
 The July 15 canopy strategy checkpoint in `docs/futaleufu-canopy-strategy-review.md` supersedes automatic V44 iteration. The mined 47-review history records zero promotions; V42's exact geometry improved backlit source silhouette IoU to 0.717 but remains 0.183 below the 0.900 gate, while V43 proves material ID cannot restore source shadow provenance. Freeze new cypress variants until the owner selects a sourcing and ecology-analog policy. The recommended next move is a bounded hybrid pilot under the unchanged gate pipeline, rights review, and explicit stop-loss rules.
+
+Futaleufú transmitting water V3 is now the retained runtime optical candidate on the unchanged runnable `L_Terminator` package. Two first-party generated visual textures supply river-local flow-normal detail and solver-masked foam breakup; their exact prompts, hashes, addressing, ownership, and no-authority limitations are pinned beside the source art. Newly generated maps persist the V3 material and textures, while a cooked-field-identity migration gives the same bindings and tuned cold-water optics to the already versioned map without resaving it together with unrelated terrain work. Solver mesh topology, wet/dry ownership, hydraulics, bathymetry, collision, and raft forces are unchanged. The identical live breaking-water camera reduces mean water-band luminance from 0.708139 to 0.691794 and the fraction above 0.90 from 0.074455 to 0.071194 while increasing blue-minus-red from 0.017644 to 0.031766. The native material, runnable-map, and water-render gates pass.
+
+This is a bounded technical improvement, not photoreal or production promotion. The retained frame still has a broad overexposed sun reflection, a smooth sheet-like standing-wave face, incomplete entrained-air depth, spray and mist, and blockout-quality banks, terrain materials, rocks, and vegetation. `futaleufu_terminator_transmitting_water_v3_review.json` keeps all six external guide, geospatial, hydraulic, ecology/geology/art, water-VFX/occlusion, and target-hardware/complete-run gates open.
+
+Colorado Hance transmitting water V2 extends the bounded river-local optical
+work to the unchanged runnable `L_Hance` map. Its capture ribbon now transmits
+the terrain beneath it using depth/bank/aeration alpha and physical IOR, while
+the live runtime resolves a wet-cell-clipped volume material, Hance flow normal,
+and solver-masked foam breakup from the cooked-field identity. The three fixed
+captures show much stronger riverbed and bank readability than the pre-change
+opaque gray carrier, and native material, capture, shared-water, and runnable-map
+checks pass. This is not a production or photoreal promotion: coarse hydraulic
+bands, thin sediment optics, duplicate guide/rapid framing, missing crest/roller
+volume and spray, terraced terrain, procedural ecology, unconverged hydraulics,
+and the six external review gates remain open.

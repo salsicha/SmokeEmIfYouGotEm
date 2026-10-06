@@ -3,7 +3,8 @@ from pathlib import Path
 
 
 PHYSICS_ROOT = Path(__file__).resolve().parents[1]
-SOLVER_SOURCE_ROOT = PHYSICS_ROOT / "cpp" / "src"
+# The solver lives in the SEIYGE core submodule.
+SOLVER_SOURCE_ROOT = PHYSICS_ROOT.parent / "unreal" / "Plugins" / "SEIYGECore" / "cpp" / "src"
 COLUMN_PROFILE_PATH = (
     PHYSICS_ROOT / "data" / "calibration" / "milestone18_column_geoclaw_profiles.json"
 )
@@ -38,4 +39,4 @@ def test_cpp_solver_sources_are_bounded_by_concern():
     assert implementation_paths
     for path in implementation_paths:
         line_count = len(path.read_text(encoding="utf-8").splitlines())
-        assert line_count <= 3_000, f"{path.relative_to(PHYSICS_ROOT)} has {line_count} lines"
+        assert line_count <= 3_000, f"{path.relative_to(PHYSICS_ROOT.parent)} has {line_count} lines"

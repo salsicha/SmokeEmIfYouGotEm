@@ -1,0 +1,323 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "RaftSimCrewAvatarActor.h"
+
+#include "RaftSimCC0CrewVisualActor.generated.h"
+
+class UPoseableMeshComponent;
+class UProceduralMeshComponent;
+class USceneComponent;
+
+/**
+ * Packaged CC0 human body used by the production guide/crew adapter.
+ *
+ * Five independently morphed MakeHuman game-engine rigs provide the body,
+ * face, skin, eyes, and wetsuit. The host avatar keeps authority over rafting
+ * gear, the paddle, gameplay, rescue state, and the deterministic pose solve.
+ */
+UCLASS(BlueprintType)
+class RAFTSIMRAFT_API ARaftSimCC0CrewVisualActor final
+    : public AActor,
+      public IRaftSimCrewProductionVisual
+{
+    GENERATED_BODY()
+
+public:
+    ARaftSimCC0CrewVisualActor();
+
+    virtual void ConfigureCrewAppearance_Implementation(
+        int32 VariantIndex,
+        int32 SeatSide,
+        bool bGuide) override;
+
+    virtual void ApplyCrewPose_Implementation(
+        ERaftSimCrewAvatarAction Action,
+        float NormalizedPhase,
+        float Intensity,
+        int32 SeatSide) override;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool IsBodyReady() const { return bBodyReady; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasFinitePose() const;
+
+    /** Both imported hands expose complete three-joint thumb/finger chains. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasArticulatedPaddleGripRig() const;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPaddleGripAnchorErrorCm() const
+    {
+        return MaximumPaddleGripAnchorErrorCm;
+    }
+
+    /** Largest radial miss between any distal finger pad and its handle. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPaddleFingerContactErrorCm() const
+    {
+        return MaximumPaddleFingerContactErrorCm;
+    }
+
+    /** Largest radial miss between either thumb pad and its handle. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPaddleThumbContactErrorCm() const
+    {
+        return MaximumPaddleThumbContactErrorCm;
+    }
+
+    /** Worst middle-finger/thumb radial dot; negative means opposed. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPaddleThumbOppositionDot() const
+    {
+        return MaximumPaddleThumbOppositionDot;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMinimumUpperPaddleFingerClosureDegrees() const
+    {
+        return MinimumUpperPaddleFingerClosureDegrees;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMinimumLowerPaddleFingerClosureDegrees() const
+    {
+        return MinimumLowerPaddleFingerClosureDegrees;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMinimumPaddleThumbClosureDegrees() const
+    {
+        return MinimumPaddleThumbClosureDegrees;
+    }
+
+    /** Render-only torso-up distance from the shoulder line to the presented head pivot. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetPresentedHeadShoulderClearanceCm() const
+    {
+        return PresentedHeadShoulderClearanceCm;
+    }
+
+    /** Distance between the two rendered inner-clavicle roots. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetPresentedClavicleRootSpanCm() const
+    {
+        return PresentedClavicleRootSpanCm;
+    }
+
+    /** Error between rendered upper-arm roots and the authoritative pose. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPresentedShoulderAnchorErrorCm() const
+    {
+        return MaximumPresentedShoulderAnchorErrorCm;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasAnatomicalShoulderTransition() const
+    {
+        return bBodyReady &&
+            PresentedClavicleRootSpanCm >= 8.5f &&
+            PresentedClavicleRootSpanCm <= 12.0f &&
+            MaximumPresentedShoulderAnchorErrorCm <= 0.25f;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasActivePaddleGripPose() const
+    {
+        return bPaddleGripActive;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FString GetSelectedMeshPath() const;
+
+    /** Posed glute underside samples, in the owning avatar's local frame.
+     * Evaluated only on seating/validation, never in the animation tick. */
+    TArray<FVector> GetSeatedContactPointsLocalCm() const;
+
+    /** CPU-skinned LOD0 vertices for offline/native clearance audits only. */
+    TArray<FVector> GetPosedBodyVerticesWorldCmForValidation() const;
+
+    /** Rest foot size the river sandals are fitted to: ankle-to-ball length
+     * and ankle height above the sole, in pose centimetres. */
+    bool GetRestFootMeasurementsCm(float& OutAnkleToBallCm, float& OutAnkleHeightCm) const;
+
+    /** World-space anchor of the coherently posed head/hair island. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetSolvedHeadWorldLocation() const;
+
+    /** World-space direction the rendered face points after the rafting pose. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetSolvedFaceForwardWorldVector() const;
+
+    /** World-space crown direction paired with the rendered face frame. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetSolvedFaceUpWorldVector() const;
+
+    /**
+     * Chest frame of the rendered spine (origin between the mid and upper
+     * spine, Z along the spine, X toward the face) for worn-gear placement.
+     * False until the body is loaded and posed.
+     */
+    bool GetSolvedChestWorldTransform(FTransform& OutWorld) const;
+
+    /** The vest's depth scale fitted to this body's measured chest (front
+     * and back carriers about 5 mm off the body); false until measured. */
+    bool GetFittedVestDepthScale(float& OutScale) const
+    {
+        OutScale = FittedVestDepthScale;
+        return bVestFitMeasured;
+    }
+
+    /** Midpoint of the rendered eyes (for eyewear); false until posed. */
+    bool GetRenderedEyeCenterWorld(FVector& OutWorldLocation) const
+    {
+        return bBodyReady && TryGetRenderedFaceEyeCenterWorld(OutWorldLocation);
+    }
+
+    /** First-person guide seat: collapse the head bone like the boot-hidden
+     * feet so the camera can sit in the eye socket. Applied every pose. */
+    void SetHeadHiddenForFirstPerson(bool bShouldHide) { bHeadHiddenForFirstPerson = bShouldHide; }
+
+    /** September 6 front/profile/rear-reviewed shell fit: crew 0.84, guide
+     * 0.90, with role-specific rear seating offsets. Guide review overrides
+     * are diagnostic only, not the default acceptance contract. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetRecommendedWhitewaterHelmetScale() const;
+
+private:
+    bool EnsureBodyLoaded();
+    void CacheReferencePose();
+    void LogPoseForensics(const FVector& NeckBaseCm, const FVector& HeadCenterCm) const;
+    void CacheRenderedFaceAnchorVertices();
+    bool TryGetRenderedFaceEyeCenterWorld(FVector& OutWorldLocation) const;
+    void ApplyBodyPose(const FRaftSimCrewAvatarPose& Pose);
+    /** Advance the person's idle gaze (URaftSimCrewRoster) for this pose. */
+    void UpdateGaze(ERaftSimCrewAvatarAction Action);
+    /** Fit the neoprene collar to the rest-pose skin/wetsuit seam. */
+    void BuildNeckCollar();
+    /** Carry the collar with the rendered upper spine. */
+    void UpdateNeckCollar();
+    /** Chest frame with the vest centre a given distance ahead of the spine. */
+    bool ComputeChestWorldTransform(float ForwardOfSpineCm, FTransform& OutWorld) const;
+    /** Measure the seated body's chest front and back (posed vertices) and fit
+     * the vest's depth and fore-aft position to them. */
+    void MeasureVestFit();
+    void ApplyPaddleGripPose(const FRaftSimCrewAvatarPose& Pose);
+    void ApplyFingerChain(bool bLeft, const TCHAR* Digit, float GripAlpha);
+    void ApplyFingerChainAroundGrip(
+        bool bLeft,
+        const TCHAR* Digit,
+        const FVector& GripCenterCm,
+        const FVector& GripAxis,
+        bool bUpperTGrip);
+    void ApplyOpposedThumbPadToGrip(
+        bool bLeft,
+        const FVector& GripCenterCm,
+        const FVector& GripAxis,
+        bool bUpperTGrip);
+    void SetPaddleGripHandTransform(
+        bool bLeft,
+        const FRaftSimCrewAvatarPose& Pose,
+        const FVector& WristCm);
+    void SetBoneAtPoint(FName BoneName, const FVector& DesiredPointCm);
+    void SetSegmentBone(
+        FName BoneName,
+        FName ReferenceEndBone,
+        const FVector& DesiredStartCm,
+        const FVector& DesiredEndCm,
+        float ShaftTwistDegrees = 0.0f);
+    FVector ToMeshSpace(const FVector& PointCm) const;
+    FVector ResolvePaddleGripWristCm(
+        bool bLeft,
+        const FRaftSimCrewAvatarPose& Pose,
+        const FVector& DesiredGripCm) const;
+    FQuat ResolvePaddleGripHandRotation(
+        bool bLeft,
+        const FRaftSimCrewAvatarPose& Pose) const;
+    FVector ResolvePaddleGripAxis(
+        const FRaftSimCrewAvatarPose& Pose,
+        const FVector& DesiredGripCm) const;
+    bool IsUpperTGrip(
+        const FRaftSimCrewAvatarPose& Pose,
+        const FVector& DesiredGripCm) const;
+    float MeasurePaddleGripAnchorErrorCm(
+        bool bLeft,
+        const FVector& DesiredGripCm) const;
+    float MeasureMinimumPaddleFingerClosureDegrees(
+        const FRaftSimCrewAvatarPose& Pose,
+        bool bUpperTGrip) const;
+    float MeasureMinimumPaddleThumbClosureDegrees() const;
+    float MeasureMaximumPaddleFingerContactErrorCm(
+        const FRaftSimCrewAvatarPose& Pose) const;
+    float MeasureMaximumPaddleThumbContactErrorCm(
+        const FRaftSimCrewAvatarPose& Pose) const;
+    float MeasureMaximumPaddleThumbOppositionDot(
+        const FRaftSimCrewAvatarPose& Pose) const;
+
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<USceneComponent> Root;
+
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Production")
+    TObjectPtr<UPoseableMeshComponent> Body;
+
+    UPROPERTY()
+    TMap<FName, FTransform> ReferenceComponentTransforms;
+
+    /** LOD0 rendered-eye vertices used once to calibrate the fitted helmet. */
+    TArray<int32> RenderedFaceAnchorVertexIndices;
+    /** Rest-pose eye centroid in head-bone space. The eyes are rigidly carried
+     * by the head, so transforming this cached point gives the same helmet
+     * anchor without CPU-skinning the eye section on every frame. */
+    FVector RenderedFaceAnchorHeadLocal = FVector::ZeroVector;
+    bool bHasRenderedFaceAnchorHeadLocal = false;
+    bool bLoggedPoseForensics = false;
+
+    int32 CurrentVariantIndex = 0;
+    bool bCurrentGuide = false;
+    bool bBodyReady = false;
+    bool bHeadHiddenForFirstPerson = false;
+    bool bPaddleGripActive = false;
+    float MaximumPaddleGripAnchorErrorCm = 0.0f;
+    float MaximumPaddleFingerContactErrorCm = 0.0f;
+    float MaximumPaddleThumbContactErrorCm = 0.0f;
+    float MaximumPaddleThumbOppositionDot = -1.0f;
+    float MinimumUpperPaddleFingerClosureDegrees = 0.0f;
+    float MinimumLowerPaddleFingerClosureDegrees = 0.0f;
+    float MinimumPaddleThumbClosureDegrees = 0.0f;
+    float PresentedHeadShoulderClearanceCm = 0.0f;
+    float PresentedClavicleRootSpanCm = 0.0f;
+    float MaximumPresentedShoulderAnchorErrorCm = 0.0f;
+    static constexpr float BodyScale = 1.0f;
+
+    /** Neoprene collar over the wetsuit's scalloped neckline (the source
+     * assigns skin and wetsuit by skin weight, which leaves a saw-tooth seam
+     * round the neck). Built in spine_03's rest frame, in cm. */
+    UPROPERTY(Transient)
+    TObjectPtr<UProceduralMeshComponent> NeckCollar;
+    bool bNeckCollarBuilt = false;
+    /** Rest-pose collar (component cm): each vertex rides spine_03 and
+     * neck_01 by its weight, so the lip follows the neck and the base the
+     * suit, stretching over the band where the posed skin crosses the suit. */
+    TArray<FVector> NeckCollarRestPositions;
+    TArray<FVector> NeckCollarRestNormals;
+    TArray<float> NeckCollarNeckWeights;
+    TArray<FVector> NeckCollarPosedPositions;
+    TArray<FVector> NeckCollarPosedNormals;
+
+    /** Idle gaze: the head turns to a look, holds it, and moves on. */
+    float GazeYawDegrees = 0.0f;
+    float GazePitchDegrees = 0.0f;
+    float GazeTargetYawDegrees = 0.0f;
+    float GazeTargetPitchDegrees = 0.0f;
+    float GazeWeight = 0.0f;
+    double GazeLastSeconds = -1.0;
+    double GazeNextChangeSeconds = 0.0;
+    FRandomStream GazeRandom;
+
+    /** Vest fitted to this body (MeasureVestFit): its centre ahead of the
+     * spine and its depth scale. */
+    bool bVestFitMeasured = false;
+    float FittedVestForwardOfSpineCm = 4.5f;
+    float FittedVestDepthScale = 1.0f;
+};

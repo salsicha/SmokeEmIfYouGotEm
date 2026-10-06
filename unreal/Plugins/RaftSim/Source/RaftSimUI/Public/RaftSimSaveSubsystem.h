@@ -14,7 +14,7 @@ class RAFTSIMUI_API URaftSimSaveSubsystem : public UGameInstanceSubsystem
 
 public:
     static const TCHAR* SlotName;
-    static constexpr int32 CurrentSaveVersion = 3;
+    static constexpr int32 CurrentSaveVersion = 4;
 
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
@@ -23,6 +23,16 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Save")
     bool SaveCurrent();
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Save")
+    bool IsCurrentSaveWritable() const { return bCurrentSaveWritable; }
+
+    /** True only when startup found no slot and created this profile from defaults. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Save")
+    bool WasFreshProfileCreatedThisSession() const
+    {
+        return bFreshProfileCreatedThisSession;
+    }
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Save")
     void MarkScenarioCompleted(FName ScenarioId, float SafetyScore, float OverallScore);
@@ -37,7 +47,8 @@ public:
     void RecordTrainingDrillCompleted(FName DrillId);
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Career")
-    void RecordCareerCheckpoint(FName ScenarioId, FName SectionId, float StationM, FTransform Transform);
+    void RecordCareerCheckpoint(FName ScenarioId, FName SectionId, float StationM, FTransform Transform,
+        const FString& CoordinateMapPath = TEXT(""));
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Career")
     bool IsScenarioUnlocked(FName ScenarioId, ERaftSimGameMode GameMode) const;
@@ -46,7 +57,13 @@ public:
     bool GetScenarioProgress(FName ScenarioId, FRaftSimScenarioProgress& OutProgress) const;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Career")
-    bool FindBestCheckpoint(float MinimumStationM, FTransform& OutTransform) const;
+    // Nearest saved checkpoint at or beyond MinimumStationM and, when given, not
+    // beyond MaximumStationM: a section resumes from the previous section's
+    // finish, never from a checkpoint kilometres further down the river.
+    bool FindBestCheckpoint(
+        float MinimumStationM, FTransform& OutTransform,
+        float MaximumStationM = 1000000000.0f, const FString& CoordinateMapPath = TEXT(""),
+        FName LevelName = NAME_None) const;
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Settings")
     void RestoreDefaultSettings();
@@ -55,15 +72,30 @@ public:
     bool RebindAction(FName ActionId, FName KeyName);
 
     /** Deterministic, disk-free helpers used by migration and automation. */
-    static void NormalizeSave(URaftSimVerticalSliceSaveGame* Save);
+    /**
+     * Migrate an older/current save in place. Returns false for null or a save
+     * written by a newer build; callers must then treat it as read-only.
+     */
+    static bool NormalizeSave(URaftSimVerticalSliceSaveGame* Save);
     static ERaftSimMedal ApplyRunResult(
         URaftSimVerticalSliceSaveGame* Save, const FRaftSimRunResult& Result);
+    static bool ApplyCareerCheckpoint(URaftSimVerticalSliceSaveGame* Save,
+        FName ScenarioId, FName SectionId, float StationM, const FTransform& Transform,
+        const FString& CoordinateMapPath);
+    static bool SelectCheckpoint(const URaftSimVerticalSliceSaveGame* Save,
+        float MinimumStationM, float MaximumStationM, const FString& CoordinateMapPath,
+        FName LevelName, FTransform& OutTransform);
 
 private:
     static FRaftSimScenarioProgress& FindOrAddProgress(
         URaftSimVerticalSliceSaveGame* Save, FName ScenarioId);
     static void RecalculateLicenseAndUnlocks(URaftSimVerticalSliceSaveGame* Save);
+    static void EnsureProgressCoordinates(URaftSimVerticalSliceSaveGame* Save,
+        FRaftSimScenarioProgress& Progress, const FString& CoordinateMapPath);
 
     UPROPERTY()
     TObjectPtr<URaftSimVerticalSliceSaveGame> CurrentSave;
+
+    bool bCurrentSaveWritable = true;
+    bool bFreshProfileCreatedThisSession = false;
 };

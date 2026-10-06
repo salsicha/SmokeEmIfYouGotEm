@@ -150,12 +150,10 @@ def test_generation_is_deterministic(committed_packages):
 def test_regeneration_matches_committed_package(committed_packages):
     regenerated = generate_meat_grinder_scenario2_5d(REPO_ROOT, "median_runnable")
     committed = committed_packages["median_runnable"]
-    np.testing.assert_allclose(regenerated.bed, committed.bed, rtol=1e-12, atol=1e-12)
-    np.testing.assert_allclose(regenerated.initial_state.depth, committed.initial_state.depth, rtol=1e-12, atol=1e-12)
-    np.testing.assert_allclose(regenerated.initial_state.u, committed.initial_state.u, rtol=1e-12, atol=1e-12)
-    assert regenerated.metadata.provenance["stage_west_m"] == pytest.approx(
-        committed.metadata.provenance["stage_west_m"], rel=1e-12, abs=1e-12
-    )
+    np.testing.assert_array_equal(regenerated.bed, committed.bed)
+    np.testing.assert_array_equal(regenerated.initial_state.depth, committed.initial_state.depth)
+    np.testing.assert_array_equal(regenerated.initial_state.u, committed.initial_state.u)
+    assert regenerated.metadata.provenance["stage_west_m"] == committed.metadata.provenance["stage_west_m"]
 
 
 def test_flow_band_boundaries_scale_with_committed_presets(committed_packages):

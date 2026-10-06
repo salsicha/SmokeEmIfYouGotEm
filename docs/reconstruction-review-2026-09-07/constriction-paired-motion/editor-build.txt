@@ -1,0 +1,140 @@
+Log started at 09/18/2026 07:58:32 (2026-09-18T14:58:32Z)
+Resolved project argument C:/Users/salsi/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject to C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\SmokeEmIfYouGotEm.uproject
+No config file at C:\ProgramData\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+No config file at C:\Users\salsi\AppData\Local\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+No config file at C:\Users\salsi\OneDrive\Documents\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+Configuration will be read from:
+  C:\Users\salsi\AppData\Roaming\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+Reading configuration file from cache (C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Intermediate\Build\XmlConfigCache.bin): C:\Users\salsi\AppData\Roaming\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+Reading configuration file from cache (C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Intermediate\Build\XmlConfigCache.bin): C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Saved\UnrealBuildTool\BuildConfiguration.xml
+Reading configuration file from cache (C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Intermediate\Build\XmlConfigCache.bin): C:\Users\salsi\AppData\Local\UnrealEngine\Intermediate\Build\UnrealBuildTool.Env.BuildConfiguration.xml
+Setting temp directory to 'C:\Users\salsi\AppData\Local\Temp\UnrealBuildTool\eb6d2d82'
+    Registering build platform: UnrealBuildTool.AndroidPlatformFactory
+    Registering build platform: UnrealBuildTool.IOSPlatformFactory
+    Registering build platform: UnrealBuildTool.LinuxPlatformFactory
+    Registering build platform: UnrealBuildTool.MacPlatformFactory
+    Registering build platform: UnrealBuildTool.TVOSPlatformFactory
+    Registering build platform: UnrealBuildTool.WindowsPlatformFactory
+Found Windows 10 SDK root at C:\Program Files (x86)\Windows Kits\10 (1)
+Found Windows 10 SDK root at C:\Program Files (x86)\Windows Kits\10 (2)
+Found Windows 10 SDK version 10.0.22621.0 at C:\Program Files (x86)\Windows Kits\10
+Found Universal CRT version 10.0.22621.0 at C:\Program Files (x86)\Windows Kits\10
+Found Windows 10 SDK version 10.0.26100.0 at C:\Program Files (x86)\Windows Kits\10
+Found Universal CRT version 10.0.26100.0 at C:\Program Files (x86)\Windows Kits\10
+Win64 Installed SDK(s): MinVersion_Sdk=10.0.19041.0, MaxVersion_Sdk=10.9.99999.0, CurrentVersion_Sdk=10.0.22621.0, Version_AutoSdk=10.0.22621.0, CurrentVersion_AutoSdk=
+        Registering build platform: Win64 - buildable: True
+    Registering build platform: UnrealBuildTool.VisionOSPlatformFactory
+Command line: "C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" SmokeEmIfYouGotEmEditor Win64 Development -Project=C:/Users/salsi/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject -WaitMutex -NoHotReloadFromIDE
+Log file: C:\Users\salsi\AppData\Local\UnrealBuildTool\Log.txt
+Deleting old log file: C:\Users\salsi\AppData\Local\UnrealBuildTool\Log-backup-2026.08.17-21.35.32.txt
+Deleting old log file: C:\Users\salsi\AppData\Local\UnrealBuildTool\Log-backup-2026.08.17-21.35.32.json
+
+Determining max actions to execute in parallel (8 physical cores, 16 logical cores)
+  Executing up to 8 processes, one per physical core
+Using 'git status' to determine working set for adaptive non-unity build (C:\Users\salsi\repos\SmokeEmIfYouGotEm).
+Skipping C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\BuildRules\UE5Rules.dll: File is installed
+Skipping C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\BuildRules\UE5ProgramRules.dll: File is installed
+UbaStorageServer - Database loaded from C:\ProgramData\Epic\UnrealBuildAccelerator\cas\casdb (v32) in 3ms (contained 0 entries estimated to 0b)
+UbaServer - Listening on 0.0.0.0:1345
+Waiting for 'git status' command to complete
+C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Source\RaftSimRaft\Private\RaftSimCaptureCommand.cpp was not part of source working set and should be
+Invalidating makefile for SmokeEmIfYouGotEmEditor (working set of source files changed)
+Compiler: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\cl.exe
+Linker: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\link.exe
+Library Manager: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\link.exe
+Resource Compiler: C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\rc.exe
+Resource Converter: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\cvtres.exe
+Using EngineIncludeOrderVersion.Unreal5_8 for target SmokeEmIfYouGotEmEditor.Target.cs
+Building UnrealEditor - SmokeEmIfYouGotEmEditor - Win64 - Development
+VerseVMBytecodeGenerator.Generate, generating CPP headers in: 'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMBytecodeOps.gen.h'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMBytecodesAndCaptures.gen.h'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMMakeCapturesFuncs.gen.h'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMCaptureSwitch.gen.h'
+Generated code is up to date.
+Found 5 shared PCH headers (listed in order of preference):
+	UnrealEd
+	Engine
+	Slate
+	CoreUObject
+	Core
+Updating C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Intermediate\Build\Win64\x64\UnrealEditor\Development\RaftSimRaft\Module.RaftSimRaft.1.cpp: contents have changed. Saving previous version to C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Intermediate\Build\Win64\x64\UnrealEditor\Development\RaftSimRaft\Module.RaftSimRaft.1.cpp.old.
+Updating C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Intermediate\Build\Win64\x64\UnrealEditor\Development\RaftSimRaft\LiveCodingInfo.json: contents have changed. Saving previous version to C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Intermediate\Build\Win64\x64\UnrealEditor\Development\RaftSimRaft\LiveCodingInfo.json.old.
+Updating C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Intermediate\Build\Win64\x64\UnrealEditor\Development\RaftSimRaft\UnrealEditor-RaftSimRaft.lib.rsp: contents have changed. Saving previous version to C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Intermediate\Build\Win64\x64\UnrealEditor\Development\RaftSimRaft\UnrealEditor-RaftSimRaft.lib.rsp.old.
+Updating C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Intermediate\Build\Win64\x64\UnrealEditor\Development\RaftSimRaft\UnrealEditor-RaftSimRaft.dll.rsp: contents have changed. Saving previous version to C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Intermediate\Build\Win64\x64\UnrealEditor\Development\RaftSimRaft\UnrealEditor-RaftSimRaft.dll.rsp.old.
+Deleting outdated item: C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Intermediate\Build\Win64\x64\UnrealEditor\Development\RaftSimRaft\UnrealEditor-RaftSimRaft.lib
+Deleting outdated item: C:\Users\salsi\repos\SmokeEmIfYouGotEm\unreal\Plugins\RaftSim\Binaries\Win64\UnrealEditor-RaftSimRaft.pdb
+Building SmokeEmIfYouGotEmEditor...
+===== Toolchain Information =====
+Using ISPC compiler (C:\Program Files\Epic Games\UE_5.8\Engine\Source\ThirdParty\Intel\ISPC\bin\Windows\ispc.exe)
+  Intel(r) Implicit SPMD Program Compiler (Intel(r) ISPC), 1.24.0 (build commit  @ 20250404, LLVM 18.1.2)
+Using Visual Studio 14.44.35228 toolchain (C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+[Adaptive Build] Excluded from RaftSimRaft unity file: RaftSimCaptureCommand.cpp
+[Adaptive Build] Excluded from RaftSimEditor unity file: RaftSimReviewViewportLibrary.cpp
+=================================
+Using Unreal Build Accelerator local executor to run 5 action(s)
+  CPU 8 physical cores, 16 logical cores
+  Memory 31.42 GB physical, 20.38 GB/33.42 GB committed
+  UBA Storage capacity 40 GB
+  UBA RootDir C:\ProgramData\Epic\UnrealBuildAccelerator
+Cache bucket 3598300154 used. Action: Compile [x64] Module.RaftSimRaft.1.cpp ()
+Cache bucket 416513229 used. Action: Link [x64] UnrealEditor-RaftSimRaft.dll ()
+All processes queued
+[1/5] Compile [x64] Module.RaftSimRaft.1.cpp
+[2/5] Compile [x64] RaftSimCaptureCommand.cpp
+[3/5] Link [x64] UnrealEditor-RaftSimRaft.lib
+[4/5] Link [x64] UnrealEditor-RaftSimRaft.dll
+[5/5] WriteMetadata SmokeEmIfYouGotEmEditor.target [NoUba]
+
+Total time in Unreal Build Accelerator local executor: 35.01 seconds
+Output binary: C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe
+UbaStorageServer - Database saved in 10ms (0 file entries, 0 cas entries. deleted 0 dropped cas files)
+WriteFileIfChanged() wrote 0 changed files of 1 requested writes.
+
+Timeline:
+[  0.000]  +0.720 Main
+   0.029          [  0.029]  +0.182 Apply XmlConfig
+   0.215          [  0.215]  +0.108 AddTelemetry
+   0.404          [  0.404]  +0.315 RegisterPlatforms
+[  0.765]  +0.072 ParseCommandLine
+[  0.955]  +0.339 LoadMakefile
+   1.008          [  0.053]  +0.105 EngineRulesPlugins
+   1.136          [  0.180]  +0.023 EngineRulesFetchDirs
+   1.173          [  0.217]  +0.018 EngineRulesAssembly
+   1.191          [  0.236]  +0.001 ProgramRulesAssembly
+   1.193          [  0.238]  +0.006 ProjectRulesAssembly
+   1.200          [  0.244]  +0.380 CreateTargetRules
+   1.297             0.341          [  0.096]  +0.000 FindPlugins
+   1.313             0.357          [  0.112]  +6.729 MakefileValid
+[  1.294]  +6.750 <unknown>
+[  8.045]  +6.673 SmokeEmIfYouGotEmEditor Win64 Development
+   8.045          [  0.000]  +4.338 <unknown>
+  12.383          [  4.338]  +0.107 UHTModules
+  12.491          [  4.445]  +0.281 <unknown>
+  12.772          [  4.727]  +0.035 UHTManifest
+  12.809          [  4.764]  +0.029 UHTTimestamps
+  12.838          [  4.793]  +1.843 <unknown>
+  14.681          [  6.636]  +0.000 WaitOnWrites
+[ 14.718]  +0.219 SavingMakefile
+  14.720          [  0.001]  +0.003 UHTWait
+  14.773          [  0.054]  +0.007 CppDependencyCache
+  14.780          [  0.061]  +0.219 Preparing ActionGraph
+  14.809             0.090          [  0.028]  +0.029 LinkActions
+  14.841             0.122          [  0.061]  +0.002 GatherPrerequisiteActions
+  14.849             0.130          [  0.068]  +0.000 CppDependencyCacheWait
+  14.851             0.132          [  0.070]  +0.108 GatherOutdatedActions
+  14.965             0.246          [  0.184]  +0.015 LinkActions
+  14.981             0.262          [  0.200]  +0.002 DeleteOutdatedProducedItems
+  14.983             0.265          [  0.203]  +0.014 SaveActionHistory
+  14.999             0.281          [  0.219]  +0.000 CreateDirectoriesForProducedItems
+[ 15.026]  +0.230 GarbageCollect
+[ 15.257] +34.782 <unknown>
+[ 50.040]  +0.000 Deploying targets
+[ 50.042]  +0.000 DisconnectCache
+[ 50.050]  +0.035 SaveCasTable
+[ 50.090]  +0.184 Saving caches
+[ 50.277]  +0.003 TelemetryService.FlushEvents
+[ 50.282]
+
+Result: Succeeded
+Total execution time: 50.28 seconds

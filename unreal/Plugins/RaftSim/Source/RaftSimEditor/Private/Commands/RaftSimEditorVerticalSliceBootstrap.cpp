@@ -30,6 +30,8 @@
 #include "UObject/Package.h"
 #include "UObject/SavePackage.h"
 
+#include "Environment/RaftSimEditorEnvironmentInternal.h"
+
 namespace RaftSimVerticalSliceBootstrap
 {
 
@@ -136,7 +138,9 @@ static void HandleCreateVerticalSliceInputAssets(const TArray<FString>&)
     AddKeyMapping(Context, Actions[TEXT("PaddleStroke")], EKeys::S, /*bNegate=*/true);
     AddKeyMapping(Context, Actions[TEXT("PaddleDraw")], EKeys::D);
     AddKeyMapping(Context, Actions[TEXT("PaddleDraw")], EKeys::A, /*bNegate=*/true);
-    AddKeyMapping(Context, Actions[TEXT("Look")], EKeys::Mouse2D);
+    // Mouse look is sampled directly by ARaftSimGuidePlayerController. Keeping
+    // it out of Enhanced Input prevents held paddle-axis keys from starving
+    // mouse deltas; IA_Look remains the independent gamepad look path.
     AddKeyMapping(Context, Actions[TEXT("HighSide")], EKeys::SpaceBar);
     AddKeyMapping(Context, Actions[TEXT("Pause")], EKeys::Escape);
     AddKeyMapping(Context, Actions[TEXT("GuideCommandForwardPaddle")], EKeys::One);
@@ -337,31 +341,72 @@ struct FRiverMapSpec
     const TCHAR* MapName;
     const TCHAR* CookedFieldsDir;
     const TCHAR* FlowBand;
+    // Raft put-in, meters along the corridor (station*100 = world X cm).
+    // Must be INSIDE the cooked wet domain: a put-in the fields don't cover
+    // leaves the raft dry and beached in automation PIE and fails the
+    // RiverMapLoads depth envelope.
+    float PutInStationM;
 };
 
-// The five runnable rivers (docs/five-river-simulation-plan.md). Each points at
-// its signature rapid's cooked flow fields; a river map that has no cooked
+// Four compact signature-rapid maps. South Fork challenges use the full-reach
+// map; Zambezi uses its separately generated source-scale reference corridor. Each
+// compact map points at its signature rapid's cooked flow fields; a map with no cooked
 // package yet falls back to the dev tank at runtime until its fields land.
 static const FRiverMapSpec GRiverMaps[] = {
-    {TEXT("L_Troublemaker"),
-     TEXT("physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker/cooked_flow_fields"),
-     TEXT("median_runnable")},
     {TEXT("L_Hance"),
-     TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields"),
-     TEXT("median_runnable")},
+     TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance_evidence_2021/cooked_flow_fields"),
+     TEXT("steady_8000cfs_2021"), 520.0f},
     {TEXT("L_UpperHuacas"),
      TEXT("physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields"),
-     TEXT("median_runnable")},
+     TEXT("median_runnable"), -60.0f},
     {TEXT("L_Terminator"),
-     TEXT("physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields"),
-     TEXT("median_runnable")},
+     TEXT("physics/data/real_world/futaleufu_river_chile/scenario_terminator_evidence_2026/cooked_flow_fields"),
+     TEXT("high_runnable_400cms"), 750.0f},
     {TEXT("L_LavaCanyon"),
-     TEXT("physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields"),
-     TEXT("median_runnable")},
+     TEXT("physics/data/real_world/chilko_river_bc/scenario_lava_canyon_evidence_2023/cooked_flow_fields"),
+     TEXT("summer_runnable_93cms"), 600.0f},
 };
 
 static bool BuildRiverMap(const FRiverMapSpec& Spec)
 {
+    // Reach-local maps with a Landscape candidate are built by that pipeline
+    // (terrain, water config, streaming, launch); the flat stub below would
+    // overwrite them.
+    const TCHAR* LandscapeRiverId =
+        FCString::Strcmp(Spec.MapName, TEXT("L_UpperHuacas")) == 0 ? TEXT("pacuare")
+        : FCString::Strcmp(Spec.MapName, TEXT("L_Hance")) == 0 ? TEXT("colorado_river")
+        : FCString::Strcmp(Spec.MapName, TEXT("L_Terminator")) == 0 ? TEXT("futaleufu_terminator")
+        : FCString::Strcmp(Spec.MapName, TEXT("L_LavaCanyon")) == 0 ? TEXT("chilko_river_lava_canyon")
+        : nullptr;
+    if (LandscapeRiverId)
+    {
+        for (const RaftSimEditorEnvironment::FRaftSimLandscapeImportCandidateSpec& Candidate :
+             RaftSimEditorEnvironment::GetLandscapeImportCandidateSpecs())
+        {
+            if (Candidate.PreviewSpec.RiverId != LandscapeRiverId)
+            {
+                continue;
+            }
+            RaftSimEditorEnvironment::FRaftSimLandscapeImportCandidateResult Result;
+            FString Summary;
+            const bool bBuilt =
+                RaftSimEditorEnvironment::BuildLandscapeImportCandidateMap(
+                    Candidate,
+                    Result,
+                    Summary);
+            UE_LOG(
+                LogTemp,
+                Display,
+                TEXT("RaftSim bootstrap: %s reach-local Landscape saved=%d\n%s"),
+                Spec.MapName,
+                bBuilt ? 1 : 0,
+                *Summary);
+            return bBuilt;
+        }
+        UE_LOG(LogTemp, Error, TEXT("RaftSim bootstrap: no %s Landscape candidate spec."), LandscapeRiverId);
+        return false;
+    }
+
     UWorld* World = UEditorLoadingAndSavingUtils::NewBlankMap(false);
     AddCommonLighting(World);
 
@@ -394,13 +439,15 @@ static bool BuildRiverMap(const FRiverMapSpec& Spec)
     UE_LOG(LogTemp, Display, TEXT("RaftSim bootstrap: %s cooked_fields=%d"),
            Spec.MapName, bCookedFieldsExist ? 1 : 0);
 
-    // Raft at the upstream scout eddy; run flows downstream (+X).
+    // Raft at the per-river put-in; run flows downstream (+X). The runtime
+    // seats the hull on the sampled surface, so only station/lateral matter.
+    const float PutInXCm = Spec.PutInStationM * 100.0f;
     AddActorToWorld(
         World, ARaftSimRaftActor::StaticClass(),
-        FTransform(FVector(-6000.0f, 0.0f, 60.0f)));
+        FTransform(FVector(PutInXCm, 0.0f, 60.0f)));
     AddActorToWorld(
         World, APlayerStart::StaticClass(),
-        FTransform(FVector(-6600.0f, 0.0f, 200.0f)));
+        FTransform(FVector(PutInXCm - 600.0f, 0.0f, 200.0f)));
 
     // Deterministic hydraulic-crux rock garden. These are runtime-authoritative
     // D4 obstacles, not decorative boulders: the raft binds their transforms,
@@ -458,7 +505,7 @@ static void HandleCreateRiverMaps(const TArray<FString>& Args)
 
 static FAutoConsoleCommand GCreateRiverMapsCommand(
     TEXT("RaftSim.CreateRiverMaps"),
-    TEXT("Generate the five runnable river maps (L_Troublemaker, L_Hance, "
+    TEXT("Generate the four compact signature-rapid maps (L_Hance, "
          "L_UpperHuacas, L_Terminator, L_LavaCanyon) with live cooked-field "
          "river water. Optional args filter by map-name substring."),
     FConsoleCommandWithArgsDelegate::CreateStatic(&HandleCreateRiverMaps));

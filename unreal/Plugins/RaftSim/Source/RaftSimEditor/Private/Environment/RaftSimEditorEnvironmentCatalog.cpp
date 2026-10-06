@@ -64,75 +64,105 @@ float GetPreviewRiverCenterY(const FRaftSimEnvironmentPreviewSpec& Spec, float X
                                                                                  
   
 
-FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const FString& RiverId)
+FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const FString& InRiverId)
 {
+    const FString RiverId = ResolveLookSettingsRiverId(InRiverId);
     FRaftSimLandscapeCandidateWaterSettings Settings;
     if (RiverId == TEXT("colorado_river"))
     {
-        Settings.BaseColorScale = 1.20f;
-        Settings.EmissiveFillScale = 0.100f;
-        Settings.Roughness = 0.40f;
-        Settings.Specular = 0.30f;
-        Settings.Opacity = 0.55f;
-        Settings.NormalIntensity = 0.40f;
-        Settings.PhaseG = 0.05f;
-        Settings.VertexTintWeight = 0.55f;
-        Settings.RenderWidthScale = 1.17f;
-        Settings.RenderNormalUpBlend = 0.60f;
-        Settings.RenderDisplacementScale = 0.55f;
-        Settings.ReflectionFillIntensity = 0.10f;
-        Settings.SolverFieldEnable = 0.0f;
-        Settings.SolverMacroNormalWeight = 0.0f;
-        Settings.SolverDepthColorWeight = 0.0f;
-        Settings.SolverFieldRoughnessWeight = 0.0f;
-        Settings.SolverFroudeAerationWeight = 0.0f;
-        Settings.SolverSpeedVisualGain = 0.0f;
-        Settings.SolverFroudeVisualGain = 0.0f;
-        Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.220f, 0.240f, 0.150f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.38f, 0.44f, 0.46f, 0.0f);
+        // The Hance map samples its own moderate-release C++ solver frame on
+        // the CPU-authored capture ribbon.  These restrained gains expose the
+        // hydraulic tongue and holes without allowing analytic displacement
+        // or a stale shader texture to invent gameplay water state.
+        Settings.BaseColorScale = 1.06f;
+        Settings.EmissiveFillScale = 0.20f;
+        Settings.Roughness = 0.25f;
+        Settings.Specular = 0.46f;
+        Settings.Opacity = 0.90f;
+        Settings.NormalIntensity = 0.30f;
+        Settings.SurfaceVariationStrength = 0.32f;
+        Settings.PhaseG = 0.08f;
+        Settings.VertexTintWeight = 0.74f;
+        Settings.RenderWidthScale = 1.20f;
+        Settings.RenderNormalUpBlend = 0.80f;
+        Settings.RenderDisplacementScale = 0.20f;
+        Settings.ReflectionFillIntensity = 0.14f;
+        Settings.SolverFieldEnable = 1.0f;
+        Settings.SolverMacroNormalWeight = 0.16f;
+        Settings.SolverDepthColorWeight = 0.26f;
+        Settings.SolverFieldRoughnessWeight = 0.12f;
+        Settings.SolverFroudeAerationWeight = 0.66f;
+        Settings.SolverSpeedVisualGain = 1.0f;
+        Settings.SolverFroudeVisualGain = 1.0f;
+        // Hance's packed 4 m field remains the hydraulic source, but 30% of
+        // its 1.5 m detrended range produced 45 cm transverse render steps.
+        // The retained subcell-smoothed presentation caps that visual-only
+        // relief at 9 cm without touching the cooked field or gameplay.
+        Settings.SolverSurfaceReliefScale = 0.06f;
+        Settings.SurfaceTint = FLinearColor(0.072f, 0.115f, 0.088f, 0.0f);
+        Settings.SolverDeepWaterTint = FLinearColor(0.050f, 0.065f, 0.046f, 0.0f);
+        Settings.SolverAerationTint = FLinearColor(0.84f, 0.82f, 0.74f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.28f, 0.40f, 0.46f, 0.0f);
         Settings.ScatteringCoefficients = FLinearColor(0.0042f, 0.0023f, 0.0007f, 0.0f);
         Settings.AbsorptionCoefficients = FLinearColor(0.0014f, 0.0022f, 0.0040f, 0.0f);
         Settings.ColorScaleBehindWater = FLinearColor(0.84f, 0.76f, 0.62f, 0.0f);
     }
     else if (RiverId == TEXT("pacuare"))
     {
-        Settings.BaseColorScale = 1.00f;
-        Settings.EmissiveFillScale = 0.075f;
+        // Pacuare uses an isolated opaque Default Lit rainforest parent after
+        // direct isolation and a procedural-bathymetry bracket both rejected
+        // Single Layer Water's hard foreground depth-composition band. Keep a
+        // bounded render overlap over known Landscape seam gaps without
+        // changing collision, solver geometry, or the analytic bank profile.
+        Settings.BaseColorScale = 1.08f;
+        Settings.EmissiveFillScale = 0.40f;
         Settings.Roughness = 0.32f;
         Settings.Specular = 0.42f;
-        Settings.Opacity = 0.40f;
-        Settings.NormalIntensity = 0.68f;
-        Settings.PhaseG = 0.25f;
-        Settings.VertexTintWeight = 0.62f;
-        Settings.RenderWidthScale = 1.45f;
-        Settings.RenderNormalUpBlend = 0.48f;
-        Settings.RenderDisplacementScale = 0.78f;
-        Settings.ReflectionFillIntensity = 0.15f;
-        Settings.SolverFieldEnable = 0.0f;
-        Settings.SolverMacroNormalWeight = 0.0f;
-        Settings.SolverDepthColorWeight = 0.0f;
-        Settings.SolverFieldRoughnessWeight = 0.0f;
-        Settings.SolverFroudeAerationWeight = 0.0f;
-        Settings.SolverSpeedVisualGain = 0.0f;
-        Settings.SolverFroudeVisualGain = 0.0f;
-        Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.018f, 0.095f, 0.065f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.32f, 0.48f, 0.54f, 0.0f);
-        Settings.ScatteringCoefficients = FLinearColor(0.0008f, 0.0030f, 0.0018f, 0.0f);
-        Settings.AbsorptionCoefficients = FLinearColor(0.0050f, 0.0012f, 0.0022f, 0.0f);
-        Settings.ColorScaleBehindWater = FLinearColor(0.82f, 0.94f, 0.84f, 0.0f);
+        Settings.Opacity = 0.28f;
+        Settings.NormalIntensity = 0.20f;
+        Settings.SurfaceVariationStrength = 0.32f;
+        Settings.PhaseG = 0.15f;
+        Settings.VertexTintWeight = 0.52f;
+        Settings.RenderWidthScale = 1.35f;
+        Settings.RenderNormalUpBlend = 0.82f;
+        Settings.RenderDisplacementScale = 0.20f;
+        Settings.ReflectionFillIntensity = 0.06f;
+        Settings.SolverFieldEnable = 1.0f;
+        Settings.SolverMacroNormalWeight = 0.18f;
+        Settings.SolverDepthColorWeight = 0.30f;
+        Settings.SolverFieldRoughnessWeight = 0.12f;
+        Settings.SolverFroudeAerationWeight = 0.58f;
+        Settings.SolverSpeedVisualGain = 1.0f;
+        Settings.SolverFroudeVisualGain = 1.0f;
+        Settings.SolverSurfaceReliefScale = 0.18f;
+        Settings.SurfaceTint = FLinearColor(0.075f, 0.160f, 0.120f, 0.0f);
+        Settings.SolverDeepWaterTint = FLinearColor(0.025f, 0.090f, 0.072f, 0.0f);
+        Settings.SolverAerationTint = FLinearColor(0.88f, 0.93f, 0.90f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.30f, 0.38f, 0.40f, 0.0f);
+        Settings.ScatteringCoefficients = FLinearColor(0.00055f, 0.00080f, 0.00065f, 0.0f);
+        Settings.AbsorptionCoefficients = FLinearColor(0.0055f, 0.0020f, 0.0035f, 0.0f);
+        Settings.ColorScaleBehindWater = FLinearColor(0.60f, 0.65f, 0.55f, 0.0f);
     }
     else if (RiverId == TEXT("zambezi_batoka_gorge"))
     {
-        Settings.BaseColorScale = 1.10f;
-        Settings.EmissiveFillScale = 0.085f;
-        Settings.Roughness = 0.38f;
-        Settings.Specular = 0.34f;
-        Settings.Opacity = 0.52f;
-        Settings.NormalIntensity = 0.58f;
-        Settings.VertexTintWeight = 0.58f;
+        // Batoka uses its own opaque Default Lit surface parent after the
+        // retained Single Layer Water bracket rendered nearly black in the
+        // canonical offscreen capture path. Keep the accepted sediment palette
+        // and shorter opposed normal wavelengths without changing the ribbon,
+        // collision, solver, or gameplay-force authority.
+        Settings.BaseColorScale = 1.08f;
+        Settings.EmissiveFillScale = 0.32f;
+        Settings.Roughness = 0.34f;
+        Settings.Specular = 0.38f;
+        Settings.Opacity = 0.48f;
+        Settings.NormalIntensity = 0.16f;
+        Settings.SurfaceVariationStrength = 0.14f;
+        Settings.PhaseG = 0.08f;
+        Settings.VertexTintWeight = 0.62f;
         Settings.RenderWidthScale = 1.24f;
+        Settings.RenderNormalUpBlend = 0.90f;
+        Settings.RenderDisplacementScale = 0.06f;
+        Settings.ReflectionFillIntensity = 0.08f;
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
         Settings.SolverDepthColorWeight = 0.0f;
@@ -141,50 +171,90 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 0.0f;
         Settings.SolverFroudeVisualGain = 0.0f;
         Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.13f, 0.16f, 0.065f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.40f, 0.46f, 0.39f, 0.0f);
+        Settings.SurfaceTint = FLinearColor(0.055f, 0.115f, 0.050f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.24f, 0.34f, 0.36f, 0.0f);
+        Settings.ScatteringCoefficients =
+            FLinearColor(0.00025f, 0.00090f, 0.00035f, 0.0f);
+        Settings.AbsorptionCoefficients =
+            FLinearColor(0.0150f, 0.0050f, 0.0180f, 0.0f);
+        Settings.ColorScaleBehindWater =
+            FLinearColor(0.12f, 0.22f, 0.10f, 0.0f);
     }
     else if (RiverId == TEXT("futaleufu_terminator"))
     {
+        // Terminator samples its median cooked C++ field on the reach-local
+        // ribbon. The CPU-authored vertex colours remain the only cooked-field
+        // color authority; the isolated parent adds native moving normals,
+        // restrained Fresnel response, and non-hydraulic optical variation.
         Settings.BaseColorScale = 1.08f;
-        Settings.EmissiveFillScale = 0.090f;
-        Settings.Roughness = 0.27f;
-        Settings.Specular = 0.50f;
+        Settings.EmissiveFillScale = 0.140f;
+        Settings.Roughness = 0.24f;
+        Settings.Specular = 0.46f;
         Settings.Opacity = 0.34f;
-        Settings.NormalIntensity = 0.74f;
-        Settings.VertexTintWeight = 0.66f;
-        Settings.RenderWidthScale = 1.30f;
-        Settings.SolverFieldEnable = 0.0f;
-        Settings.SolverMacroNormalWeight = 0.0f;
-        Settings.SolverDepthColorWeight = 0.0f;
-        Settings.SolverFieldRoughnessWeight = 0.0f;
-        Settings.SolverFroudeAerationWeight = 0.0f;
-        Settings.SolverSpeedVisualGain = 0.0f;
-        Settings.SolverFroudeVisualGain = 0.0f;
-        Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.012f, 0.20f, 0.24f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.40f, 0.60f, 0.68f, 0.0f);
+        Settings.NormalIntensity = 0.30f;
+        Settings.SurfaceVariationStrength = 0.44f;
+        Settings.VertexTintWeight = 0.76f;
+        Settings.RenderWidthScale = 1.18f;
+        Settings.RenderNormalUpBlend = 0.84f;
+        Settings.RenderDisplacementScale = 0.18f;
+        Settings.ReflectionFillIntensity = 0.10f;
+        Settings.SolverFieldEnable = 1.0f;
+        Settings.SolverMacroNormalWeight = 0.20f;
+        Settings.SolverDepthColorWeight = 0.30f;
+        Settings.SolverFieldRoughnessWeight = 0.12f;
+        Settings.SolverFroudeAerationWeight = 0.72f;
+        Settings.SolverSpeedVisualGain = 1.0f;
+        Settings.SolverFroudeVisualGain = 1.0f;
+        Settings.SolverSurfaceReliefScale = 0.22f;
+        Settings.RibbonCrossSectionSteps = 48;
+        Settings.AnalyticChopScale = 0.78f;
+        Settings.CrossCurrentChopAmplitudeCm = 8.0f;
+        Settings.EmbeddedAerationWeight = 0.22f;
+        Settings.SurfaceTint = FLinearColor(0.025f, 0.185f, 0.225f, 0.0f);
+        Settings.SolverDeepWaterTint = FLinearColor(0.006f, 0.095f, 0.13f, 0.0f);
+        Settings.SolverAerationTint = FLinearColor(0.88f, 0.95f, 0.96f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.32f, 0.53f, 0.63f, 0.0f);
     }
     else if (RiverId == TEXT("chilko_river_lava_canyon"))
     {
-        Settings.BaseColorScale = 1.06f;
-        Settings.EmissiveFillScale = 0.085f;
-        Settings.Roughness = 0.29f;
-        Settings.Specular = 0.48f;
-        Settings.Opacity = 0.36f;
-        Settings.NormalIntensity = 0.70f;
-        Settings.VertexTintWeight = 0.64f;
-        Settings.RenderWidthScale = 1.28f;
-        Settings.SolverFieldEnable = 0.0f;
-        Settings.SolverMacroNormalWeight = 0.0f;
-        Settings.SolverDepthColorWeight = 0.0f;
-        Settings.SolverFieldRoughnessWeight = 0.0f;
-        Settings.SolverFroudeAerationWeight = 0.0f;
-        Settings.SolverSpeedVisualGain = 0.0f;
-        Settings.SolverFroudeVisualGain = 0.0f;
-        Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.018f, 0.24f, 0.27f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.42f, 0.60f, 0.66f, 0.0f);
+        // Lava Canyon samples its median C++ field on the reach-local capture
+        // ribbon. V3 replaces the pale opaque response with depth/bank
+        // transmission and a first-party river-local normal. The CPU sampled
+        // field remains the only hydraulic colour and geometry authority.
+        Settings.BaseColorScale = 0.94f;
+        Settings.EmissiveFillScale = 0.060f;
+        Settings.Roughness = 0.34f;
+        Settings.Specular = 0.34f;
+        Settings.Opacity = 0.90f;
+        Settings.NormalIntensity = 0.26f;
+        Settings.SurfaceVariationStrength = 0.30f;
+        Settings.VertexTintWeight = 0.78f;
+        Settings.RenderWidthScale = 1.20f;
+        Settings.RenderNormalUpBlend = 0.82f;
+        Settings.RenderDisplacementScale = 0.18f;
+        Settings.ReflectionFillIntensity = 0.06f;
+        Settings.SolverFieldEnable = 1.0f;
+        Settings.SolverMacroNormalWeight = 0.18f;
+        Settings.SolverDepthColorWeight = 0.30f;
+        Settings.SolverFieldRoughnessWeight = 0.12f;
+        Settings.SolverFroudeAerationWeight = 0.64f;
+        Settings.SolverSpeedVisualGain = 1.0f;
+        Settings.SolverFroudeVisualGain = 1.0f;
+        Settings.SolverSurfaceReliefScale = 0.26f;
+        Settings.RibbonCrossSectionSteps = 48;
+        Settings.AnalyticChopScale = 0.72f;
+        Settings.CrossCurrentChopAmplitudeCm = 7.0f;
+        Settings.EmbeddedAerationWeight = 0.18f;
+        Settings.SurfaceTint = FLinearColor(0.018f, 0.145f, 0.19f, 0.0f);
+        Settings.SolverDeepWaterTint = FLinearColor(0.004f, 0.075f, 0.11f, 0.0f);
+        Settings.SolverAerationTint = FLinearColor(0.78f, 0.90f, 0.94f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.22f, 0.38f, 0.52f, 0.0f);
+        Settings.ScatteringCoefficients =
+            FLinearColor(0.00010f, 0.00024f, 0.00034f, 0.0f);
+        Settings.AbsorptionCoefficients =
+            FLinearColor(0.0070f, 0.0030f, 0.0015f, 0.0f);
+        Settings.ColorScaleBehindWater =
+            FLinearColor(0.22f, 0.34f, 0.40f, 0.0f);
     }
     return Settings;
 }
@@ -204,8 +274,9 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
                                                               
   
 
-FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString& RiverId)
+FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString& InRiverId)
 {
+    const FString RiverId = ResolveLookSettingsRiverId(InRiverId);
     FRaftSimPhotographicCaptureSettings Settings;
     if (RiverId == TEXT("colorado_river"))
     {
@@ -222,7 +293,7 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
     else if (RiverId == TEXT("pacuare"))
     {
         Settings.SunIntensity = 4.60f;
-        Settings.SkyLightIntensity = 1.45f;
+        Settings.SkyLightIntensity = 1.90f;
         Settings.FogDensity = 0.0075f;
         Settings.ExposureBias = -0.18f;
         Settings.Saturation = 1.04f;
@@ -230,34 +301,53 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
         Settings.Sharpen = 0.22f;
         Settings.Vignette = 0.05f;
         Settings.SunColor = FLinearColor(0.90f, 0.97f, 0.91f);
-        Settings.FogColor = FLinearColor(0.43f, 0.57f, 0.46f);
+        Settings.FogColor = FLinearColor(0.58f, 0.68f, 0.60f);
     }
     else if (RiverId == TEXT("zambezi_batoka_gorge"))
     {
-        Settings.SunIntensity = 5.30f;
-        Settings.SkyLightIntensity = 1.65f;
-        Settings.FogDensity = 0.0038f;
-        Settings.ExposureBias = -0.18f;
-        Settings.Saturation = 1.04f;
-        Settings.SunColor = FLinearColor(1.0f, 0.91f, 0.78f);
-        Settings.FogColor = FLinearColor(0.58f, 0.50f, 0.39f);
+        // V18 keeps the dry-season directional read but moves the launch
+        // gorge below the clipped-water and chalk-scarp bracket retained by
+        // V17. These values are photographic presentation only.
+        // The gorge haze is the late dry season's grey smoke haze, much
+        // thinner than before: the dense warm-tan volumetric haze (0.0038,
+        // 0.58/0.50/0.39) in-scattered over the walls 100-500 m away, so they
+        // read as tan haze whatever their albedo; at 0.0022 they still read
+        // as light grey haze. Distant walls keep their atmospheric perspective.
+        // The sky fill is the shaded walls' main light now that the ledged
+        // walls cast shadows. In play ARaftSimPresentationDirector replaced it
+        // with its shared 1.25 (about 1.22 in clear weather); the sky light is
+        // tagged RaftSimAuthoredSkyFill so the director keeps this value. The
+        // camera's filmic toe crushes the shade's low values: at 1.22 the
+        // shaded walls rendered at sRGB 20-23 (black) and the crew in the
+        // shade at about 20; at 2.44 the walls reach 30-31 with their ledges
+        // readable and the crew 37, while sunlit walls only go from 57-61 to
+        // 63-65 (2026-10-02 survey, L_Zambezi stations 4690 m and 12020 m).
+        Settings.SunIntensity = 4.35f;
+        Settings.SkyLightIntensity = 2.50f;
+        Settings.FogDensity = 0.0007f;
+        Settings.ExposureBias = -0.30f;
+        Settings.Saturation = 1.01f;
+        Settings.Contrast = 1.05f;
+        Settings.Sharpen = 0.24f;
+        Settings.SunColor = FLinearColor(1.0f, 0.94f, 0.86f);
+        Settings.FogColor = FLinearColor(0.50f, 0.52f, 0.54f);
     }
     else if (RiverId == TEXT("futaleufu_terminator"))
     {
-        Settings.SunIntensity = 4.75f;
-        Settings.SkyLightIntensity = 1.55f;
+        Settings.SunIntensity = 2.40f;
+        Settings.SkyLightIntensity = 1.35f;
         Settings.FogDensity = 0.0055f;
-        Settings.ExposureBias = -0.16f;
+        Settings.ExposureBias = -0.30f;
         Settings.Saturation = 1.05f;
         Settings.SunColor = FLinearColor(0.91f, 0.96f, 1.0f);
         Settings.FogColor = FLinearColor(0.46f, 0.58f, 0.60f);
     }
     else if (RiverId == TEXT("chilko_river_lava_canyon"))
     {
-        Settings.SunIntensity = 5.05f;
-        Settings.SkyLightIntensity = 1.60f;
+        Settings.SunIntensity = 2.90f;
+        Settings.SkyLightIntensity = 1.30f;
         Settings.FogDensity = 0.0030f;
-        Settings.ExposureBias = -0.16f;
+        Settings.ExposureBias = -0.30f;
         Settings.Saturation = 1.04f;
         Settings.Contrast = 1.03f;
         Settings.Sharpen = 0.24f;
@@ -280,8 +370,9 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
   
 
 FRaftSimLandscapeCandidateFoliageSettings GetLandscapeCandidateFoliageSettings(
-    const FString& RiverId)
+    const FString& InRiverId)
 {
+    const FString RiverId = ResolveLookSettingsRiverId(InRiverId);
     FRaftSimLandscapeCandidateFoliageSettings Settings;
     if (RiverId == TEXT("colorado_river"))
     {
@@ -337,8 +428,9 @@ FRaftSimLandscapeCandidateFoliageSettings GetLandscapeCandidateFoliageSettings(
     return Settings;
 }
 
-FRaftSimPreviewWaterMaterialResponse GetPreviewWaterMaterialResponse(const FString& RiverId)
+FRaftSimPreviewWaterMaterialResponse GetPreviewWaterMaterialResponse(const FString& InRiverId)
 {
+    const FString RiverId = ResolveLookSettingsRiverId(InRiverId);
     FRaftSimPreviewWaterMaterialResponse Response;
     if (RiverId == TEXT("colorado_river"))
     {
@@ -790,13 +882,32 @@ bool LoadLandscapeCandidateLocalCenterline(
     return true;
 }
 
+float GetLandscapeCandidateWorldMinX(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate)
+{
+    // The compact legacy previews were authored around X=-58 m. Reach-local
+    // physical windows use their cooked solver station directly so live water,
+    // Landscape collision, static capture water, and raft launch share one
+    // coordinate frame.
+    const bool bReachLocalSolverWindow =
+        Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+        Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") ||
+        IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
+    return bReachLocalSolverWindow &&
+            !Candidate.LocalCenterlineRelativePath.IsEmpty()
+        ? 0.0f
+        : -5800.0f;
+}
+
 FVector2D SampleLandscapeCandidateCenterlineWorld(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points,
     float Progress,
     FVector2D* OutTangent)
 {
-    constexpr float LandscapeMinX = -5800.0f;
+    const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     if (Points.Num() < 2)
     {
         const float X = FMath::Lerp(
@@ -866,7 +977,7 @@ bool SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
     OutWorldZ = FMath::Lerp(
         A.ConditionedVisualSurfaceNormalized,
         B.ConditionedVisualSurfaceNormalized,
-        T) * Candidate.TargetReliefCm;
+        T) * Candidate.TargetReliefCm + Candidate.WorldVerticalOffsetCm;
     return true;
 }
 
@@ -1200,37 +1311,68 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         }
         else if (PreviewSpec.RiverId == TEXT("colorado_river"))
         {
+            // Evidence-based geographic Hance (2021 corridor DEM, 2014 sonar
+            // pools, labelled inferred rapid bed): a 2500 x 1212 m north-up
+            // Landscape anchored at world X = 0 and centred in Y (Unreal +Y
+            // south). Relief and offset are the terrain manifest's
+            // target_relief_cm and (terrain_min - 740 m datum) * 100.
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_heightfield_2017.png");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_heightfield_2017.png");
             Candidate.HeightfieldManifestRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_terrain_manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_terrain_manifest.json");
             Candidate.LocalCenterlineRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/centerline_local.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_local_centerline.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ColoradoGrandCanyon_PhysicalCorridorCandidate");
+                TEXT("/Game/RaftSim/Maps/L_Hance");
             Candidate.LandscapeSize = 2017;
-            Candidate.HorizontalSpanXCm = 296889.772f;
-            Candidate.HorizontalSpanYCm = 203765.214f;
-            Candidate.TargetReliefCm = 49316.565f;
+            Candidate.HorizontalSpanXCm = 250000.0f;
+            Candidate.HorizontalSpanYCm = 121200.0f;
+            Candidate.TargetReliefCm = 53216.407299f;
+            Candidate.WorldVerticalOffsetCm = -1460.458749f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
+            // The live solver owns the water; the old straight-reach solver
+            // visualization field does not apply to the geographic reach.
             Candidate.bUseSolverVisualizationFields = false;
             Candidate.bPhysicalScaleSourceCorridor = true;
-            Candidate.bEnableLandscapeNanite = false;
-            Candidate.PreviewSpec.RiverHalfWidthCm = 6000.0f;
-            Candidate.PreviewSpec.BankWidthCm = 24000.0f;
+            Candidate.bUseDensePhysicalTerrainRenderSurface = false;
+            Candidate.bEnableLandscapeNanite = true;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 3500.0f;
+            Candidate.PreviewSpec.BankWidthCm = 6200.0f;
+            Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
         }
         else if (PreviewSpec.RiverId == TEXT("pacuare"))
         {
+            // Evidence-based Huacas-Pinball reach (IGN contours, banks and
+            // orthophoto; see pacuare-huacas-evidence.md): 2017^2 over the
+            // 1,452 x 1,620 m CRTM05 evidence window, anchored at X = 0 and
+            // centred in Y (Unreal +Y south).
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png");
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_heightfield_2017.png");
             Candidate.HeightfieldManifestRelativePath =
-                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json");
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_terrain_manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("unreal/Content/RaftSim/River/pacuare_heightfield_import_test.json");
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_terrain_manifest.json");
+            Candidate.LocalCenterlineRelativePath =
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_local_centerline.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_Pacuare_SourceLandscapeCandidate");
+                TEXT("/Game/RaftSim/Maps/L_UpperHuacas");
+            Candidate.LandscapeSize = 2017;
+            Candidate.HorizontalSpanXCm = 145200.0f;
+            Candidate.HorizontalSpanYCm = 162000.0f;
+            Candidate.TargetReliefCm = 31000.711060f;
+            Candidate.WorldVerticalOffsetCm = -1000.711060f;
+            Candidate.bApplyPreviewAnalyticChannelBurn = false;
+            // The live solver owns the water; the old straight-reach solver
+            // visualization field does not apply to the geographic reach.
+            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bPhysicalScaleSourceCorridor = true;
+            Candidate.bUseDensePhysicalTerrainRenderSurface = false;
+            Candidate.bEnableLandscapeNanite = true;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 1250.0f;
+            Candidate.PreviewSpec.BankWidthCm = 2600.0f;
+            Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
         }
         else if (PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
         {
@@ -1240,8 +1382,10 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
             Candidate.ImportContractRelativePath = PreviewSpec.SourceManifest;
             Candidate.LocalCenterlineRelativePath =
                 TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/centerline_local.json");
+            Candidate.ScenarioRelativePath =
+                TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate");
+                TEXT("/Game/RaftSim/Maps/L_Zambezi");
             Candidate.LandscapeSize = 2017;
             Candidate.HorizontalSpanXCm = 2025477.591f;
             Candidate.HorizontalSpanYCm = 1252708.111f;
@@ -1253,42 +1397,69 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         }
         else if (PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
         {
+            // Evidence-based Terminator reach (Sentinel-2 10 m, Copernicus
+            // GLO-30, OSM chainage; see futaleufu-terminator-evidence.md):
+            // 2017^2 over the 2,422 x 1,777 m UTM 18S evidence window,
+            // anchored at X = 0 and centred in Y (Unreal +Y south).
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/heightfield_2017.png");
-            Candidate.HeightfieldManifestRelativePath = PreviewSpec.SourceManifest;
-            Candidate.ImportContractRelativePath = PreviewSpec.SourceManifest;
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_heightfield_2017.png");
+            Candidate.HeightfieldManifestRelativePath =
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_terrain_manifest.json");
+            Candidate.ImportContractRelativePath =
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_terrain_manifest.json");
             Candidate.LocalCenterlineRelativePath =
-                TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/centerline_local.json");
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_local_centerline.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate");
+                TEXT("/Game/RaftSim/Maps/L_Terminator");
             Candidate.LandscapeSize = 2017;
-            Candidate.HorizontalSpanXCm = 1006390.921f;
-            Candidate.HorizontalSpanYCm = 836476.459f;
-            Candidate.TargetReliefCm = 167894.690f;
+            Candidate.HorizontalSpanXCm = 242200.0f;
+            Candidate.HorizontalSpanYCm = 177700.0f;
+            Candidate.TargetReliefCm = 73575.196455f;
+            Candidate.WorldVerticalOffsetCm = -1457.191084f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
+            // The live solver owns the water; the old reach-local solver
+            // visualization field does not apply to the geographic reach.
             Candidate.bUseSolverVisualizationFields = false;
             Candidate.bPhysicalScaleSourceCorridor = true;
-            Candidate.bEnableLandscapeNanite = false;
+            Candidate.bUseDensePhysicalTerrainRenderSurface = false;
+            Candidate.bEnableLandscapeNanite = true;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 2400.0f;
+            Candidate.PreviewSpec.BankWidthCm = 6200.0f;
+            Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
         }
         else if (PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
         {
+            // Evidence-based Lava Canyon reach, Bidwell Rapid to White Mile
+            // (LidarBC 2023 1 m DEM terrain and flight-day water surface,
+            // Sentinel-2 whitewater, HYDAT flows, VRI canopy; see
+            // chilko-lava-canyon-evidence.md): 2017^2 over the 3,464 x
+            // 3,150 m UTM 10N evidence window, anchored at X = 0 and centred
+            // in Y (Unreal +Y south).
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/heightfield_1009.png");
-            Candidate.HeightfieldManifestRelativePath = PreviewSpec.SourceManifest;
+                TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_heightfield_2017.png");
+            Candidate.HeightfieldManifestRelativePath =
+                TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_terrain_manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("unreal/Content/RaftSim/River/chilko_heightfield_import_test.json");
+                TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_terrain_manifest.json");
             Candidate.LocalCenterlineRelativePath =
-                TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/centerline_local.json");
+                TEXT("physics/data/real_world/chilko_river_bc/terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_local_centerline.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ChilkoRiver_PhysicalCorridorCandidate");
-            Candidate.LandscapeSize = 1009;
-            Candidate.HorizontalSpanXCm = 3390375.792f;
-            Candidate.HorizontalSpanYCm = 3878909.999f;
-            Candidate.TargetReliefCm = 70353.516f;
+                TEXT("/Game/RaftSim/Maps/L_LavaCanyon");
+            Candidate.LandscapeSize = 2017;
+            Candidate.HorizontalSpanXCm = 346400.0f;
+            Candidate.HorizontalSpanYCm = 315000.0f;
+            Candidate.TargetReliefCm = 25816.875494f;
+            Candidate.WorldVerticalOffsetCm = 916.486322f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
+            // The live solver owns the water; the old reach-local solver
+            // visualization field does not apply to the geographic reach.
             Candidate.bUseSolverVisualizationFields = false;
             Candidate.bPhysicalScaleSourceCorridor = true;
+            Candidate.bUseDensePhysicalTerrainRenderSurface = false;
             Candidate.bEnableLandscapeNanite = true;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 1500.0f;
+            Candidate.PreviewSpec.BankWidthCm = 4000.0f;
+            Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
         }
         else
         {
@@ -1298,11 +1469,63 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         Candidate.PreviewSpec.MapPackagePath = Candidate.MapPackagePath;
         Candidates.Add(MoveTemp(Candidate));
     }
+    // Evidence-based Zambezi upper gorge, Boiling Pot to below Stairway to
+    // Heaven (Sentinel-2 10 m low-water extent and whitewater, Copernicus
+    // GLO-30 terrain and edited water surface, ZRA flows; inferred bed and
+    // gorge walls; see zambezi-upper-gorge-evidence.md): 2017^2 over the
+    // 1,985 x 1,549 m UTM 35S evidence window, anchored at X = 0 and centred
+    // in Y (Unreal +Y south). Its water is the map-aligned Cartesian cook, so
+    // it is a separate map beside the 30 km L_Zambezi and owns its assets.
+    for (const FRaftSimEnvironmentPreviewSpec& PreviewSpec : GetEnvironmentPreviewSpecs())
+    {
+        if (PreviewSpec.RiverId != TEXT("zambezi_batoka_gorge"))
+        {
+            continue;
+        }
+        FRaftSimLandscapeImportCandidateSpec Candidate;
+        Candidate.PreviewSpec = PreviewSpec;
+        Candidate.PreviewSpec.RiverId = ZambeziUpperGorgeRiverId;
+        Candidate.PreviewSpec.DisplayName = TEXT("Zambezi Upper Batoka Gorge");
+        Candidate.PreviewSpec.SourceManifest =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/zambezi_sources_2026_09/manifest.json");
+        Candidate.PreviewSpec.SourceDrapeDescription =
+            TEXT("Sentinel-2 L2A 10 m colour of 2025-10-03 (283 m3/s) over Copernicus GLO-30 terrain for the Boiling "
+                 "Pot to Stairway to Heaven reach; the bed, submerged boulders and gorge-wall steepening are inferred.");
+        Candidate.PreviewSpec.FlowBandId = TEXT("low_water_283cms");
+        Candidate.PreviewSpec.FlowBandDisplayName = TEXT("Low Water 283 m3/s (2025-10-03)");
+        Candidate.PreviewSpec.FlowBandSource =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/zambezi_sources_2026_09/hydrometric/"
+                 "zra_victoria_falls_daily_flows.json");
+        Candidate.HeightfieldRelativePath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/terrain/upper_gorge_evidence_2025/upper_gorge_evidence_2025_heightfield_2017.png");
+        Candidate.HeightfieldManifestRelativePath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/terrain/upper_gorge_evidence_2025/upper_gorge_evidence_2025_terrain_manifest.json");
+        Candidate.ImportContractRelativePath = Candidate.HeightfieldManifestRelativePath;
+        Candidate.LocalCenterlineRelativePath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/terrain/upper_gorge_evidence_2025/upper_gorge_evidence_2025_local_centerline.json");
+        Candidate.MapPackagePath = TEXT("/Game/RaftSim/Maps/L_ZambeziUpperGorge");
+        Candidate.LandscapeSize = 2017;
+        Candidate.HorizontalSpanXCm = 198500.0f;
+        Candidate.HorizontalSpanYCm = 154900.0f;
+        Candidate.TargetReliefCm = 14613.022162f;
+        Candidate.WorldVerticalOffsetCm = 5887.927369f;
+        Candidate.bApplyPreviewAnalyticChannelBurn = false;
+        Candidate.bUseSolverVisualizationFields = false;
+        Candidate.bPhysicalScaleSourceCorridor = true;
+        Candidate.bUseDensePhysicalTerrainRenderSurface = false;
+        Candidate.bEnableLandscapeNanite = true;
+        Candidate.PreviewSpec.RiverHalfWidthCm = 2000.0f;
+        Candidate.PreviewSpec.BankWidthCm = 4000.0f;
+        Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
+        Candidate.PreviewSpec.MapPackagePath = Candidate.MapPackagePath;
+        Candidates.Add(MoveTemp(Candidate));
+    }
     return Candidates;
 }
 
-FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings(const FString& RiverId)
+FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings(const FString& InRiverId)
 {
+    const FString RiverId = ResolveLookSettingsRiverId(InRiverId);
     FRaftSimLandscapeMaterialCandidateSettings Settings;
     if (RiverId == TEXT("american_south_fork"))
     {
@@ -1313,7 +1536,7 @@ FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings
         Settings.DetailMappingScale = 144.0f;
         Settings.DetailAlbedoWeight = 0.16f;
         Settings.DetailNormalWeight = 0.28f;
-        Settings.EmissiveFillScale = 0.035f;
+        Settings.EmissiveFillScale = 0.085f;
         Settings.SpecularLevel = 0.14f;
         Settings.RiverbedBlendWeight = 0.78f;
         Settings.WetBankBlendWeight = 0.58f;

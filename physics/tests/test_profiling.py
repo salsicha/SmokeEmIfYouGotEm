@@ -3,12 +3,8 @@ import json
 import pytest
 
 from raftsim.dual_solver import CppSolverRunConfig, CppSolverRunResult
-from raftsim.profiling import (
-    profile_cpp_solver_runs,
-    profile_probe_export_runs,
-    profile_pyclaw_reference_runs,
-    profile_raft_coupling_runs,
-)
+from raftsim.profiling import (profile_cpp_solver_runs, profile_probe_export_runs, profile_pyclaw_reference_runs)
+from raftsim.raft_coupling_profiling import (profile_raft_coupling_runs)
 from raftsim.pyclaw_reference import PyClawAvailability, PyClawRunConfig, build_initial_pyclaw_reference_result
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
 

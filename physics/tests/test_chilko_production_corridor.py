@@ -25,6 +25,7 @@ UNREAL_REVIEW_ROOT = (
     REPO_ROOT
     / "docs/environment-captures/photoreal_river_previews/landscape_candidates"
 )
+EVIDENCE_LANDSCAPE_SIZE = 2017
 
 
 def _read_json(path: Path) -> dict[str, object]:
@@ -118,7 +119,7 @@ def test_corridor_manifest_preserves_authority_and_promotion_blockers() -> None:
         assert image.mode == "I;16"
 
 
-def test_unreal_candidate_is_captured_with_nanite_but_not_promoted() -> None:
+def test_unreal_candidate_is_reference_runnable_with_nanite_but_not_promoted() -> None:
     contract = _read_json(
         REPO_ROOT / "unreal/Content/RaftSim/River/chilko_heightfield_import_test.json"
     )
@@ -133,17 +134,24 @@ def test_unreal_candidate_is_captured_with_nanite_but_not_promoted() -> None:
     assert contract["authority"]["changes_solver_state"] is False
     assert contract["authority"]["changes_collision_or_raft_forces"] is False
     assert contract["production_promoted"] is False
+    # Since the 2026-09-28 rebuild L_LavaCanyon is built from the 2017^2
+    # LiDAR evidence heightfield, not from this corridor's 1009^2 contract.
     assert candidate["river_id"] == "chilko_river_lava_canyon"
-    assert candidate["heightfield_width_px"] == UNREAL_LANDSCAPE_SIZE
-    assert candidate["component_count_total"] == 64
-    assert candidate["material_bound_component_count"] == 64
+    assert candidate["heightfield_width_px"] == EVIDENCE_LANDSCAPE_SIZE
+    assert candidate["component_count_total"] == 256
+    assert candidate["material_bound_component_count"] == 256
     assert candidate["material_binding_status"] == "all_source_components_bound"
     assert candidate["nanite_enabled"] is True
-    assert candidate["nanite_component_count"] == 1
-    assert candidate["nanite_material_bound_slot_count"] == 64
+    assert candidate["nanite_component_count"] == 4
+    assert candidate["nanite_material_bound_slot_count"] == 256
     assert candidate["nanite_material_audit_error_count"] == 0
     assert candidate["nanite_representation_status"] == "enabled_and_built_up_to_date"
-    assert candidate["promotion_status"].startswith("review_gated_")
+    assert candidate["runnable_gameplay_status"] == (
+        "reference_runnable_chilko_lava_canyon_live_cooked_water_player_raft_and_game_mode"
+    )
+    assert candidate["promotion_status"] == (
+        "reference_runnable_gameplay_photoreal_and_production_promotion_review_gated"
+    )
 
     for key in ("guide_seat_capture", "river_eye_capture"):
         capture_path = REPO_ROOT / candidate[key]
@@ -151,21 +159,18 @@ def test_unreal_candidate_is_captured_with_nanite_but_not_promoted() -> None:
         pixels = np.asarray(Image.open(capture_path).convert("RGB"), dtype=np.float32)
         assert pixels.std() > 8.0
 
-    # Candidate maps are regenerable diagnostics and are no longer versioned
-    # (docs/generated-artifact-retention-policy.md, July 17 revision); the
-    # manifest and captures above remain the reviewed evidence.
-    assert candidate["map_package"].endswith(
-        "L_ChilkoRiver_PhysicalCorridorCandidate"
-    )
+    assert candidate["map_package"] == "/Game/RaftSim/Maps/L_LavaCanyon"
 
 
 def test_unreal_command_supports_an_isolated_chilko_build() -> None:
     source = read_raftsim_editor_source(REPO_ROOT)
 
     assert 'TEXT("chilko_river_lava_canyon")' in source
-    assert "L_ChilkoRiver_PhysicalCorridorCandidate" in source
+    assert 'TEXT("/Game/RaftSim/Maps/L_LavaCanyon")' in source
+    assert "lava_canyon_evidence_2023_heightfield_2017.png" in source
+    assert "lava_canyon_evidence_2023_runtime_coordinate_map.json" in source
+    assert 'FlowBand = FName(TEXT("summer_runnable_93cms"))' in source
     assert "const FString& RiverIdFilter" in source
     assert "Candidates.FilterByPredicate" in source
-    assert "Candidate.LandscapeSize = 1009" in source
+    assert "Candidate.LandscapeSize = 2017" in source
     assert "Candidate.bEnableLandscapeNanite = true" in source
-    assert "CenterSampleSpacingCm = bChilkoSourceScale ? 500.0f : 100.0f" in source

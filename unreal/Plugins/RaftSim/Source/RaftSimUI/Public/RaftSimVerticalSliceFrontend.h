@@ -102,6 +102,10 @@ struct FRaftSimRunResult
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Career")
     FName ScenarioId;
 
+    /** Empty identifies the legacy map's coordinate frame. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Career")
+    FString CoordinateMapPath;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Career")
     ERaftSimGameMode GameMode = ERaftSimGameMode::GuidedDescent;
 
@@ -137,6 +141,9 @@ struct FRaftSimScenarioProgress
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Career")
     FName ScenarioId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Career")
+    FString CoordinateMapPath;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Career")
     ERaftSimMedal BestMedal = ERaftSimMedal::None;
@@ -405,6 +412,11 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Career")
     TArray<FRaftSimScenarioProgress> ScenarioProgress;
+
+    /** Exact prior records retained when a reconstructed route replaces a
+     * checkpoint/ghost coordinate frame. These are not active spawn locations. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Career")
+    TArray<FRaftSimScenarioProgress> HistoricalRouteProgress;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Career")
     FRaftSimCareerStats CareerStats;

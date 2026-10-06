@@ -319,7 +319,11 @@ def test_rights_reviewed_futaleufu_forest_set_is_isolated_and_visually_rejected(
         REVIEWED_FUTALEUFU_FOREST_VISUAL_REVIEW_PATH.read_text(encoding="utf-8")
     )
     editor_source = EDITOR_MODULE_PATH.read_text(encoding="utf-8")
-    active_manifest = LANDSCAPE_CANDIDATE_MANIFEST_PATH.read_text(encoding="utf-8")
+    active_manifest = (
+        REPO_ROOT
+        / "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+        "landscape_candidate_manifest_futaleufu_terminator.json"
+    ).read_text(encoding="utf-8")
 
     assert 'or "alpha" in texture_name' in shared_importer
     assert "RAFTSIM_FUTALEUFU_FOREST_SOURCE_ROOT" in script
@@ -411,8 +415,24 @@ def test_rights_reviewed_futaleufu_forest_set_is_isolated_and_visually_rejected(
         if capture.exists():
             assert _sha256(capture) == visual_review["reviewed_candidate"][hash_key]
 
-    assert "FutaleufuTemperateForestSet_1K" not in editor_source
-    assert "futaleufu_temperate_forest_set" not in active_manifest.lower()
+    # The rejected whole-set canopy policy remains historical evidence. The
+    # later V1 activation is deliberately narrower: only the small saplings
+    # and ferns are allowed in a non-colliding near-bank review stratum.
+    assert visual_review["active_map_policy"] == (
+        "futaleufu_temperate_forest_set_must_not_be_loaded_or_recorded_by_the_"
+        "default_landscape_candidate_generator"
+    )
+    assert "FutaleufuTemperateForestSet_1K" in editor_source
+    assert "SM_FirSaplingMedium" not in editor_source
+    assert "RaftSimFutaleufuScannedNearBankUnderstoryV1" in editor_source
+    assert "futaleufu_temperate_forest_set" in active_manifest.lower()
+    active_candidate = json.loads(active_manifest)["candidates"][0]
+    assert active_candidate[
+        "landscape_dressing_futaleufu_medium_fir_canopy_excluded"
+    ] is True
+    assert active_candidate[
+        "landscape_dressing_futaleufu_project_owned_canopy_preserved"
+    ] is True
 
 
 def test_rights_reviewed_futaleufu_island_tree_set_is_isolated_and_visually_rejected():
@@ -518,7 +538,15 @@ def test_rights_reviewed_futaleufu_island_tree_set_is_isolated_and_visually_reje
         if capture.exists():
             assert _sha256(capture) == visual_review["reviewed_candidate"][hash_key]
 
-    assert "FutaleufuIslandTreeSet_1K" not in editor_source
+    assert "FutaleufuIslandTreeSet_1K" in editor_source
+    assert "RaftSimLiveOakIslandTreeMorphologyReview" in editor_source
+    assert "RaftSimLiveOakIslandTreeMaterialV1Review" in editor_source
+    south_fork_production_source = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
+        "RaftSimEditorSouthForkFullReach.cpp"
+    ).read_text(encoding="utf-8")
+    assert "FutaleufuIslandTreeSet_1K" not in south_fork_production_source
     assert "futaleufu_island_tree" not in active_manifest.lower()
 
 
@@ -835,11 +863,41 @@ def test_batoka_basalt_iterations_are_isolated_hashed_and_source_bounded():
     manifest = json.loads(
         ZAMBEZI_BATOKA_BASALT_AUTHORING_MANIFEST_PATH.read_text(encoding="utf-8")
     )
+    organic_review = json.loads(
+        (
+            REPO_ROOT
+            / "docs/environment-captures/photoreal_river_previews/"
+            "landscape_candidates/zambezi_organic_basalt_surface_v16_review.json"
+        ).read_text(encoding="utf-8")
+    )
     assert manifest["status"] == (
         "v13_bounded_visual_morphology_rejected_insufficient_source_resolution"
     )
     assert manifest["production_promoted"] is False
     assert manifest["corridor_substitution_performed"] is False
+    assert manifest["runnable_material_presentation"]["iteration"] == (
+        "BatokaOrganicBasaltV16"
+    )
+    assert manifest["runnable_material_presentation"][
+        "collision_or_geometry_changed"
+    ] is False
+    assert manifest["runnable_material_presentation"][
+        "water_solver_route_or_gameplay_authority_changed"
+    ] is False
+    assert organic_review["status"] == (
+        "organic_surface_improvement_pass_photoreal_promotion_fail"
+    )
+    assert organic_review["accepted_material_contract"][
+        "runtime_presentation_iteration"
+    ] == "BatokaOrganicBasaltV16"
+    assert organic_review["authority_invariants"][
+        "water_solver_route_raft_and_hazard_authority"
+    ] == "unchanged"
+    for evidence_name in ("baseline", "accepted"):
+        evidence = organic_review["evidence"][evidence_name]
+        evidence_path = REPO_ROOT / evidence["path"]
+        assert evidence_path.is_file()
+        assert _sha256(evidence_path) == evidence["sha256"]
     assert manifest["authorship"]["external_pixels_copied"] is True
     assert manifest["authorship"]["external_geometry_copied"] is False
     assert manifest["authorship"]["third_party_asset_dependency"] is True
@@ -1045,6 +1103,18 @@ def test_batoka_basalt_iterations_are_isolated_hashed_and_source_bounded():
     assert "RaftSimCaptureZambeziBatokaWorldAlignedTerrainComparison" in editor_source
     assert "RaftSim.CaptureZambeziBatokaVisualMorphologyComparison" in editor_source
     assert "RaftSimCaptureZambeziBatokaVisualMorphologyComparison" in editor_source
+    assert "BatokaOrganicBasaltV16" in editor_source
+    assert "BatokaAerialRocks02WorldAlignedSecondaryAlbedo" in editor_source
+    assert "BatokaMacroAntiTileStrength" in editor_source
+    assert "BatokaWeatheringVariationStrength" in editor_source
+    assert "BatokaMineralShadowScale" in editor_source
+    assert "BatokaMineralHighlightScale" in editor_source
+    assert "BatokaBasaltTint" in editor_source
+    assert "BatokaWeatheredInterflowTint" in editor_source
+    assert "BatokaTerrainColorCoverageFloor" in editor_source
+    assert "BatokaDetailColorWeight\"), 0.16f" in editor_source
+    assert "BatokaDetailNormalWeight" in editor_source
+    assert "BatokaDetailRoughnessWeight" in editor_source
     c1_report = json.loads(
         (REPO_ROOT / ZAMBEZI_BATOKA_BASALT_C1_CORRIDOR_REPORT_RELATIVE_PATH).read_text(
             encoding="utf-8"

@@ -8,7 +8,7 @@ from pathlib import Path
 from ..pyclaw_reference import PyClawRunConfig
 from ..scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
 from ..sweeps import ParameterSweepCandidate, default_parameter_sweep_candidates
-from ..tuning import fit_cpp_and_raft_parameters_against_pyclaw
+from ..raft_parameter_fit import (fit_cpp_and_raft_parameters_against_pyclaw)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -9,6 +9,8 @@ import sys
 
 MAX_NON_LFS_BYTES = 50 * 1024 * 1024
 FORBIDDEN_TRACKED_PREFIXES = (
+    "tmp/",
+    "dev/null/",
     "unreal/Content/RaftSim/Maps/EnvironmentPreviews/",
     "unreal/Content/RaftSim/Environment/GeneratedLocalReview/",
 )

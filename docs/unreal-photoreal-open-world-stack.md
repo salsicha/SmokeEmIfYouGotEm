@@ -31,7 +31,153 @@ The approved first-party procedural-equivalent environment asset plan is `unreal
 
 The generated preview maps live under `/Game/RaftSim/Maps/EnvironmentPreviews/`, and `RaftSim.CreatePhotorealEnvironmentPreviewMaps` plus `RaftSim.CapturePhotorealEnvironmentPreviews` rebuild the three base maps, ten flow-variant maps, and 26 guide-seat/river-eye screenshots. The July 9 renderer imports the first-party `ProductionDetailTextures` albedo, tangent normal, and packed AO/roughness/height sets for South Fork, Grand Canyon, and Pacuare. `M_RaftSim_AtlasSampleReview` now uses separate RG `AtlasTileOrigin`/`AtlasTileScale` and `TerrainDetailUvScale`/`TerrainDetailUvOffset` parameters, fixing the UE 5.8 Metal component-mask compile failure that had silently fallen back to Unreal's default material.
 
-The first native source-terrain candidates now live under `/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/`. `RaftSim.CreateLandscapeImportCandidateMaps` imports the three review-gated 1009x1009 16-bit PNG heightfields through Unreal's `LandscapeEditor` format API as 16x16-component `ALandscape` maps, builds four Nanite representations per river, audits all 256 source component and Nanite material bindings, and captures guide-seat plus river-eye evidence under `docs/environment-captures/photoreal_river_previews/landscape_candidates/`. Each candidate material combines four source-conditioned Texture2D assets with three independent first-party close-range terrain Texture2D assets. Macro albedo, normals, ambient occlusion, and roughness retain source/detail variation; the material-zone blue channel darkens submerged riverbed color/roughness and its feathered edge conditions the wet bank without altering geometry. River-specific Landscape mapping and all bounded zone settings are recorded in the generated manifest. PVE/Nanite-foliage evaluation is active in these maps: source masks and imported Landscape heights drive complete HISM tree, conifer, shrub, and understory meshes while first-party dense irregular rock meshes add bounded river-specific dressing. The maps bind a custom opaque DefaultLit solver-surface parent and per-river instances to the solver-owned procedural ribbon. These expose surface/vertex tint balance, seam-continuous normal-atlas detail, bounded render overlap/smoothing, reflection support, and a small Fresnel capture fallback without requiring WaterBody/WaterZone or changing physics/forcing authority; prior Single Layer volume parameters remain manifest-recorded but inactive. Direct isolation found that the remaining continuous white bank rails were uncovered render gaps rather than the Landscape wet-bank feather: stronger feather-tail shading did not move them, while noncolliding render overlap did. The manifest now records 1.35x South Fork, 1.17x Colorado, and 1.45x Pacuare render widths; recapture removes the South Fork rail and leaves only one isolated Pacuare bank point for production microgeometry, without widening collision or changing solver geometry. South Fork additionally binds two clamped Texture2D derivatives from the accepted whole-window median finite-volume C++ frame: tangent macro normals and packed RGBA depth/speed/Froude/detrended-`eta`. `cpp_solver_visualization_field_manifest.json` records source hashes, corrected boundary and HLL semantics, `feature_strength_scale=0`, passing GeoClaw comparison, passing full C++ gate, the accepted report-set lock, visual decode gains, and a lossless ±4 m relief encoding under a 36 cm render ceiling. The noncolliding candidate ribbon uses that relief with only 42% residual analytic displacement and adds a separate noncolliding DefaultLit foam surface whose deterministic breakup is confined to the decoded speed/Froude aeration mask. A dedicated South Fork rapid camera frames the strongest accepted mean-Froude approach, while the standard upstream capture remains calm. None of these render derivatives changes solver state, collision, raft force, conservation evidence, or feature forcing, and none is reused for Colorado or Pacuare. The offscreen renderer uses persistent view state plus a first render to request shader permutations, waits for compilation, recreates Landscape component state, and then records the evidence frame; this prevents UE 5.8's fallback grid or missing reflection history from masquerading as final shading. The candidates remain isolated and review-gated because their analytic preview channel burn is not solver or accepted geospatial geometry, the generic PVE sample species and procedural rocks are evaluation content rather than final biome assets, and visual inspection still shows coarse banks, repeated silhouettes, provisional surface shading, low-resolution whitewater, and missing crest-scale spray, atmosphere, and production VFX.
+The first native source-terrain candidates now live under `/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/`. `RaftSim.CreateLandscapeImportCandidateMaps` imports the three review-gated 1009x1009 16-bit PNG heightfields through Unreal's `LandscapeEditor` format API as 16x16-component `ALandscape` maps, builds four Nanite representations per river, audits all 256 source component and Nanite material bindings, and captures guide-seat plus river-eye evidence under `docs/environment-captures/photoreal_river_previews/landscape_candidates/`. Each candidate material combines four source-conditioned Texture2D assets with three independent first-party close-range terrain Texture2D assets. Macro albedo, normals, ambient occlusion, and roughness retain source/detail variation; the material-zone blue channel darkens submerged riverbed color/roughness and its feathered edge conditions the wet bank without altering geometry. River-specific Landscape mapping and all bounded zone settings are recorded in the generated manifest. PVE/Nanite-foliage evaluation is active in these maps: source masks and imported Landscape heights drive complete HISM tree, conifer, shrub, and understory meshes while first-party dense irregular rock meshes add bounded river-specific dressing. The maps bind opaque Default Lit water parents and per-river instances to the solver-owned procedural ribbon, including Zambezi's separately tuned capture-safe parent. These expose surface/vertex tint balance, seam-continuous normal-atlas detail, bounded render overlap/smoothing, reflection support, and a small Fresnel capture fallback without requiring WaterBody/WaterZone or changing physics/forcing authority; inactive Single Layer volume parameters remain manifest-recorded for evaluation. Direct isolation found that the remaining continuous white bank rails were uncovered render gaps rather than the Landscape wet-bank feather: stronger feather-tail shading did not move them, while noncolliding render overlap did. The manifest now records 1.35x South Fork, 1.17x Colorado, and 1.35x Pacuare render widths; recapture removes the South Fork rail and leaves only one tiny distant Pacuare bank point for production microgeometry, without widening collision or changing solver geometry. South Fork additionally binds two clamped Texture2D derivatives from the accepted whole-window median finite-volume C++ frame: tangent macro normals and packed RGBA depth/speed/Froude/detrended-`eta`. `cpp_solver_visualization_field_manifest.json` records source hashes, corrected boundary and HLL semantics, `feature_strength_scale=0`, passing GeoClaw comparison, passing full C++ gate, the accepted report-set lock, visual decode gains, and a lossless ±4 m relief encoding under a 36 cm render ceiling. The noncolliding candidate ribbon uses that relief with only 42% residual analytic displacement and adds a separate noncolliding DefaultLit foam surface whose deterministic breakup is confined to the decoded speed/Froude aeration mask. A dedicated South Fork rapid camera frames the strongest accepted mean-Froude approach, while the standard upstream capture remains calm. None of these render derivatives changes solver state, collision, raft force, conservation evidence, or feature forcing, and none is reused for Colorado or Pacuare. The offscreen renderer uses persistent view state plus a first render to request shader permutations, waits for compilation, recreates Landscape component state, and then records the evidence frame; this prevents UE 5.8's fallback grid or missing reflection history from masquerading as final shading. The candidates remain isolated and review-gated because their analytic preview channel burn is not solver or accepted geospatial geometry, the generic PVE sample species and procedural rocks are evaluation content rather than final biome assets, and visual inspection still shows coarse banks, repeated silhouettes, provisional surface shading, low-resolution whitewater, and missing crest-scale spray, atmosphere, and production VFX.
+
+Zambezi now follows the Default Lit capture contract through its isolated `M_RaftSim_Zambezi_DefaultLitWater` parent. It preserves the former experiment's opposed panned normal layers, secondary-axis swap, short cross-current wavelengths, and restrained world-space variation, but has no Single Layer Water volume output. A bounded first-party emissive fill makes the same surface readable in canonical SceneCapture2D evidence: lower-half mean luminance rises from 0.060286 to 0.247354 in the guide-seat frame and from 0.061027 to 0.223423 at river eye, with no retained lower-half pixels below 0.02. The rejected `M_RaftSim_Zambezi_SingleLayerWater` asset and its volume coefficients remain inactive audit evidence. This changes only the non-colliding presentation ribbon; the broad live solver carrier remains at zero optical coverage, the focused solver-foam sheet and raft/crew exclusion remain active, and no terrain, collision, solver, hydraulics, bathymetry, or raft-force authority changes. The 5 m reference flow field preserves its full-corridor station axis and produces live breaking sites in the launch-window PIE gate, with production Niagara roller and aerosol activity required by the test. Those 25 feature-tagged transitions are explicitly procedural reference infill, not measured hydraulics. The result remains review-gated rather than photoreal because the water still has broad smooth highlight bands and terrain silhouette, local bathymetry, credible crest/foam/spray geometry, vegetation, atmosphere, seasonal calibration, and named guide/art approval remain open.
+
+Pacuare's later isolated Single Layer V1 is now explicitly rejected and inactive. Both direct material isolation and a 31,409-vertex procedural reference-infill bathymetry bracket left the same hard horizontal foreground depth-composition band; a separate terrain-colored shoreline-infill attempt covered bright gaps but introduced broad tessellated bank facets and was also discarded. The retained `M_RaftSim_Pacuare_RainforestDefaultLitWater` preserves Pacuare's two moving normal layers and two world-variation scales without a volume output. A 1.35x non-colliding render overlap removes the continuous shoreline gaps while leaving one tiny distant river-right point for source-aligned production bank microgeometry. No rejected infill changes the saved map, Landscape collision, heightfield, solver geometry, hydraulics, or raft forces.
+
+The August 1 Pacuare field binding supersedes the earlier statement above that
+only South Fork had a river-specific solver visualization. Upper Huacas now
+has its own deterministic packed derivative from the committed
+`rainfed_runnable_planning` arrays: depth, speed, Froude, and detrended
+`bed+h` relief. The source contains 5,393 wet cells, 52 supercritical cells, a
+4.275 m/s speed maximum, and a 2.525 Froude maximum; the strongest column-mean
+Froude occurs at station 286 m. The non-colliding capture ribbon uses at most
+18 cm of added field relief, 22% residual analytic ripple, and a separate
+masked foam sheet with eight metres of bounded downstream persistence from
+adjacent cooked samples. Guide, river-eye, and dedicated solver-crux cameras
+frame that hydraulic control. Both authored actors remain hidden in play while
+the live cooked-field surface owns runtime rendering and forces; capture
+automation temporarily reveals only actors tagged
+`RaftSimCaptureOnlyStaticWater` and restores their saved state afterward. This
+closes the flat/dark-water evidence bug, not the production-fidelity gate: the
+source run is unconverged, and the opaque water, coarse foam bands, generic
+foliage, interpreted geography, missing spray/mist, guide validation, and
+full-run runtime evidence remain rejected in the V2 review.
+
+The August 3 Pacuare live-water pass supersedes the opaque gameplay-water
+limitation above. `L_UpperHuacas` now renders gameplay water through the live
+`ARaftSimWaterSurfaceActor`: an all-wet-cell-clipped transmitting volume core
+under a 3.5%-14% solver detail skin. A Pacuare-local instance of the shared
+raft-transmitting parent binds first-party flow-normal and foam-lace textures;
+the lace is masked by solver foam and speed and cannot create whitewater in
+calm or dry cells. The prior packed-field ribbon and foam sheet remain
+capture-only and hidden in play. Matched over-raft evidence replaces the
+uniform pale sheet with visible live relief and shallow riverbed variation,
+and the focused native and PIE gates pass. This changes no cooked field,
+wet/dry state, bathymetry, coordinate mapping, collision, buoyancy, or raft
+force. Rounded procedural banks, generic repeated vegetation, thin water
+optics, sparse foam, missing spray/mist, unconverged hydraulics, and six
+external gates keep photoreal and production promotion closed; the exact
+contract is hash-locked in
+`pacuare_live_transmitting_water_v1_review.json`.
+
+The August 2 Colorado Hance water pass narrows the cooked-field capture relief
+ceiling from 45 cm to 9 cm and applies a plane-preserving cardinal five-tap
+filter only to all-wet presentation vertices. The live carrier uses the same
+river-local concept with 0.72 smoothing strength, 0.55 standing-wave and relief
+scales, and a narrower rapid-foam focus; it builds a temporary presentation
+height array and leaves authoritative `WaterSamples`, collision, bathymetry,
+buoyancy, and raft forces unchanged. The capture foam bracket reduces bright
+neutral water-band coverage from 3.68% to 0.37% in the guide/solver view, so the
+previous broad white sheets are no longer dominant. This is a retained
+technical improvement, not a photoreal pass: horizontal bands remain visible,
+foam lacks credible rapid structure and spray, the water remains opaque, the
+canyon is terraced, and the hydraulic field and external review gates remain
+open. The hash-locked review is
+`colorado_hance_subcell_smoothed_water_lace_foam_v1_review.json`.
+
+The August 3 Hance V3 terrain/ecology pass keeps the complete plus-or-minus
+39 m C3 solver strip and runtime coordinate map unchanged while replacing the
+remaining sine-like outer-bank relief with deterministic seeded massing,
+incised drainage, irregular buttresses, talus, and a bounded debris-fan
+landform analog. An explicit 1.18 rise/run limiter constrains generated outer
+grades; the protected join remains below 8 mm and the dominant cross-bank band
+energy falls from 0.432 to 0.345. Four project-owned opaque dryland meshes now
+place 3,000 ground-cover and 480 shrub instances in two morphologies each,
+outside the solver strip and with no collision or ecology/geography/hydraulic
+authority. The fixed-camera result is retained because terrain massing and
+bank breakup improve, but it still fails photoreal review: vegetation is
+stylized, terrain is not a Hance survey, water/rocks/VFX remain synthetic, and
+all six external gates remain open. The hash-locked record is
+`colorado_hance_nonperiodic_canyon_dryland_ecology_v3_review.json`.
+
+The August 1 Upper Huacas integration supersedes Pacuare's broad,
+scale-mismatched DEM candidate as the active runnable map. `L_UpperHuacas` now
+owns a physical 600×78 m, 1009×1009 Landscape derived from the committed C3
+window rather than squeezing a roughly 37×44 km GLO-30 review mosaic into a
+323×55 m shell. A bounded ±0.38 m procedural relief field affects only
+unmeasured outer banks; the protected channel and map perimeter remain
+unchanged. A 301-point identity station/lateral coordinate map applies a
+454.283 m vertical datum, making the live cooked field and static Landscape
+agree exactly along the centerline. The saved map supplies the player
+raft/start and game mode, hides its deterministic capture ribbon during play,
+and passes its focused runtime load test. This is a reference-runnable
+geography correction, not photoreal promotion: water optics, visible rapid
+foam/spray, biome-specific foliage, wet-bank/riverbed detail, higher-resolution
+terrain, guide/geospatial/hydraulic/ecology/art review, and desktop/VR
+performance evidence remain open.
+
+The Zambezi render terrain now uses V17 height-aware morphology plus a V18 exposure-safe material treatment on four collision-free 12.5 m visual tiles while the source Copernicus Landscape remains the sole terrain/physics authority. Central-difference grid normals, slower relief, variable strata/erosion/talus, and a 3.2 m-capped six-pass reconstruction reduce triangle and regular-terrace artifacts. The 100 m horizontal shoreline radius remains absolute below 6 m above local conditioned water and fades to full dry-scarp strength only at 18 m. Ordinary morphology stays capped at 2.8 m, while the otherwise source-missing upper scarp may use a 4.4 m presentation cap and two broad incommensurate buttress/gully fields. V18 does not alter those vertices: it lowers the dry basalt energy, adds a broad bounded erosion-stain field, and uses a restrained sun/skylight/reflection bracket. The live solver water keeps its wet-cell geometry and bank feather, but its render-only response now uses 0% calm and 6% active detail coverage, 0.66 roughness, and 0.055 sky reflection strength. Two source-conditioned 5 m adaptive banks still cover the first kilometre and remain non-colliding. Launch cover rises to 7,200 instances while target height falls to 0.55-1.55 m, reducing oversized repeated silhouettes. Schema v20 requires the V18 scarp, water, and ecology tags alongside the existing authority tags. In the matched frame, water p95 luminance falls from 0.8859 to 0.8478 and water pixels above 0.90 fall 96.14%. The schema-v20 audit, five focused native environment tests, and all six runnable-map gates pass. The capture remains a bounded technical improvement, not photoreal promotion: the canyon geometry is still rounded and smooth at 30 m source resolution, ecology remains generic and repeated, and higher-resolution terrain, reach-specific geology/ecology, calibrated hydraulics, production art, and platform approval are still required.
+
+Zambezi also has an isolated camera-visible bank-cover component. It adds 1,200
+grounded instances of the project-owned opaque savanna mesh across the two
+canonical downstream windows, outside the active water corridor and selected
+against the lowest available DEM slope. Together with 5,600 full-corridor tree,
+scrub, and ground-cover instances, the saved map now audits 6,800 opaque,
+non-colliding vegetation instances and zero legacy alpha-card actors. Both
+captures visibly contain bank cover, but the procedural clumps, sparse ecology,
+coarse DEM silhouette, and synthetic materials still fail photoreal promotion.
+
+The next Zambezi ecology layer adds 232 camera-visible woody instances in three
+separate HISM actors: 58 riparian trees, 57 umbrella trees, and 117 thorn-scrub
+forms. A deterministic forty-candidate search rejects eight placements above a
+hard 24° DEM-slope ceiling; the maximum accepted slope is 15.83°. Muted olive
+vertex colours and a stronger low-light material floor reduce the first
+bracket's graphic green/black contrast. That milestone audited 7,032
+opaque, non-colliding vegetation instances across eight components. The result
+is more legible ecology, not production foliage: repeated procedural crowns,
+missing wind/seasonal variation, coarse lighting, and absent species/art/guide
+approval remain open.
+
+The runnable launch has four additional HISM components rather than depending
+on those downstream documentary windows. The expanded deterministic search
+places 1,721 solid savanna-cover instances approximately 151-842 m downstream
+and 174 woody instances approximately 215-864 m downstream, split 44/43/87
+between riparian tree, umbrella tree, and thorn scrub. Every candidate is
+checked against all route segments, conditioned-water height, and a hard DEM
+slope ceiling; woody plants stay at least 50 m beyond the active half-width.
+These launch-only, non-colliding components suppress shadows to avoid the
+rejected crown/wall streak under the low review sun; the full-corridor and
+camera-mosaic ground-cover layers are also shadowless, while downstream woody
+ecology retains shadows. The saved map now audits 8,927 instances across 12
+components under schema v15. The retained gameplay frame is stable and contains
+no adaptive-bank shadow wedge, but the extra ground cover reads as a thin,
+repeated shoreline band and the foreground remains sparse and synthetic. This
+is technical coverage and dry-bank conditioning, not photoreal art or ecological
+promotion.
+
+The same runnable window now has six separately auditable talus HISM actors
+because the legacy 180-rock corridor distribution starts roughly 5 km
+downstream. A deterministic 128-candidate search places 360 rights-reviewed CC0
+rock analogs approximately 118-993 m downstream, split 60 per mesh. Full-route,
+conditioned-water dry-height, and 48-degree hard-slope gates accept all targets;
+the maximum accepted slope is 37.817 degrees. The 0.95-5.20 m visual instances
+cast shadows but are source-Landscape-grounded, non-colliding, and explicitly
+barred from Batoka-lithology, water, solver, and raft-force authority. All six
+components now bind `MI_RaftSim_Zambezi_BasaltTalusV1` instead of the source
+moss material directly. The project-owned parent preserves bounded scan
+microstructure while the instance limits that already desaturated branch to
+0.42 and supplies 0.58 neutral mineral response. A -10,000,000 cm waterline
+keeps the parent's 70 cm wet band inactive until a validated per-instance local
+water elevation exists. Schema v15 and
+`RaftSim.M9.FZambeziTalusMaterial` prevent the old material binding from
+returning. The standard fixed views retain the bank breakup without route
+obstruction but do not resolve the rocks closely enough for visual material
+acceptance; generic geometry, hard shadowing, repeated bright vegetation,
+rounded coarse terrain, and the missing credible wet-bank transition still
+reject photoreal promotion.
 
 Candidate lighting and post-processing now come from one river-specific `FRaftSimPhotographicCaptureSettings` contract rather than scattered desert/rainforest conditionals. Sun, skylight, fog, manual exposure, saturation, contrast, sharpening, vignette, and zero camera-film-grain values are serialized into `landscape_candidate_manifest.json` for every evidence frame. A clean UE 5.8 rebuild and offscreen recapture produced no material or shader errors and all 26 environment tests pass. The controlled sky fill improves diagnostic shadow retention, but visual review still finds near-black repeated foliage, coarse terrain plates, and a flat overlapping foreground water/bank ribbon; these are production material/geometry blockers, not reasons to hide the scene with stronger exposure or post-process noise.
 
@@ -48,3 +194,89 @@ The source-conditioned corridor-scale candidates remain under `unreal/Content/Ra
 `physics/src/raftsim/photoreal_review_rollups.py` synchronizes each recapture's quality summaries, handoff counts, performance-review counts, production-detail provenance, source-terrain checkpoint, and water-light-response checkpoint into the source plan, procedural asset plan, art research, and gap register. The historical July 8 pixel, production-detail material, and source-terrain geometry checkpoints are explicitly superseded by the active water-light-response checkpoint.
 
 The recipe requires guide-seat review captures, desktop/VR/debug quality budgets, source and rights manifests, and replay alignment between rendered water features and solver/runtime telemetry before the environment can count as milestone-complete.
+
+Futaleufú Terminator now has a river-local transmitting-water V3 path without changing the committed runnable map. The live solver-conforming Single Layer Water core resolves a Futaleufú material instance, first-party flow normal, and solver-masked foam-lace texture from the existing cooked-field identity when an older map lacks serialized V3 references; future filtered regeneration stores those references explicitly. The capture-water generator also authors a translucent Default Lit ribbon with IOR 1.333 and CPU depth/bank/aeration opacity for future evidence. The current `L_Terminator` package stays byte-identical, and no solver, topology, collision, bathymetry, wet-mask, or raft-force authority moves. The retained identical-camera live frame has lower mean/highlight response and stronger cold-water color separation than V2, but still fails photoreal review because highlights, standing-wave shape, foam depth, spray/mist, shoreline material, terrain, and ecology remain synthetic or incomplete.
+
+Colorado Hance now uses the same split optical architecture without changing
+the runnable `L_Hance` package: a solver-clipped wet-cell volume core supplies
+the river body, while the existing plane-preserving live mesh is a low-coverage
+detail skin. The fixed capture ribbon is translucent Default Lit water with IOR
+1.333 and vertex opacity derived only from already sampled depth, wet-bank edge,
+and aeration. Project-owned Hance flow-normal and foam-lace textures are visual
+inputs only; solver state, wet/dry ownership, bathymetry, collision, buoyancy,
+and raft forces remain authoritative and unchanged. Fixed views retain the V2
+candidate because riverbed and bank readability improve over the opaque
+baseline, but coarse cross-river bands, weak hydraulic volume/VFX, duplicate
+camera evidence, and blockout canyon/ecology keep photoreal promotion closed.
+
+Chilko Lava Canyon now retains the river-local split-optics values that its
+regenerated map actually serializes. The runtime compatibility path applies old
+Chilko defaults only to genuinely legacy maps; it no longer overrides the
+current live-solver config. A default-off shared depth-coverage mask is enabled
+for Chilko, and its redundant broad detail-skin coverage is zero, leaving the
+all-wet-cell transmitting core, moving normals, and solver-masked rapid foam as
+the visible water authorities. A restrained Chilko-only lighting/reflection rig
+and muted, smaller-scale full-reach bank dressing reduce the washed-out water
+and fluorescent/tall cover without changing Futaleufu's shared material
+defaults. Matched evidence reduces water-band mean luminance 6.18%, >0.90
+coverage 59.21%, >0.95 coverage 98.93%, and bank neon-green fraction 64.77%.
+The remaining pale shallow bank band, repeated foam strokes, smooth DEM-scale
+shore, generic ecology/geology, missing spray/mist and entrained air, and
+uncalibrated hydraulics keep the result technical rather than photoreal. Solver
+arrays, wet/dry ownership, bathymetry, collision, buoyancy, and raft forces
+remain unchanged.
+
+Futaleufú Terminator and Chilko Lava Canyon now also share an explicit
+`RaftSimColdWaterHighlightNaturalismV1` saved-map contract. Futaleufú uses the
+same restrained specular/roughness/fallback-reflection response as the accepted
+Chilko optical profile, a lower-energy photographic rig, and corrected
+river-local shallow/deep/sky colors. The first desaturated Futaleufú bracket is
+rejected evidence; the retained matched frame lowers clipped >0.95 coverage
+98.20% and raises blue-minus-red separation 29.79%, while the Chilko control
+stays numerically stable. This is still not production water: broad pale
+surfaces, solver-stroke foam, weak crest volume, spray/mist, bank transitions,
+environment art, character occlusion, calibration, and target performance
+remain open. The fail-closed comparison and hashes live in
+`cold_water_highlight_naturalism_v1_review.json`; no solver, geometry,
+collision, buoyancy, or force authority moved.
+
+Zambezi V2 now closes the corresponding live-core opacity mismatch. The shared
+raft-transmitting parent preserves its depth-, foam-, and raft-interior-aware
+optical graph, then multiplies opacity by the station/lateral wet-cell coverage
+already carried in live-core vertex alpha. The Zambezi map binds a new river-
+local instance, widens the presentation-only bank blend to 7.5 m, raises
+smoothing to 0.62, reduces the detail skin to 0.025/0.13 calm/active coverage,
+and restrains specular, reflection, and fallback-sky response. Exact-transform
+gameplay evidence reduces high launch-water luminance and the sampled right-
+bank edge while preserving solver counts and 4,224 optical-core triangles.
+This does not supersede terrain, shoreline, bathymetry, hydraulics, collision,
+buoyancy, or raft-force authority; coarse DEM and wet-cell geometry plus open
+art, guide, geospatial, rights, seasonal-flow, VFX, character, and performance
+review keep the runnable map below photoreal promotion.
+
+Futaleufú and Chilko V2 now add a depth-aware cold-water optical layer without
+moving any physical authority. The shared Single Layer Water parent already
+consumes cooked depth in vertex green; river-local configs now provide explicit
+scattering, absorption, dark riverbed scale, shallow/deep opacity, and a much
+narrower speed-driven aeration shoulder. Solver foam still owns visible
+aeration, and runtime forces raft-interior surface opacity and optical depth to
+zero. Cooked-field identity migrates older maps to the same parameters that
+filtered generation stores in `L_Terminator`, `L_LavaCanyon`, and their two
+river-local material instances. Matched evidence shows stronger clear/deep/
+aerated separation, but direct-lit Futaleufú breaking water, Chilko shoreline
+geometry, foam volume, environment art, calibration, human review, and target
+performance remain below photoreal promotion. The fail-closed record is
+`cold_water_depth_attenuation_v2_review.json`.
+
+The subsequent cold-water adaptive-shoreline experiment is intentionally not
+part of the stack. It tested source-conditioned non-colliding bank overlays at
+45 m and then 18 m width; the final bracket reached 1 m lateral resolution,
+5.91 m inward breakup, and a submerged approach edge. Generation and mesh
+bounds passed, but matched Chilko captures retained the pale rectangular
+shallow-water band, slightly reduced bank-transition edge density, and exposed
+an intermediate pale rail. The candidate C++, native assertions, maps, terrain
+materials, and deterministic generator churn were restored before integration.
+Only rejection evidence remains in
+`cold_water_adaptive_shoreline_v1_review.json`. The next implementation must
+condition presentation water coverage or use reviewed bank/bathymetry
+breaklines without moving solver, collision, buoyancy, or force authority.

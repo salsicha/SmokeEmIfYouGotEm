@@ -1,4 +1,17 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
+#include "Materials/MaterialExpressionAppendVector.h"
+#include "Materials/MaterialExpressionComponentMask.h"
+#include "Materials/MaterialExpressionMax.h"
+#include "Materials/MaterialExpressionCollectionParameter.h"
+#include "Materials/MaterialExpressionClamp.h"
+#include "Materials/MaterialExpressionDivide.h"
+#include "Materials/MaterialExpressionDotProduct.h"
+#include "Materials/MaterialExpressionNoise.h"
+#include "Materials/MaterialExpressionTransform.h"
+#include "Materials/MaterialExpressionPixelDepth.h"
+#include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
+#include "Materials/MaterialParameterCollection.h"
 
 namespace RaftSimEditorEnvironment
 {
@@ -163,8 +176,11 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     {
         RiverAssetName = TEXT("Pacuare");
     }
-    else if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+    else if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge") ||
+             IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId))
     {
+        // The upper gorge loads the Zambezi textures (its drape replaces the
+        // macro albedo below); its material name comes from its own id.
         RiverAssetName = TEXT("Zambezi");
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
@@ -216,7 +232,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         TEXT("/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures"),
         TEXT("SourceConditionedMaterialZones"));
     FString DetailAssetName = RiverAssetName;
-    if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+    if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge") ||
+        IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId))
     {
         DetailAssetName = TEXT("ColoradoRiver");
     }
@@ -236,7 +253,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         DetailAssetName,
         TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
         TEXT("TerrainDetailNormal"));
-    if (Candidate.bPhysicalScaleSourceCorridor)
+    if (Candidate.bPhysicalScaleSourceCorridor &&
+        Candidate.bUseDensePhysicalTerrainRenderSurface)
     {
         SourceMacroAlbedo = LoadCandidateTexture(
             TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures"),
@@ -250,6 +268,37 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         SourceMaterialZones = LoadCandidateTexture(
             TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures"),
             TEXT("PhysicalCorridorMaterialZones"));
+    }
+    // Evidence-based reaches drape the whole Landscape with their own
+    // orthophoto (north up) instead of the pilot drape:
+    // - Hance: the 2021 corridor orthophoto, 4096 x 2048 over 2500 x 1212 m
+    //   (unreal/Scripts/install_colorado_hance_evidence_drape.py);
+    // - Pacuare Huacas: the 2014-2017 IGN orthophoto with Sentinel-2 colour
+    //   outside its footprint, 2048 x 2048 (unreal/Scripts/install_evidence_drape.py);
+    // - Futaleufu Terminator: Sentinel-2 10 m colour, 2048 x 2048 (same script);
+    // - Chilko Lava Canyon: Sentinel-2 10 m colour, 2048 x 2048 (same script);
+    // - Zambezi upper gorge: Sentinel-2 10 m colour, 2048 x 2048 (same script).
+    const TCHAR* EvidenceDrapePath =
+        IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId)
+            ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Terrain/T_RaftSim_ZambeziUpperGorge_EvidenceDrape."
+                   "T_RaftSim_ZambeziUpperGorge_EvidenceDrape")
+        : Candidate.PreviewSpec.RiverId == TEXT("colorado_river")
+            ? TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/T_RaftSim_ColoradoHance_EvidenceDrape."
+                   "T_RaftSim_ColoradoHance_EvidenceDrape")
+        : Candidate.PreviewSpec.RiverId == TEXT("pacuare")
+            ? TEXT("/Game/RaftSim/Environment/PacuareRun/Terrain/T_RaftSim_PacuareHuacas_EvidenceDrape."
+                   "T_RaftSim_PacuareHuacas_EvidenceDrape")
+        : Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator")
+            ? TEXT("/Game/RaftSim/Environment/FutaleufuRun/Terrain/T_RaftSim_FutaleufuTerminator_EvidenceDrape."
+                   "T_RaftSim_FutaleufuTerminator_EvidenceDrape")
+        : Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon")
+            ? TEXT("/Game/RaftSim/Environment/ChilkoRun/Terrain/T_RaftSim_ChilkoLavaCanyon_EvidenceDrape."
+                   "T_RaftSim_ChilkoLavaCanyon_EvidenceDrape")
+            : nullptr;
+    UTexture2D* EvidenceDrape = EvidenceDrapePath ? LoadObject<UTexture2D>(nullptr, EvidenceDrapePath) : nullptr;
+    if (EvidenceDrape)
+    {
+        SourceMacroAlbedo = EvidenceDrape;
     }
     if (!SourceMacroAlbedo || !SourcePackedSurface || !SourceNormalDetail || !SourceMaterialZones ||
         !TerrainDetailAlbedo || !TerrainDetailPackedSurface || !TerrainDetailNormal)
@@ -273,6 +322,17 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             Settings.DetailSurfaceResponseWeight = 0.18f;
             Settings.RiverbedBlendWeight = 0.18f;
             Settings.WetBankBlendWeight = 0.24f;
+        }
+        if (EvidenceDrape)
+        {
+            // The photo carries the colour; the pilot zone maps belong to other
+            // windows (Lees Ferry, the old straight Huacas reach),
+            // so its riverbed/wet-bank tints would be misregistered. Detail
+            // tiles about 30 m (1.24 m Landscape quads).
+            Settings.DetailMappingScale = 24.0f;
+            Settings.DetailAlbedoWeight = 0.10f;
+            Settings.RiverbedBlendWeight = 0.0f;
+            Settings.WetBankBlendWeight = 0.0f;
         }
     }
     FString AssetToken = Candidate.PreviewSpec.RiverId;
@@ -317,7 +377,15 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(MSM_Unlit);
+    const bool bUsesDefaultLitLandscape =
+        Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ||
+        Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+        Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") ||
+        IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId);
+    Material->SetShadingModel(
+        bUsesDefaultLitLandscape ? MSM_DefaultLit : MSM_Unlit);
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
@@ -361,6 +429,25 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         TerrainDetailAlbedo,
         SAMPLERTYPE_Color,
         DetailCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* ChilkoRotatedDetailAlbedoSample = nullptr;
+    if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        // A second, non-harmonic and rotated projection prevents the close-range
+        // detail albedo from exposing a square repeat grid across long open banks.
+        // The organic helper chooses between the two projections with its
+        // existing world-space ground field, so this remains shade-only.
+        UMaterialExpressionLandscapeLayerCoords* RotatedDetailCoordinates =
+            NewObject<UMaterialExpressionLandscapeLayerCoords>(Material);
+        RotatedDetailCoordinates->MappingType = TCMT_XY;
+        RotatedDetailCoordinates->MappingScale = 217.0f;
+        RotatedDetailCoordinates->MappingRotation = 37.0f;
+        Material->GetExpressionCollection().AddExpression(RotatedDetailCoordinates);
+        ChilkoRotatedDetailAlbedoSample = AddTextureSample(
+            TEXT("ChilkoRotatedBroadDetailAlbedo"),
+            TerrainDetailAlbedo,
+            SAMPLERTYPE_Color,
+            RotatedDetailCoordinates);
+    }
     UMaterialExpressionTextureSampleParameter2D* MacroPackedSample = AddTextureSample(
         TEXT("SourceConditionedAORoughnessHeight"),
         SourcePackedSurface,
@@ -488,8 +575,16 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     ConditionedBaseColor->Alpha.Expression = RiverbedBlendMask;
     Material->GetExpressionCollection().AddExpression(ConditionedBaseColor);
 
-    UMaterialExpression* FinalBaseColor = ConditionedBaseColor;
-    if (Candidate.bPhysicalScaleSourceCorridor)
+    UMaterialExpression* FinalBaseColor = Candidate.PreviewSpec.RiverId == TEXT("pacuare") && !EvidenceDrape
+        ? BuildPacuareOrganicRainforestBaseColor(Material, ConditionedBaseColor) : ConditionedBaseColor;
+    if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
+    {
+        FinalBaseColor = BuildSouthForkOrganicFoothillBaseColor(
+            Material,
+            FinalBaseColor,
+            0.58f);
+    }
+    if (Candidate.bPhysicalScaleSourceCorridor && !EvidenceDrape)
     {
         UMaterialExpressionVertexNormalWS* VertexNormalWs =
             NewObject<UMaterialExpressionVertexNormalWS>(Material);
@@ -527,11 +622,285 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         Material->GetExpressionCollection().AddExpression(RockColor);
         UMaterialExpressionLinearInterpolate* SlopeConditionedBaseColor =
             NewObject<UMaterialExpressionLinearInterpolate>(Material);
-        SlopeConditionedBaseColor->A.Expression = ConditionedBaseColor;
+        // Preserve river-specific organic shading before adding the shared
+        // physical-corridor rock response. Pointing this input back at the
+        // conditioned source silently discarded any organic graph authored
+        // before this block.
+        SlopeConditionedBaseColor->A.Expression = FinalBaseColor;
         SlopeConditionedBaseColor->B.Expression = RockColor;
         SlopeConditionedBaseColor->Alpha.Expression = RockSlopeMask;
         Material->GetExpressionCollection().AddExpression(SlopeConditionedBaseColor);
         FinalBaseColor = SlopeConditionedBaseColor;
+    }
+    if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") && !EvidenceDrape)
+    {
+        FinalBaseColor = BuildFutaleufuOrganicTemperateBaseColor(
+            Material,
+            FinalBaseColor);
+    }
+    if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") && !EvidenceDrape)
+    {
+        FinalBaseColor = BuildChilkoOrganicLavaCanyonBaseColor(
+            Material,
+            FinalBaseColor,
+            ChilkoRotatedDetailAlbedoSample,
+            WetBankBlendMask);
+    }
+    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !EvidenceDrape)
+    {
+        FinalBaseColor = BuildColoradoOrganicHanceBaseColor(
+            Material,
+            FinalBaseColor);
+    }
+    if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        // The source-conditioned water-zone samples contain valid near-black
+        // bed pixels, but the live carrier's narrow bank feather exposes a few
+        // dry shoreline texels. A small linear-space floor retains source
+        // variation while preventing that transition from reading as a black
+        // polygonal wall. This is presentation only and never changes terrain
+        // height, collision, wet/dry authority, or channel geometry.
+        UMaterialExpressionConstant3Vector* TemperateBankRadianceFloor =
+            NewObject<UMaterialExpressionConstant3Vector>(Material);
+        TemperateBankRadianceFloor->Constant =
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator")
+            ? FLinearColor(0.026f, 0.034f, 0.029f, 1.0f)
+            : FLinearColor(0.030f, 0.033f, 0.026f, 1.0f);
+        Material->GetExpressionCollection().AddExpression(
+            TemperateBankRadianceFloor);
+        UMaterialExpressionMax* BankFloor =
+            NewObject<UMaterialExpressionMax>(Material);
+        BankFloor->A.Expression = FinalBaseColor;
+        BankFloor->B.Expression = TemperateBankRadianceFloor;
+        Material->GetExpressionCollection().AddExpression(BankFloor);
+        FinalBaseColor = BankFloor;
+    }
+
+    // Evidence-drape maps: the top-down photo drape is stretched down steep
+    // walls, where one or two texels fill each sheared Landscape quad and
+    // read as hard-edged dark blocks (with the photo's baked shadows). On
+    // steep faces the regional colour comes from a blurred drape (no texel
+    // edges) and the rock's own relief and lighting from a world-aligned
+    // (triplanar) rock scan, normalised by the scan's mean so it modulates,
+    // not replaces, the observed colour. The pilot macro normal/AO/roughness
+    // maps belong to other windows, so these maps use only the local detail.
+    UMaterialExpression* EvidenceWallMask = nullptr;
+    UMaterialExpression* EvidenceWallNormal = nullptr;
+    int32 EvidenceWallNormalOutput = 0;
+    const bool bEvidenceTerrain = Candidate.bPhysicalScaleSourceCorridor && EvidenceDrape != nullptr;
+    UTexture2D* WallRockAlbedo = bEvidenceTerrain ? LoadObject<UTexture2D>(nullptr,
+        TEXT("/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/"
+             "T_RaftSim_Batoka_Rock037_Color_2K.T_RaftSim_Batoka_Rock037_Color_2K")) : nullptr;
+    UTexture2D* WallRockNormal = bEvidenceTerrain ? LoadObject<UTexture2D>(nullptr,
+        TEXT("/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/"
+             "T_RaftSim_Batoka_Rock037_NormalDX_2K.T_RaftSim_Batoka_Rock037_NormalDX_2K")) : nullptr;
+    if (bEvidenceTerrain && WallRockAlbedo && WallRockNormal)
+    {
+        auto AddExpr = [Material](UMaterialExpression* Expression)
+        {
+            Material->GetExpressionCollection().AddExpression(Expression);
+            return Expression;
+        };
+        auto Scalar = [Material, &AddExpr](const TCHAR* Name, float Value)
+        {
+            UMaterialExpressionScalarParameter* Parameter = NewObject<UMaterialExpressionScalarParameter>(Material);
+            Parameter->ParameterName = Name;
+            Parameter->DefaultValue = Value;
+            Parameter->Group = TEXT("RaftSimEvidenceWallRock");
+            AddExpr(Parameter);
+            return Parameter;
+        };
+        // Steepness mask from the geometric normal: 0 below ~33 deg, 1 above ~55.
+        UMaterialExpressionVertexNormalWS* WallNormalWs = NewObject<UMaterialExpressionVertexNormalWS>(Material);
+        AddExpr(WallNormalWs);
+        UMaterialExpressionComponentMask* WallNormalZ = NewObject<UMaterialExpressionComponentMask>(Material);
+        WallNormalZ->Input.Expression = WallNormalWs;
+        WallNormalZ->B = true;
+        AddExpr(WallNormalZ);
+        UMaterialExpressionOneMinus* WallSlope = NewObject<UMaterialExpressionOneMinus>(Material);
+        WallSlope->Input.Expression = WallNormalZ;
+        AddExpr(WallSlope);
+        UMaterialExpressionSubtract* WallSlopeAbove = NewObject<UMaterialExpressionSubtract>(Material);
+        WallSlopeAbove->A.Expression = WallSlope;
+        WallSlopeAbove->B.Expression = Scalar(TEXT("EvidenceWallSlopeStart"), 0.16f);
+        AddExpr(WallSlopeAbove);
+        UMaterialExpressionMultiply* WallSlopeGain = NewObject<UMaterialExpressionMultiply>(Material);
+        WallSlopeGain->A.Expression = WallSlopeAbove;
+        WallSlopeGain->B.Expression = Scalar(TEXT("EvidenceWallSlopeGain"), 4.0f);
+        AddExpr(WallSlopeGain);
+        UMaterialExpressionSaturate* WallMask = NewObject<UMaterialExpressionSaturate>(Material);
+        WallMask->Input.Expression = WallSlopeGain;
+        AddExpr(WallMask);
+        EvidenceWallMask = WallMask;
+
+        // Regional colour: the drape three mips down (~8x), without texel edges
+        // but keeping the cliffs' broad colour bands.
+        UMaterialExpressionTextureSample* BlurredDrape = NewObject<UMaterialExpressionTextureSample>(Material);
+        BlurredDrape->Texture = EvidenceDrape;
+        BlurredDrape->SamplerType = SAMPLERTYPE_Color;
+        BlurredDrape->Coordinates.Expression = MacroCoordinates;
+        BlurredDrape->MipValueMode = TMVM_MipBias;
+        BlurredDrape->ConstMipValue = 3;
+        AddExpr(BlurredDrape);
+
+        // Rock relief: world-aligned scan luminance over the scan's own mean
+        // (its 1x1 mip), so the observed regional colour is kept on average.
+        // Both rock layers drift and swap projections so they never tile on
+        // a lattice (RaftSimEditorWallRockBreakup.cpp).
+        const FRaftSimWallRockBreakup Breakup = BuildWallRockBreakup(Material);
+        int32 RockAlbedoOutput = 0;
+        UMaterialExpression* RockAlbedo = AddBrokenUpWallRock(Material, Breakup,
+            WallRockAlbedo, SAMPLERTYPE_Color, TEXT("EvidenceWallRockAlbedo"), 650.0f, false, RockAlbedoOutput);
+        EvidenceWallNormal = AddBrokenUpWallRock(Material, Breakup,
+            WallRockNormal, SAMPLERTYPE_Normal, TEXT("EvidenceWallRockNormal"), 650.0f, true, EvidenceWallNormalOutput);
+        UMaterialExpressionConstant2Vector* MeanUv = NewObject<UMaterialExpressionConstant2Vector>(Material);
+        MeanUv->R = 0.5f;
+        MeanUv->G = 0.5f;
+        AddExpr(MeanUv);
+        UMaterialExpressionTextureSample* RockMean = NewObject<UMaterialExpressionTextureSample>(Material);
+        RockMean->Texture = WallRockAlbedo;
+        RockMean->SamplerType = SAMPLERTYPE_Color;
+        RockMean->Coordinates.Expression = MeanUv;
+        RockMean->MipValueMode = TMVM_MipLevel;
+        RockMean->ConstMipValue = 12;
+        AddExpr(RockMean);
+        if (RockAlbedo && EvidenceWallNormal)
+        {
+            UMaterialExpressionConstant3Vector* LumaWeights = NewObject<UMaterialExpressionConstant3Vector>(Material);
+            LumaWeights->Constant = FLinearColor(0.299f, 0.587f, 0.114f, 1.0f);
+            AddExpr(LumaWeights);
+            UMaterialExpressionDotProduct* RockLuma = NewObject<UMaterialExpressionDotProduct>(Material);
+            RockLuma->A.Expression = RockAlbedo;
+            RockLuma->A.OutputIndex = RockAlbedoOutput;
+            RockLuma->B.Expression = LumaWeights;
+            AddExpr(RockLuma);
+            UMaterialExpressionComponentMask* RockMeanRgb = NewObject<UMaterialExpressionComponentMask>(Material);
+            RockMeanRgb->Input.Expression = RockMean;
+            RockMeanRgb->R = true;
+            RockMeanRgb->G = true;
+            RockMeanRgb->B = true;
+            AddExpr(RockMeanRgb);
+            UMaterialExpressionDotProduct* RockMeanLuma = NewObject<UMaterialExpressionDotProduct>(Material);
+            RockMeanLuma->A.Expression = RockMeanRgb;
+            RockMeanLuma->B.Expression = LumaWeights;
+            AddExpr(RockMeanLuma);
+            UMaterialExpressionMax* SafeMean = NewObject<UMaterialExpressionMax>(Material);
+            SafeMean->A.Expression = RockMeanLuma;
+            SafeMean->ConstB = 0.02f;
+            AddExpr(SafeMean);
+            UMaterialExpressionDivide* RockRatio = NewObject<UMaterialExpressionDivide>(Material);
+            RockRatio->A.Expression = RockLuma;
+            RockRatio->B.Expression = SafeMean;
+            AddExpr(RockRatio);
+            UMaterialExpressionClamp* RockRatioClamped = NewObject<UMaterialExpressionClamp>(Material);
+            RockRatioClamped->Input.Expression = RockRatio;
+            RockRatioClamped->MinDefault = 0.30f;
+            RockRatioClamped->MaxDefault = 1.80f;
+            AddExpr(RockRatioClamped);
+            UMaterialExpressionConstant* One = NewObject<UMaterialExpressionConstant>(Material);
+            One->R = 1.0f;
+            AddExpr(One);
+            UMaterialExpressionLinearInterpolate* RockContrast = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+            RockContrast->A.Expression = One;
+            RockContrast->B.Expression = RockRatioClamped;
+            // The 6.5 m layer tiles into a woven hatch across a distant
+            // 60 m wall; fade it out with camera distance (full to ~40 m,
+            // gone by ~250 m) so far walls keep only the 21 m broad layer.
+            UMaterialExpressionPixelDepth* WallDepth = NewObject<UMaterialExpressionPixelDepth>(Material);
+            AddExpr(WallDepth);
+            UMaterialExpressionSubtract* WallDepthPast = NewObject<UMaterialExpressionSubtract>(Material);
+            WallDepthPast->A.Expression = WallDepth;
+            WallDepthPast->ConstB = 4000.0f;
+            AddExpr(WallDepthPast);
+            UMaterialExpressionMultiply* WallDepthScaled = NewObject<UMaterialExpressionMultiply>(Material);
+            WallDepthScaled->A.Expression = WallDepthPast;
+            WallDepthScaled->ConstB = 1.0f / 21000.0f;
+            AddExpr(WallDepthScaled);
+            UMaterialExpressionSaturate* WallDepthT = NewObject<UMaterialExpressionSaturate>(Material);
+            WallDepthT->Input.Expression = WallDepthScaled;
+            AddExpr(WallDepthT);
+            UMaterialExpressionOneMinus* WallNearFade = NewObject<UMaterialExpressionOneMinus>(Material);
+            WallNearFade->Input.Expression = WallDepthT;
+            AddExpr(WallNearFade);
+            UMaterialExpressionMultiply* FadedRockContrast = NewObject<UMaterialExpressionMultiply>(Material);
+            FadedRockContrast->A.Expression = Scalar(TEXT("EvidenceWallRockContrast"), 0.60f);
+            FadedRockContrast->B.Expression = WallNearFade;
+            AddExpr(FadedRockContrast);
+            RockContrast->Alpha.Expression = FadedRockContrast;
+            AddExpr(RockContrast);
+            // A second, larger and incommensurate rock projection (21 m) breaks
+            // the 6.5 m scan's repeat on tall cliffs seen from the river.
+            UMaterialExpression* WallRelief = RockContrast;
+            UTexture2D* BroadRock = LoadObject<UTexture2D>(nullptr,
+                TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/"
+                     "T_RaftSim_Batoka_AerialRocks02_Diffuse_4K.T_RaftSim_Batoka_AerialRocks02_Diffuse_4K"));
+            int32 BroadOutput = 0;
+            UMaterialExpression* BroadAlbedo = BroadRock ? AddWorldAlignedWallRock(Material,
+                BroadRock, SAMPLERTYPE_Color, TEXT("EvidenceWallBroadRockAlbedo"), 2100.0f, false, Breakup.PositionB, BroadOutput) : nullptr;
+            if (BroadAlbedo)
+            {
+                UMaterialExpressionTextureSample* BroadMean = NewObject<UMaterialExpressionTextureSample>(Material);
+                BroadMean->Texture = BroadRock;
+                BroadMean->SamplerType = SAMPLERTYPE_Color;
+                BroadMean->Coordinates.Expression = MeanUv;
+                BroadMean->MipValueMode = TMVM_MipLevel;
+                BroadMean->ConstMipValue = 13;
+                AddExpr(BroadMean);
+                UMaterialExpressionDotProduct* BroadLuma = NewObject<UMaterialExpressionDotProduct>(Material);
+                BroadLuma->A.Expression = BroadAlbedo;
+                BroadLuma->A.OutputIndex = BroadOutput;
+                BroadLuma->B.Expression = LumaWeights;
+                AddExpr(BroadLuma);
+                UMaterialExpressionComponentMask* BroadMeanRgb = NewObject<UMaterialExpressionComponentMask>(Material);
+                BroadMeanRgb->Input.Expression = BroadMean;
+                BroadMeanRgb->R = true;
+                BroadMeanRgb->G = true;
+                BroadMeanRgb->B = true;
+                AddExpr(BroadMeanRgb);
+                UMaterialExpressionDotProduct* BroadMeanLuma = NewObject<UMaterialExpressionDotProduct>(Material);
+                BroadMeanLuma->A.Expression = BroadMeanRgb;
+                BroadMeanLuma->B.Expression = LumaWeights;
+                AddExpr(BroadMeanLuma);
+                UMaterialExpressionMax* BroadSafeMean = NewObject<UMaterialExpressionMax>(Material);
+                BroadSafeMean->A.Expression = BroadMeanLuma;
+                BroadSafeMean->ConstB = 0.02f;
+                AddExpr(BroadSafeMean);
+                UMaterialExpressionDivide* BroadRatio = NewObject<UMaterialExpressionDivide>(Material);
+                BroadRatio->A.Expression = BroadLuma;
+                BroadRatio->B.Expression = BroadSafeMean;
+                AddExpr(BroadRatio);
+                UMaterialExpressionClamp* BroadClamped = NewObject<UMaterialExpressionClamp>(Material);
+                BroadClamped->Input.Expression = BroadRatio;
+                BroadClamped->MinDefault = 0.35f;
+                BroadClamped->MaxDefault = 1.70f;
+                AddExpr(BroadClamped);
+                UMaterialExpressionLinearInterpolate* BroadContrast = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+                BroadContrast->A.Expression = One;
+                BroadContrast->B.Expression = BroadClamped;
+                BroadContrast->Alpha.Expression = Scalar(TEXT("EvidenceWallBroadRockContrast"), 0.60f);
+                AddExpr(BroadContrast);
+                UMaterialExpressionMultiply* Combined = NewObject<UMaterialExpressionMultiply>(Material);
+                Combined->A.Expression = RockContrast;
+                Combined->B.Expression = BroadContrast;
+                AddExpr(Combined);
+                WallRelief = Combined;
+            }
+            UMaterialExpressionMultiply* WallColor = NewObject<UMaterialExpressionMultiply>(Material);
+            WallColor->A.Expression = BlurredDrape;
+            WallColor->B.Expression = WallRelief;
+            AddExpr(WallColor);
+            UMaterialExpressionLinearInterpolate* WallBaseColor = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+            WallBaseColor->A.Expression = FinalBaseColor;
+            WallBaseColor->B.Expression = WallColor;
+            WallBaseColor->Alpha.Expression = WallMask;
+            AddExpr(WallBaseColor);
+            FinalBaseColor = WallBaseColor;
+        }
+        else
+        {
+            EvidenceWallNormal = nullptr;
+        }
     }
 
     UMaterialExpressionConstant* DetailNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
@@ -544,6 +913,31 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     Normal->B.Expression = DetailNormalSample;
     Normal->Alpha.Expression = DetailNormalWeight;
     Material->GetExpressionCollection().AddExpression(Normal);
+    UMaterialExpression* FinalNormal = Normal;
+    if (bEvidenceTerrain)
+    {
+        // The pilot macro normal belongs to another window: use a flat
+        // tangent normal plus the local detail instead.
+        UMaterialExpressionConstant3Vector* FlatTangentNormal = NewObject<UMaterialExpressionConstant3Vector>(Material);
+        FlatTangentNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f, 1.0f);
+        Material->GetExpressionCollection().AddExpression(FlatTangentNormal);
+        Normal->A.Expression = FlatTangentNormal;
+        if (EvidenceWallNormal && EvidenceWallMask)
+        {
+            UMaterialExpressionTransform* WallNormalTangent = NewObject<UMaterialExpressionTransform>(Material);
+            WallNormalTangent->Input.Expression = EvidenceWallNormal;
+            WallNormalTangent->Input.OutputIndex = EvidenceWallNormalOutput;
+            WallNormalTangent->TransformSourceType = TRANSFORMSOURCE_World;
+            WallNormalTangent->TransformType = TRANSFORM_Tangent;
+            Material->GetExpressionCollection().AddExpression(WallNormalTangent);
+            UMaterialExpressionLinearInterpolate* WallNormal = NewObject<UMaterialExpressionLinearInterpolate>(Material);
+            WallNormal->A.Expression = Normal;
+            WallNormal->B.Expression = WallNormalTangent;
+            WallNormal->Alpha.Expression = EvidenceWallMask;
+            Material->GetExpressionCollection().AddExpression(WallNormal);
+            FinalNormal = WallNormal;
+        }
+    }
 
     auto AddChannelMask = [Material](UMaterialExpression* Input, bool bRed, bool bGreen)
     {
@@ -564,16 +958,30 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     DetailSurfaceResponseWeight->R = Settings.DetailSurfaceResponseWeight;
     Material->GetExpressionCollection().AddExpression(DetailSurfaceResponseWeight);
 
+    // Evidence maps: the pilot macro AO/roughness belong to another window.
+    UMaterialExpression* SurfaceAoBase = MacroAo;
+    UMaterialExpression* SurfaceRoughnessBase = MacroRoughness;
+    if (bEvidenceTerrain)
+    {
+        UMaterialExpressionConstant* NoMacroAo = NewObject<UMaterialExpressionConstant>(Material);
+        NoMacroAo->R = 1.0f;
+        Material->GetExpressionCollection().AddExpression(NoMacroAo);
+        UMaterialExpressionConstant* GroundRoughness = NewObject<UMaterialExpressionConstant>(Material);
+        GroundRoughness->R = 0.86f;
+        Material->GetExpressionCollection().AddExpression(GroundRoughness);
+        SurfaceAoBase = NoMacroAo;
+        SurfaceRoughnessBase = GroundRoughness;
+    }
     UMaterialExpressionLinearInterpolate* AmbientOcclusion =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    AmbientOcclusion->A.Expression = MacroAo;
+    AmbientOcclusion->A.Expression = SurfaceAoBase;
     AmbientOcclusion->B.Expression = DetailAo;
     AmbientOcclusion->Alpha.Expression = DetailSurfaceResponseWeight;
     Material->GetExpressionCollection().AddExpression(AmbientOcclusion);
 
     UMaterialExpressionLinearInterpolate* Roughness =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    Roughness->A.Expression = MacroRoughness;
+    Roughness->A.Expression = SurfaceRoughnessBase;
     Roughness->B.Expression = DetailRoughness;
     Roughness->Alpha.Expression = DetailSurfaceResponseWeight;
     Material->GetExpressionCollection().AddExpression(Roughness);
@@ -604,7 +1012,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
     ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, FinalBaseColor);
     ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
-    ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, Normal);
+    ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, FinalNormal);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, AmbientOcclusion);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, ConditionedRoughness);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
@@ -849,752 +1257,6 @@ UMaterialInterface* LoadOrCreatePreviewTerrainVertexColorMaterial()
         bTerrainMaterialConfigured = true;
     }
 
-    return Material;
-}
-
-UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
-    const FRaftSimLandscapeImportCandidateSpec& Candidate,
-    bool bBatokaTerrainIntegratedReview,
-    bool bBatokaWorldAlignedReview)
-{
-    const bool bColorado = Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
-    const bool bZambezi = Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
-    const bool bFutaleufu = Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
-    const bool bChilko = Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
-    const bool bRockCanyon = bColorado || bZambezi;
-    FString RiverAssetName = TEXT("AmericanSouthFork");
-    if (bColorado)
-    {
-        RiverAssetName = TEXT("ColoradoRiver");
-    }
-    else if (bZambezi)
-    {
-        RiverAssetName = TEXT("Zambezi");
-    }
-    else if (bFutaleufu)
-    {
-        RiverAssetName = TEXT("Futaleufu");
-    }
-    else if (bChilko)
-    {
-        RiverAssetName = TEXT("Chilko");
-    }
-    if ((bBatokaTerrainIntegratedReview || bBatokaWorldAlignedReview) && !bZambezi)
-    {
-        return nullptr;
-    }
-    const FString MaterialAssetName = bBatokaWorldAlignedReview
-        ? TEXT("M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview")
-        : (bBatokaTerrainIntegratedReview
-               ? TEXT("M_RaftSim_Zambezi_BatokaV11_TerrainIntegratedReview")
-               : FString::Printf(
-                     TEXT("M_RaftSim_%s_PhysicalSourceTerrainRender"),
-                     *RiverAssetName));
-    const FString MaterialPackagePath = FString::Printf(
-        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/%s"),
-        *MaterialAssetName);
-    const FString MaterialObjectPath = FString::Printf(
-        TEXT("%s.%s"),
-        *MaterialPackagePath,
-        *MaterialAssetName);
-    UMaterial* Material = Cast<UMaterial>(
-        StaticLoadObject(UMaterial::StaticClass(), nullptr, *MaterialObjectPath));
-
-    const FString SourceTextureRoot =
-        TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures");
-    const FString SourceTexturePrefix = FString::Printf(
-        TEXT("T_RaftSim_%s_PhysicalCorridor"),
-        *RiverAssetName);
-    auto LoadSourceTexture = [&SourceTextureRoot, &SourceTexturePrefix](const FString& Token)
-    {
-        const FString AssetName = SourceTexturePrefix + Token;
-        const FString ObjectPath = FString::Printf(
-            TEXT("%s/%s.%s"),
-            *SourceTextureRoot,
-            *AssetName,
-            *AssetName);
-        return LoadObject<UTexture2D>(nullptr, *ObjectPath);
-    };
-    UTexture2D* SourceAlbedo = LoadSourceTexture(TEXT("SourceAlbedo"));
-    UTexture2D* SourceNormal = LoadSourceTexture(TEXT("Normal"));
-    UTexture2D* SourcePacked = LoadSourceTexture(TEXT("AORoughnessHeight"));
-    UTexture2D* ForestFloorAlbedo = LoadObject<UTexture2D>(
-        nullptr,
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/"
-             "T_ForestGround03_BaseColor_4K.T_ForestGround03_BaseColor_4K"));
-    UTexture2D* ForestFloorNormal = LoadObject<UTexture2D>(
-        nullptr,
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/"
-             "T_ForestGround03_NormalGL_4K.T_ForestGround03_NormalGL_4K"));
-    UTexture2D* ForestFloorRoughness = LoadObject<UTexture2D>(
-        nullptr,
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/"
-             "T_ForestGround03_Roughness_4K.T_ForestGround03_Roughness_4K"));
-    UTexture2D* RockGroundAlbedo = LoadObject<UTexture2D>(
-        nullptr,
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K/"
-             "T_RockGround_BaseColor_4K.T_RockGround_BaseColor_4K"));
-    UTexture2D* RockGroundNormal = LoadObject<UTexture2D>(
-        nullptr,
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K/"
-             "T_RockGround_NormalGL_4K.T_RockGround_NormalGL_4K"));
-    UTexture2D* RockGroundRoughness = LoadObject<UTexture2D>(
-        nullptr,
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K/"
-             "T_RockGround_Roughness_4K.T_RockGround_Roughness_4K"));
-    UTexture2D* BatokaMacroAo = nullptr;
-    UTexture2D* BatokaDetailAlbedo = nullptr;
-    UTexture2D* BatokaDetailNormal = nullptr;
-    UTexture2D* BatokaDetailRoughness = nullptr;
-    if (bBatokaTerrainIntegratedReview)
-    {
-        RockGroundAlbedo = LoadObject<UTexture2D>(
-            nullptr,
-            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/"
-                 "T_RaftSim_Batoka_AerialRocks02_Diffuse_4K."
-                 "T_RaftSim_Batoka_AerialRocks02_Diffuse_4K"));
-        RockGroundNormal = LoadObject<UTexture2D>(
-            nullptr,
-            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/"
-                 "T_RaftSim_Batoka_AerialRocks02_NormalDX_4K."
-                 "T_RaftSim_Batoka_AerialRocks02_NormalDX_4K"));
-        RockGroundRoughness = LoadObject<UTexture2D>(
-            nullptr,
-            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/"
-                 "T_RaftSim_Batoka_AerialRocks02_Roughness_4K."
-                 "T_RaftSim_Batoka_AerialRocks02_Roughness_4K"));
-        BatokaMacroAo = LoadObject<UTexture2D>(
-            nullptr,
-            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/"
-                 "T_RaftSim_Batoka_AerialRocks02_AO_4K."
-                 "T_RaftSim_Batoka_AerialRocks02_AO_4K"));
-        BatokaDetailAlbedo = LoadObject<UTexture2D>(
-            nullptr,
-            TEXT("/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/"
-                 "T_RaftSim_Batoka_Rock037_Color_2K.T_RaftSim_Batoka_Rock037_Color_2K"));
-        BatokaDetailNormal = LoadObject<UTexture2D>(
-            nullptr,
-            TEXT("/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/"
-                 "T_RaftSim_Batoka_Rock037_NormalDX_2K."
-                 "T_RaftSim_Batoka_Rock037_NormalDX_2K"));
-        BatokaDetailRoughness = LoadObject<UTexture2D>(
-            nullptr,
-            TEXT("/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/"
-                 "T_RaftSim_Batoka_Rock037_Roughness_2K."
-                 "T_RaftSim_Batoka_Rock037_Roughness_2K"));
-    }
-    if (bColorado || bZambezi)
-    {
-        ForestFloorAlbedo = RockGroundAlbedo;
-        ForestFloorNormal = RockGroundNormal;
-        ForestFloorRoughness = RockGroundRoughness;
-    }
-    if (!SourceAlbedo || !SourceNormal || !SourcePacked || !ForestFloorAlbedo ||
-        !ForestFloorNormal || !ForestFloorRoughness || !RockGroundAlbedo ||
-        !RockGroundNormal || !RockGroundRoughness ||
-        (bBatokaTerrainIntegratedReview &&
-         (!BatokaMacroAo || !BatokaDetailAlbedo || !BatokaDetailNormal ||
-          !BatokaDetailRoughness)))
-    {
-        return nullptr;
-    }
-
-    UPackage* Package = Material ? Material->GetOutermost() : CreatePackage(*MaterialPackagePath);
-    if (!Package)
-    {
-        return nullptr;
-    }
-    if (!Material)
-    {
-        Material = NewObject<UMaterial>(
-            Package,
-            *MaterialAssetName,
-            RF_Public | RF_Standalone | RF_Transactional);
-        if (!Material)
-        {
-            return nullptr;
-        }
-        FAssetRegistryModule::AssetCreated(Material);
-    }
-    Material->Modify();
-    Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(MSM_DefaultLit);
-    Material->BlendMode = BLEND_Opaque;
-    Material->TwoSided = true;
-    Material->bTangentSpaceNormal = !bBatokaWorldAlignedReview;
-
-    UMaterialExpressionTextureCoordinate* Coordinates =
-        NewObject<UMaterialExpressionTextureCoordinate>(Material);
-    Material->GetExpressionCollection().AddExpression(Coordinates);
-    const float DetailTileSizeCm = bZambezi ? 1800.0f : (bFutaleufu ? 1400.0f : 200.0f);
-    const float RockTileSizeCm = bBatokaTerrainIntegratedReview
-        ? 5000.0f
-        : (bZambezi ? 1200.0f : (bFutaleufu ? 900.0f : 150.0f));
-    UMaterialExpressionTextureCoordinate* DetailCoordinates =
-        NewObject<UMaterialExpressionTextureCoordinate>(Material);
-    DetailCoordinates->UTiling = Candidate.HorizontalSpanXCm / DetailTileSizeCm;
-    DetailCoordinates->VTiling = Candidate.HorizontalSpanYCm / DetailTileSizeCm;
-    Material->GetExpressionCollection().AddExpression(DetailCoordinates);
-    UMaterialExpressionTextureCoordinate* RockCoordinates =
-        NewObject<UMaterialExpressionTextureCoordinate>(Material);
-    RockCoordinates->UTiling = Candidate.HorizontalSpanXCm / RockTileSizeCm;
-    RockCoordinates->VTiling = Candidate.HorizontalSpanYCm / RockTileSizeCm;
-    Material->GetExpressionCollection().AddExpression(RockCoordinates);
-    UMaterialExpressionTextureCoordinate* BatokaDetailCoordinates = nullptr;
-    if (bBatokaTerrainIntegratedReview)
-    {
-        BatokaDetailCoordinates = NewObject<UMaterialExpressionTextureCoordinate>(Material);
-        BatokaDetailCoordinates->UTiling = Candidate.HorizontalSpanXCm / 240.0f;
-        BatokaDetailCoordinates->VTiling = Candidate.HorizontalSpanYCm / 240.0f;
-        Material->GetExpressionCollection().AddExpression(BatokaDetailCoordinates);
-    }
-
-    auto AddTextureSample = [Material](
-                                const TCHAR* ParameterName,
-                                UTexture2D* Texture,
-                                EMaterialSamplerType SamplerType,
-                                UMaterialExpressionTextureCoordinate* TextureCoordinates)
-    {
-        UMaterialExpressionTextureSampleParameter2D* Sample =
-            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
-        Sample->ParameterName = ParameterName;
-        Sample->Texture = Texture;
-        Sample->SamplerType = SamplerType;
-        Sample->Coordinates.Expression = TextureCoordinates;
-        Sample->Group = TEXT("RaftSimPhysicalSourceTerrain");
-        Material->GetExpressionCollection().AddExpression(Sample);
-        return Sample;
-    };
-    UMaterialExpressionTextureSampleParameter2D* AlbedoSample = AddTextureSample(
-        TEXT("PhysicalSourceAlbedo"),
-        SourceAlbedo,
-        SAMPLERTYPE_Color,
-        Coordinates);
-    UMaterialExpressionTextureSampleParameter2D* NormalSample = AddTextureSample(
-        TEXT("PhysicalSourceNormal"),
-        SourceNormal,
-        SAMPLERTYPE_Normal,
-        Coordinates);
-    UMaterialExpressionTextureSampleParameter2D* PackedSample = AddTextureSample(
-        TEXT("PhysicalSourceAORoughnessHeight"),
-        SourcePacked,
-        SAMPLERTYPE_Masks,
-        Coordinates);
-    UMaterialExpressionTextureSampleParameter2D* ForestFloorAlbedoSample = AddTextureSample(
-        TEXT("ForestFloorDetailAlbedo"),
-        ForestFloorAlbedo,
-        SAMPLERTYPE_Color,
-        DetailCoordinates);
-    UMaterialExpressionTextureSampleParameter2D* ForestFloorNormalSample = AddTextureSample(
-        TEXT("ForestFloorDetailNormal"),
-        ForestFloorNormal,
-        SAMPLERTYPE_Normal,
-        DetailCoordinates);
-    UMaterialExpressionTextureSampleParameter2D* ForestFloorRoughnessSample = AddTextureSample(
-        TEXT("ForestFloorDetailRoughness"),
-        ForestFloorRoughness,
-        SAMPLERTYPE_Masks,
-        DetailCoordinates);
-    UMaterialExpressionTextureSampleParameter2D* RockGroundAlbedoSample = AddTextureSample(
-        TEXT("RockGroundDetailAlbedo"),
-        RockGroundAlbedo,
-        SAMPLERTYPE_Color,
-        RockCoordinates);
-    UMaterialExpressionTextureSampleParameter2D* RockGroundNormalSample = AddTextureSample(
-        TEXT("RockGroundDetailNormal"),
-        RockGroundNormal,
-        SAMPLERTYPE_Normal,
-        RockCoordinates);
-    UMaterialExpressionTextureSampleParameter2D* RockGroundRoughnessSample = AddTextureSample(
-        TEXT("RockGroundDetailRoughness"),
-        RockGroundRoughness,
-        SAMPLERTYPE_Masks,
-        RockCoordinates);
-    UMaterialExpressionTextureSampleParameter2D* BatokaMacroAoSample = nullptr;
-    UMaterialExpressionTextureSampleParameter2D* BatokaDetailAlbedoSample = nullptr;
-    UMaterialExpressionTextureSampleParameter2D* BatokaDetailNormalSample = nullptr;
-    UMaterialExpressionTextureSampleParameter2D* BatokaDetailRoughnessSample = nullptr;
-    if (bBatokaTerrainIntegratedReview)
-    {
-        BatokaMacroAoSample = AddTextureSample(
-            TEXT("BatokaAerialRocks02AO"),
-            BatokaMacroAo,
-            SAMPLERTYPE_Masks,
-            RockCoordinates);
-        BatokaDetailAlbedoSample = AddTextureSample(
-            TEXT("BatokaRock037DetailAlbedo"),
-            BatokaDetailAlbedo,
-            SAMPLERTYPE_Color,
-            BatokaDetailCoordinates);
-        BatokaDetailNormalSample = AddTextureSample(
-            TEXT("BatokaRock037DetailNormal"),
-            BatokaDetailNormal,
-            SAMPLERTYPE_Normal,
-            BatokaDetailCoordinates);
-        BatokaDetailRoughnessSample = AddTextureSample(
-            TEXT("BatokaRock037DetailRoughness"),
-            BatokaDetailRoughness,
-            SAMPLERTYPE_Masks,
-            BatokaDetailCoordinates);
-    }
-
-    struct FMaterialExpressionOutputRef
-    {
-        UMaterialExpression* Expression = nullptr;
-        int32 OutputIndex = 0;
-    };
-    auto MakeOutputRef = [](UMaterialExpression* Expression)
-    {
-        FMaterialExpressionOutputRef Result;
-        Result.Expression = Expression;
-        return Result;
-    };
-    FMaterialExpressionOutputRef BatokaMacroAlbedoRef = MakeOutputRef(RockGroundAlbedoSample);
-    FMaterialExpressionOutputRef BatokaMacroNormalRef = MakeOutputRef(RockGroundNormalSample);
-    FMaterialExpressionOutputRef BatokaMacroRoughnessRef = MakeOutputRef(RockGroundRoughnessSample);
-    FMaterialExpressionOutputRef BatokaMacroAoRef = MakeOutputRef(BatokaMacroAoSample);
-    FMaterialExpressionOutputRef BatokaDetailAlbedoRef = MakeOutputRef(BatokaDetailAlbedoSample);
-    FMaterialExpressionOutputRef BatokaDetailNormalRef = MakeOutputRef(BatokaDetailNormalSample);
-    FMaterialExpressionOutputRef BatokaDetailRoughnessRef =
-        MakeOutputRef(BatokaDetailRoughnessSample);
-    if (bBatokaWorldAlignedReview)
-    {
-        auto AddWorldAlignedProjection = [Material](
-                                             const TCHAR* ParameterName,
-                                             UTexture2D* Texture,
-                                             EMaterialSamplerType SamplerType,
-                                             float TileSizeCm,
-                                             bool bNormalProjection)
-        {
-            FMaterialExpressionOutputRef Result;
-            UMaterialExpressionTextureObjectParameter* TextureObject =
-                NewObject<UMaterialExpressionTextureObjectParameter>(Material);
-            TextureObject->ParameterName = ParameterName;
-            TextureObject->Texture = Texture;
-            TextureObject->SamplerType = SamplerType;
-            TextureObject->Group = TEXT("BatokaV12WorldAlignedTerrainReview");
-            Material->GetExpressionCollection().AddExpression(TextureObject);
-
-            UMaterialExpressionConstant3Vector* TextureSize =
-                NewObject<UMaterialExpressionConstant3Vector>(Material);
-            TextureSize->Constant = FLinearColor(
-                TileSizeCm,
-                TileSizeCm,
-                TileSizeCm,
-                1.0f);
-            Material->GetExpressionCollection().AddExpression(TextureSize);
-
-            const TCHAR* FunctionPath = bNormalProjection
-                ? TEXT("/Engine/Functions/Engine_MaterialFunctions01/Texturing/"
-                       "WorldAlignedNormal.WorldAlignedNormal")
-                : TEXT("/Engine/Functions/Engine_MaterialFunctions01/Texturing/"
-                       "WorldAlignedTexture.WorldAlignedTexture");
-            UMaterialFunctionInterface* ProjectionFunction =
-                LoadObject<UMaterialFunctionInterface>(nullptr, FunctionPath);
-            UMaterialExpressionMaterialFunctionCall* ProjectionCall =
-                NewObject<UMaterialExpressionMaterialFunctionCall>(Material);
-            Material->GetExpressionCollection().AddExpression(ProjectionCall);
-            if (!ProjectionFunction || !ProjectionCall->SetMaterialFunction(ProjectionFunction))
-            {
-                return Result;
-            }
-            for (int32 InputIndex = 0;
-                 InputIndex < ProjectionCall->FunctionInputs.Num();
-                 ++InputIndex)
-            {
-                const FString InputName = ProjectionCall->GetInputName(InputIndex).ToString();
-                FExpressionInput& Input = ProjectionCall->FunctionInputs[InputIndex].Input;
-                if (InputName.Contains(TEXT("TextureObject"), ESearchCase::IgnoreCase))
-                {
-                    Input.Expression = TextureObject;
-                }
-                else if (InputName.Contains(TEXT("TextureSize"), ESearchCase::IgnoreCase))
-                {
-                    Input.Expression = TextureSize;
-                }
-            }
-            for (int32 OutputIndex = 0;
-                 OutputIndex < ProjectionCall->FunctionOutputs.Num();
-                 ++OutputIndex)
-            {
-                const FString OutputName =
-                    ProjectionCall->FunctionOutputs[OutputIndex].Output.OutputName.ToString();
-                if (OutputName.Equals(TEXT("XYZ Texture"), ESearchCase::IgnoreCase))
-                {
-                    Result.Expression = ProjectionCall;
-                    Result.OutputIndex = OutputIndex;
-                    break;
-                }
-            }
-            return Result;
-        };
-
-        BatokaMacroAlbedoRef = AddWorldAlignedProjection(
-            TEXT("BatokaAerialRocks02WorldAlignedAlbedo"),
-            RockGroundAlbedo,
-            SAMPLERTYPE_Color,
-            5000.0f,
-            false);
-        BatokaMacroNormalRef = AddWorldAlignedProjection(
-            TEXT("BatokaAerialRocks02WorldAlignedNormal"),
-            RockGroundNormal,
-            SAMPLERTYPE_Normal,
-            5000.0f,
-            true);
-        BatokaMacroRoughnessRef = AddWorldAlignedProjection(
-            TEXT("BatokaAerialRocks02WorldAlignedRoughness"),
-            RockGroundRoughness,
-            SAMPLERTYPE_Masks,
-            5000.0f,
-            false);
-        BatokaMacroAoRef = AddWorldAlignedProjection(
-            TEXT("BatokaAerialRocks02WorldAlignedAO"),
-            BatokaMacroAo,
-            SAMPLERTYPE_Masks,
-            5000.0f,
-            false);
-        BatokaDetailAlbedoRef = AddWorldAlignedProjection(
-            TEXT("BatokaRock037WorldAlignedDetailAlbedo"),
-            BatokaDetailAlbedo,
-            SAMPLERTYPE_Color,
-            240.0f,
-            false);
-        BatokaDetailNormalRef = AddWorldAlignedProjection(
-            TEXT("BatokaRock037WorldAlignedDetailNormal"),
-            BatokaDetailNormal,
-            SAMPLERTYPE_Normal,
-            240.0f,
-            true);
-        BatokaDetailRoughnessRef = AddWorldAlignedProjection(
-            TEXT("BatokaRock037WorldAlignedDetailRoughness"),
-            BatokaDetailRoughness,
-            SAMPLERTYPE_Masks,
-            240.0f,
-            false);
-        if (!BatokaMacroAlbedoRef.Expression || !BatokaMacroNormalRef.Expression ||
-            !BatokaMacroRoughnessRef.Expression || !BatokaMacroAoRef.Expression ||
-            !BatokaDetailAlbedoRef.Expression || !BatokaDetailNormalRef.Expression ||
-            !BatokaDetailRoughnessRef.Expression)
-        {
-            return nullptr;
-        }
-    }
-
-    UMaterialExpressionVertexNormalWS* VertexNormalWs =
-        NewObject<UMaterialExpressionVertexNormalWS>(Material);
-    Material->GetExpressionCollection().AddExpression(VertexNormalWs);
-    UMaterialExpressionComponentMask* VertexNormalZ =
-        NewObject<UMaterialExpressionComponentMask>(Material);
-    VertexNormalZ->Input.Expression = VertexNormalWs;
-    VertexNormalZ->B = true;
-    Material->GetExpressionCollection().AddExpression(VertexNormalZ);
-    UMaterialExpressionOneMinus* RawSlope = NewObject<UMaterialExpressionOneMinus>(Material);
-    RawSlope->Input.Expression = VertexNormalZ;
-    Material->GetExpressionCollection().AddExpression(RawSlope);
-    UMaterialExpressionConstant* RockSlopeStart = NewObject<UMaterialExpressionConstant>(Material);
-    RockSlopeStart->R = bRockCanyon ? 0.10f : 0.16f;
-    Material->GetExpressionCollection().AddExpression(RockSlopeStart);
-    UMaterialExpressionSubtract* RockSlopeAboveThreshold =
-        NewObject<UMaterialExpressionSubtract>(Material);
-    RockSlopeAboveThreshold->A.Expression = RawSlope;
-    RockSlopeAboveThreshold->B.Expression = RockSlopeStart;
-    Material->GetExpressionCollection().AddExpression(RockSlopeAboveThreshold);
-    UMaterialExpressionConstant* RockSlopeGain = NewObject<UMaterialExpressionConstant>(Material);
-    RockSlopeGain->R = 3.3f;
-    Material->GetExpressionCollection().AddExpression(RockSlopeGain);
-    UMaterialExpressionMultiply* AmplifiedRockSlope = NewObject<UMaterialExpressionMultiply>(Material);
-    AmplifiedRockSlope->A.Expression = RockSlopeAboveThreshold;
-    AmplifiedRockSlope->B.Expression = RockSlopeGain;
-    Material->GetExpressionCollection().AddExpression(AmplifiedRockSlope);
-    UMaterialExpressionSaturate* RockSlopeMask = NewObject<UMaterialExpressionSaturate>(Material);
-    RockSlopeMask->Input.Expression = AmplifiedRockSlope;
-    Material->GetExpressionCollection().AddExpression(RockSlopeMask);
-
-    UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
-    Material->GetExpressionCollection().AddExpression(VertexColor);
-    UMaterialExpressionConstant* VertexColorWeight = NewObject<UMaterialExpressionConstant>(Material);
-    VertexColorWeight->R = bZambezi ? 0.16f : (bFutaleufu ? 0.12f : (bRockCanyon ? 1.0f : 0.68f));
-    Material->GetExpressionCollection().AddExpression(VertexColorWeight);
-    UMaterialExpressionLinearInterpolate* BaseColor =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    BaseColor->A.Expression = AlbedoSample;
-    BaseColor->B.Expression = VertexColor;
-    BaseColor->Alpha.Expression = VertexColorWeight;
-    Material->GetExpressionCollection().AddExpression(BaseColor);
-    UMaterialExpressionConstant* DetailAlbedoWeight = NewObject<UMaterialExpressionConstant>(Material);
-    DetailAlbedoWeight->R = bZambezi ? 0.16f : (bFutaleufu ? 0.18f : (bRockCanyon ? 0.08f : 0.24f));
-    Material->GetExpressionCollection().AddExpression(DetailAlbedoWeight);
-    UMaterialExpressionLinearInterpolate* ForestDetailedBaseColor =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    ForestDetailedBaseColor->A.Expression = BaseColor;
-    ForestDetailedBaseColor->B.Expression = ForestFloorAlbedoSample;
-    ForestDetailedBaseColor->Alpha.Expression = DetailAlbedoWeight;
-    Material->GetExpressionCollection().AddExpression(ForestDetailedBaseColor);
-    UMaterialExpressionConstant* RockAlbedoWeight = NewObject<UMaterialExpressionConstant>(Material);
-    RockAlbedoWeight->R = bZambezi ? 0.20f : (bFutaleufu ? 0.24f : (bRockCanyon ? 0.12f : 0.30f));
-    Material->GetExpressionCollection().AddExpression(RockAlbedoWeight);
-    UMaterialExpressionLinearInterpolate* RockDetailedBaseColor =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    RockDetailedBaseColor->A.Expression = BaseColor;
-    RockDetailedBaseColor->B.Expression = RockGroundAlbedoSample;
-    RockDetailedBaseColor->Alpha.Expression = RockAlbedoWeight;
-    Material->GetExpressionCollection().AddExpression(RockDetailedBaseColor);
-    UMaterialExpression* RockSurfaceBaseColor = RockDetailedBaseColor;
-    if (bBatokaTerrainIntegratedReview)
-    {
-        UMaterialExpressionConstant3Vector* BatokaMacroColorBalance =
-            NewObject<UMaterialExpressionConstant3Vector>(Material);
-        BatokaMacroColorBalance->Constant = FLinearColor(0.78f, 0.58f, 0.72f, 1.0f);
-        Material->GetExpressionCollection().AddExpression(BatokaMacroColorBalance);
-        UMaterialExpressionMultiply* BalancedBatokaMacro =
-            NewObject<UMaterialExpressionMultiply>(Material);
-        BalancedBatokaMacro->A.Expression = BatokaMacroAlbedoRef.Expression;
-        BalancedBatokaMacro->A.OutputIndex = BatokaMacroAlbedoRef.OutputIndex;
-        BalancedBatokaMacro->B.Expression = BatokaMacroColorBalance;
-        Material->GetExpressionCollection().AddExpression(BalancedBatokaMacro);
-        UMaterialExpressionConstant* BatokaMacroWeight =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaMacroWeight->R = 0.56f;
-        Material->GetExpressionCollection().AddExpression(BatokaMacroWeight);
-        UMaterialExpressionLinearInterpolate* BatokaMacroBaseColor =
-            NewObject<UMaterialExpressionLinearInterpolate>(Material);
-        BatokaMacroBaseColor->A.Expression = BaseColor;
-        BatokaMacroBaseColor->B.Expression = BalancedBatokaMacro;
-        BatokaMacroBaseColor->Alpha.Expression = BatokaMacroWeight;
-        Material->GetExpressionCollection().AddExpression(BatokaMacroBaseColor);
-        UMaterialExpressionConstant* BatokaDetailColorScale =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaDetailColorScale->R = 1.18f;
-        Material->GetExpressionCollection().AddExpression(BatokaDetailColorScale);
-        UMaterialExpressionMultiply* ScaledBatokaDetail =
-            NewObject<UMaterialExpressionMultiply>(Material);
-        ScaledBatokaDetail->A.Expression = BatokaDetailAlbedoRef.Expression;
-        ScaledBatokaDetail->A.OutputIndex = BatokaDetailAlbedoRef.OutputIndex;
-        ScaledBatokaDetail->B.Expression = BatokaDetailColorScale;
-        Material->GetExpressionCollection().AddExpression(ScaledBatokaDetail);
-        UMaterialExpressionConstant* BatokaDetailColorWeight =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaDetailColorWeight->R = 0.16f;
-        Material->GetExpressionCollection().AddExpression(BatokaDetailColorWeight);
-        UMaterialExpressionLinearInterpolate* BatokaTwoScaleBaseColor =
-            NewObject<UMaterialExpressionLinearInterpolate>(Material);
-        BatokaTwoScaleBaseColor->A.Expression = BatokaMacroBaseColor;
-        BatokaTwoScaleBaseColor->B.Expression = ScaledBatokaDetail;
-        BatokaTwoScaleBaseColor->Alpha.Expression = BatokaDetailColorWeight;
-        Material->GetExpressionCollection().AddExpression(BatokaTwoScaleBaseColor);
-        RockSurfaceBaseColor = BatokaTwoScaleBaseColor;
-    }
-    UMaterialExpressionLinearInterpolate* DetailedBaseColor =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    DetailedBaseColor->A.Expression = ForestDetailedBaseColor;
-    DetailedBaseColor->B.Expression = RockSurfaceBaseColor;
-    DetailedBaseColor->Alpha.Expression = RockSlopeMask;
-    Material->GetExpressionCollection().AddExpression(DetailedBaseColor);
-
-    UMaterialExpressionComponentMask* AmbientOcclusion =
-        NewObject<UMaterialExpressionComponentMask>(Material);
-    AmbientOcclusion->Input.Expression = PackedSample;
-    AmbientOcclusion->R = true;
-    Material->GetExpressionCollection().AddExpression(AmbientOcclusion);
-    UMaterialExpressionComponentMask* Roughness =
-        NewObject<UMaterialExpressionComponentMask>(Material);
-    Roughness->Input.Expression = PackedSample;
-    Roughness->G = true;
-    Material->GetExpressionCollection().AddExpression(Roughness);
-    UMaterialExpressionComponentMask* ForestFloorRoughnessMask =
-        NewObject<UMaterialExpressionComponentMask>(Material);
-    ForestFloorRoughnessMask->Input.Expression = ForestFloorRoughnessSample;
-    ForestFloorRoughnessMask->R = true;
-    Material->GetExpressionCollection().AddExpression(ForestFloorRoughnessMask);
-    UMaterialExpressionComponentMask* RockGroundRoughnessMask =
-        NewObject<UMaterialExpressionComponentMask>(Material);
-    RockGroundRoughnessMask->Input.Expression = bBatokaTerrainIntegratedReview
-        ? BatokaMacroRoughnessRef.Expression
-        : RockGroundRoughnessSample;
-    RockGroundRoughnessMask->Input.OutputIndex = bBatokaTerrainIntegratedReview
-        ? BatokaMacroRoughnessRef.OutputIndex
-        : 0;
-    RockGroundRoughnessMask->R = true;
-    Material->GetExpressionCollection().AddExpression(RockGroundRoughnessMask);
-    UMaterialExpressionConstant* DetailRoughnessWeight = NewObject<UMaterialExpressionConstant>(Material);
-    DetailRoughnessWeight->R = 0.38f;
-    Material->GetExpressionCollection().AddExpression(DetailRoughnessWeight);
-    UMaterialExpressionLinearInterpolate* ForestDetailedRoughness =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    ForestDetailedRoughness->A.Expression = Roughness;
-    ForestDetailedRoughness->B.Expression = ForestFloorRoughnessMask;
-    ForestDetailedRoughness->Alpha.Expression = DetailRoughnessWeight;
-    Material->GetExpressionCollection().AddExpression(ForestDetailedRoughness);
-    UMaterialExpressionConstant* RockRoughnessWeight = NewObject<UMaterialExpressionConstant>(Material);
-    RockRoughnessWeight->R = 0.44f;
-    Material->GetExpressionCollection().AddExpression(RockRoughnessWeight);
-    UMaterialExpressionLinearInterpolate* RockDetailedRoughness =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    RockDetailedRoughness->A.Expression = Roughness;
-    RockDetailedRoughness->B.Expression = RockGroundRoughnessMask;
-    RockDetailedRoughness->Alpha.Expression = RockRoughnessWeight;
-    Material->GetExpressionCollection().AddExpression(RockDetailedRoughness);
-    UMaterialExpression* RockSurfaceRoughness = RockDetailedRoughness;
-    if (bBatokaTerrainIntegratedReview)
-    {
-        UMaterialExpressionComponentMask* BatokaDetailRoughnessMask =
-            NewObject<UMaterialExpressionComponentMask>(Material);
-        BatokaDetailRoughnessMask->Input.Expression = BatokaDetailRoughnessRef.Expression;
-        BatokaDetailRoughnessMask->Input.OutputIndex = BatokaDetailRoughnessRef.OutputIndex;
-        BatokaDetailRoughnessMask->R = true;
-        Material->GetExpressionCollection().AddExpression(BatokaDetailRoughnessMask);
-        UMaterialExpressionConstant* BatokaDetailRoughnessWeight =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaDetailRoughnessWeight->R = 0.28f;
-        Material->GetExpressionCollection().AddExpression(BatokaDetailRoughnessWeight);
-        UMaterialExpressionLinearInterpolate* BatokaTwoScaleRoughness =
-            NewObject<UMaterialExpressionLinearInterpolate>(Material);
-        BatokaTwoScaleRoughness->A.Expression = RockDetailedRoughness;
-        BatokaTwoScaleRoughness->B.Expression = BatokaDetailRoughnessMask;
-        BatokaTwoScaleRoughness->Alpha.Expression = BatokaDetailRoughnessWeight;
-        Material->GetExpressionCollection().AddExpression(BatokaTwoScaleRoughness);
-        RockSurfaceRoughness = BatokaTwoScaleRoughness;
-    }
-    UMaterialExpressionLinearInterpolate* DetailedRoughness =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    DetailedRoughness->A.Expression = ForestDetailedRoughness;
-    DetailedRoughness->B.Expression = RockSurfaceRoughness;
-    DetailedRoughness->Alpha.Expression = RockSlopeMask;
-    Material->GetExpressionCollection().AddExpression(DetailedRoughness);
-
-    UMaterialExpressionConstant3Vector* FlatNormal =
-        NewObject<UMaterialExpressionConstant3Vector>(Material);
-    FlatNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f);
-    Material->GetExpressionCollection().AddExpression(FlatNormal);
-    UMaterialExpressionConstant* DetailNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
-    DetailNormalWeight->R = bBatokaWorldAlignedReview
-        ? 0.0f
-        : (bZambezi ? 0.30f : (bFutaleufu ? 0.34f : 0.34f));
-    Material->GetExpressionCollection().AddExpression(DetailNormalWeight);
-    UMaterialExpressionLinearInterpolate* ForestDetailedNormal =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    ForestDetailedNormal->A.Expression = FlatNormal;
-    ForestDetailedNormal->B.Expression = ForestFloorNormalSample;
-    ForestDetailedNormal->Alpha.Expression = DetailNormalWeight;
-    Material->GetExpressionCollection().AddExpression(ForestDetailedNormal);
-    UMaterialExpressionConstant* RockNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
-    RockNormalWeight->R = bZambezi ? 0.38f : (bFutaleufu ? 0.42f : 0.42f);
-    Material->GetExpressionCollection().AddExpression(RockNormalWeight);
-    UMaterialExpressionLinearInterpolate* RockDetailedNormal =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    RockDetailedNormal->A.Expression = FlatNormal;
-    RockDetailedNormal->B.Expression = bBatokaTerrainIntegratedReview
-        ? BatokaMacroNormalRef.Expression
-        : RockGroundNormalSample;
-    RockDetailedNormal->B.OutputIndex = bBatokaTerrainIntegratedReview
-        ? BatokaMacroNormalRef.OutputIndex
-        : 0;
-    RockDetailedNormal->Alpha.Expression = RockNormalWeight;
-    Material->GetExpressionCollection().AddExpression(RockDetailedNormal);
-    UMaterialExpression* RockSurfaceNormal = RockDetailedNormal;
-    if (bBatokaTerrainIntegratedReview)
-    {
-        UMaterialExpressionConstant* BatokaDetailNormalWeight =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaDetailNormalWeight->R = 0.42f;
-        Material->GetExpressionCollection().AddExpression(BatokaDetailNormalWeight);
-        UMaterialExpressionLinearInterpolate* BatokaTwoScaleNormal =
-            NewObject<UMaterialExpressionLinearInterpolate>(Material);
-        BatokaTwoScaleNormal->A.Expression = RockDetailedNormal;
-        BatokaTwoScaleNormal->B.Expression = BatokaDetailNormalRef.Expression;
-        BatokaTwoScaleNormal->B.OutputIndex = BatokaDetailNormalRef.OutputIndex;
-        BatokaTwoScaleNormal->Alpha.Expression = BatokaDetailNormalWeight;
-        Material->GetExpressionCollection().AddExpression(BatokaTwoScaleNormal);
-        RockSurfaceNormal = BatokaTwoScaleNormal;
-    }
-    UMaterialExpressionLinearInterpolate* DetailedNormal =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    DetailedNormal->A.Expression = ForestDetailedNormal;
-    DetailedNormal->B.Expression = RockSurfaceNormal;
-    DetailedNormal->Alpha.Expression = RockSlopeMask;
-    Material->GetExpressionCollection().AddExpression(DetailedNormal);
-    UMaterialExpressionConstant* SourceNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
-    SourceNormalWeight->R = 0.0f;
-    Material->GetExpressionCollection().AddExpression(SourceNormalWeight);
-    UMaterialExpressionLinearInterpolate* ValidatedNormal =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    ValidatedNormal->A.Expression = DetailedNormal;
-    ValidatedNormal->B.Expression = NormalSample;
-    ValidatedNormal->Alpha.Expression = SourceNormalWeight;
-    Material->GetExpressionCollection().AddExpression(ValidatedNormal);
-
-    UMaterialExpressionConstant* FullAmbientOcclusion = NewObject<UMaterialExpressionConstant>(Material);
-    FullAmbientOcclusion->R = 1.0f;
-    Material->GetExpressionCollection().AddExpression(FullAmbientOcclusion);
-    UMaterialExpressionConstant* SourceAoWeight = NewObject<UMaterialExpressionConstant>(Material);
-    SourceAoWeight->R = (bZambezi || bFutaleufu) ? 0.18f : 0.0f;
-    Material->GetExpressionCollection().AddExpression(SourceAoWeight);
-    UMaterialExpressionLinearInterpolate* ValidatedAmbientOcclusion =
-        NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    ValidatedAmbientOcclusion->A.Expression = FullAmbientOcclusion;
-    ValidatedAmbientOcclusion->B.Expression = AmbientOcclusion;
-    ValidatedAmbientOcclusion->Alpha.Expression = SourceAoWeight;
-    Material->GetExpressionCollection().AddExpression(ValidatedAmbientOcclusion);
-    UMaterialExpression* FinalAmbientOcclusion = ValidatedAmbientOcclusion;
-    if (bBatokaTerrainIntegratedReview)
-    {
-        UMaterialExpressionComponentMask* BatokaMacroAoMask =
-            NewObject<UMaterialExpressionComponentMask>(Material);
-        BatokaMacroAoMask->Input.Expression = BatokaMacroAoRef.Expression;
-        BatokaMacroAoMask->Input.OutputIndex = BatokaMacroAoRef.OutputIndex;
-        BatokaMacroAoMask->R = true;
-        Material->GetExpressionCollection().AddExpression(BatokaMacroAoMask);
-        UMaterialExpressionConstant* BatokaMacroAoWeight =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaMacroAoWeight->R = 0.32f;
-        Material->GetExpressionCollection().AddExpression(BatokaMacroAoWeight);
-        UMaterialExpressionLinearInterpolate* BatokaRockAo =
-            NewObject<UMaterialExpressionLinearInterpolate>(Material);
-        BatokaRockAo->A.Expression = ValidatedAmbientOcclusion;
-        BatokaRockAo->B.Expression = BatokaMacroAoMask;
-        BatokaRockAo->Alpha.Expression = BatokaMacroAoWeight;
-        Material->GetExpressionCollection().AddExpression(BatokaRockAo);
-        UMaterialExpressionLinearInterpolate* BatokaSlopeAo =
-            NewObject<UMaterialExpressionLinearInterpolate>(Material);
-        BatokaSlopeAo->A.Expression = ValidatedAmbientOcclusion;
-        BatokaSlopeAo->B.Expression = BatokaRockAo;
-        BatokaSlopeAo->Alpha.Expression = RockSlopeMask;
-        Material->GetExpressionCollection().AddExpression(BatokaSlopeAo);
-        FinalAmbientOcclusion = BatokaSlopeAo;
-    }
-
-    UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
-    Specular->R = bRockCanyon ? 0.10f : 0.16f;
-    Material->GetExpressionCollection().AddExpression(Specular);
-    UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
-    EmissiveScale->R = bRockCanyon ? 0.008f : 0.025f;
-    Material->GetExpressionCollection().AddExpression(EmissiveScale);
-    UMaterialExpressionMultiply* Emissive = NewObject<UMaterialExpressionMultiply>(Material);
-    Emissive->A.Expression = DetailedBaseColor;
-    Emissive->B.Expression = EmissiveScale;
-    Material->GetExpressionCollection().AddExpression(Emissive);
-
-    UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
-    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, DetailedBaseColor);
-    ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, ValidatedNormal);
-    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, DetailedRoughness);
-    ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
-    ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, FinalAmbientOcclusion);
-    ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, Emissive);
-
-    Material->PostEditChange();
-    Package->MarkPackageDirty();
-    const FString Filename = FPackageName::LongPackageNameToFilename(
-        MaterialPackagePath,
-        FPackageName::GetAssetPackageExtension());
-    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
-    FSavePackageArgs SaveArgs;
-    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
-    SaveArgs.SaveFlags = SAVE_NoError;
-    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
-    {
-        return nullptr;
-    }
     return Material;
 }
 
@@ -1886,30 +1548,47 @@ UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial()
     return Material;
 }
 
-UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSummary)
+UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
+    FString& OutSummary,
+    bool bUseSingleLayerWater,
+    bool bUseIsolatedZambeziParent)
 {
-    static const TCHAR* MaterialPackagePath =
-        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate");
-    static const TCHAR* MaterialObjectPath =
-        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate.M_RaftSim_SolverSurfaceWaterCandidate");
+    const bool bUseZambeziMovingSurface =
+        bUseSingleLayerWater || bUseIsolatedZambeziParent;
+    const FString MaterialPackagePath = bUseSingleLayerWater
+        ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
+               "M_RaftSim_Zambezi_SingleLayerWater")
+        : (bUseIsolatedZambeziParent
+               ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
+                      "M_RaftSim_Zambezi_DefaultLitWater")
+               : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+                      "M_RaftSim_SolverSurfaceWaterCandidate"));
+    const FString MaterialObjectName = bUseSingleLayerWater
+        ? TEXT("M_RaftSim_Zambezi_SingleLayerWater")
+        : (bUseIsolatedZambeziParent
+               ? TEXT("M_RaftSim_Zambezi_DefaultLitWater")
+               : TEXT("M_RaftSim_SolverSurfaceWaterCandidate"));
+    const FString MaterialObjectPath = FString::Printf(
+        TEXT("%s.%s"), *MaterialPackagePath, *MaterialObjectName);
 
-    UPackage* Package = CreatePackage(MaterialPackagePath);
+    UPackage* Package = CreatePackage(*MaterialPackagePath);
     if (!Package)
     {
         OutSummary += TEXT("Failed to create the solver-surface water candidate material package.\n");
         return nullptr;
     }
 
-    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
+    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(
+        UMaterial::StaticClass(), nullptr, *MaterialObjectPath));
     if (!Material)
     {
-        Material = FindObject<UMaterial>(Package, TEXT("M_RaftSim_SolverSurfaceWaterCandidate"));
+        Material = FindObject<UMaterial>(Package, *MaterialObjectName);
     }
     if (!Material)
     {
         Material = NewObject<UMaterial>(
             Package,
-            TEXT("M_RaftSim_SolverSurfaceWaterCandidate"),
+            *MaterialObjectName,
             RF_Public | RF_Standalone | RF_Transactional);
         if (Material)
         {
@@ -1924,7 +1603,8 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(MSM_DefaultLit);
+    Material->SetShadingModel(
+        bUseSingleLayerWater ? MSM_SingleLayerWater : MSM_DefaultLit);
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
@@ -2079,6 +1759,41 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
     BaseColor->A.Expression = SolverConditionedSurface;
     BaseColor->B.Expression = BaseColorScale;
     Material->GetExpressionCollection().AddExpression(BaseColor);
+    UMaterialExpression* OpticallyVariedBaseColor = BaseColor;
+    if (bUseZambeziMovingSurface)
+    {
+        UMaterialExpressionNoise* SurfaceVariationNoise =
+            NewObject<UMaterialExpressionNoise>(Material);
+        SurfaceVariationNoise->Scale = 0.0032f;
+        SurfaceVariationNoise->bTurbulence = true;
+        SurfaceVariationNoise->Levels = 3;
+        SurfaceVariationNoise->OutputMin = 0.0f;
+        SurfaceVariationNoise->OutputMax = 1.0f;
+        Material->GetExpressionCollection().AddExpression(SurfaceVariationNoise);
+        UMaterialExpressionScalarParameter* SurfaceVariationStrength =
+            AddScalarParameter(TEXT("SurfaceVariationStrength"), 0.0f);
+        UMaterialExpressionMultiply* SurfaceVariationAlpha =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        SurfaceVariationAlpha->A.Expression = SurfaceVariationNoise;
+        SurfaceVariationAlpha->B.Expression = SurfaceVariationStrength;
+        Material->GetExpressionCollection().AddExpression(SurfaceVariationAlpha);
+        UMaterialExpressionConstant* LiftedSurfaceScale =
+            NewObject<UMaterialExpressionConstant>(Material);
+        LiftedSurfaceScale->R = 1.45f;
+        Material->GetExpressionCollection().AddExpression(LiftedSurfaceScale);
+        UMaterialExpressionMultiply* LiftedBaseColor =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        LiftedBaseColor->A.Expression = BaseColor;
+        LiftedBaseColor->B.Expression = LiftedSurfaceScale;
+        Material->GetExpressionCollection().AddExpression(LiftedBaseColor);
+        UMaterialExpressionLinearInterpolate* SurfaceVariation =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        SurfaceVariation->A.Expression = BaseColor;
+        SurfaceVariation->B.Expression = LiftedBaseColor;
+        SurfaceVariation->Alpha.Expression = SurfaceVariationAlpha;
+        Material->GetExpressionCollection().AddExpression(SurfaceVariation);
+        OpticallyVariedBaseColor = SurfaceVariation;
+    }
 
     UMaterialExpressionVectorParameter* AtlasTileOriginParameter =
         AddVectorParameter(TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
@@ -2096,7 +1811,12 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
     Material->GetExpressionCollection().AddExpression(AtlasTileScale);
 
     auto AddWaterNormalSample =
-        [Material, AtlasTileOrigin, AtlasTileScale, DefaultNormalTexture](float UTiling, float VTiling) -> UMaterialExpression*
+        [Material, AtlasTileOrigin, AtlasTileScale, DefaultNormalTexture, bUseZambeziMovingSurface](
+            float UTiling,
+            float VTiling,
+            float SpeedX,
+            float SpeedY,
+            bool bSwapCoordinates) -> UMaterialExpression*
     {
         UMaterialExpressionTextureCoordinate* TexCoord =
             NewObject<UMaterialExpressionTextureCoordinate>(Material);
@@ -2104,8 +1824,42 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
         TexCoord->VTiling = VTiling;
         Material->GetExpressionCollection().AddExpression(TexCoord);
 
+        UMaterialExpression* BaseCoordinates = TexCoord;
+        if (bUseZambeziMovingSurface && bSwapCoordinates)
+        {
+            UMaterialExpressionComponentMask* CoordinateU =
+                NewObject<UMaterialExpressionComponentMask>(Material);
+            CoordinateU->Input.Expression = TexCoord;
+            CoordinateU->R = true;
+            Material->GetExpressionCollection().AddExpression(CoordinateU);
+            UMaterialExpressionComponentMask* CoordinateV =
+                NewObject<UMaterialExpressionComponentMask>(Material);
+            CoordinateV->Input.Expression = TexCoord;
+            CoordinateV->G = true;
+            Material->GetExpressionCollection().AddExpression(CoordinateV);
+            UMaterialExpressionAppendVector* SwappedCoordinates =
+                NewObject<UMaterialExpressionAppendVector>(Material);
+            SwappedCoordinates->A.Expression = CoordinateV;
+            SwappedCoordinates->B.Expression = CoordinateU;
+            Material->GetExpressionCollection().AddExpression(
+                SwappedCoordinates);
+            BaseCoordinates = SwappedCoordinates;
+        }
+
+        UMaterialExpression* SampleCoordinates = BaseCoordinates;
+        if (bUseZambeziMovingSurface)
+        {
+            UMaterialExpressionPanner* Panner =
+                NewObject<UMaterialExpressionPanner>(Material);
+            Panner->SpeedX = SpeedX;
+            Panner->SpeedY = SpeedY;
+            Panner->Coordinate.Expression = BaseCoordinates;
+            Material->GetExpressionCollection().AddExpression(Panner);
+            SampleCoordinates = Panner;
+        }
+
         UMaterialExpressionFrac* WrappedUvPrimary = NewObject<UMaterialExpressionFrac>(Material);
-        WrappedUvPrimary->Input.Expression = TexCoord;
+        WrappedUvPrimary->Input.Expression = SampleCoordinates;
         Material->GetExpressionCollection().AddExpression(WrappedUvPrimary);
         UMaterialExpressionConstant2Vector* HalfPeriodOffset =
             NewObject<UMaterialExpressionConstant2Vector>(Material);
@@ -2113,7 +1867,7 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
         HalfPeriodOffset->G = 0.0f;
         Material->GetExpressionCollection().AddExpression(HalfPeriodOffset);
         UMaterialExpressionAdd* OffsetTexCoord = NewObject<UMaterialExpressionAdd>(Material);
-        OffsetTexCoord->A.Expression = TexCoord;
+        OffsetTexCoord->A.Expression = SampleCoordinates;
         OffsetTexCoord->B.Expression = HalfPeriodOffset;
         Material->GetExpressionCollection().AddExpression(OffsetTexCoord);
         UMaterialExpressionFrac* WrappedUvOffset = NewObject<UMaterialExpressionFrac>(Material);
@@ -2181,8 +1935,24 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
         return SeamContinuousNormal;
     };
 
-    UMaterialExpression* NormalSampleA = AddWaterNormalSample(0.73f, 2.15f);
-    UMaterialExpression* NormalSampleB = AddWaterNormalSample(1.11f, 3.30f);
+    // The Zambezi ribbon stretches U over the full reach. Its earlier
+    // Single Layer Water values therefore produced long, parallel grooves
+    // that read as combed plastic in the launch camera. Keep the shared
+    // Default Lit projection unchanged, but sample the isolated Zambezi
+    // parent at shorter, incommensurate wavelengths so the opposed moving
+    // layers read as local wind/current ripples instead of river-length ribs.
+    UMaterialExpression* NormalSampleA = AddWaterNormalSample(
+        bUseZambeziMovingSurface ? 2.40f : 0.73f,
+        bUseZambeziMovingSurface ? 6.20f : 2.15f,
+        0.036f,
+        0.006f,
+        false);
+    UMaterialExpression* NormalSampleB = AddWaterNormalSample(
+        bUseZambeziMovingSurface ? 4.10f : 1.11f,
+        bUseZambeziMovingSurface ? 10.30f : 3.30f,
+        -0.014f,
+        0.027f,
+        true);
     UMaterialExpressionConstant* NormalLayerBlend = NewObject<UMaterialExpressionConstant>(Material);
     NormalLayerBlend->R = 0.46f;
     Material->GetExpressionCollection().AddExpression(NormalLayerBlend);
@@ -2235,7 +2005,7 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
     UMaterialExpressionScalarParameter* EmissiveFillScale =
         AddScalarParameter(TEXT("EmissiveFillScale"), 0.004f);
     UMaterialExpressionMultiply* BaseEmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
-    BaseEmissiveColor->A.Expression = BaseColor;
+    BaseEmissiveColor->A.Expression = OpticallyVariedBaseColor;
     BaseEmissiveColor->B.Expression = EmissiveFillScale;
     Material->GetExpressionCollection().AddExpression(BaseEmissiveColor);
     UMaterialExpressionFresnel* ReflectionFresnel = NewObject<UMaterialExpressionFresnel>(Material);
@@ -2290,13 +2060,37 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
     Material->GetExpressionCollection().AddExpression(Roughness);
     UMaterialExpressionScalarParameter* Specular =
         AddScalarParameter(TEXT("Specular"), 0.52f);
+    UMaterialExpressionScalarParameter* Opacity = nullptr;
+    if (bUseSingleLayerWater)
+    {
+        Opacity = AddScalarParameter(TEXT("Opacity"), 0.58f);
+        UMaterialExpressionSingleLayerWaterMaterialOutput* WaterOutput =
+            NewObject<UMaterialExpressionSingleLayerWaterMaterialOutput>(Material);
+        Material->GetExpressionCollection().AddExpression(WaterOutput);
+        WaterOutput->ScatteringCoefficients.Expression = AddVectorParameter(
+            TEXT("ScatteringCoefficients"),
+            FLinearColor(0.00018f, 0.00023f, 0.00013f, 0.0f));
+        WaterOutput->AbsorptionCoefficients.Expression = AddVectorParameter(
+            TEXT("AbsorptionCoefficients"),
+            FLinearColor(0.0068f, 0.0058f, 0.0072f, 0.0f));
+        WaterOutput->PhaseG.Expression = AddScalarParameter(
+            TEXT("PhaseG"), 0.08f);
+        WaterOutput->ColorScaleBehindWater.Expression = AddVectorParameter(
+            TEXT("ColorScaleBehindWater"),
+            FLinearColor(0.18f, 0.20f, 0.14f, 0.0f));
+    }
     if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
     {
-        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, BaseColor);
+        ConnectPreviewMaterialColorInput(
+            EditorOnlyData->BaseColor, OpticallyVariedBaseColor);
         ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
         ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, WaterNormal);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+        if (Opacity)
+        {
+            ConnectPreviewMaterialScalarInput(EditorOnlyData->Opacity, Opacity);
+        }
     }
 
     // SetMaterialUsage compiles immediately. Refresh cached expression data first so
@@ -2322,6 +2116,253 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
         return nullptr;
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
+    return Material;
+}
+
+UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
+    FString& OutSummary)
+{
+    static const TCHAR* CollectionPackagePath =
+        TEXT("/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion");
+    static const TCHAR* CollectionObjectPath =
+        TEXT("/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion."
+             "MPC_RaftSim_RaftFoamOcclusion");
+
+    UPackage* Package = CreatePackage(CollectionPackagePath);
+    if (!Package)
+    {
+        OutSummary += TEXT(
+            "Failed to create the raft foam-occlusion parameter collection package.\n");
+        return nullptr;
+    }
+    UMaterialParameterCollection* Collection =
+        LoadObject<UMaterialParameterCollection>(nullptr, CollectionObjectPath);
+    if (!Collection)
+    {
+        Collection = NewObject<UMaterialParameterCollection>(
+            Package,
+            TEXT("MPC_RaftSim_RaftFoamOcclusion"),
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Collection)
+        {
+            FAssetRegistryModule::AssetCreated(Collection);
+        }
+    }
+    if (!Collection)
+    {
+        OutSummary += TEXT(
+            "Failed to create the raft foam-occlusion parameter collection.\n");
+        return nullptr;
+    }
+
+    Collection->Modify();
+    auto EnsureScalar = [Collection](FName Name, float DefaultValue)
+    {
+        const int32 ExistingIndex = Collection->ScalarParameters.IndexOfByPredicate(
+            [Name](const FCollectionScalarParameter& Parameter)
+            {
+                return Parameter.ParameterName == Name;
+            });
+        if (ExistingIndex != INDEX_NONE)
+        {
+            Collection->ScalarParameters[ExistingIndex].DefaultValue =
+                DefaultValue;
+            return;
+        }
+        FCollectionScalarParameter Parameter;
+        Parameter.ParameterName = Name;
+        Parameter.DefaultValue = DefaultValue;
+        Collection->ScalarParameters.Add(Parameter);
+    };
+    auto EnsureVector =
+        [Collection](FName Name, const FLinearColor& DefaultValue)
+    {
+        const int32 ExistingIndex = Collection->VectorParameters.IndexOfByPredicate(
+            [Name](const FCollectionVectorParameter& Parameter)
+            {
+                return Parameter.ParameterName == Name;
+            });
+        if (ExistingIndex != INDEX_NONE)
+        {
+            Collection->VectorParameters[ExistingIndex].DefaultValue =
+                DefaultValue;
+            return;
+        }
+        FCollectionVectorParameter Parameter;
+        Parameter.ParameterName = Name;
+        Parameter.DefaultValue = DefaultValue;
+        Collection->VectorParameters.Add(Parameter);
+    };
+    EnsureScalar(TEXT("RaftFoamExclusionEnabled"), 0.0f);
+    // Live water level minus the cooked presentation baseline, in metres,
+    // sampled near the raft each frame. The static terrain-clipped tiles are
+    // cooked at one flow band while the release schedule moves the live
+    // level through the day; this delta lets their material retire the sheet
+    // it cooked above today's waterline instead of glossing the dry bank.
+    EnsureScalar(TEXT("RaftSimLiveWaterLevelDeltaM"), 0.0f);
+    // Cumulative solver-current displacement in river station/lateral metres.
+    // The masked lace subtracts it from river UVs, keeping fine foam features
+    // stationary relative to a passive raft instead of adding fixed panners
+    // on top of the physical current.
+    EnsureVector(
+        TEXT("RaftSimFoamAdvectionMeters"),
+        FLinearColor::Transparent);
+    EnsureVector(
+        TEXT("RaftFoamExclusionCenterAndHalfWidthCm"),
+        FLinearColor(0.0f, 0.0f, 0.0f, 190.0f));
+    EnsureVector(
+        TEXT("RaftFoamExclusionForwardAndHalfLengthCm"),
+        FLinearColor(1.0f, 0.0f, 0.0f, 320.0f));
+    // The broad Single Layer Water surface needs a much tighter opening than
+    // the foam/crew exclusion. These independently sized parameters expose
+    // only the self-bailing floor instead of punching a water-free halo around
+    // the complete raft and paddles.
+    EnsureScalar(TEXT("RaftInteriorWaterTransmissionEnabled"), 0.0f);
+    // Shared presentation wave clock (seconds). The water surface actor
+    // accumulates it scaled by local flow speed each frame; the transmission
+    // WPO and the physics-side swell/band phases both consume it so waves
+    // visibly accelerate into rapids without desyncing render from support.
+    EnsureScalar(TEXT("RaftSimWaveClockSeconds"), 0.0f);
+    // Boat wake state in river coordinates, pushed per-tick by the water
+    // surface actor. The band water material evaluates the analytic wake
+    // per pixel from these — every raised live-actor mesh is depth-buried
+    // under the opaque band surface, so the band shader is the one place
+    // a dynamic boat wake reliably renders.
+    EnsureScalar(TEXT("RaftSimWakeBoatEnable"), 0.0f);
+    EnsureScalar(TEXT("RaftSimWakeBoatStationM"), 0.0f);
+    EnsureScalar(TEXT("RaftSimWakeBoatLateralM"), 0.0f);
+    EnsureScalar(TEXT("RaftSimWakeBoatVelStationMps"), 0.0f);
+    EnsureScalar(TEXT("RaftSimWakeBoatVelLateralMps"), 0.0f);
+    EnsureVector(
+        TEXT("RaftInteriorWaterCenterAndHalfWidthCm"),
+        FLinearColor(0.0f, 0.0f, 0.0f, 82.0f));
+    EnsureVector(
+        TEXT("RaftInteriorWaterForwardAndHalfLengthCm"),
+        FLinearColor(1.0f, 0.0f, 0.0f, 215.0f));
+    Collection->StateId = FGuid::NewGuid();
+    Collection->PostEditChange();
+    Package->MarkPackageDirty();
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        CollectionPackagePath,
+        FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Collection->GetPackage(), Collection, *Filename, SaveArgs))
+    {
+        OutSummary += TEXT(
+            "Failed to save the raft foam-occlusion parameter collection.\n");
+        return nullptr;
+    }
+    return Collection;
+}
+
+UMaterialInterface* LoadOrCreateReadableRaftFloorMaterial(FString& OutSummary)
+{
+    static const TCHAR* SourcePath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftTube.M_RaftSim_RaftTube");
+    static const TCHAR* PackagePath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftFloorReadable");
+    static const TCHAR* ObjectName = TEXT("M_RaftSim_RaftFloorReadable");
+    static const TCHAR* ObjectPath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftFloorReadable."
+             "M_RaftSim_RaftFloorReadable");
+
+    UMaterial* Source = LoadObject<UMaterial>(nullptr, SourcePath);
+    UPackage* Package = CreatePackage(PackagePath);
+    if (!Source || !Package)
+    {
+        OutSummary += TEXT(
+            "Could not load the coated-fabric source for the readable raft floor.\n");
+        return nullptr;
+    }
+    UMaterial* Material = LoadObject<UMaterial>(nullptr, ObjectPath);
+    if (!Material)
+    {
+        Material = DuplicateObject<UMaterial>(Source, Package, ObjectName);
+        if (!Material)
+        {
+            OutSummary += TEXT("Could not duplicate the readable raft floor material.\n");
+            return nullptr;
+        }
+        Material->SetFlags(RF_Public | RF_Standalone | RF_Transactional);
+        FAssetRegistryModule::AssetCreated(Material);
+    }
+
+    bool bHasShadowFill = false;
+    for (const TObjectPtr<UMaterialExpression>& Expression :
+         Material->GetExpressionCollection().Expressions)
+    {
+        if (Expression && Expression->Desc == TEXT("RaftSimRaftFloorShadowFill"))
+        {
+            bHasShadowFill = true;
+            break;
+        }
+    }
+    Material->Modify();
+    if (!bHasShadowFill)
+    {
+        UMaterialEditorOnlyData* EditorData = Material->GetEditorOnlyData();
+        UMaterialExpression* FloorColor =
+            EditorData ? EditorData->BaseColor.Expression : nullptr;
+        if (!EditorData || !FloorColor)
+        {
+            OutSummary += TEXT(
+                "The coated-fabric source lacks a base-colour graph for floor fill.\n");
+            return nullptr;
+        }
+        // The tubes place the self-bailing floor in deep geometric shadow.
+        // Reuse its wet coated-fabric colour as bounded indirect bounce rather
+        // than an unrelated glow, so ribs and seams remain visible under the
+        // raft while direct-sun response and authored roughness stay intact.
+        UMaterialExpressionScalarParameter* ShadowFill =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        ShadowFill->ParameterName = TEXT("FloorShadowFill");
+        ShadowFill->DefaultValue = 0.28f;
+        ShadowFill->Group = TEXT("RaftSimRaftFloor");
+        Material->GetExpressionCollection().AddExpression(ShadowFill);
+        UMaterialExpressionMultiply* FilledFloorColor =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        FilledFloorColor->Desc = TEXT("RaftSimRaftFloorShadowFill");
+        FilledFloorColor->A.Expression = FloorColor;
+        FilledFloorColor->B.Expression = ShadowFill;
+        Material->GetExpressionCollection().AddExpression(FilledFloorColor);
+        EditorData->EmissiveColor.Connect(0, FilledFloorColor);
+    }
+
+    Material->PostEditChange();
+    Material->ForceRecompileForRendering();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    FMaterialResource* Resource =
+        Material->GetMaterialResource(GMaxRHIShaderPlatform);
+    if (!Resource ||
+        Material->IsCompilingOrHadCompileError(GMaxRHIShaderPlatform) ||
+        !Resource->GetCompileErrors().IsEmpty())
+    {
+        OutSummary += FString::Printf(
+            TEXT("Readable raft floor shader validation failed: %s\n"),
+            Resource
+                ? *FString::Join(Resource->GetCompileErrors(), TEXT(" | "))
+                : TEXT("no platform material resource"));
+        return nullptr;
+    }
+    Package->MarkPackageDirty();
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
+    {
+        OutSummary += TEXT("Could not save the readable raft floor material.\n");
+        return nullptr;
+    }
     return Material;
 }
 
@@ -2362,43 +2403,291 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
         return nullptr;
     }
 
+    UMaterialParameterCollection* FoamOcclusionCollection =
+        LoadOrCreateRaftFoamOcclusionCollection(OutSummary);
+    if (!FoamOcclusionCollection)
+    {
+        return nullptr;
+    }
+
     Material->Modify();
     Material->GetExpressionCollection().Empty();
+    // Foam is a rough, strongly scattering surface, but it still belongs in
+    // the scene's light transport.  The former unlit single-tile sheet kept
+    // the same value through sun and canyon shadow and therefore read as a
+    // graphic decal.  Default Lit plus a restrained emissive floor preserves
+    // legibility without flattening the river lighting.
     Material->SetShadingModel(MSM_DefaultLit);
-    Material->BlendMode = BLEND_Translucent;
+    // Aerated crests are predominantly scattering/opaque. A masked surface is
+    // also deterministic in SceneCapture and packaged rendering, where this
+    // generated candidate's translucent vertex-alpha pass could disappear
+    // even though the same mesh rendered correctly with an opaque material.
+    Material->BlendMode = BLEND_Masked;
+    // Keep exact black texture holes masked, but let smoothed solver coverage
+    // decay for several frames before it falls below the hard mask. A clip
+    // near the old coverage threshold made whole lace islands blink whenever
+    // a marginal vertex crossed that threshold at the 15 Hz surface refresh.
+    Material->OpacityMaskClipValue = 0.01f;
     Material->TwoSided = true;
 
     UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
     Material->GetExpressionCollection().AddExpression(VertexColor);
+    UMaterialExpression* FoamMaskExpression = VertexColor;
+    int32 FoamMaskOutputIndex = 4;
+    auto CollectionParameter =
+        [Material, FoamOcclusionCollection](FName Name, bool bScalar)
+            -> UMaterialExpressionCollectionParameter*
+    {
+        UMaterialExpressionCollectionParameter* Expression =
+            NewObject<UMaterialExpressionCollectionParameter>(Material);
+        Expression->Collection = FoamOcclusionCollection;
+        Expression->ParameterName = Name;
+        Expression->ExpressionGUID = FGuid::NewGuid();
+        const int32 ParameterIndex = bScalar
+            ? FoamOcclusionCollection->ScalarParameters.IndexOfByPredicate(
+                [Name](const FCollectionScalarParameter& Parameter)
+                {
+                    return Parameter.ParameterName == Name;
+                })
+            : FoamOcclusionCollection->VectorParameters.IndexOfByPredicate(
+                [Name](const FCollectionVectorParameter& Parameter)
+                {
+                    return Parameter.ParameterName == Name;
+                });
+        if (ParameterIndex != INDEX_NONE)
+        {
+            Expression->ParameterId = bScalar
+                ? FoamOcclusionCollection->ScalarParameters[ParameterIndex].Id
+                : FoamOcclusionCollection->VectorParameters[ParameterIndex].Id;
+        }
+        Material->GetExpressionCollection().AddExpression(Expression);
+        return Expression;
+    };
+    UTexture2D* FoamLaceTexture = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
+             "T_RaftSim_SouthForkWater_FoamLace."
+             "T_RaftSim_SouthForkWater_FoamLace"));
+    if (FoamLaceTexture)
+    {
+        UMaterialExpressionTextureCoordinate* FoamCoordinates =
+            NewObject<UMaterialExpressionTextureCoordinate>(Material);
+        // Mesh UV0 encodes station/lateral in three-metre units.  U therefore
+        // follows the river and gives the material an explicit advection
+        // direction without inventing foam outside solver-owned vertex alpha.
+        FoamCoordinates->UTiling = 0.37f;
+        FoamCoordinates->VTiling = 0.89f;
+        Material->GetExpressionCollection().AddExpression(FoamCoordinates);
+        UMaterialExpressionCollectionParameter* FoamAdvectionMeters =
+            CollectionParameter(TEXT("RaftSimFoamAdvectionMeters"), false);
+        UMaterialExpressionComponentMask* FoamAdvectionRiverMeters =
+            NewObject<UMaterialExpressionComponentMask>(Material);
+        FoamAdvectionRiverMeters->Input.Expression = FoamAdvectionMeters;
+        FoamAdvectionRiverMeters->R = true;
+        FoamAdvectionRiverMeters->G = true;
+        Material->GetExpressionCollection().AddExpression(
+            FoamAdvectionRiverMeters);
+        UMaterialExpressionConstant2Vector* FoamPrimaryMetersToUv =
+            NewObject<UMaterialExpressionConstant2Vector>(Material);
+        FoamPrimaryMetersToUv->R = -0.37f / 3.0f;
+        FoamPrimaryMetersToUv->G = -0.89f / 3.0f;
+        Material->GetExpressionCollection().AddExpression(
+            FoamPrimaryMetersToUv);
+        UMaterialExpressionMultiply* FoamPrimaryAdvectionUv =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        FoamPrimaryAdvectionUv->A.Expression = FoamAdvectionRiverMeters;
+        FoamPrimaryAdvectionUv->B.Expression = FoamPrimaryMetersToUv;
+        Material->GetExpressionCollection().AddExpression(
+            FoamPrimaryAdvectionUv);
+        UMaterialExpressionAdd* SolverAdvectedPrimaryCoordinates =
+            NewObject<UMaterialExpressionAdd>(Material);
+        SolverAdvectedPrimaryCoordinates->Desc =
+            TEXT("RaftSimSolverCurrentAdvectedFoamPrimary");
+        SolverAdvectedPrimaryCoordinates->A.Expression = FoamCoordinates;
+        SolverAdvectedPrimaryCoordinates->B.Expression =
+            FoamPrimaryAdvectionUv;
+        Material->GetExpressionCollection().AddExpression(
+            SolverAdvectedPrimaryCoordinates);
+        UMaterialExpressionTextureSampleParameter2D* FoamLaceSample =
+            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
+        FoamLaceSample->ParameterName = TEXT("SolverOverlayFoamLace");
+        FoamLaceSample->Texture = FoamLaceTexture;
+        FoamLaceSample->SamplerType = SAMPLERTYPE_Masks;
+        FoamLaceSample->Coordinates.Expression =
+            SolverAdvectedPrimaryCoordinates;
+        Material->GetExpressionCollection().AddExpression(FoamLaceSample);
+
+        UMaterialExpressionTextureCoordinate* FoamDetailCoordinates =
+            NewObject<UMaterialExpressionTextureCoordinate>(Material);
+        FoamDetailCoordinates->UTiling = 0.71f;
+        FoamDetailCoordinates->VTiling = 1.57f;
+        Material->GetExpressionCollection().AddExpression(FoamDetailCoordinates);
+        UMaterialExpressionConstant2Vector* FoamDetailMetersToUv =
+            NewObject<UMaterialExpressionConstant2Vector>(Material);
+        FoamDetailMetersToUv->R = -0.71f / 3.0f;
+        FoamDetailMetersToUv->G = -1.57f / 3.0f;
+        Material->GetExpressionCollection().AddExpression(
+            FoamDetailMetersToUv);
+        UMaterialExpressionMultiply* FoamDetailAdvectionUv =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        FoamDetailAdvectionUv->A.Expression = FoamAdvectionRiverMeters;
+        FoamDetailAdvectionUv->B.Expression = FoamDetailMetersToUv;
+        Material->GetExpressionCollection().AddExpression(
+            FoamDetailAdvectionUv);
+        UMaterialExpressionAdd* SolverAdvectedDetailCoordinates =
+            NewObject<UMaterialExpressionAdd>(Material);
+        SolverAdvectedDetailCoordinates->Desc =
+            TEXT("RaftSimSolverCurrentAdvectedFoamDetail");
+        SolverAdvectedDetailCoordinates->A.Expression = FoamDetailCoordinates;
+        SolverAdvectedDetailCoordinates->B.Expression = FoamDetailAdvectionUv;
+        Material->GetExpressionCollection().AddExpression(
+            SolverAdvectedDetailCoordinates);
+        UMaterialExpressionTextureSampleParameter2D* FoamDetailSample =
+            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
+        // Reusing the same named texture parameter lets every river keep its
+        // first-party lace while the incommensurate coordinates prevent the
+        // former short rectangular repeat from dominating the silhouette.
+        FoamDetailSample->ParameterName = TEXT("SolverOverlayFoamLace");
+        FoamDetailSample->Texture = FoamLaceTexture;
+        FoamDetailSample->SamplerType = SAMPLERTYPE_Masks;
+        FoamDetailSample->Coordinates.Expression =
+            SolverAdvectedDetailCoordinates;
+        Material->GetExpressionCollection().AddExpression(FoamDetailSample);
+        UMaterialExpressionConstant* FoamDetailGain =
+            NewObject<UMaterialExpressionConstant>(Material);
+        FoamDetailGain->R = 0.46f;
+        Material->GetExpressionCollection().AddExpression(FoamDetailGain);
+        UMaterialExpressionMultiply* WeightedFoamDetail =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        WeightedFoamDetail->A.Expression = FoamDetailSample;
+        WeightedFoamDetail->A.OutputIndex = 1;
+        WeightedFoamDetail->B.Expression = FoamDetailGain;
+        Material->GetExpressionCollection().AddExpression(WeightedFoamDetail);
+        UMaterialExpressionConstant* FoamDetailFloor =
+            NewObject<UMaterialExpressionConstant>(Material);
+        FoamDetailFloor->R = 0.54f;
+        Material->GetExpressionCollection().AddExpression(FoamDetailFloor);
+        UMaterialExpressionAdd* FoamDetailEnvelope =
+            NewObject<UMaterialExpressionAdd>(Material);
+        FoamDetailEnvelope->A.Expression = FoamDetailFloor;
+        FoamDetailEnvelope->B.Expression = WeightedFoamDetail;
+        Material->GetExpressionCollection().AddExpression(FoamDetailEnvelope);
+        UMaterialExpressionMultiply* FlowAdvectedMultiscaleLace =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        FlowAdvectedMultiscaleLace->Desc =
+            TEXT("RaftSimFlowAdvectedMultiscaleFoamV1");
+        FlowAdvectedMultiscaleLace->A.Expression = FoamLaceSample;
+        FlowAdvectedMultiscaleLace->A.OutputIndex = 1;
+        FlowAdvectedMultiscaleLace->B.Expression = FoamDetailEnvelope;
+        Material->GetExpressionCollection().AddExpression(
+            FlowAdvectedMultiscaleLace);
+        UMaterialExpressionMultiply* SolverMaskedLace =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        SolverMaskedLace->A.Expression = VertexColor;
+        SolverMaskedLace->A.OutputIndex = 4;
+        SolverMaskedLace->B.Expression = FlowAdvectedMultiscaleLace;
+        Material->GetExpressionCollection().AddExpression(SolverMaskedLace);
+        FoamMaskExpression = SolverMaskedLace;
+        FoamMaskOutputIndex = 0;
+    }
+
+    // The full-reach whitewater sheet is intentionally raised above the broad
+    // water body, but it must not become a decal over the raft or its crew.
+    // A runtime-updated material collection cuts a feathered, raft-aligned
+    // ellipse only from this presentation layer. Water depth, contact spray,
+    // D3/D4 state, collision, and every solver-authored foam value are intact.
+    UMaterialExpressionWorldPosition* WorldPosition =
+        NewObject<UMaterialExpressionWorldPosition>(Material);
+    Material->GetExpressionCollection().AddExpression(WorldPosition);
+    UMaterialExpressionCollectionParameter* ExclusionEnabled =
+        CollectionParameter(TEXT("RaftFoamExclusionEnabled"), true);
+    UMaterialExpressionCollectionParameter* ExclusionCenter =
+        CollectionParameter(
+            TEXT("RaftFoamExclusionCenterAndHalfWidthCm"), false);
+    UMaterialExpressionCollectionParameter* ExclusionForward =
+        CollectionParameter(
+            TEXT("RaftFoamExclusionForwardAndHalfLengthCm"), false);
+    UMaterialExpressionCustom* RaftExclusion =
+        NewObject<UMaterialExpressionCustom>(Material);
+    RaftExclusion->Description = TEXT("Raft and crew foam-layer exclusion");
+    RaftExclusion->OutputType = CMOT_Float1;
+    RaftExclusion->Code = TEXT(
+        "float2 Delta = WorldPosition.xy - CenterAndHalfWidth.xy;\n"
+        "float2 Forward = normalize(ForwardAndHalfLength.xy + float2(1e-5, 0.0));\n"
+        "float Along = dot(Delta, Forward) / max(ForwardAndHalfLength.w, 1.0);\n"
+        "float Across = dot(Delta, float2(-Forward.y, Forward.x)) / max(CenterAndHalfWidth.w, 1.0);\n"
+        "float EllipseSquared = Along * Along + Across * Across;\n"
+        "float OutsideRaft = smoothstep(0.62, 1.0, EllipseSquared);\n"
+        "return lerp(1.0, OutsideRaft, saturate(Enabled));");
+    auto AddCustomInput = [RaftExclusion](
+        FName Name, UMaterialExpression* Expression)
+    {
+        FCustomInput Input;
+        Input.InputName = Name;
+        Input.Input.Expression = Expression;
+        RaftExclusion->Inputs.Add(Input);
+    };
+    AddCustomInput(TEXT("WorldPosition"), WorldPosition);
+    AddCustomInput(TEXT("CenterAndHalfWidth"), ExclusionCenter);
+    AddCustomInput(TEXT("ForwardAndHalfLength"), ExclusionForward);
+    AddCustomInput(TEXT("Enabled"), ExclusionEnabled);
+    Material->GetExpressionCollection().AddExpression(RaftExclusion);
+    UMaterialExpressionMultiply* OcclusionSafeFoamMask =
+        NewObject<UMaterialExpressionMultiply>(Material);
+    OcclusionSafeFoamMask->A.Expression = FoamMaskExpression;
+    OcclusionSafeFoamMask->A.OutputIndex = FoamMaskOutputIndex;
+    OcclusionSafeFoamMask->B.Expression = RaftExclusion;
+    Material->GetExpressionCollection().AddExpression(OcclusionSafeFoamMask);
+    FoamMaskExpression = OcclusionSafeFoamMask;
+    FoamMaskOutputIndex = 0;
     UMaterialExpressionConstant* Roughness = NewObject<UMaterialExpressionConstant>(Material);
-    Roughness->R = 0.82f;
+    Roughness->R = 0.78f;
     Material->GetExpressionCollection().AddExpression(Roughness);
     UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
-    Specular->R = 0.18f;
+    Specular->R = 0.24f;
     Material->GetExpressionCollection().AddExpression(Specular);
+    UMaterialExpressionConstant* BaseColorScale =
+        NewObject<UMaterialExpressionConstant>(Material);
+    BaseColorScale->R = 1.08f;
+    Material->GetExpressionCollection().AddExpression(BaseColorScale);
+    UMaterialExpressionMultiply* LitFoamBaseColor =
+        NewObject<UMaterialExpressionMultiply>(Material);
+    LitFoamBaseColor->Desc = TEXT("RaftSimLitFoamBaseColorV1");
+    LitFoamBaseColor->A.Expression = VertexColor;
+    LitFoamBaseColor->B.Expression = BaseColorScale;
+    Material->GetExpressionCollection().AddExpression(LitFoamBaseColor);
     UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
-    EmissiveScale->R = 0.025f;
+    EmissiveScale->R = 0.06f;
     Material->GetExpressionCollection().AddExpression(EmissiveScale);
     UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
-    EmissiveColor->A.Expression = VertexColor;
+    EmissiveColor->A.Expression = LitFoamBaseColor;
     EmissiveColor->B.Expression = EmissiveScale;
     Material->GetExpressionCollection().AddExpression(EmissiveColor);
 
     if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
     {
-        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, VertexColor);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, LitFoamBaseColor);
         ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
-        EditorOnlyData->Opacity.Expression = VertexColor;
-        EditorOnlyData->Opacity.OutputIndex = 4;
-        EditorOnlyData->Opacity.Mask = 1;
-        EditorOnlyData->Opacity.MaskR = 0;
-        EditorOnlyData->Opacity.MaskG = 0;
-        EditorOnlyData->Opacity.MaskB = 0;
-        EditorOnlyData->Opacity.MaskA = 1;
+        EditorOnlyData->Opacity.Expression = nullptr;
+        EditorOnlyData->OpacityMask.Expression = FoamMaskExpression;
+        EditorOnlyData->OpacityMask.OutputIndex = FoamMaskOutputIndex;
+        EditorOnlyData->OpacityMask.Mask = FoamMaskOutputIndex == 4 ? 1 : 0;
+        EditorOnlyData->OpacityMask.MaskR = 0;
+        EditorOnlyData->OpacityMask.MaskG = 0;
+        EditorOnlyData->OpacityMask.MaskB = 0;
+        EditorOnlyData->OpacityMask.MaskA = FoamMaskOutputIndex == 4 ? 1 : 0;
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
     }
 
+    // The solver-foam actors participate in the instanced terminal HLOD layer.
+    // Persist this usage before saving so the HLOD commandlet does not mutate
+    // the material and invalidate its source hash on every process launch.
+    if (!Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes))
+    {
+        OutSummary += TEXT("Failed to enable instanced-static-mesh usage for the solver-field foam material.\n");
+        return nullptr;
+    }
     Material->PostEditChange();
     Package->MarkPackageDirty();
     const FString Filename =
@@ -2446,6 +2735,11 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     {
         RiverAssetName = TEXT("Chilko");
     }
+    else if (IsZambeziUpperGorgeRiverId(Spec.RiverId))
+    {
+        // Own capture-ribbon instance; L_Zambezi's stays untouched.
+        RiverAssetName = TEXT("ZambeziUpperGorge");
+    }
     if (RiverAssetName.IsEmpty())
     {
         OutSummary += FString::Printf(
@@ -2454,27 +2748,76 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         return nullptr;
     }
 
-    UMaterial* Parent = LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(OutSummary);
+    // The isolated Single Layer Water parent remains committed as rejected
+    // comparison evidence. Its volume pass renders nearly black through the
+    // deterministic SceneCapture2D path even though the editor/game viewport
+    // is readable. Bind the authored Zambezi ribbon to an isolated Default Lit
+    // parent so canonical evidence and gameplay use the same surface-shading
+    // contract while preserving geometry, collision, and solver authority.
+    const bool bUseSingleLayerWater = false;
+    const bool bUseIsolatedZambeziParent =
+        Spec.RiverId == TEXT("zambezi_batoka_gorge") || IsZambeziUpperGorgeRiverId(Spec.RiverId);
+    // The upper gorge only loads L_Zambezi's Default Lit parent: rebuilding
+    // it here would re-save that map's material.
+    UMaterial* Parent = IsZambeziUpperGorgeRiverId(Spec.RiverId)
+        ? LoadObject<UMaterial>(nullptr,
+              TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_DefaultLitWater."
+                   "M_RaftSim_Zambezi_DefaultLitWater"))
+        : Spec.RiverId == TEXT("pacuare")
+        ? LoadOrCreatePacuareRainforestWaterParent(OutSummary)
+        : (Spec.RiverId == TEXT("colorado_river")
+               ? LoadOrCreateColoradoHanceWaterParent(OutSummary)
+               : (Spec.RiverId == TEXT("futaleufu_terminator")
+               ? LoadOrCreateFutaleufuTerminatorWaterParent(OutSummary)
+               : (Spec.RiverId == TEXT("chilko_river_lava_canyon")
+                      ? LoadOrCreateChilkoLavaCanyonWaterParent(OutSummary)
+                      : LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
+                            OutSummary,
+                            bUseSingleLayerWater,
+                            bUseIsolatedZambeziParent))));
     if (!Parent)
     {
         return nullptr;
     }
     FString WaterNormalAssetName = RiverAssetName;
-    if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+    if (Spec.RiverId == TEXT("zambezi_batoka_gorge") || IsZambeziUpperGorgeRiverId(Spec.RiverId))
     {
         WaterNormalAssetName = TEXT("ColoradoRiver");
     }
-    else if (Spec.RiverId == TEXT("futaleufu_terminator"))
-    {
-        WaterNormalAssetName = TEXT("Pacuare");
-    }
-    const FString NormalAtlasName = FString::Printf(
-        TEXT("T_RaftSim_%s_NormalAtlas"),
-        *WaterNormalAssetName);
-    const FString NormalAtlasObjectPath = FString::Printf(
-        TEXT("/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/%s.%s"),
-        *NormalAtlasName,
-        *NormalAtlasName);
+    const bool bUsesColoradoRiverLocalFlowNormal =
+        Spec.RiverId == TEXT("colorado_river");
+    const bool bUsesFutaleufuRiverLocalFlowNormal =
+        Spec.RiverId == TEXT("futaleufu_terminator");
+    const bool bUsesChilkoRiverLocalFlowNormal =
+        Spec.RiverId == TEXT("chilko_river_lava_canyon");
+    const FString NormalAtlasName = bUsesColoradoRiverLocalFlowNormal
+        ? TEXT("T_RaftSim_ColoradoHanceWaterV1_FlowNormal")
+        : (bUsesFutaleufuRiverLocalFlowNormal
+        ? TEXT("T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal")
+        : (bUsesChilkoRiverLocalFlowNormal
+        ? TEXT("T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal")
+        : FString::Printf(
+              TEXT("T_RaftSim_%s_NormalAtlas"),
+              *WaterNormalAssetName)));
+    const FString NormalAtlasObjectPath = bUsesColoradoRiverLocalFlowNormal
+        ? FString::Printf(
+              TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/%s.%s"),
+              *NormalAtlasName,
+              *NormalAtlasName)
+        : (bUsesFutaleufuRiverLocalFlowNormal
+        ? FString::Printf(
+              TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/%s.%s"),
+              *NormalAtlasName,
+              *NormalAtlasName)
+        : (bUsesChilkoRiverLocalFlowNormal
+        ? FString::Printf(
+              TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Textures/%s.%s"),
+              *NormalAtlasName,
+              *NormalAtlasName)
+        : FString::Printf(
+              TEXT("/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/%s.%s"),
+              *NormalAtlasName,
+              *NormalAtlasName)));
     UTexture2D* WaterNormalAtlas = LoadObject<UTexture2D>(nullptr, *NormalAtlasObjectPath);
     if (!WaterNormalAtlas)
     {
@@ -2545,6 +2888,23 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
 
     FRaftSimLandscapeCandidateWaterSettings Settings =
         GetLandscapeCandidateWaterSettings(Spec.RiverId);
+    if (bDisableSolverVisualizationFields &&
+        (Spec.RiverId == TEXT("colorado_river") ||
+         Spec.RiverId == TEXT("futaleufu_terminator") ||
+         Spec.RiverId == TEXT("chilko_river_lava_canyon") ||
+         IsZambeziUpperGorgeRiverId(Spec.RiverId)))
+    {
+        // Hance, Terminator, and Chilko each sample their packed field once
+        // while the CPU builds ribbon geometry and vertex colours. Do not
+        // re-sample the shared South Fork fallback over those local results.
+        Settings.SolverFieldEnable = 0.0f;
+        Settings.SolverMacroNormalWeight = 0.0f;
+        Settings.SolverDepthColorWeight = 0.0f;
+        Settings.SolverFieldRoughnessWeight = 0.0f;
+        Settings.SolverFroudeAerationWeight = 0.0f;
+        Settings.SolverSpeedVisualGain = 0.0f;
+        Settings.SolverFroudeVisualGain = 0.0f;
+    }
     if (bDisableSolverVisualizationFields && Spec.RiverId == TEXT("american_south_fork"))
     {
         Settings.BaseColorScale = 1.00f;
@@ -2564,6 +2924,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     }
     Instance->Modify();
     Instance->SetParentEditorOnly(Parent);
+    Instance->ClearParameterValuesEditorOnly();
     auto SetScalar = [Instance](const TCHAR* Name, float Value)
     {
         Instance->SetScalarParameterValueEditorOnly(FMaterialParameterInfo(Name), Value);
@@ -2579,6 +2940,23 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     SetScalar(TEXT("Roughness"), Settings.Roughness);
     SetScalar(TEXT("Specular"), Settings.Specular);
     SetScalar(TEXT("NormalIntensity"), Settings.NormalIntensity);
+    if (bUseSingleLayerWater || bUseIsolatedZambeziParent ||
+        bUsesChilkoRiverLocalFlowNormal)
+    {
+        SetScalar(
+            TEXT("SurfaceVariationStrength"),
+            Settings.SurfaceVariationStrength);
+    }
+    if (bUseSingleLayerWater || bUsesColoradoRiverLocalFlowNormal ||
+        bUsesFutaleufuRiverLocalFlowNormal || bUsesChilkoRiverLocalFlowNormal)
+    {
+        SetScalar(TEXT("Opacity"), Settings.Opacity);
+        SetScalar(TEXT("RefractionIor"), Settings.RefractionIor);
+        SetScalar(TEXT("PhaseG"), Settings.PhaseG);
+        SetVector(TEXT("ScatteringCoefficients"), Settings.ScatteringCoefficients);
+        SetVector(TEXT("AbsorptionCoefficients"), Settings.AbsorptionCoefficients);
+        SetVector(TEXT("ColorScaleBehindWater"), Settings.ColorScaleBehindWater);
+    }
     SetScalar(TEXT("SolverFieldEnable"), Settings.SolverFieldEnable);
     SetScalar(TEXT("SolverMacroNormalWeight"), Settings.SolverMacroNormalWeight);
     SetScalar(TEXT("SolverDepthColorWeight"), Settings.SolverDepthColorWeight);
@@ -2590,8 +2968,18 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     SetVector(TEXT("SolverDeepWaterTint"), Settings.SolverDeepWaterTint);
     SetVector(TEXT("SolverAerationTint"), Settings.SolverAerationTint);
     SetVector(TEXT("ReflectionTint"), Settings.ReflectionTint);
-    SetVector(TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
-    SetVector(TEXT("AtlasTileScale"), FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f));
+    SetVector(
+        TEXT("AtlasTileOrigin"),
+        (bUsesColoradoRiverLocalFlowNormal || bUsesFutaleufuRiverLocalFlowNormal ||
+         bUsesChilkoRiverLocalFlowNormal)
+            ? FLinearColor(0.0f, 0.0f, 0.0f, 0.0f)
+            : FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
+    SetVector(
+        TEXT("AtlasTileScale"),
+        (bUsesColoradoRiverLocalFlowNormal || bUsesFutaleufuRiverLocalFlowNormal ||
+         bUsesChilkoRiverLocalFlowNormal)
+            ? FLinearColor(1.0f, 1.0f, 0.0f, 0.0f)
+            : FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f));
     Instance->SetTextureParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("WaterNormalAtlas")),
         WaterNormalAtlas);
@@ -2620,11 +3008,52 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
     OutSummary += FString::Printf(
-        TEXT("Built %s opaque DefaultLit solver-surface water candidate (roughness %.3f, normal %.3f, solver field %.0f).\n"),
+        TEXT("Built %s %s %s solver-surface water candidate (roughness %.3f, opacity %.3f, normal %.3f, solver field %.0f).\n"),
         *Spec.RiverId,
+        (Spec.RiverId == TEXT("futaleufu_terminator") ||
+         Spec.RiverId == TEXT("colorado_river") ||
+         Spec.RiverId == TEXT("chilko_river_lava_canyon"))
+            ? TEXT("transmitting")
+            : TEXT("opaque"),
+        bUseSingleLayerWater ? TEXT("SingleLayerWater") : TEXT("DefaultLit"),
         Settings.Roughness,
+        bUseSingleLayerWater ? Settings.Opacity : 1.0f,
         Settings.NormalIntensity,
         Settings.SolverFieldEnable);
     return Instance;
 }
+
+static void HandleRefreshZambeziPhysicalCorridorWaterMaterial(
+    const TArray<FString>&)
+{
+    FString Summary;
+    bool bSucceeded = false;
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate :
+         GetLandscapeImportCandidateSpecs())
+    {
+        if (Candidate.PreviewSpec.RiverId != TEXT("zambezi_batoka_gorge"))
+        {
+            continue;
+        }
+        bSucceeded = LoadOrCreateLandscapeCandidateWaterMaterial(
+            Candidate.PreviewSpec,
+            Summary,
+            !Candidate.bUseSolverVisualizationFields) != nullptr;
+        break;
+    }
+    UE_LOG(
+        LogRaftSimEditorEnvironment,
+        Display,
+        TEXT("RaftSim.RefreshZambeziPhysicalCorridorWaterMaterial: "
+             "succeeded=%d\n%s"),
+        bSucceeded ? 1 : 0,
+        *Summary);
+}
+
+static FAutoConsoleCommand GRefreshZambeziPhysicalCorridorWaterMaterialCommand(
+    TEXT("RaftSim.RefreshZambeziPhysicalCorridorWaterMaterial"),
+    TEXT("Regenerate only the isolated Zambezi Single Layer Water parent and "
+         "physical-corridor instance; do not rebuild or save the map."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(
+        &HandleRefreshZambeziPhysicalCorridorWaterMaterial));
 } // namespace RaftSimEditorEnvironment

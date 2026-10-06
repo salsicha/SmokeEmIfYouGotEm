@@ -1,6 +1,8 @@
 #include "RaftSimSaveSubsystem.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "RaftSimVerticalSliceFrontend.h"
 
 namespace
@@ -28,7 +30,11 @@ void URaftSimSaveSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
 
-    if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+    // Automated gameplay must not load, normalize or score into a user's
+    // real profile. This opt-in session keeps normal save behavior unchanged.
+    const bool bEphemeral = FParse::Param(FCommandLine::Get(), TEXT("RaftSimEphemeralProfile"));
+    const bool bExistingSlot = !bEphemeral && UGameplayStatics::DoesSaveGameExist(SlotName, 0);
+    if (bExistingSlot)
     {
         CurrentSave = Cast<URaftSimVerticalSliceSaveGame>(
             UGameplayStatics::LoadGameFromSlot(SlotName, 0));
@@ -38,23 +44,37 @@ void URaftSimSaveSubsystem::Initialize(FSubsystemCollectionBase& Collection)
         CurrentSave = Cast<URaftSimVerticalSliceSaveGame>(
             UGameplayStatics::CreateSaveGameObject(URaftSimVerticalSliceSaveGame::StaticClass()));
     }
-    NormalizeSave(CurrentSave);
-    SaveCurrent();
+    bFreshProfileCreatedThisSession = !bExistingSlot && CurrentSave != nullptr;
+    bCurrentSaveWritable = NormalizeSave(CurrentSave);
+    FString TestScenario;
+    FRaftSimCareerScenarioDefinition Definition;
+    if (bEphemeral && bCurrentSaveWritable &&
+        FParse::Value(FCommandLine::Get(), TEXT("RaftSimScenario="), TestScenario) &&
+        URaftSimProgressionLibrary::FindScenario(FName(*TestScenario), Definition))
+    {
+        CurrentSave->Selection.ScenarioId = Definition.ScenarioId;
+        CurrentSave->ActiveGameMode = ERaftSimGameMode::FreeRun;
+    }
+    if (bCurrentSaveWritable)
+    {
+        SaveCurrent();
+    }
 }
 
 bool URaftSimSaveSubsystem::SaveCurrent()
 {
-    if (CurrentSave == nullptr)
+    if (CurrentSave == nullptr || !bCurrentSaveWritable)
     {
         return false;
     }
+    if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimEphemeralProfile"))) return true;
     return UGameplayStatics::SaveGameToSlot(CurrentSave, SlotName, 0);
 }
 
 void URaftSimSaveSubsystem::MarkScenarioCompleted(
     FName ScenarioId, float SafetyScore, float OverallScore)
 {
-    if (CurrentSave == nullptr)
+    if (CurrentSave == nullptr || !bCurrentSaveWritable)
     {
         return;
     }
@@ -83,11 +103,18 @@ FRaftSimScenarioProgress& URaftSimSaveSubsystem::FindOrAddProgress(
     return Progress;
 }
 
-void URaftSimSaveSubsystem::NormalizeSave(URaftSimVerticalSliceSaveGame* Save)
+bool URaftSimSaveSubsystem::NormalizeSave(URaftSimVerticalSliceSaveGame* Save)
 {
     if (Save == nullptr)
     {
-        return;
+        return false;
+    }
+    // Never downgrade or rewrite data authored by a newer schema. Unreal keeps
+    // unknown reflected fields only while that newer build owns the file, so
+    // saving it here could irreversibly discard progress.
+    if (Save->SaveVersion > CurrentSaveVersion)
+    {
+        return false;
     }
 
     // Version-zero saves only had CompletedScenarioIds and two global bests.
@@ -122,8 +149,17 @@ void URaftSimSaveSubsystem::NormalizeSave(URaftSimVerticalSliceSaveGame* Save)
     AddDefaultBinding(Save->InputBindings, TEXT("RescueThrowLine"), TEXT("R"));
     AddDefaultBinding(Save->InputBindings, TEXT("ReseatCrew"), TEXT("F"));
 
+    // Troublemaker is a rapid in South Fork, not a selectable scenario.
+    // Preserve historical scores, but never reuse its local rapid checkpoint
+    // as a full-river start or credit it as a completed South Fork descent.
+    if (Save->Selection.ScenarioId == TEXT("troublemaker_challenge"))
+    {
+        Save->Selection.ScenarioId = TEXT("south_fork_full_descent");
+    }
+
     Save->SaveVersion = CurrentSaveVersion;
     RecalculateLicenseAndUnlocks(Save);
+    return true;
 }
 
 void URaftSimSaveSubsystem::RecalculateLicenseAndUnlocks(URaftSimVerticalSliceSaveGame* Save)
@@ -147,15 +183,14 @@ void URaftSimSaveSubsystem::RecalculateLicenseAndUnlocks(URaftSimVerticalSliceSa
                 ? ERaftSimLicenseTier::TripLeader
                 : ERaftSimLicenseTier::Trainee;
 
-    Save->UnlockedScenarioIds.AddUnique(TEXT("training_eddy_basics"));
-    Save->UnlockedScenarioIds.AddUnique(TEXT("south_fork_upper"));
-    Save->UnlockedScenarioIds.AddUnique(TEXT("troublemaker_challenge"));
+    // Guide license is retained as career rank/progression feedback, but it no
+    // longer gates playable content. Every shipped scenario is available on a
+    // fresh or migrated profile; medals and XP describe accomplishment rather
+    // than withholding river access.
+    Save->UnlockedScenarioIds.Reset();
     for (const FRaftSimCareerScenarioDefinition& Scenario : URaftSimProgressionLibrary::GetScenarioCatalog())
     {
-        if (static_cast<int32>(Scenario.RequiredLicense) <= static_cast<int32>(Save->LicenseTier))
-        {
-            Save->UnlockedScenarioIds.AddUnique(Scenario.ScenarioId);
-        }
+        Save->UnlockedScenarioIds.AddUnique(Scenario.ScenarioId);
     }
 }
 
@@ -167,7 +202,8 @@ ERaftSimMedal URaftSimSaveSubsystem::ApplyRunResult(
         return ERaftSimMedal::None;
     }
     FRaftSimScenarioProgress& Progress = FindOrAddProgress(Save, Result.ScenarioId);
-    const bool bNewBestRoute = Result.OverallScore >= Progress.BestOverallScore;
+    EnsureProgressCoordinates(Save, Progress, Result.CoordinateMapPath);
+    const bool bNewBestRoute = Progress.BestGhostRoute.IsEmpty() || Result.OverallScore >= Progress.BestOverallScore;
     ++Progress.AttemptCount;
     Progress.FurthestStationM = FMath::Max(Progress.FurthestStationM, Result.FurthestStationM);
     Save->CareerStats.TotalRuns++;
@@ -212,7 +248,7 @@ ERaftSimMedal URaftSimSaveSubsystem::ApplyRunResult(
 
 bool URaftSimSaveSubsystem::BeginSession(ERaftSimGameMode GameMode, FName ScenarioId)
 {
-    if (CurrentSave == nullptr || !IsScenarioUnlocked(ScenarioId, GameMode))
+    if (CurrentSave == nullptr || !bCurrentSaveWritable || !IsScenarioUnlocked(ScenarioId, GameMode))
     {
         return false;
     }
@@ -228,6 +264,10 @@ bool URaftSimSaveSubsystem::BeginSession(ERaftSimGameMode GameMode, FName Scenar
 
 ERaftSimMedal URaftSimSaveSubsystem::RecordRunResult(const FRaftSimRunResult& Result)
 {
+    if (!bCurrentSaveWritable)
+    {
+        return ERaftSimMedal::None;
+    }
     const ERaftSimMedal Medal = ApplyRunResult(CurrentSave, Result);
     SaveCurrent();
     return Medal;
@@ -235,7 +275,7 @@ ERaftSimMedal URaftSimSaveSubsystem::RecordRunResult(const FRaftSimRunResult& Re
 
 void URaftSimSaveSubsystem::RecordTrainingDrillCompleted(FName DrillId)
 {
-    if (CurrentSave == nullptr || DrillId.IsNone())
+    if (CurrentSave == nullptr || !bCurrentSaveWritable || DrillId.IsNone())
     {
         return;
     }
@@ -245,13 +285,38 @@ void URaftSimSaveSubsystem::RecordTrainingDrillCompleted(FName DrillId)
 }
 
 void URaftSimSaveSubsystem::RecordCareerCheckpoint(
-    FName ScenarioId, FName SectionId, float StationM, FTransform Transform)
+    FName ScenarioId, FName SectionId, float StationM, FTransform Transform,
+    const FString& CoordinateMapPath)
 {
-    if (CurrentSave == nullptr || ScenarioId.IsNone() || !Transform.IsValid())
+    if (bCurrentSaveWritable && ApplyCareerCheckpoint(CurrentSave,ScenarioId,SectionId,StationM,Transform,CoordinateMapPath))
     {
-        return;
+        SaveCurrent();
     }
-    FRaftSimScenarioProgress& Progress = FindOrAddProgress(CurrentSave, ScenarioId);
+}
+
+void URaftSimSaveSubsystem::EnsureProgressCoordinates(URaftSimVerticalSliceSaveGame* Save,
+    FRaftSimScenarioProgress& Progress, const FString& CoordinateMapPath)
+{
+    if (Progress.CoordinateMapPath == CoordinateMapPath) return;
+    // Keep the full historical record, including scores/medals and the exact
+    // old checkpoint/ghost, before starting coordinates in the new frame.
+    if (Progress.bHasCheckpoint || !Progress.BestGhostRoute.IsEmpty() || Progress.FurthestStationM != 0.f)
+        Save->HistoricalRouteProgress.Add(Progress);
+    Progress.CoordinateMapPath = CoordinateMapPath;
+    Progress.FurthestStationM = 0.f;
+    Progress.CheckpointTransform = FTransform::Identity;
+    Progress.bHasCheckpoint = false;
+    Progress.BestGhostRoute.Reset();
+    Progress.BestTimeSeconds = 0.f; // Times on different route geometries are not comparable.
+}
+
+bool URaftSimSaveSubsystem::ApplyCareerCheckpoint(URaftSimVerticalSliceSaveGame* Save,
+    FName ScenarioId, FName SectionId, float StationM, const FTransform& Transform,
+    const FString& CoordinateMapPath)
+{
+    if (!Save || ScenarioId.IsNone() || !Transform.IsValid() || !FMath::IsFinite(StationM)) return false;
+    FRaftSimScenarioProgress& Progress = FindOrAddProgress(Save, ScenarioId);
+    EnsureProgressCoordinates(Save,Progress,CoordinateMapPath);
     if (!Progress.bHasCheckpoint || StationM >= Progress.FurthestStationM)
     {
         Progress.FurthestStationM = StationM;
@@ -260,9 +325,9 @@ void URaftSimSaveSubsystem::RecordCareerCheckpoint(
     }
     if (!SectionId.IsNone())
     {
-        CurrentSave->CompletedCareerSectionIds.AddUnique(SectionId);
+        Save->CompletedCareerSectionIds.AddUnique(SectionId);
     }
-    SaveCurrent();
+    return true;
 }
 
 bool URaftSimSaveSubsystem::IsScenarioUnlocked(FName ScenarioId, ERaftSimGameMode GameMode) const
@@ -270,10 +335,6 @@ bool URaftSimSaveSubsystem::IsScenarioUnlocked(FName ScenarioId, ERaftSimGameMod
     if (CurrentSave == nullptr)
     {
         return false;
-    }
-    if (GameMode == ERaftSimGameMode::FreeRun)
-    {
-        return true;
     }
     FRaftSimCareerScenarioDefinition Scenario;
     if (!URaftSimProgressionLibrary::FindScenario(ScenarioId, Scenario))
@@ -284,7 +345,9 @@ bool URaftSimSaveSubsystem::IsScenarioUnlocked(FName ScenarioId, ERaftSimGameMod
     {
         return Scenario.bTraining;
     }
-    return CurrentSave->UnlockedScenarioIds.Contains(ScenarioId);
+    // Guided Descent and Free Run expose every valid catalog entry. License
+    // tier remains a visible career rank only and never disables Start.
+    return true;
 }
 
 bool URaftSimSaveSubsystem::GetScenarioProgress(
@@ -306,16 +369,34 @@ bool URaftSimSaveSubsystem::GetScenarioProgress(
 }
 
 bool URaftSimSaveSubsystem::FindBestCheckpoint(
-    float MinimumStationM, FTransform& OutTransform) const
+    float MinimumStationM, FTransform& OutTransform, float MaximumStationM,
+    const FString& CoordinateMapPath, FName LevelName) const
 {
-    if (CurrentSave == nullptr)
+    return SelectCheckpoint(CurrentSave,MinimumStationM,MaximumStationM,CoordinateMapPath,LevelName,OutTransform);
+}
+
+bool URaftSimSaveSubsystem::SelectCheckpoint(const URaftSimVerticalSliceSaveGame* Save,
+    float MinimumStationM, float MaximumStationM, const FString& CoordinateMapPath,
+    FName LevelName, FTransform& OutTransform)
+{
+    if (Save == nullptr)
     {
         return false;
     }
     const FRaftSimScenarioProgress* Best = nullptr;
-    for (const FRaftSimScenarioProgress& Progress : CurrentSave->ScenarioProgress)
+    for (const FRaftSimScenarioProgress& Progress : Save->ScenarioProgress)
     {
+        // Its -60..110 m local survey frame overlaps the South Fork put-in
+        // search range numerically, but is not a full-river checkpoint.
+        if (Progress.ScenarioId == TEXT("troublemaker_challenge")) continue;
+        if (Progress.CoordinateMapPath != CoordinateMapPath) continue;
+        if (!LevelName.IsNone())
+        {
+            FRaftSimCareerScenarioDefinition Scenario;
+            if (!URaftSimProgressionLibrary::FindScenario(Progress.ScenarioId,Scenario) || Scenario.LevelName != LevelName) continue;
+        }
         if (Progress.bHasCheckpoint && Progress.FurthestStationM >= MinimumStationM &&
+            Progress.FurthestStationM <= MaximumStationM &&
             (Best == nullptr || Progress.FurthestStationM < Best->FurthestStationM))
         {
             Best = &Progress;
@@ -331,7 +412,7 @@ bool URaftSimSaveSubsystem::FindBestCheckpoint(
 
 void URaftSimSaveSubsystem::RestoreDefaultSettings()
 {
-    if (CurrentSave == nullptr)
+    if (CurrentSave == nullptr || !bCurrentSaveWritable)
     {
         return;
     }
@@ -342,7 +423,7 @@ void URaftSimSaveSubsystem::RestoreDefaultSettings()
 
 bool URaftSimSaveSubsystem::RebindAction(FName ActionId, FName KeyName)
 {
-    if (CurrentSave == nullptr || ActionId.IsNone() || KeyName.IsNone())
+    if (CurrentSave == nullptr || !bCurrentSaveWritable || ActionId.IsNone() || KeyName.IsNone())
     {
         return false;
     }

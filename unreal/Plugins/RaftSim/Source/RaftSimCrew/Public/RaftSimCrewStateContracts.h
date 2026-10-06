@@ -313,6 +313,12 @@ struct FRaftSimRescueInteractionState
 {
     GENERATED_BODY()
 
+    // A cast has a fixed landing point, not a homing endpoint.
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Rescue")
+    FVector ThrowOriginMeters = FVector::ZeroVector;
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Rescue")
+    FVector ThrowLandingMeters = FVector::ZeroVector;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
     ERaftSimRescueInteractionPhase Phase = ERaftSimRescueInteractionPhase::Idle;
 

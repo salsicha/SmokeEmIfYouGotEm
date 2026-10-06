@@ -376,6 +376,8 @@ FRaftSimRescueInteractionState URaftSimSwimmerRescueLibrary::BeginRescueInteract
     State.Method = Method;
     State.LineStartWorldMeters = LineStartWorldMeters;
     State.LineEndWorldMeters = TargetWorldMeters;
+    State.ThrowOriginMeters = LineStartWorldMeters;
+    State.ThrowLandingMeters = TargetWorldMeters;
     const FVector ToTarget = TargetWorldMeters - LineStartWorldMeters;
     State.DistanceMeters = ToTarget.Size();
     const FVector SafeAim = AimDirection.GetSafeNormal();
@@ -410,6 +412,15 @@ FRaftSimRescueInteractionState URaftSimSwimmerRescueLibrary::BeginRescueInteract
             ? ERaftSimRescueInteractionPhase::LineInFlight
             : ERaftSimRescueInteractionPhase::Pulling;
         State.bLineVisible = Method == ERaftSimRescueMethod::ThrowLine;
+        if (State.bLineVisible)
+        {
+            State.LineEndWorldMeters = LineStartWorldMeters;
+            // Throw past the swimmer, not at them: the bag carries on beyond
+            // so the rope itself lands across their chest within reach.
+            const FVector Flat(ToTarget.X, ToTarget.Y, 0.0);
+            State.ThrowLandingMeters = TargetWorldMeters +
+                Flat.GetSafeNormal() * FMath::Min(1.0, 0.2 * Flat.Size());
+        }
         State.FeedbackCode = Method == ERaftSimRescueMethod::ThrowLine
             ? FName(TEXT("rescue_line_thrown"))
             : FName(TEXT("rescue_contact"));
@@ -434,16 +445,34 @@ FRaftSimRescueInteractionState URaftSimSwimmerRescueLibrary::AdvanceRescueIntera
     if (State.Phase == ERaftSimRescueInteractionPhase::LineInFlight)
     {
         State.bLineVisible = true;
+        const float T = FMath::Clamp(State.PhaseElapsedSeconds / .45f, 0.f, 1.f);
+        State.LineEndWorldMeters = FMath::Lerp(State.ThrowOriginMeters, State.ThrowLandingMeters, T)
+            + FVector(0, 0, 4.f * T * (1.f-T));
         if (State.PhaseElapsedSeconds >= 0.45f)
         {
-            State.Phase = ERaftSimRescueInteractionPhase::Pulling;
+            // The swimmer grabs the floating rope, which lies from the
+            // thrower's hand to the bag; a bag landing well short or wide misses.
+            const auto Flat = [](const FVector& P) { return FVector(P.X, P.Y, 0.0); };
+            const FVector Closest = FMath::ClosestPointOnSegment(Flat(TargetWorldMeters),
+                Flat(State.ThrowOriginMeters), Flat(State.ThrowLandingMeters));
+            const bool bCaught = FVector::Dist2D(TargetWorldMeters, Closest) <= 1.5f;
+            State.Phase = bCaught ? ERaftSimRescueInteractionPhase::Pulling : ERaftSimRescueInteractionPhase::Failed;
             State.PhaseElapsedSeconds = 0.0f;
-            State.FeedbackCode = TEXT("rescue_line_connected");
+            State.FeedbackCode = bCaught ? TEXT("rescue_line_connected") : TEXT("rescue_cast_missed_retry");
+            State.bLineVisible = bCaught;
         }
         return State;
     }
     if (State.Phase != ERaftSimRescueInteractionPhase::Pulling)
     {
+        return State;
+    }
+
+    if (State.Method == ERaftSimRescueMethod::ThrowLine && State.DistanceMeters > 9.f)
+    {
+        State.Phase = ERaftSimRescueInteractionPhase::Failed;
+        State.FeedbackCode = TEXT("rescue_line_out_of_reach_retry");
+        State.bLineVisible = false;
         return State;
     }
 

@@ -1,4 +1,6 @@
 #include "RaftSimTrainingDirector.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+CSV_DEFINE_CATEGORY(RaftSimTickTraining,true);
 
 #include "EngineUtils.h"
 #include "RaftSimRaftActor.h"
@@ -54,7 +56,7 @@ FText ARaftSimTrainingDirector::GetCurrentPrompt() const
         case 0:
             return NSLOCTEXT("RaftSim", "TrainingCalls", "Paddle once, call ALL FORWARD, then STOP. Use the command wheel or hotkeys.");
         case 1:
-            return NSLOCTEXT("RaftSim", "TrainingScout", "Open the scout board, issue a LEFT/RIGHT turn, then high-side with Space / gamepad shoulder.");
+            return NSLOCTEXT("RaftSim", "TrainingScout", "Open the scout board, issue a LEFT/RIGHT turn, then high-side with Space / X (Square). Crew calls: Tab / View (Select).");
         default:
             return NSLOCTEXT("RaftSim", "TrainingRescue", "Recover the swimmer: select, reach or throw, pull to the tube, then reseat.");
     }
@@ -104,6 +106,7 @@ void ARaftSimTrainingDirector::NotifyScoutReviewed()
 
 void ARaftSimTrainingDirector::Tick(float DeltaSeconds)
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimTickTraining,Tick);
     Super::Tick(DeltaSeconds);
     if (Raft == nullptr)
     {

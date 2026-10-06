@@ -28,14 +28,21 @@ SIMULATOR_RUNS_RELATIVE_PATH = (
 
 MILES_TO_METERS = 1609.344
 FLOW_BANDS = ("low_review", "reference_review", "high_review")
+# Rivers rowed by one person on an oar rig rather than a guided paddle crew
+# (docs/oar-rig-reference.md): no voice paddle commands.
+OAR_RIG_RIVERS = {
+    "colorado_river_grand_canyon_rowing",
+    "zambezi_batoka_gorge",
+}
 RUNNABLE_RIVERS = {
     "south_fork_american_chili_bar",
     "colorado_river_grand_canyon_rowing",
     "pacuare_river_costa_rica",
     "futaleufu_river_chile",
     "chilko_river_lava_canyon",
+    "zambezi_batoka_gorge",
 }
-ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS = {"zambezi_batoka_gorge"}
+ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS: set[str] = set()
 REQUIRED_RIVERS = RUNNABLE_RIVERS | ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS
 NAMED_RAPID_SUBFEATURE_TYPES = (
     "hole",
@@ -319,7 +326,11 @@ def _normalised_feature_inventory(
     ]
 
 
-def _station_record(river: dict[str, Any], rapid: dict[str, Any]) -> dict[str, Any]:
+def _station_record(
+    river: dict[str, Any],
+    rapid: dict[str, Any],
+    repo_root: Path,
+) -> dict[str, Any]:
     if "river_mile" in rapid:
         station_m = float(rapid["river_mile"]) * MILES_TO_METERS
         return {
@@ -336,6 +347,73 @@ def _station_record(river: dict[str, Any], rapid: dict[str, Any]) -> dict[str, A
             "published_value": rapid["river_km"],
             "published_unit": "river_kilometer",
             "production_authoritative": True,
+        }
+
+    observed_stationing_source = river.get("observed_stationing_source")
+    if observed_stationing_source:
+        source_path = repo_root / observed_stationing_source["path"]
+        payload = json.loads(source_path.read_text(encoding="utf-8"))
+        expected_schema = observed_stationing_source.get("schema")
+        if expected_schema and payload.get("schema") != expected_schema:
+            raise ValueError(
+                f"Unexpected observed stationing schema for {river['river_id']}: "
+                f"{payload.get('schema')}"
+            )
+        rapid_number = str(rapid.get("rapid_number", ""))
+        observed = next(
+            (
+                candidate
+                for candidate in payload.get("rapid_stations", [])
+                if str(candidate.get("rapid_number")) == rapid_number
+            ),
+            None,
+        )
+        if observed is None:
+            raise ValueError(
+                f"Observed stationing is missing rapid {rapid_number} for {river['river_id']}"
+            )
+        return {
+            "station_m": round(float(observed["control_station_m"]), 3),
+            "station_kind": "observed_whitewater_landmarks_and_outfitter_km",
+            "published_value": observed["span_m"],
+            "published_unit": "observed_span_route_station_m",
+            "confidence": observed["confidence"],
+            "source_path": observed_stationing_source["path"],
+            "source_status": observed_stationing_source["status"],
+            "production_authoritative": False,
+        }
+
+    map_stationing_source = river.get("map_stationing_source")
+    if map_stationing_source:
+        source_path = repo_root / map_stationing_source["path"]
+        payload = json.loads(source_path.read_text(encoding="utf-8"))
+        expected_schema = map_stationing_source.get("schema")
+        if expected_schema and payload.get("schema") != expected_schema:
+            raise ValueError(
+                f"Unexpected map stationing schema for {river['river_id']}: "
+                f"{payload.get('schema')}"
+            )
+        rapid_number = str(rapid.get("rapid_number", ""))
+        digitized = next(
+            (
+                candidate
+                for candidate in payload.get("rapids", [])
+                if str(candidate.get("rapid_number")) == rapid_number
+            ),
+            None,
+        )
+        if digitized is None:
+            raise ValueError(
+                f"Map stationing is missing rapid {rapid_number} for {river['river_id']}"
+            )
+        return {
+            "station_m": round(float(digitized["station_m"]), 3),
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "published_value": digitized["map_relative_station_fraction"],
+            "published_unit": "illustrative_map_fraction",
+            "source_path": map_stationing_source["path"],
+            "source_status": map_stationing_source["status"],
+            "production_authoritative": False,
         }
 
     rapids = river["rapids"]
@@ -474,7 +552,7 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
         markers = []
         for rapid in river["rapids"]:
             feature_id = rapid_feature_id(river["river_id"], rapid["name"])
-            station = _station_record(river, rapid)
+            station = _station_record(river, rapid, repo_root)
             map_geometry = _project_station_to_candidate_geometry(
                 repo_root,
                 river,
@@ -530,18 +608,19 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
                     ),
                 }
             )
-        rivers.append(
-            {
-                "river_id": river["river_id"],
-                "portfolio_role": river["portfolio_role"],
-                "display_name": river["display_name"],
-                "run_length_m": river["run_length_m"],
-                "stationing_authority": river["stationing_authority"],
-                "source_refs": [source_lookup[source_id] for source_id in river["source_ids"]],
-                "marker_count": len(markers),
-                "markers": markers,
-            }
-        )
+        river_record = {
+            "river_id": river["river_id"],
+            "portfolio_role": river["portfolio_role"],
+            "display_name": river["display_name"],
+            "run_length_m": river["run_length_m"],
+            "stationing_authority": river["stationing_authority"],
+            "source_refs": [source_lookup[source_id] for source_id in river["source_ids"]],
+            "marker_count": len(markers),
+            "markers": markers,
+        }
+        if river.get("local_reference_sources"):
+            river_record["local_reference_sources"] = river["local_reference_sources"]
+        rivers.append(river_record)
     return {
         "schema": "raftsim.unreal.named_rapid_editor_markers.v1",
         "status": "editor_review_markers_ready_exact_geometry_and_guide_review_required",
@@ -648,7 +727,7 @@ def _line_definitions(marker: dict[str, Any]) -> list[dict[str, Any]]:
 def build_simulator_review_runs(editor_markers: dict[str, Any]) -> dict[str, Any]:
     runs: list[dict[str, Any]] = []
     for river in editor_markers["rivers"]:
-        control_mode = "manual_oar_rig" if river["river_id"] == "colorado_river_grand_canyon_rowing" else "guided_paddle_crew"
+        control_mode = "manual_oar_rig" if river["river_id"] in OAR_RIG_RIVERS else "guided_paddle_crew"
         voice_commands = control_mode == "guided_paddle_crew"
         for marker in river["markers"]:
             for flow_band in FLOW_BANDS:

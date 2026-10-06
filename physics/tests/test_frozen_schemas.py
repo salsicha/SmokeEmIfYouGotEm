@@ -83,7 +83,7 @@ def test_frozen_source_manifest_schema_uses_source_manifest_version():
 def test_frozen_analytic_fixture_manifest_schema_uses_fixture_manifest_version():
     schema = _load_schema("analytic_fixture_manifest.schema.json")
     example = json.loads(
-        (Path(__file__).resolve().parents[1] / "data" / "validation" / "milestone17" / "analytic_fixture_manifest.example.json").read_text(
+        (CORE_CONFIG.parents[1] / "data" / "validation" / "milestone17" / "analytic_fixture_manifest.example.json").read_text(
             encoding="utf-8"
         )
     )
@@ -107,7 +107,7 @@ def test_frozen_analytic_fixture_manifest_schema_uses_fixture_manifest_version()
 
 def test_frozen_feature_forcing_schema_uses_feature_forcing_version():
     schema = _load_schema("feature_forcing.schema.json")
-    manifest = json.loads((Path(__file__).resolve().parents[1] / "config" / "feature_forcing_defaults.json").read_text(encoding="utf-8"))
+    manifest = json.loads((CORE_CONFIG / "feature_forcing_defaults.json").read_text(encoding="utf-8"))
 
     assert schema["properties"]["schema_version"]["const"] == FEATURE_FORCING_SCHEMA_VERSION
     assert schema["properties"]["defaults"]["properties"]["tuning_surface_exposed"]["const"] is True
@@ -121,7 +121,7 @@ def test_frozen_milestone17_contract_schemas_use_versions():
     reach = _load_schema("reach_local_grid.schema.json")
     annotations = _load_schema("river_validation_annotation.schema.json")
     geospatial = _load_schema("geospatial_format_contract.schema.json")
-    config_dir = Path(__file__).resolve().parents[1] / "config"
+    config_dir = CORE_CONFIG
 
     assert reach["properties"]["schema_version"]["const"] == REACH_LOCAL_GRID_SCHEMA_VERSION
     assert annotations["properties"]["schema_version"]["const"] == RIVER_VALIDATION_ANNOTATION_SCHEMA_VERSION
@@ -129,6 +129,10 @@ def test_frozen_milestone17_contract_schemas_use_versions():
     assert json.loads((config_dir / "reach_local_grid_contract.json").read_text(encoding="utf-8"))["schema_version"] == REACH_LOCAL_GRID_SCHEMA_VERSION
     assert json.loads((config_dir / "river_validation_annotations.example.geojson").read_text(encoding="utf-8"))["schema_version"] == RIVER_VALIDATION_ANNOTATION_SCHEMA_VERSION
     assert json.loads((config_dir / "geospatial_format_contract.json").read_text(encoding="utf-8"))["schema_version"] == GEOSPATIAL_FORMAT_CONTRACT_SCHEMA_VERSION
+
+
+# Water-solver contracts live in the SEIYGE core submodule.
+CORE_CONFIG = Path(__file__).resolve().parents[2] / "unreal" / "Plugins" / "SEIYGECore" / "python" / "config"
 
 
 def _load_schema(name: str) -> dict[str, object]:

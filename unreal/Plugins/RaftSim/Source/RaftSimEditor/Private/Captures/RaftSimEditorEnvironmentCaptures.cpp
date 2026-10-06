@@ -11,8 +11,10 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
     const FRaftSimPhotographicCaptureSettings CaptureSettings =
         GetPhotographicCaptureSettings(Spec.RiverId);
 
+    const float GuideSeatPitch = Spec.RiverId == TEXT("pacuare") ? -5.5f : -13.5f;
+    const float GuideSeatHeight = Spec.RiverId == TEXT("pacuare") ? 165.0f : 140.0f;
     ACameraActor* Camera = Cast<ACameraActor>(
-        GEditor->AddActor(World->GetCurrentLevel(), ACameraActor::StaticClass(), FTransform(FRotator(-13.5f, 0.0f, 0.0f), FVector(-5250.0f, GetPreviewRiverCenterY(Spec, -5250.0f), 140.0f))));
+        GEditor->AddActor(World->GetCurrentLevel(), ACameraActor::StaticClass(), FTransform(FRotator(GuideSeatPitch, 0.0f, 0.0f), FVector(-5250.0f, GetPreviewRiverCenterY(Spec, -5250.0f), GuideSeatHeight))));
     if (Camera)
     {
         Camera->SetActorLabel(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"));
@@ -67,11 +69,18 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
             World->GetCurrentLevel(),
             ACameraActor::StaticClass(),
             FTransform(
-                FRotator(Spec.bDesertCanyon ? -10.5f : -12.75f, RiverEyeCenterlineFollowingYawDeg, 0.0f),
+                FRotator(
+                    Spec.bDesertCanyon
+                        ? -10.5f
+                        : (Spec.RiverId == TEXT("pacuare") ? -5.0f : -12.75f),
+                    RiverEyeCenterlineFollowingYawDeg,
+                    0.0f),
                 FVector(
                     RiverEyeCameraX,
                     RiverEyeCameraY,
-                    Spec.bDesertCanyon ? 152.0f : 162.0f))));
+                    Spec.bDesertCanyon
+                        ? 152.0f
+                        : (Spec.RiverId == TEXT("pacuare") ? 175.0f : 162.0f)))));
     if (RiverEyeCamera)
     {
         RiverEyeCamera->SetActorLabel(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"));
@@ -86,10 +95,21 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
         }
     }
 
-    if (Spec.RiverId == TEXT("american_south_fork"))
+    // Every physical runnable river owns a distinct solver-rapid review
+    // camera. The source-Landscape builder repositions this provisional actor
+    // onto the river-local hydraulic evidence after the centerline loads. The
+    // old South-Fork-only condition left Hance and the other bonus rivers with
+    // no rapid camera, so capture fell back to a duplicate guide/river-eye
+    // frame and could not prove the named rapid was visible.
     {
-        constexpr float SolverRapidCameraX = 240.0f;
-        constexpr float SolverRapidTargetX = 4740.0f;
+        const bool bSouthForkSolverRapidCamera =
+            Spec.RiverId == TEXT("american_south_fork");
+        const float SolverRapidCameraX = bSouthForkSolverRapidCamera
+            ? 240.0f
+            : RiverEyeCameraX + 900.0f;
+        const float SolverRapidTargetX = bSouthForkSolverRapidCamera
+            ? 4740.0f
+            : RiverEyeTargetX + 900.0f;
         const float SolverRapidCameraY = GetPreviewRiverCenterY(Spec, SolverRapidCameraX);
         const float SolverRapidTargetY = GetPreviewRiverCenterY(Spec, SolverRapidTargetX);
         const float SolverRapidYawDeg = FMath::RadiansToDegrees(
@@ -101,12 +121,19 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
                 World->GetCurrentLevel(),
                 ACameraActor::StaticClass(),
                 FTransform(
-                    FRotator(-9.5f, SolverRapidYawDeg, 0.0f),
-                    FVector(SolverRapidCameraX, SolverRapidCameraY, 168.0f))));
+                    FRotator(
+                        Spec.bDesertCanyon ? -8.5f : -9.5f,
+                        SolverRapidYawDeg,
+                        0.0f),
+                    FVector(
+                        SolverRapidCameraX,
+                        SolverRapidCameraY,
+                        Spec.bDesertCanyon ? 185.0f : 168.0f))));
         if (SolverRapidCamera)
         {
             SolverRapidCamera->SetActorLabel(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"));
-            SolverRapidCamera->GetCameraComponent()->FieldOfView = 70.0f;
+            SolverRapidCamera->GetCameraComponent()->FieldOfView =
+                Spec.bDesertCanyon ? 64.0f : 70.0f;
             if (RiverEyeCamera && RiverEyeCamera->GetCameraComponent())
             {
                 SolverRapidCamera->GetCameraComponent()->PostProcessSettings =
@@ -454,7 +481,7 @@ bool CapturePreviewImageForSpec(
                 {
                     CaptureComponent->HideComponent(PrimitiveComponent);
                     HiddenState.ComponentStates.Add(
-                        {PrimitiveComponent, PrimitiveComponent->IsVisible(), PrimitiveComponent->bHiddenInGame});
+                        {PrimitiveComponent, PrimitiveComponent->IsVisible(), PrimitiveComponent->bHiddenInGame != 0});
                     PrimitiveComponent->SetVisibility(false, true);
                     PrimitiveComponent->SetHiddenInGame(true, true);
                     ++CulledReviewOnlyForegroundComponentCount;
@@ -479,6 +506,80 @@ bool CapturePreviewImageForSpec(
             CulledReviewOnlyForegroundComponentCount,
             *Spec.RiverId);
     }
+    struct FCaptureOnlyWaterVisibilityState
+    {
+        AActor* Actor = nullptr;
+        bool bWasHiddenInGame = false;
+        bool bWasTemporarilyHiddenInEditor = false;
+        TArray<FForegroundRaftProxyHiddenState::FComponentHiddenState> ComponentStates;
+    };
+    TArray<FCaptureOnlyWaterVisibilityState> CaptureOnlyWaterVisibilityStates;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor ||
+            !Actor->Tags.Contains(TEXT("RaftSimCaptureOnlyStaticWater")))
+        {
+            continue;
+        }
+        FCaptureOnlyWaterVisibilityState State;
+        State.Actor = Actor;
+        State.bWasHiddenInGame = Actor->IsHidden();
+        State.bWasTemporarilyHiddenInEditor =
+            Actor->IsTemporarilyHiddenInEditor(false);
+        TArray<UPrimitiveComponent*> PrimitiveComponents;
+        Actor->GetComponents<UPrimitiveComponent>(PrimitiveComponents);
+        for (UPrimitiveComponent* PrimitiveComponent : PrimitiveComponents)
+        {
+            if (!PrimitiveComponent)
+            {
+                continue;
+            }
+            State.ComponentStates.Add(
+                {PrimitiveComponent,
+                 PrimitiveComponent->IsVisible(),
+                 PrimitiveComponent->bHiddenInGame != 0});
+            PrimitiveComponent->SetVisibility(true, true);
+            PrimitiveComponent->SetHiddenInGame(false, true);
+        }
+        Actor->SetActorHiddenInGame(false);
+        Actor->SetIsTemporarilyHiddenInEditor(false);
+        CaptureOnlyWaterVisibilityStates.Add(MoveTemp(State));
+    }
+    auto RestoreCaptureOnlyWaterVisibility = [&CaptureOnlyWaterVisibilityStates]()
+    {
+        for (const FCaptureOnlyWaterVisibilityState& State :
+             CaptureOnlyWaterVisibilityStates)
+        {
+            if (State.Actor)
+            {
+                State.Actor->SetActorHiddenInGame(State.bWasHiddenInGame);
+                State.Actor->SetIsTemporarilyHiddenInEditor(
+                    State.bWasTemporarilyHiddenInEditor);
+            }
+            for (const FForegroundRaftProxyHiddenState::FComponentHiddenState&
+                     ComponentState : State.ComponentStates)
+            {
+                if (!ComponentState.Component)
+                {
+                    continue;
+                }
+                ComponentState.Component->SetVisibility(
+                    ComponentState.bWasVisible,
+                    true);
+                ComponentState.Component->SetHiddenInGame(
+                    ComponentState.bWasHiddenInGame,
+                    true);
+            }
+        }
+    };
+    if (!CaptureOnlyWaterVisibilityStates.IsEmpty())
+    {
+        OutSummary += FString::Printf(
+            TEXT("Temporarily revealed %d capture-only water actors for %s evidence.\n"),
+            CaptureOnlyWaterVisibilityStates.Num(),
+            *Spec.RiverId);
+    }
     const bool bUseTemporaryRiverEyeCenterArtifactCover = false;
     AActor* RiverEyeCenterArtifactCoverActor = bHideForegroundRaftProxies && bUseTemporaryRiverEyeCenterArtifactCover
         ? AddPreviewRiverEyeCenterArtifactCover(World, Spec)
@@ -491,8 +592,40 @@ bool CapturePreviewImageForSpec(
             RiverEyeCenterArtifactCoverActor = nullptr;
         }
     };
-    CaptureComponent->CaptureScene();
-    FlushRenderingCommands();
+    // Persisted scene-capture state needs several rendered frames for TSR
+    // and Lumen history to converge — the settled South Fork capture path
+    // already does this; without it a fresh offscreen session (first seen on
+    // the Linux review machine) reads as an unlit pre-dawn scene. Evidence
+    // only; no actor, package, material, or gameplay authority is written.
+    constexpr int32 CandidateSettleFrameCount = 12;
+    for (int32 SettleFrameIndex = 0;
+         SettleFrameIndex < CandidateSettleFrameCount;
+         ++SettleFrameIndex)
+    {
+        CaptureComponent->CaptureScene();
+        FlushRenderingCommands();
+        FPlatformProcess::Sleep(0.016f);
+    }
+    // The rig recaptures the SkyLight cubemap at build time, which snapshots
+    // an unrendered (black) sky in a fresh headless session — the scene's
+    // ambient design leans on that cubemap, so the saved captures read as
+    // unlit silhouettes (first seen on the Linux review machine; interactive
+    // Mac sessions repopulated it implicitly via viewport redraws).
+    // Recapture after the settle frames, then let the refreshed ambient
+    // propagate into the persisted capture history.
+    for (TActorIterator<ASkyLight> SkyIt(World); SkyIt; ++SkyIt)
+    {
+        if (SkyIt->GetLightComponent())
+        {
+            SkyIt->GetLightComponent()->RecaptureSky();
+        }
+    }
+    for (int32 AmbientFrameIndex = 0; AmbientFrameIndex < 6; ++AmbientFrameIndex)
+    {
+        CaptureComponent->CaptureScene();
+        FlushRenderingCommands();
+        FPlatformProcess::Sleep(0.016f);
+    }
     FAssetCompilingManager::Get().FinishAllCompilation();
     if (GShaderCompilingManager)
     {
@@ -518,6 +651,7 @@ bool CapturePreviewImageForSpec(
         ImageData.Num() != CaptureWidth * CaptureHeight)
     {
         DestroyRiverEyeCenterArtifactCover();
+        RestoreCaptureOnlyWaterVisibility();
         RestoreForegroundRaftProxyVisibility();
         SceneCapture->Destroy();
         RenderTarget->ReleaseResource();
@@ -575,6 +709,7 @@ bool CapturePreviewImageForSpec(
     const bool bSaved = FFileHelper::SaveArrayToFile(CompressedPng, *AbsoluteCapturePath);
 
     DestroyRiverEyeCenterArtifactCover();
+    RestoreCaptureOnlyWaterVisibility();
     RestoreForegroundRaftProxyVisibility();
     SceneCapture->Destroy();
     RenderTarget->ReleaseResource();

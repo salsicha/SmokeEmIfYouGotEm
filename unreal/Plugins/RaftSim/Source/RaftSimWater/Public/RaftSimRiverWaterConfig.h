@@ -5,6 +5,9 @@
 
 #include "RaftSimRiverWaterConfig.generated.h"
 
+class UMaterialInterface;
+class UTexture2D;
+
 /**
  * Placed in a river map to tell the water runtime to load a cooked steady-state
  * flow window (raftsim.cooked_flow_fields.v1) instead of the dev flat tank. The
@@ -17,6 +20,9 @@ class RAFTSIMWATER_API ARaftSimRiverWaterConfig : public AActor
 
 public:
     ARaftSimRiverWaterConfig();
+
+    virtual void BeginPlay() override;
+    virtual void Tick(float DeltaSeconds) override;
 
     /** Repo-relative directory of the cooked_flow_fields manifest. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water")
@@ -35,6 +41,12 @@ public:
     /** Window extent in meters (square). */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water")
     float WindowExtentM = 600.0f;
+
+    /** Legacy named-rapid windows place their strongest hydraulic at local
+     * origin. Full-corridor maps with a station/lateral coordinate map must
+     * disable this so cooked cells retain their global river stations. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water")
+    bool bRecenterHydraulicCrux = true;
 
     /** Optional dense station/lateral-to-curved-world coordinate map. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming")
@@ -57,7 +69,308 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming", meta = (ClampMin = "8.0"))
     float MovingWindowAdvanceM = 80.0f;
 
+    /** Curved-map live presentation strip across the channel, metres; 0 keeps
+     * the surface actor default (96 m). Geographic reaches whose wetted width
+     * or centreline offset exceeds +-48 m need the full cooked lateral span. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "0.0"))
+    float LivePresentationWidthM = 0.0f;
+
+    /** Curved-map live presentation strip along the river, metres; 0 keeps
+     * the surface actor default (240 m). */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "0.0"))
+    float LivePresentationLengthM = 0.0f;
+
+    /** Curved maps: draw the cooked presentation baseline (support_band_field_<band>.bin)
+     * as render-only water along the whole reach outside the live strip. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableCookedFarFieldWater = false;
+
+    /** Froude number where the generic rough-surface aeration starts (0.78 by
+     * default). A map may calibrate it against measured whitewater coverage
+     * at its cooked flow; it changes appearance only, never hydraulics. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "0.1", ClampMax = "2.0"))
+    float LiveFoamFroudeOnset = 0.78f;
+
+    /** Froude span from onset to full generic aeration (1.25 by default). */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "0.05", ClampMax = "3.0"))
+    float LiveFoamFroudeRamp = 1.25f;
+
+    /** Volume-core whitewater lace floor (negative keeps the built-in value).
+     * Higher values fill foam cells more solidly between lace filaments. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    float LiveWhitewaterLaceFloor = -1.0f;
+
+    /** Volume-core foam outside compact froth patches (negative keeps the built-in value). */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    float LiveWhitewaterPatchOutsideFloor = -1.0f;
+
+    /** Foam source from the photographed whitewater at the cooked flow
+     * (observed_whitewater_<band>.bin beside the cooked fields; curved maps
+     * only). Render-only appearance evidence: the gain scales the observed
+     * fraction into the live foam and far-field cue. 0 disables. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    float ObservedWhitewaterGain = 0.0f;
+
+    /** Cartesian maps whose live core takes its foam from the GPU moving
+     * detail (not the carrier's vertex foam): the observed whitewater
+     * fraction, scaled by this gain, joins the detail's breaking source (max
+     * union with the flow and crest sources), so the white starts where the
+     * photographs show it and is then transported and decayed by the detail.
+     * Render-only appearance evidence. 0 disables. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float ObservedWhitewaterEntrainmentGain = 0.0f;
+
+    /** EV added to the runtime cameras' fixed manual exposure on this map
+     * (presentation only). The shared exposure was set for South Fork; under
+     * a stronger sun a dark surface such as basalt reads light grey. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "-3.0", ClampMax = "3.0"))
+    float PresentationExposureBiasOffset = 0.0f;
+
     /** Full-reach production terrain exists in the map; suppress local bed proxy. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment")
     bool bMapProvidesTerrain = false;
+
+    /** Reassert a generated river map's reviewed height-fog values after PIE
+     * world duplication. UE 5.8 can otherwise restore stale state-stream
+     * values even though the serialized component is correct. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    bool bEnforceTaggedHeightFogPresentation = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    FName RuntimeHeightFogActorTag = NAME_None;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "0.05"))
+    float RuntimeHeightFogDensity = 0.0025f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    bool bRuntimeVolumetricFogEnabled = false;
+
+    /** Reassert a river-local directional-light intensity in runtime worlds.
+     * This prevents a capture-oriented broad sun lobe from clipping turbulent
+     * water after PIE/game-world duplication. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    bool bEnforceTaggedDirectionalLightPresentation = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    FName RuntimeDirectionalLightActorTag = NAME_None;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "20.0"))
+    float RuntimeDirectionalLightIntensity = 4.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    FRotator RuntimeDirectionalLightRotation = FRotator(-50.0f, 55.0f, 0.0f);
+
+    /** The authored editor-capture ribbon is hidden during play, so the live
+     * solver mesh must render the complete visible river rather than a
+     * subordinate hydraulic-detail overlay. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bLiveSolverOwnsRuntimeRendering = false;
+
+    /** Render a solver-conforming Single Layer Water core beneath the live
+     * detail surface. The core is triangulated only through fully sampled wet
+     * cells, so it supplies optical depth without restoring the rectangular
+     * moving-window or wet-bank artifacts of a broad opaque sheet. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLiveSolverVolumeCore = false;
+
+    /** Optional river-local parent/instance for the non-colliding optical
+     * core. Hydraulics and topology remain owned by the sampled solver mesh;
+     * this override changes only material response. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UMaterialInterface> LiveVolumeCoreMaterialOverride;
+
+    /** River-local first-party surface detail. These textures are multiplied
+     * by solver-authored activity masks and cannot create hydraulics or foam
+     * outside the live wet mesh. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UTexture2D> LiveWaterFlowNormalTexture;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UTexture2D> LiveWaterFoamLaceTexture;
+
+    /** Coverage of the non-volumetric live detail surface in ordinary current.
+     * A river using the volume core keeps this low: the core supplies depth,
+     * while this layer carries geometric normals and a soft shoreline feather. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveSurfaceCalmCoverage = 0.86f;
+
+    /** Coverage of the non-volumetric detail surface in solver-active water. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveSurfaceActiveCoverage = 0.96f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveSurfaceSpecular = 0.28f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.02", ClampMax = "1.0"))
+    float LiveSurfaceRoughness = 0.15f;
+
+    /** Strength of the bounded Fresnel sky tint on the solver-owned carrier.
+     * Matches MI_RaftSim_SouthForkProductionWater — at the previous 0.62 the
+     * carrier wore a milky sky veil the static tiles did not. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveSkyReflectionStrength = 0.15f;
+
+    /** Strength of the two moving micro-normal layers. Geometry and solver
+     * normals remain authoritative at zero and one alike. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveRippleStrength = 0.18f;
+
+    /** Optical intensity of solver-derived entrained-air coloration. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.5"))
+    float LiveFoamIntensity = 0.52f;
+
+    /** Enables a plane-preserving five-tap filter over the visible carrier
+     * and rigid raft-support surface. This removes cooked-cell stair steps
+     * without mutating solver state, collision, flexible D3 overwash, or
+     * authored bathymetry. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLivePresentationSurfaceSmoothing = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LivePresentationSurfaceSmoothingStrength = 0.0f;
+
+    /** River-local scale for the solver-energy-gated sub-grid standing-wave
+     * term shared by the visible carrier and rigid raft support. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LivePresentationStandingWaveScale = 1.0f;
+
+    /** River-local scale for carrier/support relief derived from solver
+     * surface curvature. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LivePresentationHydraulicReliefScale = 1.0f;
+
+    /** Current-driven breaking relief shared by the visible carrier and
+     * raft support. Production opt-in, independent of map names/review flags. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLiveSharedBreakingRelief = false;
+
+    /** Use the fine presentation lattice on bounded named-rapid windows. The
+     * solver remains authoritative; this only gives coupled crests, boulder
+     * wakes, and the raft-local GPU heightfield enough vertices to form a
+     * three-dimensional surface instead of one-cell ramps. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLiveRapidSurfaceRefinement = true;
+
+    /** Subdivision of the three-metre analysis lattice in bounded rapid
+     * windows. Six produces 0.5 m presentation cells. Full-reach carriers
+     * retain their coarse far field and use the raft-local shader layer. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "1", ClampMax = "6"))
+    int32 LiveRapidSurfaceSubdivision = 6;
+
+    /** Enables the current-driven GPU heightfield on the existing live water
+     * carrier. It never creates a second mesh or changes wet/dry, collision,
+     * buoyancy, or solver state. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLiveRaftLocalFluidHeightfield = true;
+
+    /** Diameter of the raft-centred GPU fluid window. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "20.0", ClampMax = "200.0"))
+    float LiveRaftLocalFluidWindowMeters = 100.0f;
+
+    /** Vertical strength of the foam- and Froude-gated GPU crest/boil field. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveRaftLocalFluidHeightfieldStrength = 0.65f;
+
+    /** Solver-foam focus remap for the separate masked lace sheet. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "0.95"))
+    float LiveRapidFoamFocusStart = 0.12f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.05", ClampMax = "1.0"))
+    float LiveRapidFoamFocusEnd = 0.72f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveRapidFoamCoverageGain = 1.0f;
+
+    /** Width of the presentation-only alpha feather at the sampled wet bank.
+     * Solver-owned carriers use a narrow blend so water does not appear to
+     * climb several metres onto dry land. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "1.5", ClampMax = "12.0"))
+    float LiveSurfaceBankBlendMeters = 4.5f;
+
+    /** Breaks up the presentation-only bank feather in river-station space.
+     * The sampled wet mask, wet-cell topology, collision, bathymetry,
+     * buoyancy, raft forces, D3, and D4 remain unchanged. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLivePresentationBankNaturalism = false;
+
+    /** Maximum shift, in metres, applied inside the existing visual bank
+     * feather and as an inward-only retreat of the optical core's outermost
+     * wet vertex. This cannot extend visible water beyond solver-owned wet
+     * topology. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.25"))
+    float LivePresentationBankNaturalismAmplitudeMeters = 0.0f;
+
+    /** Defaults are the South Fork clear-water calibration and match
+     * MI_RaftSim_SouthForkProductionWater so the live carrier and the static
+     * terrain-clipped tiles render one continuous body of water. Rivers with
+     * different optics override these in their environment passes. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveShallowSurfaceColor =
+        FLinearColor(0.012f, 0.030f, 0.026f, 1.0f);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveDeepSurfaceColor =
+        FLinearColor(0.006f, 0.020f, 0.019f, 1.0f);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveReflectedSkyColor =
+        FLinearColor(0.075f, 0.130f, 0.150f, 1.0f);
+
+    /** River-local optical coefficients for the non-colliding volume core.
+     * These presentation values do not alter solver depth, velocity, wet/dry,
+     * collision, buoyancy, raft forces, or scoring. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveWaterScattering =
+        FLinearColor(0.00010f, 0.00028f, 0.00020f, 0.0f);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveWaterAbsorption =
+        FLinearColor(0.0066f, 0.0026f, 0.0040f, 0.0f);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveRiverbedColorScale =
+        FLinearColor(0.60f, 0.64f, 0.58f, 0.0f);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveShallowWaterOpacity = 0.30f;
+
+    /** Presentation-only power curve applied to the normalized solver depth
+     * before shallow/deep colour and opacity blending. One is linear; values
+     * below one concentrate optical attenuation near a clear-water bank. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.25", ClampMax = "2.0"))
+    float LiveOpticalDepthResponseExponent = 1.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveDeepWaterOpacity = 0.54f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveFoamWaterOpacity = 0.91f;
+
+private:
+    void ApplyTaggedHeightFogPresentation();
+    void ApplyTaggedDirectionalLightPresentation();
 };

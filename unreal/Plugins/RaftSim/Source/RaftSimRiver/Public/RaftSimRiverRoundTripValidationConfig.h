@@ -101,7 +101,7 @@ public:
     FString Schema = TEXT("raftsim.unreal.river_round_trip_validation.v1");
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|RoundTrip")
-    FString CanonicalFormatContract = TEXT("physics/config/geospatial_format_contract.json");
+    FString CanonicalFormatContract = TEXT("unreal/Plugins/SEIYGECore/python/config/geospatial_format_contract.json");
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|RoundTrip")
     FString GeospatialImportPipeline = TEXT("unreal/Content/RaftSim/River/geospatial_import_pipeline.json");

@@ -5,7 +5,17 @@ public class RaftSimRaft : ModuleRules
     public RaftSimRaft(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "EnhancedInput", "RaftSimCore", "RaftSimPhysics", "RaftSimInput", "RaftSimWater", "RaftSimCrew", "ProceduralMeshComponent" });
-        PrivateDependencyModuleNames.AddRange(new[] { "Json", "InputCore" });
+        PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "EnhancedInput", "Niagara", "RaftSimCore", "RaftSimPhysics", "RaftSimInput", "RaftSimWater", "RaftSimCrew", "ProceduralMeshComponent" });
+        PrivateDependencyModuleNames.AddRange(new[] { "Json", "InputCore", "HairStrandsCore", "Slate", "SlateCore", "MovieSceneCapture", "Landscape", "RaftSimWaterDetail", "RenderCore", "RHI" });
+        if (Target.bBuildEditor)
+        {
+            // Transient in-game terrain alignment diagnostic; absent from packaged games.
+            PrivateDependencyModuleNames.AddRange(new[] { "MeshDescription", "StaticMeshDescription" });
+        }
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            // Debug screen recorder: Media Foundation H.264 sink writer.
+            PublicSystemLibraries.AddRange(new[] { "mfplat.lib", "mfreadwrite.lib", "mfuuid.lib" });
+        }
     }
 }

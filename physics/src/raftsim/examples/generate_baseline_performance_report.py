@@ -7,12 +7,8 @@ from pathlib import Path
 
 from ..dual_solver import CppSolverRunConfig
 from ..performance import build_baseline_performance_report
-from ..profiling import (
-    profile_cpp_solver_runs,
-    profile_probe_export_runs,
-    profile_pyclaw_reference_runs,
-    profile_raft_coupling_runs,
-)
+from ..profiling import (profile_cpp_solver_runs, profile_probe_export_runs, profile_pyclaw_reference_runs)
+from ..raft_coupling_profiling import (profile_raft_coupling_runs)
 from ..pyclaw_reference import PyClawRunConfig, canonical_pyclaw_scenarios
 
 

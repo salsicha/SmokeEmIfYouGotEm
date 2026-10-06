@@ -4,14 +4,25 @@
 #include "GameFramework/Actor.h"
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimRaftCondition.h"
+#include "RaftSimRaftMesh.h"
+#include "RaftSimOarRig.h"
+#include "RaftSimCrewAvatarActor.h"
 
 #include "RaftSimRaftActor.generated.h"
 
 class UStaticMeshComponent;
 class USceneComponent;
+class UMaterialInstanceDynamic;
 class ARaftSimCrewAvatarActor;
+struct FRaftSimFlexCrewAction;
+enum class ERaftSimCrewAvatarAction : uint8;
 class URaftSimChronoRuntimeAdapter;
 class URaftSimPhysicsBridgeSubsystem;
+namespace RaftSimHullPrepareCache {struct FCache;}
+namespace RaftSimRaftMesh {class FImmutableProductionRestMesh;}
+
+/** Scenario-owned destination preparation; no project dependency in the raft module. */
+DECLARE_DELEGATE_RetVal_OneParam(bool, FRaftSimCheckpointPreparation, FTransform&);
 
 /** Which side of the raft a paddle stroke acts on. */
 UENUM(BlueprintType)
@@ -34,6 +45,12 @@ enum class ERaftSimRaftMode : uint8
     Recovering
 };
 
+UENUM(BlueprintType)
+enum class ERaftSimFlipLinePhase : uint8
+{
+    Idle, Climbing, Attaching, Crossing, Pulling, Completed, Failed
+};
+
 /** Guide paddle commands issued to the AI crew. */
 UENUM(BlueprintType)
 enum class ERaftSimCrewCommand : uint8
@@ -45,7 +62,10 @@ enum class ERaftSimCrewCommand : uint8
     TurnRight,
     Stop,
     GetDown,
-    HighSide
+    HighSide,
+    /** "Back to your seats!": everyone scrambles back off the high side and
+     *  sits ready with paddles across their laps. */
+    Seats
 };
 
 /**
@@ -60,12 +80,37 @@ UCLASS()
 class RAFTSIMRAFT_API ARaftSimRaftActor : public AActor
 {
     GENERATED_BODY()
+    friend class FRaftSimCrewCommandWeightTest;
+    friend class FRaftSimOarCommandParityTest;
+    friend class FRaftSimInputContextIsolationTest;
+    friend class FRaftSimCrewOccupancyTest;
+    friend class FRaftSimRescueEquipmentTest;
+    friend class FRaftSimPassengerWashoutTest;
+    friend class FRaftSimCrewFatigueTest;
+    friend class FRaftSimRiverTrialSetup;
+    friend class FRaftSimIndependentTrialSetupTest;
+    friend class FRaftSimSwampedSeatTest;
+    friend class FRaftSimBackToSeatsTest;
+    friend class FRaftSimProductionCapturedRockPin;
+    friend class URaftSimOarRigComponent;
 
 public:
+    /** Exact triangle samples of current uploaded floor and tube/thwart sections, in raft local cm. */
+    bool SampleRenderedCrewSupport(const TArray<FVector>& PointsCm,
+        TArray<double>& FloorZCm, TArray<double>& SolidZCm, bool bForceReference = false) const;
+    uint64 GetCrewSupportGeometryRevision() const { return CrewSupportGeometryRevision; }
     ARaftSimRaftActor();
 
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaSeconds) override;
+
+    /** Uses the gameplay mesh/seat path without starting river physics. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Validation")
+    void InitializeCrewSeatingForValidation();
+
+    /** Minimum signed glute-to-tube clearance; negative is compression. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Validation")
+    float GetCrewSeatContactClearanceCm(ARaftSimCrewAvatarActor* Avatar) const;
 
     /** Apply one paddle stroke impulse. ForwardScale in [-1, 1]; negative = back-paddle. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
@@ -75,8 +120,60 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void ApplyTurnStroke(float TurnScale);
 
+    /**
+     * The guide's OWN stern draw/pry: animates the guide and yaws the hull,
+     * never touches the crew. TurnScale in [-1, 1]; positive turns bow
+     * starboard. Separate from ApplyTurnStroke, which is a crew call.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
+    void ApplyGuideSteerStroke(float TurnScale);
+
+    /**
+     * First-person presentation for the possessed guide seat: hides the
+     * guide avatar's head and helmet so the camera can sit in its eye
+     * socket. Idempotent; the pawn syncs it every tick.
+     */
+    void SetGuideFirstPersonView(bool bFirstPerson);
+
+    /**
+     * Hides the guide avatar's whole body (gear and paddle included) while
+     * the possessed first-person view glances over the shoulder; otherwise
+     * the rearward camera fills with the inside of the guide's own arms.
+     * Idempotent; the pawn syncs it every tick.
+     */
+    void SetGuideFirstPersonBodyHidden(bool bShouldHide);
+
+    /** World-space centre of the guide avatar's posed head, for seating the
+     * first-person camera on the real anatomy instead of a fixed offset. */
+    bool GetGuideHeadWorldLocationCm(FVector& OutCm) const;
+
+    /** Guide stroke presentation state, for the pawn's first-person paddle. */
+    ERaftSimCrewAvatarAction GetGuideStrokeAction() const { return GuideStrokeAction; }
+    float GetGuideStrokeSecondsRemaining() const { return GuideStrokeActionSeconds; }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     USceneComponent* GetSternSeatAttachPoint() const { return SternSeatAttachPoint; }
+
+    /** True when the authored production rest mesh drives the D4 visual. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
+    bool HasProductionWhitewaterRaft() const { return bUsingProductionRaftRestMesh; }
+
+#if !UE_BUILD_SHIPPING
+    /** Isolated feature controls reuse the exact production geometry producer. */
+    bool BindIsolatedFeatureHull(URaftSimChronoRuntimeAdapter* Runtime);
+    void RefreshIsolatedFeatureHull();
+    /** Execute the normal actor capsize lifecycle on its bound real runtime. */
+    bool AdvanceIsolatedFlipDemo(float Dt);
+    bool BindIsolatedFlipRuntime(URaftSimChronoRuntimeAdapter* Runtime,bool bFullHullExport);
+    void RefreshIsolatedFlipVisual(float Dt);
+    bool HasScriptedCapsizeTransition() const {return CapsizeTransitionRemainingSeconds>0.f;}
+    double GetPhysicalCapsizeEntryUpZ() const {return PhysicalCapsizeEntryUpZ;}
+    uint64 GetSharedHullShadingUploadCount() const {return SharedHullShadingUploads;}
+    TConstArrayView<FRaftSimSwimmerRescueFrame> GetIsolatedFlipSwimmers() const {return Swimmers;}
+#endif
+
+    /** Highest rendered floor point in a centre-deck window, in world cm. */
+    bool GetRenderedFloorCenterWorldZCm(float& OutWorldZCm) const;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     FVector GetRaftVelocity() const;
@@ -88,6 +185,49 @@ public:
     /** Deepest current tube indentation in meters, used to scale impact sheets. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
     float GetMaximumWaterContactIndentationM() const;
+
+    /** Current D4 contacts carrying multi-segment wrap support. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
+    int32 GetWrappingRockContactCount() const;
+
+    /** Distinct D4 obstacles whose release margin is currently negative. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
+    int32 GetPinnedRockObstacleCount() const;
+
+    /** Former contacts relaxing stored tube indentation after separation. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
+    int32 GetRecoveringRockContactCount() const;
+
+    /** True when the last D3 step consumed segment-keyed runtime water. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|Water")
+    bool IsUsingLiveD3WaterField() const;
+
+    /** Number of deformed tube segments sampled from live water last step. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|Water")
+    int32 GetLiveD3WaterSampleCount() const;
+
+    /** Number of those live D3 samples that were wet. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|Water")
+    int32 GetLiveD3WetSampleCount() const;
+
+    /** Retained D3 deck-water load from the last fixed step, in kilograms. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|Water")
+    float GetD3RetainedWaterMassKg() const;
+
+    /**
+     * Dominant current D4 contact expressed in world centimetres. The point,
+     * normal, and indentation come from the same per-segment solve that drives
+     * tube deformation and contact force; presentation systems may use it to
+     * place impact water without running a second visual collision model.
+     */
+    bool GetDominantWaterContactPresentation(
+        FVector& OutWorldPositionCm,
+        FVector& OutWorldNormal,
+        float& OutIndentationM) const;
+
+    /** Solver/contact-derived saturation applied to the coated raft fabric. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
+    float GetSurfaceWetness() const { return SurfaceWetness; }
 
     // --- Flip / swim / recover loop (P2) ---------------------------------
 
@@ -117,6 +257,20 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void RequestReflip();
 
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Rescue")
+    ERaftSimFlipLinePhase GetFlipLinePhase() const { return FlipLinePhase; }
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Rescue")
+    FText GetFlipLinePrompt() const;
+    /** Stage of the throw-bag / boarding / post-flip hand-off, or empty. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Rescue")
+    FText GetRescuePrompt() const;
+    /** A boarded swimmer is still being pulled in over the tube. */
+    bool IsAssistedBoardingActive() const { return AssistedBoardingAvatar.IsValid(); }
+    bool IsFlipLineActive() const;
+    bool IsGuideRescuing() const;
+    /** Published guide hand, shared by rope presentation and aimed inputs. */
+    FVector GetRescueHandWorldM() const;
+
     /** Cycle the explicit rescue target by input sign. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
     void SelectRescueTarget(float Direction);
@@ -141,12 +295,31 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Checkpoint")
     void ResetToCheckpoint();
 
+    /** Native callers can retain run state when a destination is unavailable. */
+    bool TryResetToCheckpoint();
+    bool TryRestoreCheckpoint(const FTransform& Destination);
+    /** Observation only: distinguish a checkpoint reset from in-river recovery. */
+    uint64 GetCheckpointRestoreCount() const { return CheckpointRestoreCount; }
+    void SetCheckpointPreparation(FRaftSimCheckpointPreparation Preparation);
+
     /** Replace the recovery checkpoint and optionally move the live body now. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Checkpoint")
     void SetCheckpointTransform(FTransform NewCheckpoint, bool bRestoreImmediately = false);
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Training")
     int32 GetPaddleStrokeCount() const { return PaddleStrokeCount; }
+
+    /** Shared normalized phase used by both visible crew strokes and propulsion. */
+    float GetCrewStrokePhase() const { return CrewStrokePhase; }
+
+    /** Phase of the most recent planted-blade impulse application. */
+    float GetLastCrewStrokeImpulsePhase() const { return LastCrewStrokeImpulsePhase; }
+
+    /** Number of physics impulse slices emitted inside planted power phases. */
+    int32 GetCrewStrokeImpulseApplicationCount() const { return CrewStrokeImpulseApplicationCount; }
+
+    /** The crew's blades entering the water: one per cadence stroke (audio cues). */
+    int32 GetCrewStrokeCatchCount() const { return CrewStrokeCatchCount; }
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Training")
     int32 GetHighSideResponseCount() const { return HighSideResponseCount; }
@@ -158,6 +331,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
     void ForceCrewOverboardForTesting(int32 Count);
 
+    /** Explicit guide-only drill; uses the same swimmer/occupancy path as capsize. */
+    void ForceGuideOverboardForTesting() { SpawnSwimmers(1, true); }
+
     /**
      * Timed high-side response: shift crew weight to the given side (+1 = starboard,
      * -1 = port) to counter an incoming roll. Feeds the D2 crew action into the
@@ -165,6 +341,7 @@ public:
      */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void HandleHighSideResponse(int32 Direction);
+    int32 ResolveHighSideDirection() const;
 
     /**
      * Test/authoring hook: impose a strong uniform overwash surface (meters) on
@@ -178,6 +355,18 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void ResetMotionForTesting();
 
+    /**
+     * Automation/authoring hook: hard-place the raft. Moves the solver body
+     * with the actor (a bare SetActorLocation is overwritten by the adapter
+     * mirror on the next tick) and clears all motion. When bApplyFacing is
+     * set, the hull is also yawed to FacingYawDegrees (e.g. downstream).
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
+    void TeleportForTesting(
+        const FVector& WorldLocationCm,
+        float FacingYawDegrees = 0.0f,
+        bool bApplyFacing = false);
+
     /** Crew size seeded as swimmers on capsize (guide + paddlers). */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void SetCrewSize(int32 InCrewSize) { CrewSize = FMath::Clamp(InCrewSize, 0, 8); }
@@ -188,6 +377,53 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
     ERaftSimCrewCommand GetActiveCrewCommand() const { return ActiveCrewCommand; }
+    /** The call just made, before the crew react to it. */
+    ERaftSimCrewCommand GetPendingCrewCommand() const { return PendingCrewCommand; }
+
+    /** Paddling stamina of one crew member: 1 fresh .. 0 spent. Hard
+     * paddling drains it; resting (or just bracing) slowly restores it. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
+    float GetCrewStamina(FName PassengerId) const;
+
+    /** Mean stamina of the paddlers aboard (1 when none are aboard). */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
+    float GetCrewEnergy() const;
+
+    /** The most tired paddler aboard and their stamina; NAME_None if none. */
+    FName GetMostTiredPaddler(float& OutStamina) const;
+
+    /** Share of a fresh stroke's force delivered at a given stamina. */
+    static float StrokeStrengthForStamina(float Stamina) { return .45f + .55f * FMath::Clamp(Stamina, 0.f, 1.f); }
+
+    /** Validation: set one crew member's stamina directly. */
+    void SetCrewStaminaForTesting(FName PassengerId, float Stamina);
+
+    /** How this raft is crewed, resolved at BeginPlay (Auto resolves by map). */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
+    ERaftSimRaftRig GetRaftRig() const { return ResolvedRaftRig; }
+
+    /** One rower on an oar frame instead of a guide and paddle crew. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
+    bool IsSoloOarRig() const { return URaftSimOarRigComponent::IsOarRig(ResolvedRaftRig); }
+
+    /** The rower's input for each oar, -1 pull .. +1 push (oar rigs only). */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew")
+    void SetOarIntents(float Left, float Right);
+
+    URaftSimOarRigComponent* GetOarRig() const { return OarRig; }
+
+    /** The rig a map is crewed with: the Grand Canyon (Colorado) and
+     * Zambezi runs are rowed oar rigs; every other map a paddle crew. */
+    static ERaftSimRaftRig ResolveRaftRigForMap(const FString& MapName);
+
+    /** Validation: choose the rig before seating (InitializeCrewSeatingForValidation). */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Validation")
+    void SetRaftRigForValidation(ERaftSimRaftRig InRig);
+
+    /** Validation: pose the oars and rower at one point of a stroke (+1
+     * push, -1 pull, 0 rest per oar), with no impulses. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Validation")
+    void PoseOarRigForValidation(float Phase, float LeftDirection, float RightDirection);
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Raft")
@@ -221,11 +457,18 @@ protected:
 
     /** Total buoyancy at full submersion as a multiple of weight. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
-    float BuoyancyWeightMultiple = 2.6f;
+    float BuoyancyWeightMultiple = 5.2f;
 
-    /** Linear drag coefficient (quadratic in speed) per submerged fraction. */
+    /** Hull-water drag coefficient (quadratic above the low-speed reference). */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
-    float LinearDragCoefficient = 45.0f;
+    float LinearDragCoefficient = 9000.0f;
+
+    /** Bow-first slicing drag (see FRaftSimRaftBodyConfig): small enough
+     * that a stroke coasts down over a couple of seconds instead of
+     * snapping back to water speed, while the blunt coefficient above keeps
+     * current capture prompt. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float ForwardSlicingDragCoefficient = 1400.0f;
 
     /** Angular damping factor per second. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
@@ -239,9 +482,44 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float HeaveDampingNsPerM = 1500.0f;
 
-    /** Impulse in Newton-seconds delivered by one full paddle stroke. */
+    /** Impulse in Newton-seconds delivered by one full paddle stroke.
+     * Measured 2026-08-26: at 260 the hull drag returned the raft to water
+     * speed between strokes (continuous AllForward oscillated 0.85-1.3 m/s
+     * in a 1.05 m/s pool — "paddling doesn't make it go faster"), and 560
+     * still sustained only ~+0.5 m/s. The hull drag constant belongs to the
+     * measured physics contract, so feel is tuned here instead: sized so
+     * crew cadence sustains near the MaxPaddleSpeedOverWaterMps governor,
+     * which remains the actual speed authority (strokes fade to zero
+     * there, so this cannot overshoot). */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
-    float PaddleStrokeImpulseNs = 260.0f;
+    float PaddleStrokeImpulseNs = 1150.0f;
+
+    /** Paddling governor: strokes fade to zero as the hull reaches this
+     * speed over the water in the stroke direction. Uncapped strokes
+     * compounded to 9.7 m/s on 2026-08-10 (triple a paddled raft) and
+     * rolled the boat in the cascade wave train; tune feel here instead of
+     * removing the cap. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft", meta = (ClampMin = "0.5"))
+    float MaxPaddleSpeedOverWaterMps = 2.2f;
+
+    /** Impulse basis for the crew's opposing-sides pivot strokes
+     * (TurnLeft/TurnRight). Deliberately decoupled from
+     * PaddleStrokeImpulseNs: forward power is sized against hull drag,
+     * while yaw meets far less resistance — sharing one knob made turns
+     * 4.4x too strong when forward feel was fixed on 2026-08-27. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float CrewTurnStrokeImpulseNs = 260.0f;
+
+    /** Yaw impulse of one guide stern sweep (the mouse-button steer). */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float GuideSteerYawImpulseNms = 300.0f;
+
+    /** Forward component of the guide's steer stroke: his blade sweeps, so
+     * steering also pulls the hull forward a little — or backward while the
+     * crew is back-paddling (a back-ferry). Governor-gated like every
+     * stroke, so it cannot compound. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float GuideSteerForwardImpulseNs = 170.0f;
 
     /** Fixed physics substep in seconds (120 Hz), forwarded to the bridge. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
@@ -255,6 +533,10 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float CapsizeLatchSeconds = 0.35f;
 
+    /** Duration of the D3-triggered authoritative roll into inverted equilibrium. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float CapsizeTransitionSeconds = 0.85f;
+
     /** Reach radius (meters) within which a swimmer can be reseated. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float SwimmerReseatReachM = 3.0f;
@@ -267,6 +549,11 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Crew")
     int32 PaddlerCount = 4;
 
+    /** Paddle crew or a single rower's oar rig. Auto rows the Colorado and
+     * Zambezi maps (docs/oar-rig-reference.md); raftsim.RaftRig overrides. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Crew")
+    ERaftSimRaftRig RaftRig = ERaftSimRaftRig::Auto;
+
     /** Crew stroke cadence in seconds. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Crew")
     float CrewStrokeIntervalSeconds = 0.8f;
@@ -275,23 +562,95 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Crew")
     float CrewReactionSeconds = 0.4f;
 
+    /** Seconds of continuous hard forward paddling that spend an average
+     * fresh paddler (fitter crew last longer, the guide longest). */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Crew", meta = (ClampMin = "10.0"))
+    float CrewEnduranceSeconds = 180.0f;
+
+    /** Rest recovery time constant: about 63% of the spent stamina comes
+     * back after this long sitting easy; bracing recovers at half rate. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Crew", meta = (ClampMin = "1.0"))
+    float CrewRecoverySeconds = 45.0f;
+
 private:
+    double PhysicalCapsizeEntryUpZ=1.;
     void UpdateCapsizeLoop(float DeltaSeconds);
     void EnterCapsize();
     void DriftSwimmers(float DeltaSeconds);
+    void AttachSwimmerToWaterSurface(FRaftSimSwimmerRescueFrame& Swimmer) const;
     void TryReseatSwimmers();
     void UpdateRescueInteraction(float DeltaSeconds);
+    void UpdateTimedBoarding(float DeltaSeconds);
+    void CancelTimedBoarding();
+    bool GetSwimmerTubeTarget(FName PassengerId, const FVector& SwimmerM, FVector& TargetM) const;
+    double GetRenderedHullDistanceM(const FVector& WorldM) const;
+    bool FindBoardingTubeSupports(const FVector& SwimmerWorldCm, double HandSpacingCm,
+        FVector& LeftLocalCm, FVector& RightLocalCm) const;
     void UpdateRescueLineVisual();
-    void SpawnSwimmers(int32 Count, bool bIncludeGuide);
+    // Throw-bag choreography (RaftSimThrowBagRescue.cpp): the guide's turn,
+    // wind-up and underhand toss, the bag's flight, hand-over-hand haul and
+    // the swimmer towed on their back to the guide's tube.
+    void PoseGuideForRescue(float DeltaSeconds);
+    void StartThrowChoreography();
+    void AdvanceThrowBag(float DeltaSeconds);
+    float GetHaulPullFraction() const;
+    bool GetGuideHaulStation(FName PassengerId, const FVector& SwimmerM, FVector& TargetM) const;
+    bool FlipLineRopeVisible() const;
+    void BuildFlipLineRope(TArray<FVector>& WorldPointsCm, TArray<float>& SegmentSagCm) const;
+    bool GetTubeOutlineLocalCm(FBox& OutBounds) const;
+    void BuildRopeMesh(const TArray<FVector>& WorldPointsCm, const TArray<float>& SegmentSagCm);
+    // A boarded passenger's pull-in over the tube, presentation only: the
+    // seat and mass are restored the moment the rescue completes. The guide
+    // grabs the PFD shoulder straps, dunks, then falls back hauling them in;
+    // a swimmer without the guide beside them (or the guide) climbs in alone.
+    void BeginAssistedBoarding(ARaftSimCrewAvatarActor* Avatar, FName PassengerId,
+        const FTransform& StartWorld, const FRaftSimCrewAvatarPose& StartPose);
+    void UpdateAssistedBoarding(float DeltaSeconds);
+    void FinishAssistedBoarding();
+    void ReleaseGuideFromBoarding();
+    bool IsGuideBusyWithBoarding() const;
+    void UpdateFlipLine(float DeltaSeconds);
+    void CancelFlipLine();
+    bool FindInvertedHullSupport(FVector& LocalCm) const;
+    void SpawnSwimmers(int32 Count, bool bIncludeGuide, FName OnlyPassenger = NAME_None,
+        FVector WashVelocityMps = FVector::ZeroVector);
+    void UpdatePassengerWashouts(float DeltaSeconds);
+    TMap<FName, float> PassengerWashImpulseNs;
+    /** Weighted seconds a passenger's seat has been chest-deep under water. */
+    TMap<FName, float> PassengerSwampedSeconds;
+    void RefreshCrewSeatOccupancy();
     void RemoveSwimmerAt(int32 Index);
     int32 FindSwimmerIndex(FName PassengerId) const;
     ARaftSimCrewAvatarActor* FindAvatar(FName PassengerId) const;
     void AttachAvatarToSeat(ARaftSimCrewAvatarActor* Avatar, FName PassengerId);
     void UpdateCrew(float DeltaSeconds);
+    void UpdateCrewTransfer(ARaftSimCrewAvatarActor* Avatar, int32 Index, bool bHighSide,
+        float DeltaSeconds, FRaftSimFlexCrewAction& Action);
+    /** The guide makes a call and moves first; each paddler reacts a few
+     *  hundredths later, so the crew move as a ripple, not in unison. */
+    float CrewCallStagger(int32 Index) const;
+    // Fatigue (RaftSimCrewFatigue.cpp), parallel to CrewAvatars.
+    TArray<float> CrewStamina;
+    int32 CrewIndexFor(FName PassengerId) const;
+    void UpdateCrewStamina(int32 Index, ERaftSimCrewAvatarAction Action, float DeltaSeconds);
+    /** Summed stroke strength of the paddlers aboard, in fresh-paddler units. */
+    float GetCrewStrokeStrength() const;
+    /** The guide's (or rower's) own stroke strength. */
+    float GetGuideStrokeStrength() const;
     void UpdateRaftCondition(float DeltaSeconds);
     void SpawnCrewVisuals();
     void BuildRaftVisual();
+    /** Resolve RaftRig (map, console override) and size the crew for it. */
+    void ResolveRaftRig();
+    /** Rigged gear on the hull: the guide's throw bag at the stern and coiled
+     * bow and stern lines (presentation only, no collision). */
+    void BuildRaftGear(const FBox& HullBoundsCm);
     void UpdateFlexibleRaftVisual();
+    void ConfigureSharedHullGeometryReview();
+    bool PrepareSharedHullGeometry(const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out);
+    void CommitSharedHullGeometry();
+    void UpdateSharedHullVisual();
+    void UpdateRaftWetness(float DeltaSeconds);
     void UpdateRockObstacles();
     FVector SampleWaterVelocityMps(const FVector& WorldLocationCm) const;
 
@@ -312,11 +671,77 @@ private:
     FRaftSimRescueInteractionState RescueInteraction;
 
     FVector RescueAimWorldDirection = FVector::ForwardVector;
+    FName BoardingPassenger;
+    FTransform BoardingStartLocal, BoardingReachLocal, BoardingSeatLocal;
+    float BoardingElapsed = 0.f, BoardingDuration = 0.f;
     int32 SelectedSwimmerIndex = INDEX_NONE;
 
     /** Visible, sagging throw line built from project-owned procedural geometry. */
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<class UProceduralMeshComponent> RescueLineVisual;
+
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Rescue")
+    TObjectPtr<UStaticMeshComponent> ThrowBagVisual;
+    UPROPERTY(Transient)
+    TObjectPtr<class UMaterialInterface> RopeMaterial;
+    // Throw: the bag stays in the hand through the wind-up and release
+    // swing, then flies for a distance-scaled time on one fixed arc.
+    float ThrowWindUpRemaining = 0.f;
+    float ThrowFlightSeconds = .45f;
+    float ThrowFlightElapsed = 0.f;
+    float RescueChoreographySeconds = 0.f;
+    float RopeRecoverRemaining = 0.f;
+    float GuideRescueYawDeg = 0.f;
+    bool bGuideRescuePoseActive = false;
+    bool bThrowBagDeployed = false;
+    bool bRopeSwimmerAtStation = false;
+    FVector ThrowReleaseWorldCm = FVector::ZeroVector;
+    FVector ThrowBagWorldCm = FVector::ZeroVector;
+    FVector RopeSwimmerGripWorldCm = FVector::ZeroVector;
+    ERaftSimRescueInteractionPhase LastChoreographyPhase = ERaftSimRescueInteractionPhase::Idle;
+    // The guide's seated legs (with fitted feet) kept under rescue poses.
+    FRaftSimCrewAvatarPose GuideRescueLegs;
+    // Assisted boarding presentation.
+    TWeakObjectPtr<ARaftSimCrewAvatarActor> AssistedBoardingAvatar;
+    FName AssistedBoardingPassenger;
+    bool bAssistedBoardingByGuide = false;
+    bool bAssistedGuideReleased = false;
+    float AssistedBoardingElapsed = 0.f;
+    float AssistedBoardingDuration = 0.f;
+    FTransform AssistedBoardingStartLocal, AssistedBoardingSeatLocal;
+    FVector AssistedBoardingTubeLocalCm = FVector::ZeroVector;
+    FVector AssistedBoardingInsideLocalCm = FVector::ZeroVector;
+    FVector AssistedBoardingOutsideLocalCm = FVector::ZeroVector;
+    float AssistedBoardingFloorZ = 0.f;
+    float AssistedBoardingHaulSeconds = 0.f;
+    float AssistedBoardingCrawlSeconds = 0.f;
+    FRaftSimCrewAvatarPose AssistedBoardingStartPose, AssistedBoardingSeatPose;
+    ERaftSimFlipLinePhase FlipLinePhase = ERaftSimFlipLinePhase::Idle;
+    float FlipLineSeconds = 0.f;
+    float FlipLineSide = 1.f;
+    FVector FlipClimbStartLocalCm = FVector::ZeroVector;
+    FVector FlipHookLocalCm = FVector::ZeroVector;
+    FVector FlipStandLocalCm = FVector::ZeroVector;
+    FVector FlipDRingLocalCm = FVector::ZeroVector;
+    FVector FlipEdgeLocalCm = FVector::ZeroVector;
+    FVector FlipKneelLocalCm = FVector::ZeroVector;
+    bool bFlipGuideReleased = false;
+    bool bFlipLineClipped = false;
+    float LastFlipLineTorqueNm = 0.f;
+    float FlipWaterWorldZCm = 0.f;
+    FVector FlipPullFacing = FVector::ZeroVector;
+    float FlipLineLogSeconds = 0.f;
+    /** Gameplay scale on the leaning guide's rope tension. A rigid-hull
+     * statics estimate under-reads a real flip, which also gets the bounce
+     * of the guide's weight, the hull flexing and water spilling from under
+     * the rising tube; tune feel here, not with an orientation assist. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Rescue", meta = (ClampMin = "0.5", ClampMax = "4.0"))
+    float FlipLineLeverage = 2.0f;
+    UPROPERTY(Transient)
+    TObjectPtr<class UProceduralMeshComponent> GuideWaistLineVisual;
+    bool PrepareFlipLineStations();
+    void ReleaseFlipGuide();
+    void UpdateGuideWaistLine();
 
     /** Transform to respawn the raft at when recovery completes / is requested. */
     FTransform CheckpointTransform = FTransform::Identity;
@@ -324,7 +749,16 @@ private:
     /** Raft location at the moment of capsize; re-flip rights the boat here. */
     FVector CapsizeLocation = FVector::ZeroVector;
 
+    /** Symmetric sealed-tube orientation reached after the live flip transition. */
+    FQuat CapsizeTargetRotation = FQuat::Identity;
+
+    FVector CapsizeRollAxisWorld = FVector::ForwardVector;
+    float CapsizeFlipDirection = 1.0f;
+    float CapsizeStartPitchDegrees = 0.0f;
+    float CapsizeStartRollDegrees = 0.0f;
+
     float FlipRiskLatchSeconds = 0.0f;
+    float CapsizeTransitionRemainingSeconds = 0.0f;
     bool bReflipRequested = false;
 
     // Crew state.
@@ -334,14 +768,119 @@ private:
     UPROPERTY()
     ERaftSimCrewCommand PendingCrewCommand = ERaftSimCrewCommand::Rest;
 
+    // Hold a called side across hull oscillations; only a new order reselects it.
+    int32 CrewHighSideDirection = -1;
+
     UPROPERTY()
     TArray<TObjectPtr<ARaftSimCrewAvatarActor>> CrewAvatars;
 
     UPROPERTY()
     FRaftSimRaftConditionState RaftCondition;
 
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> TubeMaterialInstance;
+    UPROPERTY(Transient)
+    TObjectPtr<class UProceduralMeshComponent> RaftGear;
+
+    UPROPERTY(Transient)
+    TObjectPtr<URaftSimOarRigComponent> OarRig;
+
+    ERaftSimRaftRig ResolvedRaftRig = ERaftSimRaftRig::PaddleCrew;
+    // Held axes override standing orders; releasing them restores the order.
+    FVector2D ManualOarIntents = FVector2D::ZeroVector;
+    FVector2D TransientOarIntents = FVector2D::ZeroVector;
+    float TransientOarSeconds = 0.0f;
+    float OarSteerScale = 0.0f;
+    float OarSteerSeconds = 0.0f;
+    FVector2D ResolveOarCommandIntents() const;
+    void RefreshOarCommandIntents();
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> FloorMaterialInstance;
+
+    /** CPU-readable authored rest topology, split by the five material slots. */
+    TSharedPtr<const RaftSimRaftMesh::FImmutableProductionRestMesh> ProductionRaftRestSections;
+
+    /** Persistent dynamic buffers avoid copying immutable topology every frame. */
+    TArray<RaftSimRaftMesh::FMeshData> ProductionRaftDeformedSections;
+
+    /** Precomputed rest-vertex/D1-D4 Gaussian binding; dynamic solve state is not cached. */
+    RaftSimRaftMesh::FProductionRaftDeformationCache ProductionRaftDeformationCache;
+
+    /** Last D1-D4 state actually uploaded; unchanged local shapes need no CPU remesh. */
+    TArray<FRaftSimFlexVisualSegmentState> LastRenderedFlexVisualSegments;
+    RaftSimRaftMesh::FRaftSimRaftVisualCondition LastRenderedRaftVisualCondition;
+    bool bHasRenderedFlexibleRaftState = false;
+    uint64 CrewSupportGeometryRevision = 0;
+    struct FCrewSupportTriangle
+    {
+        FVector A,B,C;
+        double Determinant;
+        bool bFloor;
+    };
+    mutable uint64 CrewSupportIndexRevision = MAX_uint64;
+    mutable FTransform CrewSupportIndexTransform;
+    mutable TArray<FCrewSupportTriangle> CrewSupportTriangles;
+    mutable TMap<FIntPoint,TArray<int32>> CrewSupportBins;
+
+    /** Authored CPU source is present; shared snapshots alone do not enable full-hull contact. */
+    bool bUsingProductionRaftRestMesh = false;
+
+    // One fixed-step geometry producer, transactional publication to physics
+    // and render. Normal production contact uses this complete original mesh.
+    bool bSharedHullGeometryReview=false;
+    TArray<RaftSimRaftMesh::FMeshData> SharedHullPreparedSections;
+    TArray<FRaftSimFlexVisualSegmentState> SharedHullPreparedSegments,SharedHullPublishedSegments;
+    RaftSimRaftMesh::FRaftSimRaftVisualCondition SharedHullPreparedCondition,SharedHullPublishedCondition;
+    uint64 LastRenderedHullRevision=0,LastLoggedHullRevision=0;
+    double SharedHullPrepareTotalMs=0,SharedHullPrepareMaximumMs=0;
+    uint64 SharedHullPrepareCount=0;
+    TSharedPtr<RaftSimHullPrepareCache::FCache> SharedHullRenderedCache;
+    uint64 SharedHullShadingUploads=0;
+
+    /** Persistent surface saturation; contact wets quickly and dries slowly. */
+    float SurfaceWetness = 0.0f;
+
     float CrewReactionRemaining = 0.0f;
-    float CrewStrokeTimer = 0.0f;
+    float CrewStrokePhase = 0.0f;
+    float LastCrewStrokeImpulsePhase = -1.0f;
+    int32 CrewStrokeImpulseApplicationCount = 0;
+    int32 CrewStrokeCatchCount = 0;
+    float DriftTelemetrySeconds = 0.0f;
+
+    // The guide's own W/S/turn strokes hold this pose on the stern avatar
+    // for a beat so the player's inputs are visible on the body and paddle
+    // (first South Fork playtest: audio fired with no visible stroke).
+    // Initialized to SeatedIdle in the constructor; the enum is only
+    // forward-declared here.
+    ERaftSimCrewAvatarAction GuideStrokeAction;
+    float GuideStrokeActionSeconds = 0.0f;
+
+    // W/S/A/D are the guide's CALLS to the crew: a tap owns the crew for
+    // exactly one cadence stroke and expires back to Rest, while the
+    // number keys set standing orders that never expire. The guide's own
+    // blade lives solely on ApplyGuideSteerStroke (2026-08-11: "when the
+    // paddle command is given to the crew the guide should not also
+    // paddle" — the command IS the crew's stroke; the guide's paddle is
+    // for steering).
+    float GuidePaddleCommandSeconds = 0.0f;
+    bool bCrewCommandFromGuidePaddle = false;
+
+    // Direct (non-cadence) stroke impulses wait for the guide pose's catch
+    // (~0.29 of the stroke cycle) so the boat never moves before a blade
+    // visually reaches the water.
+    FVector PendingDirectLinearImpulseNs = FVector::ZeroVector;
+    FVector PendingDirectAngularImpulseNms = FVector::ZeroVector;
+    float DirectImpulseDelaySeconds = 0.0f;
+
+    float GetPaddlePropulsionShortfall(const FVector& StrokeDirection) const;
+    float GetPaddleWaterPurchase() const;
+    void QueueDirectStrokeImpulse(
+        const FVector& LinearImpulseNs, const FVector& AngularImpulseNms);
+    /** Highest rendered raft-surface Z (actor frame) under a seat station. */
+    float ComputeSeatTubeTopZCm(const FVector& SeatCm, bool& bOutFound) const;
+    bool ComputeRenderedSeatOriginZCm(
+        const FVector& SeatCm, const TArray<FVector>& ContactPoints, float& OutZCm) const;
     float RescueFailureResetRemaining = -1.0f;
     int32 PaddleStrokeCount = 0;
     int32 HighSideResponseCount = 0;
@@ -349,4 +888,11 @@ private:
 
     /** Seconds between runtime rock-authority scans. */
     float RockObstacleRefreshRemaining = 0.0f;
+    // Presentation surface whose refresh frames take fewer fixed ticks.
+    TWeakObjectPtr<class ARaftSimWaterSurfaceActor> PresentationSurface;
+    float PresentationSurfaceSearchSeconds = 0.0f;
+    FRaftSimCheckpointPreparation CheckpointPreparation;
+    bool bCheckpointPreparationRequired = false;
+    bool bCheckpointResetInProgress = false;
+    uint64 CheckpointRestoreCount = 0;
 };

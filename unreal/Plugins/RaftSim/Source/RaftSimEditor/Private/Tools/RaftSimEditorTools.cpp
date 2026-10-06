@@ -1254,7 +1254,7 @@ TSharedRef<SWidget> FRaftSimEditorModule::BuildToolSpecificBody(const FRaftSimEd
     {
         Body->AddSlot().AutoHeight().Padding(0.0f, 4.0f)[MakeSectionHeader(LOCTEXT("FeatureTuningControlsHeader", "Feature Tuning Controls"))];
         Body->AddSlot().AutoHeight()[SNew(STextBlock).Text(LOCTEXT("FeatureTuningControls", "Controls separate solver-state, raft-coupling, visual-only, and audio-only domains. Physics-facing edits require manifest records, GeoClaw comparison, and conservation guards.")).AutoWrapText(true)];
-        Body->AddSlot().AutoHeight()[MakePathRow(LOCTEXT("FeatureDefaults", "Feature Defaults"), TEXT("physics/config/feature_forcing_defaults.json"))];
+        Body->AddSlot().AutoHeight()[MakePathRow(LOCTEXT("FeatureDefaults", "Feature Defaults"), TEXT("unreal/Plugins/SEIYGECore/python/config/feature_forcing_defaults.json"))];
     }
     else if (Descriptor.ToolId == TEXT("GeospatialValidator"))
     {

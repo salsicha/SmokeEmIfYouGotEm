@@ -1,7 +1,3 @@
-{
-  "comparisons": [],
-  "feature_count": 0,
-  "max_abs_strength_delta": 0.0,
-  "max_location_delta": 0.0,
-  "scenario_id": "sloping_manning_channel_seed_16"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:a9ca3a983981ef4d8b78ef3ff544e7f681dc7804d0cb6baf65e1038145c7866c
+size 165

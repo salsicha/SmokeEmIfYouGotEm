@@ -1809,46 +1809,216 @@ void AddPreviewNearFieldPhotorealReviewDressing(
 
 void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    if (!World || !GEditor)
+    if (!World)
     {
         return;
     }
+    // GEditor->AddActor returns null in unattended/offscreen sessions (first
+    // seen regenerating candidate maps headless on the Linux review machine),
+    // which silently skipped the entire rig behind per-actor null guards and
+    // saved dusk-lit maps. Fall back to a plain world spawn so headless
+    // regeneration produces the same authored rig as interactive runs.
+    auto SpawnRigActor = [World](UClass* ActorClass,
+                                 const FTransform& Transform) -> AActor*
+    {
+        AActor* Placed = GEditor
+            ? GEditor->AddActor(World->GetCurrentLevel(), ActorClass, Transform)
+            : nullptr;
+        if (!Placed)
+        {
+            FActorSpawnParameters Parameters;
+            Parameters.SpawnCollisionHandlingOverride =
+                ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            Parameters.OverrideLevel = World->GetCurrentLevel();
+            Placed = World->SpawnActor<AActor>(
+                ActorClass,
+                Transform.GetLocation(),
+                Transform.GetRotation().Rotator(),
+                Parameters);
+        }
+        return Placed;
+    };
     const FRaftSimPhotographicCaptureSettings CaptureSettings =
         GetPhotographicCaptureSettings(Spec.RiverId);
+    // The Zambezi upper gorge shares the Batoka rig (sun, haze, reflection).
+    const FString LookRiverId = ResolveLookSettingsRiverId(Spec.RiverId);
+    const bool bPacuareHumidAtmosphere =
+        Spec.RiverId == TEXT("pacuare");
+    const bool bColdWaterHighlightNaturalism =
+        Spec.RiverId == TEXT("futaleufu_terminator") ||
+        Spec.RiverId == TEXT("chilko_river_lava_canyon");
 
+    // Batoka's coarse source DEM produces a conspicuous diagonal comb when lit
+    // across its facets at the shared grazing angle.  Keep the shared rig for
+    // every other river, but align this review-only sun more closely with the
+    // gorge so the renderer does not amplify source sampling into fake ribs.
+    const FRotator SunRotation = LookRiverId == TEXT("zambezi_batoka_gorge")
+        ? FRotator(-48.0f, -90.0f, 0.0f)
+        : Spec.RiverId == TEXT("futaleufu_terminator")
+        ? FRotator(-50.0f, 30.0f, 0.0f)
+        : bColdWaterHighlightNaturalism
+        ? FRotator(-50.0f, 55.0f, 0.0f)
+        : FRotator(-58.0f, -30.0f, 0.0f);
     ADirectionalLight* Sun = Cast<ADirectionalLight>(
-        GEditor->AddActor(World->GetCurrentLevel(), ADirectionalLight::StaticClass(), FTransform(FRotator(-58.0f, -30.0f, 0.0f))));
+        SpawnRigActor(ADirectionalLight::StaticClass(), FTransform(SunRotation)));
     if (Sun)
     {
+        // AddActor may preserve the DirectionalLight class template's rotation;
+        // make the authored map contract absolute and inspectable.
+        Sun->GetLightComponent()->SetMobility(EComponentMobility::Movable);
+        Sun->SetActorRotation(SunRotation);
         Sun->SetActorLabel(TEXT("RaftSim_Sun_LumenPreview"));
         Sun->GetLightComponent()->SetIntensity(CaptureSettings.SunIntensity);
         Sun->GetLightComponent()->SetLightColor(CaptureSettings.SunColor);
+        Sun->GetLightComponent()->SetCastShadows(true);
+        if (Spec.RiverId == TEXT("chilko_river_lava_canyon"))
+        {
+            Sun->Tags.AddUnique(
+                TEXT("RaftSimChilkoRestrainedReflectionRigV3"));
+        }
+        if (bColdWaterHighlightNaturalism)
+        {
+            Sun->Tags.AddUnique(
+                TEXT("RaftSimColdWaterHighlightNaturalismV1"));
+        }
+        if (UDirectionalLightComponent* SunComponent = Sun->GetComponent())
+        {
+            SunComponent->SetAtmosphereSunLight(true);
+            SunComponent->SetAtmosphereSunLightIndex(0);
+        }
+        if (LookRiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            Sun->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
+            Sun->Tags.AddUnique(TEXT("RaftSimAtmosphereSunLight"));
+        }
+        if (bPacuareHumidAtmosphere)
+        {
+            Sun->Tags.AddUnique(TEXT("RaftSimPacuareHumidAtmosphereV1"));
+            Sun->Tags.AddUnique(TEXT("RaftSimHumidityDirectionalLight"));
+        }
     }
 
     ASkyLight* SkyLight = Cast<ASkyLight>(
-        GEditor->AddActor(World->GetCurrentLevel(), ASkyLight::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 1000.0f))));
+        SpawnRigActor(ASkyLight::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 1000.0f))));
     if (SkyLight)
     {
         SkyLight->SetActorLabel(TEXT("RaftSim_SkyLight_PhotorealPreview"));
         SkyLight->GetLightComponent()->SetMobility(EComponentMobility::Movable);
         SkyLight->GetLightComponent()->SourceType = SLS_CapturedScene;
+        // A build-time cubemap bake snapshots whatever has rendered so far —
+        // in a headless regeneration session that is an unrendered (black)
+        // sky, and the saved map then reads as unlit silhouettes everywhere
+        // (first seen on the Linux review machine; interactive Mac sessions
+        // repopulated the bake implicitly). Real-time capture derives the
+        // ambient from the live sky in every session type instead.
+        SkyLight->GetLightComponent()->SetRealTimeCapture(true);
         SkyLight->GetLightComponent()->SetIntensity(CaptureSettings.SkyLightIntensity);
+        if (bPacuareHumidAtmosphere)
+        {
+            SkyLight->Tags.AddUnique(
+                TEXT("RaftSimPacuareHumidAtmosphereV1"));
+            SkyLight->Tags.AddUnique(TEXT("RaftSimHumiditySkyFill"));
+        }
+        if (LookRiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            SkyLight->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
+            SkyLight->Tags.AddUnique(TEXT("RaftSimCapturedGorgeSkyFill"));
+            // The runtime presentation director keeps this intensity as the
+            // clear-weather fill instead of its shared 1.25.
+            SkyLight->Tags.AddUnique(TEXT("RaftSimAuthoredSkyFill"));
+        }
     }
 
     ASkyAtmosphere* Atmosphere = Cast<ASkyAtmosphere>(
-        GEditor->AddActor(World->GetCurrentLevel(), ASkyAtmosphere::StaticClass(), FTransform::Identity));
+        SpawnRigActor(ASkyAtmosphere::StaticClass(), FTransform::Identity));
     if (Atmosphere)
     {
         Atmosphere->SetActorLabel(TEXT("RaftSim_SkyAtmosphere_SourceAware"));
+        if (bPacuareHumidAtmosphere && Atmosphere->GetComponent())
+        {
+            // A moist, low-altitude Mie response softens distance contrast
+            // while retaining the exact source Landscape silhouette.  These
+            // parameters affect light transport only and carry no terrain,
+            // water, solver, or gameplay authority.
+            USkyAtmosphereComponent* AtmosphereComponent =
+                Atmosphere->GetComponent();
+            AtmosphereComponent->SetMultiScatteringFactor(1.08f);
+            AtmosphereComponent->SetMieScatteringScale(0.0048f);
+            AtmosphereComponent->SetMieAnisotropy(0.72f);
+            AtmosphereComponent->SetMieExponentialDistribution(0.90f);
+            Atmosphere->Tags.AddUnique(
+                TEXT("RaftSimPacuareHumidAtmosphereV1"));
+            Atmosphere->Tags.AddUnique(TEXT("RaftSimHumidAerialPerspective"));
+        }
+        if (LookRiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            Atmosphere->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
+            Atmosphere->Tags.AddUnique(TEXT("RaftSimSourceAwareDrySeasonSky"));
+        }
+        if (Spec.RiverId == TEXT("south_fork_american_chili_bar") &&
+            Atmosphere->GetComponent())
+        {
+            // Dry Sierra-summer air: deeper Rayleigh blue and far less Mie
+            // haze so the sky keeps saturation down to the horizon. The
+            // horizon sky is what grazing water mirrors — with the stock
+            // pale wash, the whole near-field river rendered as one smooth
+            // white sheet from deck-level cameras (the "broad white
+            // texture" reports; wave normals cannot texture a mirror of a
+            // featureless region). A saturated sky corridor tints that
+            // mirror blue instead. Light transport only — no terrain,
+            // water, solver, or gameplay authority.
+            USkyAtmosphereComponent* AtmosphereComponent =
+                Atmosphere->GetComponent();
+            AtmosphereComponent->SetRayleighScatteringScale(0.0442f);
+            AtmosphereComponent->SetMieScatteringScale(0.0018f);
+            AtmosphereComponent->SetMieAnisotropy(0.85f);
+            Atmosphere->Tags.AddUnique(
+                TEXT("RaftSimSouthForkDrySierraSkyV1"));
+        }
     }
 
     AExponentialHeightFog* Fog = Cast<AExponentialHeightFog>(
-        GEditor->AddActor(World->GetCurrentLevel(), AExponentialHeightFog::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 220.0f))));
+        SpawnRigActor(AExponentialHeightFog::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 220.0f))));
     if (Fog)
     {
         Fog->SetActorLabel(Spec.bHasWaterfalls ? TEXT("RaftSim_RainforestMist") : TEXT("RaftSim_CanyonAtmosphere"));
         Fog->GetComponent()->SetFogDensity(CaptureSettings.FogDensity);
         Fog->GetComponent()->SetFogInscatteringColor(CaptureSettings.FogColor);
+        if (bPacuareHumidAtmosphere)
+        {
+            UExponentialHeightFogComponent* FogComponent =
+                Fog->GetComponent();
+            // UE 5.8's state-stream setters update the live render handle, but
+            // an existing generated package can retain the prior serialized
+            // density/volumetric values.  Modify the component and mirror the
+            // two serialization-critical fields before the map is saved so a
+            // PIE reload exactly matches the reviewed capture rig.
+            FogComponent->Modify();
+            FogComponent->FogDensity = CaptureSettings.FogDensity;
+            FogComponent->bEnableVolumetricFog = false;
+            FogComponent->SetFogHeightFalloff(0.18f);
+            FogComponent->SetFogMaxOpacity(0.62f);
+            FogComponent->SetStartDistance(450.0f);
+            FogComponent->SetSecondFogDensity(0.0012f);
+            FogComponent->SetSecondFogHeightOffset(-160.0f);
+            FogComponent->SetSecondFogHeightFalloff(0.06f);
+            FogComponent->SetVolumetricFog(false);
+            FogComponent->MarkPackageDirty();
+            Fog->Tags.AddUnique(TEXT("RaftSimPacuareHumidAtmosphereV1"));
+            Fog->Tags.AddUnique(TEXT("RaftSimLayeredRainforestHumidity"));
+            Fog->Tags.AddUnique(TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+        }
+        if (LookRiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            // A shallow warm haze gives the kilometre-scale gorge readable
+            // atmospheric perspective without disguising source-terrain gaps.
+            // It affects presentation only; water, collision, and hydraulics
+            // remain unchanged.
+            Fog->GetComponent()->SetFogHeightFalloff(0.20f);
+            Fog->GetComponent()->SetVolumetricFog(true);
+            Fog->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
+            Fog->Tags.AddUnique(TEXT("RaftSimVolumetricGorgeHaze"));
+        }
     }
 
     if (SkyLight && SkyLight->GetLightComponent())
@@ -1857,8 +2027,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     }
 
     ASphereReflectionCapture* RiverReflectionCapture = Cast<ASphereReflectionCapture>(
-        GEditor->AddActor(
-            World->GetCurrentLevel(),
+        SpawnRigActor(
             ASphereReflectionCapture::StaticClass(),
             FTransform(
                 FRotator::ZeroRotator,
@@ -1870,10 +2039,30 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
                 Cast<USphereReflectionCaptureComponent>(RiverReflectionCapture->GetCaptureComponent()))
         {
             ReflectionComponent->InfluenceRadius = 42000.0f;
-            ReflectionComponent->Brightness = 1.0f;
+            ReflectionComponent->Brightness =
+                bColdWaterHighlightNaturalism
+                ? 0.65f
+                : LookRiverId == TEXT("zambezi_batoka_gorge")
+                ? 0.62f
+                : 1.0f;
             ReflectionComponent->ReflectionSourceType = EReflectionSourceType::CapturedScene;
             ReflectionComponent->bRuntimeCapture = true;
             ReflectionComponent->MarkDirtyForRecapture();
+            if (Spec.RiverId == TEXT("chilko_river_lava_canyon"))
+            {
+                RiverReflectionCapture->Tags.AddUnique(
+                    TEXT("RaftSimChilkoRestrainedReflectionRigV3"));
+            }
+            if (bColdWaterHighlightNaturalism)
+            {
+                RiverReflectionCapture->Tags.AddUnique(
+                    TEXT("RaftSimColdWaterHighlightNaturalismV1"));
+            }
+            if (LookRiverId == TEXT("zambezi_batoka_gorge"))
+            {
+                RiverReflectionCapture->Tags.AddUnique(
+                    TEXT("RaftSimZambeziExposureSafeReflectionRigV18"));
+            }
             World->SendAllEndOfFrameUpdates();
             UReflectionCaptureComponent::UpdateReflectionCaptureContents(
                 World,

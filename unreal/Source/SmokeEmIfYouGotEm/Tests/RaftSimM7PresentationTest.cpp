@@ -1,6 +1,9 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Camera/PlayerCameraManager.h"
+#include "Components/SkyLightComponent.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/SkyLight.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Framework/Application/SlateApplication.h"
@@ -14,6 +17,7 @@
 #include "RaftSimRaftActor.h"
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimVerticalSliceFrontend.h"
+#include "Slate/SceneViewport.h"
 #include "Tests/AutomationCommon.h"
 #include "UnrealClient.h"
 
@@ -21,6 +25,7 @@
 #include "../RaftSimPresentationDirector.h"
 #include "../RaftSimRunAudioDirector.h"
 #include "../RaftSimRunHudWidget.h"
+#include "RaftSimCaptureViewportGuard.h"
 
 #if WITH_AUTOMATION_TESTS
 
@@ -90,7 +95,7 @@ bool FRaftSimM7TriggerAudio::Update()
     if (Audio != nullptr)
     {
         Test->TestEqual(TEXT("eight authored procedural mix layers"), Audio->GetProductionLayerCount(), 8);
-        Test->TestTrue(TEXT("every production layer contains queued PCM"), Audio->HasQueuedPcmForEveryLayer());
+        Test->TestTrue(TEXT("every production layer streams a live synth voice"), Audio->HasStreamingVoiceForEveryLayer());
     }
     if (Raft != nullptr)
     {
@@ -112,12 +117,26 @@ bool FRaftSimM7AssertAudioResponse::Update()
     }
     const FRaftSimProductionAudioMixState Mix = Audio->GetProductionMixState();
     Test->TestEqual(TEXT("all production layers remain active"), Mix.ActiveLayerCount, 8);
-    Test->TestTrue(TEXT("paddle stroke opens paddle envelope"), Mix.Paddle > 0.05f);
+    // The audible Paddle channel is ducked by water loudness BY DESIGN
+    // (2026-08-10: rushing water must bury strokes), so the stroke's
+    // observability assertion moved to the pre-duck envelope; the channel
+    // itself must merely stay alive.
+    Test->TestTrue(TEXT("paddle stroke opens paddle envelope"),
+        Mix.PaddleStrokeEnvelope > 0.05f);
+    Test->TestTrue(TEXT("ducked paddle channel stays alive"), Mix.Paddle > 0.0f);
     Test->TestTrue(TEXT("crew command opens crew callout envelope"), Mix.CrewAndRescue > 0.05f);
     Test->TestTrue(TEXT("river bed is never a silent placeholder"), Mix.RiverBed > 0.05f);
     Test->TestTrue(TEXT("adaptive music bed is present"), Mix.Music >= 0.035f);
     Test->TestTrue(TEXT("occlusion filter stays audible and finite"),
         FMath::IsFinite(Mix.OcclusionLowPassHz) && Mix.OcclusionLowPassHz >= 4000.0f);
+    // Leave the shared tank map at rest: the AllForward issued to open the
+    // callout envelope otherwise keeps the raft driving at the governor cap
+    // for whatever test reuses this world next (2026-08-11: P1 measured it
+    // as 2.44 m/s of phantom "self-propulsion").
+    if (ARaftSimRaftActor* Raft = FindM7Actor<ARaftSimRaftActor>(FindM7World()))
+    {
+        Raft->IssueCrewCommand(ERaftSimCrewCommand::Rest);
+    }
     return true;
 }
 
@@ -145,9 +164,55 @@ bool FRaftSimM7AssertCameraWeather::Update()
         Test->TestTrue(TEXT("storm supplies wet/reverberant dusk state"),
             Storm.WeatherWetness >= 0.85f && Storm.ReverbStrength >= 0.65f &&
             Storm.TimeOfDayHours >= 18.0f);
+        Test->TestTrue(TEXT("storm enables coherent volumetric cloud cover"),
+            Presentation->IsCloudLayerVisible());
     }
     if (Guide != nullptr)
     {
+        const auto HasProductionExposure = [this](
+            const TCHAR* Label,
+            const UCameraComponent* Camera)
+        {
+            Test->TestNotNull(Label, Camera);
+            if (Camera == nullptr)
+            {
+                return;
+            }
+            const FPostProcessSettings& Settings = Camera->PostProcessSettings;
+            Test->TestTrue(
+                FString::Printf(TEXT("%s uses deterministic manual exposure"), Label),
+                Settings.bOverride_AutoExposureMethod &&
+                    Settings.AutoExposureMethod == AEM_Manual &&
+                    Settings.bOverride_AutoExposureApplyPhysicalCameraExposure &&
+                    Settings.AutoExposureApplyPhysicalCameraExposure == 0);
+            Test->TestTrue(
+                FString::Printf(TEXT("%s retains bounded photographic exposure"), Label),
+                Settings.bOverride_AutoExposureBias &&
+                    FMath::IsNearlyEqual(Settings.AutoExposureBias, 1.25f, 0.001f));
+            Test->TestTrue(
+                FString::Printf(TEXT("%s compresses highlights and recovers faces"), Label),
+                // Independent values from the Aug27 anti-flicker contract in
+                // docs/water-visual-feature-plan.md, not pre-fix exposure.
+                Settings.bOverride_LocalExposureMethod &&
+                    Settings.LocalExposureMethod == ELocalExposureMethod::Bilateral &&
+                    Settings.bOverride_LocalExposureHighlightContrastScale &&
+                    FMath::IsNearlyEqual(
+                        Settings.LocalExposureHighlightContrastScale, 0.86f, 0.001f) &&
+                    Settings.bOverride_LocalExposureShadowContrastScale &&
+                    FMath::IsNearlyEqual(
+                        Settings.LocalExposureShadowContrastScale, 0.76f, 0.001f) &&
+                    Settings.bOverride_LocalExposureBlurredLuminanceBlend &&
+                    FMath::IsNearlyEqual(
+                        Settings.LocalExposureBlurredLuminanceBlend, 0.70f, 0.001f));
+            Test->TestTrue(
+                FString::Printf(TEXT("%s retains anti-flicker detail and luminance support"), Label),
+                Settings.bOverride_LocalExposureDetailStrength &&
+                    FMath::IsNearlyEqual(Settings.LocalExposureDetailStrength, 0.75f, 0.001f) &&
+                Settings.bOverride_LocalExposureBlurredLuminanceKernelSizePercent &&
+                    FMath::IsNearlyEqual(Settings.LocalExposureBlurredLuminanceKernelSizePercent, 65.0f, 0.001f));
+        };
+        HasProductionExposure(TEXT("guide camera"), Guide->GetGuideCamera());
+        HasProductionExposure(TEXT("chase camera"), Guide->GetChaseCamera());
         Test->TestNotNull(TEXT("optional chase camera is constructed"), Guide->GetChaseCamera());
         Guide->SetChaseCameraAllowed(true);
         Test->TestTrue(TEXT("Free Run chase camera toggles on"),
@@ -269,6 +334,19 @@ bool FRaftSimM7PrepareFullReachCapture::Update()
         Presentation->SetWeatherVariant(ERaftSimWeatherVariant::ClearMorning, true);
         Test->TestTrue(TEXT("full-reach authored atmosphere actors are bound"),
             Presentation->HasBoundEnvironmentActors());
+        Test->TestTrue(TEXT("full-reach clear morning retains reflective high clouds"),
+            Presentation->IsCloudLayerVisible());
+        ASkyLight* SkyLight = FindM7Actor<ASkyLight>(World);
+        Test->TestNotNull(TEXT("full-reach captured-scene skylight is present"), SkyLight);
+        if (SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr)
+        {
+            Test->TestTrue(TEXT("clear morning retains authored outdoor fill"),
+                SkyLight->GetLightComponent()->Intensity >= 1.20f &&
+                SkyLight->GetLightComponent()->Intensity <= 1.25f);
+            Test->TestFalse(
+                TEXT("cloud reflection uses a stable one-shot sky capture"),
+                SkyLight->GetLightComponent()->IsRealTimeCaptureEnabled());
+        }
     }
     if (Audio != nullptr)
     {
@@ -314,12 +392,76 @@ bool FRaftSimM7CaptureFullReach::Update()
     {
         const UCameraComponent* Chase = Guide->GetChaseCamera();
         const APlayerCameraManager* CameraManager = Controller->PlayerCameraManager;
+        if (Chase != nullptr && CameraManager != nullptr)
+        {
+            const FRotator ViewRotation = CameraManager->GetCameraRotation();
+            Test->AddInfo(FString::Printf(
+                TEXT("Full-reach capture camera=%s rotation=%s pawn=%s pawn_rotation=%s "
+                     "chase=%s clearance_cm=%.1f"),
+                *CameraManager->GetCameraLocation().ToCompactString(),
+                *ViewRotation.ToCompactString(),
+                *Guide->GetActorLocation().ToCompactString(),
+                *Guide->GetActorRotation().ToCompactString(),
+                *Chase->GetComponentLocation().ToCompactString(),
+                Guide->GetCameraRuntimeState().ChaseWaterClearanceCm));
+            UE_LOG(LogTemp, Display,
+                TEXT("RAFTSIM_M7_CAPTURE_DIAGNOSTIC camera=%s rotation=%s pawn=%s "
+                     "pawn_rotation=%s chase=%s clearance_cm=%.1f"),
+                *CameraManager->GetCameraLocation().ToCompactString(),
+                *ViewRotation.ToCompactString(),
+                *Guide->GetActorLocation().ToCompactString(),
+                *Guide->GetActorRotation().ToCompactString(),
+                *Chase->GetComponentLocation().ToCompactString(),
+                Guide->GetCameraRuntimeState().ChaseWaterClearanceCm);
+            Test->TestTrue(TEXT("rendered chase camera preserves world up"),
+                ViewRotation.RotateVector(FVector::UpVector).Z > 0.85f);
+            Test->TestTrue(TEXT("rendered chase camera has a bounded downward pitch"),
+                ViewRotation.Pitch < -1.0f && ViewRotation.Pitch > -45.0f);
+            Test->TestTrue(TEXT("rendered chase camera clears the sampled water"),
+                Guide->GetCameraRuntimeState().ChaseWaterClearanceCm >= 300.0f);
+        }
         Test->TestTrue(TEXT("rendered view uses the upright chase camera"),
             Chase != nullptr && CameraManager != nullptr &&
             FVector::Distance(CameraManager->GetCameraLocation(), Chase->GetComponentLocation()) < 5.0f &&
             FMath::Abs(CameraManager->GetCameraRotation().Roll) < 2.0f &&
             CameraManager->GetCameraRotation().Vector().Z < -0.05f);
     }
+    return true;
+}
+
+DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
+    FRaftSimM7CaptureFullReachEnvironment, FAutomationTestBase*, Test);
+bool FRaftSimM7CaptureFullReachEnvironment::Update()
+{
+    UWorld* World = FindM7World();
+    ARaftSimGuidePlayerController* Controller = Cast<ARaftSimGuidePlayerController>(
+        UGameplayStatics::GetPlayerController(World, 0));
+    if (Controller == nullptr || Controller->GetRunHud() == nullptr)
+    {
+        Test->AddError(TEXT("full-reach shell missing at clean environment capture"));
+        return true;
+    }
+    // Keep the authored presentation capture above, then ask Unreal for the
+    // game scene without Slate UI. Restricting the request to the game
+    // viewport is essential in an editor automation process; otherwise the
+    // active level-editor viewport can satisfy the request instead of PIE.
+    if (FApp::CanEverRender())
+    {
+        UGameViewportClient* GameViewportClient = World->GetGameViewport();
+        FSceneViewport* SceneViewport =
+            GameViewportClient != nullptr ? GameViewportClient->GetGameViewport() : nullptr;
+        if (SceneViewport == nullptr)
+        {
+            Test->AddError(TEXT("PIE game viewport missing at clean environment capture"));
+            return true;
+        }
+        FScreenshotRequest::RequestScreenshot(
+            TEXT("M7_FullReachEnvironment.png"), false, false, false, FIntRect(), true);
+        Test->TestTrue(TEXT("clean full-reach game viewport capture saved"),
+            GameViewportClient->ProcessScreenShots(SceneViewport));
+    }
+    Test->TestTrue(TEXT("clean full-reach review keeps the run shell active"),
+        Controller->GetRunHud()->IsInViewport());
     return true;
 }
 }
@@ -338,6 +480,14 @@ bool FRaftSimM7ProductionAudioTest::RunTest(const FString&)
 
 bool FRaftSimM7CameraWeatherTest::RunTest(const FString&)
 {
+#if PLATFORM_MAC
+    // UE 5.8 offscreen PIE can release the NSWindow before its text-input
+    // context. Suppress only that exact engine teardown diagnostic.
+    AddExpectedErrorPlain(
+        TEXT("LogMacTextInputMethodSystem: Deactivating a context failed when its window couldn't be found."),
+        EAutomationExpectedErrorFlags::Contains,
+        -1);
+#endif
     AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank"));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.5f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimM7AssertCameraWeather(this));
@@ -348,6 +498,7 @@ bool FRaftSimM7RuntimePresentationTest::RunTest(const FString&)
 {
     AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank"));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.5f));
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimEnsureCaptureViewport(this));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimM7PrepareCapture(this));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.5f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimM7CapturePresentation(this));
@@ -357,13 +508,25 @@ bool FRaftSimM7RuntimePresentationTest::RunTest(const FString&)
 
 bool FRaftSimM7FullReachPresentationTest::RunTest(const FString&)
 {
+#if PLATFORM_MAC
+    // UE 5.8 can tear down the offscreen test-tank PIE window before its
+    // text-input context while this fixture transitions into World Partition.
+    // Suppress only that exact engine diagnostic; gameplay errors still fail.
+    AddExpectedErrorPlain(
+        TEXT("LogMacTextInputMethodSystem: Deactivating a context failed when its window couldn't be found."),
+        EAutomationExpectedErrorFlags::Contains,
+        -1);
+#endif
     AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank"));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.5f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimM7OpenFullReach(this));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(12.0f));
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimEnsureCaptureViewport(this));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimM7PrepareFullReachCapture(this));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.75f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimM7CaptureFullReach(this));
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.5f));
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimM7CaptureFullReachEnvironment(this));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.5f));
     return true;
 }

@@ -1,0 +1,45 @@
+#include "/Engine/Public/Platform.ush"
+uint ColumnCount;
+uint Depth;
+StructuredBuffer<uint4> Columns;
+#if RAFTSIM_HALO_VECTOR
+#define HALO_VALUE float4
+#else
+#define HALO_VALUE float
+#endif
+#define DECLARE_GRID(N) RWTexture3D<HALO_VALUE> Grids_##N;
+DECLARE_GRID(0) DECLARE_GRID(1) DECLARE_GRID(2) DECLARE_GRID(3)
+DECLARE_GRID(4) DECLARE_GRID(5) DECLARE_GRID(6) DECLARE_GRID(7)
+DECLARE_GRID(8) DECLARE_GRID(9) DECLARE_GRID(10) DECLARE_GRID(11)
+DECLARE_GRID(12) DECLARE_GRID(13) DECLARE_GRID(14) DECLARE_GRID(15)
+
+HALO_VALUE ReadPhysical(uint Owner,uint3 P)
+{
+    switch(Owner) {
+#define READ_GRID(N) case N: return Grids_##N[P];
+    READ_GRID(0) READ_GRID(1) READ_GRID(2) READ_GRID(3)
+    READ_GRID(4) READ_GRID(5) READ_GRID(6) READ_GRID(7)
+    READ_GRID(8) READ_GRID(9) READ_GRID(10) READ_GRID(11)
+    READ_GRID(12) READ_GRID(13) READ_GRID(14) READ_GRID(15)
+    }
+    return 0; // CPU validates every owner; unreachable.
+}
+void WriteHalo(uint Owner,uint3 P,HALO_VALUE Value)
+{
+    switch(Owner) {
+#define WRITE_GRID(N) case N: Grids_##N[P]=Value; break;
+    WRITE_GRID(0) WRITE_GRID(1) WRITE_GRID(2) WRITE_GRID(3)
+    WRITE_GRID(4) WRITE_GRID(5) WRITE_GRID(6) WRITE_GRID(7)
+    WRITE_GRID(8) WRITE_GRID(9) WRITE_GRID(10) WRITE_GRID(11)
+    WRITE_GRID(12) WRITE_GRID(13) WRITE_GRID(14) WRITE_GRID(15)
+    }
+}
+[numthreads(64,1,1)]
+void MainCS(uint3 Id:SV_DispatchThreadID)
+{
+    if(Id.x>=ColumnCount || Id.y>=Depth) return;
+    uint4 S=Columns[2*Id.x],D=Columns[2*Id.x+1];
+    // Physical source and halo destination sets are disjoint. Every destination
+    // is unique. Bidirectional exchange is race-free without intra-pass barriers.
+    WriteHalo(D.x,uint3(D.yz,Id.y),ReadPhysical(S.x,uint3(S.yz,Id.y)));
+}

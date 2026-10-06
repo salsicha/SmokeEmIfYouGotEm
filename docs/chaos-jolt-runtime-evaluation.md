@@ -67,7 +67,7 @@ Both Chaos and Jolt must run the same six fixtures with the same water snapshots
 - Chaos automation fixture export: `unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json`.
 - Chaos fixture summary: `physics/reports/milestone19/chaos/summary.json` and `.md`.
 - Chaos replay summaries: `physics/reports/milestone19/chaos/replays/*.replay_summary.json`.
-- Jolt native smoke harness manifest: `physics/cpp/tests/jolt_smoke_harness_manifest.json`.
+- Jolt native smoke harness manifest: `unreal/Plugins/SEIYGECore/cpp/tests/jolt_smoke_harness_manifest.json`.
 - Jolt fixture summary: `physics/reports/milestone19/jolt/summary.json` and `.md`.
 - Jolt replay summaries: `physics/reports/milestone19/jolt/replays/*.replay_summary.json`.
 - Chaos-vs-Jolt comparison report: `physics/reports/milestone19/chaos_vs_jolt_comparison.json` and `.md`.

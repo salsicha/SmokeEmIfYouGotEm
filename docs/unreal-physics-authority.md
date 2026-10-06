@@ -45,7 +45,7 @@ Jolt must consume the same custom-water query API and emit the same telemetry/re
 
 ## Custom Reduced Fallback
 
-`CustomReducedRigidBody` is the selected first vertical-slice raft/contact/swimmer authority because the Milestone 19 comparison report currently blocks Chaos or Jolt selection pending measured runtime telemetry.
+`CustomReducedRigidBody` remains the selected raft/contact/swimmer authority. The D6 Unreal Chaos rigid baseline is now genuinely measured for all seven flexible-raft comparison fixtures, but those baseline deltas do not select Chaos as scoring authority and do not replace the separate Chaos/Jolt runtime-authority suite.
 
 Milestone 22 implements that selection through `unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json`, but the blocked Milestone 20 report-set lock must prevent live C++ water authority. `URaftSimPhysicsBridgeSubsystem` may use frozen validation snapshots for the raft/contact evaluation; Chaos remains visual/non-authoritative unless the shared fixture suite later allows scoring-critical authority.
 
@@ -53,6 +53,8 @@ Contact response telemetry is defined in `unreal/Content/RaftSim/Physics/raft_co
 
 The fallback may be replaced only after:
 
-- Unreal Chaos automation fixtures are run with measured telemetry.
+- The full Chaos runtime-authority fixtures (impact, shelf grounding, pin/release, swimmer transition, 1000-step replay, and crowded cost) are run with measured telemetry; the completed D6 flexible-raft baseline alone is insufficient.
 - The native Jolt SDK/plugin harness is run with measured telemetry.
 - The Chaos-vs-Jolt comparison report allows scoring-critical authority selection.
+
+The D6 external-measurement implementation is technically complete: seven genuine Chaos baseline records plus seven independent Project Chrono compliant records populate the 14-record comparison, which passes with zero missing targets and zero failed compliant metrics. D6 remains fail-closed because named physics, Unreal-integration, deterministic-replay, and professional guide/safety reviews have not approved promotion. This result does not select Chaos as scoring authority or replace the separate Chaos/Jolt authority suite.

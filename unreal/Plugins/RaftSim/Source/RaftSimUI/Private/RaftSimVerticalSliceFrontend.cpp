@@ -31,8 +31,9 @@ FRaftSimCareerScenarioDefinition MakeScenario(
 
 TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenarioCatalog()
 {
-    // These are real launch contracts, not menu labels. The four South Fork
-    // section bounds share the continuous M4 map and M3 moving-water runtime.
+    // These are launch contracts, not menu labels. South Fork bounds match
+    // reconstruction_2026_09/full_reach/playable_route/session_contracts.json.
+    // Named boundaries are provisional guide mileage, not surveyed landmarks.
     // Completion checkpoints let a new guide resume the next section at the
     // exact transform already reached in the preceding section.
     return {
@@ -45,52 +46,76 @@ TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenario
             TEXT("south_fork_upper"), TEXT("South Fork I: Chili Bar to Coloma"),
             TEXT("Guide the upper reach, establish crew timing, and finish clean at Coloma."),
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::Trainee, 1, 120.0f, 5200.0f),
+            ERaftSimLicenseTier::Trainee, 1, 120.0f, 9012.3264f),
         MakeScenario(
             TEXT("south_fork_coloma"), TEXT("South Fork II: Coloma Valley"),
             TEXT("Read the transition water and prepare the crew for the gorge."),
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::TripLeader, 2, 5200.0f, 18500.0f),
+            ERaftSimLicenseTier::TripLeader, 2, 9012.3264f, 25427.6352f),
         MakeScenario(
             TEXT("south_fork_gorge"), TEXT("South Fork III: Gorge Rapids"),
             TEXT("Run the technical gorge sequence with deliberate lines and rescue readiness."),
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::SeniorGuide, 3, 18500.0f, 33000.0f),
+            ERaftSimLicenseTier::SeniorGuide, 3, 25427.6352f, 29933.0304f),
         MakeScenario(
             TEXT("south_fork_lower"), TEXT("South Fork IV: Lower Gorge to Salmon Falls"),
             TEXT("Manage fatigue and finish the long lower reach at the take-out."),
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::SeniorGuide, 4, 33000.0f, 48900.0f),
+            ERaftSimLicenseTier::SeniorGuide, 4, 29933.0304f, 33280.0f),
         MakeScenario(
             TEXT("south_fork_full_descent"), TEXT("South Fork: Full Guided Descent"),
-            TEXT("Guide the complete 48.8 km run in one continuous scored trip."),
+            TEXT("Guide the reconstructed 33.2 km playable reach, including Troublemaker, in one continuous scored trip."),
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::ExpeditionGuide, 5, 120.0f, 48900.0f, false, true),
-        MakeScenario(
-            TEXT("troublemaker_challenge"), TEXT("Troublemaker Rapid Challenge"),
-            TEXT("A short technical challenge at the commercial flow band."),
-            TEXT("/Game/RaftSim/Maps/L_Troublemaker"),
-            ERaftSimLicenseTier::Trainee, 10, -1.0f, -1.0f),
+            ERaftSimLicenseTier::ExpeditionGuide, 5, 120.0f, 33280.0f, false, true),
         MakeScenario(
             TEXT("hance_challenge"), TEXT("Hance Rapid Free Run"),
-            TEXT("Bonus large-volume Colorado rapid slice."),
+            TEXT("Keep the boat in position through Hance and continue into Son of Hance without a reset."),
             TEXT("/Game/RaftSim/Maps/L_Hance"),
-            ERaftSimLicenseTier::ExpeditionGuide, 11, -1.0f, -1.0f),
+            ERaftSimLicenseTier::ExpeditionGuide, 11, 520.0f, 1500.0f),
         MakeScenario(
             TEXT("upper_huacas_challenge"), TEXT("Upper Huacas Free Run"),
-            TEXT("Bonus rain-fed Pacuare rapid slice."),
+            TEXT("Run the Huacas gorge, prepare both Lower Pinball moves, and continue through Guatemala."),
             TEXT("/Game/RaftSim/Maps/L_UpperHuacas"),
-            ERaftSimLicenseTier::ExpeditionGuide, 12, -1.0f, -1.0f),
+            ERaftSimLicenseTier::ExpeditionGuide, 12, 280.0f, 2328.0f),
         MakeScenario(
             TEXT("terminator_challenge"), TEXT("Terminator Free Run"),
-            TEXT("Bonus Futaleufu big-water rapid slice."),
+            TEXT("Link Terminator's entrance, crux, and exit moves into Khyber Pass and the Himalayas."),
             TEXT("/Game/RaftSim/Maps/L_Terminator"),
-            ERaftSimLicenseTier::ExpeditionGuide, 13, -1.0f, -1.0f),
+            ERaftSimLicenseTier::ExpeditionGuide, 13, 750.0f, 2380.0f),
         MakeScenario(
             TEXT("lava_canyon_challenge"), TEXT("Lava Canyon Free Run"),
-            TEXT("Bonus Chilko rapid slice."),
+            TEXT("Manage position, crew fatigue, and swimmer recovery through the continuous Lava Canyon section."),
             TEXT("/Game/RaftSim/Maps/L_LavaCanyon"),
-            ERaftSimLicenseTier::ExpeditionGuide, 14, -1.0f, -1.0f)
+            ERaftSimLicenseTier::ExpeditionGuide, 14, 600.0f, 3975.0f),
+        // Rapid stations and the Mukuni Beach finish are observed
+        // (observed_rapids/batoka_run_observed_rapids.json: Sentinel-2
+        // whitewater, side-stream confluences, outfitter km); Rapid 25 is at
+        // ~28.3 km, past the stylised map's 27.36 km end.
+        MakeScenario(
+            TEXT("zambezi_reference_run"), TEXT("Zambezi: Boiling Pot to Mukuni Beach"),
+            TEXT("Runnable Reference Free Run: guide the source-scale Batoka Gorge corridor "
+                 "past all 25 rapids at their observed stations to Mukuni Beach. Water and "
+                 "missing bathymetry are procedural, with each rapid's observed whitewater, "
+                 "pending guide and rapid-specific hydraulic review; Rapid 9 is a mandatory "
+                 "portage."),
+            TEXT("/Game/RaftSim/Maps/L_Zambezi"),
+            ERaftSimLicenseTier::ExpeditionGuide, 15, 0.0f, 28950.0f),
+        // Stations are the upper-gorge progress map's (Sentinel-2 midline);
+        // they match the map's run manager and the export's checked launch.
+        MakeScenario(
+            TEXT("zambezi_upper_gorge_challenge"), TEXT("Zambezi: Boiling Pot to Stairway to Heaven"),
+            TEXT("Evidence-based low-water upper Batoka Gorge (283 m3/s, the 2025-10-03 Sentinel-2 day): "
+                 "banks, whitewater and terrain are measured; the bed and gorge walls are inferred."),
+            TEXT("/Game/RaftSim/Maps/L_ZambeziUpperGorge"),
+            ERaftSimLicenseTier::ExpeditionGuide, 16, 212.7f, 3382.0f),
+        MakeScenario(
+            TEXT("catalog_badger_creek"), TEXT("Colorado: Badger Creek"),
+            TEXT("8000 cfs construction reach. Set up beside the upper-right hydraulic, "
+                 "then keep the oar raft square through the following waves. "
+                 "2021 surveyed water profile; rapid bed and individual hydraulics are inferred. "
+                 "Difficulty calibration is in progress."),
+            TEXT("/Game/RaftSim/Maps/Catalog/L_Colorado_BadgerCreek"),
+            ERaftSimLicenseTier::ExpeditionGuide, 17, 300.0f, 1300.0f)
     };
 }
 

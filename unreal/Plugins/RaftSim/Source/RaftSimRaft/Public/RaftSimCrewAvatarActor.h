@@ -3,12 +3,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "UObject/Interface.h"
 
 #include "RaftSimCrewAvatarActor.generated.h"
 
 class UMaterialInterface;
+class UMaterialInstanceDynamic;
+class UChildActorComponent;
 class UProceduralMeshComponent;
 class USceneComponent;
+class UStaticMeshComponent;
 
 /** Project-owned articulated animation states; no third-party character asset is required. */
 UENUM(BlueprintType)
@@ -26,7 +30,40 @@ enum class ERaftSimCrewAvatarAction : uint8
     Swimming,
     ReachRescue,
     ThrowLine,
-    Reentry
+    Reentry,
+    HaulLine,
+    FlipLineClimb,
+    FlipLineStand,
+    FlipLinePull,
+    /** On the back, feet downstream, both fists on a throw rope over the shoulder. */
+    RopeTow
+};
+
+/**
+ * Contract implemented by a production character wrapper Blueprint. The
+ * wrapper can contain an assembled MetaHuman (or an equivalent licensed
+ * skeletal character) while the raft simulation remains asset-agnostic.
+ */
+UINTERFACE(BlueprintType)
+class RAFTSIMRAFT_API URaftSimCrewProductionVisual : public UInterface
+{
+    GENERATED_BODY()
+};
+
+class RAFTSIMRAFT_API IRaftSimCrewProductionVisual
+{
+    GENERATED_BODY()
+
+public:
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "RaftSim|Crew|Production")
+    void ConfigureCrewAppearance(int32 VariantIndex, int32 SeatSide, bool bGuide);
+
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "RaftSim|Crew|Production")
+    void ApplyCrewPose(
+        ERaftSimCrewAvatarAction Action,
+        float NormalizedPhase,
+        float Intensity,
+        int32 SeatSide);
 };
 
 /** Joint targets in avatar-local centimetres. */
@@ -51,6 +88,19 @@ struct FRaftSimCrewAvatarPose
     FVector PaddleTopCm = FVector::ZeroVector;
     FVector PaddleBottomCm = FVector::ZeroVector;
     bool bShowPaddle = true;
+    float BoardingPalmSupportBlend = 0.f;
+    // Hidden paddle during boarding; blend the rig toward its seated grip
+    // independently of whether the paddle prop is visible.
+    float BoardingPaddleGripBlend = 0.f;
+    bool bFeetPlanted = false;
+    /** Both hands hold oar handles (an oar rig's rower): each hand grips
+     * along its own oar, whose direction from handle toward blade is
+     * LeftOarAxis / RightOarAxis. The paddle prop stays hidden. */
+    bool bOarGrip = false;
+    FVector LeftOarAxis = FVector::RightVector * -1.0;
+    FVector RightOarAxis = FVector::RightVector;
+    /** Closed fists without a paddle: rope, PFD shoulder straps, perimeter line. */
+    float FistGripBlend = 0.f;
 };
 
 UCLASS()
@@ -66,15 +116,47 @@ public:
         float NormalizedPhase,
         int32 SeatSide
     );
+
+    /** Small repeatable timing error that keeps a commanded crew coordinated but not cloned. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
+    static float GetDeterministicTimingOffset(int32 VariantIndex, bool bGuide);
+
+    /** Start of the planted-blade interval used by propulsion (normalized phase). */
+    static float GetPaddlePowerPhaseStart();
+
+    /** End of the planted-blade interval used by propulsion (normalized phase). */
+    static float GetPaddlePowerPhaseEnd();
+
+    /** True only while the visible blade is planted and driving mid-stroke. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
+    static bool IsPaddleBladeInPowerPhase(float NormalizedPhase);
+
+    /** The blade's face normal for a shaft running T-grip to blade along
+     * Direction: forward on a working stroke, up for a paddle resting across
+     * the lap. */
+    static FVector GetPaddleBladeNormal(const FVector& Direction, bool bResting);
+
+    /** The blade's width axis, oriented toward -Y. A paddle's T-grip
+     * crossbar runs parallel to it, so the top hand's knuckles line up with
+     * the blade and the paddler can feel its angle. */
+    static FVector GetPaddleBladeWidthAxis(const FVector& Direction, bool bResting);
+
+    /** A seated rower on an oar frame, facing the bow: hands on the two oar
+     * handles (grip centres and oar directions, avatar-local), feet braced
+     * on the foot bar, the torso leaning and twisting with the handles. */
+    static FRaftSimCrewAvatarPose EvaluateRowingPose(
+        const FVector& LeftGripCm, const FVector& LeftOarAxis,
+        const FVector& RightGripCm, const FVector& RightOarAxis,
+        const FVector& FootBarCm);
+
 };
 
 /**
- * Project-owned, procedurally meshed crew character. Rounded organic body,
- * splash clothing, PFD, helmet, paddle, and joint-driven animation are built
- * from source at runtime, avoiding placeholder Engine primitives and raw-asset
- * redistribution concerns.
+ * Crew presentation host. It prefers a configured production-character
+ * wrapper implementing IRaftSimCrewProductionVisual and retains the complete
+ * project-owned procedural character as a deterministic missing-asset fallback.
  */
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, Config = Game, DefaultConfig)
 class RAFTSIMRAFT_API ARaftSimCrewAvatarActor : public AActor
 {
     GENERATED_BODY()
@@ -85,11 +167,98 @@ public:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaSeconds) override;
 
+    // Raft drives root animation and consumes the SAME displacement as mass.
+    // A leap is gather (crouch, paddle out), take-off, a ballistic flight,
+    // a compressed landing on the downstream tube and a low hold with the
+    // outboard hand on the perimeter line. StartDelaySeconds staggers the
+    // crew inside the fixed transfer time; the guide calling it goes first.
+    void BeginHighSideTransfer(const FVector& TargetRaftCm, int32 Direction, float StartDelaySeconds = 0.f);
+    void ReturnFromHighSide(float StartDelaySeconds = 0.f);
+    void AdvanceHighSideTransfer(float DeltaSeconds);
+    void ResetHighSideTransfer();
+    bool HasHighSideTransfer() const { return bCrewTransfer; }
+    int32 GetHighSideTransferDirection() const { return CrewTransferDirection; }
+    /** Mass displacement: the root's path along the boat without the jump arc. */
+    FVector GetHighSideTransferOffsetCm() const;
+    /** 0..1 progress of the current leap or return after its stagger delay. */
+    float GetHighSideMotionAlpha() const;
+    /** Root is off the boat (between take-off and touchdown). */
+    bool IsHighSideAirborne() const { return bCrewTransfer && CrewTransferLift > .5f; }
+    static constexpr float HighSideTransferSeconds = .8f;
+    /** Scramble back across the floor and sit: low, hands down, no leap. */
+    static constexpr float HighSideReturnSeconds = 1.8f;
+
+    /** The equipment and owned CC0 body consume the same fitted pose. */
+    bool TryGetRenderedPose(ERaftSimCrewAvatarAction Action, float Phase, FRaftSimCrewAvatarPose& OutPose) const;
+    const FRaftSimCrewAvatarPose& GetPublishedCrewPose() const { return LastRenderedPose; }
+    void SetBoardingPose(const FRaftSimCrewAvatarPose& Start, const FRaftSimCrewAvatarPose& End, float Alpha);
+    bool TryGetBoardingGripDestination(FRaftSimCrewAvatarPose& OutPose) const;
+    void SetBoardingReachPose(const FRaftSimCrewAvatarPose& Reach) { BoardingReachPose = BoardingPullPose = Reach; bBoardingHasReach = true; }
+    void SetBoardingPullPose(const FRaftSimCrewAvatarPose& Pull) { BoardingPullPose = Pull; }
+    void SetBoardingLegOverPoses(const FRaftSimCrewAvatarPose& Lift, const FRaftSimCrewAvatarPose& Over) { BoardingLiftPose = Lift; BoardingLegOverPose = Over; }
+    void AdvanceBoardingPose(float Alpha);
+    void SetBoardingTransferFrames(const FTransform& ReachToCurrent, const FTransform& SeatToCurrent)
+    { BoardingReachToCurrent = ReachToCurrent; BoardingSeatToCurrent = SeatToCurrent; bBoardingHasTransferFrames = true; }
+    static constexpr float BoardingReachFraction = .35f;
+    static constexpr float BoardingPullFraction = .6f;
+    static constexpr float BoardingLiftFraction = .675f;
+    static constexpr float BoardingLegOverFraction = .75f;
+
+    /** Contact solve succeeded; independent tread/mesh checks remain required. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
+    bool HasPlantedRenderedFeet() const { return bHasRenderedPose && LastRenderedPose.bFeetPlanted; }
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Animation")
     void SetAvatarAction(ERaftSimCrewAvatarAction NewAction, float Intensity = 1.0f);
 
+    /** Validation captures: pose this avatar at one point of an action's
+     * cycle (0 catch .. 0.58 exit .. 1 the next catch for the strokes). */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Validation")
+    void SetAvatarActionPhaseForValidation(ERaftSimCrewAvatarAction NewAction, float NormalizedPhase);
+
+    /** Drive the seated pose from outside (an oar rig posing its rower each
+     * frame). Replaces the library pose while the avatar is SeatedIdle;
+     * other actions (swimming, boarding) keep their own. bApplyNow poses
+     * the body immediately instead of on the avatar's next tick. */
+    void SetExternalPose(const FRaftSimCrewAvatarPose& Pose, bool bApplyNow = false);
+    void ClearExternalPose();
+    bool HasExternalPose() const { return bHasExternalPose; }
+
+    /**
+     * Hides this avatar's head and helmet so a first-person camera can sit
+     * in its eye socket (possessed guide seat). Idempotent per value.
+     */
+    void SetFirstPersonHeadHidden(bool bShouldHide);
+
+    /**
+     * Hides the avatar's whole body (torso, gear, limbs, paddle) for the
+     * possessed guide's over-the-shoulder glance: with the camera in the eye
+     * socket, turning the view rearward otherwise fills the screen with the
+     * inside of the guide's own arms and vest. Idempotent per value.
+     */
+    void SetFirstPersonBodyHidden(bool bShouldHide);
+
+    /**
+     * World-space centre of the posed head. Valid while the head is hidden
+     * for first person: the hidden part still tracks the pose every frame.
+     */
+    FVector GetPoseHeadWorldLocationCm() const;
+
+    /**
+     * Legacy procedural pelvis estimate for adapters without skinned
+     * contact samples. CC0 seating uses GetSeatedContactPointsLocalCm.
+     */
+    float GetSeatedPelvisBottomLocalZCm() const;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    TArray<FVector> GetSeatedContactPointsLocalCm() const;
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Appearance")
     void ConfigureAppearance(int32 InVariantIndex, int32 InSeatSide, bool bInGuide);
+
+    /** Builds renderer-owned layers when spawned by editor validation tooling. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Appearance")
+    void InitializeAvatarVisual();
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
     ERaftSimCrewAvatarAction GetAvatarAction() const { return CurrentAction; }
@@ -97,14 +266,221 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     int32 GetProceduralBodyPartCount() const { return BodyParts.Num(); }
 
+    /** Deterministic depth/width/stature profile used to break up cloned silhouettes. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
-    bool UsesProjectOwnedProceduralGeometry() const { return true; }
+    FVector GetBodyProportionScale() const;
+
+    /** Deterministic skin tone authored into the batched head mesh vertex colours. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    FLinearColor GetSkinTone() const;
+
+    /** True when the full river-ready PFD and helmet-retention layers exist. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasLayeredCommercialSafetyGear() const;
+
+    /** True when the fitted project-owned static whitewater helmet replaced the fallback cap. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasProductionWhitewaterHelmet() const;
+
+    /** True when the authored static rescue PFD replaced all procedural vest layers. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasProductionWhitewaterPfd() const;
+
+    /** True when the visible PFD shell owns its live water-response material instance. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasLivePfdMaterialResponse() const;
+
+    /** True when the visible splash-jacket torso and sleeves share live cloth wetness. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasLiveSplashJacketMaterialResponse() const
+    {
+        return SplashJacketMaterialInstance != nullptr;
+    }
+
+    /** Bounded presentation-only PFD saturation; never physics or rescue authority. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    float GetPfdPresentationWetness() const { return PfdPresentationWetness; }
+
+    /** True when both solved feet wear authored static river footwear. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasProductionRiverFootwear() const;
+
+    /** True when both feet's footwear is fitted, toe-forward, and unambiguously sole-down. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasFittedUprightProductionRiverFootwear() const;
+
+    /** True when the crew wear river sandals over bare feet (else river boots). */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool UsesProductionRiverSandals() const { return bProductionRiverSandals; }
+
+    /** Yaw of a foot and its footwear for a pose: seated feet splay outward. */
+    float GetFootwearYawDegrees(const FRaftSimCrewAvatarPose& Pose, bool bLeft) const;
+
+    /** Per-axis sandal scale fitted to this wearer's own rest foot. */
+    FVector GetRiverSandalFitScale() const;
+
+    /** True when the host carries a modeled blade, shaft, and transverse T-grip. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasCommercialPaddleSilhouette() const;
+
+    /** True when the existing head draw contains the complete coloured face assembly. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasBatchedFacialFeatures() const;
+
+    /** Disconnected facial shapes batched into the existing single head draw. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    int32 GetBatchedFacialSubmeshCount() const { return 17; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool UsesProjectOwnedProceduralGeometry() const { return !bUsingProductionVisual; }
+
+    /** True only when a packaged production wrapper loaded and accepted the adapter contract. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool IsUsingProductionVisual() const { return bUsingProductionVisual; }
+
+    /** Configured or conventional soft class path selected for this avatar. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FString GetProductionVisualClassPath() const;
+
+    /** Live selected visual child used by gameplay and evidence capture. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    AActor* GetProductionVisualActor() const;
+
+    /** True when the packaged CC0 body owns the complete visible anatomy. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasExclusiveCC0BodyOwnership() const;
+
+    /** Selects the packaged CC0 adapter for deterministic renderer validation. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Validation")
+    bool ActivateCC0FallbackForValidation();
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     bool HasFiniteVisualTransforms() const;
 
+    /** Distance between the visible helmet fit and the solved production head. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetProductionHelmetHeadErrorCm() const;
+
+    /** Dot product between the shell's authored front and the rendered face direction. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetProductionHelmetForwardAlignment() const;
+
+    /** Effective identity-calibrated uniform scale of the production helmet. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetProductionHelmetFitScale() const;
+
+    /** PFD attachment error against the rendered CC0 chest (legacy host anchor otherwise), not garment clearance. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetProductionPfdTorsoErrorCm() const;
+
+    /** True when the production character retains the pose-matched wetsuit waist/hip volume. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasVisibleWaistHipSilhouette() const;
+
+    /** Half-extents of the retained waist/hip volume in centimetres. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetWaistHipExtentCm() const;
+
+    /** Distance between the visible waist/hip volume and the solved hip centre. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetWaistHipCenterErrorCm() const;
+
+    /** True when the pelvis and pose-matched thigh roots all use opaque materials. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool IsWaistHipMaterialOpaque() const;
+
+    /** Smallest half-extent shared by the two retained wetsuit thigh bridges. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetMinimumHipThighBridgeExtentCm() const;
+
+    /** Smallest authored vertex count shared by the two anatomical thigh meshes. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    int32 GetMinimumThighMeshVertexCount() const;
+
+    /** Smallest dot product between either thigh's anterior axis and torso forward. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMinimumThighForwardAlignment() const;
+
+    /** Largest distance from either solved hip to its buried thigh-bridge centreline. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumHipThighBridgeCoverageErrorCm() const;
+
+    /** True when both tapered thigh overlays overlap their solved knees without oversizing them. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasContinuousThighKneeSilhouette() const;
+
+    /** Largest distance from either solved knee to its tapered thigh centreline. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumThighKneeBridgeCoverageErrorCm() const;
+
+    /** True when two pose-matched splash-jacket sleeves bridge the PFD to the assembled arms. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasVisibleShoulderSilhouette() const;
+
+    /** Smallest half-extent shared by the two visible proximal shoulder sleeves. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetMinimumShoulderSleeveExtentCm() const;
+
+    /** Smallest authored vertex count shared by the two tapered garment sleeves. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    int32 GetMinimumShoulderSleeveVertexCount() const;
+
+    /** Largest distance between a sleeve's proximal endpoint and its solved shoulder joint. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumShoulderSleeveAnchorErrorCm() const;
+
+    /** Keep one posed production-body caster instead of duplicate character layers. */
+    void SetProductionBodyOnlyShadowMode(bool bEnabled);
+
+    /** Solve grounded review stances after seating, without publishing poses. */
+    bool PrepareRenderedFootPlacements();
+
 private:
+    void FitFeetToRenderedRaft(FRaftSimCrewAvatarPose& Pose, ERaftSimCrewAvatarAction Action);
+    FRaftSimCrewAvatarPose LastRenderedPose;
+    bool bHasRenderedPose = false;
+    FRaftSimCrewAvatarPose ExternalPose;
+    bool bHasExternalPose = false;
+    struct FGroundedFootPlacement
+    {
+        bool bBound = false;
+        FVector Feet[2] = {FVector::ZeroVector, FVector::ZeroVector};
+        uint64 SupportRevision = 0;
+        double SupportZ[2] = {0,0};
+        FTransform SupportToRaft;
+    };
+    // Idle/stroke/brace, high-side port, high-side starboard. Each entry must
+    // independently revalidate against the current uploaded shape and seat.
+    FGroundedFootPlacement GroundedFootPlacements[3];
+    TWeakObjectPtr<AActor> FootPlacementRaft;
     void BuildVisual();
+    void RebuildSafetyGearMeshes();
+    void RebuildPaddleMeshes();
+    void RebuildHeadMesh();
+    void TryActivateProductionVisual();
+    bool TryActivateCC0FallbackVisual();
+    /** Shows the full fallback, or only project-owned rafting gear over a rigged body. */
+    void SetProceduralVisualVisible(bool bVisible);
+    /** Last CC0-body readiness the overlay visibility pass saw; Tick
+     * re-applies the pass when readiness flips so gap-fill parts cannot
+     * linger visible (or hidden) on load-order luck. */
+    bool bLastAppliedCC0BodyReady = false;
+    void DispatchProductionPose();
+    bool ResolveProductionHeadFit(
+        FVector& OutSolvedHeadWorldLocation,
+        FVector& OutFaceForwardWorld,
+        FVector& OutFaceUpWorld,
+        float& OutHelmetScale) const;
+    void AlignProductionHeadgearToSolvedHead();
+    /** Personal accessories from URaftSimCrewRoster (eyewear; the guide's
+     * whistle and river knife), built once and fitted to the solved face
+     * and chest frames every tick. */
+    void BuildPersonalAccessories();
+    /** Foam side panels between the vest's front and back carriers. */
+    void BuildPfdSidePanels();
+    void UpdatePersonalAccessories();
+    void UpdatePfdMaterialResponse(float DeltaSeconds);
+    void ApplyPfdMaterialWetness();
     void ApplyPose(const FRaftSimCrewAvatarPose& Pose);
     UProceduralMeshComponent* CreateOrganicPart(
         const TCHAR* Name,
@@ -120,36 +496,121 @@ private:
         const FVector& StartCm,
         const FVector& EndCm,
         float RadiusCm);
+    static void SetAnatomicalThigh(
+        UProceduralMeshComponent* Component,
+        const FVector& StartCm,
+        const FVector& EndCm,
+        float RadiusCm,
+        const FVector& TorsoForward);
 
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<USceneComponent> Root;
+
+    /**
+     * Child actor hosting a production character Blueprint. A valid wrapper
+     * must implement IRaftSimCrewProductionVisual; arbitrary classes fail
+     * closed to the procedural fallback.
+     */
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Production")
+    TObjectPtr<UChildActorComponent> ProductionVisual;
+
+    UPROPERTY(Config, EditAnywhere, Category = "RaftSim|Crew|Production")
+    TArray<FSoftClassPath> ProductionCrewVisualClassPaths;
+
+    UPROPERTY(Config, EditAnywhere, Category = "RaftSim|Crew|Production")
+    FSoftClassPath ProductionGuideVisualClassPath;
 
     UPROPERTY()
     TArray<TObjectPtr<UProceduralMeshComponent>> BodyParts;
 
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Pelvis;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Torso;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> LeftShoulderSleeve;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> RightShoulderSleeve;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Pfd;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> PfdRearWebbing;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> PfdBelt;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> PfdBuckle;
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Production")
+    TObjectPtr<UStaticMeshComponent> ProductionPfd;
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> PfdShellMaterialInstance;
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> SplashJacketMaterialInstance;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> Neck;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Head;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Helmet;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> HelmetRim;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> HelmetRetention;
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Production")
+    TObjectPtr<UStaticMeshComponent> ProductionHelmet;
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Production")
+    TObjectPtr<UStaticMeshComponent> ProductionHelmetStraps;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> LeftUpperArm;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> LeftLowerArm;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> LeftHand;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> RightUpperArm;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> RightLowerArm;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> RightHand;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> LeftThigh;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> LeftShin;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> LeftBoot;
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Production")
+    TObjectPtr<UStaticMeshComponent> ProductionLeftBoot;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> RightThigh;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> RightShin;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> RightBoot;
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Production")
+    TObjectPtr<UStaticMeshComponent> ProductionRightBoot;
+    // The production footwear slots carry river sandals when those meshes are
+    // present (bare CC0 feet shown) and fall back to the river boot.
+    bool bProductionRiverSandals = false;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> PaddleShaft;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> PaddleBlade;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> PaddleGrip;
+    UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> EyewearFrame;
+    UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> EyewearLenses;
+    UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> RescueWhistle;
+    UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> RescueKnife;
+
+    /** Closes the production vest's sides under the arms (child of the vest,
+     * so it shares the vest's fit and colour). */
+    UPROPERTY(Transient)
+    TObjectPtr<UProceduralMeshComponent> PfdSidePanels;
 
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Animation")
     ERaftSimCrewAvatarAction CurrentAction = ERaftSimCrewAvatarAction::SeatedIdle;
+    bool bCrewTransfer = false;
+    int32 CrewTransferDirection = 0;
+    FVector CrewTransferHome = FVector::ZeroVector;
+    FVector CrewTransferFrom = FVector::ZeroVector;
+    FVector CrewTransferTarget = FVector::ZeroVector;
+    FVector CrewTransferRootBase = FVector::ZeroVector;
+    float CrewTransferTime = 0.f;
+    float CrewTransferLift = 0.f;
+    float CrewTransferDuration = HighSideTransferSeconds;
+    float CrewTransferDelay = 0.f;
+    float CrewTransferHoldSeconds = 0.f;
+    // Side whose tube the crew last held; the return keeps the same paddle hand.
+    int32 CrewTransferHeldSide = 0;
+    FRaftSimCrewAvatarPose CrewTransferStartPose;
+    void StartHighSideLeg(const FVector& TargetRaftCm, float DurationSeconds, float DelaySeconds);
+    FRaftSimCrewAvatarPose BuildHighSideTransferPose(const FRaftSimCrewAvatarPose& AuthoredPose);
 
     int32 VariantIndex = 0;
     int32 SeatSide = 1;
     bool bGuide = false;
     bool bVisualBuilt = false;
+    bool bUsingProductionVisual = false;
+    bool bFirstPersonHeadHidden = false;
+    bool bFirstPersonBodyHidden = false;
     float AnimationPhase = 0.0f;
+    float AnimationPhaseOffset = 0.0f;
     float ActionIntensity = 1.0f;
+    FRaftSimCrewAvatarPose BoardingStartPose, BoardingReachPose, BoardingPullPose, BoardingLiftPose, BoardingLegOverPose, BoardingEndPose;
+    bool bBoardingHasReach = false;
+    FTransform BoardingReachToCurrent, BoardingSeatToCurrent;
+    bool bBoardingHasTransferFrames = false;
+    float BoardingPoseAlpha = -1.f;
+    float PfdPresentationWetness = 0.0f;
 };

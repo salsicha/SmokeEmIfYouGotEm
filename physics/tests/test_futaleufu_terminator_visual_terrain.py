@@ -1,0 +1,116 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from raftsim.editor_source_layout import LandscapeFoliageSourceSet, read_landscape_foliage_source
+
+import numpy as np
+from PIL import Image
+
+from raftsim.futaleufu_terminator_visual_terrain import (
+    SCHEMA,
+    build_futaleufu_terminator_visual_terrain,
+)
+from raftsim.editor_source_layout import read_raftsim_editor_source
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_build_futaleufu_terminator_visual_terrain(tmp_path: Path) -> None:
+    manifest = build_futaleufu_terminator_visual_terrain(
+        REPO_ROOT, output_dir=tmp_path, output_size_px=257
+    )
+
+    assert manifest["schema"] == SCHEMA
+    assert manifest["reference_flow_band"] == "median_runnable"
+    assert manifest["landscape"]["horizontal_span_x_m"] == 600.0
+    assert manifest["landscape"]["horizontal_span_y_m"] == 600.0
+    assert manifest["landscape"]["source_solver_span_y_m"] == 84.0
+    assert manifest["procedural_infill"]["protected_solver_strip_change_m"] == 0.0
+    assert manifest["procedural_infill"][
+        "maximum_corridor_dem_edge_correction_m"
+    ] < 8.0
+    assert manifest["procedural_infill"]["maximum_procedural_microrelief_m"] <= 1.5
+    assert manifest["alignment"][
+        "maximum_static_to_runtime_centerline_surface_error_m"
+    ] < 1.0e-9
+    assert manifest["honesty"]["production_promoted"] is False
+    assert manifest["honesty"]["route_station_authority"].startswith(
+        "order_distributed"
+    )
+
+    image = np.asarray(
+        Image.open(tmp_path / "terminator_conditioned_heightfield_257.png")
+    )
+    assert image.shape == (257, 257)
+    assert image.dtype == np.uint16
+    assert int(image.min()) == 0
+    assert int(image.max()) == 65535
+
+    centerline = json.loads(
+        (tmp_path / "terminator_local_centerline.json").read_text(encoding="utf-8")
+    )
+    assert len(centerline["points"]) == 301
+    assert centerline["points"][0]["unreal_local_cm"] == [0.0, 30000.0]
+    assert centerline["points"][-1]["unreal_local_cm"] == [60000.0, 30000.0]
+    assert centerline["points"][0]["corridor_station_m"] == 5012.259
+    assert centerline["points"][-1]["corridor_station_m"] == 5612.259
+
+    coordinate_map = json.loads(
+        (tmp_path / "terminator_runtime_coordinate_map.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert coordinate_map["points"][0] == [0.0, 0.0, 0.0, 0.0, 1.0]
+    assert coordinate_map["points"][-1] == [600.0, 600.0, 0.0, 0.0, 1.0]
+    assert 190.0 < coordinate_map["vertical_datum_m"] < 220.0
+
+
+def test_unreal_binds_terminator_reach_local_landscape_and_runtime_water() -> None:
+    source = read_raftsim_editor_source(REPO_ROOT)
+
+    # Since the 2026-09-27 rebuild L_Terminator binds the evidence reach
+    # (test_futaleufu_terminator_evidence.py); this test's builder output
+    # above is the retired 600 m reach-local terrain.
+    assert 'TEXT("/Game/RaftSim/Maps/L_Terminator")' in source
+    assert "terminator_evidence_heightfield_2017.png" in source
+    assert "terminator_evidence_terrain_manifest.json" in source
+    assert "terminator_evidence_local_centerline.json" in source
+    assert "terminator_evidence_runtime_coordinate_map.json" in source
+    assert 'FlowBand = FName(TEXT("high_runnable_400cms"))' in source
+    assert 'TEXT("RaftSim_FutaleufuTerminator_PlayerRaft")' in source
+    assert 'TEXT("RaftSimFutaleufuTerminatorSolverVisualization")' in source
+    # The 600 m scene's D4 entry-marker boulder has no place on the real reach.
+    assert 'TEXT("RaftSim_FutaleufuTerminator_D4_EntryMarkerBoulder")' not in source
+
+
+def test_shared_temperate_canopy_breaks_repeated_geometry_and_placement() -> None:
+    foliage_source = read_landscape_foliage_source(REPO_ROOT)
+    map_test_source = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+        "RaftSimTroublemakerMapTest.cpp"
+    ).read_text(encoding="utf-8")
+
+    assert "UMaterialExpressionPerInstanceRandom" in foliage_source
+    assert "constexpr int32 SatelliteLobeCount = 3" in foliage_source
+    assert "const int32 BranchCount = 6 + FMath::Clamp" in foliage_source
+    assert "const bool bStormShortenedBranch" in foliage_source
+    assert "const float ConiferCrownBodyScale" in foliage_source
+    assert "constexpr float TreeHeightCm = 850.0f" in foliage_source
+    assert "0.88f" in foliage_source
+    assert "1.13f" in foliage_source
+    assert "constexpr int32 TemperateSpeciesPermutation = 7" in foliage_source
+    assert "TemperateBlockOffset" in foliage_source
+    assert "ZambeziVegetationUnitRandom(ClusterIndex, 9161)" in foliage_source
+    assert "SM_RaftSim_Temperate_BroadleafTree_B_OpaqueV1" in foliage_source
+    assert "SM_RaftSim_Temperate_ConiferTree_B_OpaqueV1" in foliage_source
+    assert "SM_RaftSim_Temperate_RiparianShrub_B_OpaqueV1" in foliage_source
+    assert "SM_RaftSim_Temperate_GroundCover_B_OpaqueV1" in foliage_source
+    assert "bSecondaryMorphology" in foliage_source
+    assert "TemperateNearBankEcologyTargetInstanceCount = 1800" in foliage_source
+    assert "CandidateIndex < 64" in foliage_source
+    assert 'TEXT("RaftSimTemperateBankEcologyV4")' in foliage_source
+    assert 'TEXT("RaftSimTemperateNearBankEcologyV4")' in foliage_source
+    assert 'TEXT("RaftSimTemperateBankEcologyV4")' in map_test_source

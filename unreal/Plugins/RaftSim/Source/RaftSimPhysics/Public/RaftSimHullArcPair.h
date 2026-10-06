@@ -1,0 +1,109 @@
+#pragma once
+#include "RaftSimHullArcClearance.h"
+#include "RaftSimHullContact.h"
+
+// Shared production/lab proof. Original indexed face and full curved path;
+// never a proxy, enlarged obstacle, relaxed clearance or prescribed rotation.
+namespace RaftSimHullArcPair
+{
+// Owned by ONE synchronous source query. Nothing survives a new pose, shape,
+// interval or ground query. A visited original vertex uses the identical
+// Derivatives operation once, not once per incident face/ground triangle.
+// Lazy allocation/evaluation preserves the old visitation of unused inputs.
+class FQueryDerivatives
+{
+public:
+    explicit FQueryDerivatives(const FRaftSimHullArcPath* InArc):Arc(InArc){}
+    void Read(int32 I,FVector& V,FVector& A)
+    {
+        if(Ready.IsEmpty())
+        {
+            Ready.SetNumZeroed(Arc->Before->VerticesM.Num());
+            Values.SetNumUninitialized(Ready.Num());
+        }
+        if(!Ready[I])
+        {
+            Arc->Derivatives(I,Values[I].Velocity,Values[I].Acceleration);
+            Ready[I]=1;++EvaluatedVertices;
+        }
+        V=Values[I].Velocity;A=Values[I].Acceleration;
+    }
+    // Evaluate (once each, as Read would) every vertex of these faces, so
+    // parallel narrow-phase workers can share the values read-only.
+    void Prepare(TConstArrayView<int32> FaceIds,TConstArrayView<FIntVector> Faces)
+    {
+        FVector V,A;
+        for(const int32 Face:FaceIds)for(int32 J=0;J<3;++J)Read(Faces[Face][J],V,A);
+    }
+    void ReadPrepared(int32 I,FVector& V,FVector& A) const
+    {
+        check(Ready.IsValidIndex(I) && Ready[I]);
+        V=Values[I].Velocity;A=Values[I].Acceleration;
+    }
+    int32 EvaluatedVertexCount() const{return EvaluatedVertices;}
+private:
+    struct FValue{FVector Velocity,Acceleration;};
+    const FRaftSimHullArcPath* Arc;
+    TArray<FValue> Values;
+    TArray<uint8> Ready;
+    int32 EvaluatedVertices=0;
+};
+inline bool SeparatedWithDerivatives(const FIntVector& Face,const RaftSimSurfaceSweep::FTriangle& Start,
+    const RaftSimSurfaceSweep::FTriangle& Ground,const FRaftSimHullArcPath& Arc,
+    const RaftSimSurfaceSweep::FTriangle& Velocity,const RaftSimSurfaceSweep::FTriangle& Acceleration)
+{
+    using namespace RaftSimHullArcClearance;
+    const auto Axis=[&](const FVector& N)
+    {return PlaneSeparated(Start,Velocity,Acceleration,Ground,N,Arc.Interval,Arc.JerkBound)
+        || PlaneSeparated(Start,Velocity,Acceleration,Ground,-N,Arc.Interval,Arc.JerkBound);};
+    bool Clear=Axis(FVector::CrossProduct(Ground.V[1]-Ground.V[0],Ground.V[2]-Ground.V[0]))
+        || Axis(FVector::CrossProduct(Start.V[1]-Start.V[0],Start.V[2]-Start.V[0]));
+    for(int32 M=0;M<3 && !Clear;++M)for(int32 N=0;N<3 && !Clear;++N)
+        Clear=Axis(FVector::CrossProduct(Start.V[(M+1)%3]-Start.V[M],Ground.V[(N+1)%3]-Ground.V[N]));
+    if(!Clear && Arc.Before->VerticesM[Face.X]==Arc.After->VerticesM[Face.X]
+        && Arc.Before->VerticesM[Face.Y]==Arc.After->VerticesM[Face.Y]
+        && Arc.Before->VerticesM[Face.Z]==Arc.After->VerticesM[Face.Z])
+    {
+        const RaftSimSurfaceSweep::FTriangle Local{{Arc.Before->VerticesM[Face.X],Arc.Before->VerticesM[Face.Y],Arc.Before->VerticesM[Face.Z]}};
+        Clear=RigidFaceSeparated(Local,Ground,Arc.State.Orientation,Arc.State.Position,
+            Arc.State.LinearVelocity,Arc.State.AngularVelocity,Arc.Interval);
+        for(int32 M=0;M<3 && !Clear;++M)for(int32 N=0;N<3 && !Clear;++N)
+            Clear=RigidEdgeAxisSeparated(Local,Ground,Arc.State.Orientation,Arc.State.Position,
+                Arc.State.LinearVelocity,Arc.State.AngularVelocity,Arc.Interval,M,N);
+    }
+    return Clear;
+}
+// Independent uncached evaluation remains available to same-input native
+// controls and the exhaustive reference source-query path.
+inline bool Separated(const FIntVector& Face,const RaftSimSurfaceSweep::FTriangle& Start,
+    const RaftSimSurfaceSweep::FTriangle& Ground,const FRaftSimHullArcPath& Arc)
+{
+    RaftSimSurfaceSweep::FTriangle Velocity,Acceleration;
+    for(int32 J=0;J<3;++J)Arc.Derivatives(Face[J],Velocity.V[J],Acceleration.V[J]);
+    return SeparatedWithDerivatives(Face,Start,Ground,Arc,Velocity,Acceleration);
+}
+inline bool Separated(const FIntVector& Face,const RaftSimSurfaceSweep::FTriangle& Start,
+    const RaftSimSurfaceSweep::FTriangle& Ground,const FRaftSimHullArcPath& Arc,FQueryDerivatives& Query)
+{
+    RaftSimSurfaceSweep::FTriangle Velocity,Acceleration;
+    for(int32 J=0;J<3;++J)Query.Read(Face[J],Velocity.V[J],Acceleration.V[J]);
+    return SeparatedWithDerivatives(Face,Start,Ground,Arc,Velocity,Acceleration);
+}
+inline bool SeparatedPrepared(const FIntVector& Face,const RaftSimSurfaceSweep::FTriangle& Start,
+    const RaftSimSurfaceSweep::FTriangle& Ground,const FRaftSimHullArcPath& Arc,const FQueryDerivatives& Query)
+{
+    RaftSimSurfaceSweep::FTriangle Velocity,Acceleration;
+    for(int32 J=0;J<3;++J)Query.ReadPrepared(Face[J],Velocity.V[J],Acceleration.V[J]);
+    return SeparatedWithDerivatives(Face,Start,Ground,Arc,Velocity,Acceleration);
+}
+inline void GroundFeature(RaftSimSurfaceSweep::FResult& Hit,const RaftSimSurfaceSweep::FTriangle& Ground)
+{
+    if(Hit.Status!=RaftSimSurfaceSweep::EStatus::Contact)return;
+    TArray<int32,TInlineAllocator<3>> Feature;
+    for(int32 I=0;I<3;++I)if(Hit.Witness.GroundBary[I]>1.e-10)Feature.Add(I);
+    if(Feature.Num()!=1 && Feature.Num()!=2)return;
+    Hit.bHasGroundFeature=true;Hit.GroundFeatureA=Ground.V[Feature[0]];Hit.GroundFeatureB=Ground.V[Feature.Last()];
+    const auto A=Hit.GroundFeatureA,B=Hit.GroundFeatureB;
+    if(A.X>B.X || (A.X==B.X && (A.Y>B.Y || (A.Y==B.Y && A.Z>B.Z))))Swap(Hit.GroundFeatureA,Hit.GroundFeatureB);
+}
+}

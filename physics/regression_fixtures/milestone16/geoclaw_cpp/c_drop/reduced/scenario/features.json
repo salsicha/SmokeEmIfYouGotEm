@@ -1,34 +1,3 @@
-{
-  "features": [
-    {
-      "angle": 0.0,
-      "center": {
-        "x": 11.5,
-        "y": 0.0
-      },
-      "kind": "ledge",
-      "length": 11.0,
-      "metadata": {
-        "fixture_role": "drop_ledge_variable_topography"
-      },
-      "radius": 0.0,
-      "strength": 0.45,
-      "width": 4.0
-    },
-    {
-      "angle": 0.0,
-      "center": {
-        "x": 14.379999999999999,
-        "y": 0.0
-      },
-      "kind": "wave_train",
-      "length": 5.28,
-      "metadata": {
-        "fixture_role": "downstream_drop_recovery"
-      },
-      "radius": 2.16,
-      "strength": 0.65,
-      "width": 5.4
-    }
-  ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:b0ad94af954c2139e5d6d9f5c5abd0d77bfda3aa25385af3e2c8dc2ba3ba8129
+size 651

@@ -2,13 +2,23 @@
 
 #include "Dom/JsonObject.h"
 #include "Engine/GameInstance.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/StaticMeshActor.h"
+#include "Engine/Level.h"
+#include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Misc/FileHelper.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Misc/Paths.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimTerrainProbeSources.h"
+#include "RaftSimCapturedGroundRendering.h"
+#include "RaftSimDetailSourceFootprint.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -41,11 +51,54 @@ void ARaftSimRiverWaterStreamingActor::BeginPlay()
     }
     if (!RiverConfig || !Raft || !WaterAdapter || !LoadStreamingManifest())
     {
+        // Four preconditions, one silent early-out: this actor spent its
+        // life impossible to distinguish from working (2026-08-10 audit).
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim river streaming disabled: config=%d raft=%d ")
+            TEXT("water=%d manifest=%d"),
+            RiverConfig != nullptr, Raft != nullptr, WaterAdapter != nullptr,
+            RiverConfig != nullptr && Raft != nullptr && WaterAdapter != nullptr);
         SetActorTickEnabled(false);
         return;
     }
+    CachedFlowBand = RiverConfig->FlowBand;
+    bCachedLiveSolverOwnsRuntimeRendering =
+        RiverConfig->bLiveSolverOwnsRuntimeRendering ||
+        RiverConfig->CookedFieldsDir.Contains(
+            TEXT("south_fork_american_chili_bar/full_hydraulics"),
+            ESearchCase::IgnoreCase);
+    bCachedSouthForkSingleSurface =
+        RiverConfig->CookedFieldsDir.Contains(
+            TEXT("south_fork_american_chili_bar/full_hydraulics"),
+            ESearchCase::IgnoreCase);
+    CachedMovingWindowAdvanceM = RiverConfig->MovingWindowAdvanceM;
+    CachedMovingWindowStationExtentM = bCachedSouthForkSingleSurface
+        ? FMath::Max(
+              RiverConfig->MovingWindowStationExtentM,
+              ARaftSimWaterSurfaceActor::
+                  GetSouthForkHydraulicWindowLengthMeters())
+        : RiverConfig->MovingWindowStationExtentM;
+    CachedMovingWindowLateralExtentM = RiverConfig->MovingWindowLateralExtentM;
+    // World Partition can add a shoreline-water cell immediately after the
+    // periodic visibility sweep. Subscribe before the initial pass so every
+    // subsequently loaded actor receives its final runtime ownership state in
+    // the same level-add event, before a rendered frame can expose it.
+    LevelAddedToWorldHandle = FWorldDelegates::LevelAddedToWorld.AddUObject(
+        this,
+        &ARaftSimRiverWaterStreamingActor::HandleLevelAddedToWorld);
     ApplyStaticFlowBandVisibility();
     UpdateWaterWindow(/*bForce=*/true);
+}
+
+void ARaftSimRiverWaterStreamingActor::EndPlay(
+    const EEndPlayReason::Type EndPlayReason)
+{
+    if (LevelAddedToWorldHandle.IsValid())
+    {
+        FWorldDelegates::LevelAddedToWorld.Remove(LevelAddedToWorldHandle);
+        LevelAddedToWorldHandle.Reset();
+    }
+    Super::EndPlay(EndPlayReason);
 }
 
 bool ARaftSimRiverWaterStreamingActor::LoadStreamingManifest()
@@ -69,6 +122,18 @@ bool ARaftSimRiverWaterStreamingActor::LoadStreamingManifest()
         return false;
     }
     FString Schema;
+    if (Root->TryGetStringField(TEXT("schema"), Schema) &&
+        Schema == TEXT("raftsim.cartesian_water_streaming.v1"))
+    {
+        FString Error;
+        bCartesianStreaming = WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates() &&
+            CartesianRegions.Load(Root, Error);
+        if (!bCartesianStreaming)
+        {
+            UE_LOG(LogTemp, Error, TEXT("RaftSim Cartesian streaming requires matching Cartesian water coordinates and valid cooked regions: %s"), *Error);
+        }
+        return bCartesianStreaming;
+    }
     if (!Root->TryGetStringField(TEXT("schema"), Schema) ||
         Schema != TEXT("raftsim.south_fork.moving_water_streaming.v1"))
     {
@@ -110,6 +175,30 @@ bool ARaftSimRiverWaterStreamingActor::LoadStreamingManifest()
         }
         FSourceWindow Window;
         Window.FieldsDirectory = FPaths::GetPath(ManifestPath);
+#if !UE_BUILD_SHIPPING
+        // Explicit, process-local preview of a diagnostic cook. Keep the
+        // production manifest and every other rapid/flow band untouched.
+        FString ReviewFieldsDirectory;
+        if (WindowId == TEXT("south_fork_troublemaker_live_window") &&
+            FParse::Value(FCommandLine::Get(),
+                TEXT("RaftSimTroublemakerReviewFields="), ReviewFieldsDirectory))
+        {
+            ReviewFieldsDirectory =
+                URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(ReviewFieldsDirectory);
+            if (RiverConfig->FlowBand != FName(TEXT("median_runnable")) ||
+                !FPaths::FileExists(ReviewFieldsDirectory / TEXT("manifest.json")))
+            {
+                UE_LOG(LogTemp, Error,
+                    TEXT("Troublemaker review fields require median_runnable and an existing manifest: %s"),
+                    *ReviewFieldsDirectory);
+                return false;
+            }
+            Window.FieldsDirectory = ReviewFieldsDirectory;
+            UE_LOG(LogTemp, Display,
+                TEXT("Troublemaker DIAGNOSTIC field override (not production promotion): %s"),
+                *Window.FieldsDirectory);
+        }
+#endif
         Window.WindowId = WindowId;
         Window.StartStationM = static_cast<float>((*Range)[0]->AsNumber());
         Window.EndStationM = static_cast<float>((*Range)[1]->AsNumber());
@@ -141,9 +230,20 @@ ARaftSimRiverWaterStreamingActor::SelectSource(float StationM) const
     return Best;
 }
 
-bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
+bool ARaftSimRiverWaterStreamingActor::EnsureDetailSourceCoverage(
+    URaftSimWaterRuntimeAdapter* ConsumerWater,const FBox2D& RequiredBoundsM)
 {
-    if (!Raft || !RiverConfig || !WaterAdapter)
+    check(IsInGameThread());
+    if(!bCartesianStreaming || !ConsumerWater || ConsumerWater!=WaterAdapter || !RequiredBoundsM.bIsValid)return false;
+    FBox2D Bounds;
+    if(WaterAdapter->GetLiveWaterFieldBoundsM(Bounds) && FRaftSimDetailSourceFootprint::Covered(Bounds,RequiredBoundsM))return true;
+    if(!UpdateWaterWindow(true,&RequiredBoundsM))return false;
+    return WaterAdapter->GetLiveWaterFieldBoundsM(Bounds) && FRaftSimDetailSourceFootprint::Covered(Bounds,RequiredBoundsM);
+}
+
+bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce,const FBox2D* RequiredSourceBoundsM)
+{
+    if (!Raft || !WaterAdapter)
     {
         return false;
     }
@@ -153,7 +253,36 @@ bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
     if (!WaterAdapter->WorldToRiverCoordinates(
             Raft->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
     {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim river streaming: WorldToRiverCoordinates failed at ")
+            TEXT("raft=(%.0f, %.0f, %.0f)"),
+            Raft->GetActorLocation().X,
+            Raft->GetActorLocation().Y,
+            Raft->GetActorLocation().Z);
         return false;
+    }
+    if (bCartesianStreaming)
+    {
+        FVector2D WindowCenter;
+        const auto* Region = CartesianRegions.Select(RiverPosition, ActiveFieldsDirectory,&WindowCenter,RequiredSourceBoundsM);
+        if (!Region)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("RaftSim Cartesian water has no complete source crop at (%.3f, %.3f)"),
+                RiverPosition.X, RiverPosition.Y);
+            return false;
+        }
+        if (!bForce && Region->FieldsDirectory == ActiveFieldsDirectory &&
+            CartesianRegions.CoversRaft(RiverPosition,LastCartesianCenterM) &&
+            !CartesianRegions.NeedsRecentering(WindowCenter, LastCartesianCenterM)) return true;
+        if (!WaterAdapter->ConfigureMovingRiverWindow(Region->FieldsDirectory,
+                CachedFlowBand.ToString(), WindowCenter, CartesianRegions.GetExtentM(),
+                CartesianRegions.GetRoughnessManning())) return false;
+        ActiveFieldsDirectory = Region->FieldsDirectory;
+        LastCartesianCenterM = WindowCenter;
+        ++SuccessfulHandoffCount;
+        UE_LOG(LogTemp, Display, TEXT("RaftSim Cartesian water handoff %d at (%.3f, %.3f), center=(%.3f, %.3f), source=%s"),
+            SuccessfulHandoffCount, RiverPosition.X, RiverPosition.Y,WindowCenter.X,WindowCenter.Y,*Region->Id);
+        return true;
     }
     const FSourceWindow* RapidWindow = SelectSource(RiverPosition.X);
     const FString DesiredDirectory = RapidWindow
@@ -161,50 +290,136 @@ bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
         : TransitFieldsDirectory;
     const bool bSourceChanged = DesiredDirectory != ActiveFieldsDirectory;
     if (!bForce && !bSourceChanged &&
-        FMath::Abs(RiverPosition.X - LastWindowCenterStationM) < RiverConfig->MovingWindowAdvanceM)
+        FMath::Abs(RiverPosition.X - LastWindowCenterStationM) < CachedMovingWindowAdvanceM)
     {
         return true;
     }
     const FVector2D Extent(
-        RiverConfig->MovingWindowStationExtentM,
-        RiverConfig->MovingWindowLateralExtentM);
+        CachedMovingWindowStationExtentM,
+        CachedMovingWindowLateralExtentM);
+    // Spend most of the finite-volume budget downstream of the raft. This
+    // exposes an approaching hole and wave train in the forward camera while
+    // retaining enough solved water behind the hull for wake/support probes.
+    const float DownstreamLookAheadM = bCachedSouthForkSingleSurface
+        ? 0.30f * CachedMovingWindowStationExtentM
+        : 0.0f;
+    float WindowCenterStationM = RiverPosition.X + DownstreamLookAheadM;
+    float MinimumRiverStationM = 0.0f;
+    float MaximumRiverStationM = 0.0f;
+    if (bCachedSouthForkSingleSurface &&
+        WaterAdapter->GetRiverStationRangeM(
+            MinimumRiverStationM, MaximumRiverStationM))
+    {
+        // Match the render carrier's end clamp at the put-in/take-out. At the
+        // old unclamped station 120 centre, even a wider solver crop was cut
+        // back to 0-320 m while the 400 m surface asked for the whole grade.
+        const float HalfExtentM = 0.5f * CachedMovingWindowStationExtentM;
+        WindowCenterStationM = FMath::Clamp(
+            WindowCenterStationM,
+            MinimumRiverStationM + HalfExtentM,
+            MaximumRiverStationM - HalfExtentM);
+    }
     if (!WaterAdapter->ConfigureMovingRiverWindow(
-            DesiredDirectory, RiverConfig->FlowBand.ToString(),
-            FVector2D(RiverPosition.X, 0.0f), Extent,
+            DesiredDirectory, CachedFlowBand.ToString(),
+            FVector2D(WindowCenterStationM, 0.0f), Extent,
             /*RoughnessManning=*/0.041f))
     {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim river streaming: ConfigureMovingRiverWindow FAILED ")
+            TEXT("station=%.1f source=%s"),
+            RiverPosition.X,
+            *DesiredDirectory);
         return false;
     }
     ActiveFieldsDirectory = DesiredDirectory;
     LastWindowCenterStationM = RiverPosition.X;
     ++SuccessfulHandoffCount;
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim river streaming handoff %d: station=%.1f source=%s"),
+        SuccessfulHandoffCount,
+        RiverPosition.X,
+        *DesiredDirectory);
     return true;
 }
 
 void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibility() const
 {
-    if (!RiverConfig)
+    // No RiverConfig guard: the placed config actor unloads with its
+    // world-partition cell on long rides; CachedFlowBand is captured at
+    // BeginPlay. Re-run periodically from Tick — a single BeginPlay pass
+    // misses every actor whose cell streams in later ("white foam appears
+    // at distance and vanishes as the camera approaches", 2026-08-14).
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    {
+        ApplyStaticFlowBandVisibilityToActor(*It);
+    }
+}
+
+void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibilityToActor(
+    AActor* Actor) const
+{
+    if (!Actor)
     {
         return;
     }
+    RaftSimCapturedGroundRendering::ApplyToActor(Actor);
+    static const FName SolverFoamOverlayTag(TEXT("RaftSimSolverFoamOverlay"));
     const FName ActiveTag(*FString::Printf(
-        TEXT("RaftSimFlowBand_%s"), *RiverConfig->FlowBand.ToString()));
-    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+        TEXT("RaftSimFlowBand_%s"), *CachedFlowBand.ToString()));
+    bool bIsBandPresentation = false;
+    bool bActiveBand = false;
+    bool bBakedFoamOverlay = false;
+    for (const FName& Tag : Actor->Tags)
     {
-        AActor* Actor = *It;
-        bool bIsBandPresentation = false;
-        bool bActiveBand = false;
-        for (const FName& Tag : Actor->Tags)
+        bBakedFoamOverlay |= Tag == SolverFoamOverlayTag;
+        if (Tag.ToString().StartsWith(TEXT("RaftSimFlowBand_")))
         {
-            if (Tag.ToString().StartsWith(TEXT("RaftSimFlowBand_")))
-            {
-                bIsBandPresentation = true;
-                bActiveBand |= Tag == ActiveTag;
-            }
+            bIsBandPresentation = true;
+            bActiveBand |= Tag == ActiveTag;
         }
-        if (bIsBandPresentation)
+    }
+    if (bBakedFoamOverlay || bIsBandPresentation)
+    {
+        // These tagged meshes are presentation carriers, never riverbed or
+        // obstacle collision. Old cooked cells can retain collision even
+        // while hidden, intercepting the live surface's shoreline probes.
+        // Apply on every streamed cell as well as the initial visibility pass.
+        Actor->SetActorEnableCollision(false);
+    }
+    if (bBakedFoamOverlay && !bIsBandPresentation)
+    {
+        Actor->SetActorHiddenInGame(true);
+        return;
+    }
+    if (bIsBandPresentation)
+    {
+        // A live-owned river must have only one runtime carrier. Revealing
+        // the authored fallback beyond the solver crop exposes shoreline
+        // slivers and cross-channel stripes as its partition cell streams.
+        Actor->SetActorHiddenInGame(
+            bCachedLiveSolverOwnsRuntimeRendering || !bActiveBand);
+    }
+}
+
+void ARaftSimRiverWaterStreamingActor::HandleLevelAddedToWorld(
+    ULevel* Level,
+    UWorld* World)
+{
+    if (!Level || World != GetWorld())
+    {
+        return;
+    }
+    bool bTerrainArrived = false;
+    for (AActor* Actor : Level->Actors)
+    {
+        ApplyStaticFlowBandVisibilityToActor(Actor);
+        bTerrainArrived |= RaftSimTerrainProbeSources::ActorHasSource(Actor);
+    }
+    if (bTerrainArrived)
+    {
+        for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
         {
-            Actor->SetActorHiddenInGame(!bActiveBand);
+            It->InvalidateMissedTerrainProbes();
         }
     }
 }
@@ -217,5 +432,14 @@ void ARaftSimRiverWaterStreamingActor::Tick(float DeltaSeconds)
     {
         TimeSinceUpdateSeconds = 0.0f;
         UpdateWaterWindow(/*bForce=*/false);
+    }
+    // Safety audit for dynamically spawned legacy actors that are not part of
+    // a streamed level. Normal World Partition cells are handled immediately
+    // by HandleLevelAddedToWorld above.
+    TimeSinceVisibilityReapplySeconds += DeltaSeconds;
+    if (TimeSinceVisibilityReapplySeconds >= 2.0f)
+    {
+        TimeSinceVisibilityReapplySeconds = 0.0f;
+        ApplyStaticFlowBandVisibility();
     }
 }

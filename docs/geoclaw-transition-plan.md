@@ -65,7 +65,7 @@ The Python package now includes a GeoClaw setup check:
 
 ```bash
 cd physics
-PYTHONPATH=src python -m raftsim.examples.run_geoclaw_reference --check --allow-unavailable
+PYTHONPATH=src python -m seiyge_core.examples.run_geoclaw_reference --check --allow-unavailable
 ```
 
 The check writes `outputs/geoclaw_reference/geoclaw_setup_report.json` and verifies the required Clawpack Python modules plus local build tools normally needed by GeoClaw reference runs:

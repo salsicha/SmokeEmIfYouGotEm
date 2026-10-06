@@ -57,7 +57,7 @@ public:
     FString Schema = TEXT("raftsim.unreal.geospatial_import_pipeline.v1");
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|GeoImport")
-    FString FormatContract = TEXT("physics/config/geospatial_format_contract.json");
+    FString FormatContract = TEXT("unreal/Plugins/SEIYGECore/python/config/geospatial_format_contract.json");
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|GeoImport")
     FString SourceManifest = TEXT("physics/data/real_world/south_fork_american_chili_bar/source_manifest.json");

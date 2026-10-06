@@ -1,0 +1,91 @@
+#include "/Engine/Public/Platform.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidCompactTransport.ush"
+int3 Size;
+int3 UpdateMin;
+int3 UpdateMax;
+float3 CellCm;
+float Dt;
+uint CompactTransport;
+Texture3D<float> Source;
+Texture3D<float4> Velocity;
+RWTexture3D<float> Result;
+RWStructuredBuffer<uint> Diagnostics;
+
+bool Stencil(float3 Q,out int3 Low,out float3 Fraction)
+{
+    Low=0;Fraction=0;
+    if(!all(isfinite(Q))) return false;
+    // Q addresses centred samples: integer i is sample (i+.5)*CellCm.
+    if(any(Q<0) || any(Q>=float3(Size-1))) return false;
+    Low=int3(floor(Q));Fraction=Q-Low;return true;
+}
+
+float3 SampleVelocity(int3 Low,float3 Fraction)
+{
+    float3 Value=0;
+    [unroll] for(int Z=0;Z<2;++Z) [unroll] for(int Y=0;Y<2;++Y) [unroll] for(int X=0;X<2;++X)
+    {
+        float3 W=lerp(1-Fraction,Fraction,float3(X,Y,Z));
+        Value+=W.x*W.y*W.z*Velocity.Load(int4(Low+int3(X,Y,Z),0)).xyz;
+    }
+    return Value;
+}
+
+bool SampleTransportVelocity(float3 Q,out float3 Value)
+{
+    Value=0;
+    if(!all(isfinite(Q))) return false;
+    if(CompactTransport==0)
+    {
+        int3 Low;float3 F;
+        if(!Stencil(Q,Low,F)) return false;
+        Value=SampleVelocity(Low,F);return true;
+    }
+    int3 Low=int3(floor(Q))-1;
+    if(any(Low<0) || any(Low+3>=Size)) return false;
+    for(int Z=0;Z<4;++Z) for(int Y=0;Y<4;++Y) for(int X=0;X<4;++X)
+    {
+        if(int(X==0 || X==3)+int(Y==0 || Y==3)+int(Z==0 || Z==3)>1) continue;
+        int3 I=Low+int3(X,Y,Z);
+        Value+=Velocity.Load(int4(I,0)).xyz*RaftSimLiquidCompactWeights(float3(I)-Q);
+    }
+    return true;
+}
+
+float SampleScalar(int3 Low,float3 Fraction)
+{
+    float Value=0;
+    [unroll] for(int Z=0;Z<2;++Z) [unroll] for(int Y=0;Y<2;++Y) [unroll] for(int X=0;X<2;++X)
+    {
+        float3 W=lerp(1-Fraction,Fraction,float3(X,Y,Z));
+        Value+=W.x*W.y*W.z*Source.Load(int4(Low+int3(X,Y,Z),0));
+    }
+    return Value;
+}
+
+#ifndef RAFTSIM_INTERFACE_HELPERS_ONLY
+[numthreads(4,4,4)]
+void MainCS(uint3 P:SV_DispatchThreadID)
+{
+    if(any(P>=uint3(Size))) return;
+    float Old=Source.Load(int4(P,0));
+    Result[P]=Old;
+    if(!isfinite(Old)) { InterlockedAdd(Diagnostics[2],1);return; }
+    if(any(int3(P)<UpdateMin) || any(int3(P)>=UpdateMax)) return;
+    float3 V=Velocity.Load(int4(P,0)).xyz;
+    if(CompactTransport!=0 && !SampleTransportVelocity(float3(P),V))
+    { InterlockedAdd(Diagnostics[1],1);return; }
+    if(!all(isfinite(V))) { InterlockedAdd(Diagnostics[2],1);return; }
+    float3 Mid=float3(P)-.5*Dt*V/CellCm,F;int3 Low;
+    if(!all(isfinite(Mid))) { InterlockedAdd(Diagnostics[2],1);return; }
+    if(!Stencil(Mid,Low,F)) { InterlockedAdd(Diagnostics[1],1);return; }
+    float3 MidVelocity;
+    if(!SampleTransportVelocity(Mid,MidVelocity)) { InterlockedAdd(Diagnostics[1],1);return; }
+    float3 Back=float3(P)-Dt*MidVelocity/CellCm;
+    if(!all(isfinite(Back))) { InterlockedAdd(Diagnostics[2],1);return; }
+    if(!Stencil(Back,Low,F)) { InterlockedAdd(Diagnostics[1],1);return; }
+    float Value=SampleScalar(Low,F);
+    if(!isfinite(Value)) { InterlockedAdd(Diagnostics[2],1);return; }
+    Result[P]=Value;InterlockedAdd(Diagnostics[0],1);
+}
+#endif

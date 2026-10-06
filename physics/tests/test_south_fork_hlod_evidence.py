@@ -49,5 +49,5 @@ def test_hlod_log_parser_rejects_false_completion(text: str):
 def test_checked_in_hlod_evidence_matches_current_actor_packages():
     evidence = validate_south_fork_hlod_evidence(REPO_ROOT)
 
-    assert evidence["commandlet_result"]["world_actor_count"] == 20
+    assert evidence["commandlet_result"]["world_actor_count"] == 28
     assert evidence["acceptance"]["merged_atlas_parent_absent"] is True

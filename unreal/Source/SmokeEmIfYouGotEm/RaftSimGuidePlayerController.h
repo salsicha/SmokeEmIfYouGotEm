@@ -6,6 +6,9 @@
 #include "RaftSimGuidePlayerController.generated.h"
 
 class URaftSimRunHudWidget;
+class IInputProcessor;
+class FRaftSimMouseLookInputProcessor;
+class FRaftSimCrewChatter;
 
 /** In-run controller: creates the HUD and holds game input focus. */
 UCLASS()
@@ -15,7 +18,9 @@ class SMOKEEMIFYOUGOTEM_API ARaftSimGuidePlayerController : public APlayerContro
 
 public:
     virtual void BeginPlay() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     virtual void SetupInputComponent() override;
+    virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
     virtual void PlayerTick(float DeltaTime) override;
 
     URaftSimRunHudWidget* GetRunHud() const { return RunHud; }
@@ -35,27 +40,38 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Shell")
     void TogglePhotoMode();
 
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Shell")
+    void RestartCheckpoint();
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Shell")
+    void ReturnToMainMenu();
+
 protected:
     UPROPERTY()
     TObjectPtr<URaftSimRunHudWidget> RunHud;
 
 private:
+    friend class FRaftSimMouseLookInputProcessor;
+
     void ToggleCommandWheel();
     void CloseCommandWheel();
     void HandleGamepadDPadDown();
     void HandleGamepadFaceButtonBottom();
+    void HandleGamepadFaceButtonRight();
     void ToggleChaseCamera();
     void CycleWeatherVariant();
     void ToggleReview();
-    void RestartCheckpoint();
-    void ReturnToMainMenu();
     void CapturePhoto();
     void CommandForward();
     void CommandBackward();
     void CommandLeft();
     void CommandRight();
     void CommandStop();
+    void CommandSeats();
     void ApplyCommand(int32 CommandIndex);
+    void MouseLookYaw(float Value);
+    void MouseLookPitch(float Value);
+    void AccumulateSlateMouseLook(const FVector2D& Delta);
     void PhotoLookYaw(float Value);
     void PhotoLookPitch(float Value);
     void ApplySavedSettings();
@@ -66,4 +82,8 @@ private:
     bool bPhotoMode = false;
     bool bReviewVisible = false;
     bool bRestoreHudAfterCapture = false;
+    FVector2D PendingSlateMouseLook = FVector2D::ZeroVector;
+    TSharedPtr<IInputProcessor> MouseLookInputProcessor;
+    /** The crew's own lines on the river, shown as subtitles. */
+    TSharedPtr<FRaftSimCrewChatter> CrewChatter;
 };

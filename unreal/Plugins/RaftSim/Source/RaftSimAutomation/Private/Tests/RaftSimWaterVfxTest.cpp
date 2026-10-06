@@ -1,12 +1,60 @@
-#include "Components/HierarchicalInstancedStaticMeshComponent.h"
+#include "Components/InstancedStaticMeshComponent.h"
 #include "Components/PostProcessComponent.h"
+#include "Engine/StaticMesh.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/AutomationTest.h"
+#include "ProceduralMeshComponent.h"
 #include "RaftSimWaterVfxActor.h"
 #include "Tests/AutomationCommon.h"
 
 #if WITH_AUTOMATION_TESTS
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimSouthForkSprayMapTest,
+    "RaftSim.M4.SouthForkSprayReviewMap", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimSouthForkSprayMapTest::RunTest(const FString&)
+{
+    for (const FString Name : {TEXT("L_SouthForkAmerican_FullReach"),
+        TEXT("SouthForkRegisteredRockPlayable"), TEXT("UEDPIE_0_SouthForkRegisteredRockPlayable"),
+        TEXT("/Game/RaftSim/Maps/Review/UEDPIE_12_SouthForkRegisteredRockPlayable")})
+        TestTrue(*Name, ARaftSimWaterVfxActor::IsSouthForkSprayReviewMap(Name));
+    for (const FString Name : {TEXT("SouthForkSurveyPlayable"), TEXT("L_LavaCanyon"),
+        TEXT("OtherSouthForkRegisteredRockPlayable"), TEXT("SouthForkRegisteredRockPlayable_Old"),
+        TEXT("UEDPIE_bad_SouthForkRegisteredRockPlayable"), TEXT("")})
+        TestFalse(*Name, ARaftSimWaterVfxActor::IsSouthForkSprayReviewMap(Name));
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimRapidSourcePlaneTest,
+    "RaftSim.M4.RapidSourcePlane", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimRapidSourcePlaneTest::RunTest(const FString&)
+{
+    for (float Yaw : {0.0f, 45.0f, 90.0f, 180.0f, 275.0f})
+    {
+        for (float Pitch : {-20.0f, 16.0f, 47.0f, 60.0f, 89.0f})
+        {
+            const FVector Launch = FRotator(Pitch, Yaw, 0).Vector();
+            const FQuat Emitter = FRotationMatrix::MakeFromX(Launch).ToQuat();
+            const FQuat Local = ARaftSimWaterVfxActor::ComputeRapidSourcePlaneRotation(Launch);
+            const FQuat SourceWorld = Emitter * Local;
+            TestTrue(TEXT("source normal stays up regardless of launch pitch/yaw"),
+                SourceWorld.RotateVector(FVector::UpVector).Equals(FVector::UpVector, 1.e-5));
+            for (const FVector Corner : {FVector(-120,-35,0), FVector(120,35,0)})
+            {
+                TestTrue(TEXT("wide source corners cannot become aerial fountains"),
+                    FMath::Abs(SourceWorld.RotateVector(Corner).Z) < 0.001);
+            }
+            TestTrue(TEXT("launch orientation remains independent"),
+                Emitter.RotateVector(FVector::ForwardVector).Equals(Launch, 1.e-5));
+        }
+    }
+    TestFalse(TEXT("zero launch has a finite fallback"),
+        ARaftSimWaterVfxActor::ComputeRapidSourcePlaneRotation(FVector::ZeroVector).ContainsNaN());
+    return true;
+}
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FRaftSimWaterVfxClassifierTest,
@@ -23,6 +71,9 @@ bool FRaftSimWaterVfxClassifierTest::RunTest(const FString&)
         ARaftSimWaterVfxActor::EvaluatePresentation(
             Calm, FVector(0.2f, 0.0f, 0.0f), 0, 0.0f, false);
     TestTrue(TEXT("calm water does not manufacture spray"), CalmState.Spray < 0.05f);
+    TestTrue(
+        TEXT("calm water remains below visible mist threshold"),
+        CalmState.Mist < 0.22f);
 
     FRaftSimWaterSample Rapid = Calm;
     Rapid.DepthMeters = 0.75f;
@@ -36,11 +87,73 @@ bool FRaftSimWaterVfxClassifierTest::RunTest(const FString&)
     TestTrue(TEXT("aeration creates mist"), RapidState.Mist > 0.6f);
     TestEqual(TEXT("underwater state is explicit"), RapidState.Underwater, 1.0f);
 
+    const FVector Downstream =
+        Rapid.VelocityMetersPerSecond.GetSafeNormal2D();
+    const FVector RollerDirection =
+        ARaftSimWaterVfxActor::ComputeRapidRollerLaunchDirection(
+            Rapid.VelocityMetersPerSecond);
+    const FVector CrestDirection =
+        ARaftSimWaterVfxActor::ComputeRapidCrestSprayLaunchDirection(
+            Rapid.VelocityMetersPerSecond, 0.12f);
+    TestTrue(
+        TEXT("rapid roller travels visibly upstream while rising"),
+        FVector::DotProduct(RollerDirection, Downstream) < -0.55f &&
+            RollerDirection.Z > 0.65f);
+    TestTrue(
+        TEXT("crest spray travels upstream while rising"),
+        FVector::DotProduct(CrestDirection, Downstream) < -0.40f &&
+            CrestDirection.Z > 0.80f);
     FRaftSimWaterSample Dry;
     const FRaftSimWaterVfxState DryState =
         ARaftSimWaterVfxActor::EvaluatePresentation(
             Dry, FVector::ZeroVector, 8, 0.22f, false);
     TestEqual(TEXT("dry terrain has no spray"), DryState.Spray, 0.0f);
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimRaftSprayOwnershipTest,
+    "RaftSim.M4.RaftSpraySourceOwnership",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimRaftSprayOwnershipTest::RunTest(const FString&)
+{
+    FRaftSimWaterSample Water;
+    Water.bWet=true;Water.DepthMeters=.75f;
+    Water.VelocityMetersPerSecond=FVector(6.8f,.4f,0.f);
+    const auto CoMoving=ARaftSimWaterVfxActor::EvaluatePresentation(
+        Water,Water.VelocityMetersPerSecond,0,0.f,true,true);
+    TestEqual(TEXT("co-moving raft is not another river spray source"),CoMoving.Spray,0.f);
+    TestEqual(TEXT("ambient river mist is not emitted from raft centre"),CoMoving.Mist,0.f);
+    TestEqual(TEXT("no contact/slip means no raft droplets"),CoMoving.Droplets,0.f);
+    TestEqual(TEXT("no contact/slip means no impact sheet"),CoMoving.ImpactSheet,0.f);
+    TestEqual(TEXT("underwater state remains independent"),CoMoving.Underwater,1.f);
+    const auto Legacy=ARaftSimWaterVfxActor::EvaluatePresentation(
+        Water,Water.VelocityMetersPerSecond,0,0.f,false);
+    TestTrue(TEXT("regression exercises formerly active ambient raft emission"),
+        Legacy.Spray>.7f && Legacy.Mist>.8f && Legacy.Droplets>.5f);
+    const auto Contact=ARaftSimWaterVfxActor::EvaluatePresentation(
+        Water,FVector(2,0,0),4,.16f,false,true);
+    const auto OriginalContact=ARaftSimWaterVfxActor::EvaluatePresentation(
+        Water,FVector(2,0,0),4,.16f,false,false);
+    TestEqual(TEXT("full contact spray retained"),Contact.Spray,OriginalContact.Spray);
+    TestEqual(TEXT("full contact mist retained"),Contact.Mist,OriginalContact.Mist);
+    TestEqual(TEXT("full contact droplets retained"),Contact.Droplets,OriginalContact.Droplets);
+    TestEqual(TEXT("impact sheet retained"),Contact.ImpactSheet,OriginalContact.ImpactSheet);
+    float PreviousSpray=0.f;
+    for(float Slip:{.01f,.1f,1.f,3.f,6.5f})
+    {
+        const auto Impact=ARaftSimWaterVfxActor::EvaluatePresentation(
+            Water,Water.VelocityMetersPerSecond-FVector(Slip,0,0),0,0.f,false,true);
+        TestTrue(TEXT("relative impacts still produce bounded increasing spray"),
+            Impact.Spray>PreviousSpray && Impact.Spray<=1.f && Impact.Droplets>0.f);
+        PreviousSpray=Impact.Spray;
+    }
+    Water.bWet=false;
+    const auto Dry=ARaftSimWaterVfxActor::EvaluatePresentation(Water,FVector::ZeroVector,8,.22f,true,true);
+    TestEqual(TEXT("dry ground cannot emit spray"),Dry.Spray,0.f);
+    TestEqual(TEXT("dry ground cannot emit mist"),Dry.Mist,0.f);
+    TestEqual(TEXT("dry ground cannot emit droplets"),Dry.Droplets,0.f);
+    TestEqual(TEXT("dry probe preserves underwater flag"),Dry.Underwater,1.f);
     return true;
 }
 
@@ -83,13 +196,52 @@ bool FRaftSimAssertWaterVfxPoolCommand::Update()
     Test->TestNotNull(TEXT("raft spawns live-water VFX actor"), Vfx);
     if (Vfx)
     {
-        TArray<UHierarchicalInstancedStaticMeshComponent*> Pools;
+        TArray<UInstancedStaticMeshComponent*> Pools;
         Vfx->GetComponents(Pools);
-        Test->TestEqual(TEXT("spray/mist/sheet/droplet pools exist"), Pools.Num(), 4);
+        Test->TestEqual(
+            TEXT("spray/mist/sheet/droplet/rapid-aerosol pools exist"), Pools.Num(), 5);
+        for (const UInstancedStaticMeshComponent* Pool : Pools)
+        {
+            const UStaticMesh* CardMesh = Pool->GetStaticMesh().Get();
+            Test->TestNotNull(TEXT("water VFX pool has a card mesh"), CardMesh);
+            if (CardMesh)
+            {
+                Test->TestTrue(
+                    TEXT("water VFX uses soft plane cards rather than geometric spheres"),
+                    CardMesh->GetPathName().Contains(TEXT("Plane")));
+            }
+            Test->TestNotNull(
+                TEXT("water VFX pool receives a channel-specific dynamic material"),
+                Cast<UMaterialInstanceDynamic>(Pool->GetMaterial(0)));
+        }
         Test->TestNotNull(
             TEXT("underwater post process exists"),
             Vfx->FindComponentByClass<UPostProcessComponent>());
+        const UProceduralMeshComponent* ContactPatch =
+            Vfx->FindComponentByClass<UProceduralMeshComponent>();
+        Test->TestNotNull(TEXT("bounded contact-water patch exists"), ContactPatch);
+        if (ContactPatch)
+        {
+            Test->TestEqual(
+                TEXT("contact-water patch never affects collision"),
+                ContactPatch->GetCollisionEnabled(),
+                ECollisionEnabled::NoCollision);
+            Test->TestNotNull(
+                TEXT("contact-water patch receives a dynamic material"),
+                Cast<UMaterialInstanceDynamic>(ContactPatch->GetMaterial(0)));
+        }
+        Test->TestTrue(
+            TEXT("contact-water patch starts fail-closed without D4 contact"),
+            !Vfx->IsContactWaterPatchVisible() &&
+                Vfx->GetContactWaterPatchTriangleCount() == 0);
         Test->TestTrue(TEXT("VFX actor binds live solver water"), Vfx->IsLiveWaterBound());
+        Test->TestTrue(
+            TEXT("production Niagara water VFX replaces visible card rendering"),
+            Vfx->IsProductionNiagaraReady());
+        Test->TestEqual(
+            TEXT("three contact and twenty-four rapid Niagara components are asset-bound"),
+            Vfx->GetProductionNiagaraComponentCount(),
+            27);
     }
     return true;
 }
@@ -97,6 +249,15 @@ bool FRaftSimAssertWaterVfxPoolCommand::Update()
 
 bool FRaftSimWaterVfxRuntimePoolTest::RunTest(const FString&)
 {
+#if PLATFORM_MAC
+    // UE 5.8 can tear down an offscreen PIE text-input context after its
+    // NSWindow has already gone away. This engine diagnostic is unrelated to
+    // the runtime VFX pool assertions.
+    AddExpectedErrorPlain(
+        TEXT("LogMacTextInputMethodSystem: Deactivating a context failed when its window couldn't be found."),
+        EAutomationExpectedErrorFlags::Contains,
+        -1);
+#endif
     AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank"));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.0f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertWaterVfxPoolCommand(this));

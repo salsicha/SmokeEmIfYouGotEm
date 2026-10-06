@@ -1,17 +1,118 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
+#include "Landscape/RaftSimEditorZambeziWallRelief.h"
+
+#include "Engine/CollisionProfile.h"
 
 namespace RaftSimEditorEnvironment
 {
+namespace
+{
+// Evidence reaches place an always-loaded, render-only terrain backdrop
+// around their Landscape (measured terrain beyond it). Meshes come from
+// unreal/Scripts/install_colorado_hance_backdrop.py (Hance) and
+// install_terrain_backdrop.py (others); the translation and (1, -1, 1)
+// scale come from the `backdrop` block of each terrain manifest (the
+// python evidence tests check they match). Under the Landscape the mesh
+// sits below it, so the Landscape wins.
+bool AddEvidenceTerrainBackdrop(
+    UWorld* World, const TCHAR* MeshPath, const FVector& TranslationCm, const TCHAR* Label, const TCHAR* Tag, FString& OutSummary)
+{
+    UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, MeshPath);
+    if (!Mesh)
+    {
+        OutSummary += FString::Printf(TEXT("Missing the terrain backdrop mesh %s; run its install script.\n"), MeshPath);
+        return false;
+    }
+    AStaticMeshActor* Actor = World->SpawnActor<AStaticMeshActor>(TranslationCm, FRotator::ZeroRotator);
+    if (!Actor)
+    {
+        OutSummary += TEXT("Failed to spawn the terrain backdrop actor.\n");
+        return false;
+    }
+    Actor->SetActorScale3D(FVector(1.0, -1.0, 1.0));
+    Actor->SetActorLabel(Label);
+    Actor->Tags.AddUnique(TEXT("RaftSimTerrainBackdrop"));
+    Actor->Tags.AddUnique(Tag);
+    UStaticMeshComponent* Component = Actor->GetStaticMeshComponent();
+    Component->SetMobility(EComponentMobility::Static);
+    Component->SetStaticMesh(Mesh);
+    Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    Component->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+    Component->SetCanEverAffectNavigation(false);
+    Component->bAffectDistanceFieldLighting = false;
+    // Valley walls beyond the Landscape shade the river at low sun.
+    Component->SetCastShadow(true);
+    OutSummary += FString::Printf(TEXT("Placed the terrain backdrop %s (no collision).\n"), *Mesh->GetPathName());
+    return true;
+}
+
+bool AddColoradoHanceTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    // USGS 3DEP 10 m over a 6.5 km window (hance_evidence_terrain_manifest.json).
+    const FVector BackdropTranslationCm(-199500.0, -340100.0, 0.0);
+    return AddEvidenceTerrainBackdrop(World,
+        TEXT("/Game/RaftSim/Environment/ColoradoRun/Terrain/SM_RaftSim_ColoradoHance_3DEPBackdrop."
+             "SM_RaftSim_ColoradoHance_3DEPBackdrop"),
+        BackdropTranslationCm, TEXT("RaftSim_ColoradoHance_3DEPBackdrop"), TEXT("RaftSimColoradoHance3DEPBackdrop"), OutSummary);
+}
+
+bool AddPacuareHuacasTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    // IGN 10 m contours over their download extent (huacas_evidence_terrain_manifest.json).
+    const FVector PacuareBackdropTranslationCm(-375900.0, -385900.0, 0.0);
+    return AddEvidenceTerrainBackdrop(World,
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Terrain/SM_RaftSim_PacuareHuacas_ContourBackdrop."
+             "SM_RaftSim_PacuareHuacas_ContourBackdrop"),
+        PacuareBackdropTranslationCm, TEXT("RaftSim_PacuareHuacas_ContourBackdrop"), TEXT("RaftSimPacuareHuacasContourBackdrop"), OutSummary);
+}
+
+bool AddFutaleufuTerminatorTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    // Copernicus GLO-30 at 20 m, 3 km around the Landscape (terminator_evidence_terrain_manifest.json).
+    const FVector FutaleufuBackdropTranslationCm(-299600.0, -388850.0, 0.0);
+    return AddEvidenceTerrainBackdrop(World,
+        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Terrain/SM_RaftSim_FutaleufuTerminator_GLO30Backdrop."
+             "SM_RaftSim_FutaleufuTerminator_GLO30Backdrop"),
+        FutaleufuBackdropTranslationCm, TEXT("RaftSim_FutaleufuTerminator_GLO30Backdrop"),
+        TEXT("RaftSimFutaleufuTerminatorGLO30Backdrop"), OutSummary);
+}
+
+bool AddChilkoLavaCanyonTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    // LidarBC 1 m bare earth as 20 m block means, 3 km around the Landscape
+    // (lava_canyon_evidence_2023_terrain_manifest.json).
+    const FVector ChilkoBackdropTranslationCm(-300700.0, -456900.0, 0.0);
+    return AddEvidenceTerrainBackdrop(World,
+        TEXT("/Game/RaftSim/Environment/ChilkoRun/Terrain/SM_RaftSim_ChilkoLavaCanyon_LidarBackdrop."
+             "SM_RaftSim_ChilkoLavaCanyon_LidarBackdrop"),
+        ChilkoBackdropTranslationCm, TEXT("RaftSim_ChilkoLavaCanyon_LidarBackdrop"),
+        TEXT("RaftSimChilkoLavaCanyonLidarBackdrop"), OutSummary);
+}
+
+bool AddZambeziUpperGorgeTerrainBackdrop(UWorld* World, FString& OutSummary)
+{
+    // Copernicus GLO-30 at 20 m, 3 km around the Landscape
+    // (upper_gorge_evidence_2025_terrain_manifest.json).
+    const FVector ZambeziBackdropTranslationCm(-299300.0, -378050.0, 0.0);
+    return AddEvidenceTerrainBackdrop(World,
+        TEXT("/Game/RaftSim/Environment/ZambeziRun/Terrain/SM_RaftSim_ZambeziUpperGorge_GLO30Backdrop."
+             "SM_RaftSim_ZambeziUpperGorge_GLO30Backdrop"),
+        ZambeziBackdropTranslationCm, TEXT("RaftSim_ZambeziUpperGorge_GLO30Backdrop"),
+        TEXT("RaftSimZambeziUpperGorgeGLO30Backdrop"), OutSummary);
+}
+} // namespace
+
 bool BuildLandscapeImportCandidateMap(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     FRaftSimLandscapeImportCandidateResult& OutResult,
-    FString& OutSummary)
+    FString& OutSummary,
+    bool bReuseSharedSolverPresentationAssets)
 {
     const int32 LandscapeSize = Candidate.LandscapeSize;
     const int32 LandscapeQuads = LandscapeSize - 1;
     const int32 NumSubsections = Candidate.bPhysicalScaleSourceCorridor ? 2 : 1;
     constexpr int32 SubsectionSizeQuads = 63;
-    constexpr float MinX = -5800.0f;
+    const float MinX = GetLandscapeCandidateWorldMinX(Candidate);
 
     const FString HeightfieldAbsolutePath = FPaths::ConvertRelativePathToFull(
         FPaths::Combine(GetRepoRoot(), Candidate.HeightfieldRelativePath));
@@ -105,11 +206,17 @@ bool BuildLandscapeImportCandidateMap(
     {
         return false;
     }
+    // Reach-local packed fields are sampled on the CPU-authored capture
+    // ribbon.  Keep the water material free of the South Fork default texture;
+    // the candidate-specific pixels already drive ribbon relief and foam.
+    const bool bDisableSolverVisualizationFieldsInMaterial =
+        !Candidate.bUseSolverVisualizationFields ||
+        !Candidate.SolverVisualizationFieldRelativePath.IsEmpty();
     UMaterialInterface* CandidateWaterMaterial =
         LoadOrCreateLandscapeCandidateWaterMaterial(
             Candidate.PreviewSpec,
             OutSummary,
-            !Candidate.bUseSolverVisualizationFields);
+            bDisableSolverVisualizationFieldsInMaterial);
     if (!CandidateWaterMaterial)
     {
         return false;
@@ -121,9 +228,10 @@ bool BuildLandscapeImportCandidateMap(
     UMaterialInterface* SolverFoamMaterial = nullptr;
     if (Candidate.bUseSolverVisualizationFields && CandidateWaterSettings.SolverFieldEnable > 0.5f)
     {
-        const FString SolverFieldImage =
-            TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
-                 "american_south_fork_median_cpp_solver_depth_speed_froude_v1.png");
+        const FString SolverFieldImage = Candidate.SolverVisualizationFieldRelativePath.IsEmpty()
+            ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                   "american_south_fork_median_cpp_solver_depth_speed_froude_v1.png")
+            : Candidate.SolverVisualizationFieldRelativePath;
         if (!LoadPreviewPngImage(SolverFieldImage, SolverVisualizationFields))
         {
             OutSummary += FString::Printf(
@@ -132,7 +240,22 @@ bool BuildLandscapeImportCandidateMap(
             return false;
         }
         SolverVisualizationFieldsPtr = &SolverVisualizationFields;
-        SolverFoamMaterial = LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
+        if (bReuseSharedSolverPresentationAssets)
+        {
+            SolverFoamMaterial = LoadObject<UMaterialInterface>(
+                nullptr,
+                TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+                     "M_RaftSim_SolverFieldFoamCandidate."
+                     "M_RaftSim_SolverFieldFoamCandidate"));
+            OutSummary += SolverFoamMaterial
+                ? TEXT("Reused the reviewed shared solver-foam material without resaving it.\n")
+                : TEXT("Could not load the reviewed shared solver-foam material.\n");
+        }
+        else
+        {
+            SolverFoamMaterial =
+                LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
+        }
         if (!SolverFoamMaterial)
         {
             return false;
@@ -149,7 +272,7 @@ bool BuildLandscapeImportCandidateMap(
     OutResult.LandscapeLocation = FVector(
         MinX,
         -Candidate.HorizontalSpanYCm * 0.5f,
-        ChannelBedWorldZ - EncodedChannelFloorCm);
+        ChannelBedWorldZ - EncodedChannelFloorCm + Candidate.WorldVerticalOffsetCm);
     OutResult.LandscapeScale = FVector(ScaleX, ScaleY, ScaleZ);
 
     ALandscape* Landscape = World->SpawnActor<ALandscape>(
@@ -257,6 +380,7 @@ bool BuildLandscapeImportCandidateMap(
         return false;
     }
     if (Candidate.bPhysicalScaleSourceCorridor &&
+        Candidate.bUseDensePhysicalTerrainRenderSurface &&
         !AddLandscapeCandidatePhysicalBankCorridorMesh(World, Landscape, Candidate, OutSummary))
     {
         OutSummary += FString::Printf(
@@ -264,7 +388,94 @@ bool BuildLandscapeImportCandidateMap(
             *Candidate.PreviewSpec.RiverId);
         return false;
     }
-    if (Candidate.bPhysicalScaleSourceCorridor)
+    if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        UMaterialInterface* BatokaTerrainMaterial =
+            LoadOrCreatePhysicalSourceTerrainRenderMaterial(Candidate, true, true);
+        FZambeziBatokaVisualMorphologyStats MorphologyStats;
+        if (!BatokaTerrainMaterial ||
+            !ApplyZambeziBatokaVisualTerrainTreatment(
+                World,
+                BatokaTerrainMaterial,
+                Candidate,
+                true,
+                &MorphologyStats,
+                OutSummary) ||
+            MorphologyStats.VisualTileCount != 4 ||
+            MorphologyStats.ReconstructedVertexCount <= 0 ||
+            (MorphologyStats.ReconstructedInsideProtectedRadiusVertexCount > 0 &&
+             MorphologyStats.MinimumReconstructedInsideRadiusHeightAboveWaterCm +
+                     0.5f <
+                 600.0f) ||
+            MorphologyStats.ModifiedVertexCount <= 0 ||
+            MorphologyStats.NearBankModifiedVertexCount <= 0 ||
+            MorphologyStats.UpperCliffModifiedInsideProtectedRadiusVertexCount <= 0 ||
+            MorphologyStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm +
+                    0.5f <
+                600.0f ||
+            MorphologyStats.NormalReliefVertexCount <= 0 ||
+            MorphologyStats.NormalReliefInsideProtectedRadiusVertexCount <= 0 ||
+            MorphologyStats.MinimumNormalReliefInsideRadiusHeightAboveWaterCm + 0.5f <
+                600.0f ||
+            MorphologyStats.MaximumAbsoluteHorizontalReliefCm > 520.5f)
+        {
+            OutSummary += TEXT(
+                "Runnable Zambezi map requires four conditioned Batoka visual-terrain "
+                "tiles with bounded procedural morphology.\n");
+            return false;
+        }
+        OutSummary += FString::Printf(
+            TEXT("Saved runnable Batoka visual terrain: %lld vertices received capped "
+                 "source-facet reconstruction (maximum %.2f m; %lld upper-cliff vertices "
+                 "inside the horizontal buffer, minimum %.2f m above local water), then "
+                 "%lld/%lld vertices received bounded morphology, including %lld dry "
+                 "near-bank vertices and %lld upper-cliff vertices inside the %.1f m "
+                 "horizontal shoreline radius (minimum %.2f m above local water; nearest "
+                 "conditioned vertex %.2f m; full horizontal strength by %.1f m). "
+                 "V20 applied normal-oriented relief to %lld vertices (%lld inside "
+                 "the protected radius, minimum %.2f m above local water), with "
+                 "%.2f m maximum and %.2f m mean horizontal displacement.\n"),
+            MorphologyStats.ReconstructedVertexCount,
+            MorphologyStats.MaximumAbsoluteReconstructionOffsetCm / 100.0f,
+            MorphologyStats.ReconstructedInsideProtectedRadiusVertexCount,
+            MorphologyStats.ReconstructedInsideProtectedRadiusVertexCount > 0
+                ? MorphologyStats.MinimumReconstructedInsideRadiusHeightAboveWaterCm /
+                      100.0f
+                : 0.0f,
+            MorphologyStats.ModifiedVertexCount,
+            MorphologyStats.TotalVertexCount,
+            MorphologyStats.NearBankModifiedVertexCount,
+            MorphologyStats.UpperCliffModifiedInsideProtectedRadiusVertexCount,
+            MorphologyStats.ProtectedShorelineRadiusCm / 100.0f,
+            MorphologyStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm /
+                100.0f,
+            MorphologyStats.MinimumModifiedCenterlineDistanceCm / 100.0f,
+            MorphologyStats.FullStrengthMorphologyRadiusCm / 100.0f,
+            MorphologyStats.NormalReliefVertexCount,
+            MorphologyStats.NormalReliefInsideProtectedRadiusVertexCount,
+            MorphologyStats.MinimumNormalReliefInsideRadiusHeightAboveWaterCm / 100.0f,
+            MorphologyStats.MaximumAbsoluteHorizontalReliefCm / 100.0f,
+            MorphologyStats.AbsoluteHorizontalReliefSumCm /
+                MorphologyStats.NormalReliefVertexCount / 100.0f);
+
+        FZambeziAdaptiveNearFieldTerrainStats NearFieldStats;
+        if (!AddZambeziAdaptiveNearFieldTerrain(
+                World,
+                Landscape,
+                Candidate,
+                BatokaTerrainMaterial,
+                NearFieldStats,
+                OutSummary))
+        {
+            OutSummary += TEXT(
+                "Runnable Zambezi map requires the source-conditioned adaptive "
+                "near-field bank surface at the playable launch.\n");
+            return false;
+        }
+        ApplyZambeziWallLedges(World, Landscape, Candidate, OutSummary);
+    }
+    if (Candidate.bPhysicalScaleSourceCorridor &&
+        Candidate.bUseDensePhysicalTerrainRenderSurface)
     {
         Landscape->SetActorHiddenInGame(true);
         for (ULandscapeComponent* LandscapeComponent : Landscape->LandscapeComponents)
@@ -279,13 +490,29 @@ bool BuildLandscapeImportCandidateMap(
             "Physical source Landscape remains the collision and height-query authority; "
             "dense source-terrain tiles are the non-colliding render surface.\n");
     }
+    else if (Candidate.bPhysicalScaleSourceCorridor)
+    {
+        OutSummary += TEXT(
+            "Reach-local physical Landscape remains visible and owns terrain collision/rendering; "
+            "no duplicate dense source-terrain overlay is active.\n");
+    }
     AddPreviewLightRig(World, Candidate.PreviewSpec);
+    if ((Candidate.PreviewSpec.RiverId == TEXT("colorado_river") && !AddColoradoHanceTerrainBackdrop(World, OutSummary)) ||
+        (Candidate.PreviewSpec.RiverId == TEXT("pacuare") && !AddPacuareHuacasTerrainBackdrop(World, OutSummary)) ||
+        (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") && !AddFutaleufuTerminatorTerrainBackdrop(World, OutSummary)) ||
+        (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") && !AddChilkoLavaCanyonTerrainBackdrop(World, OutSummary)) ||
+        (IsZambeziUpperGorgeRiverId(Candidate.PreviewSpec.RiverId) && !AddZambeziUpperGorgeTerrainBackdrop(World, OutSummary)))
+    {
+        return false;
+    }
     AActor* WaterActor = Candidate.bPhysicalScaleSourceCorridor
         ? AddLandscapeCandidatePhysicalRiverRibbon(
               World,
               Landscape,
               Candidate,
               CandidateWaterMaterial,
+              SolverVisualizationFieldsPtr,
+              SolverFoamMaterial,
               OutSummary)
         : AddPreviewRiverRibbonMesh(
               World,
@@ -308,9 +535,11 @@ bool BuildLandscapeImportCandidateMap(
             }
         }
     }
+    const EMaterialShadingModel ExpectedWaterShadingModel = MSM_DefaultLit;
     OutResult.bSolverSurfaceWaterMaterialBound =
         OutResult.WaterMaterialBoundComponentCount == 1 &&
-        CandidateWaterMaterial->GetShadingModels().HasShadingModel(MSM_DefaultLit);
+        CandidateWaterMaterial->GetShadingModels().HasShadingModel(
+            ExpectedWaterShadingModel);
     if (!OutResult.bSolverSurfaceWaterMaterialBound)
     {
         OutSummary += FString::Printf(
@@ -318,8 +547,22 @@ bool BuildLandscapeImportCandidateMap(
             *Candidate.PreviewSpec.RiverId);
         return false;
     }
+    if (!AddLandscapeCandidateScenarioMarkers(World, Landscape, Candidate, OutSummary))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Scenario marker generation failed for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
     AddPreviewCameraAndStart(World, Candidate.PreviewSpec);
     RepositionLandscapeCandidatePhysicalCameras(World, Landscape, Candidate, OutSummary);
+    if (!AddLandscapeCandidateRunnableGameplay(World, Landscape, Candidate, OutSummary))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Runnable gameplay bootstrap failed for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
 
     OutSummary += FString::Printf(
         TEXT("Imported %s as a %d-component ALandscape candidate; preview channel burn modified %d samples.\n"),

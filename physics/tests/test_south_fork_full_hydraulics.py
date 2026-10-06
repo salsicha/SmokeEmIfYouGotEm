@@ -50,6 +50,7 @@ def test_all_named_rapid_fields_are_finite_hash_locked_and_feature_complete():
         assert rapid["all_bands_passed"] is True
         assert rapid["authority"]["not_surveyed"] is True
         assert rapid["authority"]["not_for_navigation"] is True
+        assert 120.0 < rapid["source_elevation_datum_m"] < 500.0
         assert [band["band_id"] for band in rapid["bands"]] == list(FLOW_BAND_IDS)
         feature_count += rapid_entry["catalog_feature_count"]
         for band in rapid["bands"]:
@@ -72,7 +73,10 @@ def test_all_named_rapid_fields_are_finite_hash_locked_and_feature_complete():
                 )
                 assert _sha256(path) == record["sha256"]
                 array = np.load(path, allow_pickle=False)
-                assert list(array.shape) == record["shape"] == [21, 101]
+                # Each rapid records its own solve grid (4 m legacy cooks,
+                # finer cooks where a crux needs metre-scale relief).
+                grid = rapid["grid"]
+                assert list(array.shape) == record["shape"] == [grid["ny"], grid["nx"]]
                 assert np.isfinite(array).all()
                 if name == "h":
                     assert float(np.min(array)) >= 0.0

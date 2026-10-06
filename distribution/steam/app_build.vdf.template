@@ -1,0 +1,13 @@
+"appbuild"
+{
+    "appid" "__STEAM_APP_ID__"
+    "desc" "RaftSim 1.0.0-rc1"
+    "buildoutput" "__BUILD_OUTPUT__"
+    "contentroot" "__CONTENT_ROOT__"
+    "setlive" ""
+    "preview" "1"
+    "depots"
+    {
+        "__STEAM_DEPOT_ID__" "depot_build.vdf"
+    }
+}

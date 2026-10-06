@@ -10,6 +10,6 @@ def test_custom_cpp_water_solver_is_primary_unreal_runtime_candidate():
     assert payload["schema_version"] == "raftsim.runtime_baseline.v0"
     assert primary["solver_id"] == "raftsim_water_reduced_cpp_v0"
     assert primary["executable"] == "raftsim_water_solver"
-    assert primary["source"] == "physics/cpp"
+    assert primary["source"] == "unreal/Plugins/SEIYGECore/cpp"
     assert primary["validation_reference"] == "PyClaw"
     assert payload["chrono_role"]["fsi_policy"] == "optional_experiment_reference_only"

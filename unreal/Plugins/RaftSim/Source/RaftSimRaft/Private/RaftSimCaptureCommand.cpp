@@ -8,19 +8,340 @@
 // the multi-command no-op pitfall.
 
 #include "Camera/CameraActor.h"
+#include "Camera/CameraComponent.h"
+#include "Camera/PlayerCameraManager.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
+#include "Components/MeshComponent.h"
+#include "Components/PrimitiveComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Engine/Engine.h"
+#include "Engine/DirectionalLight.h"
+#include "Engine/GameInstance.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/LocalPlayer.h"
+#include "Engine/StaticMesh.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
+#include "HAL/IConsoleManager.h"
 #include "HAL/PlatformMisc.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialInterface.h"
 #include "Misc/Paths.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "Misc/AutomationTest.h"
+#include "Misc/FileHelper.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonSerializer.h"
+#include "SceneView.h"
+#include "NiagaraComponent.h"
+#include "ProceduralMeshComponent.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimGuidePawn.h"
 #include "RaftSimRockObstacleActor.h"
+#include "RaftSimCameraPresentation.h"
+#include "RaftSimRunCoordinateProvider.h"
+#include "RaftSimPhysicsBridgeSubsystem.h"
+#include "RaftSimChronoRuntimeAdapter.h"
+#include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimWaterVfxActor.h"
+#include "RaftSimScreenRecorderSubsystem.h"
 #include "TimerManager.h"
 #include "UnrealClient.h"
 
 namespace RaftSimCaptureCommand
 {
+
+// Game-thread camera observation paired with the submitted carrier export.
+// This is not a GPU fence or a claim that the carrier is the visible occluder.
+static bool SaveCarrierViewAudit(UWorld* World, const FString& Path)
+{
+    if (!World || FPaths::FileExists(Path)) return false;
+    const APlayerController* PC = World->GetFirstPlayerController();
+    const ULocalPlayer* Player = PC ? PC->GetLocalPlayer() : nullptr;
+    FSceneViewProjectionData View;
+    if (!Player || !Player->ViewportClient || !Player->ViewportClient->Viewport ||
+        !Player->GetProjectionData(Player->ViewportClient->Viewport, View) ||
+        !View.IsValidViewRectangle()) return false;
+    const FMatrix Matrix = View.ComputeViewProjectionMatrix();
+    TArray<TSharedPtr<FJsonValue>> MatrixRows;
+    for (int32 Row = 0; Row < 4; ++Row)
+    {
+        TArray<TSharedPtr<FJsonValue>> Values;
+        for (int32 Col = 0; Col < 4; ++Col)
+        {
+            if (!FMath::IsFinite(Matrix.M[Row][Col])) return false;
+            Values.Add(MakeShared<FJsonValueNumber>(Matrix.M[Row][Col]));
+        }
+        MatrixRows.Add(MakeShared<FJsonValueArray>(Values));
+    }
+    const FIntRect Rect = View.GetConstrainedViewRect();
+    TArray<TSharedPtr<FJsonValue>> RectValues;
+    for (int32 Value : {Rect.Min.X, Rect.Min.Y, Rect.Max.X, Rect.Max.Y})
+        RectValues.Add(MakeShared<FJsonValueNumber>(Value));
+    auto Report = MakeShared<FJsonObject>();
+    Report->SetStringField(TEXT("schema"), TEXT("raftsim.carrier_view.v1"));
+    Report->SetNumberField(TEXT("game_frame"), double(GFrameCounter));
+    Report->SetNumberField(TEXT("world_seconds"), World->GetTimeSeconds());
+    Report->SetArrayField(TEXT("world_cm_to_clip_row_matrix"), MatrixRows);
+    Report->SetArrayField(TEXT("constrained_view_rect"), RectValues);
+    FString ProbeText;
+    // Commas/semicolons belong to the probe list, not command-line separators.
+    if (FParse::Value(FCommandLine::Get(), TEXT("RaftSimCaptureTerrainPixels="), ProbeText, false))
+    {
+        TArray<FString> Probes;
+        ProbeText.ParseIntoArray(Probes, TEXT(";"), true);
+        if (Probes.IsEmpty() || Probes.Num() > 32) return false;
+        TArray<TSharedPtr<FJsonValue>> Hits;
+        int32 Budget = 128;
+        const auto VectorJson = [](const FVector& V)
+        {
+            TArray<TSharedPtr<FJsonValue>> Values;
+            for (double X : {V.X,V.Y,V.Z}) Values.Add(MakeShared<FJsonValueNumber>(X));
+            return Values;
+        };
+        for (const FString& Probe : Probes)
+        {
+            FString X, Y;
+            if (!Probe.Split(TEXT(","), &X, &Y) || !X.IsNumeric() || !Y.IsNumeric()) return false;
+            const FVector2D Pixel(FCString::Atod(*X), FCString::Atod(*Y));
+            if (Pixel.ContainsNaN() || Pixel.X < Rect.Min.X || Pixel.Y < Rect.Min.Y ||
+                Pixel.X >= Rect.Max.X || Pixel.Y >= Rect.Max.Y) return false;
+            FVector Origin, Direction;
+            FSceneView::DeprojectScreenToWorld(Pixel, Rect, Matrix.Inverse(), Origin, Direction);
+            FCollisionQueryParams Params(TEXT("RaftSimCarrierCameraTerrain"), true);
+            Params.bReturnFaceIndex = true;
+            FHitResult Hit;
+            const int32 Before = Budget;
+            const bool Found = ARaftSimWaterSurfaceActor::TraceTerrainSurface(World,
+                Origin, Origin + Direction*100000.f, Params, Budget, Hit);
+            auto Row = MakeShared<FJsonObject>();
+            TArray<TSharedPtr<FJsonValue>> Pixels;
+            Pixels.Add(MakeShared<FJsonValueNumber>(Pixel.X));
+            Pixels.Add(MakeShared<FJsonValueNumber>(Pixel.Y));
+            Row->SetArrayField(TEXT("pixel"), Pixels);
+            Row->SetArrayField(TEXT("ray_origin_cm"), VectorJson(Origin));
+            Row->SetArrayField(TEXT("ray_direction"), VectorJson(Direction));
+            Row->SetBoolField(TEXT("hit"), Found);
+            Row->SetNumberField(TEXT("rays_used"), Before-Budget);
+            if (Found)
+            {
+                Row->SetArrayField(TEXT("ground_world_cm"), VectorJson(Hit.ImpactPoint));
+                Row->SetNumberField(TEXT("distance_cm"), Hit.Distance);
+                Row->SetNumberField(TEXT("face_index"), Hit.FaceIndex);
+                Row->SetStringField(TEXT("actor"), Hit.GetActor()->GetPathName());
+                Row->SetStringField(TEXT("component"), Hit.GetComponent() ? Hit.GetComponent()->GetPathName() : TEXT("unavailable"));
+            }
+            Hits.Add(MakeShared<FJsonValueObject>(Row));
+        }
+        Report->SetArrayField(TEXT("terrain_ray_probes"), Hits);
+        Report->SetStringField(TEXT("terrain_ray_scope"), TEXT("Current complex collision against legacy full-reach terrain or actor/component-tagged physical-ground static meshes via the bounded trace helper. Maximum 1km, at most four attempts per probe; missing hit is unavailable. Not GPU scene depth, refraction, or unrestricted scene occlusion."));
+    }
+    Report->SetStringField(TEXT("scope"), TEXT("LocalPlayer game-thread projection at the screenshot request. Row-vector world centimeters to UE reversed-Z clip coordinates. No render-thread fence, temporal jitter, terrain/crew occlusion or pixel visibility acceptance."));
+    FString Json;
+    return FJsonSerializer::Serialize(Report, TJsonWriterFactory<>::Create(&Json)) &&
+        FFileHelper::SaveStringToFile(Json, *Path);
+}
+
+// Inspect the material actually bound to gameplay water, not just the saved
+// parent or an editor-only capture sheet. Overrides live only in this process.
+static void HandleWaterMaterialProbe(const TArray<FString>& Args, UWorld* World)
+{
+    if (!World) return;
+    if (!Args.IsEmpty() && Args.Last().StartsWith(TEXT("delay=")))
+    {
+        const float Delay = FCString::Atof(*Args.Last().Mid(6));
+        if (!FMath::IsFinite(Delay) || Delay <= 0.0f || Delay > 60.0f) return;
+        TArray<FString> DeferredArgs = Args;
+        DeferredArgs.Pop();
+        const TWeakObjectPtr<UWorld> WeakWorld(World);
+        FTimerHandle Handle;
+        World->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([WeakWorld, DeferredArgs]()
+        {
+            if (WeakWorld.IsValid()) HandleWaterMaterialProbe(DeferredArgs, WeakWorld.Get());
+        }), Delay, false);
+        return;
+    }
+    UE_LOG(LogTemp, Display, TEXT("WaterProbe world_s=%.3f"), World->GetTimeSeconds());
+    for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
+    {
+        TInlineComponentArray<UMeshComponent*> Components(*It);
+        for (UMeshComponent* Component : Components)
+        {
+            for (int32 Slot = 0; Slot < Component->GetNumMaterials(); ++Slot)
+            {
+                UMaterialInterface* Material = Component->GetMaterial(Slot);
+                if (!Material) continue;
+                FLinearColor Origin;
+                if (Material->GetVectorParameterValue(
+                        FHashedMaterialParameterInfo(TEXT("RaftSimWaterUVOrigin")), Origin))
+                {
+                    UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s river_uv_origin=(%.3f,%.3f)"),
+                        *Component->GetName(), Origin.R, Origin.G);
+                }
+                if (auto* Procedural = Cast<UProceduralMeshComponent>(Component))
+                {
+                    if (const FProcMeshSection* Section = Procedural->GetProcMeshSection(Slot))
+                    {
+                        int32 MaximumFoam = 0;
+                        double FoamSum = 0;
+                        float MaxAbsUV = 0;
+                        int32 WetCount = 0;
+                        int32 FoamOver20 = 0;
+                        int32 FoamOver50 = 0;
+                        for (const FProcMeshVertex& Vertex : Section->ProcVertexBuffer)
+                        {
+                            MaximumFoam = FMath::Max(MaximumFoam, int32(Vertex.Color.R));
+                            FoamSum += Vertex.Color.R / 255.0;
+                            MaxAbsUV = FMath::Max(MaxAbsUV, FMath::Abs(float(Vertex.UV0.X)));
+                            if (Vertex.Color.A > 127)
+                            {
+                                ++WetCount;
+                                FoamOver20 += Vertex.Color.R > 51 ? 1 : 0;
+                                FoamOver50 += Vertex.Color.R > 127 ? 1 : 0;
+                            }
+                        }
+                        UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s vertices=%d foam_mean=%.4f foam_max=%.4f max_abs_u=%.3f"),
+                            *Component->GetName(), Section->ProcVertexBuffer.Num(),
+                            FoamSum / FMath::Max(1, Section->ProcVertexBuffer.Num()), MaximumFoam / 255.0, MaxAbsUV);
+                        UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s slot=%d visible=%d wet_vertices=%d foam_over20=%d foam_over50=%d"),
+                            *Component->GetName(), Slot, Component->IsVisible() && Section->bSectionVisible,
+                            WetCount, FoamOver20, FoamOver50);
+                    }
+                }
+                if (Args.Num() >= 2)
+                {
+                    UMaterialInstanceDynamic* Dynamic = Cast<UMaterialInstanceDynamic>(Material);
+                    if (!Dynamic) Dynamic = Component->CreateDynamicMaterialInstance(Slot, Material);
+                    if (Dynamic)
+                    {
+                        Dynamic->SetScalarParameterValue(FName(*Args[0]), FCString::Atof(*Args[1]));
+                        Material = Dynamic;
+                    }
+                }
+                for (const TCHAR* Name : {TEXT("CalmRippleStrength"), TEXT("FlowRippleStrength"),
+                    TEXT("FoamRippleStrength"), TEXT("FlowStreakRoughness"),
+                    TEXT("HydraulicFoamIntensity"), TEXT("WaterRoughness"),
+                    TEXT("HydraulicFoamCoverageGain"), TEXT("HydraulicFoamColorBreakupGain"),
+                    TEXT("HydraulicFoamColorCoreGain"), TEXT("WhitewaterFrothLaceModulationFloor"),
+                    TEXT("SouthForkTravelingWaveWPOStrength"), TEXT("RaftSimLocalFluidWPOStrength"),
+                    TEXT("ShallowWaterOpacity"), TEXT("DeepWaterOpacity"),
+                    TEXT("OpticalDepthResponseExponent"), TEXT("ApplyLiveLevelShoreClip")})
+                {
+                    float Value = 0;
+                    const bool Found = Material->GetScalarParameterValue(
+                        FHashedMaterialParameterInfo(FName(Name)), Value);
+                    UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s material=%s parameter=%s found=%d value=%.4f"),
+                        *Component->GetName(), *Material->GetName(), Name, Found, Value);
+                }
+                for (const TCHAR* Name : {TEXT("WaterScattering"), TEXT("WaterAbsorption"),
+                    TEXT("RiverbedColorScale"), TEXT("ShallowWaterColor"), TEXT("DeepWaterColor")})
+                {
+                    FLinearColor Value;
+                    const bool Found = Material->GetVectorParameterValue(
+                        FHashedMaterialParameterInfo(FName(Name)), Value);
+                    if (Found) { UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s material=%s vector=%s value=%s"),
+                        *Component->GetName(), *Material->GetName(), Name, *Value.ToString()); }
+                }
+            }
+        }
+    }
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GWaterMaterialProbeCommand(
+    TEXT("RaftSim.WaterMaterialProbe"),
+    TEXT("Log actual gameplay water values; optionally override <parameter> <value> for this run only. Optional final delay=<seconds> inspects the settled field."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleWaterMaterialProbe));
+
+static void LogVisibleWaterPresentationInventory(UWorld* World)
+{
+    if (World == nullptr)
+    {
+        return;
+    }
+    int32 MatchingComponentCount = 0;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (Actor == nullptr)
+        {
+            continue;
+        }
+        TInlineComponentArray<UPrimitiveComponent*> Components(Actor);
+        for (UPrimitiveComponent* Component : Components)
+        {
+            if (Component == nullptr)
+            {
+                continue;
+            }
+            FString MaterialList;
+            bool bWaterNamed =
+                Actor->GetName().Contains(TEXT("Water"), ESearchCase::IgnoreCase) ||
+                Actor->GetName().Contains(TEXT("River"), ESearchCase::IgnoreCase) ||
+                Component->GetName().Contains(TEXT("Water"), ESearchCase::IgnoreCase) ||
+                Component->GetName().Contains(TEXT("River"), ESearchCase::IgnoreCase) ||
+                Component->GetName().Contains(TEXT("Foam"), ESearchCase::IgnoreCase);
+            for (int32 MaterialIndex = 0;
+                 MaterialIndex < Component->GetNumMaterials(); ++MaterialIndex)
+            {
+                const UMaterialInterface* Material =
+                    Component->GetMaterial(MaterialIndex);
+                if (Material == nullptr)
+                {
+                    continue;
+                }
+                const FString MaterialPath = Material->GetPathName();
+                bWaterNamed |=
+                    MaterialPath.Contains(TEXT("Water"), ESearchCase::IgnoreCase) ||
+                    MaterialPath.Contains(TEXT("River"), ESearchCase::IgnoreCase) ||
+                    MaterialPath.Contains(TEXT("Foam"), ESearchCase::IgnoreCase);
+                if (!MaterialList.IsEmpty())
+                {
+                    MaterialList += TEXT(",");
+                }
+                MaterialList += MaterialPath;
+            }
+            if (!bWaterNamed)
+            {
+                continue;
+            }
+            ++MatchingComponentCount;
+            const FBox Bounds = Component->Bounds.GetBox();
+            FString TagList;
+            for (const FName& Tag : Actor->Tags)
+            {
+                if (!TagList.IsEmpty())
+                {
+                    TagList += TEXT(",");
+                }
+                TagList += Tag.ToString();
+            }
+            UE_LOG(
+                LogTemp,
+                Display,
+                TEXT("RaftSim water presentation inventory: actor=%s class=%s "
+                     "component=%s visible=%d shouldRender=%d actorHidden=%d "
+                     "center=%s size=%s tags=[%s] materials=[%s]"),
+                *Actor->GetName(),
+                *Actor->GetClass()->GetName(),
+                *Component->GetName(),
+                Component->IsVisible() ? 1 : 0,
+                Component->ShouldRender() ? 1 : 0,
+                Actor->IsHidden() ? 1 : 0,
+                *Bounds.GetCenter().ToCompactString(),
+                *Bounds.GetSize().ToCompactString(),
+                *TagList,
+                *MaterialList);
+        }
+    }
+    UE_LOG(
+        LogTemp,
+        Display,
+        TEXT("RaftSim water presentation inventory: matchingComponents=%d"),
+        MatchingComponentCount);
+}
 
 static ARaftSimRaftActor* FindRaft(UWorld* World)
 {
@@ -32,6 +353,227 @@ static ARaftSimRaftActor* FindRaft(UWorld* World)
         }
     }
     return nullptr;
+}
+
+static void ResolveRapidEvidenceCameraPose(
+    const ARaftSimRaftActor& Raft,
+    const FString& CameraPreset,
+    FVector& OutLocation,
+    FRotator& OutRotation)
+{
+    FVector CameraOffset(-400.0f, -380.0f, 290.0f);
+    FVector LookAtOffset(20.0f, -10.0f, 35.0f);
+    if (CameraPreset == TEXT("upstream_left"))
+    {
+        CameraOffset = FVector(400.0f, 380.0f, 290.0f);
+    }
+    else if (CameraPreset == TEXT("downstream_left"))
+    {
+        CameraOffset = FVector(-400.0f, 380.0f, 290.0f);
+    }
+    else if (CameraPreset == TEXT("upstream_right"))
+    {
+        CameraOffset = FVector(400.0f, -380.0f, 290.0f);
+    }
+    else if (CameraPreset == TEXT("contact_port"))
+    {
+        // Lower port-side review angle aimed at the bounded Meat Grinder D4
+        // interface. This is camera composition only; the obstacle and raft
+        // retain their live solver-derived world transforms.
+        CameraOffset = FVector(-100.0f, -520.0f, 330.0f);
+        LookAtOffset = FVector(-80.0f, -130.0f, 60.0f);
+    }
+    else if (CameraPreset == TEXT("contact_starboard"))
+    {
+        // Mirrored close review angle for seat-side paddle, crew, and contact
+        // checks that cannot be judged reliably through the port-side crew.
+        CameraOffset = FVector(-100.0f, 520.0f, 330.0f);
+        LookAtOffset = FVector(-80.0f, 130.0f, 60.0f);
+    }
+    else if (CameraPreset == TEXT("particle_macro"))
+    {
+        // Capture-only inspection of the real D4 contact emitter volume. The
+        // camera is close enough to resolve production-scale 2-6 cm spray and
+        // sub-3 cm droplets without scaling particles or staging new events.
+        CameraOffset = FVector(-100.0f, -300.0f, 145.0f);
+        LookAtOffset = FVector(-100.0f, -130.0f, 10.0f);
+    }
+    else if (CameraPreset == TEXT("wrap_hero"))
+    {
+        // Release-review composition: retain the upstream-right view of the
+        // real D4 contact while filling the frame with raft deformation, crew
+        // response, and the obstacle instead of the distant shoreline.
+        CameraOffset = FVector(360.0f, -350.0f, 275.0f);
+        LookAtOffset = FVector(15.0f, -20.0f, 35.0f);
+    }
+    else if (CameraPreset == TEXT("river_action"))
+    {
+        // Guide-height contextual action view: the authentic D4 contact stays
+        // in the foreground while the active channel, banks, terrain, and
+        // downstream line remain legible. This is the release-media companion
+        // to the close technical wrap_hero frame, not a staged simulation.
+        CameraOffset = FVector(-680.0f, -520.0f, 245.0f);
+        LookAtOffset = FVector(260.0f, 0.0f, 55.0f);
+    }
+    // Follow downstream yaw, but never inherit the wrapped raft's roll/pitch:
+    // local +Z can point below the water once a real contact rotates the hull.
+    const FVector FlatForward = Raft.GetActorForwardVector().GetSafeNormal2D();
+    const FTransform LevelCameraBasis(
+        FlatForward.IsNearlyZero()
+            ? FRotator::ZeroRotator
+            : FlatForward.Rotation(),
+        Raft.GetActorLocation());
+    OutLocation = LevelCameraBasis.TransformPosition(CameraOffset);
+    const FVector LookAt = LevelCameraBasis.TransformPosition(LookAtOffset);
+    OutRotation = (LookAt - OutLocation).Rotation();
+}
+
+static bool ResolveBreakingWaterEvidenceCameraPose(
+    UWorld* World,
+    const ARaftSimRaftActor& Raft,
+    const FString& CameraPreset,
+    FVector& OutLocation,
+    FRotator& OutRotation)
+{
+    if (World == nullptr)
+    {
+        return false;
+    }
+    TArray<ARaftSimWaterSurfaceActor::FBreakingSite> Sites;
+    if (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It)
+    {
+        It->GetBreakingSites(Sites);
+    }
+    if (Sites.IsEmpty())
+    {
+        return false;
+    }
+
+    // Sites are already sorted strongest first by the live surface. Target
+    // that genuine jump so material/geometry review does not mistake a weak
+    // fringe response for the authored production bound.
+    const ARaftSimWaterSurfaceActor::FBreakingSite* SelectedSite = &Sites[0];
+    const float DistanceToRaftSquared = FVector::DistSquared2D(
+        Raft.GetActorLocation(), SelectedSite->WorldPositionCm);
+    FVector Downstream = SelectedSite->WorldVelocityMps.GetSafeNormal2D();
+    if (Downstream.IsNearlyZero())
+    {
+        Downstream = Raft.GetActorForwardVector().GetSafeNormal2D();
+    }
+    if (Downstream.IsNearlyZero())
+    {
+        Downstream = FVector::ForwardVector;
+    }
+    const FVector Across(-Downstream.Y, Downstream.X, 0.0f);
+    FVector LookAt = SelectedSite->WorldPositionCm -
+        Downstream * 40.0f + FVector::UpVector * 35.0f;
+    if (CameraPreset == TEXT("breaking_water_side"))
+    {
+        OutLocation = SelectedSite->WorldPositionCm -
+            Downstream * 260.0f - Across * 650.0f + FVector::UpVector * 270.0f;
+        LookAt = SelectedSite->WorldPositionCm +
+            Downstream * 110.0f + FVector::UpVector * 45.0f;
+    }
+    else if (CameraPreset == TEXT("breaking_water_opposite"))
+    {
+        OutLocation = SelectedSite->WorldPositionCm -
+            Downstream * 180.0f + Across * 600.0f + FVector::UpVector * 255.0f;
+        LookAt = SelectedSite->WorldPositionCm +
+            Downstream * 100.0f + FVector::UpVector * 40.0f;
+    }
+    else if (CameraPreset == TEXT("breaking_water_high"))
+    {
+        // Elevated geometry review: the crest/pocket/wave-train/eddy shapes
+        // read from above where grazing sky reflection cannot flatten them.
+        OutLocation = SelectedSite->WorldPositionCm +
+            Downstream * 1500.0f - Across * 500.0f + FVector::UpVector * 1300.0f;
+        LookAt = SelectedSite->WorldPositionCm +
+            Downstream * 250.0f;
+    }
+    else
+    {
+        // Default: review the breaking face from downstream and mostly along
+        // channel, keeping the river corridor rather than a bank cut behind it.
+        OutLocation = SelectedSite->WorldPositionCm +
+            Downstream * 650.0f - Across * 160.0f + FVector::UpVector * 220.0f;
+    }
+    OutRotation = (LookAt - OutLocation).Rotation();
+    const FName DressingTag(TEXT("RaftSimFullReachDressing"));
+    const FName FarFieldDressingTag(TEXT("RaftSimFullReachFarFieldDressing"));
+    for (TActorIterator<AActor> ActorIt(World); ActorIt; ++ActorIt)
+    {
+        AActor* Actor = *ActorIt;
+        if (!Actor ||
+            (!Actor->ActorHasTag(DressingTag) &&
+             !Actor->ActorHasTag(FarFieldDressingTag)))
+        {
+            continue;
+        }
+        TInlineComponentArray<UHierarchicalInstancedStaticMeshComponent*>
+            Components(Actor);
+        for (UHierarchicalInstancedStaticMeshComponent* Component : Components)
+        {
+            if (!Component)
+            {
+                continue;
+            }
+            UStaticMesh* Mesh = Component->GetStaticMesh();
+            for (int32 InstanceIndex = 0;
+                 Mesh && InstanceIndex < Component->GetInstanceCount();
+                 ++InstanceIndex)
+            {
+                FTransform InstanceTransform;
+                if (!Component->GetInstanceTransform(
+                        InstanceIndex, InstanceTransform, true))
+                {
+                    continue;
+                }
+                const float DistanceToSiteCm = FVector::Dist2D(
+                    InstanceTransform.GetLocation(), SelectedSite->WorldPositionCm);
+                if (DistanceToSiteCm > 3000.0f)
+                {
+                    continue;
+                }
+                const FBoxSphereBounds WorldBounds =
+                    Mesh->GetBounds().TransformBy(InstanceTransform);
+                const bool bRockComponent =
+                    Component->GetName().Contains(TEXT("Boulder")) ||
+                    Component->GetName().Contains(TEXT("Rock"));
+                if (!bRockComponent && WorldBounds.BoxExtent.GetMax() < 50.0f)
+                {
+                    continue;
+                }
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRapidWrapTest: nearbyDressingRock "
+                         "component=%s mesh=%s instance=%d distanceToSiteCm=%.1f "
+                         "location=%s scale=%s extent=%s"),
+                    *Component->GetName(),
+                    *Mesh->GetPathName(),
+                    InstanceIndex,
+                    DistanceToSiteCm,
+                    *InstanceTransform.GetLocation().ToCompactString(),
+                    *InstanceTransform.GetScale3D().ToCompactString(),
+                    *WorldBounds.BoxExtent.ToCompactString());
+            }
+        }
+    }
+    UE_LOG(
+        LogTemp,
+        Display,
+        TEXT("RaftSim.CaptureRapidWrapTest: breakingWaterCamera site=%s "
+             "riverStationM=%.1f riverLateralM=%.1f "
+             "intensity=%.3f presentationCoverage=%.3f "
+             "presentationEdgeClearanceM=%.1f distanceToRaftCm=%.1f"),
+        *SelectedSite->WorldPositionCm.ToCompactString(),
+        SelectedSite->RiverCoordinatesMeters.X,
+        SelectedSite->RiverCoordinatesMeters.Y,
+        SelectedSite->Intensity,
+        SelectedSite->PresentationCoverage,
+        SelectedSite->PresentationEdgeClearanceMeters,
+        FMath::Sqrt(DistanceToRaftSquared));
+    return true;
 }
 
 static void HandleCaptureAfter(const TArray<FString>& Args, UWorld* World)
@@ -49,6 +591,7 @@ static void HandleCaptureAfter(const TArray<FString>& Args, UWorld* World)
     bool bHasCamera = false;
     FVector CamLoc = FVector::ZeroVector;
     FRotator CamRot = FRotator::ZeroRotator;
+    const FString CameraPreset = Args.Num() > 2 ? Args[2] : FString();
     if (Args.Num() >= 7)
     {
         CamLoc = FVector(FCString::Atof(*Args[2]), FCString::Atof(*Args[3]), FCString::Atof(*Args[4]));
@@ -60,15 +603,40 @@ static void HandleCaptureAfter(const TArray<FString>& Args, UWorld* World)
     FTimerHandle Handle;
     World->GetTimerManager().SetTimer(
         Handle,
-        FTimerDelegate::CreateLambda([WeakWorld, OutPath, bHasCamera, CamLoc, CamRot]()
+        FTimerDelegate::CreateLambda(
+            [WeakWorld, OutPath, bHasCamera, CamLoc, CamRot, CameraPreset]()
         {
             UWorld* W = WeakWorld.Get();
-            if (W != nullptr && bHasCamera)
+            FVector ResolvedCamLoc = CamLoc;
+            FRotator ResolvedCamRot = CamRot;
+            bool bResolvedCamera = bHasCamera;
+            if (W != nullptr && !bResolvedCamera &&
+                (CameraPreset == TEXT("breaking_water") ||
+                 CameraPreset == TEXT("breaking_water_side") ||
+                 CameraPreset == TEXT("breaking_water_opposite")))
+            {
+                if (ARaftSimRaftActor* Raft = FindRaft(W))
+                {
+                    bResolvedCamera = ResolveBreakingWaterEvidenceCameraPose(
+                        W,
+                        *Raft,
+                        CameraPreset,
+                        ResolvedCamLoc,
+                        ResolvedCamRot);
+                }
+            }
+            if (W != nullptr && bResolvedCamera)
             {
                 ACameraActor* Cam = W->SpawnActor<ACameraActor>(
-                    ACameraActor::StaticClass(), CamLoc, CamRot);
+                    ACameraActor::StaticClass(), ResolvedCamLoc, ResolvedCamRot);
                 if (Cam != nullptr)
                 {
+                    // Match the gameplay cameras' fixed photographic
+                    // exposure: a default-exposure review camera pumps with
+                    // auto eye adaptation and captures a look the player
+                    // never sees.
+                    RaftSimCameraPresentation::Configure(
+                        Cam->GetCameraComponent());
                     if (APlayerController* PC = W->GetFirstPlayerController())
                     {
                         PC->SetViewTarget(Cam);
@@ -98,9 +666,699 @@ static void HandleCaptureAfter(const TArray<FString>& Args, UWorld* World)
 static FAutoConsoleCommandWithWorldAndArgs GCaptureAfterCommand(
     TEXT("RaftSim.CaptureAfter"),
     TEXT("After N in-game seconds, optionally place a camera (x y z pitch yaw), "
-         "screenshot the viewport and exit. "
-         "Usage: RaftSim.CaptureAfter <seconds> [label] [x y z pitch yaw]"),
+         "or use a solver-owned breaking-water preset, then screenshot the "
+         "viewport and exit. Usage: RaftSim.CaptureAfter <seconds> [label] "
+         "[x y z pitch yaw|breaking_water|breaking_water_side|"
+         "breaking_water_opposite]"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureAfter));
+
+// Frames a diagonal stretch of the near-bank waterline from mid-channel so
+// temporal shoreline artifacts (wet cells toggling, streamed slivers) can be
+// reviewed across a burst of frames.
+static bool ResolveShorelineCameraPose(
+    UWorld* World,
+    const ARaftSimRaftActor& Raft,
+    bool bRiverLeft,
+    bool bLow,
+    bool bLegacyHydraulicFrame,
+    FVector& OutLocation,
+    FRotator& OutRotation)
+{
+    URaftSimWaterRuntimeAdapter* Adapter = nullptr;
+    if (const UGameInstance* GameInstance =
+            World ? World->GetGameInstance() : nullptr)
+    {
+        if (URaftSimPhysicsBridgeSubsystem* Bridge =
+                GameInstance->GetSubsystem<URaftSimPhysicsBridgeSubsystem>())
+        {
+            Adapter = Bridge->GetWaterRuntime();
+        }
+    }
+    return RaftSimReviewCoordinates::ShorePose(World, Adapter, Raft.GetActorLocation(),
+        bRiverLeft, bLow, bLegacyHydraulicFrame, OutLocation, OutRotation);
+}
+
+// Burst variant of CaptureAfter for temporal artifacts: after the start
+// delay, resolve the camera once, then take <count> numbered screenshots at
+// <interval> seconds and exit. One -ExecCmds command, like CaptureAfter.
+static bool ResolveCarrierCaptureIndex(const TCHAR* CommandLine,int32 Count,int32& Index)
+{
+    Index=FParse::Param(CommandLine,TEXT("RaftSimCaptureFirstCarrierShape")) ? 0 : INDEX_NONE;
+    FString Token;
+    if (!FParse::Value(CommandLine,TEXT("RaftSimCaptureCarrierShapeIndex="),Token)) return Count>0;
+    int32 Parsed=INDEX_NONE;
+    if (!LexTryParseString(Parsed,*Token) || Token!=FString::FromInt(Parsed) ||
+        Parsed<0 || Parsed>=Count || (Index==0 && Parsed!=0)) return false;
+    Index=Parsed;return true;
+}
+
+#if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCarrierCaptureIndexTest,
+    "RaftSim.M4.CarrierCaptureIndex",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FRaftSimCarrierCaptureIndexTest::RunTest(const FString&)
+{
+    int32 Index=123;
+    TestTrue(TEXT("No observation by default"),ResolveCarrierCaptureIndex(TEXT(""),24,Index) && Index==INDEX_NONE);
+    TestTrue(TEXT("Legacy first-frame observation"),ResolveCarrierCaptureIndex(TEXT("-RaftSimCaptureFirstCarrierShape"),24,Index) && Index==0);
+    TestTrue(TEXT("Later accepted screenshot index"),ResolveCarrierCaptureIndex(TEXT("-RaftSimCaptureCarrierShapeIndex=22"),24,Index) && Index==22);
+    for (const TCHAR* Token:{TEXT("-1"),TEXT("24"),TEXT("1.5"),TEXT("22oops"),TEXT("2147483648")})
+        TestFalse(TEXT("Invalid or out-of-range index rejected"),ResolveCarrierCaptureIndex(*(FString(TEXT("-RaftSimCaptureCarrierShapeIndex="))+Token),24,Index));
+    TestFalse(TEXT("Conflicting requests rejected"),ResolveCarrierCaptureIndex(TEXT("-RaftSimCaptureFirstCarrierShape -RaftSimCaptureCarrierShapeIndex=22"),24,Index));
+    return !HasAnyErrors();
+}
+#endif
+
+// Input-only drill on the current playable raft; never changes water, time or
+// camera. Samples come from completed physics steps, not intended input values.
+static void ScheduleCrewOverboardReview(UWorld* World)
+{
+    if (!World) return;
+    const TWeakObjectPtr<UWorld> WeakWorld(World);
+    FTimerHandle EjectHandle;
+    World->GetTimerManager().SetTimer(EjectHandle, FTimerDelegate::CreateLambda([WeakWorld]()
+    {
+        if (auto* Raft = FindRaft(WeakWorld.Get()))
+        {
+            Raft->ForceCrewOverboardForTesting(1);
+            UE_LOG(LogTemp, Display, TEXT("CrewOverboard input issued: one passenger"));
+        }
+    }), 1.f, false);
+    for (float Seconds : {3.f, 9.f})
+    {
+        FTimerHandle SampleHandle;
+        World->GetTimerManager().SetTimer(SampleHandle, FTimerDelegate::CreateLambda([WeakWorld, Seconds]()
+        {
+            UWorld* Current = WeakWorld.Get();
+            auto* Raft = FindRaft(Current);
+            UGameInstance* GI = Current ? Current->GetGameInstance() : nullptr;
+            auto* Bridge = GI ? GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
+            auto* Adapter = Bridge ? Bridge->GetRaftRuntime() : nullptr;
+            if (!Raft || !Adapter || !Adapter->GetLastFlexibleStepTelemetry().bEvaluated)
+            {
+                UE_LOG(LogTemp, Error, TEXT("CrewOverboard missing completed physics sample"));
+                return;
+            }
+            const auto& T = Adapter->GetLastFlexibleStepTelemetry();
+            UE_LOG(LogTemp, Display, TEXT("CREW_OCCUPANCY_SAMPLE seconds=%.0f swimmers=%d crew_kg=%.3f integrated_kg=%.3f buoyancy_reference_kg=%.3f"),
+                Seconds, Raft->GetSwimmerCount(), T.OccupiedCrewMassKg, T.IntegratedMassKg, T.BuoyancyReferenceMassKg);
+        }), Seconds, false);
+    }
+}
+
+static void AuditSwimHullCamera(ARaftSimRaftActor* Raft,APlayerController* Player,float Seconds)
+{
+    if(!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSwimHullCameraAudit")) || !Player->PlayerCameraManager) return;
+    FVector Swimmer;
+    if(!Raft->GetSwimmerWorldPosition(TEXT("guide"),Swimmer)) return;
+    UProceduralMeshComponent* Hull=nullptr;
+    TInlineComponentArray<UProceduralMeshComponent*> Meshes(Raft);
+    for(auto* Mesh:Meshes)if(Mesh && Mesh->GetFName()==TEXT("RaftVisual")){Hull=Mesh;break;}
+    if(!Hull){UE_LOG(LogTemp,Error,TEXT("SwimHullCameraAudit missing rendered hull"));return;}
+    const FVector Camera=Player->PlayerCameraManager->GetCameraLocation();
+    const FVector Direction=Player->PlayerCameraManager->GetCameraRotation().Vector();
+    const FVector Away=(Swimmer-Raft->GetActorLocation()).GetSafeNormal2D();
+    const FTransform Transform=Hull->GetComponentTransform();
+    const FBox Box=Hull->CalcBounds(Transform).GetBox();
+    const double Clearance=FVector::DotProduct(Camera-Box.GetCenter(),Away)-FVector::DotProduct(Box.GetExtent(),Away.GetAbs());
+    double Nearest=MAX_dbl,RayHit=MAX_dbl;
+    int32 Triangles=0;
+    for(int32 S=0;S<Hull->GetNumSections();++S)
+    {
+        const auto* Section=Hull->GetProcMeshSection(S);
+        if(!Section || !Section->bSectionVisible)continue;
+        for(int32 I=0;I+2<Section->ProcIndexBuffer.Num();I+=3)
+        {
+            const FVector A=Transform.TransformPosition(Section->ProcVertexBuffer[Section->ProcIndexBuffer[I]].Position);
+            const FVector B=Transform.TransformPosition(Section->ProcVertexBuffer[Section->ProcIndexBuffer[I+1]].Position);
+            const FVector C=Transform.TransformPosition(Section->ProcVertexBuffer[Section->ProcIndexBuffer[I+2]].Position);
+            const FVector E1=B-A,E2=C-A;
+            if(FVector::CrossProduct(E1,E2).SizeSquared()<1.e-12)continue;
+            ++Triangles;
+            Nearest=FMath::Min(Nearest,FVector::Distance(Camera,FMath::ClosestPointOnTriangleToPoint(Camera,A,B,C)));
+            // Double-sided Moller-Trumbore ray, rendered triangles only.
+            const FVector P=FVector::CrossProduct(Direction,E2);
+            const double Det=FVector::DotProduct(E1,P);
+            if(FMath::Abs(Det)<1.e-10)continue;
+            const FVector T=Camera-A;
+            const double U=FVector::DotProduct(T,P)/Det;
+            if(U<0 || U>1)continue;
+            const FVector Q=FVector::CrossProduct(T,E1);
+            const double V=FVector::DotProduct(Direction,Q)/Det;
+            if(V<0 || U+V>1)continue;
+            const double Hit=FVector::DotProduct(E2,Q)/Det;
+            if(Hit>=0)RayHit=FMath::Min(RayHit,Hit);
+        }
+    }
+    UE_LOG(LogTemp,Display,TEXT("SwimHullCameraAudit seconds=%.0f triangles=%d support_clearance_cm=%.6f nearest_cm=%.6f forward_hit_cm=%.6f camera_z_cm=%.6f swimmer_z_cm=%.6f hull_min_z_cm=%.6f hull_max_z_cm=%.6f"),
+        Seconds,Triangles,Clearance,Nearest==MAX_dbl?-1.:Nearest,RayHit==MAX_dbl?-1.:RayHit,Camera.Z,Swimmer.Z,Box.Min.Z,Box.Max.Z);
+}
+
+static void ScheduleGuideReentryReview(UWorld* World)
+{
+    const TWeakObjectPtr<UWorld> WeakWorld(World);
+    for(float Seconds:{1.f,2.f,3.f,4.f,6.f,8.f,10.f,11.f})
+    {
+        FTimerHandle Handle;
+        World->GetTimerManager().SetTimer(Handle,FTimerDelegate::CreateLambda([WeakWorld,Seconds]()
+        {
+            UWorld* Current=WeakWorld.Get();
+            auto* Raft=FindRaft(Current);
+            auto* Player=Current ? Current->GetFirstPlayerController() : nullptr;
+            auto* Guide=Player ? Cast<ARaftSimGuidePawn>(Player->GetPawn()) : nullptr;
+            if(!Raft || !Guide)
+            {UE_LOG(LogTemp,Error,TEXT("GUIDE_REENTRY missing raft or possessed guide"));return;}
+            if(Seconds==1.f)Raft->ForceGuideOverboardForTesting();
+            if(Seconds==3.f)
+            {
+                FVector Swimmer;
+                if(Raft->GetSwimmerWorldPosition(TEXT("guide"),Swimmer))
+                {
+                    const FVector Origin=Raft->GetActorLocation()+Raft->GetActorForwardVector()*45.f+FVector(0,0,65);
+                    Raft->AimRescue(Swimmer-Origin);
+                    const bool ThrowLine=FParse::Param(FCommandLine::Get(),TEXT("RaftSimGuideReentryThrowLine"));
+                    const bool Began=Raft->BeginRescue(ThrowLine ? ERaftSimRescueMethod::ThrowLine : ERaftSimRescueMethod::ReachGrab);
+                    UE_LOG(LogTemp,Display,TEXT("GUIDE_REENTRY rescue_requested throw_line=%d result=%d feedback=%s distance_m=%.6f"),
+                        int32(ThrowLine),int32(Began),*Raft->GetRescueInteractionState().FeedbackCode.ToString(),
+                        Raft->GetRescueInteractionState().DistanceMeters);
+                }
+            }
+            if(Seconds==6.f || Seconds==10.f)
+            {
+                const bool Reentered=Raft->RequestSelectedReentry();
+                UE_LOG(LogTemp,Display,TEXT("GUIDE_REENTRY reentry_requested seconds=%.0f result=%d"),Seconds,int32(Reentered));
+            }
+            AuditSwimHullCamera(Raft,Player,Seconds);
+            UE_LOG(LogTemp,Display,TEXT("GUIDE_REENTRY sample seconds=%.0f swimming=%d mobility=%d attached=%d rescue_phase=%d target=%s completed=%d control_yaw=%.6f pawn_yaw=%.6f raft_yaw=%.6f"),
+                Seconds,int32(Raft->IsPassengerSwimming(TEXT("guide"))),int32(Guide->GetMobilityMode()),
+                int32(Guide->GetAttachParentActor()==Raft),int32(Raft->GetRescueInteractionState().Phase),
+                *Raft->GetRescueInteractionState().TargetPassengerId.ToString(),Raft->GetCompletedRescueCount(),
+                Player->GetControlRotation().Yaw,Guide->GetActorRotation().Yaw,Raft->GetActorRotation().Yaw);
+        }),Seconds,false);
+    }
+}
+
+static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
+{
+    if (World == nullptr)
+    {
+        return;
+    }
+    const float StartDelay =
+        Args.Num() > 0 ? FMath::Max(FCString::Atof(*Args[0]), 0.1f) : 3.0f;
+    const int32 Count =
+        Args.Num() > 1 ? FMath::Clamp(FCString::Atoi(*Args[1]), 1, 120) : 10;
+    int32 CarrierCaptureIndex=INDEX_NONE;
+    if (!ResolveCarrierCaptureIndex(FCommandLine::Get(),Count,CarrierCaptureIndex))
+    { UE_LOG(LogTemp,Error,TEXT("CaptureSeries: invalid/conflicting carrier screenshot index; no capture started"));return; }
+    const float Interval =
+        Args.Num() > 2 ? FMath::Max(FCString::Atof(*Args[2]), 0.05f) : 0.2f;
+    const FString Label = Args.Num() > 3 ? Args[3] : TEXT("RaftSimSeries");
+    // Named options also work with the ordinary gameplay camera (no preset).
+    const FString FirstOption = Args.Num() > 4 ? Args[4] : FString();
+    const bool bFirstIsOption = FirstOption.Contains(TEXT("=")) ||
+        FirstOption.Equals(TEXT("record"), ESearchCase::IgnoreCase) ||
+        FirstOption.Equals(TEXT("highside"), ESearchCase::IgnoreCase) ||
+        FirstOption.Equals(TEXT("paddle"), ESearchCase::IgnoreCase);
+    const FString CameraPreset = bFirstIsOption ? FString() : FirstOption;
+    bool bHasPose = false;
+    FVector CamLoc = FVector::ZeroVector;
+    FRotator CamRot = FRotator::ZeroRotator;
+    // Named options such as focus/record/paddle can also make nine arguments.
+    // Only five numeric values denote an explicit camera pose.
+    if (Args.Num() >= 9 && Args[4].IsNumeric() && Args[5].IsNumeric() &&
+        Args[6].IsNumeric() && Args[7].IsNumeric() && Args[8].IsNumeric())
+    {
+        CamLoc = FVector(
+            FCString::Atof(*Args[4]),
+            FCString::Atof(*Args[5]),
+            FCString::Atof(*Args[6]));
+        CamRot = FRotator(
+            FCString::Atof(*Args[7]), FCString::Atof(*Args[8]), 0.0f);
+        bHasPose = true;
+    }
+    bool bPaddle = false;
+    bool bHighSide = false;
+    bool bOverboard = false;
+    float TargetStationM = -1.0f;
+    float TargetLateralM = 0.0f;
+    float FocusStationM = -1.0f;
+    float FocusLateralM = 0.0f;
+    bool bRecord=false;
+    bool bLegacyHydraulicFrame = false;
+    for (const FString& Arg : Args)
+    {
+        bPaddle |= Arg.Equals(TEXT("paddle"), ESearchCase::IgnoreCase);
+        bHighSide |= Arg.Equals(TEXT("highside"), ESearchCase::IgnoreCase);
+        bOverboard |= Arg.Equals(TEXT("overboard"), ESearchCase::IgnoreCase);
+        bRecord |= Arg.Equals(TEXT("record"), ESearchCase::IgnoreCase);
+        bLegacyHydraulicFrame |= Arg.Equals(TEXT("legacy_hydraulic_frame"), ESearchCase::IgnoreCase);
+        if (Arg.StartsWith(TEXT("station="), ESearchCase::IgnoreCase))
+        {
+            TargetStationM = FCString::Atof(*Arg.RightChop(8));
+        }
+        else if (Arg.StartsWith(TEXT("lateral="), ESearchCase::IgnoreCase))
+        {
+            TargetLateralM = FCString::Atof(*Arg.RightChop(8));
+        }
+        else if (Arg.StartsWith(TEXT("focusstation="), ESearchCase::IgnoreCase))
+        {
+            FocusStationM = FCString::Atof(*Arg.RightChop(13));
+        }
+        else if (Arg.StartsWith(TEXT("focuslateral="), ESearchCase::IgnoreCase))
+        {
+            FocusLateralM = FCString::Atof(*Arg.RightChop(13));
+        }
+    }
+
+    TWeakObjectPtr<UWorld> WeakWorld(World);
+    const bool bGuideReentry=FParse::Param(FCommandLine::Get(),TEXT("RaftSimGuideReentryReview"));
+    if(int32(bPaddle) + int32(bHighSide) + int32(bOverboard) + int32(bGuideReentry) > 1)
+    { UE_LOG(LogTemp,Error,TEXT("CaptureSeries: crew inputs conflict; no capture started"));return; }
+    if (bOverboard) ScheduleCrewOverboardReview(World);
+    if (bGuideReentry) ScheduleGuideReentryReview(World);
+    if (bPaddle || bHighSide)
+    {
+        // Same paddle-in as CaptureRaft so a burst can happen mid-rapid.
+        FTimerHandle PaddleHandle;
+        World->GetTimerManager().SetTimer(
+            PaddleHandle,
+            FTimerDelegate::CreateLambda([WeakWorld,bHighSide]()
+            {
+                if (ARaftSimRaftActor* Raft = FindRaft(WeakWorld.Get()))
+                {
+                    Raft->IssueCrewCommand(bHighSide ? ERaftSimCrewCommand::HighSide : ERaftSimCrewCommand::AllForward);
+                    UE_LOG(LogTemp,Display,TEXT("CaptureSeries input issued: %s"),bHighSide ? TEXT("HighSide") : TEXT("AllForward"));
+                }
+            }),
+            1.0f,
+            false);
+    }
+    if (TargetStationM >= 0.0f)
+    {
+        // Walk the raft to the requested river station in sub-80 m hops,
+        // matching the streamer's runtime handoff contract (a long direct
+        // teleport is rejected because solver state cannot transfer across
+        // the skipped reach). Each hop lets physics resettle before the
+        // next; the capture start delay must cover the walk.
+        TSharedRef<FTimerHandle> MoveHandle = MakeShared<FTimerHandle>();
+        World->GetTimerManager().SetTimer(
+            *MoveHandle,
+            FTimerDelegate::CreateLambda(
+                [WeakWorld, MoveHandle, TargetStationM, TargetLateralM]()
+            {
+                UWorld* W = WeakWorld.Get();
+                if (W == nullptr)
+                {
+                    return;
+                }
+                URaftSimWaterRuntimeAdapter* Water = nullptr;
+                if (const UGameInstance* GameInstance = W->GetGameInstance())
+                {
+                    if (URaftSimPhysicsBridgeSubsystem* Bridge =
+                            GameInstance->GetSubsystem<
+                                URaftSimPhysicsBridgeSubsystem>())
+                    {
+                        Water = Bridge->GetWaterRuntime();
+                    }
+                }
+                ARaftSimRaftActor* Raft = FindRaft(W);
+                FVector2D RiverPosition;
+                FVector Tangent;
+                FVector LeftNormal;
+                if (Water == nullptr || Raft == nullptr ||
+                    !RaftSimReviewCoordinates::WorldToCoordinates(W, Water,
+                        Raft->GetActorLocation(),
+                        RiverPosition,
+                        Tangent,
+                        LeftNormal))
+                {
+                    return;
+                }
+                const float RemainingM = TargetStationM - RiverPosition.X;
+                if (FMath::Abs(RemainingM) < 2.0f)
+                {
+                    W->GetTimerManager().ClearTimer(*MoveHandle);
+                    UE_LOG(LogTemp, Display,
+                        TEXT("RaftSim.CaptureSeries: raft arrived at "
+                             "station %.1f m"),
+                        RiverPosition.X);
+                    return;
+                }
+                const float StepStationM =
+                    RiverPosition.X + FMath::Clamp(RemainingM, -79.0f, 79.0f);
+                const bool bFinalStep =
+                    FMath::Abs(TargetStationM - StepStationM) < 2.0f;
+                const float StepLateralM = bFinalStep ? TargetLateralM : 0.0f;
+                FVector StepWorldCm = FVector::ZeroVector;
+                FVector AheadWorldCm = FVector::ZeroVector;
+                const auto* Progress = RaftSimReviewCoordinates::GetMap(W, Water);
+                if (!Progress || !Progress->RiverToWorldPosition(
+                        FVector2D(StepStationM, StepLateralM),
+                        Water->GetRiverVerticalDatumM(),
+                        StepWorldCm) ||
+                    !Progress->RiverToWorldPosition(
+                        FVector2D(StepStationM + 1.0f, StepLateralM),
+                        Water->GetRiverVerticalDatumM(),
+                        AheadWorldCm))
+                {
+                    return;
+                }
+                StepWorldCm.Z = Raft->GetActorLocation().Z;
+                Raft->TeleportForTesting(
+                    StepWorldCm,
+                    (AheadWorldCm - StepWorldCm).Rotation().Yaw,
+                    /*bApplyFacing=*/true);
+            }),
+            0.7f,
+            /*bLoop=*/true,
+            /*FirstDelay=*/2.0f);
+    }
+    FTimerHandle StartHandle;
+    World->GetTimerManager().SetTimer(
+        StartHandle,
+        FTimerDelegate::CreateLambda(
+            [WeakWorld, Count, Interval, Label, CameraPreset, bHasPose,
+             CamLoc, CamRot, FocusStationM, FocusLateralM, bRecord, bLegacyHydraulicFrame, CarrierCaptureIndex]()
+        {
+            UWorld* W = WeakWorld.Get();
+            if (W == nullptr)
+            {
+                return;
+            }
+            FVector ResolvedLoc = CamLoc;
+            FRotator ResolvedRot = CamRot;
+            bool bCamera = bHasPose;
+            // A fixed, explicit river-space target avoids selecting a different
+            // ranked breaking site or drifting beyond a hole during warm-up.
+            // This moves only the review camera; raft and water keep evolving.
+            if (CameraPreset.StartsWith(TEXT("river_station")))
+            {
+                const UGameInstance* GI = W->GetGameInstance();
+                URaftSimPhysicsBridgeSubsystem* Bridge = GI ?
+                    GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
+                URaftSimWaterRuntimeAdapter* Water = Bridge ? Bridge->GetWaterRuntime() : nullptr;
+                FRaftSimWaterSample Sample;
+                FVector Focus, Ahead;
+                const auto* Progress = RaftSimReviewCoordinates::GetMap(W, Water);
+                if (!Water || !FMath::IsFinite(FocusStationM) || FocusStationM < 0.0f ||
+                    !FMath::IsFinite(FocusLateralM) ||
+                    !Progress ||
+                    !Progress->RiverToWorldPosition(FVector2D(FocusStationM, FocusLateralM), Water->GetRiverVerticalDatumM(), Focus) ||
+                    !Progress->RiverToWorldPosition(FVector2D(FocusStationM + 1.0f, FocusLateralM), Water->GetRiverVerticalDatumM(), Ahead) ||
+                    !Water->SampleWaterAtWorldPosition(Focus, Sample) || !Sample.bWet)
+                {
+                    UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureSeries: invalid or dry fixed river focus %.3f,%.3f; refusing misleading fallback capture"), FocusStationM, FocusLateralM);
+                    FPlatformMisc::RequestExit(false);
+                    return;
+                }
+                // SampleWater already returns world-space surface elevation;
+                // RiverToWorldPosition instead accepts source-datum elevation.
+                // Resolve XY in that map, then assign world Z exactly once.
+                Focus.Z = Ahead.Z = Sample.SurfaceHeightMeters * 100.0f;
+                const FVector Downstream = (Ahead - Focus).GetSafeNormal2D();
+                const FVector Across(-Downstream.Y, Downstream.X, 0.0f);
+                ResolvedLoc = Focus - Downstream * 800.0f + FVector::UpVector * 240.0f;
+                if (CameraPreset == TEXT("river_station_side"))
+                    ResolvedLoc = Focus - Downstream * 150.0f - Across * 850.0f + FVector::UpVector * 350.0f;
+                else if (CameraPreset == TEXT("river_station_downstream"))
+                    ResolvedLoc = Focus + Downstream * 850.0f + FVector::UpVector * 240.0f;
+                ResolvedRot = (Focus + FVector::UpVector * 35.0f - ResolvedLoc).Rotation();
+                bCamera = true;
+                UE_LOG(LogTemp, Display, TEXT("RaftSim.CaptureSeries: fixed river focus station=%.3f lateral=%.3f surface_m=%.3f camera=%s"),
+                    FocusStationM, FocusLateralM, Sample.SurfaceHeightMeters, *ResolvedLoc.ToCompactString());
+            }
+            if (!bCamera && !CameraPreset.IsEmpty())
+            {
+                if (ARaftSimRaftActor* Raft = FindRaft(W))
+                {
+                    if (CameraPreset.StartsWith(TEXT("breaking_water")))
+                    {
+                        bCamera = ResolveBreakingWaterEvidenceCameraPose(
+                            W, *Raft, CameraPreset, ResolvedLoc, ResolvedRot);
+                    }
+                    else if (CameraPreset == TEXT("shore_left") ||
+                             CameraPreset == TEXT("shore_right") ||
+                             CameraPreset == TEXT("shore_left_low") ||
+                             CameraPreset == TEXT("shore_right_low"))
+                    {
+                        bCamera = ResolveShorelineCameraPose(
+                            W,
+                            *Raft,
+                            CameraPreset.StartsWith(TEXT("shore_left")),
+                            CameraPreset.EndsWith(TEXT("_low")),
+                            bLegacyHydraulicFrame,
+                            ResolvedLoc,
+                            ResolvedRot);
+                    }
+                }
+            }
+            if (!bCamera && !CameraPreset.IsEmpty())
+            {
+                UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureSeries: could not resolve requested camera %s; refusing fallback capture"), *CameraPreset);
+                FPlatformMisc::RequestExit(false);
+                return;
+            }
+            UE_LOG(LogTemp, Display, TEXT("RaftSim.CaptureSeries: camera preset=%s shore_frame=%s location=%s rotation=%s"),
+                *CameraPreset, !CameraPreset.StartsWith(TEXT("shore_")) ? TEXT("not_applicable") :
+                bLegacyHydraulicFrame ? TEXT("legacy_hydraulic_axes_NOT_downstream") : TEXT("scenario_downstream"),
+                *ResolvedLoc.ToCompactString(), *ResolvedRot.ToCompactString());
+            if (bCamera)
+            {
+                ACameraActor* Cam = W->SpawnActor<ACameraActor>(
+                    ACameraActor::StaticClass(), ResolvedLoc, ResolvedRot);
+                APlayerController* PC = W->GetFirstPlayerController();
+                if (!Cam || !PC)
+                {
+                    UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureSeries: requested camera could not be installed; refusing fallback capture"));
+                    FPlatformMisc::RequestExit(false);
+                    return;
+                }
+                else
+                {
+                    // Same fixed photographic exposure as gameplay cameras;
+                    // an auto-exposure review camera pumps frame to frame.
+                    RaftSimCameraPresentation::Configure(
+                        Cam->GetCameraComponent());
+                    PC->SetViewTarget(Cam);
+                }
+            }
+            TSharedRef<int32> Taken = MakeShared<int32>(0);
+            if (bRecord)
+            {
+                UGameInstance* GI=W->GetGameInstance();
+                auto* Recorder=GI ? GI->GetSubsystem<URaftSimScreenRecorderSubsystem>() : nullptr;
+                if (!Recorder || !Recorder->StartRecording())
+                {
+                    UE_LOG(LogTemp,Error,TEXT("CaptureSeries recording unavailable; refusing still-only motion evidence"));
+                    FPlatformMisc::RequestExit(false);return;
+                }
+            }
+            TSharedRef<FTimerHandle> LoopHandle = MakeShared<FTimerHandle>();
+            W->GetTimerManager().SetTimer(
+                *LoopHandle,
+                FTimerDelegate::CreateLambda(
+                    [WeakWorld, Taken, Count, Label, LoopHandle, CarrierCaptureIndex]()
+                {
+                    UWorld* W2 = WeakWorld.Get();
+                    if (W2 == nullptr)
+                    {
+                        return;
+                    }
+                    // A hitch can dispatch this repeating timer several
+                    // times before one render. Screenshot requests share a
+                    // single slot: overwriting it silently dropped numbered
+                    // evidence frames. Count only accepted requests.
+                    if (FScreenshotRequest::IsScreenshotRequested()) return;
+                    if (*Taken == 0)
+                    {
+                        if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimCaptureZeroWaterSpecular")))
+                        {
+                            // Optical control only: in Single Layer Water, zero
+                            // dielectric specular gives IOR=1 and no refraction.
+                            // Also removes surface specular reflection, so this
+                            // is not an isolated reflection or appearance gate.
+                            for (const TCHAR* Name : {TEXT("Specular"), TEXT("FresnelSpecular"),
+                                TEXT("ShoreMarginSpecular"), TEXT("DriftFoamSpecular")})
+                                HandleWaterMaterialProbe({Name, TEXT("0")}, W2);
+                            UE_LOG(LogTemp, Display, TEXT("Capture water specular control: four connected inputs set to zero; extinction and geometry unchanged"));
+                        }
+                        float ExtinctionScale = 0.f;
+                        if (FParse::Value(FCommandLine::Get(), TEXT("RaftSimCaptureWaterExtinctionScale="), ExtinctionScale) &&
+                            FMath::IsFinite(ExtinctionScale) && ExtinctionScale >= 0.f && ExtinctionScale <= 1.f)
+                        {
+                            for (TActorIterator<ARaftSimWaterSurfaceActor> It(W2); It; ++It)
+                            {
+                                TInlineComponentArray<UMeshComponent*> Components(*It);
+                                for (UMeshComponent* Component : Components)
+                                    if (Component->GetName() == TEXT("CartesianShorelineMesh"))
+                                        if (auto* Material = Cast<UMaterialInstanceDynamic>(Component->GetMaterial(0)))
+                                            for (const TCHAR* Name : {TEXT("WaterScattering"), TEXT("WaterAbsorption"), TEXT("AeratedWaterScattering")})
+                                            {
+                                                FLinearColor Value;
+                                                if (Material->GetVectorParameterValue(FHashedMaterialParameterInfo(FName(Name)), Value))
+                                                {
+                                                    Material->SetVectorParameterValue(FName(Name), Value * ExtinctionScale);
+                                                    UE_LOG(LogTemp, Display, TEXT("Capture extinction control: %s scale=%.6f"), Name, ExtinctionScale);
+                                                }
+                                            }
+                            }
+                        }
+                        if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimCaptureHideLiveCarrier")))
+                        {
+                            for (TActorIterator<ARaftSimWaterSurfaceActor> It(W2); It; ++It)
+                            {
+                                TInlineComponentArray<UMeshComponent*> Components(*It);
+                                for (UMeshComponent* Component : Components)
+                                    if (Component->GetName() == TEXT("CartesianShorelineMesh"))
+                                    {
+                                        Component->SetHiddenInGame(true);
+                                        UE_LOG(LogTemp, Display, TEXT("Capture visibility ablation: hidden %s"), *Component->GetPathName());
+                                    }
+                            }
+                            LogVisibleWaterPresentationInventory(W2);
+                        }
+                        float Opacity = 0.f;
+                        if (FParse::Value(FCommandLine::Get(), TEXT("RaftSimCaptureShallowOpacity="), Opacity))
+                        {
+                            // Explicit, process-local optical control. Does not
+                            // change wet membership, geometry or conserved state.
+                            if (FMath::IsFinite(Opacity) && Opacity >= 0.f && Opacity <= 1.f)
+                                HandleWaterMaterialProbe({TEXT("ShallowWaterOpacity"), FString::SanitizeFloat(Opacity)}, W2);
+                            else { UE_LOG(LogTemp, Error, TEXT("Invalid capture shallow opacity; no override applied")); }
+                        }
+                        else if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimCaptureFirstCarrierShape")))
+                            HandleWaterMaterialProbe({}, W2);
+                    }
+                    const FString OutPath = FPaths::Combine(
+                        FPaths::ProjectSavedDir(),
+                        TEXT("Screenshots"),
+                        FString::Printf(
+                            TEXT("%s_%03d.png"), *Label, *Taken));
+                    FScreenshotRequest::RequestScreenshot(
+                        OutPath, /*bShowUI=*/false,
+                        /*bAddFilenameSuffix=*/false);
+                    if (*Taken==CarrierCaptureIndex)
+                    {
+                        // Observe at the screenshot request, not at an earlier
+                        // publication. Still not a render-thread/GPU fence.
+                        ARaftSimWaterSurfaceActor* Surface=nullptr;
+                        int32 Surfaces=0;
+                        for (TActorIterator<ARaftSimWaterSurfaceActor> It(W2);It;++It)
+                        { Surface=*It;++Surfaces; }
+                        const FString ShapePath=OutPath+TEXT(".carrier.json");
+                        const bool Saved=Surfaces==1 && Surface->SavePresentedCarrierShapeAudit(ShapePath);
+                        const bool ViewSaved=Saved && SaveCarrierViewAudit(W2,OutPath+TEXT(".view.json"));
+                        if (Saved) { UE_LOG(LogTemp,Display,TEXT("CaptureSeries carrier shape index=%d frame=%llu saved=%s"),*Taken,GFrameCounter,*ShapePath); }
+                        else { UE_LOG(LogTemp,Error,TEXT("CaptureSeries carrier shape refused: surfaces=%d path=%s"),Surfaces,*ShapePath); }
+                        if (!ViewSaved) { UE_LOG(LogTemp,Error,TEXT("CaptureSeries first carrier camera export refused: %s"),*OutPath); }
+                    }
+                    const UGameInstance* GI = W2->GetGameInstance();
+                    URaftSimPhysicsBridgeSubsystem* Bridge = GI ?
+                        GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
+                    URaftSimWaterRuntimeAdapter* Water = Bridge ? Bridge->GetWaterRuntime() : nullptr;
+                    ARaftSimRaftActor* Raft = FindRaft(W2);
+                    FVector2D RaftRiver = FVector2D::ZeroVector;
+                    FVector Tangent, LeftNormal;
+                    const bool bRiver = Water && Raft && RaftSimReviewCoordinates::WorldToCoordinates(W2, Water,
+                        Raft->GetActorLocation(), RaftRiver, Tangent, LeftNormal);
+                    APlayerController* PC = W2->GetFirstPlayerController();
+                    const APlayerCameraManager* Camera = PC ? PC->PlayerCameraManager : nullptr;
+                    UE_LOG(LogTemp, Display, TEXT("RaftSim capture-series request: index=%d world_s=%.3f frame=%llu raft_river_valid=%d raft_station_m=%.3f raft_lateral_m=%.3f camera_valid=%d camera_world_cm=%s camera_pitch_deg=%.6f camera_yaw_deg=%.6f camera_roll_deg=%.6f camera_fov_deg=%.3f raft_coordinates=scenario_downstream raft_yaw_deg=%.6f camera_raft_local_cm=%s"),
+                        *Taken, W2->GetTimeSeconds(), static_cast<unsigned long long>(GFrameCounter),
+                        bRiver, RaftRiver.X, RaftRiver.Y, Camera != nullptr,
+                        Camera ? *Camera->GetCameraLocation().ToCompactString() : TEXT("unavailable"),
+                        Camera ? Camera->GetCameraRotation().Pitch : 0.,
+                        Camera ? Camera->GetCameraRotation().Yaw : 0.,
+                        Camera ? Camera->GetCameraRotation().Roll : 0.,
+                        Camera ? Camera->GetFOVAngle() : 0.f,
+                        Raft ? Raft->GetActorRotation().Yaw : 0.,
+                        Camera && Raft ? *Raft->GetActorTransform().InverseTransformPosition(
+                            Camera->GetCameraLocation()).ToCompactString() : TEXT("unavailable"));
+                    // FScreenshotRequest is global. In offscreen PIE an editor
+                    // viewport can consume it first (producing an empty editor
+                    // grid instead of this player's view). Read the existing
+                    // game backbuffer explicitly before yielding to Slate. No
+                    // resampling or extra simulation/render step is introduced;
+                    // this is the last rendered player frame, not a GPU fence
+                    // for the game-thread pose logged above. Standalone capture
+                    // retains its ordinary asynchronous path.
+                    if (W2->WorldType == EWorldType::PIE &&
+                        FParse::Param(FCommandLine::Get(), TEXT("RenderOffscreen")))
+                    {
+                        UGameViewportClient* Client = GI ? GI->GetGameViewportClient() : nullptr;
+                        const bool Saved = Client && Client->GetWorld() == W2 && Client->Viewport &&
+                            Client->ProcessScreenShots(Client->Viewport);
+                        UE_LOG(LogTemp, Display, TEXT("RaftSim PIE player-backbuffer capture: index=%d saved=%d"), *Taken, Saved);
+                        if (!Saved)
+                        {
+                            FScreenshotRequest::Reset();
+                            UE_LOG(LogTemp, Error, TEXT("PIE player capture failed; refusing editor viewport fallback"));
+                        }
+                    }
+                    ++(*Taken);
+                    if (*Taken >= Count)
+                    {
+                        W2->GetTimerManager().ClearTimer(*LoopHandle);
+                        FTimerHandle ExitHandle;
+                        W2->GetTimerManager().SetTimer(
+                            ExitHandle,
+                            FTimerDelegate::CreateLambda(
+                                []() { FPlatformMisc::RequestExit(false); }),
+                            4.0f,
+                            false);
+                    }
+                }),
+                Interval,
+                /*bLoop=*/true,
+                /*FirstDelay=*/0.0f);
+        }),
+        StartDelay,
+        false);
+
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim.CaptureSeries: %d frames every %.2fs starting in %.1fs "
+             "-> %s_NNN.png (preset=%s)"),
+        Count, Interval, StartDelay, *Label, *CameraPreset);
+}
+
+// Input-only cost probe: no screenshots, recording, camera or early shutdown.
+static FAutoConsoleCommandWithWorldAndArgs GProfileHighSideCommand(
+    TEXT("RaftSim.ProfileHighSide"),
+    TEXT("Issue the normal high-side crew command after one second; CSV owns observation and shutdown."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateLambda([](const TArray<FString>&,UWorld* World)
+    {
+        if(!World)return;
+        TWeakObjectPtr<UWorld> WeakWorld(World);
+        FTimerHandle Handle;
+        World->GetTimerManager().SetTimer(Handle,FTimerDelegate::CreateLambda([WeakWorld]()
+        {
+            if(ARaftSimRaftActor* Raft=FindRaft(WeakWorld.Get()))
+            {
+                Raft->IssueCrewCommand(ERaftSimCrewCommand::HighSide);
+                UE_LOG(LogTemp,Display,TEXT("ProfileHighSide input issued: HighSide"));
+            }
+        }),1.f,false);
+    }));
+
+static FAutoConsoleCommandWithWorldAndArgs GProfileCrewOverboardCommand(
+    TEXT("RaftSim.ProfileCrewOverboard"),
+    TEXT("Issue one overboard drill after one second; CSV owns observation and shutdown."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateLambda([](const TArray<FString>&, UWorld* World)
+    { ScheduleCrewOverboardReview(World); }));
+
+static FAutoConsoleCommandWithWorldAndArgs GCaptureSeriesCommand(
+    TEXT("RaftSim.CaptureSeries"),
+    TEXT("After a start delay, take a numbered burst of screenshots at a "
+         "fixed interval, then exit. Usage: RaftSim.CaptureSeries "
+         "<startSeconds> <count> <intervalSeconds> [label] "
+         "[x y z pitch yaw|shore_left|shore_right|breaking_water|"
+         "breaking_water_side|breaking_water_opposite|river_station|"
+         "river_station_side|river_station_downstream] [paddle|highside|overboard] "
+         "[focusstation=<m>] [focuslateral=<m>] [record] "
+         "[legacy_hydraulic_frame (shore comparison only, NOT downstream)] "
+         "[station=<m>] [lateral=<m>] (station walks the raft there in "
+         "sub-80 m handoff-sized hops before the capture starts)"),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureSeries));
 
 // Over-the-shoulder capture: order the crew to paddle downstream so the raft
 // runs into the rapid, then place the camera behind the raft's live position
@@ -116,6 +1374,49 @@ static void HandleCaptureRaft(const TArray<FString>& Args, UWorld* World)
     const float BackM = Args.Num() > 2 ? FCString::Atof(*Args[2]) : 8.0f;
     const float UpM = Args.Num() > 3 ? FCString::Atof(*Args[3]) : 4.0f;
     const float AheadM = Args.Num() > 4 ? FCString::Atof(*Args[4]) : 22.0f;
+    auto DiagnosticFloat = [&Args](const TCHAR* Prefix, float DefaultValue)
+    {
+        const FString PrefixString(Prefix);
+        for (int32 Index = 5; Index < Args.Num(); ++Index)
+        {
+            if (Args[Index].StartsWith(PrefixString, ESearchCase::IgnoreCase))
+            {
+                return FCString::Atof(*Args[Index].RightChop(PrefixString.Len()));
+            }
+        }
+        return DefaultValue;
+    };
+    auto HasDiagnosticMode = [&Args](const TCHAR* Mode)
+    {
+        for (int32 Index = 5; Index < Args.Num(); ++Index)
+        {
+            if (Args[Index].Equals(Mode, ESearchCase::IgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
+    };
+    const float WaterRoughnessDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterroughness="), -1.0f), -1.0f, 1.0f);
+    const float WaterSpecularDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterspecular="), -1.0f), -1.0f, 1.0f);
+    const float WaterNormalDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waternormal="), -1.0f), -1.0f, 1.5f);
+    const float WaterReflectionDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterreflection="), -1.0f), -1.0f, 1.0f);
+    const float WaterEmissiveDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("wateremissive="), -1.0f), -1.0f, 0.5f);
+    const float WaterVariationDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("watervariation="), -1.0f), -1.0f, 1.0f);
+    const float WaterOpacityDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("wateropacity="), -1.0f), -1.0f, 1.0f);
+    const float SunPitchDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("sunpitch="), 999.0f), -89.0f, 999.0f);
+    const float SunYawDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("sunyaw="), 999.0f), -360.0f, 999.0f);
+    const bool bWaterInventoryDiagnostic =
+        HasDiagnosticMode(TEXT("waterinventory"));
     const FString OutPath =
         FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Screenshots"), Label + TEXT(".png"));
 
@@ -137,9 +1438,119 @@ static void HandleCaptureRaft(const TArray<FString>& Args, UWorld* World)
     FTimerHandle ShotHandle;
     World->GetTimerManager().SetTimer(
         ShotHandle,
-        FTimerDelegate::CreateLambda([WeakWorld, OutPath, BackM, UpM, AheadM]()
+        FTimerDelegate::CreateLambda(
+            [WeakWorld, OutPath, BackM, UpM, AheadM,
+             WaterRoughnessDiagnostic, WaterSpecularDiagnostic,
+             WaterNormalDiagnostic, WaterReflectionDiagnostic,
+             WaterEmissiveDiagnostic, WaterVariationDiagnostic,
+             WaterOpacityDiagnostic, SunPitchDiagnostic, SunYawDiagnostic,
+             bWaterInventoryDiagnostic]()
         {
             UWorld* W = WeakWorld.Get();
+            if (W != nullptr &&
+                (SunPitchDiagnostic < 900.0f || SunYawDiagnostic < 900.0f))
+            {
+                for (TActorIterator<ADirectionalLight> It(W); It; ++It)
+                {
+                    ADirectionalLight* Sun = *It;
+                    if (!Sun)
+                    {
+                        continue;
+                    }
+                    FRotator Rotation = Sun->GetActorRotation();
+                    if (SunPitchDiagnostic < 900.0f)
+                    {
+                        Rotation.Pitch = SunPitchDiagnostic;
+                    }
+                    if (SunYawDiagnostic < 900.0f)
+                    {
+                        Rotation.Yaw = SunYawDiagnostic;
+                    }
+                    Sun->SetActorRotation(Rotation);
+                    UE_LOG(
+                        LogTemp,
+                        Display,
+                        TEXT("RaftSim.CaptureRaft: sun diagnostic pitch=%.1f yaw=%.1f"),
+                        Rotation.Pitch,
+                        Rotation.Yaw);
+                    break;
+                }
+            }
+            if (W != nullptr &&
+                (WaterRoughnessDiagnostic >= 0.0f ||
+                 WaterSpecularDiagnostic >= 0.0f ||
+                 WaterNormalDiagnostic >= 0.0f ||
+                 WaterReflectionDiagnostic >= 0.0f ||
+                 WaterEmissiveDiagnostic >= 0.0f ||
+                 WaterVariationDiagnostic >= 0.0f ||
+                 WaterOpacityDiagnostic >= 0.0f))
+            {
+                int32 OverrideComponentCount = 0;
+                const FName PhysicalWaterTag(TEXT("RaftSimPhysicalCorridorWater"));
+                for (TActorIterator<AActor> It(W); It; ++It)
+                {
+                    AActor* Actor = *It;
+                    if (!Actor || !Actor->ActorHasTag(PhysicalWaterTag))
+                    {
+                        continue;
+                    }
+                    TInlineComponentArray<UMeshComponent*> Components(Actor);
+                    for (UMeshComponent* Component : Components)
+                    {
+                        if (!Component || Component->GetNumMaterials() == 0)
+                        {
+                            continue;
+                        }
+                        UMaterialInstanceDynamic* Material =
+                            Component->CreateDynamicMaterialInstance(0);
+                        if (!Material)
+                        {
+                            continue;
+                        }
+                        auto SetIfRequested = [Material](
+                            const TCHAR* ParameterName, float Value)
+                        {
+                            if (Value >= 0.0f)
+                            {
+                                Material->SetScalarParameterValue(
+                                    ParameterName, Value);
+                            }
+                        };
+                        SetIfRequested(TEXT("Roughness"), WaterRoughnessDiagnostic);
+                        SetIfRequested(TEXT("Specular"), WaterSpecularDiagnostic);
+                        SetIfRequested(TEXT("NormalIntensity"), WaterNormalDiagnostic);
+                        SetIfRequested(
+                            TEXT("ReflectionFillIntensity"),
+                            WaterReflectionDiagnostic);
+                        SetIfRequested(
+                            TEXT("EmissiveFillScale"), WaterEmissiveDiagnostic);
+                        SetIfRequested(
+                            TEXT("SurfaceVariationStrength"),
+                            WaterVariationDiagnostic);
+                        SetIfRequested(TEXT("Opacity"), WaterOpacityDiagnostic);
+                        ++OverrideComponentCount;
+                    }
+                }
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRaft: physical-water diagnostic "
+                         "components=%d roughness=%.3f specular=%.3f "
+                         "normal=%.3f reflection=%.3f emissive=%.3f "
+                         "variation=%.3f opacity=%.3f"),
+                    OverrideComponentCount,
+                    WaterRoughnessDiagnostic,
+                    WaterSpecularDiagnostic,
+                    WaterNormalDiagnostic,
+                    WaterReflectionDiagnostic,
+                    WaterEmissiveDiagnostic,
+                    WaterVariationDiagnostic,
+                    WaterOpacityDiagnostic);
+            }
+            if (W != nullptr && bWaterInventoryDiagnostic)
+            {
+                LogVisibleWaterPresentationInventory(W);
+            }
             if (ARaftSimRaftActor* Raft = FindRaft(W))
             {
                 const FVector RaftLoc = Raft->GetActorLocation();
@@ -185,7 +1596,10 @@ static void HandleCaptureRaft(const TArray<FString>& Args, UWorld* World)
 static FAutoConsoleCommandWithWorldAndArgs GCaptureRaftCommand(
     TEXT("RaftSim.CaptureRaft"),
     TEXT("Paddle the raft downstream into the rapid, then screenshot over its "
-         "shoulder. Usage: RaftSim.CaptureRaft <seconds> [label] [backM] [upM] [aheadM]"),
+         "shoulder. Usage: RaftSim.CaptureRaft <seconds> [label] [backM] [upM] "
+         "[aheadM] [waterroughness=N] [waterspecular=N] [waternormal=N] "
+         "[waterreflection=N] [wateremissive=N] [watervariation=N] "
+         "[wateropacity=N] [waterinventory] [sunpitch=N] [sunyaw=N]"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureRaft));
 
 // Deterministic close-up for M1: place an authoritative D4 rock against the
@@ -245,14 +1659,50 @@ static void HandleCaptureWrapTest(const TArray<FString>& Args, UWorld* World)
                     }
                 }
             }
-            FScreenshotRequest::RequestScreenshot(OutPath, false, false);
             if (W != nullptr)
             {
-                FTimerHandle ExitHandle;
+                // Settle eye adaptation, water material history, and dynamic
+                // lighting after the rapid teleport and camera cut. Capturing
+                // in the same frame as SetViewTarget records a black exposure
+                // transient that a player never sees.
+                FTimerHandle CaptureHandle;
                 W->GetTimerManager().SetTimer(
-                    ExitHandle,
-                    FTimerDelegate::CreateLambda([]() { FPlatformMisc::RequestExit(false); }),
-                    4.0f,
+                    CaptureHandle,
+                    FTimerDelegate::CreateLambda([WeakWorld, OutPath]()
+                    {
+                        if (UWorld* DiagnosticWorld = WeakWorld.Get())
+                        {
+                            TActorIterator<ARaftSimWaterVfxActor> VfxIt(DiagnosticWorld);
+                            const APlayerController* PC =
+                                DiagnosticWorld->GetFirstPlayerController();
+                            const APlayerCameraManager* Camera =
+                                PC ? PC->PlayerCameraManager : nullptr;
+                            UE_LOG(
+                                LogTemp,
+                                Display,
+                                TEXT("RaftSim.CaptureWrapTest: captureCamera=%s "
+                                     "underwater=%.3f blend=%.3f"),
+                                Camera
+                                    ? *Camera->GetCameraLocation().ToCompactString()
+                                    : TEXT("unavailable"),
+                                VfxIt ? VfxIt->GetLastPresentationState().Underwater : -1.0f,
+                                VfxIt ? VfxIt->GetUnderwaterBlendWeight() : -1.0f);
+                        }
+                        FScreenshotRequest::RequestScreenshot(OutPath, false, false);
+                        if (UWorld* CaptureWorld = WeakWorld.Get())
+                        {
+                            FTimerHandle ExitHandle;
+                            CaptureWorld->GetTimerManager().SetTimer(
+                                ExitHandle,
+                                FTimerDelegate::CreateLambda([]()
+                                {
+                                    FPlatformMisc::RequestExit(false);
+                                }),
+                                4.0f,
+                                false);
+                        }
+                    }),
+                    1.0f,
                     false);
             }
         }),
@@ -265,5 +1715,1209 @@ static FAutoConsoleCommandWithWorldAndArgs GCaptureWrapTestCommand(
     TEXT("Place an authoritative D4 rock against the raft and capture the visibly "
          "deformed tube. Usage: RaftSim.CaptureWrapTest [label]"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureWrapTest));
+
+// Named-rapid production evidence: reset the live solver to the authoritative
+// Meat Grinder crop, place the real raft at the sampled free surface, then let
+// a D4-authoritative contact boulder drive the normal contact path. Its visible
+// shell prefers the rights-reviewed CC0 scan used by the South Fork corridor and
+// retains a project-owned procedural fallback. Nothing here fabricates mesh
+// deformation or VFX state; the command only stages a bounded, reproducible
+// review scenario that is never active during ordinary gameplay.
+static int32 HideBreakingWaterPresentationComponents(
+    UWorld* World,
+    bool bHideLip,
+    bool bHideRoller)
+{
+    if (World == nullptr || (!bHideLip && !bHideRoller))
+    {
+        return 0;
+    }
+    int32 HiddenComponentCount = 0;
+    for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
+    {
+        TInlineComponentArray<UProceduralMeshComponent*> Components(*It);
+        for (UProceduralMeshComponent* Component : Components)
+        {
+            const bool bHideLipComponent = Component && bHideLip &&
+                Component->GetName() == TEXT("BreakingLipMesh");
+            const bool bHideRollerComponent = Component && bHideRoller &&
+                Component->GetName() == TEXT("BreakingRollerVolumeMesh");
+            if (bHideLipComponent || bHideRollerComponent)
+            {
+                Component->SetVisibility(false, true);
+                ++HiddenComponentCount;
+            }
+        }
+    }
+    return HiddenComponentCount;
+}
+
+static int32 HideRapidNiagaraPresentationComponents(
+    UWorld* World,
+    bool bHideAerosol,
+    bool bHideRoller,
+    bool bHideCrestSpray)
+{
+    if (World == nullptr ||
+        (!bHideAerosol && !bHideRoller && !bHideCrestSpray))
+    {
+        return 0;
+    }
+    int32 HiddenComponentCount = 0;
+    for (TActorIterator<ARaftSimWaterVfxActor> It(World); It; ++It)
+    {
+        TInlineComponentArray<UPrimitiveComponent*> Components(*It);
+        for (UPrimitiveComponent* Component : Components)
+        {
+            const bool bHideAerosolComponent = Component && bHideAerosol &&
+                Component->GetName().StartsWith(TEXT("ProductionRapidAerosol_"));
+            const bool bHideRollerComponent = Component && bHideRoller &&
+                Component->GetName().StartsWith(TEXT("ProductionRapidRoller_"));
+            const bool bHideCrestSprayComponent =
+                Component && bHideCrestSpray &&
+                Component->GetName().StartsWith(
+                    TEXT("ProductionRapidCrestSpray_"));
+            if (bHideAerosolComponent || bHideRollerComponent ||
+                bHideCrestSprayComponent)
+            {
+                Component->SetVisibility(false, true);
+                ++HiddenComponentCount;
+            }
+        }
+    }
+    return HiddenComponentCount;
+}
+
+static void HandleCaptureRapidWrapTest(const TArray<FString>& Args, UWorld* World)
+{
+    if (World == nullptr)
+    {
+        return;
+    }
+    const FString Label = Args.Num() > 0 ? Args[0] : TEXT("M9_MeatGrinderD4Wrap");
+    const float StationM = Args.Num() > 1
+        ? FMath::Clamp(FCString::Atof(*Args[1]), 785.606f, 1145.606f)
+        : 960.0f;
+    const FString CameraPreset = Args.Num() > 2
+        ? Args[2].ToLower()
+        : TEXT("upstream_right");
+    auto HasDiagnosticMode = [&Args](const TCHAR* Mode)
+    {
+        for (int32 Index = 3; Index < Args.Num(); ++Index)
+        {
+            if (Args[Index].Equals(Mode, ESearchCase::IgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
+    };
+    auto DiagnosticFloat = [&Args](const TCHAR* Prefix, float DefaultValue)
+    {
+        const FString PrefixString(Prefix);
+        for (int32 Index = 3; Index < Args.Num(); ++Index)
+        {
+            if (Args[Index].StartsWith(PrefixString, ESearchCase::IgnoreCase))
+            {
+                return FCString::Atof(*Args[Index].RightChop(PrefixString.Len()));
+            }
+        }
+        return DefaultValue;
+    };
+    auto DiagnosticString = [&Args](const TCHAR* Prefix)
+    {
+        const FString PrefixString(Prefix);
+        for (int32 Index = 3; Index < Args.Num(); ++Index)
+        {
+            if (Args[Index].StartsWith(PrefixString, ESearchCase::IgnoreCase))
+            {
+                return Args[Index].RightChop(PrefixString.Len());
+            }
+        }
+        return FString();
+    };
+    const FVector RockLocalCm(
+        FMath::Clamp(DiagnosticFloat(TEXT("rockx="), -100.0f), -180.0f, 180.0f),
+        FMath::Clamp(DiagnosticFloat(TEXT("rocky="), -130.0f), -180.0f, 180.0f),
+        FMath::Clamp(DiagnosticFloat(TEXT("rockz="), -20.0f), -100.0f, 120.0f));
+    const float CameraExposureBias = FMath::Clamp(
+        DiagnosticFloat(TEXT("exposure="), 1.25f), -2.0f, 3.0f);
+    const float LiveSurfaceCoverageDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("livecoverage="), -1.0f), -1.0f, 0.25f);
+    const float LiveWaterRoughnessDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("livewaterroughness="), -1.0f), -1.0f, 0.80f);
+    const float LiveWaterSpecularDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("livewaterspecular="), -1.0f), -1.0f, 1.0f);
+    const bool bUnlitDiagnostic = HasDiagnosticMode(TEXT("unlit"));
+    const bool bHideLiveSurfaceDiagnostic = HasDiagnosticMode(TEXT("nowater"));
+    const bool bHideAuthoredWaterDiagnostic =
+        HasDiagnosticMode(TEXT("noauthoredwater"));
+    const bool bHideContactRockDiagnostic =
+        HasDiagnosticMode(TEXT("norockvisual"));
+    const bool bHideWaterVfxDiagnostic = HasDiagnosticMode(TEXT("novfx"));
+    const bool bHideBreakingLipDiagnostic =
+        HasDiagnosticMode(TEXT("nobreakinglip"));
+    const bool bHideBreakingRollerDiagnostic =
+        HasDiagnosticMode(TEXT("nobreakingroller"));
+    const bool bHideRapidAerosolDiagnostic =
+        HasDiagnosticMode(TEXT("norapidaerosol"));
+    const bool bHideRapidRollerDiagnostic =
+        HasDiagnosticMode(TEXT("norapidroller"));
+    const bool bHideRapidCrestSprayDiagnostic =
+        HasDiagnosticMode(TEXT("norapidcrestspray"));
+    const bool bHideDetailedTerrainDiagnostic = HasDiagnosticMode(TEXT("noterrain"));
+    const bool bHideFarFieldDiagnostic = HasDiagnosticMode(TEXT("nofarfield"));
+    const bool bHideDressingDiagnostic = HasDiagnosticMode(TEXT("nodressing"));
+    const bool bHideBoulderDressingDiagnostic =
+        HasDiagnosticMode(TEXT("noboulderdressing"));
+    const bool bWaterInventoryDiagnostic = HasDiagnosticMode(TEXT("waterinventory"));
+    const bool bTerrainVertexMacroDiagnostic =
+        HasDiagnosticMode(TEXT("terrainvertexmacro"));
+    const bool bTerrainNoEdgeBlendDiagnostic =
+        HasDiagnosticMode(TEXT("terrainnoedgeblend"));
+    const bool bTerrainNoSpecularDiagnostic =
+        HasDiagnosticMode(TEXT("terrainnospecular"));
+    const float TerrainMacroInfluenceDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("terrainmacro="), -1.0f), -1.0f, 1.0f);
+    const float AuthoredWaterDetailDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterdetail="), -1.0f), -1.0f, 0.40f);
+    const float AuthoredWaterFoamDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterfoam="), -1.0f), -1.0f, 2.0f);
+    const float AuthoredWaterFoamCoreDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterfoamcore="), -1.0f), -1.0f, 2.0f);
+    const float AuthoredWaterFoamLaceDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterfoamlace="), -1.0f), -1.0f, 2.0f);
+    const float AuthoredWaterRoughnessDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterroughness="), -1.0f), -1.0f, 0.80f);
+    const float AuthoredWaterSpecularDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterspecular="), -1.0f), -1.0f, 1.0f);
+    const bool bDisableAuthoredWaterShadowDiagnostic =
+        HasDiagnosticMode(TEXT("noshadowwater"));
+    const bool bHideRiggingDiagnostic = HasDiagnosticMode(TEXT("norigging"));
+    const bool bHideRubberDiagnostic = HasDiagnosticMode(TEXT("norubber"));
+    const bool bHideTubesDiagnostic = HasDiagnosticMode(TEXT("notubes"));
+    const bool bHideFloorDiagnostic = HasDiagnosticMode(TEXT("nofloor"));
+    const bool bHideFittingsDiagnostic = HasDiagnosticMode(TEXT("nofittings"));
+    auto SetDiagnosticConsoleVariable = [](const TCHAR* Name, int32 Value)
+    {
+        if (IConsoleVariable* Variable =
+                IConsoleManager::Get().FindConsoleVariable(Name))
+        {
+            // Capture-only renderer comparisons run after the world exists;
+            // switching these at startup can race Metal initialization.
+            Variable->Set(Value, ECVF_SetByConsole);
+        }
+    };
+    if (HasDiagnosticMode(TEXT("taa")))
+    {
+        SetDiagnosticConsoleVariable(TEXT("r.AntiAliasingMethod"), 2);
+    }
+    if (HasDiagnosticMode(TEXT("nobloom")))
+    {
+        SetDiagnosticConsoleVariable(TEXT("r.BloomQuality"), 0);
+    }
+    if (HasDiagnosticMode(TEXT("nocloud")))
+    {
+        SetDiagnosticConsoleVariable(TEXT("r.VolumetricCloud"), 0);
+    }
+    const bool bReviewedRockDiagnostic = HasDiagnosticMode(TEXT("reviewedrock"));
+    const FString ReviewedRockMeshOverridePath =
+        DiagnosticString(TEXT("rockmesh="));
+    const FString AuthoredWaterMaterialOverridePath =
+        DiagnosticString(TEXT("watermaterial="));
+    const FString TerrainMaterialOverridePath =
+        DiagnosticString(TEXT("terrainmaterial="));
+    if (!AuthoredWaterMaterialOverridePath.IsEmpty())
+    {
+        UMaterialInterface* AuthoredWaterMaterialOverride =
+            LoadObject<UMaterialInterface>(
+                nullptr, *AuthoredWaterMaterialOverridePath);
+        if (AuthoredWaterMaterialOverride == nullptr)
+        {
+            UE_LOG(
+                LogTemp,
+                Error,
+                TEXT("RaftSim.CaptureRapidWrapTest: water material override "
+                     "could not be loaded: %s"),
+                *AuthoredWaterMaterialOverridePath);
+        }
+        else
+        {
+            const FName AuthoredWaterTag(
+                TEXT("RaftSimFlowBand_median_runnable"));
+            int32 OverrideComponentCount = 0;
+            for (TActorIterator<AActor> It(World); It; ++It)
+            {
+                AActor* Actor = *It;
+                if (!Actor || !Actor->ActorHasTag(AuthoredWaterTag))
+                {
+                    continue;
+                }
+                if (UStaticMeshComponent* WaterComponent =
+                        Actor->FindComponentByClass<UStaticMeshComponent>())
+                {
+                    WaterComponent->SetMaterial(
+                        0, AuthoredWaterMaterialOverride);
+                    ++OverrideComponentCount;
+                }
+            }
+            UE_LOG(
+                LogTemp,
+                Display,
+                TEXT("RaftSim.CaptureRapidWrapTest: waterMaterialOverride=%s "
+                     "components=%d"),
+                *AuthoredWaterMaterialOverride->GetPathName(),
+                OverrideComponentCount);
+        }
+    }
+    if (AuthoredWaterDetailDiagnostic >= 0.0f ||
+        AuthoredWaterFoamDiagnostic >= 0.0f ||
+        AuthoredWaterFoamCoreDiagnostic >= 0.0f ||
+        AuthoredWaterFoamLaceDiagnostic >= 0.0f ||
+        AuthoredWaterRoughnessDiagnostic >= 0.0f ||
+        AuthoredWaterSpecularDiagnostic >= 0.0f)
+    {
+        const FName AuthoredWaterTag(TEXT("RaftSimFlowBand_median_runnable"));
+        int32 OverrideComponentCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (!Actor || !Actor->ActorHasTag(AuthoredWaterTag))
+            {
+                continue;
+            }
+            if (UStaticMeshComponent* WaterComponent =
+                    Actor->FindComponentByClass<UStaticMeshComponent>())
+            {
+                if (UMaterialInstanceDynamic* WaterMaterial =
+                        WaterComponent->CreateDynamicMaterialInstance(0))
+                {
+                    // Render-only bracket over the existing flow-normal
+                    // texture. Geometry, foam masks, depth, and solver state
+                    // remain fixed while short-wave slope strength changes.
+                    if (AuthoredWaterDetailDiagnostic >= 0.0f)
+                    {
+                        WaterMaterial->SetScalarParameterValue(
+                            TEXT("CalmRippleStrength"),
+                            AuthoredWaterDetailDiagnostic * 0.75f);
+                        WaterMaterial->SetScalarParameterValue(
+                            TEXT("FlowRippleStrength"),
+                            AuthoredWaterDetailDiagnostic);
+                        WaterMaterial->SetScalarParameterValue(
+                            TEXT("FoamRippleStrength"),
+                            AuthoredWaterDetailDiagnostic * 1.35f);
+                    }
+                    if (AuthoredWaterFoamDiagnostic >= 0.0f)
+                    {
+                        WaterMaterial->SetScalarParameterValue(
+                            TEXT("HydraulicFoamIntensity"),
+                            AuthoredWaterFoamDiagnostic);
+                    }
+                    if (AuthoredWaterFoamCoreDiagnostic >= 0.0f)
+                    {
+                        WaterMaterial->SetScalarParameterValue(
+                            TEXT("HydraulicFoamColorCoreGain"),
+                            AuthoredWaterFoamCoreDiagnostic);
+                    }
+                    if (AuthoredWaterFoamLaceDiagnostic >= 0.0f)
+                    {
+                        WaterMaterial->SetScalarParameterValue(
+                            TEXT("HydraulicFoamColorBreakupGain"),
+                            AuthoredWaterFoamLaceDiagnostic);
+                    }
+                    if (AuthoredWaterRoughnessDiagnostic >= 0.0f)
+                    {
+                        WaterMaterial->SetScalarParameterValue(
+                            TEXT("WaterRoughness"),
+                            AuthoredWaterRoughnessDiagnostic);
+                    }
+                    if (AuthoredWaterSpecularDiagnostic >= 0.0f)
+                    {
+                        WaterMaterial->SetScalarParameterValue(
+                            TEXT("Specular"),
+                            AuthoredWaterSpecularDiagnostic);
+                    }
+                    ++OverrideComponentCount;
+                }
+            }
+        }
+        UE_LOG(
+            LogTemp,
+            Display,
+            TEXT("RaftSim.CaptureRapidWrapTest: authored water diagnostic "
+                 "components=%d detail=%.3f foam=%.3f core=%.3f lace=%.3f "
+                 "roughness=%.3f specular=%.3f"),
+            OverrideComponentCount,
+            AuthoredWaterDetailDiagnostic,
+            AuthoredWaterFoamDiagnostic,
+            AuthoredWaterFoamCoreDiagnostic,
+            AuthoredWaterFoamLaceDiagnostic,
+            AuthoredWaterRoughnessDiagnostic,
+            AuthoredWaterSpecularDiagnostic);
+    }
+    if (!TerrainMaterialOverridePath.IsEmpty())
+    {
+        UMaterialInterface* TerrainMaterialOverride = LoadObject<UMaterialInterface>(
+            nullptr, *TerrainMaterialOverridePath);
+        if (TerrainMaterialOverride == nullptr)
+        {
+            UE_LOG(
+                LogTemp,
+                Error,
+                TEXT("RaftSim.CaptureRapidWrapTest: terrain material override "
+                     "could not be loaded: %s"),
+                *TerrainMaterialOverridePath);
+        }
+        else
+        {
+            const FName DetailedTerrainTag(TEXT("RaftSimFullReachTerrain"));
+            int32 OverrideComponentCount = 0;
+            for (TActorIterator<AActor> It(World); It; ++It)
+            {
+                AActor* Actor = *It;
+                if (!Actor || !Actor->ActorHasTag(DetailedTerrainTag))
+                {
+                    continue;
+                }
+                if (UStaticMeshComponent* TerrainComponent =
+                        Actor->FindComponentByClass<UStaticMeshComponent>())
+                {
+                    TerrainComponent->SetMaterial(0, TerrainMaterialOverride);
+                    ++OverrideComponentCount;
+                }
+            }
+            UE_LOG(
+                LogTemp,
+                Display,
+                TEXT("RaftSim.CaptureRapidWrapTest: terrainMaterialOverride=%s "
+                     "components=%d"),
+                *TerrainMaterialOverride->GetPathName(),
+                OverrideComponentCount);
+        }
+    }
+    if (bTerrainVertexMacroDiagnostic || bTerrainNoEdgeBlendDiagnostic ||
+        bTerrainNoSpecularDiagnostic || TerrainMacroInfluenceDiagnostic >= 0.0f)
+    {
+        const FName DetailedTerrainTag(TEXT("RaftSimFullReachTerrain"));
+        int32 OverrideComponentCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (!Actor || !Actor->ActorHasTag(DetailedTerrainTag))
+            {
+                continue;
+            }
+            if (UStaticMeshComponent* TerrainComponent =
+                    Actor->FindComponentByClass<UStaticMeshComponent>())
+            {
+                if (UMaterialInstanceDynamic* TerrainMaterial =
+                        TerrainComponent->CreateDynamicMaterialInstance(0))
+                {
+                    if (bTerrainVertexMacroDiagnostic)
+                    {
+                        TerrainMaterial->SetScalarParameterValue(
+                            TEXT("UseSourceMacroTexture"), 0.0f);
+                    }
+                    if (bTerrainNoEdgeBlendDiagnostic)
+                    {
+                        TerrainMaterial->SetScalarParameterValue(
+                            TEXT("UseCorridorEdgeBlend"), 0.0f);
+                    }
+                    if (bTerrainNoSpecularDiagnostic)
+                    {
+                        TerrainMaterial->SetScalarParameterValue(
+                            TEXT("TerrainSpecular"), 0.0f);
+                    }
+                    if (TerrainMacroInfluenceDiagnostic >= 0.0f)
+                    {
+                        // Presentation A/B only: source hue and geometry stay
+                        // fixed while reviewers bracket how much sub-meter
+                        // ground detail survives the registered aerial blend.
+                        TerrainMaterial->SetScalarParameterValue(
+                            TEXT("SourceMacroInfluence"),
+                            TerrainMacroInfluenceDiagnostic);
+                    }
+                    ++OverrideComponentCount;
+                }
+            }
+        }
+        UE_LOG(
+            LogTemp,
+            Display,
+            TEXT("RaftSim.CaptureRapidWrapTest: terrain parameter diagnostic "
+                 "components=%d vertexMacro=%d noEdgeBlend=%d noSpecular=%d "
+                 "macroInfluence=%.3f"),
+            OverrideComponentCount,
+            bTerrainVertexMacroDiagnostic ? 1 : 0,
+            bTerrainNoEdgeBlendDiagnostic ? 1 : 0,
+            bTerrainNoSpecularDiagnostic ? 1 : 0,
+            TerrainMacroInfluenceDiagnostic);
+    }
+    const FString OutPath =
+        FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Screenshots"), Label + TEXT(".png"));
+    TWeakObjectPtr<UWorld> WeakWorld(World);
+
+    FTimerHandle PrepareHandle;
+    World->GetTimerManager().SetTimer(
+        PrepareHandle,
+        FTimerDelegate::CreateLambda([WeakWorld, StationM]()
+        {
+            UWorld* W = WeakWorld.Get();
+            ARaftSimRaftActor* Raft = FindRaft(W);
+            UGameInstance* GameInstance = W ? W->GetGameInstance() : nullptr;
+            URaftSimPhysicsBridgeSubsystem* Bridge = GameInstance
+                ? GameInstance->GetSubsystem<URaftSimPhysicsBridgeSubsystem>()
+                : nullptr;
+            URaftSimWaterRuntimeAdapter* Water = Bridge ? Bridge->GetWaterRuntime() : nullptr;
+            if (Raft == nullptr || Water == nullptr)
+            {
+                UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureRapidWrapTest: runtime unavailable"));
+                return;
+            }
+            // Lock this evidence recipe to one shipping presentation preset.
+            // The ordinary game still selects/cycles all three weather states;
+            // clear morning keeps wet fabric, deformation, and contact
+            // geometry legible after the authored water's reflection and
+            // foam response have been bounded for the high-energy tile.
+            if (GEngine != nullptr)
+            {
+                GEngine->Exec(W, TEXT("RaftSim.SetWeather clear_morning"));
+            }
+            static const FString MeatGrinderCooked = TEXT(
+                "physics/data/real_world/south_fork_american_chili_bar/"
+                "full_hydraulics/rapids/meat_grinder/cooked");
+            if (!Water->ConfigureRiverWindow(
+                    MeatGrinderCooked,
+                    TEXT("median_runnable"),
+                    FVector2D(StationM, 0.0f),
+                    FVector2D(200.0f, 40.0f),
+                    0.039f,
+                    /*bRecenterHydraulicCrux=*/false))
+            {
+                UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureRapidWrapTest: Meat Grinder window failed"));
+                return;
+            }
+
+            FVector RiverBaseCm;
+            if (!Water->RiverToWorldPosition(
+                    FVector2D(StationM, 0.0f), Water->GetRiverVerticalDatumM(), RiverBaseCm))
+            {
+                UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureRapidWrapTest: station mapping failed"));
+                return;
+            }
+            FRaftSimWaterSample Sample;
+            if (!Water->SampleWaterAtWorldPosition(RiverBaseCm, Sample) || !Sample.bWet)
+            {
+                UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureRapidWrapTest: station sample is dry"));
+                return;
+            }
+            FVector2D RiverCoordinates;
+            FVector Tangent;
+            FVector LeftNormal;
+            Water->WorldToRiverCoordinates(RiverBaseCm, RiverCoordinates, Tangent, LeftNormal);
+            RiverBaseCm.Z = Sample.SurfaceHeightMeters * 100.0f + 6.0f;
+            const FRotator Downstream = Tangent.GetSafeNormal2D().Rotation();
+            Raft->SetCheckpointTransform(FTransform(Downstream, RiverBaseCm), true);
+            Raft->ResetMotionForTesting();
+            Raft->IssueCrewCommand(ERaftSimCrewCommand::HighSide);
+            UE_LOG(
+                LogTemp,
+                Display,
+                TEXT("RaftSim.CaptureRapidWrapTest: station=%.3f depth=%.3f speed=%.3f surfaceZ=%.1f"),
+                StationM,
+                Sample.DepthMeters,
+                Sample.VelocityMetersPerSecond.Size(),
+                RiverBaseCm.Z);
+        }),
+        0.35f,
+        false);
+
+    FTimerHandle ContactHandle;
+    World->GetTimerManager().SetTimer(
+        ContactHandle,
+        FTimerDelegate::CreateLambda(
+            [WeakWorld, RockLocalCm, bReviewedRockDiagnostic,
+             ReviewedRockMeshOverridePath]()
+        {
+            UWorld* W = WeakWorld.Get();
+            ARaftSimRaftActor* Raft = FindRaft(W);
+            if (W == nullptr || Raft == nullptr)
+            {
+                return;
+            }
+            const FVector RockWorld = Raft->GetActorTransform().TransformPosition(
+                RockLocalCm);
+            if (ARaftSimRockObstacleActor* Rock = W->SpawnActor<ARaftSimRockObstacleActor>(
+                    ARaftSimRockObstacleActor::StaticClass(), RockWorld, FRotator(8.0f, 27.0f, -5.0f)))
+            {
+                if (bReviewedRockDiagnostic && !ReviewedRockMeshOverridePath.IsEmpty())
+                {
+                    if (UStaticMesh* ReviewedRockMeshOverride =
+                            LoadObject<UStaticMesh>(
+                                nullptr, *ReviewedRockMeshOverridePath))
+                    {
+                        Rock->SetReviewedVisualMeshForDiagnostics(
+                            ReviewedRockMeshOverride);
+                        UE_LOG(
+                            LogTemp,
+                            Display,
+                            TEXT("RaftSim.CaptureRapidWrapTest: "
+                                 "rockMeshOverride=%s"),
+                            *ReviewedRockMeshOverride->GetPathName());
+                    }
+                    else
+                    {
+                        UE_LOG(
+                            LogTemp,
+                            Error,
+                            TEXT("RaftSim.CaptureRapidWrapTest: rock mesh "
+                                 "override could not be loaded: %s"),
+                            *ReviewedRockMeshOverridePath);
+                    }
+                }
+                Rock->ConfigureContact(1.20f, 0.82f);
+                Rock->SetPreferReviewedVisual(bReviewedRockDiagnostic);
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRapidWrapTest: contactLocalCm=%s"),
+                    *RockLocalCm.ToCompactString());
+            }
+        }),
+        0.75f,
+        false);
+
+    FTimerHandle ShotHandle;
+    World->GetTimerManager().SetTimer(
+        ShotHandle,
+        FTimerDelegate::CreateLambda(
+            [WeakWorld, OutPath, CameraPreset, CameraExposureBias, bUnlitDiagnostic,
+             bHideLiveSurfaceDiagnostic, bHideWaterVfxDiagnostic,
+             bHideAuthoredWaterDiagnostic, bHideContactRockDiagnostic,
+             bHideDetailedTerrainDiagnostic, bHideFarFieldDiagnostic,
+             bHideDressingDiagnostic, bHideBoulderDressingDiagnostic,
+             bWaterInventoryDiagnostic,
+             bDisableAuthoredWaterShadowDiagnostic,
+             bHideRiggingDiagnostic, bHideRubberDiagnostic,
+             bHideTubesDiagnostic, bHideFloorDiagnostic,
+             bHideFittingsDiagnostic, bHideBreakingLipDiagnostic,
+             bHideBreakingRollerDiagnostic, bHideRapidAerosolDiagnostic,
+             bHideRapidRollerDiagnostic, bHideRapidCrestSprayDiagnostic,
+             LiveSurfaceCoverageDiagnostic,
+             LiveWaterRoughnessDiagnostic, LiveWaterSpecularDiagnostic]()
+        {
+            UWorld* W = WeakWorld.Get();
+            if (bUnlitDiagnostic && GEngine != nullptr && W != nullptr)
+            {
+                GEngine->Exec(W, TEXT("viewmode unlit"));
+            }
+            if (W != nullptr &&
+                (bHideRapidAerosolDiagnostic || bHideRapidRollerDiagnostic ||
+                 bHideRapidCrestSprayDiagnostic))
+            {
+                const int32 HiddenRapidNiagaraComponentCount =
+                    HideRapidNiagaraPresentationComponents(
+                        W,
+                        bHideRapidAerosolDiagnostic,
+                        bHideRapidRollerDiagnostic,
+                        bHideRapidCrestSprayDiagnostic);
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRapidWrapTest: hidden rapid Niagara "
+                         "components=%d aerosol=%d roller=%d crestSpray=%d"),
+                    HiddenRapidNiagaraComponentCount,
+                    bHideRapidAerosolDiagnostic ? 1 : 0,
+                    bHideRapidRollerDiagnostic ? 1 : 0,
+                    bHideRapidCrestSprayDiagnostic ? 1 : 0);
+            }
+            if (W != nullptr && bHideLiveSurfaceDiagnostic)
+            {
+                for (TActorIterator<ARaftSimWaterSurfaceActor> It(W); It; ++It)
+                {
+                    It->SetActorHiddenInGame(true);
+                }
+            }
+            if (W != nullptr && bHideAuthoredWaterDiagnostic)
+            {
+                int32 HiddenAuthoredWaterActors = 0;
+                for (TActorIterator<AActor> It(W); It; ++It)
+                {
+                    AActor* Actor = *It;
+                    if (!Actor)
+                    {
+                        continue;
+                    }
+                    bool bAuthoredWater = false;
+                    for (const FName& Tag : Actor->Tags)
+                    {
+                        const FString TagString = Tag.ToString();
+                        if (TagString.StartsWith(TEXT("RaftSimFlowBand_")) ||
+                            Tag == TEXT("RaftSimSolverFoamOverlay"))
+                        {
+                            bAuthoredWater = true;
+                            break;
+                        }
+                    }
+                    if (bAuthoredWater)
+                    {
+                        Actor->SetActorHiddenInGame(true);
+                        ++HiddenAuthoredWaterActors;
+                    }
+                }
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRapidWrapTest: hidden authored-water actors=%d"),
+                    HiddenAuthoredWaterActors);
+            }
+            if (W != nullptr && bHideContactRockDiagnostic)
+            {
+                int32 HiddenContactRocks = 0;
+                for (TActorIterator<ARaftSimRockObstacleActor> It(W); It; ++It)
+                {
+                    It->SetActorHiddenInGame(true);
+                    ++HiddenContactRocks;
+                }
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRapidWrapTest: hidden contact rocks=%d"),
+                    HiddenContactRocks);
+            }
+            if (W != nullptr &&
+                (bHideBreakingLipDiagnostic || bHideBreakingRollerDiagnostic))
+            {
+                const int32 HiddenBreakingComponentCount =
+                    HideBreakingWaterPresentationComponents(
+                        W,
+                        bHideBreakingLipDiagnostic,
+                        bHideBreakingRollerDiagnostic);
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRapidWrapTest: hidden breaking-water "
+                         "components=%d lip=%d roller=%d"),
+                    HiddenBreakingComponentCount,
+                    bHideBreakingLipDiagnostic ? 1 : 0,
+                    bHideBreakingRollerDiagnostic ? 1 : 0);
+            }
+            if (W != nullptr &&
+                (LiveSurfaceCoverageDiagnostic >= 0.0f ||
+                 LiveWaterRoughnessDiagnostic >= 0.0f ||
+                 LiveWaterSpecularDiagnostic >= 0.0f))
+            {
+                int32 OverrideComponentCount = 0;
+                for (TActorIterator<ARaftSimWaterSurfaceActor> It(W); It; ++It)
+                {
+                    TInlineComponentArray<UProceduralMeshComponent*> Components(*It);
+                    for (UProceduralMeshComponent* Component : Components)
+                    {
+                        if (!Component ||
+                            Component->GetName() != TEXT("SurfaceMesh"))
+                        {
+                            continue;
+                        }
+                        if (UMaterialInstanceDynamic* Material =
+                                Cast<UMaterialInstanceDynamic>(
+                                    Component->GetMaterial(0)))
+                        {
+                            if (LiveSurfaceCoverageDiagnostic >= 0.0f)
+                            {
+                                Material->SetScalarParameterValue(
+                                    TEXT("ActiveLiveSurfaceCoverage"),
+                                    LiveSurfaceCoverageDiagnostic);
+                            }
+                            if (LiveWaterRoughnessDiagnostic >= 0.0f)
+                            {
+                                Material->SetScalarParameterValue(
+                                    TEXT("LiveWaterRoughness"),
+                                    LiveWaterRoughnessDiagnostic);
+                            }
+                            if (LiveWaterSpecularDiagnostic >= 0.0f)
+                            {
+                                Material->SetScalarParameterValue(
+                                    TEXT("LiveWaterSpecular"),
+                                    LiveWaterSpecularDiagnostic);
+                            }
+                            ++OverrideComponentCount;
+                        }
+                    }
+                }
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRapidWrapTest: live surface diagnostic "
+                         "coverage=%.3f roughness=%.3f specular=%.3f "
+                         "components=%d"),
+                    LiveSurfaceCoverageDiagnostic,
+                    LiveWaterRoughnessDiagnostic,
+                    LiveWaterSpecularDiagnostic,
+                    OverrideComponentCount);
+            }
+            if (W != nullptr && bHideWaterVfxDiagnostic)
+            {
+                for (TActorIterator<ARaftSimWaterVfxActor> It(W); It; ++It)
+                {
+                    It->SetActorHiddenInGame(true);
+                }
+            }
+            if (W != nullptr && bHideBoulderDressingDiagnostic)
+            {
+                const FName DressingTag(TEXT("RaftSimFullReachDressing"));
+                const FName FarFieldDressingTag(
+                    TEXT("RaftSimFullReachFarFieldDressing"));
+                for (TActorIterator<AActor> It(W); It; ++It)
+                {
+                    AActor* Actor = *It;
+                    if (!Actor ||
+                        (!Actor->ActorHasTag(DressingTag) &&
+                         !Actor->ActorHasTag(FarFieldDressingTag)))
+                    {
+                        continue;
+                    }
+                    TInlineComponentArray<
+                        UHierarchicalInstancedStaticMeshComponent*> Components(Actor);
+                    for (UHierarchicalInstancedStaticMeshComponent* Component : Components)
+                    {
+                        if (Component &&
+                            (Component->GetName().Contains(TEXT("Boulder")) ||
+                             Component->GetName().Contains(TEXT("Rock"))))
+                        {
+                            Component->SetVisibility(false, true);
+                        }
+                    }
+                }
+            }
+            if (W != nullptr &&
+                (bHideDetailedTerrainDiagnostic || bHideFarFieldDiagnostic ||
+                 bHideDressingDiagnostic ||
+                 bDisableAuthoredWaterShadowDiagnostic))
+            {
+                const FName DetailedTerrainTag(TEXT("RaftSimFullReachTerrain"));
+                const FName FarFieldTag(TEXT("RaftSimFullReachFarField"));
+                const FName DressingTag(TEXT("RaftSimFullReachDressing"));
+                const FName FarFieldDressingTag(
+                    TEXT("RaftSimFullReachFarFieldDressing"));
+                const FName AuthoredWaterTag(TEXT("RaftSimFlowBand_median_runnable"));
+                for (TActorIterator<AActor> It(W); It; ++It)
+                {
+                    AActor* Actor = *It;
+                    const bool bHide = Actor &&
+                        ((bHideDetailedTerrainDiagnostic &&
+                          Actor->ActorHasTag(DetailedTerrainTag)) ||
+                         (bHideFarFieldDiagnostic &&
+                          Actor->ActorHasTag(FarFieldTag)) ||
+                         (bHideDressingDiagnostic &&
+                          (Actor->ActorHasTag(DressingTag) ||
+                           Actor->ActorHasTag(FarFieldDressingTag))));
+                    if (bHide)
+                    {
+                        Actor->SetActorHiddenInGame(true);
+                    }
+                    if (Actor && bDisableAuthoredWaterShadowDiagnostic &&
+                        Actor->ActorHasTag(AuthoredWaterTag))
+                    {
+                        if (UStaticMeshComponent* WaterComponent =
+                                Actor->FindComponentByClass<UStaticMeshComponent>())
+                        {
+                            WaterComponent->SetCastShadow(false);
+                        }
+                    }
+                }
+            }
+            if (W != nullptr && bWaterInventoryDiagnostic)
+            {
+                LogVisibleWaterPresentationInventory(W);
+            }
+            if (ARaftSimRaftActor* Raft = FindRaft(W))
+            {
+                if (UProceduralMeshComponent* RaftMesh =
+                        Raft->FindComponentByClass<UProceduralMeshComponent>())
+                {
+                    RaftMesh->SetMeshSectionVisible(0, !bHideTubesDiagnostic);
+                    RaftMesh->SetMeshSectionVisible(1, !bHideFloorDiagnostic);
+                    RaftMesh->SetMeshSectionVisible(2, !bHideRiggingDiagnostic);
+                    RaftMesh->SetMeshSectionVisible(3, !bHideFittingsDiagnostic);
+                    RaftMesh->SetMeshSectionVisible(4, !bHideRubberDiagnostic);
+                }
+                FVector CamLoc;
+                FRotator CamRot;
+                ResolveRapidEvidenceCameraPose(*Raft, CameraPreset, CamLoc, CamRot);
+                if (ACameraActor* Cam = W->SpawnActor<ACameraActor>(
+                        ACameraActor::StaticClass(), CamLoc, CamRot))
+                {
+                    UCameraComponent* CameraComponent = Cam->GetCameraComponent();
+                    CameraComponent->SetFieldOfView(
+                        CameraPreset == TEXT("particle_macro")
+                            ? 42.0f
+                            : (CameraPreset == TEXT("contact_port")
+                                ? 54.0f
+                                : (CameraPreset == TEXT("river_action") ? 62.0f : 56.0f)));
+                    RaftSimCameraPresentation::Configure(
+                        CameraComponent, CameraExposureBias);
+                    if (APlayerController* PC = W->GetFirstPlayerController())
+                    {
+                        PC->SetViewTarget(Cam);
+                    }
+                }
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRapidWrapTest: contacts=%d wrapping=%d "
+                         "pinned=%d recovering=%d indentation=%.3f wetness=%.3f "
+                         "raftZ=%.1f rotation=%s"),
+                    Raft->GetActiveWaterContactCount(),
+                    Raft->GetWrappingRockContactCount(),
+                    Raft->GetPinnedRockObstacleCount(),
+                    Raft->GetRecoveringRockContactCount(),
+                    Raft->GetMaximumWaterContactIndentationM(),
+                    Raft->GetSurfaceWetness(),
+                    Raft->GetActorLocation().Z,
+                    *Raft->GetActorRotation().ToCompactString());
+                FVector DominantContactWorldCm;
+                FVector DominantContactNormal;
+                float DominantContactIndentationM = 0.0f;
+                if (Raft->GetDominantWaterContactPresentation(
+                        DominantContactWorldCm,
+                        DominantContactNormal,
+                        DominantContactIndentationM))
+                {
+                    UE_LOG(
+                        LogTemp,
+                        Display,
+                        TEXT("RaftSim.CaptureRapidWrapTest: dominantContact localCm=%s "
+                             "normalWorld=%s indentation=%.3f"),
+                        *Raft->GetActorTransform().InverseTransformPosition(
+                            DominantContactWorldCm).ToCompactString(),
+                        *DominantContactNormal.ToCompactString(),
+                        DominantContactIndentationM);
+                }
+            }
+            if (W != nullptr)
+            {
+                const FName AuthoredWaterTag(
+                    TEXT("RaftSimFlowBand_median_runnable"));
+                int32 AuthoredWaterComponentCount = 0;
+                int32 AuthoredWaterShadowCount = 0;
+                for (TActorIterator<AActor> It(W); It; ++It)
+                {
+                    AActor* Actor = *It;
+                    if (!Actor || !Actor->ActorHasTag(AuthoredWaterTag))
+                    {
+                        continue;
+                    }
+                    if (const UStaticMeshComponent* WaterComponent =
+                            Actor->FindComponentByClass<UStaticMeshComponent>())
+                    {
+                        ++AuthoredWaterComponentCount;
+                        AuthoredWaterShadowCount += WaterComponent->CastShadow ? 1 : 0;
+                    }
+                }
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRapidWrapTest: authoredWater=%d "
+                         "shadowCasting=%d"),
+                    AuthoredWaterComponentCount,
+                    AuthoredWaterShadowCount);
+                TActorIterator<ARaftSimWaterVfxActor> VfxIt(W);
+                if (VfxIt)
+                {
+                    const FRaftSimWaterVfxState& Vfx = VfxIt->GetLastPresentationState();
+                    UE_LOG(
+                        LogTemp,
+                        Display,
+                        TEXT("RaftSim.CaptureRapidWrapTest: spray=%.3f mist=%.3f "
+                             "sheet=%.3f droplets=%.3f instances=%d/%d/%d/%d "
+                             "contactPatchTriangles=%d contactPatchVisible=%d "
+                             "connectedV6Triangles=%d connectedV6Visible=%d "
+                             "connectedV7Triangles=%d connectedV7Visible=%d "
+                             "connectedV8Triangles=%d connectedV8Visible=%d "
+                             "depthV10Triangles=%d depthV10Visible=%d "
+                             "depthV10Frames=%d depthV10Frame=%d "
+                             "depthV10DepthCm=%.2f "
+                             "productionNiagara=%d rapidRollerEmitters=%d "
+                             "rapidCrestSprayEmitters=%d"),
+                        Vfx.Spray,
+                        Vfx.Mist,
+                        Vfx.ImpactSheet,
+                        Vfx.Droplets,
+                        VfxIt->GetSprayInstanceCount(),
+                        VfxIt->GetMistInstanceCount(),
+                        VfxIt->GetImpactFoamInstanceCount(),
+                        VfxIt->GetDropletInstanceCount(),
+                        VfxIt->GetContactWaterPatchTriangleCount(),
+                        VfxIt->IsContactWaterPatchVisible() ? 1 : 0,
+                        VfxIt->GetConnectedContactWaterV6TriangleCount(),
+                        VfxIt->IsConnectedContactWaterV6Visible() ? 1 : 0,
+                        VfxIt->GetConnectedContactWaterV7TriangleCount(),
+                        VfxIt->IsConnectedContactWaterV7Visible() ? 1 : 0,
+                        VfxIt->GetConnectedContactWaterV8TriangleCount(),
+                        VfxIt->IsConnectedContactWaterV8Visible() ? 1 : 0,
+                        VfxIt->GetDepthBearingContactWaterV10TriangleCount(),
+                        VfxIt->IsDepthBearingContactWaterV10Visible() ? 1 : 0,
+                        VfxIt->GetDepthBearingContactWaterV10CachedFrameCount(),
+                        VfxIt->GetDepthBearingContactWaterV10CurrentFrame(),
+                        VfxIt->GetDepthBearingContactWaterV10DepthCm(),
+                        VfxIt->GetProductionNiagaraComponentCount(),
+                        VfxIt->GetActiveRapidRollerNiagaraCount(),
+                        VfxIt->GetActiveRapidCrestSprayNiagaraCount());
+                }
+            }
+            if (W != nullptr)
+            {
+                FTimerHandle CaptureHandle;
+                W->GetTimerManager().SetTimer(
+                    CaptureHandle,
+                    FTimerDelegate::CreateLambda(
+                        [WeakWorld, OutPath, CameraPreset,
+                         bHideBreakingLipDiagnostic,
+                         bHideBreakingRollerDiagnostic,
+                         bHideRapidAerosolDiagnostic,
+                         bHideRapidRollerDiagnostic,
+                         bHideRapidCrestSprayDiagnostic]()
+                    {
+                        if (UWorld* DiagnosticWorld = WeakWorld.Get())
+                        {
+                            // The live surface rebuilds at 15 Hz and may have
+                            // recreated a component after the preparation
+                            // callback. Reapply the requested visibility in
+                            // this exact screenshot callback so isolation
+                            // evidence cannot race the presentation refresh.
+                            HideBreakingWaterPresentationComponents(
+                                DiagnosticWorld,
+                                bHideBreakingLipDiagnostic,
+                                bHideBreakingRollerDiagnostic);
+                            HideRapidNiagaraPresentationComponents(
+                                DiagnosticWorld,
+                                bHideRapidAerosolDiagnostic,
+                                bHideRapidRollerDiagnostic,
+                                bHideRapidCrestSprayDiagnostic);
+                            APlayerController* MutablePC =
+                                DiagnosticWorld->GetFirstPlayerController();
+                            ARaftSimRaftActor* CurrentRaft = FindRaft(DiagnosticWorld);
+                            ACameraActor* EvidenceCamera = MutablePC
+                                ? Cast<ACameraActor>(MutablePC->GetViewTarget())
+                                : nullptr;
+                            if (CurrentRaft != nullptr && EvidenceCamera != nullptr)
+                            {
+                                FVector CameraLocation;
+                                FRotator CameraRotation;
+                                ResolveRapidEvidenceCameraPose(
+                                    *CurrentRaft,
+                                    CameraPreset,
+                                    CameraLocation,
+                                    CameraRotation);
+                                if (CameraPreset.StartsWith(TEXT("breaking_water")))
+                                {
+                                    ResolveBreakingWaterEvidenceCameraPose(
+                                        DiagnosticWorld,
+                                        *CurrentRaft,
+                                        CameraPreset,
+                                        CameraLocation,
+                                        CameraRotation);
+                                }
+                                EvidenceCamera->SetActorLocationAndRotation(
+                                    CameraLocation,
+                                    CameraRotation);
+                                // Timers execute after the player camera's
+                                // normal update. Force the moved evidence
+                                // camera through the manager before the
+                                // screenshot request so the captured frame and
+                                // logged pose cannot lag one tick behind.
+                                if (MutablePC->PlayerCameraManager)
+                                {
+                                    MutablePC->PlayerCameraManager->UpdateCamera(0.0f);
+                                }
+                            }
+                            if (CurrentRaft != nullptr)
+                            {
+                                UE_LOG(
+                                    LogTemp,
+                                    Display,
+                                    TEXT("RaftSim.CaptureRapidWrapTest: finalFrame "
+                                         "contacts=%d wrapping=%d pinned=%d "
+                                         "recovering=%d indentation=%.3f "
+                                         "wetness=%.3f raft=%s"),
+                                    CurrentRaft->GetActiveWaterContactCount(),
+                                    CurrentRaft->GetWrappingRockContactCount(),
+                                    CurrentRaft->GetPinnedRockObstacleCount(),
+                                    CurrentRaft->GetRecoveringRockContactCount(),
+                                    CurrentRaft->GetMaximumWaterContactIndentationM(),
+                                    CurrentRaft->GetSurfaceWetness(),
+                                    *CurrentRaft->GetActorLocation().ToCompactString());
+                            }
+                            TActorIterator<ARaftSimWaterVfxActor> VfxIt(DiagnosticWorld);
+                            const APlayerController* PC =
+                                DiagnosticWorld->GetFirstPlayerController();
+                            const APlayerCameraManager* Camera =
+                                PC ? PC->PlayerCameraManager : nullptr;
+                            UE_LOG(
+                                LogTemp,
+                                Display,
+                                TEXT("RaftSim.CaptureRapidWrapTest: captureCamera=%s "
+                                     "underwater=%.3f blend=%.3f"),
+                                Camera
+                                    ? *Camera->GetCameraLocation().ToCompactString()
+                                    : TEXT("unavailable"),
+                                VfxIt ? VfxIt->GetLastPresentationState().Underwater : -1.0f,
+                                VfxIt ? VfxIt->GetUnderwaterBlendWeight() : -1.0f);
+                            for (TActorIterator<ARaftSimWaterSurfaceActor> It(DiagnosticWorld); It; ++It)
+                            {
+                                const FBox Bounds = It->GetComponentsBoundingBox(true);
+                                UE_LOG(
+                                    LogTemp,
+                                    Display,
+                                    TEXT("RaftSim.CaptureRapidWrapTest: liveSurface center=%s "
+                                         "size=%s breakingLipTriangles=%d "
+                                         "breakingLipVisible=%d "
+                                         "breakingRollerTriangles=%d "
+                                         "breakingRollerVertices=%d "
+                                         "breakingRollerMaxThicknessCm=%.2f "
+                                         "breakingRollerVisible=%d"),
+                                    *Bounds.GetCenter().ToCompactString(),
+                                    *Bounds.GetSize().ToCompactString(),
+                                    It->GetBreakingLipTriangleCount(),
+                                    It->IsBreakingLipVisible() ? 1 : 0,
+                                    It->GetBreakingRollerVolumeTriangleCount(),
+                                    It->GetBreakingRollerVolumeVertexCount(),
+                                    It->GetBreakingRollerVolumeMaximumThicknessCm(),
+                                    It->IsBreakingRollerVolumeVisible() ? 1 : 0);
+                            }
+                            for (TActorIterator<ARaftSimRockObstacleActor> It(DiagnosticWorld); It; ++It)
+                            {
+                                const FBox Bounds = It->GetComponentsBoundingBox(true);
+                                const FVector RockRelativeToRaftCm = CurrentRaft
+                                    ? CurrentRaft->GetActorTransform().InverseTransformPosition(
+                                          It->GetActorLocation())
+                                    : FVector::ZeroVector;
+                                UE_LOG(
+                                    LogTemp,
+                                    Display,
+                                    TEXT("RaftSim.CaptureRapidWrapTest: rock center=%s size=%s "
+                                         "relativeToRaftCm=%s"),
+                                    *Bounds.GetCenter().ToCompactString(),
+                                    *Bounds.GetSize().ToCompactString(),
+                                    *RockRelativeToRaftCm.ToCompactString());
+                                if (const UProceduralMeshComponent* ProceduralRock =
+                                        It->FindComponentByClass<UProceduralMeshComponent>())
+                                {
+                                    const UMaterialInterface* Material =
+                                        ProceduralRock->GetMaterial(0);
+                                    UE_LOG(
+                                        LogTemp,
+                                        Display,
+                                        TEXT("RaftSim.CaptureRapidWrapTest: "
+                                             "proceduralRock visible=%d section0=%d "
+                                             "material=%s center=%s extent=%s"),
+                                        ProceduralRock->IsVisible() ? 1 : 0,
+                                        ProceduralRock->IsMeshSectionVisible(0) ? 1 : 0,
+                                        Material
+                                            ? *Material->GetPathName()
+                                            : TEXT("unavailable"),
+                                        *ProceduralRock->Bounds.Origin.ToCompactString(),
+                                        *ProceduralRock->Bounds.BoxExtent.ToCompactString());
+                                }
+                                TArray<UStaticMeshComponent*> StaticRockComponents;
+                                It->GetComponents(StaticRockComponents);
+                                for (const UStaticMeshComponent* Component : StaticRockComponents)
+                                {
+                                    UE_LOG(
+                                        LogTemp,
+                                        Display,
+                                        TEXT("RaftSim.CaptureRapidWrapTest: rockVisual=%s "
+                                             "visible=%d registered=%d renderState=%d "
+                                             "shouldRender=%d hiddenInGame=%d ownerHidden=%d "
+                                             "materialSlots=%d center=%s extent=%s"),
+                                        Component ? *Component->GetName() : TEXT("unavailable"),
+                                        Component && Component->IsVisible() ? 1 : 0,
+                                        Component && Component->IsRegistered() ? 1 : 0,
+                                        Component && Component->IsRenderStateCreated() ? 1 : 0,
+                                        Component && Component->ShouldRender() ? 1 : 0,
+                                        Component && Component->bHiddenInGame ? 1 : 0,
+                                        Component && Component->GetOwner() &&
+                                                Component->GetOwner()->IsHidden()
+                                            ? 1
+                                            : 0,
+                                        Component ? Component->GetNumMaterials() : 0,
+                                        Component
+                                            ? *Component->Bounds.Origin.ToCompactString()
+                                            : TEXT("unavailable"),
+                                        Component
+                                            ? *Component->Bounds.BoxExtent.ToCompactString()
+                                            : TEXT("unavailable"));
+                                    if (Component)
+                                    {
+                                        for (int32 MaterialIndex = 0;
+                                             MaterialIndex < Component->GetNumMaterials();
+                                             ++MaterialIndex)
+                                        {
+                                            const UMaterialInterface* Material =
+                                                Component->GetMaterial(MaterialIndex);
+                                            UE_LOG(
+                                                LogTemp,
+                                                Display,
+                                                TEXT("RaftSim.CaptureRapidWrapTest: "
+                                                     "rockMaterial[%d]=%s"),
+                                                MaterialIndex,
+                                                Material
+                                                    ? *Material->GetPathName()
+                                                    : TEXT("unavailable"));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        FScreenshotRequest::RequestScreenshot(OutPath, false, false);
+                        if (UWorld* CaptureWorld = WeakWorld.Get())
+                        {
+                            FTimerHandle ExitHandle;
+                            CaptureWorld->GetTimerManager().SetTimer(
+                                ExitHandle,
+                                FTimerDelegate::CreateLambda([]()
+                                {
+                                    FPlatformMisc::RequestExit(false);
+                                }),
+                                4.0f,
+                                false);
+                        }
+                    }),
+                    // The camera is already in the running level. Two 60 Hz
+                    // frames resolve the view target without turning an active
+                    // D4 wrap into a later shape-recovery screenshot.
+                    0.03f,
+                    false);
+            }
+        }),
+        0.95f,
+        false);
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GCaptureRapidWrapTestCommand(
+    TEXT("RaftSim.CaptureRapidWrapTest"),
+    TEXT("Stage the live raft in Meat Grinder, add a D4-authoritative contact boulder, "
+         "and capture the solver-derived wrap, wetness, and spray. "
+         "Usage: RaftSim.CaptureRapidWrapTest [label] [stationM] "
+         "[downstream_right|upstream_left|downstream_left|upstream_right|contact_port|particle_macro|breaking_water] "
+         "[unlit] [nowater] [noauthoredwater] [norockvisual] "
+         "[novfx] [notubes] [nofloor] [norigging] "
+         "[nobreakinglip] [nobreakingroller] "
+         "[norapidaerosol] [norapidroller] [norapidcrestspray] "
+         "[taa] [nobloom] [nocloud] "
+         "[nofittings] [norubber] [reviewedrock] [noshadowwater] [nodressing] "
+         "[noboulderdressing] [waterinventory] [terrainvertexmacro] "
+         "[terrainnoedgeblend] [terrainnospecular] "
+         "[terrainmacro=0..1] "
+         "[waterdetail=0..0.40] "
+         "[waterfoam=0..2] [waterfoamcore=0..2] [waterfoamlace=0..2] "
+         "[waterroughness=0..0.80] [waterspecular=0..1] "
+         "[rockx=cm] [rocky=cm] [rockz=cm] "
+         "[livecoverage=0..0.25] "
+         "[livewaterroughness=0..0.80] [livewaterspecular=0..1] "
+         "[rockmesh=/Game/path.Asset] "
+         "[watermaterial=/Game/path.Asset]"
+         " [terrainmaterial=/Game/path.Asset]"),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureRapidWrapTest));
 
 } // namespace RaftSimCaptureCommand

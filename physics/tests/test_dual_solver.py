@@ -24,14 +24,8 @@ from raftsim.pyclaw_reference import PyClawRunConfig, check_pyclaw_availability
 from raftsim.regression import promote_passing_dual_solver_run
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
 from raftsim.sweeps import ParameterSweepCandidate
-from raftsim.tuning import (
-    CppTuningCandidate,
-    default_cascading_cpp_tuning_candidates,
-    fit_cpp_and_raft_parameters_against_pyclaw,
-    tune_cpp_solver_against_cascading_geoclaw,
-    tune_cpp_solver_against_geoclaw,
-    tune_cpp_solver_against_pyclaw,
-)
+from raftsim.tuning import (CppTuningCandidate, default_cascading_cpp_tuning_candidates, tune_cpp_solver_against_cascading_geoclaw, tune_cpp_solver_against_geoclaw, tune_cpp_solver_against_pyclaw)
+from raftsim.raft_parameter_fit import (fit_cpp_and_raft_parameters_against_pyclaw)
 
 
 def _build_cpp_solver(tmp_path: Path) -> Path:

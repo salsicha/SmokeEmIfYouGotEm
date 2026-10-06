@@ -12,6 +12,7 @@ import argparse
 from pathlib import Path
 
 from raftsim.colorado_hance_c3_window import (
+    HanceWindowParameters,
     SCENARIO_ROOT_RELATIVE,
     run_hance_behavioral_validation,
     write_hance_scenario_packages,
@@ -33,10 +34,16 @@ def main() -> None:
         help="Uncommitted solver run directory (default: physics/outputs/hance_c3_window).",
     )
     parser.add_argument("--steps", type=int, default=4000, help="Solver steps per band (fixed_dt 0.05 s).")
+    parser.add_argument(
+        "--cell-size-m", type=float, default=0.5,
+        help="Named-rapid hydraulic cell size (default: 0.5 m).",
+    )
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parents[4]
-    manifest = write_hance_scenario_packages(repo_root)
+    manifest = write_hance_scenario_packages(
+        repo_root, HanceWindowParameters(cell_size_m=args.cell_size_m)
+    )
     print(f"wrote={SCENARIO_ROOT_RELATIVE}/window_manifest.json")
     for band_id, entry in manifest["flow_band_packages"].items():
         print(

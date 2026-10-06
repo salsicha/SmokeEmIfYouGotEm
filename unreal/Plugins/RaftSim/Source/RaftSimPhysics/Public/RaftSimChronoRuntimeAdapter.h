@@ -2,6 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "RaftSimFlexibleRaftModel.h"
+#include "RaftSimGroundContactObservation.h"
+#include "RaftSimSweptGroundContact.h"
+#include "RaftSimHullGeometry.h"
+#include "RaftSimHullContact.h"
+#include "RaftSimOverwashLoads.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
@@ -73,9 +78,59 @@ struct FRaftSimRaftBodyConfig
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
     float BuoyancyWeightMultiple = 2.6f;
 
-    /** Quadratic water drag coefficient applied per submerged fraction. */
+    /** Hull-water drag coefficient applied per submerged fraction. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
-    float LinearDragCoefficient = 45.0f;
+    float LinearDragCoefficient = 650.0f;
+
+    /**
+     * Reference speed used to retain viscous hull resistance near rest.
+     * Above this speed the same term remains purely quadratic.
+     * 1.5 welded the hull to the local streamline: with the blunt 9000
+     * coefficient the lateral relative velocity decayed in ~0.1 s, so a
+     * drifting raft tracked a bend's turning water to within 0.1 degree
+     * and never carried to the outside of the turn (drift telemetry,
+     * 2026-09-02). 0.25 overshot the other way — a free drift lagged the
+     * turning water by 1-2.5 degrees even on gentle pool reaches and
+     * beached itself on the outside bank within minutes ("while drifting
+     * the boat moves sideways across the river and runs into the left
+     * shore"). 0.55 keeps a clearly visible outside set in real bends
+     * while a hands-off pool drift stays in the channel; the >=1.5 m/s
+     * capture regime that keeps advected froth behind the boat is
+     * numerically unchanged.
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
+    float LowSpeedDragReferenceMps = 0.35f;
+
+    /**
+     * Slow-water counterpart to LowSpeedDragReferenceMps: the effective
+     * floor blends from this value in still water down to
+     * LowSpeedDragReferenceMps once the sampled current reaches ~2 m/s.
+     * Resolves the tension between two field reports: a soft constant
+     * floor let a hands-off pool drift wander into the bank ("the boat
+     * still drifts into the left riverbank"), while a stiff one welded
+     * the hull to the streamline through bends ("the boat should be
+     * pushed to the outside of the turn"). Slow pools now track the
+     * channel; fast water frees the hull's inertia to carry outside.
+     * Fixtures that pin LowSpeedDragReferenceMps at the legacy 1.5 get a
+     * constant 1.5 floor (the max of both ends), preserving their
+     * behaviour exactly.
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
+    float SlowWaterDragReferenceMps = 1.2f;
+
+    /**
+     * Drag coefficient for the bow-first slicing component of relative
+     * flow. The blunt coefficient above must stay large so an overtaking
+     * current captures the hull promptly (2026-08 requirement: advected
+     * froth must never pass the boat), but applying it to forward motion
+     * THROUGH the water erased paddle glide — the hull snapped back to
+     * water speed the instant blades left the water. A hull slices
+     * bow-first with far less resistance than it is bluntly pushed, so the
+     * forward component drags at this smaller coefficient and a stroke
+     * coasts down over a couple of seconds.
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
+    float ForwardSlicingDragCoefficient = 1400.0f;
 
     /**
      * Vertical (heave) damping in N·s/m applied per submerged fraction:
@@ -111,6 +166,10 @@ struct FRaftSimRaftKinematicState
 struct FRaftSimFlexStepTelemetry
 {
     bool bEvaluated = false;
+    double OccupiedCrewMassKg = 0.0;
+    double IntegratedMassKg = 0.0;
+    FVector IntegratedInertiaKgM2 = FVector::ZeroVector;
+    double BuoyancyReferenceMassKg = 0.0;
     double MaxFreeboardLossM = 0.0;
     double PortTotalFreeboardLossM = 0.0;
     double StarboardTotalFreeboardLossM = 0.0;
@@ -118,9 +177,14 @@ struct FRaftSimFlexStepTelemetry
     double TubePitchLoadBiasNm = 0.0;
     double TotalRetainedWaterMassKg = 0.0;
     double RetainedWaterRollMomentNm = 0.0;
+    double OvertoppingDynamicRollMomentNm = 0.0;
     double ReferenceFlipThresholdNm = 0.0;
     double ReferenceFlipMarginNm = 0.0;
     bool bReferenceFlipRisk = false;
+    bool bUsedLiveWaterField = false;
+    bool bUsedUniformWaterOverride = false;
+    int32 LiveWaterSampleCount = 0;
+    int32 LiveWetSampleCount = 0;
     int32 ContactCount = 0;
     int32 WrappingContactCount = 0;
     int32 PinnedObstacleCount = 0;
@@ -152,8 +216,16 @@ UCLASS(BlueprintType)
 class RAFTSIMPHYSICS_API URaftSimChronoRuntimeAdapter : public UObject
 {
     GENERATED_BODY()
+    friend class FRaftSimCrewCommandWeightTest;
+    friend class FRaftSimCrewOccupancyTest;
 
 public:
+    /** Read-only configuration for in-engine controls using identical loading. */
+    const FRaftSimFlexParameters& GetFlexibleParameters() const { return FlexParameters; }
+    const TArray<FRaftSimFlexCrewSeat>& GetFlexibleSeats() const { return FlexSeats; }
+    FORCEINLINE bool SampleBoundFlexibleWater(const FVector& WorldCm, FRaftSimFlexUniformWater& OutWater) const
+    { return FlexibleWaterFieldSampler && FlexibleWaterFieldSampler(WorldCm, OutWater); }
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Chrono")
     void ConfigureRaftBody(const FRaftSimRaftBodyConfig& InConfig);
 
@@ -196,20 +268,86 @@ public:
     void SetWaterSurfaceSampler(
         TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> InSampler);
 
+    /** Tube support points whose water cell sampled dry on the last support
+     * pass — the direct instrument for fall-through-the-wet-mask sinks. */
+    int32 GetLastDrySupportPointCount() const { return LastDrySupportPointCount; }
+
+    /**
+     * Bind the authoritative terrain height sampled below each tube point.
+     * The selected reduced runtime resolves the contact; the callback only
+     * supplies world-space ground height and normal from Landscape or the
+     * solver bed. This keeps visual/query collision from becoming a second
+     * rigid-body authority.
+     */
+    void SetGroundSurfaceSampler(
+        TFunction<bool(
+            const FVector& WorldPositionCm,
+            float& OutGroundZCm,
+            FVector& OutGroundNormal)> InSampler);
+
+    int32 GetLastGroundedSupportPointCount() const
+    {
+        return LastGroundedSupportPointCount;
+    }
+
+    // Optional observer, never a force/pose callback. Empty in ordinary play.
+    void SetGroundContactObserver(TFunction<void(const FRaftSimGroundContactObservation&)> Observer)
+    { GroundContactObserver=MoveTemp(Observer); }
+    void SetGroundSphereSweep(FRaftSimGroundSweep Sweep) { GroundSphereSweep=MoveTemp(Sweep); }
+    void SetHullGroundQuery(FRaftSimHullGroundQuery Query) { HullGroundQuery=MoveTemp(Query);LastHullContact={}; }
+    const FRaftSimHullContactResult& GetLastHullContact() const { return LastHullContact; }
+    const FRaftSimHullContactTotals& GetHullContactTotals() const { return HullContactTotals; }
+    const RaftSimOverwashLoads::FDiagnostics& GetLastSurfacePressure() const {return LastSurfacePressure;}
+    // Gameplay lifecycle sees every committed fixed step, never a rejected
+    // intermediate pose or only the final render-frame state.
+    void SetCommittedStepObserver(TFunction<void(const FRaftSimRaftKinematicState&)> Observer)
+    {CommittedStepObserver=MoveTemp(Observer);}
+
+    float GetLastMaximumGroundPenetrationMeters() const
+    {
+        return LastMaximumGroundPenetrationM;
+    }
+
+    /**
+     * Bind full live-water samples for D3. The adapter evaluates this at each
+     * deformed tube segment in world centimetres and passes the resulting
+     * surface/velocity field into the authoritative overwash solve.
+     */
+    void SetFlexibleWaterFieldSampler(
+        TFunction<bool(
+            const FVector& WorldPositionCm,
+            FRaftSimFlexUniformWater& OutWater)> InSampler);
+
     // --- Flexible-raft model (D1-D4 port; CustomReducedRigidBody path) ------
 
     // Stand up the quasi-static flexible model behind the adapter. Seats may be
     // empty (no crew loads). The tube layout is rebuilt from the parameters.
+    // Production's body includes ALL configured seat masses; occupancy then
+    // subtracts absent occupants from integration, not hull buoyancy capacity.
+    // Independent reference fixtures retain their separately specified body.
     void ConfigureFlexibleRaftModel(
         const FRaftSimFlexParameters& InParameters,
         const TArray<FRaftSimFlexCrewSeat>& InSeats,
-        double NominalPressurePa = 18000.0);
+        double NominalPressurePa = 18000.0,
+        bool bBodyMassIncludesAllSeats = false);
+
+    /** Physical ids (guide/passenger_0..N). Does not rebuild hull or reset motion. */
+    bool SetFlexibleCrewSeatOccupied(const FString& SeatId, bool bOccupied);
 
     void SetFlexibleCrewActions(const TArray<FRaftSimFlexCrewAction>& InActions);
 
-    // Uniform water descriptor for D3 overwash sampling. Disabled by default;
-    // when disabled, retained deck water still drains deterministically.
+    // Deterministic uniform D3 override used by fixtures/tests. When disabled,
+    // the live per-segment sampler drives D3 and missing/dry samples drain.
     void SetFlexibleUniformWater(const FRaftSimFlexUniformWater& InWater, bool bInEnabled);
+
+    /**
+     * Switch the flexible solve between crewed-upright and empty-capsized
+     * loading. Capsizing ejects crew and drains open-floor overwash, while D4
+     * rock contact and indentation memory remain authoritative.
+     */
+    void SetFlexibleCapsized(bool bInCapsized);
+
+    bool IsFlexibleCapsized() const { return bFlexCapsized; }
 
     void SetFlexibleRockObstacles(const TArray<FRaftSimFlexRockObstacle>& InObstacles);
 
@@ -244,7 +382,21 @@ public:
         return LastFlexVisualSegments;
     }
 
+    // A caller-owned source avoids a Physics -> Raft/render module cycle.
+    // Prepare is evaluated from THIS fixed substep's D1-D4 state. Commit is
+    // called only when that same body step is published successfully.
+    bool SetHullGeometryProvider(
+        TFunction<bool(const TArray<FRaftSimFlexVisualSegmentState>&,FRaftSimHullGeometry&)> Prepare,
+        TFunction<void()> Commit);
+    const FRaftSimHullGeometry& GetHullGeometry() const { return PublishedHullGeometry; }
+    uint64 GetHullGeometryRevision() const { return HullGeometryRevision; }
+    // Optional certified curved-path query. Existing normal-game queries keep
+    // their current semantics; the caller must still inspect every source face.
+    void SetHullGroundArcQuery(FRaftSimHullGroundArcQuery Query){HullGroundArcQuery=MoveTemp(Query);}
+
 private:
+    TFunction<void(const FRaftSimRaftKinematicState&)> CommittedStepObserver;
+    FRaftSimHullGroundArcQuery HullGroundArcQuery;
     UPROPERTY()
     FRaftSimRaftBodyConfig RaftConfig;
 
@@ -256,6 +408,25 @@ private:
 
     // Buoyancy support stage (plain C++ members; deterministic).
     TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> WaterSurfaceSampler;
+    int32 LastDrySupportPointCount = 0;
+    float LastWetSupportSurfaceZCm = 0.0f;
+    bool bHasLastWetSupportSurface = false;
+    FVector LastWetWaterVelocityMps = FVector::ZeroVector;
+    TFunction<bool(
+        const FVector& WorldPositionCm,
+        float& OutGroundZCm,
+        FVector& OutGroundNormal)> GroundSurfaceSampler;
+    TFunction<void(const FRaftSimGroundContactObservation&)> GroundContactObserver;
+    FRaftSimGroundSweep GroundSphereSweep;
+    FRaftSimHullGroundQuery HullGroundQuery;
+    FRaftSimHullContactResult LastHullContact;
+    FRaftSimHullContactTotals HullContactTotals;
+    RaftSimOverwashLoads::FDiagnostics LastSurfacePressure;
+    int32 LastGroundedSupportPointCount = 0;
+    float LastMaximumGroundPenetrationM = 0.0f;
+    TFunction<bool(
+        const FVector& WorldPositionCm,
+        FRaftSimFlexUniformWater& OutWater)> FlexibleWaterFieldSampler;
     TArray<FVector> TubeSamplePointsM;
     float FlexPressureFraction = 1.0f;
     float FlexFabricIntegrity = 1.0f;
@@ -266,14 +437,28 @@ private:
     FRaftSimFlexParameters FlexParameters;
     TArray<FRaftSimFlexTubeSegment> FlexLayout;
     TArray<FRaftSimFlexCrewSeat> FlexSeats;
+    // Opted in by production's combined body, not independent reference fixtures.
+    bool bBodyMassIncludesFlexibleCrew = false;
+    bool bFlexibleCrewMassContractValid = true;
+    double NominalFlexibleCrewMassKg = 0.0;
+    TArray<FRaftSimFlexCrewSeat> FlexCapsizedSeats;
     TArray<FRaftSimFlexCrewAction> FlexActions;
     TArray<FRaftSimFlexRockObstacle> FlexObstacles;
     FRaftSimFlexUniformWater FlexWater;
-    bool bFlexWaterEnabled = false;
+    bool bFlexUniformWaterOverrideEnabled = false;
+    bool bFlexCapsized = false;
+    // Reused at the 120 Hz physics rate. Keeping this allocation resident
+    // avoids per-substep map churn while preserving SegmentId-keyed D3 input.
+    TMap<FString, FRaftSimFlexUniformWater> LiveWaterBySegmentScratch;
     TMap<FString, double> RetainedVolumeBySegment;
     TMap<FString, double> IndentationBySegment;
     FRaftSimFlexStepTelemetry LastFlexStepTelemetry;
     TArray<FRaftSimFlexVisualSegmentState> LastFlexVisualSegments;
+
+    TFunction<bool(const TArray<FRaftSimFlexVisualSegmentState>&,FRaftSimHullGeometry&)> HullGeometryProvider;
+    TFunction<void()> HullGeometryCommit;
+    FRaftSimHullGeometry PublishedHullGeometry,PendingHullGeometry;
+    uint64 HullGeometryRevision=0;
 
     bool StepFlexibleRaftDynamics(double SubstepSeconds);
 };

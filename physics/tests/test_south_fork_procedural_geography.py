@@ -14,6 +14,8 @@ from raftsim.south_fork_procedural_geography import (
     FEATURE_SHELF,
     FEATURE_SHORELINE_BREAKUP,
     FEATURE_WAVE_TRAIN,
+    MATERIAL_EXPOSED_ROCK,
+    MATERIAL_VEGETATION,
     PROCEDURAL_BOULDER_CATALOG_RELATIVE_PATH,
     PROCEDURAL_GEOGRAPHY_GRID_RELATIVE_PATH,
     PROCEDURAL_GEOGRAPHY_MANIFEST_RELATIVE_PATH,
@@ -55,6 +57,7 @@ def test_procedural_geography_grid_is_continuous_complete_and_labelled():
         lateral = grid["lateral_offsets_m"]
         bed = grid["bed_elevation_m"]
         source = grid["source_authority"]
+        source_vegetation_score = grid["source_vegetation_score"]
         procedural = grid["procedural_infill"]
         uncertainty = grid["uncertainty"]
         features = grid["features"]
@@ -83,6 +86,7 @@ def test_procedural_geography_grid_is_continuous_complete_and_labelled():
         assert lateral[0] == -256.0
         assert lateral[-1] == 256.0
         assert bed.shape == (stations.size, lateral.size)
+        assert source_vegetation_score.shape == bed.shape
         assert np.isfinite(bed).all()
         assert np.array_equal(
             source.astype(np.uint16) + procedural, np.full(source.shape, 255)
@@ -135,6 +139,65 @@ def test_procedural_geography_grid_is_continuous_complete_and_labelled():
     assert manifest["continuity"]["no_unbounded_discontinuities"] is True
     assert manifest["continuity"]["maximum_center_bed_step_m"] < 2.0
     assert manifest["continuity"]["maximum_corridor_edge_step_m"] < 16.0
+    detailed_orientation = manifest["continuity"][
+        "unreal_detailed_ribbon_orientation"
+    ]
+    assert detailed_orientation["half_width_m"] == 112.0
+    assert detailed_orientation["inverted_or_degenerate_triangle_count"] == 0
+    assert detailed_orientation["mixed_orientation_cell_count"] == 0
+    assert detailed_orientation["affected_row_count"] == 0
+
+
+def test_source_backed_canopy_is_not_stripped_from_plausible_wooded_slopes():
+    manifest = _load_manifest()
+    with np.load(REPO_ROOT / PROCEDURAL_GEOGRAPHY_GRID_RELATIVE_PATH) as grid:
+        lateral = grid["lateral_offsets_m"]
+        material = grid["material"]
+        vegetation_score = grid["source_vegetation_score"]
+        source_dem = grid["source_dem_elevation_m"]
+        features = grid["features"]
+        cross_slope = np.abs(np.gradient(source_dem, 4.0, axis=1))
+        visible_bank = np.broadcast_to(
+            (np.abs(lateral)[None, :] >= 34.0)
+            & (np.abs(lateral)[None, :] <= 112.0),
+            material.shape,
+        )
+        strong_source_canopy = (
+            visible_bank & (vegetation_score > 142)
+        )
+        dry_bank = (
+            (features & FEATURE_SHORELINE_BREAKUP) == 0
+        ) & ((features & FEATURE_CHANNEL) == 0)
+        plausible_wooded_slope = (
+            strong_source_canopy & dry_bank & (cross_slope <= 1.25)
+        )
+        extreme_source_slope = strong_source_canopy & dry_bank & (cross_slope > 1.25)
+
+        assert np.count_nonzero(plausible_wooded_slope) > 50_000
+        assert np.all(material[plausible_wooded_slope] == MATERIAL_VEGETATION)
+        assert np.all(material[extreme_source_slope] == MATERIAL_EXPOSED_ROCK)
+
+    classification = manifest["surface_classification"]
+    assert classification["strong_source_vegetation_score_threshold"] == 142
+    assert classification["maximum_wooded_cross_slope"] == 1.25
+    assert classification["visible_strong_source_canopy_preserved_fraction"] > 0.9
+    assert classification["visible_bank_lateral_range_m"] == [34.0, 112.0]
+    assert manifest["bank_conditioning"] == {
+        "algorithm": "world_space_bounded_erosion_envelope_v1",
+        "authority": (
+            "procedural game infill where the adopted route and source DEM "
+            "thalweg are horizontally misregistered; never surveyed"
+        ),
+        "full_conditioning_distance_from_bank_m": 88.0,
+        "maximum_erosion_relief_m": 5.5,
+        "profile_base_m": 0.35,
+        "profile_linear_grade": 0.09,
+        "profile_quadratic_grade": 0.00032,
+        "provenance_mask_updated_per_changed_sample": True,
+        "source_fade_distance_from_bank_m": 224.0,
+        "source_samples_retained": True,
+        "wet_transition_m": 14.0,
+    }
 
 
 def test_geotiff_response_extent_overrides_non_square_request_bounds():

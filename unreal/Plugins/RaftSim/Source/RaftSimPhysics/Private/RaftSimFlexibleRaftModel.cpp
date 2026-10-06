@@ -101,6 +101,20 @@ double SumFreeboardForPrefix(const TArray<FRaftSimFlexSegmentResponse>& Response
     return TotalLoss;
 }
 
+const FRaftSimFlexSegmentResponse* FindSegmentResponse(
+    const TArray<FRaftSimFlexSegmentResponse>& Responses,
+    const FString& SegmentId)
+{
+    for (const FRaftSimFlexSegmentResponse& Response : Responses)
+    {
+        if (Response.SegmentId.Equals(SegmentId, ESearchCase::CaseSensitive))
+        {
+            return &Response;
+        }
+    }
+    return nullptr;
+}
+
 // _contact_payload (flexible_raft_d4.py).
 FRaftSimFlexRockContact BuildContact(
     const FRaftSimFlexSeatLoadSolve& SeatTubeSolve,
@@ -452,10 +466,11 @@ FRaftSimFlexCrewTelemetry EvaluateCrewWeightDistribution(
 
         const FVector HighSideOffset(0.0, static_cast<double>(Action.HighSideDirection) * HighSideOffsetM, 0.0);
         const FVector BraceOffset(0.0, 0.0, Action.bBrace ? -BraceCenterDropM : 0.0);
-        const FVector ActionOffset = LeanOffset + HighSideOffset + BraceOffset;
+        const FVector ActionOffset = Action.bUseCrewTransfer && !Action.CrewTransferOffsetM.ContainsNaN()
+            ? Action.CrewTransferOffsetM : LeanOffset + HighSideOffset + BraceOffset;
         const FVector EffectivePosition = Seat.LocalPosition + ActionOffset;
         const bool bActionIsActive =
-            LeanOffset.Length() > 1.0e-9
+            Action.bUseCrewTransfer || LeanOffset.Length() > 1.0e-9
             || Action.HighSideDirection != 0
             || Action.bBrace
             || Action.bRecovery;
@@ -638,7 +653,12 @@ FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
     double FluxCoefficient,
     double DrainageRatePerS,
     double WaterDensityKgM3,
-    double GravityMps2)
+    double GravityMps2,
+    const TMap<FString, FRaftSimFlexUniformWater>* WaterBySegment,
+    double MaximumIncomingSpeedMps,
+    double MaximumOvertoppingDepthM,
+    double MaximumRetainedVolumePerSegmentM3,
+    double DynamicPressureRollLeverM)
 {
     FRaftSimFlexOverwashSolve Solve;
     if (Dt <= 0.0)
@@ -646,32 +666,42 @@ FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
         return Solve;
     }
 
-    TMap<FString, const FRaftSimFlexSegmentResponse*> ResponsesById;
-    for (const FRaftSimFlexSegmentResponse& Response : SeatTubeSolve.TubeSolve.SegmentResponses)
-    {
-        ResponsesById.Add(Response.SegmentId, &Response);
-    }
-
     const FRaftSimFlexRigidState& RigidState = SeatTubeSolve.RigidState;
+    Solve.SegmentOverwash.Reserve(Layout.Num());
     for (const FRaftSimFlexTubeSegment& Segment : Layout)
     {
-        const FRaftSimFlexSegmentResponse* const* FoundResponse = ResponsesById.Find(Segment.SegmentId);
+        const FRaftSimFlexSegmentResponse* FoundResponse = FindSegmentResponse(
+            SeatTubeSolve.TubeSolve.SegmentResponses,
+            Segment.SegmentId);
         if (FoundResponse == nullptr)
         {
             continue;
         }
-        const FRaftSimFlexSegmentResponse& Response = **FoundResponse;
+        const FRaftSimFlexSegmentResponse& Response = *FoundResponse;
+        const FRaftSimFlexUniformWater* SegmentWater = WaterBySegment
+            ? WaterBySegment->Find(Segment.SegmentId)
+            : nullptr;
+        const FRaftSimFlexUniformWater& EffectiveWater = SegmentWater
+            ? *SegmentWater
+            : Water;
 
         const FVector WorldPosition = RigidState.WorldPoint(Response.LocalPosition);
         const FVector WorldNormal = RigidState.Orientation.RotateVector(Segment.OutwardNormal).GetSafeNormal();
         const FVector RelativeWaterVelocity =
-            Water.VelocityMps - RigidState.PointVelocity(Response.LocalPosition);
-        const double IncomingSpeed = FMath::Max(0.0, -FVector::DotProduct(RelativeWaterVelocity, WorldNormal));
+            EffectiveWater.VelocityMps - RigidState.PointVelocity(Response.LocalPosition);
+        const double IncomingSpeed = FMath::Min(
+            FMath::Max(0.0, -FVector::DotProduct(RelativeWaterVelocity, WorldNormal)),
+            FMath::Max(0.0, MaximumIncomingSpeedMps));
         const double DepressedTubeTop = WorldPosition.Z + BaseTubeTopFreeboardM - Response.FreeboardLossM;
-        const double OvertoppingDepth = FMath::Max(0.0, Water.SurfaceHeightM - DepressedTubeTop);
-        const bool bUpstreamExposed = Water.bWet && IncomingSpeed > 1.0e-6 && OvertoppingDepth > 1.0e-6;
+        const double OvertoppingDepth = FMath::Max(
+            0.0, EffectiveWater.SurfaceHeightM - DepressedTubeTop);
+        const double FluxDepth = FMath::Min(
+            OvertoppingDepth,
+            FMath::Max(0.0, MaximumOvertoppingDepthM));
+        const bool bUpstreamExposed = EffectiveWater.bWet &&
+            IncomingSpeed > 1.0e-6 && OvertoppingDepth > 1.0e-6;
         const double Flux = bUpstreamExposed
-            ? FluxCoefficient * OvertoppingDepth * IncomingSpeed * Segment.TributaryLengthM
+            ? FluxCoefficient * FluxDepth * IncomingSpeed * Segment.TributaryLengthM
             : 0.0;
 
         double PreviousVolume = 0.0;
@@ -683,14 +713,16 @@ FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
             }
         }
         const double DrainageFlux = FMath::Min(PreviousVolume / Dt, PreviousVolume * DrainageRatePerS);
-        const double RetainedVolume = FMath::Max(0.0, PreviousVolume + Flux * Dt - DrainageFlux * Dt);
+        const double RetainedVolume = FMath::Min(
+            FMath::Max(0.0, PreviousVolume + Flux * Dt - DrainageFlux * Dt),
+            FMath::Max(0.0, MaximumRetainedVolumePerSegmentM3));
         const double RetainedMass = RetainedVolume * WaterDensityKgM3;
         const double VerticalLoad = RetainedMass * GravityMps2;
 
         FRaftSimFlexSegmentOverwash Overwash;
         Overwash.SegmentId = Segment.SegmentId;
         Overwash.LocalPosition = Response.LocalPosition;
-        Overwash.WaterSurfaceM = Water.SurfaceHeightM;
+        Overwash.WaterSurfaceM = EffectiveWater.SurfaceHeightM;
         Overwash.DepressedTubeTopM = DepressedTubeTop;
         Overwash.OvertoppingDepthM = OvertoppingDepth;
         Overwash.IncomingSpeedMps = IncomingSpeed;
@@ -701,7 +733,7 @@ FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
         Overwash.RetainedWaterRollMomentNm = VerticalLoad * Response.LocalPosition.Y;
         Overwash.RetainedWaterPitchMomentNm = VerticalLoad * Response.LocalPosition.X;
         Overwash.bUpstreamExposed = bUpstreamExposed;
-        Overwash.bWet = Water.bWet;
+        Overwash.bWet = EffectiveWater.bWet;
         Solve.SegmentOverwash.Add(Overwash);
     }
 
@@ -715,9 +747,52 @@ FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
         Solve.RetainedWaterPitchMomentNm += Segment.RetainedWaterPitchMomentNm;
     }
 
+    // Overtopped-face dynamic pressure (production coupling term, off in the
+    // reference fixtures). Retained deck water alone can no longer reach the
+    // flip threshold: an open self-bailer's interior volume caps each
+    // segment's retained mass, and with the production caps the maximum
+    // whole-side flood moment sits below the loaded raft's righting
+    // threshold, which made D3-driven capsize unreachable at any flow. The
+    // physics the retained-mass model omits is the water itself: an
+    // overwashing current presses on the exposed face with q = rho v^2 / 2
+    // over the overtopped strip, and that side load — not deck weight — is
+    // what levers a buried tube over in a real side-surf. Accumulate it as a
+    // destabilizing magnitude only while a face is genuinely overtopped
+    // (bUpstreamExposed), so ordinary ferrying and drifting, where relative
+    // speed and overtopping are both near zero, contribute nothing.
+    if (DynamicPressureRollLeverM > 0.0)
+    {
+        for (const FRaftSimFlexSegmentOverwash& Segment : Solve.SegmentOverwash)
+        {
+            if (!Segment.bUpstreamExposed)
+            {
+                continue;
+            }
+            const FRaftSimFlexTubeSegment* LayoutSegment = Layout.FindByPredicate(
+                [&Segment](const FRaftSimFlexTubeSegment& Candidate)
+                {
+                    return Candidate.SegmentId == Segment.SegmentId;
+                });
+            if (LayoutSegment == nullptr)
+            {
+                continue;
+            }
+            const double LoadedDepthM = FMath::Min(
+                Segment.OvertoppingDepthM,
+                FMath::Max(0.0, MaximumOvertoppingDepthM));
+            const double DynamicPressurePa = 0.5 * WaterDensityKgM3 *
+                Segment.IncomingSpeedMps * Segment.IncomingSpeedMps;
+            Solve.OvertoppingDynamicRollMomentNm += DynamicPressurePa *
+                LoadedDepthM * LayoutSegment->TributaryLengthM *
+                DynamicPressureRollLeverM;
+        }
+    }
+
     Solve.ReferenceFlipThresholdNm = SeatTubeSolve.CrewTelemetry.RecoveryThresholds.FlipThresholdNm;
     Solve.ReferenceFlipMarginNm =
-        Solve.ReferenceFlipThresholdNm - FMath::Abs(Solve.RetainedWaterRollMomentNm);
+        Solve.ReferenceFlipThresholdNm -
+        (FMath::Abs(Solve.RetainedWaterRollMomentNm) +
+            Solve.OvertoppingDynamicRollMomentNm);
     Solve.bReferenceFlipRisk = Solve.ReferenceFlipMarginNm < 0.0;
     return Solve;
 }
@@ -743,12 +818,6 @@ FRaftSimFlexRockContactSolve EvaluateRockContactWrapPinD4(
         return Solve;
     }
     const bool bRigidBaseline = Mode == EModelMode::RigidBaseline;
-
-    TMap<FString, const FRaftSimFlexSegmentResponse*> ResponsesById;
-    for (const FRaftSimFlexSegmentResponse& Response : SeatTubeSolve.TubeSolve.SegmentResponses)
-    {
-        ResponsesById.Add(Response.SegmentId, &Response);
-    }
 
     struct FContactCandidate
     {
@@ -795,8 +864,9 @@ FRaftSimFlexRockContactSolve EvaluateRockContactWrapPinD4(
 
     for (const FContactCandidate& Candidate : Candidates)
     {
-        const FRaftSimFlexSegmentResponse* const* FoundResponse =
-            ResponsesById.Find(Candidate.Segment->SegmentId);
+        const FRaftSimFlexSegmentResponse* FoundResponse = FindSegmentResponse(
+            SeatTubeSolve.TubeSolve.SegmentResponses,
+            Candidate.Segment->SegmentId);
         if (FoundResponse == nullptr)
         {
             continue;
@@ -805,7 +875,7 @@ FRaftSimFlexRockContactSolve EvaluateRockContactWrapPinD4(
             SeatTubeSolve,
             *Candidate.Obstacle,
             *Candidate.Segment,
-            **FoundResponse,
+            *FoundResponse,
             Candidate.ClearanceM,
             Candidate.PenetrationM,
             PreviousIndentation(Candidate.Segment->SegmentId),
@@ -836,7 +906,9 @@ FRaftSimFlexRockContactSolve EvaluateRockContactWrapPinD4(
             {
                 continue;
             }
-            const FRaftSimFlexSegmentResponse* const* FoundResponse = ResponsesById.Find(Segment.SegmentId);
+            const FRaftSimFlexSegmentResponse* FoundResponse = FindSegmentResponse(
+                SeatTubeSolve.TubeSolve.SegmentResponses,
+                Segment.SegmentId);
             if (FoundResponse == nullptr)
             {
                 continue;
@@ -850,7 +922,7 @@ FRaftSimFlexRockContactSolve EvaluateRockContactWrapPinD4(
                 SeatTubeSolve,
                 RecoveryObstacle,
                 Segment,
-                **FoundResponse,
+                *FoundResponse,
                 /*ClearanceM=*/0.0,
                 /*PenetrationM=*/0.0,
                 Previous,

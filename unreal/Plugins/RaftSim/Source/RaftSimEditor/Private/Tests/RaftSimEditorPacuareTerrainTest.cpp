@@ -1,0 +1,525 @@
+#include "Environment/RaftSimEditorEnvironmentInternal.h"
+
+#include "Engine/StaticMesh.h"
+#include "Engine/Texture2D.h"
+#include "Materials/Material.h"
+#include "Materials/MaterialExpressionNoise.h"
+#include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialExpressionTextureBase.h"
+#include "Materials/MaterialExpressionVectorParameter.h"
+#include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
+#include "Materials/MaterialInstanceConstant.h"
+#include "Misc/AutomationTest.h"
+
+#if WITH_AUTOMATION_TESTS
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareOpaqueRainforestVegetationTest,
+    "RaftSim.M9.FPacuareOpaqueRainforestVegetation",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareOpaqueRainforestVegetationTest::RunTest(
+    const FString& Parameters)
+{
+    UMaterial* Material = LoadObject<UMaterial>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Materials/"
+             "M_RaftSim_Pacuare_OpaqueRainforestVegetation."
+             "M_RaftSim_Pacuare_OpaqueRainforestVegetation"));
+    TestNotNull(TEXT("Pacuare opaque rainforest material exists"), Material);
+    if (!Material)
+    {
+        return false;
+    }
+    TestEqual(TEXT("Rainforest material is opaque"), Material->BlendMode, BLEND_Opaque);
+    TestFalse(TEXT("Rainforest material is one-sided"), Material->TwoSided);
+    TestTrue(
+        TEXT("Rainforest material uses scene lighting"),
+        Material->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+    TestTrue(
+        TEXT("Rainforest material supports instanced static meshes"),
+        Material->GetUsageByFlag(MATUSAGE_InstancedStaticMeshes));
+    TestTrue(
+        TEXT("Rainforest material supports Nanite"),
+        Material->GetUsageByFlag(MATUSAGE_Nanite));
+
+    const TCHAR* MeshPaths[] = {
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
+             "SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV2."
+             "SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV2"),
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
+             "SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV2."
+             "SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV2"),
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
+             "SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV2."
+             "SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV2"),
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
+             "SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV2."
+             "SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV2")};
+    for (const TCHAR* MeshPath : MeshPaths)
+    {
+        UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, MeshPath);
+        TestNotNull(FString::Printf(TEXT("%s exists"), MeshPath), Mesh);
+        if (!Mesh)
+        {
+            continue;
+        }
+        TestTrue(
+            FString::Printf(TEXT("%s has Nanite enabled"), MeshPath),
+            Mesh->IsNaniteEnabled());
+        TestTrue(
+            FString::Printf(TEXT("%s has solid geometry"), MeshPath),
+            Mesh->GetNumVertices(0) > 1000 &&
+                Mesh->GetNumTriangles(0) > 1000);
+        TestEqual(
+            FString::Printf(TEXT("%s has one material slot"), MeshPath),
+            Mesh->GetStaticMaterials().Num(),
+            1);
+        TestEqual(
+            FString::Printf(TEXT("%s binds the Pacuare material"), MeshPath),
+            Mesh->GetMaterial(0),
+            static_cast<UMaterialInterface*>(Material));
+    }
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareOrganicRainforestTerrainTest,
+    "RaftSim.M9.FPacuareOrganicRainforestTerrain",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareOrganicRainforestTerrainTest::RunTest(
+    const FString& Parameters)
+{
+    UMaterial* Material = LoadObject<UMaterial>(
+        nullptr,
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+             "M_RaftSim_pacuare_physicalcorridor_SourceLandscapeCandidate."
+             "M_RaftSim_pacuare_physicalcorridor_SourceLandscapeCandidate"));
+    TestNotNull(TEXT("Pacuare source Landscape material exists"), Material);
+    if (!Material)
+    {
+        return false;
+    }
+
+    TestEqual(TEXT("Pacuare terrain stays opaque"), Material->BlendMode, BLEND_Opaque);
+    TestTrue(
+        TEXT("Pacuare terrain uses scene lighting"),
+        Material->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+    TestTrue(TEXT("Pacuare terrain remains two-sided"), Material->TwoSided);
+    TestTrue(
+        TEXT("Pacuare detail normals remain tangent-space"),
+        Material->bTangentSpaceNormal);
+    const UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+    TestNotNull(TEXT("Pacuare material exposes editor graph data"), EditorOnlyData);
+    if (EditorOnlyData)
+    {
+        TestNull(
+            TEXT("Organic shading never displaces reviewed terrain"),
+            EditorOnlyData->WorldPositionOffset.Expression);
+    }
+
+    // The evidence reach (pacuare-huacas-evidence.md) is coloured by the
+    // 2014-2017 IGN orthophoto drape; the invented procedural palette (noise
+    // fields, litter/moss/wet-rock tints) must not come back over it.
+    const UTexture2D* EvidenceDrape = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Terrain/T_RaftSim_PacuareHuacas_EvidenceDrape."
+             "T_RaftSim_PacuareHuacas_EvidenceDrape"));
+    TestNotNull(TEXT("Pacuare evidence orthophoto drape exists"), EvidenceDrape);
+    bool bSamplesEvidenceDrape = false;
+    int32 NoiseCount = 0;
+    bool bHasPaletteTint = false;
+    for (const TObjectPtr<UMaterialExpression>& Expression :
+         Material->GetExpressionCollection().Expressions)
+    {
+        if (const UMaterialExpressionTextureBase* Texture =
+                Cast<UMaterialExpressionTextureBase>(Expression.Get()))
+        {
+            bSamplesEvidenceDrape |= EvidenceDrape && Texture->Texture == EvidenceDrape;
+        }
+        NoiseCount += Cast<UMaterialExpressionNoise>(Expression.Get()) ? 1 : 0;
+        if (const UMaterialExpressionVectorParameter* Vector =
+                Cast<UMaterialExpressionVectorParameter>(Expression.Get()))
+        {
+            bHasPaletteTint |= Vector->ParameterName == TEXT("PacuareLeafLitterTint") ||
+                Vector->ParameterName == TEXT("PacuareMossTint") ||
+                Vector->ParameterName == TEXT("PacuareWetRockTint");
+        }
+    }
+    TestTrue(TEXT("Pacuare terrain samples the evidence orthophoto drape"), bSamplesEvidenceDrape);
+    TestEqual(TEXT("No procedural noise palette over the photographed colour"), NoiseCount, 0);
+    TestFalse(TEXT("No invented litter/moss/wet-rock tints over the photographed colour"), bHasPaletteTint);
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareRainforestDefaultLitWaterTest,
+    "RaftSim.M9.FPacuareRainforestDefaultLitWater",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareRainforestDefaultLitWaterTest::RunTest(
+    const FString& Parameters)
+{
+    UMaterialInstanceConstant* Instance = LoadObject<UMaterialInstanceConstant>(
+        nullptr,
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+             "MI_RaftSim_Pacuare_PhysicalCorridorWaterCandidate."
+             "MI_RaftSim_Pacuare_PhysicalCorridorWaterCandidate"));
+    TestNotNull(TEXT("Pacuare water instance exists"), Instance);
+    if (!Instance)
+    {
+        return false;
+    }
+
+    UMaterial* Parent = Cast<UMaterial>(Instance->Parent);
+    TestNotNull(TEXT("Pacuare water parent exists"), Parent);
+    if (!Parent)
+    {
+        return false;
+    }
+    TestEqual(
+        TEXT("Pacuare water has an isolated rainforest parent"),
+        Parent->GetPathName(),
+        FString(TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/"
+                     "M_RaftSim_Pacuare_RainforestDefaultLitWater."
+                     "M_RaftSim_Pacuare_RainforestDefaultLitWater")));
+    TestTrue(
+        TEXT("Pacuare uses capture-accepted Default Lit water"),
+        Parent->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+    TestFalse(
+        TEXT("Rejected Pacuare Single Layer Water stays inactive"),
+        Parent->GetShadingModels().HasShadingModel(MSM_SingleLayerWater));
+    TestEqual(TEXT("Pacuare water stays opaque"), Parent->BlendMode, BLEND_Opaque);
+    const UMaterialEditorOnlyData* EditorOnlyData = Parent->GetEditorOnlyData();
+    TestNotNull(TEXT("Pacuare water graph is inspectable"), EditorOnlyData);
+    if (EditorOnlyData)
+    {
+        TestNull(
+            TEXT("Pacuare presentation never displaces solver geometry"),
+            EditorOnlyData->WorldPositionOffset.Expression);
+    }
+
+    int32 PannerCount = 0;
+    int32 WaterOutputCount = 0;
+    TArray<float> NoiseScales;
+    for (const TObjectPtr<UMaterialExpression>& Expression :
+         Parent->GetExpressionCollection().Expressions)
+    {
+        PannerCount += Cast<UMaterialExpressionPanner>(Expression.Get()) ? 1 : 0;
+        WaterOutputCount +=
+            Cast<UMaterialExpressionSingleLayerWaterMaterialOutput>(Expression.Get())
+            ? 1
+            : 0;
+        if (const UMaterialExpressionNoise* Noise =
+                Cast<UMaterialExpressionNoise>(Expression.Get()))
+        {
+            NoiseScales.Add(Noise->Scale);
+        }
+    }
+    TestEqual(TEXT("Two independently moving normal layers exist"), PannerCount, 2);
+    TestEqual(TEXT("Rejected water-volume output is absent"), WaterOutputCount, 0);
+    TestEqual(TEXT("Two world-space variation fields exist"), NoiseScales.Num(), 2);
+    TestTrue(TEXT("Rainforest reach-scale variation exists"), NoiseScales.Contains(0.00042f));
+    TestTrue(TEXT("Rainforest surface-scale variation exists"), NoiseScales.Contains(0.00210f));
+
+    auto TestScalar = [this, Instance](
+                          const TCHAR* ParameterName,
+                          float ExpectedValue)
+    {
+        float Value = 0.0f;
+        TestTrue(
+            FString::Printf(TEXT("%s is bound"), ParameterName),
+            Instance->GetScalarParameterValue(
+                FMaterialParameterInfo(ParameterName), Value));
+        TestTrue(
+            FString::Printf(TEXT("%s keeps its reviewed value"), ParameterName),
+            FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
+    };
+    auto TestVector = [this, Instance](
+                          const TCHAR* ParameterName,
+                          const FLinearColor& ExpectedValue)
+    {
+        FLinearColor Value = FLinearColor::Black;
+        TestTrue(
+            FString::Printf(TEXT("%s is bound"), ParameterName),
+            Instance->GetVectorParameterValue(
+                FMaterialParameterInfo(ParameterName), Value));
+        TestTrue(
+            FString::Printf(TEXT("%s keeps its reviewed value"), ParameterName),
+            Value.Equals(ExpectedValue, 0.0001f));
+    };
+    TestScalar(TEXT("BaseColorScale"), 1.08f);
+    TestScalar(TEXT("Opacity"), 0.28f);
+    TestScalar(TEXT("Roughness"), 0.32f);
+    TestScalar(TEXT("Specular"), 0.42f);
+    TestScalar(TEXT("NormalIntensity"), 0.20f);
+    TestScalar(TEXT("SurfaceVariationStrength"), 0.32f);
+    TestScalar(TEXT("RefractionIor"), 1.333f);
+    TestScalar(TEXT("SolverFieldEnable"), 1.0f);
+    TestVector(
+        TEXT("SurfaceTint"),
+        FLinearColor(0.075f, 0.160f, 0.120f, 0.0f));
+    TestVector(
+        TEXT("ScatteringCoefficients"),
+        FLinearColor(0.00055f, 0.00080f, 0.00065f, 0.0f));
+    TestVector(
+        TEXT("AbsorptionCoefficients"),
+        FLinearColor(0.0055f, 0.0020f, 0.0035f, 0.0f));
+    TestVector(
+        TEXT("ColorScaleBehindWater"),
+        FLinearColor(0.60f, 0.65f, 0.55f, 0.0f));
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareLiveTransmittingWaterTest,
+    "RaftSim.M9.FPacuareLiveTransmittingWater",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareLiveTransmittingWaterTest::RunTest(
+    const FString& Parameters)
+{
+    FString AuthoringSummary;
+    UMaterialInstanceConstant* Instance =
+        RaftSimEditorEnvironment::
+            LoadOrCreatePacuareUpperHuacasLiveWaterInstance(AuthoringSummary);
+    TestNotNull(
+        TEXT("Pacuare river-local live-volume authoring succeeds"),
+        Instance);
+    if (!Instance)
+    {
+        AddError(AuthoringSummary);
+        return false;
+    }
+
+    TestNotNull(TEXT("Pacuare live-volume parent exists"), Instance->Parent.Get());
+    if (Instance->Parent)
+    {
+        TestEqual(
+            TEXT("Pacuare uses its current-carried raft-transmitting water parent"),
+            Instance->Parent->GetPathName(),
+            FString(TEXT(
+                "/Game/RaftSim/Environment/PacuareRun/Water/Materials/"
+                "M_RaftSim_PacuareCurrentWaterV2."
+                "M_RaftSim_PacuareCurrentWaterV2")));
+    }
+
+    UTexture* FlowNormal = nullptr;
+    UTexture* FoamLace = nullptr;
+    TestTrue(
+        TEXT("Pacuare live volume binds its first-party flow normal"),
+        Instance->GetTextureParameterValue(
+            FMaterialParameterInfo(TEXT("WaterFlowNormalPrimary")),
+            FlowNormal));
+    TestTrue(
+        TEXT("Pacuare live volume binds its solver-masked foam lace"),
+        Instance->GetTextureParameterValue(
+            FMaterialParameterInfo(TEXT("WhitewaterFoamLace")),
+            FoamLace));
+    TestTrue(
+        TEXT("Pacuare flow normal is river-local"),
+        FlowNormal && FlowNormal->GetPathName().Contains(
+            TEXT("T_RaftSim_PacuareUpperHuacasWaterV1_FlowNormal")));
+    TestTrue(
+        TEXT("Pacuare foam lace is river-local"),
+        FoamLace && FoamLace->GetPathName().Contains(
+            TEXT("T_RaftSim_PacuareUpperHuacasWaterV1_FoamLace")));
+
+    if (const UTexture2D* FlowNormal2D = Cast<UTexture2D>(FlowNormal))
+    {
+        TestEqual(
+            TEXT("Pacuare flow normal imports as normal-map data"),
+            FlowNormal2D->CompressionSettings,
+            TC_Normalmap);
+        TestFalse(TEXT("Pacuare flow normal stays linear"), FlowNormal2D->SRGB);
+        TestEqual(TEXT("Pacuare flow normal wraps in X"), FlowNormal2D->AddressX, TA_Wrap);
+        TestEqual(TEXT("Pacuare flow normal wraps in Y"), FlowNormal2D->AddressY, TA_Wrap);
+    }
+    if (const UTexture2D* FoamLace2D = Cast<UTexture2D>(FoamLace))
+    {
+        TestEqual(
+            TEXT("Pacuare foam lace imports as mask data"),
+            FoamLace2D->CompressionSettings,
+            TC_Masks);
+        TestFalse(TEXT("Pacuare foam lace stays linear"), FoamLace2D->SRGB);
+        TestEqual(TEXT("Pacuare foam lace wraps in X"), FoamLace2D->AddressX, TA_Wrap);
+        TestEqual(TEXT("Pacuare foam lace wraps in Y"), FoamLace2D->AddressY, TA_Wrap);
+    }
+
+    auto TestScalar = [this, Instance](
+                          const TCHAR* ParameterName,
+                          float ExpectedValue)
+    {
+        float Value = 0.0f;
+        TestTrue(
+            FString::Printf(TEXT("%s is bound"), ParameterName),
+            Instance->GetScalarParameterValue(
+                FMaterialParameterInfo(ParameterName), Value));
+        TestTrue(
+            FString::Printf(TEXT("%s keeps its authored value"), ParameterName),
+            FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
+    };
+    TestScalar(TEXT("HydraulicFoamCoverageGain"), 4.5f);
+    TestScalar(TEXT("HydraulicFoamColorCoreGain"), 1.8f);
+    TestScalar(TEXT("HydraulicWhitewaterGain"), 0.0f);
+    TestScalar(TEXT("PacuareCurrentNormalStrength"), 0.24f);
+    TestScalar(TEXT("SpeedAerationFraction"), 0.14f);
+    TestScalar(TEXT("FoamRoughness"), 0.74f);
+    TestScalar(TEXT("SlickNormalFloor"), 0.28f);
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareScannedFernUnderstoryTest,
+    "RaftSim.M9.FPacuareScannedFernUnderstory",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareScannedFernUnderstoryTest::RunTest(
+    const FString& Parameters)
+{
+    static const TCHAR* AssetNames[] = {
+        TEXT("SM_Fern02_fern_02_a"),
+        TEXT("SM_Fern02_fern_02_b"),
+        TEXT("SM_Fern02_fern_02_c"),
+        TEXT("SM_Fern02_fern_02_d")};
+    for (const TCHAR* AssetName : AssetNames)
+    {
+        const FString ObjectPath = FString::Printf(
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/"
+                 "FutaleufuTemperateForestSet_1K/%s.%s"),
+            AssetName,
+            AssetName);
+        UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath);
+        TestNotNull(
+            FString::Printf(TEXT("Reviewed Pacuare fern analog %s exists"), AssetName),
+            Mesh);
+        if (!Mesh)
+        {
+            continue;
+        }
+        TestTrue(
+            FString::Printf(TEXT("%s has Nanite enabled"), AssetName),
+            Mesh->IsNaniteEnabled());
+        TestTrue(
+            FString::Printf(TEXT("%s has material slots"), AssetName),
+            !Mesh->GetStaticMaterials().IsEmpty());
+        bool bHasFernFrondMaterial = false;
+        for (int32 MaterialIndex = 0;
+             MaterialIndex < Mesh->GetStaticMaterials().Num();
+             ++MaterialIndex)
+        {
+            const UMaterialInterface* Material = Mesh->GetMaterial(MaterialIndex);
+            TestNotNull(
+                FString::Printf(
+                    TEXT("%s material slot %d is bound"),
+                    AssetName,
+                    MaterialIndex),
+                Material);
+            if (Material)
+            {
+                const FString MaterialPath = Material->GetPathName();
+                TestTrue(
+                    FString::Printf(
+                        TEXT("%s material stays in the reviewed CC0 asset root"),
+                        AssetName),
+                    MaterialPath.Contains(
+                        TEXT("/FutaleufuTemperateForestSet_1K/")));
+                bHasFernFrondMaterial |=
+                    MaterialPath.Contains(TEXT("M_Fern02_Fronds"));
+                TestTrue(
+                    FString::Printf(
+                        TEXT("%s material supports instanced static meshes"),
+                        AssetName),
+                    Material->GetUsageByFlag(MATUSAGE_InstancedStaticMeshes));
+                TestTrue(
+                    FString::Printf(TEXT("%s material supports Nanite"), AssetName),
+                    Material->GetUsageByFlag(MATUSAGE_Nanite));
+            }
+        }
+        TestTrue(
+            FString::Printf(TEXT("%s retains its scanned frond material"), AssetName),
+            bHasFernFrondMaterial);
+    }
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareForestFloorStructureTest,
+    "RaftSim.M9.FPacuareForestFloorStructure",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareForestFloorStructureTest::RunTest(
+    const FString& Parameters)
+{
+    UMaterialInterface* Material = LoadObject<UMaterialInterface>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Materials/"
+             "M_RaftSim_Pacuare_OpaqueRainforestVegetation."
+             "M_RaftSim_Pacuare_OpaqueRainforestVegetation"));
+    TestNotNull(TEXT("Pacuare forest-floor material exists"), Material);
+
+    struct FExpectedForestFloorMesh
+    {
+        const TCHAR* AssetName;
+        int32 MinimumVertexCount;
+        int32 MinimumTriangleCount;
+        float MinimumHorizontalSpanCm;
+    };
+    const FExpectedForestFloorMesh ExpectedMeshes[] = {
+        {TEXT("SM_RaftSim_Pacuare_FoldedLeafLitter_A_ForestFloorV1"),
+         430,
+         810,
+         280.0f},
+        {TEXT("SM_RaftSim_Pacuare_FoldedLeafLitter_B_ForestFloorV1"),
+         420,
+         790,
+         280.0f},
+        {TEXT("SM_RaftSim_Pacuare_ButtressRoot_A_ForestFloorV1"),
+         250,
+         240,
+         300.0f},
+        {TEXT("SM_RaftSim_Pacuare_Deadwood_A_ForestFloorV1"),
+         250,
+         300,
+         280.0f}};
+    for (const FExpectedForestFloorMesh& Expected : ExpectedMeshes)
+    {
+        const FString ObjectPath = FString::Printf(
+            TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/%s.%s"),
+            Expected.AssetName,
+            Expected.AssetName);
+        UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath);
+        TestNotNull(
+            FString::Printf(TEXT("%s exists"), Expected.AssetName),
+            Mesh);
+        if (!Mesh)
+        {
+            continue;
+        }
+        TestTrue(
+            FString::Printf(TEXT("%s uses Nanite"), Expected.AssetName),
+            Mesh->IsNaniteEnabled());
+        TestTrue(
+            FString::Printf(TEXT("%s has bounded solid detail"), Expected.AssetName),
+            Mesh->GetNumVertices(0) >= Expected.MinimumVertexCount &&
+                Mesh->GetNumTriangles(0) >= Expected.MinimumTriangleCount);
+        TestTrue(
+            FString::Printf(TEXT("%s spans a visible floor patch"), Expected.AssetName),
+            FMath::Max(
+                Mesh->GetBounds().BoxExtent.X,
+                Mesh->GetBounds().BoxExtent.Y) * 2.0f >=
+                Expected.MinimumHorizontalSpanCm);
+        TestEqual(
+            FString::Printf(TEXT("%s has one material slot"), Expected.AssetName),
+            Mesh->GetStaticMaterials().Num(),
+            1);
+        TestEqual(
+            FString::Printf(TEXT("%s binds the rainforest material"), Expected.AssetName),
+            Mesh->GetMaterial(0),
+            Material);
+    }
+    return !HasAnyErrors();
+}
+
+#endif // WITH_AUTOMATION_TESTS

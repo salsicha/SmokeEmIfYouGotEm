@@ -1,12 +1,6 @@
-"""Frozen shared schema version identifiers."""
+"""Moved to the SEIYGE core submodule: seiyge_core.schema_versions (unreal/Plugins/SEIYGECore/python/src)."""
+import sys as _sys
 
-SHARED_SCHEMA_SET_VERSION = "raftsim.shared_schemas.v0"
-TELEMETRY_FORCE_SCHEMA_VERSION = "raftsim.telemetry_forces.v0"
-REPLAY_SCHEMA_VERSION = "raftsim.replay.v0"
-PARAMETER_SCHEMA_VERSION = "raftsim.parameters.v0"
-SOURCE_MANIFEST_SCHEMA_VERSION = "raftsim.source_manifest.v0"
-ANALYTIC_FIXTURE_MANIFEST_SCHEMA_VERSION = "raftsim.analytic_fixture_manifest.v0"
-FEATURE_FORCING_SCHEMA_VERSION = "raftsim.feature_forcing.v0"
-REACH_LOCAL_GRID_SCHEMA_VERSION = "raftsim.reach_local_grid.v0"
-RIVER_VALIDATION_ANNOTATION_SCHEMA_VERSION = "raftsim.river_validation_annotation.v0"
-GEOSPATIAL_FORMAT_CONTRACT_SCHEMA_VERSION = "raftsim.geospatial_format_contract.v0"
+from raftsim._core import load as _load
+
+_sys.modules[__name__] = _load("schema_versions")

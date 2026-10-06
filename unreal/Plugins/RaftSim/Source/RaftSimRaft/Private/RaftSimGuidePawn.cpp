@@ -1,10 +1,17 @@
 #include "RaftSimGuidePawn.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+CSV_DEFINE_CATEGORY(RaftSimTickGuide,true);
 
 #include "Camera/CameraComponent.h"
+#include "ProceduralMeshComponent.h"
+#include "RaftSimCrewAvatarActor.h"
+#include "RaftSimPaddleBladeMesh.h"
+#include "RaftSimScreenRecorderSubsystem.h"
 #include "Components/SceneComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/GameInstance.h"
+#include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "EngineUtils.h"
 #include "InputAction.h"
@@ -14,9 +21,12 @@
 #include "InputCoreTypes.h"
 #include "Kismet/GameplayStatics.h"
 #include "RaftSimInputActions.h"
+#include "RaftSimCameraPresentation.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace
@@ -26,6 +36,30 @@ T* LoadGeneratedInputAsset(const TCHAR* Path)
 {
     ConstructorHelpers::FObjectFinderOptional<T> Finder(Path);
     return Finder.Succeeded() ? Finder.Get() : nullptr;
+}
+
+bool HasNegateModifier(const FEnhancedActionKeyMapping& Mapping)
+{
+    for (const TObjectPtr<UInputModifier>& Modifier : Mapping.Modifiers)
+    {
+        if (Modifier != nullptr && Modifier->IsA<UInputModifierNegate>())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void UnmapKeyPreservingOrder(UInputMappingContext* Context, const UInputAction* Action, const FKey& Key)
+{
+    const auto Matches = [Action,&Key](const FEnhancedActionKeyMapping& Mapping)
+        { return Mapping.Action == Action && Mapping.Key == Key; };
+    if (!Context->GetMappings().ContainsByPredicate(Matches)) return;
+    const auto Preserved = Context->GetMappings().FilterByPredicate(
+        [&Matches](const FEnhancedActionKeyMapping& Mapping) { return !Matches(Mapping); });
+    while (Context->GetMappings().ContainsByPredicate(Matches)) Context->UnmapKey(Action,Key);
+    // UE's UnmapKey uses RemoveAtSwap. Preserve surviving priority and modifiers.
+    for (int32 I=0; I<Preserved.Num(); ++I) Context->GetMapping(I)=Preserved[I];
 }
 }
 
@@ -53,6 +87,34 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     ReseatCrewAction = LoadGeneratedInputAsset<UInputAction>(
         TEXT("/Game/RaftSim/Input/IA_ReseatCrew.IA_ReseatCrew"));
 
+    GuideSteerAction = CreateDefaultSubobject<UInputAction>(TEXT("IA_GuideSteerRuntime"));
+    GuideSteerAction->ValueType = EInputActionValueType::Axis1D;
+    ToggleRecordingAction = CreateDefaultSubobject<UInputAction>(TEXT("IA_ToggleRecordingRuntime"));
+    ToggleRecordingAction->ValueType = EInputActionValueType::Boolean;
+    InitializeGuideComponents();
+}
+
+void ARaftSimGuidePawn::PostInitializeComponents()
+{
+    Super::PostInitializeComponents();
+    // Never add pawn-owned actions/modifiers to a cooked asset in the root
+    // set. Duplicate the complete context (including profile overrides and
+    // instanced modifiers) only after this pawn's subobjects are initialized.
+    if (!DefaultMappingContext || !GetWorld() || !GetWorld()->IsGameWorld()) return;
+    DefaultMappingContext = DuplicateObject<UInputMappingContext>(DefaultMappingContext, this);
+    DefaultMappingContext->SetFlags(RF_Transient);
+
+    // The cooked IMC predates independent raw mouse look. Remove its mouse
+    // mapping at runtime so held paddle-axis keys cannot starve IA_Look and
+    // so the controller's raw MouseX/MouseY sampling never double-applies.
+    // The gamepad right stick stays mapped to IA_Look below.
+    if (DefaultMappingContext && LookAction)
+    {
+        UnmapKeyPreservingOrder(DefaultMappingContext, LookAction, EKeys::Mouse2D);
+        UnmapKeyPreservingOrder(DefaultMappingContext, LookAction, EKeys::MouseX);
+        UnmapKeyPreservingOrder(DefaultMappingContext, LookAction, EKeys::MouseY);
+    }
+
     // Shipping fallback: bind the already-cooked rescue actions even when an
     // older IMC asset is present. The editor bootstrap mirrors these mappings
     // for future regeneration; packaged play does not depend on that command.
@@ -62,6 +124,11 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
         {
             return;
         }
+        // Older cooked contexts can contain serialized null references to
+        // the former pawn-owned actions. Repair only a key whose replacement
+        // action is available; never mutate the source asset or remove a
+        // valid binding that shares the key.
+        UnmapKeyPreservingOrder(DefaultMappingContext, nullptr, Key);
         for (const FEnhancedActionKeyMapping& Existing : DefaultMappingContext->GetMappings())
         {
             if (Existing.Action == Action && Existing.Key == Key)
@@ -84,6 +151,21 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     MapRescueKey(RescueReachAction, EKeys::Gamepad_FaceButton_Bottom);
     MapRescueKey(RescueThrowLineAction, EKeys::Gamepad_RightTrigger);
     MapRescueKey(ReseatCrewAction, EKeys::Gamepad_FaceButton_Right);
+    // The guide's own stern draw/pry rides the mouse buttons: RMB = pry
+    // right, LMB = draw left (gamepad: left trigger = draw left; the right
+    // trigger belongs to the throw line). Runtime-transient action mapped
+    // into the pawn-private IMC exactly like the rescue fallback above —
+    // GActionSpecs mirrors the Milestone 23 input contract, so no new
+    // generated asset.
+    MapRescueKey(GuideSteerAction, EKeys::RightMouseButton);
+    MapRescueKey(GuideSteerAction, EKeys::LeftMouseButton, /*bNegate=*/true);
+    MapRescueKey(GuideSteerAction, EKeys::Gamepad_LeftTrigger, /*bNegate=*/true);
+    // F9 toggles the debug screen recorder (clips in Saved/VideoCaptures).
+    MapRescueKey(ToggleRecordingAction, EKeys::F9);
+}
+
+void ARaftSimGuidePawn::InitializeGuideComponents()
+{
     for (const TCHAR* CommandPath : {
              TEXT("/Game/RaftSim/Input/IA_GuideCommandForwardPaddle.IA_GuideCommandForwardPaddle"),
              TEXT("/Game/RaftSim/Input/IA_GuideCommandBackPaddle.IA_GuideCommandBackPaddle"),
@@ -102,7 +184,12 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
 
     GuideSeatAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("GuideSeatAnchor"));
     GuideSeatAnchor->SetupAttachment(Root);
-    GuideSeatAnchor->SetRelativeLocation(FVector(-180.0f, 0.0f, 45.0f));
+    // The pawn root rides the stern seat attach point (raft-relative
+    // (-165, 0, 55)); the seated guide avatar's eyes sit at roughly
+    // (-167, 0, 104) raft-relative. The former (-180, 0, 45) put the view
+    // 1.8 m BEHIND the guide's back — an over-shoulder framing the first
+    // South Fork playtest rejected. This anchor is the guide's own eyes.
+    GuideSeatAnchor->SetRelativeLocation(FVector(-2.0f, 0.0f, 49.0f));
 
     ViewOriginAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("ViewOriginAnchor"));
     ViewOriginAnchor->SetupAttachment(GuideSeatAnchor);
@@ -120,7 +207,12 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
 
     PaddleAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("PaddleAnchor"));
     PaddleAnchor->SetupAttachment(ViewOriginAnchor);
-    PaddleAnchor->SetRelativeLocation(FVector(25.0f, -65.0f, -20.0f));
+    // Chest-height carry, near the frame centre-line: at the original
+    // (25, -65, -20) the whole 1.7 m shaft hung below a level 90-degree
+    // view's bottom edge (verified against a headless first-person
+    // screenshot, 2026-08-10) — the paddle existed but never rendered
+    // in frame.
+    PaddleAnchor->SetRelativeLocation(FVector(35.0f, -30.0f, -12.0f));
 
     RaftContextAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("RaftContextAnchor"));
     RaftContextAnchor->SetupAttachment(Root);
@@ -146,6 +238,7 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     GuideCamera->SetRelativeLocation(FVector::ZeroVector);
     GuideCamera->bUsePawnControlRotation = true;
     GuideCamera->SetFieldOfView(90.0f);
+    RaftSimCameraPresentation::Configure(GuideCamera);
 
     ChaseCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FreeRunChaseCamera"));
     ChaseCamera->SetupAttachment(Root);
@@ -155,16 +248,108 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     ChaseCamera->SetUsingAbsoluteLocation(true);
     ChaseCamera->SetUsingAbsoluteRotation(true);
     ChaseCamera->bUsePawnControlRotation = false;
-    ChaseCamera->SetFieldOfView(86.0f);
+    ChaseCamera->SetFieldOfView(78.0f);
+    RaftSimCameraPresentation::Configure(ChaseCamera);
     ChaseCamera->SetActive(false);
 }
 
 void ARaftSimGuidePawn::Tick(float DeltaSeconds)
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimTickGuide,Tick);
     Super::Tick(DeltaSeconds);
+    // Resolve detachment/reboarding before positioning the eye. Otherwise the
+    // old seat-local eye offset survives a swimmer move for the whole swim.
+    UpdateSwimmingAndRescueAim();
+    // Seat the view on the guide avatar's actual posed head each frame. The
+    // constructor offset was a fixed estimate that landed inside the chest
+    // (2026-08-09 playtest: "all that can be seen is the inside of the life
+    // vest"); the posed head tracks seat, lean, and identity exactly.
+    if (ARaftSimRaftActor* RaftForView = ResolveRaft())
+    {
+        FVector HeadWorldCm;
+        if (RaftForView->GetGuideHeadWorldLocationCm(HeadWorldCm))
+        {
+            GuideSeatAnchor->SetWorldLocation(
+                HeadWorldCm + GetActorForwardVector() * 9.0f +
+                GetActorUpVector() * 4.0f);
+        }
+    }
+    UpdateSeatedHeading();
     UpdateComfortCamera(DeltaSeconds);
     UpdateChaseCamera();
-    UpdateSwimmingAndRescueAim();
+    UpdateOarInputs();
+    // The seated guide avatar owns the sole visible paddle; the former
+    // camera-attached view model duplicated it and floated ahead of the guide.
+    // With the view seated in the guide avatar's own eye socket, its head
+    // and helmet must not render into the first-person camera. The setter
+    // early-outs when unchanged, so per-tick sync is cheap and follows
+    // chase-camera toggles and swims automatically.
+    if (ARaftSimRaftActor* Raft = ResolveRaft())
+    {
+        // The hide only makes sense while this pawn's own camera is the
+        // view: review cameras, cinematics, and the capture commands set
+        // another view target, and from there the zero-scaled head read as
+        // a black spike where the wetsuit collar collapsed into the neck
+        // joint (Hance three-quarter burst, 2026-09-02).
+        const APlayerController* ViewingController = Cast<APlayerController>(GetController());
+        const bool bViewedThroughOwnCamera =
+            ViewingController == nullptr || ViewingController->GetViewTarget() == this;
+        const bool bFirstPersonView =
+            bViewedThroughOwnCamera &&
+            !CameraRuntimeState.bChaseCameraActive;
+        const bool bFirstPersonSeat = bFirstPersonView &&
+            MobilityMode == ERaftSimGuideMobilityMode::InRaft;
+        Raft->SetGuideFirstPersonView(bFirstPersonView);
+        // Over-the-shoulder glance: a seated human turns their head, not
+        // their torso, so a strongly rearward view must not fill with the
+        // inside of the guide's own arms and vest. Hide the avatar's body
+        // past ~100 degrees of view-vs-hull yaw, restore under ~85, so the
+        // toggle never flickers at the boundary.
+        const float ViewYawOffsetDegrees = FMath::Abs(FMath::UnwindDegrees(
+            GetControlRotation().Yaw - Raft->GetActorRotation().Yaw));
+        if (bGuideRearGlanceBodyHidden)
+        {
+            bGuideRearGlanceBodyHidden = ViewYawOffsetDegrees > 85.0f;
+        }
+        else
+        {
+            bGuideRearGlanceBodyHidden = ViewYawOffsetDegrees > 100.0f;
+        }
+        Raft->SetGuideFirstPersonBodyHidden(
+            bFirstPersonSeat && bGuideRearGlanceBodyHidden);
+    }
+}
+
+void ARaftSimGuidePawn::UpdateSeatedHeading()
+{
+    const APlayerController* Player = Cast<APlayerController>(GetController());
+    const bool bSeatedView = AttachedRaft && GetAttachParentActor() == AttachedRaft &&
+        MobilityMode == ERaftSimGuideMobilityMode::InRaft &&
+        !CameraRuntimeState.bChaseCameraActive && GuideCamera && GuideCamera->bUsePawnControlRotation &&
+        Player && Player->GetViewTarget() == this &&
+        // Keep tracked-HMD orientation semantics unchanged by this flat-screen fix.
+        !(GEngine && GEngine->IsStereoscopic3D());
+    bool bCarryHeading = bSeatedView;
+#if !UE_BUILD_SHIPPING
+    // Same-build control for actual-game comparisons, not a different camera.
+    static const bool bWorldLocked = FParse::Param(FCommandLine::Get(), TEXT("RaftSimWorldLockedGuideYaw"));
+    bCarryHeading = bCarryHeading && !bWorldLocked;
+#endif
+    if(bCarryHeading && bInitialSeatedHeadingPending)
+    {
+        // Possession can occur after BeginPlay/attachment. Carry the initial
+        // spawn-to-seat rotation once, when this is actually the player's view;
+        // keep any mouse offset already accumulated on the spawn heading.
+        SeatedHeading.Advance(InitialSeatedPawnYaw,true);
+        bInitialSeatedHeadingPending=false;
+    }
+    const double Delta = SeatedHeading.Advance(AttachedRaft ? AttachedRaft->GetActorRotation().Yaw : 0., bCarryHeading);
+    if (bCarryHeading && Delta != 0.)
+    {
+        FRotator View = GetController()->GetControlRotation();
+        View.Yaw = FMath::UnwindDegrees(View.Yaw + Delta);
+        GetController()->SetControlRotation(View);
+    }
 }
 
 void ARaftSimGuidePawn::CalcCamera(float DeltaTime, FMinimalViewInfo& OutResult)
@@ -229,7 +414,7 @@ void ARaftSimGuidePawn::UpdateChaseCamera()
         }
     }
 
-    FVector CameraLocation = SubjectLocation - PlanarForward * 680.0f;
+    FVector CameraLocation = SubjectLocation - PlanarForward * 560.0f;
     if (Water != nullptr)
     {
         FRaftSimWaterSample CameraSample;
@@ -238,10 +423,10 @@ void ARaftSimGuidePawn::UpdateChaseCamera()
             CameraSurfaceZCm = CameraSample.SurfaceHeightMeters * 100.0f;
         }
     }
-    CameraLocation.Z = FMath::Max(SubjectLocation.Z + 380.0f, CameraSurfaceZCm + 340.0f);
+    CameraLocation.Z = FMath::Max(SubjectLocation.Z + 350.0f, CameraSurfaceZCm + 330.0f);
     const FVector LookTarget(
-        SubjectLocation.X + PlanarForward.X * 1400.0f,
-        SubjectLocation.Y + PlanarForward.Y * 1400.0f,
+        SubjectLocation.X + PlanarForward.X * 1050.0f,
+        SubjectLocation.Y + PlanarForward.Y * 1050.0f,
         FMath::Max(SubjectLocation.Z + 80.0f, SubjectSurfaceZCm + 90.0f));
     FRotator CameraRotation = (LookTarget - CameraLocation).Rotation();
     CameraRotation.Roll = 0.0f;
@@ -382,6 +567,41 @@ bool ARaftSimGuidePawn::HasCompleteRescueInputBindings() const
     return Bound.Num() == 4;
 }
 
+bool ARaftSimGuidePawn::HasPaddleStrokeKeyBinding(FKey Key, bool bNegated) const
+{
+    if (!DefaultMappingContext || !PaddleStrokeAction)
+    {
+        return false;
+    }
+    for (const FEnhancedActionKeyMapping& Mapping : DefaultMappingContext->GetMappings())
+    {
+        if (Mapping.Action == PaddleStrokeAction && Mapping.Key == Key &&
+            HasNegateModifier(Mapping) == bNegated)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ARaftSimGuidePawn::UsesIndependentMouseLook() const
+{
+    if (!DefaultMappingContext || !LookAction)
+    {
+        return false;
+    }
+    for (const FEnhancedActionKeyMapping& Mapping : DefaultMappingContext->GetMappings())
+    {
+        if (Mapping.Action == LookAction &&
+            (Mapping.Key == EKeys::Mouse2D || Mapping.Key == EKeys::MouseX ||
+             Mapping.Key == EKeys::MouseY))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool ARaftSimGuidePawn::ApplyRuntimeKeyBinding(FName ActionId, FKey NewKey)
 {
     if (!DefaultMappingContext || !NewKey.IsValid() || NewKey.IsGamepadKey())
@@ -411,17 +631,25 @@ bool ARaftSimGuidePawn::ApplyRuntimeKeyBinding(FName ActionId, FKey NewKey)
     {
         return false;
     }
+    // PaddleStroke and PaddleDraw are paired axes: the save stores the
+    // positive/primary key only (W or D), while the generated IMC owns the
+    // negated partner (S or A). Removing every keyboard mapping here used to
+    // silently delete S during normal startup when the saved W binding was
+    // applied. Rebind only the positive half and retain the negated half.
+    const bool bPairedAxisAction =
+        Target == PaddleStrokeAction || Target == PaddleDrawAction;
     TArray<FKey> KeyboardKeys;
     for (const FEnhancedActionKeyMapping& Mapping : DefaultMappingContext->GetMappings())
     {
-        if (Mapping.Action == Target && !Mapping.Key.IsGamepadKey())
+        if (Mapping.Action == Target && !Mapping.Key.IsGamepadKey() &&
+            (!bPairedAxisAction || !HasNegateModifier(Mapping)))
         {
             KeyboardKeys.AddUnique(Mapping.Key);
         }
     }
     for (const FKey& OldKey : KeyboardKeys)
     {
-        DefaultMappingContext->UnmapKey(Target, OldKey);
+        UnmapKeyPreservingOrder(DefaultMappingContext, Target, OldKey);
     }
     DefaultMappingContext->MapKey(Target, NewKey);
     return true;
@@ -543,9 +771,26 @@ void ARaftSimGuidePawn::UpdateComfortCamera(float DeltaSeconds)
         : 0.0f;
 }
 
+void ARaftSimGuidePawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = RegisteredInputSubsystem.Get())
+    {
+        if (DefaultMappingContext) InputSubsystem->RemoveMappingContext(DefaultMappingContext);
+    }
+    RegisteredInputSubsystem.Reset();
+    Super::EndPlay(EndPlayReason);
+}
+
 void ARaftSimGuidePawn::BeginPlay()
 {
     Super::BeginPlay();
+    InitialSeatedPawnYaw=GetActorRotation().Yaw;
+    // The map's river water config may offset the shared exposure.
+    const float ExposureBias = RaftSimCameraPresentation::ResolveExposureBias(GetWorld());
+    RaftSimCameraPresentation::Configure(GuideCamera, ExposureBias);
+    RaftSimCameraPresentation::Configure(ChaseCamera, ExposureBias);
+    // Do not construct a second paddle. The posed guide avatar already owns
+    // the hand-held paddle in both camera modes.
 
     if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
     {
@@ -556,6 +801,7 @@ void ARaftSimGuidePawn::BeginPlay()
             if (DefaultMappingContext != nullptr)
             {
                 InputSubsystem->AddMappingContext(DefaultMappingContext, 0);
+                RegisteredInputSubsystem = InputSubsystem;
             }
         }
     }
@@ -565,6 +811,8 @@ void ARaftSimGuidePawn::BeginPlay()
         AttachToComponent(
             Raft->GetSternSeatAttachPoint(),
             FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+        // Read the completed raft/crew pose before placing the seated view.
+        AddTickPrerequisiteActor(Raft);
     }
 }
 
@@ -603,6 +851,12 @@ void ARaftSimGuidePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
             PaddleDrawAction, ETriggerEvent::Triggered, this,
             &ARaftSimGuidePawn::HandleTurnStroke);
     }
+    if (GuideSteerAction != nullptr)
+    {
+        EnhancedInput->BindAction(
+            GuideSteerAction, ETriggerEvent::Triggered, this,
+            &ARaftSimGuidePawn::HandleGuideSteer);
+    }
     if (LookAction != nullptr)
     {
         EnhancedInput->BindAction(
@@ -637,6 +891,23 @@ void ARaftSimGuidePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
             ReseatCrewAction, ETriggerEvent::Started, this,
             &ARaftSimGuidePawn::HandleReseatCrew);
     }
+    if (ToggleRecordingAction != nullptr)
+    {
+        EnhancedInput->BindActionValueLambda(
+            ToggleRecordingAction, ETriggerEvent::Started,
+            [this](const FInputActionValue&)
+            {
+                if (URaftSimScreenRecorderSubsystem* Recorder =
+                        GetGameInstance()
+                            ? GetGameInstance()
+                                  ->GetSubsystem<
+                                      URaftSimScreenRecorderSubsystem>()
+                            : nullptr)
+                {
+                    Recorder->ToggleRecording();
+                }
+            });
+    }
     for (const TObjectPtr<UInputAction>& CommandAction : GuideCommandActions)
     {
         if (CommandAction != nullptr)
@@ -649,8 +920,54 @@ void ARaftSimGuidePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     }
 }
 
+bool ARaftSimGuidePawn::RecordOarAxis(int32 Axis, float Value)
+{
+    const ARaftSimRaftActor* Raft = ResolveRaft();
+    if (!Raft || !Raft->IsSoloOarRig() || MobilityMode != ERaftSimGuideMobilityMode::InRaft)
+    {
+        return false;
+    }
+    OarAxisValues[Axis] = FMath::Clamp(Value, -1.0f, 1.0f);
+    OarAxisTimes[Axis] = GetWorld()->GetTimeSeconds();
+    return true;
+}
+
+void ARaftSimGuidePawn::UpdateOarInputs()
+{
+    ARaftSimRaftActor* Raft = ResolveRaft();
+    if (!Raft || !Raft->IsSoloOarRig())
+    {
+        return;
+    }
+    // A held key fires every frame; one that has not fired for a few frames
+    // has been released.
+    constexpr double ReleaseSeconds = 0.12;
+    const double Now = GetWorld()->GetTimeSeconds();
+    float Held[3];
+    for (int32 Axis = 0; Axis < 3; ++Axis)
+    {
+        Held[Axis] = MobilityMode == ERaftSimGuideMobilityMode::InRaft && Now - OarAxisTimes[Axis] <= ReleaseSeconds
+            ? OarAxisValues[Axis]
+            : 0.0f;
+    }
+    // W/S pushes or pulls both oars (W drives the bow downstream, S is the
+    // pull, the rower's power stroke). A/D pivots on opposed oars: turning
+    // right pushes the left oar and pulls the right. A mouse button pulls
+    // the one oar on its side, swinging the bow that way.
+    const float Stroke = Held[0];
+    const float Pivot = Held[1];
+    const float Steer = Held[2];
+    const float Left = Stroke + Pivot - (Steer < -0.2f ? 1.0f : 0.0f);
+    const float Right = Stroke - Pivot - (Steer > 0.2f ? 1.0f : 0.0f);
+    Raft->SetOarIntents(FMath::Clamp(Left, -1.0f, 1.0f), FMath::Clamp(Right, -1.0f, 1.0f));
+}
+
 void ARaftSimGuidePawn::HandlePaddleStroke(const FInputActionValue& Value)
 {
+    if (RecordOarAxis(0, Value.Get<FVector>().X))
+    {
+        return;
+    }
     const float Now = GetWorld()->GetTimeSeconds();
     if (Now - LastStrokeTimeSeconds < StrokeCooldownSeconds)
     {
@@ -681,6 +998,10 @@ void ARaftSimGuidePawn::HandlePaddleStroke(const FInputActionValue& Value)
 void ARaftSimGuidePawn::HandleTurnStroke(const FInputActionValue& Value)
 {
     const FVector2D Axis = Value.Get<FVector2D>();
+    if (RecordOarAxis(1, Axis.X))
+    {
+        return;
+    }
     if (FMath::Abs(Axis.X) < 0.2f)
     {
         return;
@@ -694,6 +1015,33 @@ void ARaftSimGuidePawn::HandleTurnStroke(const FInputActionValue& Value)
     {
         LastStrokeTimeSeconds = Now;
         Raft->ApplyTurnStroke(Axis.X);
+    }
+}
+
+void ARaftSimGuidePawn::HandleGuideSteer(const FInputActionValue& Value)
+{
+    const float Axis = Value.Get<float>();
+    if (RecordOarAxis(2, Axis))
+    {
+        return;
+    }
+    if (FMath::Abs(Axis) < 0.2f)
+    {
+        return;
+    }
+    const float Now = GetWorld()->GetTimeSeconds();
+    if (Now - LastSteerTimeSeconds < StrokeCooldownSeconds)
+    {
+        return;
+    }
+    if (ARaftSimRaftActor* Raft = ResolveRaft())
+    {
+        LastSteerTimeSeconds = Now;
+        if (MobilityMode == ERaftSimGuideMobilityMode::Swimming)
+        {
+            return;
+        }
+        Raft->ApplyGuideSteerStroke(Axis);
     }
 }
 
@@ -717,8 +1065,7 @@ void ARaftSimGuidePawn::HandleHighSide(const FInputActionValue&)
         }
         else
         {
-            const float Roll = Raft->GetActorRotation().Roll;
-            Raft->HandleHighSideResponse(Roll >= 0.0f ? -1 : 1);
+            Raft->HandleHighSideResponse(Raft->ResolveHighSideDirection());
         }
     }
 }
@@ -781,4 +1128,179 @@ void ARaftSimGuidePawn::HandleReseatCrew(const FInputActionValue&)
     {
         Raft->RequestSelectedReentry();
     }
+}
+
+namespace
+{
+void AppendPaddleBox(
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& UVs,
+    TArray<FProcMeshTangent>& Tangents,
+    const FVector& HalfExtentCm,
+    const FVector& CenterCm)
+{
+    const FVector Axes[3] = {
+        FVector::ForwardVector, FVector::RightVector, FVector::UpVector};
+    for (int32 Face = 0; Face < 6; ++Face)
+    {
+        const int32 Axis = Face / 2;
+        const float Sign = (Face % 2 == 0) ? 1.0f : -1.0f;
+        const int32 UAxis = (Axis + 1) % 3;
+        const int32 VAxis = (Axis + 2) % 3;
+        const FVector FaceNormal = Axes[Axis] * Sign;
+        const int32 Start = Vertices.Num();
+        for (int32 Corner = 0; Corner < 4; ++Corner)
+        {
+            const float SU = (Corner == 1 || Corner == 2) ? 1.0f : -1.0f;
+            const float SV = (Corner >= 2) ? 1.0f : -1.0f;
+            Vertices.Add(
+                CenterCm + FaceNormal * HalfExtentCm[Axis] +
+                Axes[UAxis] * SU * HalfExtentCm[UAxis] +
+                Axes[VAxis] * SV * HalfExtentCm[VAxis]);
+            Normals.Add(FaceNormal);
+            UVs.Add(FVector2D(SU * 0.5f + 0.5f, SV * 0.5f + 0.5f));
+            Tangents.Add(FProcMeshTangent(Axes[UAxis], false));
+        }
+        if (Sign > 0.0f)
+        {
+            Triangles.Append({Start, Start + 1, Start + 2, Start, Start + 2, Start + 3});
+        }
+        else
+        {
+            Triangles.Append({Start, Start + 2, Start + 1, Start, Start + 3, Start + 2});
+        }
+    }
+}
+}
+
+void ARaftSimGuidePawn::BuildFirstPersonPaddle()
+{
+    if (FirstPersonPaddleShaft != nullptr || PaddleAnchor == nullptr)
+    {
+        return;
+    }
+    const auto MakePart = [this](const TCHAR* Name, const TCHAR* MaterialPath)
+    {
+        UProceduralMeshComponent* Part =
+            NewObject<UProceduralMeshComponent>(this, FName(Name));
+        Part->SetupAttachment(PaddleAnchor);
+        Part->RegisterComponent();
+        Part->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        // View-model: the crew avatar's paddle owns the world shadow.
+        Part->SetCastShadow(false);
+        if (UMaterialInterface* Material =
+                LoadObject<UMaterialInterface>(nullptr, MaterialPath))
+        {
+            Part->SetMaterial(0, Material);
+        }
+        return Part;
+    };
+    FirstPersonPaddleShaft = MakePart(
+        TEXT("FirstPersonPaddleShaft"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"));
+    FirstPersonPaddleGrip = MakePart(
+        TEXT("FirstPersonPaddleGrip"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"));
+    FirstPersonPaddleBlade = MakePart(
+        TEXT("FirstPersonPaddleBlade"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleBlade.M_RaftSim_PaddleBlade"));
+
+    TArray<FVector> Vertices, Normals;
+    TArray<int32> Triangles;
+    TArray<FVector2D> UVs;
+    TArray<FProcMeshTangent> Tangents;
+    TArray<FLinearColor> Colors;
+
+    // Guide stern paddle: T-grip at the anchor, shaft down local +Z, the
+    // shared commercial blade at the throat (total ~2.1 m).
+    AppendPaddleBox(Vertices, Triangles, Normals, UVs, Tangents,
+        FVector(2.0f, 2.0f, 85.0f), FVector(0.0f, 0.0f, 85.0f));
+    FirstPersonPaddleShaft->CreateMeshSection_LinearColor(
+        0, Vertices, Triangles, Normals, UVs, Colors, Tangents, false);
+
+    Vertices.Reset(); Triangles.Reset(); Normals.Reset();
+    UVs.Reset(); Tangents.Reset();
+    AppendPaddleBox(Vertices, Triangles, Normals, UVs, Tangents,
+        FVector(7.0f, 2.5f, 2.5f), FVector(0.0f, 0.0f, -2.5f));
+    FirstPersonPaddleGrip->CreateMeshSection_LinearColor(
+        0, Vertices, Triangles, Normals, UVs, Colors, Tangents, false);
+
+    Vertices.Reset(); Triangles.Reset(); Normals.Reset();
+    UVs.Reset(); Tangents.Reset();
+    RaftSimPaddleBladeMesh::BuildCommercialPaddleBladeMesh(
+        Vertices, Triangles, Normals, UVs, Tangents);
+    FirstPersonPaddleBlade->CreateMeshSection_LinearColor(
+        0, Vertices, Triangles, Normals, UVs, Colors, Tangents, false);
+    FirstPersonPaddleBlade->SetRelativeLocation(FVector(0.0f, 0.0f, 172.0f));
+
+    PaddleAnchor->SetRelativeRotation(
+        FRotationMatrix::MakeFromZX(
+            FVector(0.38f, 0.52f, -0.77f), FVector::ForwardVector).Rotator());
+}
+
+void ARaftSimGuidePawn::UpdateFirstPersonPaddle(float DeltaSeconds)
+{
+    if (FirstPersonPaddleShaft == nullptr || PaddleAnchor == nullptr)
+    {
+        return;
+    }
+    const bool bShow = !CameraRuntimeState.bChaseCameraActive &&
+        MobilityMode == ERaftSimGuideMobilityMode::InRaft;
+    FirstPersonPaddleShaft->SetVisibility(bShow);
+    FirstPersonPaddleGrip->SetVisibility(bShow);
+    FirstPersonPaddleBlade->SetVisibility(bShow);
+    if (!bShow)
+    {
+        return;
+    }
+    ARaftSimRaftActor* Raft = ResolveRaft();
+    if (Raft == nullptr)
+    {
+        return;
+    }
+    // Shaft direction in view space: rest at the guide's relaxed ready
+    // angle; strokes sweep reach-to-exit over the raft's one-second guide
+    // stroke window, mirroring the impulse that already fired.
+    // Rest: a cross-body chest carry with the blade low right — the upper
+    // shaft rides the lower-right frame edge so the paddle is present at
+    // rest and sweeps fully through frame on strokes.
+    FVector ShaftDirection(0.42f, 0.80f, -0.42f);
+    const float Remaining = Raft->GetGuideStrokeSecondsRemaining();
+    if (Remaining > 0.0f)
+    {
+        const float T = 1.0f - FMath::Clamp(Remaining, 0.0f, 1.0f);
+        FVector Reach = ShaftDirection;
+        FVector Exit = ShaftDirection;
+        switch (Raft->GetGuideStrokeAction())
+        {
+            case ERaftSimCrewAvatarAction::ForwardStroke:
+                Reach = FVector(0.88f, 0.22f, -0.42f);
+                Exit = FVector(-0.20f, 0.60f, -0.77f);
+                break;
+            case ERaftSimCrewAvatarAction::BackStroke:
+                Reach = FVector(-0.30f, 0.62f, -0.72f);
+                Exit = FVector(0.88f, 0.22f, -0.42f);
+                break;
+            case ERaftSimCrewAvatarAction::TurnRight:
+                Reach = FVector(0.30f, 0.85f, -0.44f);
+                Exit = FVector(0.42f, -0.20f, -0.88f);
+                break;
+            case ERaftSimCrewAvatarAction::TurnLeft:
+                Reach = FVector(0.42f, -0.20f, -0.88f);
+                Exit = FVector(0.30f, 0.85f, -0.44f);
+                break;
+            default:
+                break;
+        }
+        ShaftDirection = FMath::Lerp(Reach, Exit, T).GetSafeNormal();
+    }
+    const FQuat TargetRotation = FRotationMatrix::MakeFromZX(
+        ShaftDirection, FVector::ForwardVector).ToQuat();
+    PaddleAnchor->SetRelativeRotation(
+        FQuat::Slerp(
+            PaddleAnchor->GetRelativeRotation().Quaternion(),
+            TargetRotation,
+            FMath::Clamp(DeltaSeconds * 10.0f, 0.0f, 1.0f)));
 }

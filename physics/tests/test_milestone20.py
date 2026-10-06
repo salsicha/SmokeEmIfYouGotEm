@@ -298,7 +298,7 @@ def test_live_water_adapter_lives_in_water_module_with_manifest_capture_contract
     assert not old_physics_header.exists()
     assert "RaftSimWater" in physics_build
     assert "RAFTSIM_WATER_RUNTIME_NAME" in water_build
-    assert "physics/cpp/include" in water_build
+    assert "unreal/Plugins/SEIYGECore/cpp/include" in water_build
     assert "FRaftSimWaterReportManifestState" in header_text
     assert "FRaftSimWaterDeterministicCaptureState" in header_text
     assert "AcceptedReportSetManifestPath" in header_text

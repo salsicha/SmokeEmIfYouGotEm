@@ -1,6 +1,10 @@
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterFeatureKinematics.h"
+#include "RaftSimWaterFlowFrame.h"
 
 #include "RaftSimLiveWaterWindow.h"
+
+#include "Algo/BinarySearch.h"
 
 URaftSimWaterRuntimeAdapter::~URaftSimWaterRuntimeAdapter() = default;
 
@@ -11,12 +15,39 @@ URaftSimWaterRuntimeAdapter::~URaftSimWaterRuntimeAdapter() = default;
 #include "Misc/Crc.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "ProfilingDebugging/CpuProfilerTrace.h"
+#include "ProfilingDebugging/CsvProfiler.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include <exception>
+#include <limits>
+
+CSV_DEFINE_CATEGORY(RaftSimSolver,true);
 
 void URaftSimWaterRuntimeAdapter::Configure(const FRaftSimWaterRuntimeConfig& InConfig)
 {
     Config = InConfig;
+    // A new scenario resets the coordinate frame below. Never retain physical
+    // or presentation data expressed in the previous frame across that reset.
+#if RAFTSIM_HAS_LIVE_SOLVER
+    LiveWindow.Reset();
+    LastFixedWindowExtentM = FVector2D::ZeroVector;
+#endif
+    ReportManifestState = FRaftSimWaterReportManifestState();
+    CartesianWaterBoundsM = FBox2D(ForceInit);
+    RaftSupportBreakingSites.Reset();
+    RaftSupportBoulderFootprints.Reset();
+    bFeatureKinematicsEnabled = false;
+    FeatureSurfaceTransportOwner.Reset();FeatureSurfaceTransportSampler=nullptr;
+    FeatureBoulderFootprints.Reset();
+    RaftSupportBreakingCrestLiftMeters = 0.0f;
+    RaftSupportBreakingStationSpacingMeters = 1.0f;
+    RaftSupportBandField.Reset();
+    PresentationBaselineField.Reset();
+    PresentationWaveClockSeconds = -1.0f;
+    bRaftSupportLocalFluidEnabled = false;
+    RaftSupportLocalFluidStrength = 0.0f;
+    RaftSupportLocalFluidAdvectionMeters = FVector2D::ZeroVector;
     CaptureState = FRaftSimWaterDeterministicCaptureState();
     CaptureState.CapturePath = Config.DeterministicCapturePath;
     CaptureState.bEnabled = Config.bEnableDeterministicCapture;
@@ -30,9 +61,20 @@ void URaftSimWaterRuntimeAdapter::Configure(const FRaftSimWaterRuntimeConfig& In
     MaxSolverStepMilliseconds = 0.0;
     TimedSolverStepCount = 0;
     RiverCoordinatePoints.Reset();
+    bCartesianWaterCoordinates = false;
     RiverSpatialHash.Reset();
+    LastWorldToRiverSegment = INDEX_NONE;
+    LastWorldToRiverPositionM = FVector2D::ZeroVector;
+    bHasLastWorldToRiverQuery = false;
     RiverVerticalDatumM = 0.0f;
+    RiverWorldYSign = 1.0;
     RiverCoordinateMapPath.Reset();
+    bRaftSupportSurfaceEnabled = false;
+    RaftSupportCarrierOwner.Reset();
+    RaftSupportCarrierSampler = {};
+    RaftSupportSurfaceSmoothingStrength = 0.0f;
+    RaftSupportStandingWaveScale = 0.0f;
+    RaftSupportHydraulicReliefScale = 0.0f;
 
     bool bManifestReady = !Config.bRequireAcceptedReportManifest;
     if (!Config.AcceptedReportSetManifestPath.IsEmpty())
@@ -104,7 +146,10 @@ bool URaftSimWaterRuntimeAdapter::LoadAcceptedReportManifest(const FString& Mani
 
 bool URaftSimWaterRuntimeAdapter::StepWater(float DeltaSeconds)
 {
-    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized || DeltaSeconds <= 0.0f)
+    CSV_SCOPED_TIMING_STAT(RaftSimSolver,StepWater);
+    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized ||
+        Status == ERaftSimWaterRuntimeStatus::Faulted ||
+        !FMath::IsFinite(DeltaSeconds) || DeltaSeconds <= 0.0f)
     {
         return false;
     }
@@ -120,7 +165,30 @@ bool URaftSimWaterRuntimeAdapter::StepWater(float DeltaSeconds)
     if (LiveWindow.IsValid())
     {
         const double StartSeconds = FPlatformTime::Seconds();
-        LiveWindow->Step(DeltaSeconds);
+        try
+        {
+            const double Before=LiveWindow->SimTimeSeconds();
+            LiveWindow->Step(DeltaSeconds);
+            const double After=LiveWindow->SimTimeSeconds(),Advanced=After-Before;
+            // Never publish a requested duration which the native field did
+            // not actually integrate (including its legacy large-dt clamp).
+            const double ClockRoundoff=FMath::Max(1e-12,8.*std::numeric_limits<double>::epsilon()*FMath::Abs(Before));
+            if(!FMath::IsFinite(After) || Advanced<=0 || FMath::Abs(Advanced-double(DeltaSeconds))>ClockRoundoff)
+            {
+                Status=ERaftSimWaterRuntimeStatus::Faulted;
+                UE_LOG(LogTemp,Error,TEXT("RaftSim native water clock mismatch: requested=%.17g advanced=%.17g; refusing committed duration"),double(DeltaSeconds),Advanced);
+                return false;
+            }
+        }
+        catch (const std::exception& Exception)
+        {
+            // A rejected CFL workload is a failed simulation, not a completed
+            // water frame. Latch the fault until explicitly reconfigured;
+            // do not repeatedly retry it or let a native exception crash UE.
+            Status = ERaftSimWaterRuntimeStatus::Faulted;
+            UE_LOG(LogTemp, Error, TEXT("RaftSim live-water step rejected: %hs"), Exception.what());
+            return false;
+        }
         const double ElapsedMilliseconds =
             (FPlatformTime::Seconds() - StartSeconds) * 1000.0;
         LastSolverStepMillisecondsValue = ElapsedMilliseconds;
@@ -128,6 +196,17 @@ bool URaftSimWaterRuntimeAdapter::StepWater(float DeltaSeconds)
         MaxSolverStepMilliseconds = FMath::Max(
             MaxSolverStepMilliseconds, ElapsedMilliseconds);
         ++TimedSolverStepCount;
+        if (TimedSolverStepCount == 1 ||
+            (ElapsedMilliseconds >= 8.0 && (TimedSolverStepCount % 120) == 0))
+        {
+            UE_LOG(
+                LogTemp,
+                Display,
+                TEXT("RaftSim live-water solver: step_ms=%.2f average_ms=%.2f max_ms=%.2f"),
+                LastSolverStepMillisecondsValue,
+                TotalSolverStepMilliseconds / static_cast<double>(TimedSolverStepCount),
+                MaxSolverStepMilliseconds);
+        }
     }
 #endif
     SimTimeSeconds += DeltaSeconds;
@@ -136,12 +215,462 @@ bool URaftSimWaterRuntimeAdapter::StepWater(float DeltaSeconds)
     return true;
 }
 
+namespace
+{
+constexpr float kCoupledSurfaceGravity = 9.80665f;
+constexpr float kCoupledFoamFroudeStart = 0.72f;
+constexpr float kCoupledFoamFroudeRange = 1.18f;
+// Mirror of the render-side travelling wave. The band bake
+// (RaftSimEditorSouthForkFullReach.cpp) plus the transmission material's
+// RaftSimTravelingBakeWaveWPO block present this moving field; coupling it
+// into sampled surface heights makes the raft — rigid support, flex
+// segments (which is what lets the soft hull CURVE over wave shapes),
+// overwash, audio, and telemetry — feel the same waves the camera sees
+// (2026-08-10 playtest: "the water level goes up and down in the boat,
+// but the boat doesn't ride over the waves"). Constants must stay paired
+// with the WPO block; energy is recomputed from Froude and speed, the
+// same quantities the bake's vertex colours encoded.
+float PresentationTravelingWaveM(
+    float StationM, float LateralM, float TimeSeconds,
+    float SpeedMps, float DepthM)
+{
+    // Base swell only. The energetic term's render amplitude derives from
+    // BAKED band colours while a physics-side reconstruction can only use
+    // LIVE solver energy — the two diverge in exactly the water where the
+    // waves are big, and the 2026-08-10 playtest saw the hull visually
+    // buried under rendered crests it correctly was not riding ("the boat
+    // went below the water surface for no apparent reason"; drift
+    // telemetry showed constant 21 cm draft throughout). The universal
+    // base term is identical on both sides, so coupling it is exact; the
+    // energetic mismatch is bounded separately by halving the rendered
+    // energetic amplitude in the WPO block.
+    (void)SpeedMps;
+    (void)DepthM;
+    const float PhaseA =
+        StationM * 0.19f + LateralM * 0.61f - TimeSeconds * 0.90f;
+    return 0.030f * FMath::Sin(PhaseA);
+}
+
+static TAutoConsoleVariable<int32> CVarRaftSimPresentationWaveCoupling(
+    TEXT("RaftSim.Water.PresentationWaveCoupling"), 1,
+    TEXT("1: sampled water heights include the rendered travelling wave, and "
+         "rigid support also follows the shared standing-wave and hydraulic-"
+         "relief surface; 0: matched-baseline solver heights only."));
+}
+FRaftSimWaterStandingWave URaftSimWaterRuntimeAdapter::ComputeCoupledStandingWave(
+    const FVector2D& RiverCoordinatesMeters,
+    float SpeedMetersPerSecond,
+    float DepthMeters)
+{
+    const float SafeSpeed = FMath::Max(SpeedMetersPerSecond, 0.0f);
+    const float SafeDepth = FMath::Max(DepthMeters, 0.05f);
+    const float Froude =
+        SafeSpeed / FMath::Sqrt(kCoupledSurfaceGravity * SafeDepth);
+    const float PresentationFoam = FMath::Clamp(
+        (Froude - kCoupledFoamFroudeStart) / kCoupledFoamFroudeRange,
+        0.0f,
+        1.0f);
+    const float SpeedNorm = FMath::Clamp(SafeSpeed / 8.0f, 0.0f, 1.0f);
+    const float HydraulicEnergy = FMath::Clamp(
+        PresentationFoam * 0.72f + SpeedNorm * 0.48f,
+        0.0f,
+        1.0f);
+
+    FRaftSimWaterStandingWave Result;
+    auto AccumulateBand = [&Result](
+                              float AmplitudeMeters,
+                              float Envelope,
+                              float EnvelopeStationDerivative,
+                              float EnvelopeLateralDerivative,
+                              float Phase,
+                              float PhaseStationDerivative,
+                              float PhaseLateralDerivative)
+    {
+        const float SinPhase = FMath::Sin(Phase);
+        const float CosPhase = FMath::Cos(Phase);
+        Result.DisplacementMeters +=
+            AmplitudeMeters * Envelope * SinPhase;
+        Result.StationSlope +=
+            AmplitudeMeters *
+            (EnvelopeStationDerivative * SinPhase +
+                Envelope * CosPhase * PhaseStationDerivative);
+        Result.LateralSlope +=
+            AmplitudeMeters *
+            (EnvelopeLateralDerivative * SinPhase +
+                Envelope * CosPhase * PhaseLateralDerivative);
+    };
+
+    const float StationM = RiverCoordinatesMeters.X;
+    const float LateralM = RiverCoordinatesMeters.Y;
+    const float CalmWarpA = StationM * 0.11f - LateralM * 0.19f;
+    const float CalmPhaseA =
+        StationM * 0.73f + LateralM * 0.27f +
+        0.16f * FMath::Sin(CalmWarpA);
+    AccumulateBand(
+        0.011f, 1.0f, 0.0f, 0.0f, CalmPhaseA,
+        0.73f + 0.16f * 0.11f * FMath::Cos(CalmWarpA),
+        0.27f - 0.16f * 0.19f * FMath::Cos(CalmWarpA));
+
+    const float CalmWarpB = StationM * 0.23f + LateralM * 0.13f;
+    const float CalmPhaseB =
+        StationM * 1.21f - LateralM * 0.33f +
+        0.10f * FMath::Sin(CalmWarpB);
+    AccumulateBand(
+        0.007f, 1.0f, 0.0f, 0.0f, CalmPhaseB,
+        1.21f + 0.10f * 0.23f * FMath::Cos(CalmWarpB),
+        -0.33f + 0.10f * 0.13f * FMath::Cos(CalmWarpB));
+
+    const float PacketWarp = StationM * 0.013f - LateralM * 0.091f;
+    const float PacketPhase =
+        StationM * 0.041f + LateralM * 0.067f +
+        0.60f * FMath::Sin(PacketWarp);
+    const float PacketPhaseStationDerivative =
+        0.041f + 0.60f * 0.013f * FMath::Cos(PacketWarp);
+    const float PacketPhaseLateralDerivative =
+        0.067f - 0.60f * 0.091f * FMath::Cos(PacketWarp);
+    const float PacketSignal = 0.5f + 0.5f * FMath::Sin(PacketPhase);
+    const float PacketSignalStationDerivative =
+        0.5f * FMath::Cos(PacketPhase) * PacketPhaseStationDerivative;
+    const float PacketSignalLateralDerivative =
+        0.5f * FMath::Cos(PacketPhase) * PacketPhaseLateralDerivative;
+    const float PrimaryPacket =
+        0.18f + 0.82f * PacketSignal * PacketSignal;
+    const float PrimaryPacketStationDerivative =
+        1.64f * PacketSignal * PacketSignalStationDerivative;
+    const float PrimaryPacketLateralDerivative =
+        1.64f * PacketSignal * PacketSignalLateralDerivative;
+    const float SecondaryPacket = 1.0f - 0.45f * PacketSignal;
+    const float SecondaryPacketStationDerivative =
+        -0.45f * PacketSignalStationDerivative;
+    const float SecondaryPacketLateralDerivative =
+        -0.45f * PacketSignalLateralDerivative;
+
+    const float PrimaryWarpA = StationM * 0.063f - LateralM * 0.14f;
+    const float PrimaryWarpB = StationM * 0.017f + LateralM * 0.23f;
+    const float PrimaryPhase =
+        StationM * 0.58f + LateralM * 0.09f +
+        0.35f * FMath::Sin(PrimaryWarpA) +
+        0.22f * FMath::Sin(PrimaryWarpB);
+    AccumulateBand(
+        0.065f,
+        HydraulicEnergy * PrimaryPacket,
+        HydraulicEnergy * PrimaryPacketStationDerivative,
+        HydraulicEnergy * PrimaryPacketLateralDerivative,
+        PrimaryPhase,
+        0.58f + 0.35f * 0.063f * FMath::Cos(PrimaryWarpA) +
+            0.22f * 0.017f * FMath::Cos(PrimaryWarpB),
+        0.09f - 0.35f * 0.14f * FMath::Cos(PrimaryWarpA) +
+            0.22f * 0.23f * FMath::Cos(PrimaryWarpB));
+
+    const float SecondaryWarp = StationM * 0.033f + LateralM * 0.17f;
+    const float SecondaryPhase =
+        StationM * 1.03f - LateralM * 0.12f +
+        0.28f * FMath::Sin(SecondaryWarp);
+    AccumulateBand(
+        0.043f,
+        HydraulicEnergy * SecondaryPacket,
+        HydraulicEnergy * SecondaryPacketStationDerivative,
+        HydraulicEnergy * SecondaryPacketLateralDerivative,
+        SecondaryPhase,
+        1.03f + 0.28f * 0.033f * FMath::Cos(SecondaryWarp),
+        -0.12f + 0.28f * 0.17f * FMath::Cos(SecondaryWarp));
+
+    const float DetailWarp = StationM * 0.12f - LateralM * 0.33f;
+    const float DetailPhase =
+        StationM * 1.47f + LateralM * 0.21f +
+        0.16f * FMath::Sin(DetailWarp);
+    AccumulateBand(
+        0.026f, HydraulicEnergy, 0.0f, 0.0f, DetailPhase,
+        1.47f + 0.16f * 0.12f * FMath::Cos(DetailWarp),
+        0.21f - 0.16f * 0.33f * FMath::Cos(DetailWarp));
+
+    const float CrossWarp = StationM * 0.027f + LateralM * 0.19f;
+    const float CrossPhase =
+        StationM * 0.36f - LateralM * 0.31f +
+        0.25f * FMath::Sin(CrossWarp);
+    AccumulateBand(
+        0.016f, HydraulicEnergy, 0.0f, 0.0f, CrossPhase,
+        0.36f + 0.25f * 0.027f * FMath::Cos(CrossWarp),
+        -0.31f + 0.25f * 0.19f * FMath::Cos(CrossWarp));
+    return Result;
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledLocalFluidHeightfieldMeters(
+    const FVector2D& RiverCoordinatesMeters,
+    const FVector2D& AdvectedDistanceMeters,
+    float SpeedMetersPerSecond,
+    float DepthMeters,
+    float WaveClockSeconds,
+    float Strength,
+    float HydraulicFeatureEnergy)
+{
+    const float SafeSpeed = FMath::Max(SpeedMetersPerSecond, 0.0f);
+    const float SafeDepth = FMath::Max(DepthMeters, 0.05f);
+    const float Froude =
+        SafeSpeed / FMath::Sqrt(kCoupledSurfaceGravity * SafeDepth);
+    const float Foam = FMath::Clamp(
+        (Froude - kCoupledFoamFroudeStart) / kCoupledFoamFroudeRange,
+        0.0f,
+        1.0f);
+    const float AeratedRapid = FMath::SmoothStep(0.025f, 0.42f, Foam);
+    const float Rapid = FMath::Clamp(
+        FMath::Max(AeratedRapid, HydraulicFeatureEnergy),
+        0.0f,
+        1.0f);
+    if (Rapid <= KINDA_SMALL_NUMBER || Strength <= KINDA_SMALL_NUMBER)
+    {
+        return 0.0f;
+    }
+
+    // The coherent standing-wave train is already owned by the solver and
+    // obstacle presentation geometry. This coupled local field adds compact
+    // crest clusters and boils. Earlier versions summed long sine phase lines;
+    // their infinite wavefronts turned into horizontal and vertical reflection
+    // bars at guide-eye grazing angles.
+    const FVector2D StationaryP = RiverCoordinatesMeters;
+    const FVector2D AdvectedP =
+        RiverCoordinatesMeters - AdvectedDistanceMeters;
+
+    const auto TransformCoordinates = [](
+        const FVector2D& P,
+        float Xx,
+        float Xy,
+        float Yx,
+        float Yy,
+        float Scale,
+        const FVector2D& Offset)
+    {
+        return FVector2D(
+            Xx * P.X + Xy * P.Y,
+            Yx * P.X + Yy * P.Y) * Scale + Offset;
+    };
+    const auto ValueNoise = [](
+        const FVector2D& P,
+        const FVector2D& HashBasis,
+        float HashMultiplier)
+    {
+        const FVector2D Cell(
+            FMath::FloorToFloat(P.X), FMath::FloorToFloat(P.Y));
+        const FVector2D Fraction = P - Cell;
+        const FVector2D Blend(
+            Fraction.X * Fraction.X * (3.0f - 2.0f * Fraction.X),
+            Fraction.Y * Fraction.Y * (3.0f - 2.0f * Fraction.Y));
+        const auto Hash = [&HashBasis, HashMultiplier](const FVector2D& Q)
+        {
+            const float Raw = FMath::Sin(
+                Q.X * HashBasis.X + Q.Y * HashBasis.Y) * HashMultiplier;
+            return Raw - FMath::FloorToFloat(Raw);
+        };
+        const float H00 = Hash(Cell);
+        const float H10 = Hash(Cell + FVector2D(1.0f, 0.0f));
+        const float H01 = Hash(Cell + FVector2D(0.0f, 1.0f));
+        const float H11 = Hash(Cell + FVector2D(1.0f, 1.0f));
+        return FMath::Lerp(
+            FMath::Lerp(H00, H10, Blend.X),
+            FMath::Lerp(H01, H11, Blend.X),
+            Blend.Y);
+    };
+
+    const float AnchorNoiseA = ValueNoise(
+        TransformCoordinates(
+            StationaryP, 0.731f, 0.682f, -0.682f, 0.731f,
+            0.205f, FVector2D::ZeroVector),
+        FVector2D(127.1f, 311.7f), 43758.5453f);
+    const float AnchorNoiseB = ValueNoise(
+        TransformCoordinates(
+            StationaryP, -0.417f, 0.909f, -0.909f, -0.417f,
+            0.397f, FVector2D(17.31f, -9.17f)),
+        FVector2D(269.5f, 183.3f), 24634.6345f);
+    const float AnchorNoise = FMath::Clamp(
+        0.64f * AnchorNoiseA + 0.36f * AnchorNoiseB, 0.0f, 1.0f);
+    const float CrestCluster = FMath::Pow(
+        FMath::Clamp((AnchorNoise - 0.43f) * 1.82f, 0.0f, 1.0f),
+        2.6f);
+    const float AnchorTrough = FMath::Pow(
+        FMath::Clamp((0.46f - AnchorNoise) * 1.95f, 0.0f, 1.0f),
+        2.2f);
+    const float CrestBreath = 0.90f + 0.10f * FMath::Sin(
+        WaveClockSeconds * 0.71f + AnchorNoiseB * 2.0f * UE_PI);
+
+    const float BoilNoiseA = ValueNoise(
+        TransformCoordinates(
+            AdvectedP, 0.847f, -0.532f, 0.532f, 0.847f,
+            0.315f, FVector2D(-4.11f, 13.73f)),
+        FVector2D(157.7f, 113.5f), 31973.417f);
+    const float BoilNoiseB = ValueNoise(
+        TransformCoordinates(
+            AdvectedP, -0.615f, -0.789f, 0.789f, -0.615f,
+            0.611f, FVector2D(8.37f, 2.91f)),
+        FVector2D(101.3f, 271.9f), 41719.213f);
+    // Noise is transported with the current. Multiplying its changing value
+    // by elapsed time made spatial/advective derivatives grow for the entire
+    // run: a centimetre of drift could pop the surface by forty centimetres
+    // after an hour. Keep the clock frequency constant and noise as bounded
+    // phase offsets, matching the repaired material-side convention.
+    const float BoilPhase = WaveClockSeconds * 1.70f +
+        2.90f * BoilNoiseB + 2.0f * UE_PI * BoilNoiseA;
+    const float BoilPulse = FMath::Sin(BoilPhase);
+    const float SplashPulse = FMath::Pow(FMath::Clamp(
+        0.5f + 0.5f * FMath::Sin(
+            BoilPhase * 1.73f + AnchorNoiseA * 4.7f),
+        0.0f, 1.0f), 6.0f);
+    const float AnchoredRelief = CrestBreath *
+        (0.72f * CrestCluster - 0.20f * AnchorTrough);
+    const float CarriedBoils =
+        0.25f * (BoilNoiseA - 0.5f) * (0.45f + BoilNoiseB) +
+        0.17f * BoilPulse * (0.30f + 0.70f * BoilNoiseB) +
+        0.20f * SplashPulse;
+    return FMath::Clamp(Strength, 0.0f, 1.0f) * FMath::Clamp(
+        Rapid * (AnchoredRelief + CarriedBoils), -0.50f, 0.78f);
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledHydraulicFeatureEnergy(
+    const FVector2D& RiverCoordinatesMeters,
+    float HydraulicReliefMeters)
+{
+    const float ReliefEnergy = FMath::SmoothStep(
+        0.035f, 0.16f, FMath::Abs(HydraulicReliefMeters));
+    if (ReliefEnergy <= KINDA_SMALL_NUMBER)
+    {
+        return 0.0f;
+    }
+
+    // Long, overlapping lobes break a solver station row into crest shoulders
+    // instead of painting another homogeneous white bar across the channel.
+    const float Warp = FMath::Sin(
+        RiverCoordinatesMeters.X * 0.043f -
+        RiverCoordinatesMeters.Y * 0.117f);
+    const float LobeSignal = 0.5f + 0.5f * FMath::Sin(
+        RiverCoordinatesMeters.X * 0.17f +
+        RiverCoordinatesMeters.Y * 0.39f + 0.55f * Warp);
+    const float LobeEnvelope = 0.28f + 0.72f * LobeSignal * LobeSignal;
+    return FMath::Clamp(ReliefEnergy * LobeEnvelope, 0.0f, 1.0f);
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledRapidGradeWaveMeters(
+    const FVector2D& RiverCoordinatesMeters,
+    float UpstreamFarSurfaceHeightMeters,
+    float DownstreamFarSurfaceHeightMeters,
+    float SpeedMetersPerSecond)
+{
+    const float DownstreamFallMeters = FMath::Max(
+        UpstreamFarSurfaceHeightMeters - DownstreamFarSurfaceHeightMeters,
+        0.0f);
+    // These samples span 12 m. Four to eighteen centimetres therefore maps
+    // to roughly 0.3-1.5% surface fall: quiet pool grade stays inactive while
+    // Troublemaker's measured 0.6 m / 40 m face reaches full strength.
+    const float GradeEnergy =
+        FMath::SmoothStep(0.04f, 0.18f, DownstreamFallMeters) *
+        FMath::SmoothStep(0.10f, 0.70f, SpeedMetersPerSecond);
+    if (GradeEnergy <= KINDA_SMALL_NUMBER)
+    {
+        return 0.0f;
+    }
+
+    const float StationM = RiverCoordinatesMeters.X;
+    const float LateralM = RiverCoordinatesMeters.Y;
+    const float Warp =
+        0.46f * FMath::Sin(StationM * 0.071f - LateralM * 0.19f) +
+        0.23f * FMath::Sin(StationM * 0.037f + LateralM * 0.31f);
+    const float LobeSignal = 0.5f + 0.5f * FMath::Sin(
+        StationM * 0.13f + LateralM * 0.34f + Warp);
+    const float LobeEnvelope = 0.32f + 0.68f * LobeSignal * LobeSignal;
+    const float Phase =
+        StationM * 0.72f + LateralM * 0.12f + Warp;
+    const float CrestProfile =
+        FMath::Sin(Phase) +
+        0.30f * FMath::Sin(2.0f * Phase + 0.64f) +
+        0.12f * FMath::Sin(3.0f * Phase + 1.17f);
+    return 0.18f * GradeEnergy * LobeEnvelope * CrestProfile;
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledHydraulicReliefMeters(
+    float CenterSurfaceHeightMeters,
+    float UpstreamFarSurfaceHeightMeters,
+    float UpstreamNearSurfaceHeightMeters,
+    float DownstreamNearSurfaceHeightMeters,
+    float DownstreamFarSurfaceHeightMeters,
+    float SpeedMetersPerSecond,
+    float DepthMeters)
+{
+    const float SafeSpeed = FMath::Max(SpeedMetersPerSecond, 0.0f);
+    const float SafeDepth = FMath::Max(DepthMeters, 0.05f);
+    const float Froude =
+        SafeSpeed / FMath::Sqrt(kCoupledSurfaceGravity * SafeDepth);
+    const float NearCriticalActivation = FMath::Clamp(
+        (Froude - 0.55f) / 0.85f, 0.0f, 1.0f);
+    const float SpeedActivation =
+        FMath::Clamp(SafeSpeed / 4.0f, 0.0f, 1.0f);
+    const float HydraulicActivation = FMath::Clamp(
+        NearCriticalActivation * 0.82f + SpeedActivation * 0.18f,
+        0.0f,
+        1.0f);
+    const float NeighbourSurfaceMeters =
+        UpstreamFarSurfaceHeightMeters * 0.125f +
+        UpstreamNearSurfaceHeightMeters * 0.375f +
+        DownstreamNearSurfaceHeightMeters * 0.375f +
+        DownstreamFarSurfaceHeightMeters * 0.125f;
+    const float SolverReliefMeters =
+        CenterSurfaceHeightMeters - NeighbourSurfaceMeters;
+    // Some stitched production fields retain a credible metre-scale surface
+    // ledge but under-report velocity at the handoff. Do not erase that real
+    // topographic control: a nonzero current plus strong resolved curvature
+    // may energize bounded relief. Exact still water remains inactive, and a
+    // linear grade still has zero curvature.
+    const float CurvatureActivation = FMath::SmoothStep(
+        0.06f, 0.35f, FMath::Abs(SolverReliefMeters));
+    const float MovingWaterActivation = FMath::SmoothStep(
+        0.05f, 0.25f, SafeSpeed);
+    const float ResolvedFeatureActivation =
+        CurvatureActivation * MovingWaterActivation * 0.65f;
+    const float EffectiveHydraulicActivation = FMath::Max(
+        HydraulicActivation, ResolvedFeatureActivation);
+    const float MaximumReliefMeters =
+        0.22f + 0.18f * FMath::Clamp(SafeDepth / 2.0f, 0.0f, 1.0f);
+    return FMath::Clamp(
+        SolverReliefMeters * 1.25f * EffectiveHydraulicActivation,
+        -MaximumReliefMeters,
+        MaximumReliefMeters);
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledSmoothedSurfaceHeightMeters(
+    float CenterSurfaceHeightMeters,
+    float UpstreamSurfaceHeightMeters,
+    float DownstreamSurfaceHeightMeters,
+    float RiverRightSurfaceHeightMeters,
+    float RiverLeftSurfaceHeightMeters,
+    float Strength)
+{
+    const float SafeStrength = FMath::Clamp(Strength, 0.0f, 1.0f);
+    // A strength of one is reserved for South Fork's single live carrier.
+    // Its cooked field repeats station rows across the channel; the ordinary
+    // isotropic kernel retains 44% of an alternating row signal, which reads
+    // as white transverse stripes at grazing angles. This directional kernel
+    // has a zero at that station-row frequency, preserves a linear river
+    // grade exactly, and retains one quarter of the cross-channel shape.
+    const float FilteredSurfaceHeightMeters = SafeStrength >= 0.999f
+        ? CenterSurfaceHeightMeters * 0.25f +
+            (UpstreamSurfaceHeightMeters + DownstreamSurfaceHeightMeters) *
+                0.25f +
+            (RiverRightSurfaceHeightMeters + RiverLeftSurfaceHeightMeters) *
+                0.125f
+        : CenterSurfaceHeightMeters * 0.44f +
+            (UpstreamSurfaceHeightMeters + DownstreamSurfaceHeightMeters +
+                RiverRightSurfaceHeightMeters + RiverLeftSurfaceHeightMeters) *
+                0.14f;
+    return FMath::Lerp(
+        CenterSurfaceHeightMeters,
+        FilteredSurfaceHeightMeters,
+        SafeStrength);
+}
+
 bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
     const FVector& WorldPosition,
     FRaftSimWaterSample& OutSample
 ) const
 {
-    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized)
+    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized ||
+        Status == ERaftSimWaterRuntimeStatus::Faulted)
     {
         return false;
     }
@@ -163,6 +692,17 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
         if (Live.bValid)
         {
             OutSample.SurfaceHeightMeters = Live.SurfaceHeightM - RiverVerticalDatumM;
+            if (Live.bWet && LiveWindow->HasTravelingWavePresentation() &&
+                CVarRaftSimPresentationWaveCoupling.GetValueOnAnyThread() != 0)
+            {
+                const UWorld* World = GetWorld();
+                OutSample.SurfaceHeightMeters += PresentationTravelingWaveM(
+                    SolverPositionM.X, SolverPositionM.Y,
+                    PresentationWaveClockSeconds >= 0.0f
+                        ? PresentationWaveClockSeconds
+                        : (World ? World->GetTimeSeconds() : 0.0f),
+                    Live.VelocityMps.Size(), Live.DepthM);
+            }
             OutSample.BedHeightMeters = Live.BedHeightM - RiverVerticalDatumM;
             OutSample.DepthMeters = Live.DepthM;
             OutSample.VelocityMetersPerSecond =
@@ -180,12 +720,1053 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
         return false;
     }
 #endif
-    OutSample.SurfaceHeightMeters = WorldPosition.Z;
-    OutSample.BedHeightMeters = WorldPosition.Z - 1.0f;
-    OutSample.DepthMeters = 1.0f;
-    OutSample.VelocityMetersPerSecond = FVector::ZeroVector;
+    // Binding a scenario is not evidence of a water field. In particular do
+    // not fabricate a wet sheet at the probe height when loading has failed.
+    // Explicit development tanks use the same valid LiveWindow path above.
+    return false;
+}
+void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportSurface(
+    bool bEnabled,
+    float SurfaceSmoothingStrength,
+    float StandingWaveScale,
+    float HydraulicReliefScale)
+{
+    bRaftSupportSurfaceEnabled = bEnabled;
+    RaftSupportSurfaceSmoothingStrength =
+        FMath::Clamp(SurfaceSmoothingStrength, 0.0f, 1.0f);
+    RaftSupportStandingWaveScale =
+        FMath::Clamp(StandingWaveScale, 0.0f, 1.0f);
+    RaftSupportHydraulicReliefScale =
+        FMath::Clamp(HydraulicReliefScale, 0.0f, 1.0f);
+
+    RaftSupportBreakingSites.Reset();
+    RaftSupportBoulderFootprints.Reset();
+    RaftSupportBreakingCrestLiftMeters = 0.0f;
+    RaftSupportBandField.Reset();
+
+    UE_LOG(
+        LogTemp,
+        Display,
+        TEXT("RaftSim raft support surface: enabled=%d smoothing=%.2f ")
+        TEXT("standing=%.2f hydraulic=%.2f"),
+        bRaftSupportSurfaceEnabled ? 1 : 0,
+        RaftSupportSurfaceSmoothingStrength,
+        RaftSupportStandingWaveScale,
+        RaftSupportHydraulicReliefScale);
+}
+
+void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportBoulderFootprints(
+    TConstArrayView<FSupportBoulderFootprint> Footprints)
+{
+    RaftSupportBoulderFootprints.Reset(Footprints.Num());
+    RaftSupportBoulderFootprints.Append(
+        Footprints.GetData(), Footprints.Num());
+    ConfigureFeatureBoulderFootprints(Footprints);
+}
+
+FVector URaftSimWaterRuntimeAdapter::ComputeFeatureVelocityAtRiverCoordinates(
+    const FVector2D& P, const FVector2D& BaseVelocity, float DepthM, float DepthFraction) const
+{
+    FVector Result(BaseVelocity.X, BaseVelocity.Y, 0.0);
+    if (!bFeatureKinematicsEnabled || DepthM <= 0.05f || BaseVelocity.ContainsNaN()) return Result;
+    using namespace RaftSimWaterFlowFrame;
+    using namespace RaftSimWaterFeatureKinematics;
+    const double Speed = BaseVelocity.Size();
+    const FVector2D D = Direction(BaseVelocity);
+    FVector Hole = FVector::ZeroVector, Eddy = FVector::ZeroVector;
+    double HoleOwner = 0.0, EddyOwner = 0.0;
+    // Strongest local owner prevents overlapping inferred features from
+    // accumulating unbounded force. That selection is not a global CFD proof.
+    for (const FSupportBreakingSite& Site : RaftSupportBreakingSites)
+    {
+        const FVector2D Q = ToLocal(P-Site.RiverCoordinatesMeters, Site.FlowDirection);
+        const double Strength = Site.Intensity*Site.SpillingFraction;
+        const FVector Surface = HoleDelta(Q.X,Q.Y,1.0,DepthM,Speed,Strength);
+        const double Weight = Surface.SizeSquared();
+        if (Weight <= HoleOwner) continue;
+        HoleOwner = Weight;
+        const FVector Local = HoleDelta(Q.X,Q.Y,DepthFraction,DepthM,Speed,Strength);
+        const FVector2D XY = ToField(FVector2D(Local.X,Local.Y),Site.FlowDirection);
+        Hole = FVector(XY.X,XY.Y,Local.Z);
+    }
+    for (const FSupportBoulderFootprint& Rock : FeatureBoulderFootprints)
+    {
+        const FVector2D OwnerDirection = Rock.FlowDirection.IsNearlyZero() ? D : Rock.FlowDirection;
+        const FVector2D Q = ToLocal(P-Rock.RiverCoordinatesMeters,OwnerDirection);
+        const FVector2D Incident=ToLocal(BaseVelocity,OwnerDirection);
+        const FVector Local = EddyDelta(Q.X,Q.Y,Rock.RadiusMeters,Speed,Incident.Y);
+        if (Local.SizeSquared() <= EddyOwner) continue;
+        EddyOwner = Local.SizeSquared();
+        const FVector2D XY = ToField(FVector2D(Local.X,Local.Y),OwnerDirection);
+        Eddy = FVector(XY.X,XY.Y,0.0);
+    }
+    return Result+Hole+Eddy;
+}
+
+FVector URaftSimWaterRuntimeAdapter::SampleFeatureSurfaceVelocity(
+    const FVector2D& P,const FVector2D& Base,float DepthM) const
+{
+    FVector Surface=ComputeFeatureVelocityAtRiverCoordinates(P,Base,DepthM,1.f);
+    if(bFeatureKinematicsEnabled && IsInGameThread() && FeatureSurfaceTransportOwner.IsValid() && FeatureSurfaceTransportSampler)
+    {
+        FVector2D Paired;float Weight=0;
+        if(FeatureSurfaceTransportSampler(P,Paired,Weight) && !Paired.ContainsNaN() && FMath::IsFinite(Weight))
+        {const float W=FMath::Clamp(Weight,0.f,1.f);Surface.X=FMath::Lerp(Surface.X,Paired.X,W);Surface.Y=FMath::Lerp(Surface.Y,Paired.Y,W);}
+    }
+    return Surface;
+}
+
+bool URaftSimWaterRuntimeAdapter::SampleRaftInteractionWaterAtWorldPosition(
+    const FVector& P, FRaftSimWaterSample& Out)
+{
+    if (!bFeatureKinematicsEnabled) return SampleWaterAtWorldPosition(P,Out);
+    // Carrier height, dry exclusion and bed remain authoritative. Never make
+    // an unsupported point wet merely because a feature envelope overlaps it.
+    if (!SampleRaftSupportSurfaceAtWorldPosition(P,Out)) return false;
+    if (!bFeatureKinematicsEnabled || !Out.bWet) return true;
+    FVector2D Coordinates;
+    FVector Tangent,Left;
+    if (!WorldToRiverCoordinates(P,Coordinates,Tangent,Left)) return true;
+    const FVector2D Base(FVector::DotProduct(Out.VelocityMetersPerSecond,Tangent),
+        FVector::DotProduct(Out.VelocityMetersPerSecond,Left));
+    const float Depth = FMath::Max(Out.SurfaceHeightMeters-Out.BedHeightMeters,0.05f);
+    // Preserve world-position precision before converting centimetres to SI;
+    // a float centimetre cast at a 300 m river datum shifts the surface sample.
+    const float Z = float(FMath::Clamp((P.Z*0.01-double(Out.BedHeightMeters))/double(Depth),0.0,1.0));
+    FVector Velocity = ComputeFeatureVelocityAtRiverCoordinates(Coordinates,Base,Depth,Z);
+    if(IsInGameThread() && FeatureSurfaceTransportOwner.IsValid() && FeatureSurfaceTransportSampler)
+    {
+        // Share the retained, displayed surface flow rather than sampling a
+        // newer grid. Keep the authored submerged hole leg relative to that
+        // surface current; never reapply the surface feature a second time.
+        Velocity+=SampleFeatureSurfaceVelocity(Coordinates,Base,Depth)-
+            ComputeFeatureVelocityAtRiverCoordinates(Coordinates,Base,Depth,1.f);
+    }
+    Out.VelocityMetersPerSecond = Tangent*Velocity.X + Left*Velocity.Y + FVector::UpVector*Velocity.Z;
+    return true;
+}
+
+FVector2D URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderWakePresentation(
+    float DownstreamMeters,
+    float AcrossMeters,
+    float BoulderRadiusMeters,
+    float WaterSpeedMetersPerSecond,
+    float PhaseSeconds)
+{
+    const float RadiusMeters = FMath::Max(BoulderRadiusMeters, 0.75f);
+    const float StartMeters = 0.35f * RadiusMeters;
+    const float EndMeters = 18.0f * RadiusMeters;
+    if (DownstreamMeters <= StartMeters || DownstreamMeters >= EndMeters)
+    {
+        return FVector2D::ZeroVector;
+    }
+
+    // A real obstruction wake opens gradually. The old 0.62 slope sent both
+    // breaking arms onto the banks within a few rock diameters and left the
+    // actual downstream wake nearly flat.
+    const float ArmCenterMeters =
+        0.75f * RadiusMeters + 0.38f * DownstreamMeters;
+    const float ArmDistanceMeters =
+        FMath::Abs(FMath::Abs(AcrossMeters) - ArmCenterMeters);
+    const float ArmWidthMeters = FMath::Max(1.10f, 0.85f * RadiusMeters);
+    const float ArmEnvelope = FMath::Exp(
+        -0.5f * FMath::Square(ArmDistanceMeters / ArmWidthMeters));
+    const float StartEnvelope = FMath::SmoothStep(
+        StartMeters, StartMeters + 1.5f * RadiusMeters, DownstreamMeters);
+    const float EndEnvelope = 1.0f - FMath::SmoothStep(
+        14.0f * RadiusMeters, EndMeters, DownstreamMeters);
+    const float SpeedEnvelope = FMath::SmoothStep(
+        0.45f, 1.65f, FMath::Max(WaterSpeedMetersPerSecond, 0.0f));
+    const float Envelope =
+        ArmEnvelope * StartEnvelope * EndEnvelope * SpeedEnvelope;
+    if (Envelope <= KINDA_SMALL_NUMBER)
+    {
+        return FVector2D::ZeroVector;
+    }
+
+    const float WavelengthMeters = FMath::Max(3.8f, 3.4f * RadiusMeters);
+    // The wake pattern belongs to the obstruction, not to a decal travelling
+    // downstream. Water and entrained air pass through this stationary wave
+    // train; translating the displacement phase made the white arms outrun
+    // both the rock and the raft and periodically replaced every crest with a
+    // trough. Keep the coupled geometry fixed in obstacle space. Only the
+    // aeration breathes, while the persistent foam field carries it with the
+    // sampled current.
+    const float WavePhase = DownstreamMeters *
+        (2.0f * UE_PI / WavelengthMeters);
+    const float Wave = FMath::Sin(WavePhase);
+    const float BreakingProfile = Wave >= 0.0f
+        ? FMath::Pow(Wave, 0.58f)
+        : 0.42f * Wave;
+    const float RadiusAmplitude = FMath::Lerp(
+        0.72f, 1.0f,
+        FMath::Clamp((RadiusMeters - 0.75f) / 1.25f, 0.0f, 1.0f));
+    constexpr float MaximumCrestAmplitudeMeters = 0.24f;
+    const float DisplacementMeters = MaximumCrestAmplitudeMeters *
+        RadiusAmplitude * Envelope * BreakingProfile;
+    const float FoamBreath = FMath::Clamp(
+        0.92f + 0.08f * FMath::Sin(
+            PhaseSeconds * (1.1f + 0.18f * WaterSpeedMetersPerSecond) +
+            0.11f * DownstreamMeters + 0.17f * FMath::Abs(AcrossMeters)),
+        0.84f,
+        1.0f);
+    const float CrestFoam =
+        0.92f * Envelope * FoamBreath *
+            FMath::Pow(FMath::Max(Wave, 0.0f), 0.38f);
+    // Aerated recirculation persists between rolling arm crests. This broad
+    // central froth is still born from the obstruction footprint and sampled
+    // water speed, but it prevents the wake from blinking off every time the
+    // signed arm wave enters its trough phase.
+    const float CentralTrail =
+        FMath::Exp(-0.5f * FMath::Square(
+            AcrossMeters / FMath::Max(1.15f * RadiusMeters, 1.0f))) *
+        StartEnvelope * EndEnvelope * SpeedEnvelope;
+    const float Foam = FMath::Clamp(
+        FMath::Max(CrestFoam, 0.58f * CentralTrail), 0.0f, 1.0f);
+    return FVector2D(DisplacementMeters, Foam);
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderPillowDisplacementMeters(
+    float DownstreamMeters,
+    float AcrossMeters,
+    float BoulderRadiusMeters,
+    float WaterSpeedMetersPerSecond)
+{
+    const float RadiusMeters = FMath::Max(BoulderRadiusMeters, 0.75f);
+    if (DownstreamMeters >= -0.35f * RadiusMeters)
+    {
+        return 0.0f;
+    }
+    const float DistanceMeters = FVector2D(
+        DownstreamMeters, AcrossMeters).Size();
+    if (DistanceMeters >= 1.95f * RadiusMeters)
+    {
+        return 0.0f;
+    }
+    const float Ring = FMath::Clamp(
+        1.0f - FMath::Abs(DistanceMeters - 1.10f * RadiusMeters) /
+            (0.85f * RadiusMeters),
+        0.0f, 1.0f);
+    const float NoseEnvelope = FMath::SmoothStep(
+        -1.95f * RadiusMeters, -0.35f * RadiusMeters, DownstreamMeters);
+    // Readability ramp lowered from (0.45, 1.65): the old floor muted the
+    // pillow to ~2 cm in the 0.7-0.9 m/s current that carries the raft past
+    // Meat Grinder's exposed boulders, and a metre-wide rock in visibly
+    // moving water with a dead-flat nose reads as a bug ("the water flowing
+    // downhill should form a pillow as it slams into the rock", player
+    // screenshots 2026-08-30 at river km 0.86). On top of the ramp, any
+    // genuinely moving water (>= ~0.12 m/s — bank-edge drift past pool
+    // rocks) guarantees a readable minimum mound: five separate "no pillow"
+    // reports were all rocks standing in slow edge water where the physical
+    // stagnation rise is a few invisible centimetres. Dead-still water
+    // still mounds nothing, and full amplitude still needs real current.
+    const float ClampedSpeed = FMath::Max(WaterSpeedMetersPerSecond, 0.0f);
+    float SpeedEnvelope = FMath::SmoothStep(0.25f, 1.20f, ClampedSpeed);
+    if (ClampedSpeed >= 0.12f)
+    {
+        SpeedEnvelope = FMath::Max(SpeedEnvelope, 0.33f);
+    }
+    return 0.22f * Ring * NoseEnvelope * SpeedEnvelope;
+}
+
+float URaftSimWaterRuntimeAdapter::
+    ComputeConfiguredBoulderSupportDisplacementMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        float WaterSpeedMetersPerSecond,
+        float PhaseSeconds,
+        const FVector2D& FlowDirection) const
+{
+    float StrongestDisplacementM = 0.0f;
+    for (const FSupportBoulderFootprint& Footprint :
+         RaftSupportBoulderFootprints)
+    {
+        const FVector2D Relative = RaftSimWaterFlowFrame::ToLocal(
+            RiverCoordinatesMeters - Footprint.RiverCoordinatesMeters,
+            FlowDirection);
+        const float DownstreamM = Relative.X;
+        const float AcrossM = Relative.Y;
+        const float PillowM = ComputeCoupledBoulderPillowDisplacementMeters(
+            DownstreamM, AcrossM, Footprint.RadiusMeters,
+            WaterSpeedMetersPerSecond);
+        const float WakeM = ComputeCoupledBoulderWakePresentation(
+            DownstreamM, AcrossM, Footprint.RadiusMeters,
+            WaterSpeedMetersPerSecond, PhaseSeconds).X;
+        const float CandidateM = PillowM + WakeM;
+        if (FMath::Abs(CandidateM) > FMath::Abs(StrongestDisplacementM))
+        {
+            StrongestDisplacementM = CandidateM;
+        }
+    }
+    return StrongestDisplacementM;
+}
+
+bool URaftSimWaterRuntimeAdapter::FSupportBandField::Sample(
+    float StationM,
+    float LateralM,
+    float& OutElevationAbsM,
+    float& OutEnergy) const
+{
+    if (!IsValid())
+    {
+        return false;
+    }
+    if (StationM < RowStationsM[0] || StationM > RowStationsM.Last())
+    {
+        return false;
+    }
+    const float LateralIndexF = (LateralM - LateralOriginM) / LateralSpacingM;
+    if (LateralIndexF < 0.0f ||
+        LateralIndexF > static_cast<float>(Width - 1))
+    {
+        return false;
+    }
+    int32 RowHigh = Algo::UpperBound(RowStationsM, StationM);
+    RowHigh = FMath::Clamp(RowHigh, 1, RowStationsM.Num() - 1);
+    const int32 RowLow = RowHigh - 1;
+    const float RowSpanM = FMath::Max(
+        RowStationsM[RowHigh] - RowStationsM[RowLow], KINDA_SMALL_NUMBER);
+    const float RowAlpha = FMath::Clamp(
+        (StationM - RowStationsM[RowLow]) / RowSpanM, 0.0f, 1.0f);
+    const int32 ColumnLow = FMath::Clamp(
+        FMath::FloorToInt32(LateralIndexF), 0, Width - 2);
+    const float ColumnAlpha = FMath::Clamp(
+        LateralIndexF - static_cast<float>(ColumnLow), 0.0f, 1.0f);
+    const int32 Corners[4] = {
+        RowLow * Width + ColumnLow,
+        RowLow * Width + ColumnLow + 1,
+        RowHigh * Width + ColumnLow,
+        RowHigh * Width + ColumnLow + 1};
+    for (const int32 Corner : Corners)
+    {
+        if (Wet[Corner] == 0)
+        {
+            return false;
+        }
+    }
+    const auto Bilinear = [&](const TArray<float>& Field)
+    {
+        const float Low = FMath::Lerp(
+            Field[Corners[0]], Field[Corners[1]], ColumnAlpha);
+        const float High = FMath::Lerp(
+            Field[Corners[2]], Field[Corners[3]], ColumnAlpha);
+        return FMath::Lerp(Low, High, RowAlpha);
+    };
+    OutElevationAbsM = Bilinear(ElevationAbsM);
+    OutEnergy = FMath::Clamp(Bilinear(Energy), 0.0f, 1.0f);
+    return true;
+}
+
+bool URaftSimWaterRuntimeAdapter::LoadRaftSupportBandFieldFromFile(
+    const FString& AbsolutePath)
+{
+    RaftSupportBandField.Reset();
+    TUniquePtr<FArchive> Reader(
+        IFileManager::Get().CreateFileReader(*AbsolutePath));
+    if (!Reader.IsValid())
+    {
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim support band field: none at %s"), *AbsolutePath);
+        return false;
+    }
+    uint32 Magic = 0;
+    uint32 Version = 0;
+    *Reader << Magic;
+    *Reader << Version;
+    if (Magic != 0x52534246u /* 'RSBF' */ || Version != 1u)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim support band field: bad header in %s"), *AbsolutePath);
+        return false;
+    }
+    int32 Width = 0;
+    int32 RowCount = 0;
+    *Reader << Width;
+    *Reader << RowCount;
+    *Reader << RaftSupportBandField.LateralOriginM;
+    *Reader << RaftSupportBandField.LateralSpacingM;
+    if (Width < 2 || Width > 512 || RowCount < 2 || RowCount > 200000)
+    {
+        RaftSupportBandField.Reset();
+        return false;
+    }
+    RaftSupportBandField.Width = Width;
+    *Reader << RaftSupportBandField.RowStationsM;
+    *Reader << RaftSupportBandField.ElevationAbsM;
+    *Reader << RaftSupportBandField.Energy;
+    *Reader << RaftSupportBandField.Wet;
+    if (Reader->IsError() || !RaftSupportBandField.IsValid() ||
+        RaftSupportBandField.RowStationsM.Num() != RowCount)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim support band field: malformed body in %s"),
+            *AbsolutePath);
+        RaftSupportBandField.Reset();
+        return false;
+    }
+    // A band cooked for the whole reach (stations 0-49 km) sampled with a
+    // compact map's local 0-300 m stations reads the wrong river: the
+    // Troublemaker map rode its band 1.5 m (the clamp) above the solver
+    // water with the raft hovering over the visible surface (2026-09-02).
+    // Without a coordinate map there is no global station authority, so a
+    // band whose span dwarfs the fixed window cannot be the window's own.
+    if (!HasRiverCoordinateMap() && LastFixedWindowExtentM.X > 0.0f &&
+        RaftSupportBandField.RowStationsM.Num() >= 2)
+    {
+        const float BandSpanM =
+            RaftSupportBandField.RowStationsM.Last() - RaftSupportBandField.RowStationsM[0];
+        if (BandSpanM > 4.0f * LastFixedWindowExtentM.X)
+        {
+            UE_LOG(
+                LogTemp, Warning,
+                TEXT("RaftSim support band field: %s spans %.0f m but the fixed window without a coordinate map spans %.0f m; ignoring the band"),
+                *AbsolutePath, BandSpanM, LastFixedWindowExtentM.X);
+            RaftSupportBandField.Reset();
+            return false;
+        }
+    }
+    int32 WetCells = 0;
+    for (const uint8 Cell : RaftSupportBandField.Wet)
+    {
+        WetCells += Cell != 0 ? 1 : 0;
+    }
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim support band field: %d rows x %d columns, %d wet cells, ")
+        TEXT("stations %.0f-%.0f m (%s)"),
+        RowCount,
+        Width,
+        WetCells,
+        RaftSupportBandField.RowStationsM[0],
+        RaftSupportBandField.RowStationsM.Last(),
+        *AbsolutePath);
+    return true;
+}
+
+bool URaftSimWaterRuntimeAdapter::LoadPresentationBaselineFieldFromFile(
+    const FString& AbsolutePath)
+{
+    PresentationBaselineField.Reset();
+    TUniquePtr<FArchive> Reader(
+        IFileManager::Get().CreateFileReader(*AbsolutePath));
+    if (!Reader.IsValid())
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim presentation baseline: none at %s"), *AbsolutePath);
+        return false;
+    }
+
+    uint32 Magic = 0;
+    uint32 Version = 0;
+    *Reader << Magic;
+    *Reader << Version;
+    if (Magic != 0x52534246u /* 'RSBF' */ || Version != 1u)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim presentation baseline: bad header in %s"),
+            *AbsolutePath);
+        return false;
+    }
+
+    int32 Width = 0;
+    int32 RowCount = 0;
+    *Reader << Width;
+    *Reader << RowCount;
+    *Reader << PresentationBaselineField.LateralOriginM;
+    *Reader << PresentationBaselineField.LateralSpacingM;
+    if (Width < 2 || Width > 512 || RowCount < 2 || RowCount > 200000)
+    {
+        PresentationBaselineField.Reset();
+        return false;
+    }
+    PresentationBaselineField.Width = Width;
+    *Reader << PresentationBaselineField.RowStationsM;
+    *Reader << PresentationBaselineField.ElevationAbsM;
+    *Reader << PresentationBaselineField.Energy;
+    *Reader << PresentationBaselineField.Wet;
+    if (Reader->IsError() || !PresentationBaselineField.IsValid() ||
+        PresentationBaselineField.RowStationsM.Num() != RowCount)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim presentation baseline: malformed body in %s"),
+            *AbsolutePath);
+        PresentationBaselineField.Reset();
+        return false;
+    }
+
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim presentation baseline: %d rows x %d columns, "
+             "stations %.0f-%.0f m; render-only organic shoreline"),
+        RowCount,
+        Width,
+        PresentationBaselineField.RowStationsM[0],
+        PresentationBaselineField.RowStationsM.Last());
+    return true;
+}
+
+bool URaftSimWaterRuntimeAdapter::LoadObservedWhitewaterFieldFromFile(
+    const FString& AbsolutePath)
+{
+    ObservedWhitewaterField.Reset();
+    TUniquePtr<FArchive> Reader(IFileManager::Get().CreateFileReader(*AbsolutePath));
+    if (!Reader.IsValid())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim observed whitewater: none at %s"), *AbsolutePath);
+        return false;
+    }
+    uint32 Magic = 0;
+    uint32 Version = 0;
+    *Reader << Magic;
+    *Reader << Version;
+    int32 Width = 0;
+    int32 RowCount = 0;
+    if (Magic == 0x52534246u /* 'RSBF' */ && Version == 1u)
+    {
+        *Reader << Width;
+        *Reader << RowCount;
+        *Reader << ObservedWhitewaterField.LateralOriginM;
+        *Reader << ObservedWhitewaterField.LateralSpacingM;
+    }
+    if (Width < 2 || Width > 512 || RowCount < 2 || RowCount > 200000)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim observed whitewater: bad header in %s"), *AbsolutePath);
+        ObservedWhitewaterField.Reset();
+        return false;
+    }
+    ObservedWhitewaterField.Width = Width;
+    *Reader << ObservedWhitewaterField.RowStationsM;
+    *Reader << ObservedWhitewaterField.ElevationAbsM;
+    *Reader << ObservedWhitewaterField.Energy;
+    *Reader << ObservedWhitewaterField.Wet;
+    if (Reader->IsError() || !ObservedWhitewaterField.IsValid() ||
+        ObservedWhitewaterField.RowStationsM.Num() != RowCount)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim observed whitewater: malformed body in %s"), *AbsolutePath);
+        ObservedWhitewaterField.Reset();
+        return false;
+    }
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim observed whitewater: %d rows x %d columns, stations %.0f-%.0f m; render-only appearance evidence"),
+        RowCount, Width, ObservedWhitewaterField.RowStationsM[0], ObservedWhitewaterField.RowStationsM.Last());
+    return true;
+}
+
+float URaftSimWaterRuntimeAdapter::SampleObservedWhitewaterAtRiverCoordinates(
+    FVector2D StationLateralM) const
+{
+    float ElevationAbsM = 0.0f;
+    float Fraction = 0.0f;
+    if (!ObservedWhitewaterField.IsValid() ||
+        !ObservedWhitewaterField.Sample(StationLateralM.X, StationLateralM.Y, ElevationAbsM, Fraction))
+    {
+        return 0.0f;
+    }
+    return FMath::Clamp(Fraction, 0.0f, 1.0f);
+}
+
+bool URaftSimWaterRuntimeAdapter::
+    SamplePresentationBaselineFieldAtRiverCoordinates(
+        FVector2D StationLateralM,
+        FRaftSimWaterSample& OutSample,bool bCacheAtlasStencil) const
+{
+    if (bCartesianWaterCoordinates)
+    {
+        OutSample = FRaftSimWaterSample{};
+#if RAFTSIM_HAS_LIVE_SOLVER
+        if (!LiveWindow.IsValid()) return false;
+        const FRaftSimLiveWaterSampleResult Source = LiveWindow->SamplePresentationSource(StationLateralM,bCacheAtlasStencil);
+        if (!Source.bValid) return false;
+        OutSample.SurfaceHeightMeters = Source.SurfaceHeightM - RiverVerticalDatumM;
+        OutSample.BedHeightMeters = Source.BedHeightM - RiverVerticalDatumM;
+        OutSample.DepthMeters = Source.DepthM;
+        OutSample.VelocityMetersPerSecond = FVector(Source.VelocityMps.X, Source.VelocityMps.Y, 0.);
+        OutSample.SurfaceNormal = Source.SurfaceNormal;
+        OutSample.bWet = Source.bWet;
+        return true;
+#else
+        return false;
+#endif
+    }
+    float ElevationAbsM = 0.0f;
+    float Energy = 0.0f;
+    if (!PresentationBaselineField.Sample(
+            StationLateralM.X,
+            StationLateralM.Y,
+            ElevationAbsM,
+            Energy))
+    {
+        return false;
+    }
+
+    OutSample = FRaftSimWaterSample{};
+    OutSample.SurfaceHeightMeters = ElevationAbsM - RiverVerticalDatumM;
+    // The baseline binary intentionally stores only the terrain-clipped
+    // surface, wet mask, and hydraulic presentation energy. These bounded
+    // values feed optical depth and current cues only; no gameplay sampler
+    // calls this method.
+    OutSample.DepthMeters = FMath::Lerp(0.80f, 2.40f, Energy);
+    OutSample.BedHeightMeters =
+        OutSample.SurfaceHeightMeters - OutSample.DepthMeters;
+    OutSample.VelocityMetersPerSecond = FVector(
+        FMath::Lerp(1.0f, 2.8f, Energy), 0.0f, 0.0f);
     OutSample.SurfaceNormal = FVector::UpVector;
     OutSample.bWet = true;
+    return true;
+}
+
+void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportBreakingSites(
+    TConstArrayView<FSupportBreakingSite> Sites,
+    float CrestLiftMeters,
+    float StationSpacingMeters)
+{
+    RaftSupportBreakingSites.Reset(Sites.Num());
+    RaftSupportBreakingSites.Append(Sites.GetData(), Sites.Num());
+    RaftSupportBreakingCrestLiftMeters = FMath::Max(CrestLiftMeters, 0.0f);
+    RaftSupportBreakingStationSpacingMeters =
+        FMath::Max(StationSpacingMeters, 0.05f);
+}
+
+namespace
+{
+struct FPhysicalCrestEnvelope
+{
+    float Along,Crest,Edge,Lateral;
+    FPhysicalCrestEnvelope(const FVector2D& Relative,float Length)
+    {
+        const float Across=Relative.Y,Downstream=Relative.X;
+        Along=Downstream-0.035f*Across*Across;
+        const float Width=Along<0.f ? Length : 0.42f*Length;
+        Crest=FMath::Exp(-FMath::Square(Along/Width));
+        Edge=FMath::SmoothStep(-3.f*Length,-2.f*Length,Downstream)*
+            (1.f-FMath::SmoothStep(6.f*Length,7.f*Length,Downstream));
+        Lateral=FMath::Exp(-FMath::Square(Across/FMath::Clamp(Length,3.f,5.f)))*
+            (1.f-FMath::SmoothStep(10.f,12.f,FMath::Abs(Across)));
+    }
+    float Source(float Spill) const
+    {
+        return 0.85f*FMath::SmoothStep(0.65f,0.95f,Crest)*Edge*Lateral*FMath::Clamp(Spill,0.f,1.f);
+    }
+};
+}
+
+float URaftSimWaterRuntimeAdapter::SampleAcceptedBreakingSource(const FVector2D& P) const
+{
+    float Source=0.f;
+    for (const auto& Site:RaftSupportBreakingSites)
+    {
+        // The legacy profile never supplies OutCrestFoam. A physical source
+        // needs only its envelope, not unused toe/tail height exponentials.
+        if (Site.PhysicalCrestHeightMeters<0.f || Site.SpillingFraction<=0.f)continue;
+        const FVector2D Relative=RaftSimWaterFlowFrame::ToLocal(P-Site.RiverCoordinatesMeters,Site.FlowDirection);
+        const float Length=FMath::Clamp(Site.PhysicalCrestLengthMeters,2.f,7.f);
+        const float Across=Relative.Y,Downstream=Relative.X;
+        if (FMath::Abs(Across)>12.f || Downstream<-3.f*Length || Downstream>7.f*Length)continue;
+        Source=FMath::Max(Source,FPhysicalCrestEnvelope(Relative,Length).Source(Site.SpillingFraction));
+    }
+    return Source;
+}
+
+FVector2D URaftSimWaterRuntimeAdapter::ComputeHydraulicCrestDimensionsMeters(
+    float Depth, float Froude, float ResolvedRise)
+{
+    if (!FMath::IsFinite(Depth) || !FMath::IsFinite(Froude) ||
+        !FMath::IsFinite(ResolvedRise) || Depth <= 0.05f || Froude <= 1.0f)
+    {
+        return FVector2D::ZeroVector;
+    }
+    // USACE EM 1110-2-1601, 4-3d, Eq. 4-5: undular first-wave height
+    // a/y1 = Fr1^2 - 1. Above the undular regime, blend to 1.5 times
+    // conjugate-depth rise (Eq. 4-4). The blend, caps and face length are
+    // presentation choices, not a surveyed Chilko hydraulic calibration.
+    const float Fr = FMath::Min(Froude, 4.0f);
+    const float UndularHeight = Depth * (Fr * Fr - 1.0f);
+    const float JumpRise = Depth * 0.5f * (FMath::Sqrt(1.0f + 8.0f * Fr * Fr) - 3.0f);
+    const float Height = FMath::Lerp(UndularHeight, 1.5f * JumpRise,
+        FMath::SmoothStep(1.5f, 1.9f, Fr));
+    const float Additional = FMath::Clamp(Height - FMath::Max(ResolvedRise, 0.0f),
+        0.0f, FMath::Min(0.8f * Depth, 1.2f));
+    return FVector2D(Additional, FMath::Clamp(3.0f * Depth, 2.0f, 7.0f));
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
+    const FVector2D& RiverCoordinatesMeters,
+    TConstArrayView<FSupportBreakingSite> Sites,
+    float CrestLiftMeters,
+    float StationSpacingMeters,
+    float* OutCrestFoam,
+    float GlobalOwnerCapMeters)
+{
+    if (OutCrestFoam) *OutCrestFoam = 0.0f;
+    // The depth-scaled branch below reconstructs a continuous subgrid profile;
+    // the visible mesh samples it at vertices, so off-vertex triangle heights
+    // approximate (rather than exactly equal) analytic raft support.
+    // The legacy branch mirrors the earlier breaking-water displacement: the crest
+    // vertex leans up by CrestLift*Intensity, the first subcritical station
+    // dips 0.45x of it, and a decaying ~18 m tailwater train follows. Values
+    // at the station lattice equal the mesh vertices; between lattice points
+    // this interpolates linearly, exactly like the mesh triangles.
+    const float SpacingM = FMath::Max(StationSpacingMeters, 0.05f);
+    const int32 TailStepCount = FMath::Max(1, FMath::RoundToInt(18.0f / SpacingM));
+    float TotalM = 0.0f;
+    // A prepared spatial subset retains the full set's nonlocal owner cap.
+    // Ordinary callers use zero; local envelope caps are still evaluated here.
+    float MaximumLiftM = GlobalOwnerCapMeters;
+    for (const FSupportBreakingSite& Site : Sites)
+    {
+        const FVector2D Relative = RaftSimWaterFlowFrame::ToLocal(
+            RiverCoordinatesMeters-Site.RiverCoordinatesMeters,Site.FlowDirection);
+        if (Site.PhysicalCrestHeightMeters >= 0.0f)
+        {
+            const float Lift = FMath::Clamp(Site.PhysicalCrestHeightMeters, 0.0f, 1.2f);
+            const float Length = FMath::Clamp(Site.PhysicalCrestLengthMeters, 2.0f, 7.0f);
+            if (!Site.bLocalEnvelopeCap) MaximumLiftM = FMath::Max(MaximumLiftM, Lift);
+            const float Across = Relative.Y;
+            const float Downstream = Relative.X;
+            // A jump whose rise is already resolved needs no extra geometry,
+            // but still spills. Do not couple foam generation to the missing
+            // (subgrid) portion of its height.
+            if ((Lift <= 0.0f && !OutCrestFoam) || FMath::Abs(Across) > 12.0f ||
+                Downstream < -3.0f * Length || Downstream > 7.0f * Length) continue;
+            // A broad rising face, a shorter falling face and a contained toe.
+            // Curve the crest across the flow so it cannot form a straight
+            // river-wide lattice bar. Both rendering and support use this field.
+            const FPhysicalCrestEnvelope Envelope(Relative,Length);
+            const float Along=Envelope.Along,Crest=Envelope.Crest;
+            const float Toe = 0.32f * FMath::Exp(-FMath::Square((Along - 0.95f * Length) / (0.5f * Length)));
+            const float TailA = 0.35f * FMath::Exp(-FMath::Square((Along - 2.8f * Length) / (0.75f * Length)));
+            const float TailB = 0.16f * FMath::Exp(-FMath::Square((Along - 5.1f * Length) / Length));
+            const float Edge=Envelope.Edge,Lateral=Envelope.Lateral;
+            if (Site.bLocalEnvelopeCap)
+                MaximumLiftM = FMath::Max(MaximumLiftM, Lift * Edge * Lateral);
+            TotalM += Lift * (Crest - Toe + TailA + TailB) * Edge * Lateral;
+            if (OutCrestFoam)
+            {
+                // Only the narrow crest top spills. The broad upstream face
+                // and negative toe do not continually manufacture white foam.
+                *OutCrestFoam = FMath::Max(*OutCrestFoam,Envelope.Source(Site.SpillingFraction));
+            }
+            continue;
+        }
+        if (!Site.bLocalEnvelopeCap) MaximumLiftM = FMath::Max(MaximumLiftM, CrestLiftMeters);
+        const float LiftM =
+            CrestLiftMeters * FMath::Clamp(Site.Intensity, 0.0f, 1.0f);
+        if (LiftM <= 0.0f)
+        {
+            continue;
+        }
+        const float DownstreamM = Relative.X;
+        if (DownstreamM < -SpacingM ||
+            DownstreamM > (2 + TailStepCount) * SpacingM)
+        {
+            continue;
+        }
+        // Accepted sites deduplicate to 6 m along a jump line; a 3 m lateral
+        // falloff keeps neighbouring lobes continuous without doubling where
+        // they overlap.
+        const float LateralM = Relative.Y;
+        const float LateralEnvelope =
+            FMath::Exp(-FMath::Square(LateralM / 3.0f));
+        if (LateralEnvelope < 0.02f)
+        {
+            continue;
+        }
+        if (Site.bLocalEnvelopeCap)
+            MaximumLiftM = FMath::Max(MaximumLiftM, LiftM * LateralEnvelope);
+        const auto LatticeValueM = [LiftM, SpacingM, TailStepCount](
+                                       int32 StationStep) -> float
+        {
+            if (StationStep < 0 || StationStep > 1 + TailStepCount)
+            {
+                return 0.0f;
+            }
+            if (StationStep == 0)
+            {
+                return LiftM;
+            }
+            if (StationStep == 1)
+            {
+                return -0.45f * LiftM;
+            }
+            const float TailDistanceM = (StationStep - 1) * SpacingM;
+            return 0.62f * LiftM * FMath::Exp(-0.14f * TailDistanceM) *
+                FMath::Cos((2.05f / 3.0f) * TailDistanceM);
+        };
+        const float StepFloat = DownstreamM / SpacingM;
+        const int32 StepLow = FMath::FloorToInt32(StepFloat);
+        const float Alpha = StepFloat - static_cast<float>(StepLow);
+        TotalM += FMath::Lerp(
+                      LatticeValueM(StepLow), LatticeValueM(StepLow + 1), Alpha) *
+            LateralEnvelope;
+    }
+    // Overlapping sites cannot build a wall taller than the largest individual
+    // owner (or the legacy configured cap when legacy owners are present).
+    return FMath::Clamp(TotalM, -MaximumLiftM, MaximumLiftM);
+}
+
+void URaftSimWaterRuntimeAdapter::SetRaftSupportCarrierSampler(
+    UObject* Owner, FCarrierSupportSampler Sampler)
+{
+    check(IsInGameThread());
+    RaftSupportCarrierOwner = Owner;
+    RaftSupportCarrierSampler = MoveTemp(Sampler);
+}
+
+void URaftSimWaterRuntimeAdapter::ClearRaftSupportCarrierSampler(const UObject* Owner)
+{
+    check(IsInGameThread());
+    if (RaftSupportCarrierOwner.Get() != Owner) return;
+    RaftSupportCarrierOwner.Reset();
+    RaftSupportCarrierSampler = {};
+}
+
+bool URaftSimWaterRuntimeAdapter::SampleRaftSupportSurfaceAtWorldPosition(
+    const FVector& WorldPosition,
+    FRaftSimWaterSample& OutSample) const
+{
+    if (!SampleWaterAtWorldPosition(WorldPosition, OutSample))
+    {
+        return false;
+    }
+
+#if RAFTSIM_HAS_LIVE_SOLVER
+    if (!bRaftSupportSurfaceEnabled ||
+        !OutSample.bWet ||
+        !LiveWindow.IsValid() ||
+        (!LiveWindow->HasTravelingWavePresentation() && !bCartesianWaterCoordinates) ||
+        CVarRaftSimPresentationWaveCoupling.GetValueOnAnyThread() == 0)
+    {
+        return true;
+    }
+
+    // Use the submitted CPU carrier, rather than independently reconstructing
+    // its filtered/temporal/shore-weighted relief a second time. Never allows
+    // off-window or raw-dry water to become raft support. The normal moving
+    // carrier also includes its paired, completed GPU-detail presentation.
+    if (bCartesianWaterCoordinates && IsInGameThread() &&
+        RaftSupportCarrierOwner.IsValid() && RaftSupportCarrierSampler)
+    {
+        float HeightM=0.f; bool bCarrierWet=false;
+        if (RaftSupportCarrierSampler(WorldPosition,HeightM,bCarrierWet) &&
+            (!bCarrierWet || FMath::IsFinite(HeightM)))
+        {
+            OutSample.bWet=bCarrierWet;
+            if (bCarrierWet) OutSample.SurfaceHeightMeters=HeightM;
+            return true;
+        }
+    }
+
+    FVector2D RiverCoordinatesM(
+        WorldPosition.X / 100.0f,
+        WorldPosition.Y / 100.0f);
+    FVector WorldTangent = FVector::ForwardVector;
+    FVector WorldLeftNormal = FVector::RightVector;
+    if (!WorldToRiverCoordinates(
+            WorldPosition,
+            RiverCoordinatesM,
+            WorldTangent,
+            WorldLeftNormal))
+    {
+        return true;
+    }
+
+    constexpr float AnalysisNearOffsetM = 3.0f;
+    constexpr float AnalysisFarOffsetM = 6.0f;
+    auto SamplePresentedBaseHeight = [this](
+                                         const FVector2D& CoordinatesM,
+                                         float& OutHeightM) -> bool
+    {
+        FRaftSimWaterSample Center;
+        if (!SampleWaterFieldAtRiverCoordinates(CoordinatesM, Center) ||
+            !Center.bWet)
+        {
+            return false;
+        }
+        OutHeightM = Center.SurfaceHeightMeters;
+        if (RaftSupportSurfaceSmoothingStrength <= KINDA_SMALL_NUMBER)
+        {
+            return true;
+        }
+
+        FRaftSimWaterSample Upstream;
+        FRaftSimWaterSample Downstream;
+        FRaftSimWaterSample RiverRight;
+        FRaftSimWaterSample RiverLeft;
+        if (!SampleWaterFieldAtRiverCoordinates(
+                CoordinatesM + FVector2D(-AnalysisNearOffsetM, 0.0f),
+                Upstream) ||
+            !SampleWaterFieldAtRiverCoordinates(
+                CoordinatesM + FVector2D(AnalysisNearOffsetM, 0.0f),
+                Downstream) ||
+            !SampleWaterFieldAtRiverCoordinates(
+                CoordinatesM + FVector2D(0.0f, -AnalysisNearOffsetM),
+                RiverRight) ||
+            !SampleWaterFieldAtRiverCoordinates(
+                CoordinatesM + FVector2D(0.0f, AnalysisNearOffsetM),
+                RiverLeft) ||
+            !Upstream.bWet ||
+            !Downstream.bWet ||
+            !RiverRight.bWet ||
+            !RiverLeft.bWet)
+        {
+            return true;
+        }
+
+        OutHeightM = ComputeCoupledSmoothedSurfaceHeightMeters(
+            Center.SurfaceHeightMeters,
+            Upstream.SurfaceHeightMeters,
+            Downstream.SurfaceHeightMeters,
+            RiverRight.SurfaceHeightMeters,
+            RiverLeft.SurfaceHeightMeters,
+            RaftSupportSurfaceSmoothingStrength);
+        return true;
+    };
+
+    FRaftSimWaterSample RawCenter;
+    float PresentedCenterHeightM = 0.0f;
+    if (!SampleWaterFieldAtRiverCoordinates(RiverCoordinatesM, RawCenter) ||
+        !RawCenter.bWet ||
+        !SamplePresentedBaseHeight(
+            RiverCoordinatesM,
+            PresentedCenterHeightM))
+    {
+        return true;
+    }
+
+    // Replace the unsmoothed solver base with the carrier's base. Preserve the
+    // already-coupled travelling swell added by SampleWaterAtWorldPosition.
+    OutSample.SurfaceHeightMeters +=
+        (bCartesianWaterCoordinates ? RawCenter.SurfaceHeightMeters : PresentedCenterHeightM) -
+        RawCenter.SurfaceHeightMeters;
+    // Cartesian carrier keeps native mean stage; smoothing remains an
+    // analysis input below, not an artificial fill of a physical trough.
+
+    // RawCenter came from the field API, not the world-space probe. Its XY
+    // velocity already uses hydraulic east/north; do not reflect north again.
+    const FVector2D DownstreamDirection = bCartesianWaterCoordinates
+        ? RaftSimWaterFlowFrame::Direction(FVector2D(RawCenter.VelocityMetersPerSecond.X,
+            RawCenter.VelocityMetersPerSecond.Y)) : FVector2D(1.,0.);
+    const FRaftSimWaterStandingWave StandingWave = bCartesianWaterCoordinates ? FRaftSimWaterStandingWave{} :
+        ComputeCoupledStandingWave(
+            RiverCoordinatesM,
+            RawCenter.VelocityMetersPerSecond.Size2D(),
+            RawCenter.DepthMeters);
+    OutSample.SurfaceHeightMeters +=
+        StandingWave.DisplacementMeters * RaftSupportStandingWaveScale;
+
+    float UpstreamFarHeightM = 0.0f;
+    float UpstreamNearHeightM = 0.0f;
+    float DownstreamNearHeightM = 0.0f;
+    float DownstreamFarHeightM = 0.0f;
+    float HydraulicReliefM = 0.0f;
+    if (SamplePresentedBaseHeight(
+            RiverCoordinatesM - DownstreamDirection*AnalysisFarOffsetM,
+            UpstreamFarHeightM) &&
+        SamplePresentedBaseHeight(
+            RiverCoordinatesM - DownstreamDirection*AnalysisNearOffsetM,
+            UpstreamNearHeightM) &&
+        SamplePresentedBaseHeight(
+            RiverCoordinatesM + DownstreamDirection*AnalysisNearOffsetM,
+            DownstreamNearHeightM) &&
+        SamplePresentedBaseHeight(
+            RiverCoordinatesM + DownstreamDirection*AnalysisFarOffsetM,
+            DownstreamFarHeightM))
+    {
+        HydraulicReliefM =
+            (ComputeCoupledHydraulicReliefMeters(
+                 PresentedCenterHeightM,
+                 UpstreamFarHeightM,
+                 UpstreamNearHeightM,
+                 DownstreamNearHeightM,
+                 DownstreamFarHeightM,
+                 RawCenter.VelocityMetersPerSecond.Size2D(),
+                 RawCenter.DepthMeters) +
+             (bCartesianWaterCoordinates ? 0.f : ComputeCoupledRapidGradeWaveMeters(
+                 RiverCoordinatesM,
+                 UpstreamFarHeightM,
+                 DownstreamFarHeightM,
+                 RawCenter.VelocityMetersPerSecond.Size2D()))) *
+            RaftSupportHydraulicReliefScale;
+        OutSample.SurfaceHeightMeters += HydraulicReliefM;
+    }
+
+    if (bRaftSupportLocalFluidEnabled)
+    {
+        const float HydraulicFeatureEnergy = FMath::Clamp(
+            ComputeCoupledHydraulicFeatureEnergy(
+                RiverCoordinatesM, HydraulicReliefM) * 0.72f * 1.9f,
+            0.0f,
+            1.0f);
+        OutSample.SurfaceHeightMeters +=
+            ComputeCoupledLocalFluidHeightfieldMeters(
+                RiverCoordinatesM,
+                RaftSupportLocalFluidAdvectionMeters,
+                RawCenter.VelocityMetersPerSecond.Size2D(),
+                RawCenter.DepthMeters,
+                PresentationWaveClockSeconds,
+                RaftSupportLocalFluidStrength,
+                HydraulicFeatureEnergy);
+    }
+
+    if (RaftSupportBreakingSites.Num() > 0 &&
+        RaftSupportBreakingCrestLiftMeters > 0.0f)
+    {
+        OutSample.SurfaceHeightMeters +=
+            ComputeCoupledBreakingReliefMeters(
+                RiverCoordinatesM,
+                RaftSupportBreakingSites,
+                RaftSupportBreakingCrestLiftMeters,
+                RaftSupportBreakingStationSpacingMeters) *
+            RaftSupportHydraulicReliefScale;
+    }
+
+    if (RaftSupportBoulderFootprints.Num() > 0)
+    {
+        const UWorld* SupportWorld = GetWorld();
+        const float PhaseSeconds = PresentationWaveClockSeconds >= 0.0f
+            ? PresentationWaveClockSeconds
+            : (SupportWorld ? SupportWorld->GetTimeSeconds() : 0.0f);
+        const float WaterSpeedMps =
+            RawCenter.VelocityMetersPerSecond.Size2D();
+        OutSample.SurfaceHeightMeters +=
+            ComputeConfiguredBoulderSupportDisplacementMeters(
+                RiverCoordinatesM, WaterSpeedMps, PhaseSeconds,
+                DownstreamDirection);
+    }
+
+    // Legacy authored band water: carry the baked sculpt delta plus the same
+    // halved, band-gated energetic WPO term the render draws. Phases and time
+    // must stay paired with the transmission material's WPO block.
+    if (RaftSupportBandField.IsValid())
+    {
+        float BandElevationAbsM = 0.0f;
+        float BandEnergy = 0.0f;
+        if (RaftSupportBandField.Sample(
+                RiverCoordinatesM.X, RiverCoordinatesM.Y,
+                BandElevationAbsM, BandEnergy))
+        {
+            const UWorld* BandWorld = GetWorld();
+            const float BandTime = PresentationWaveClockSeconds >= 0.0f
+                ? PresentationWaveClockSeconds
+                : (BandWorld ? BandWorld->GetTimeSeconds() : 0.0f);
+            const float BandPhaseA = RiverCoordinatesM.X * 0.19f +
+                RiverCoordinatesM.Y * 0.61f - BandTime * 0.90f;
+            const float BandPhaseB = RiverCoordinatesM.X * 0.071f -
+                RiverCoordinatesM.Y * 0.37f - BandTime * 0.55f;
+            const float BakedBaseDeltaM = FMath::Clamp(
+                (BandElevationAbsM - RiverVerticalDatumM) -
+                    RawCenter.SurfaceHeightMeters,
+                -1.5f,
+                1.5f);
+            // Full energetic amplitude, mirrored with the transmission
+            // WPO block (both were 0.5 while paired; raised together
+            // 2026-08-16 so boulder-wake and rapid crests are real waves
+            // the hull physically rides).
+            OutSample.SurfaceHeightMeters += BakedBaseDeltaM +
+                BandEnergy * 1.0f *
+                    (0.16f * FMath::Sin(BandPhaseA) +
+                     0.09f * FMath::Sin(BandPhaseB));
+        }
+    }
+#endif
+
     return true;
 }
 
@@ -223,12 +1804,24 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtRiverCoordinates(
     return true;
 }
 
+bool URaftSimWaterRuntimeAdapter::GetLiveFieldTimeSeconds(double& OutSeconds) const
+{
+#if RAFTSIM_HAS_LIVE_SOLVER
+    if(LiveWindow.IsValid() && Status!=ERaftSimWaterRuntimeStatus::Faulted)
+    {
+        OutSeconds=LiveWindow->SimTimeSeconds();return FMath::IsFinite(OutSeconds);
+    }
+#endif
+    return false;
+}
+
 bool URaftSimWaterRuntimeAdapter::SampleWaterFieldAtRiverCoordinates(
     FVector2D StationLateralM,
     FRaftSimWaterSample& OutSample
 ) const
 {
-    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized)
+    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized ||
+        Status == ERaftSimWaterRuntimeStatus::Faulted)
     {
         return false;
     }
@@ -253,15 +1846,16 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterFieldAtRiverCoordinates(
     }
 #endif
 
-    OutSample.WorldPosition = FVector(
-        StationLateralM.X * 100.0f, StationLateralM.Y * 100.0f, 0.0f);
-    OutSample.SurfaceHeightMeters = 0.0f;
-    OutSample.BedHeightMeters = -1.0f;
-    OutSample.DepthMeters = 1.0f;
-    OutSample.VelocityMetersPerSecond = FVector::ZeroVector;
-    OutSample.SurfaceNormal = FVector::UpVector;
-    OutSample.bWet = true;
-    return true;
+    return false;
+}
+
+bool URaftSimWaterRuntimeAdapter::GetLiveWaterFieldBoundsM(FBox2D& OutBounds) const
+{
+#if RAFTSIM_HAS_LIVE_SOLVER
+    return LiveWindow.IsValid() && LiveWindow->GetFieldBoundsM(OutBounds);
+#else
+    return false;
+#endif
 }
 
 FIntPoint URaftSimWaterRuntimeAdapter::RiverSpatialHashKey(
@@ -286,8 +1880,13 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverCoordinateMap(
     const FString& CoordinateMapPath)
 {
     RiverCoordinatePoints.Reset();
+    bCartesianWaterCoordinates = false;
     RiverSpatialHash.Reset();
+    LastWorldToRiverSegment = INDEX_NONE;
+    LastWorldToRiverPositionM = FVector2D::ZeroVector;
+    bHasLastWorldToRiverQuery = false;
     RiverVerticalDatumM = 0.0f;
+    RiverWorldYSign = 1.0;
     RiverCoordinateMapPath.Reset();
 
     FString Text;
@@ -306,14 +1905,51 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverCoordinateMap(
     }
     FString Schema;
     if (!Root->TryGetStringField(TEXT("schema"), Schema) ||
-        Schema != TEXT("raftsim.curved_river_coordinate_map.v1"))
+        (Schema != TEXT("raftsim.curved_river_coordinate_map.v1") &&
+         Schema != TEXT("raftsim.cartesian_water_coordinate_map.v1")))
     {
         UE_LOG(LogTemp, Error, TEXT("RaftSim coordinate map schema is unsupported: %s"), *Schema);
         return false;
     }
+    // Keep source coordinates, spatial search and solver lateral directions
+    // unchanged. Reflect only at the Unreal world boundary, in both directions.
+    double WorldYSign = 1.0;
+    if (Root->HasField(TEXT("world_y_sign")) &&
+        (!Root->TryGetNumberField(TEXT("world_y_sign"), WorldYSign) ||
+         (WorldYSign != 1.0 && WorldYSign != -1.0)))
+    {
+        UE_LOG(LogTemp, Error, TEXT("RaftSim coordinate map world_y_sign must be +1 or -1"));
+        return false;
+    }
+    RiverWorldYSign = WorldYSign;
     double VerticalDatum = 0.0;
     Root->TryGetNumberField(TEXT("vertical_datum_m"), VerticalDatum);
     RiverVerticalDatumM = static_cast<float>(VerticalDatum);
+
+    if (Schema == TEXT("raftsim.cartesian_water_coordinate_map.v1"))
+    {
+        const TArray<TSharedPtr<FJsonValue>>* Bounds = nullptr;
+        if (!Root->HasField(TEXT("world_y_sign")) ||
+            !Root->TryGetNumberField(TEXT("vertical_datum_m"), VerticalDatum) ||
+            !FMath::IsFinite(VerticalDatum) ||
+            !Root->TryGetArrayField(TEXT("hydraulic_bounds_m"), Bounds) ||
+            Bounds == nullptr || Bounds->Num() != 4) return false;
+        double Values[4];
+        for (int32 Index = 0; Index < 4; ++Index)
+        {
+            if (!(*Bounds)[Index].IsValid() ||
+                !(*Bounds)[Index]->TryGetNumber(Values[Index]) ||
+                !FMath::IsFinite(Values[Index])) return false;
+        }
+        if (Values[0] >= Values[2] || Values[1] >= Values[3]) return false;
+        CartesianWaterBoundsM = FBox2D(FVector2D(Values[0],Values[1]), FVector2D(Values[2],Values[3]));
+        bCartesianWaterCoordinates = true;
+        RiverCoordinateMapPath = CoordinateMapPath;
+        // Solver XY are east/north relative to the geographic world origin.
+        // These are never downstream station/lateral or gameplay progress.
+        UE_LOG(LogTemp, Display, TEXT("RaftSim bound Cartesian water map %s"), *CoordinateMapPath);
+        return true;
+    }
 
     const TArray<TSharedPtr<FJsonValue>>* Points = nullptr;
     if (!Root->TryGetArrayField(TEXT("points"), Points) || Points == nullptr || Points->Num() < 2)
@@ -398,6 +2034,14 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
     const FVector& WorldPositionCm, FVector2D& OutStationLateralM,
     FVector& OutWorldTangent, FVector& OutWorldLeftNormal) const
 {
+    TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimWater_WorldToRiverCoordinates);
+    if (bCartesianWaterCoordinates)
+    {
+        OutStationLateralM = FVector2D(WorldPositionCm.X / 100., RiverWorldYSign * WorldPositionCm.Y / 100.);
+        OutWorldTangent = FVector::ForwardVector;
+        OutWorldLeftNormal = FVector(0., RiverWorldYSign, 0.);
+        return !OutStationLateralM.ContainsNaN() && CartesianWaterBoundsM.IsInsideOrOn(OutStationLateralM);
+    }
     if (!HasRiverCoordinateMap())
     {
         OutStationLateralM = FVector2D(WorldPositionCm.X / 100.0, WorldPositionCm.Y / 100.0);
@@ -405,47 +2049,26 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
         OutWorldLeftNormal = FVector::RightVector;
         return true;
     }
-    const FVector2D PositionM(WorldPositionCm.X / 100.0, WorldPositionCm.Y / 100.0);
-    const FIntPoint CenterKey = RiverSpatialHashKey(PositionM);
-    TSet<int32> CandidateSegments;
-    constexpr int32 QueryRadiusCells = 3;
-    for (int32 Y = -QueryRadiusCells; Y <= QueryRadiusCells; ++Y)
-    {
-        for (int32 X = -QueryRadiusCells; X <= QueryRadiusCells; ++X)
-        {
-            if (const TArray<int32>* Indices = RiverSpatialHash.Find(CenterKey + FIntPoint(X, Y)))
-            {
-                for (int32 PointIndex : *Indices)
-                {
-                    if (PointIndex > 0)
-                    {
-                        CandidateSegments.Add(PointIndex - 1);
-                    }
-                    if (PointIndex + 1 < RiverCoordinatePoints.Num())
-                    {
-                        CandidateSegments.Add(PointIndex);
-                    }
-                }
-            }
-        }
-    }
-    if (CandidateSegments.IsEmpty())
-    {
-        return false;
-    }
-
+    const FVector2D PositionM(WorldPositionCm.X / 100.0, RiverWorldYSign * WorldPositionCm.Y / 100.0);
     double BestDistanceSquared = TNumericLimits<double>::Max();
+    double BestLateralAbsM = TNumericLimits<double>::Max();
     int32 BestSegment = INDEX_NONE;
     double BestAlpha = 0.0;
-    for (int32 SegmentIndex : CandidateSegments)
+    const auto EvaluateSegment =
+        [this, &PositionM, &BestDistanceSquared, &BestLateralAbsM, &BestSegment, &BestAlpha](
+            int32 SegmentIndex)
     {
+        if (SegmentIndex < 0 || SegmentIndex + 1 >= RiverCoordinatePoints.Num())
+        {
+            return;
+        }
         const FRiverCoordinatePoint& PointA = RiverCoordinatePoints[SegmentIndex];
         const FRiverCoordinatePoint& PointB = RiverCoordinatePoints[SegmentIndex + 1];
         const FVector2D Segment = PointB.LocalPositionM - PointA.LocalPositionM;
         const double LengthSquared = Segment.SquaredLength();
         if (LengthSquared <= UE_DOUBLE_SMALL_NUMBER)
         {
-            continue;
+            return;
         }
 
         // RiverToWorldPosition describes a ruled corridor, not a simple
@@ -462,32 +2085,129 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
             const FVector2D Left = FMath::Lerp(
                 PointA.LeftNormal, PointB.LeftNormal, Alpha).GetSafeNormal();
             const double Lateral = FVector2D::DotProduct(PositionM - Center, Left);
+            // A segment's lateral line reconstructs ANY point of the plane
+            // exactly, so without a bound a segment hundreds of metres away
+            // ties with the true one and wins on candidate order: the
+            // 2026-09-02 reach survey saw a point ON the 9300 m centreline
+            // resolve to station 9694 / lateral -553 m, which dried every
+            // water probe there and dropped the raft through the river. The
+            // corridor is authored to +/-256 m, so reject reconstructions
+            // outside it.
+            constexpr double CorridorHalfWidthM = 256.0;
+            if (FMath::Abs(Lateral) > CorridorHalfWidthM)
+            {
+                return TNumericLimits<double>::Max();
+            }
             return (PositionM - (Center + Left * Lateral)).SquaredLength();
         };
-        double LowerAlpha = 0.0;
-        double UpperAlpha = 1.0;
-        for (int32 Iteration = 0; Iteration < 24; ++Iteration)
+        double Alpha = 0.0;
+        const FVector2D StationAxis(PointA.LeftNormal.Y, -PointA.LeftNormal.X);
+        const double StationSpan = FVector2D::DotProduct(Segment, StationAxis);
+        if (PointA.LeftNormal.Equals(PointB.LeftNormal, 1.0e-12) &&
+            FMath::Abs(StationSpan) > UE_DOUBLE_SMALL_NUMBER)
         {
-            const double Third = (UpperAlpha - LowerAlpha) / 3.0;
-            const double LeftAlpha = LowerAlpha + Third;
-            const double RightAlpha = UpperAlpha - Third;
-            if (ReconstructionDistanceSquared(LeftAlpha) <=
-                ReconstructionDistanceSquared(RightAlpha))
-            {
-                UpperAlpha = RightAlpha;
-            }
-            else
-            {
-                LowerAlpha = LeftAlpha;
-            }
+            // Constant-normal survey grids have an exact linear inverse.
+            // Ternary search never reaches segment endpoints and can choose
+            // opposite sides of the same station after world translation,
+            // moving a steep-bed sample by submillimetres. Keep that rigid
+            // mapping exact (and avoid 48 residual evaluations per segment).
+            Alpha = FMath::Clamp(FVector2D::DotProduct(
+                PositionM - PointA.LocalPositionM, StationAxis) / StationSpan, 0.0, 1.0);
         }
-        const double Alpha = 0.5 * (LowerAlpha + UpperAlpha);
-        const double DistanceSquared = ReconstructionDistanceSquared(Alpha);
-        if (DistanceSquared < BestDistanceSquared)
+        else
         {
-            BestDistanceSquared = DistanceSquared;
+            double LowerAlpha = 0.0;
+            double UpperAlpha = 1.0;
+            for (int32 Iteration = 0; Iteration < 24; ++Iteration)
+            {
+                const double Third = (UpperAlpha - LowerAlpha) / 3.0;
+                const double LeftAlpha = LowerAlpha + Third;
+                const double RightAlpha = UpperAlpha - Third;
+                if (ReconstructionDistanceSquared(LeftAlpha) <=
+                    ReconstructionDistanceSquared(RightAlpha))
+                {
+                    UpperAlpha = RightAlpha;
+                }
+                else
+                {
+                    LowerAlpha = LeftAlpha;
+                }
+            }
+            Alpha = 0.5 * (LowerAlpha + UpperAlpha);
+        }
+        const double DistanceSquared = ReconstructionDistanceSquared(Alpha);
+        if (DistanceSquared == TNumericLimits<double>::Max())
+        {
+            return;
+        }
+        // On a tightly meandering reach (Pacuare Huacas: 122 m minimum
+        // radius against the 256 m corridor) several segments' lateral lines
+        // pass through the same point and all reconstruct it exactly; the
+        // candidate order then chose a stretch a kilometre away (the launch
+        // at station 280 resolved to 1392 m, 239.5 m off the centreline).
+        // Among exact reconstructions, keep the one nearest the centreline.
+        const FVector2D Center = FMath::Lerp(PointA.LocalPositionM, PointB.LocalPositionM, Alpha);
+        const FVector2D Left = FMath::Lerp(PointA.LeftNormal, PointB.LeftNormal, Alpha).GetSafeNormal();
+        const double LateralAbsM = FMath::Abs(FVector2D::DotProduct(PositionM - Center, Left));
+        constexpr double ExactToleranceSquaredM2 = 1.0e-4;  // 1 cm
+        if (DistanceSquared + ExactToleranceSquaredM2 < BestDistanceSquared ||
+            (DistanceSquared <= BestDistanceSquared + ExactToleranceSquaredM2 && LateralAbsM < BestLateralAbsM))
+        {
+            BestDistanceSquared = FMath::Min(DistanceSquared, BestDistanceSquared);
+            BestLateralAbsM = LateralAbsM;
             BestSegment = SegmentIndex;
             BestAlpha = Alpha;
+        }
+    };
+
+    // The 12 D1-D4 tube samples and the center wetness probe form one
+    // continuous, sub-five-metre query chain. Their correct coordinate-map
+    // segments are therefore adjacent to the previous exact solution. This
+    // keeps the same 24-iteration ruled-surface inverse while eliminating the
+    // repeated 7x7-cell candidate-set construction that dominated raft ticks.
+    constexpr double NearbyQueryDistanceM = 8.0;
+    constexpr int32 NearbySegmentRadius = 4;
+    const bool bCanUseNearbySeed =
+        bHasLastWorldToRiverQuery &&
+        LastWorldToRiverSegment != INDEX_NONE &&
+        FVector2D::DistSquared(PositionM, LastWorldToRiverPositionM) <=
+            FMath::Square(NearbyQueryDistanceM);
+    if (bCanUseNearbySeed)
+    {
+        for (int32 Offset = -NearbySegmentRadius; Offset <= NearbySegmentRadius; ++Offset)
+        {
+            EvaluateSegment(LastWorldToRiverSegment + Offset);
+        }
+    }
+    else
+    {
+        const FIntPoint CenterKey = RiverSpatialHashKey(PositionM);
+        TSet<int32> CandidateSegments;
+        constexpr int32 QueryRadiusCells = 3;
+        for (int32 Y = -QueryRadiusCells; Y <= QueryRadiusCells; ++Y)
+        {
+            for (int32 X = -QueryRadiusCells; X <= QueryRadiusCells; ++X)
+            {
+                if (const TArray<int32>* Indices =
+                        RiverSpatialHash.Find(CenterKey + FIntPoint(X, Y)))
+                {
+                    for (int32 PointIndex : *Indices)
+                    {
+                        if (PointIndex > 0)
+                        {
+                            CandidateSegments.Add(PointIndex - 1);
+                        }
+                        if (PointIndex + 1 < RiverCoordinatePoints.Num())
+                        {
+                            CandidateSegments.Add(PointIndex);
+                        }
+                    }
+                }
+            }
+        }
+        for (int32 SegmentIndex : CandidateSegments)
+        {
+            EvaluateSegment(SegmentIndex);
         }
     }
     if (BestSegment == INDEX_NONE)
@@ -502,8 +2222,11 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
     const FVector2D Tangent2D(Left2D.Y, -Left2D.X);
     OutStationLateralM.X = FMath::Lerp(A.StationM, B.StationM, BestAlpha);
     OutStationLateralM.Y = FVector2D::DotProduct(PositionM - Center, Left2D);
-    OutWorldTangent = FVector(Tangent2D.X, Tangent2D.Y, 0.0);
-    OutWorldLeftNormal = FVector(Left2D.X, Left2D.Y, 0.0);
+    OutWorldTangent = FVector(Tangent2D.X, RiverWorldYSign * Tangent2D.Y, 0.0);
+    OutWorldLeftNormal = FVector(Left2D.X, RiverWorldYSign * Left2D.Y, 0.0);
+    LastWorldToRiverSegment = BestSegment;
+    LastWorldToRiverPositionM = PositionM;
+    bHasLastWorldToRiverQuery = true;
     return true;
 }
 
@@ -512,6 +2235,16 @@ bool URaftSimWaterRuntimeAdapter::ResolveRiverBasis(
     FVector& OutWorldPositionCm, FVector& OutWorldTangent,
     FVector& OutWorldLeftNormal) const
 {
+    if (bCartesianWaterCoordinates)
+    {
+        if (StationLateralM.ContainsNaN() || !FMath::IsFinite(ElevationM) ||
+            !CartesianWaterBoundsM.IsInsideOrOn(StationLateralM)) return false;
+        OutWorldPositionCm = FVector(StationLateralM.X * 100.,
+            RiverWorldYSign * StationLateralM.Y * 100., (ElevationM - RiverVerticalDatumM) * 100.);
+        OutWorldTangent = FVector::ForwardVector;
+        OutWorldLeftNormal = FVector(0., RiverWorldYSign, 0.);
+        return true;
+    }
     if (!HasRiverCoordinateMap())
     {
         OutWorldPositionCm = FVector(
@@ -551,10 +2284,10 @@ bool URaftSimWaterRuntimeAdapter::ResolveRiverBasis(
     const FVector2D Tangent(LeftNormal.Y, -LeftNormal.X);
     const FVector2D WorldXYM = Center + LeftNormal * StationLateralM.Y;
     OutWorldPositionCm = FVector(
-        WorldXYM.X * 100.0, WorldXYM.Y * 100.0,
+        WorldXYM.X * 100.0, RiverWorldYSign * WorldXYM.Y * 100.0,
         (ElevationM - RiverVerticalDatumM) * 100.0);
-    OutWorldTangent = FVector(Tangent.X, Tangent.Y, 0.0);
-    OutWorldLeftNormal = FVector(LeftNormal.X, LeftNormal.Y, 0.0);
+    OutWorldTangent = FVector(Tangent.X, RiverWorldYSign * Tangent.Y, 0.0);
+    OutWorldLeftNormal = FVector(LeftNormal.X, RiverWorldYSign * LeftNormal.Y, 0.0);
     return true;
 }
 
@@ -571,14 +2304,24 @@ bool URaftSimWaterRuntimeAdapter::RiverToWorldPosition(
 bool URaftSimWaterRuntimeAdapter::GetRiverStationRangeM(
     float& OutMinimumStationM, float& OutMaximumStationM) const
 {
-    if (!HasRiverCoordinateMap())
+    double MinimumM=0.,MaximumM=0.;
+    const bool Available=GetExactRiverStationRangeM(MinimumM,MaximumM);
+    OutMinimumStationM=static_cast<float>(MinimumM);
+    OutMaximumStationM=static_cast<float>(MaximumM);
+    return Available;
+}
+
+bool URaftSimWaterRuntimeAdapter::GetExactRiverStationRangeM(
+    double& OutMinimumStationM, double& OutMaximumStationM) const
+{
+    if (!HasRiverCoordinateMap() || bCartesianWaterCoordinates)
     {
-        OutMinimumStationM = 0.0f;
-        OutMaximumStationM = 0.0f;
+        OutMinimumStationM = 0.;
+        OutMaximumStationM = 0.;
         return false;
     }
-    OutMinimumStationM = static_cast<float>(RiverCoordinatePoints[0].StationM);
-    OutMaximumStationM = static_cast<float>(RiverCoordinatePoints.Last().StationM);
+    OutMinimumStationM = RiverCoordinatePoints[0].StationM;
+    OutMaximumStationM = RiverCoordinatePoints.Last().StationM;
     return true;
 }
 
@@ -624,6 +2367,20 @@ FString URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(const FString& Path)
 {
     if (FPaths::IsRelative(Path))
     {
+#if WITH_EDITOR
+        // Editor automation and PIE must validate the authoritative source
+        // data. A prior packaged build may leave an older RuntimeData copy in
+        // Binaries/Mac; preferring it makes local tests silently exercise
+        // stale hydraulics and manifests. Shipping builds take the packaged
+        // branches below because the repository is not present there.
+        const FString EditorRepoRelative = FPaths::ConvertRelativePathToFull(
+            FPaths::Combine(FPaths::ProjectDir(), TEXT(".."), Path));
+        if (FPaths::FileExists(EditorRepoRelative) || FPaths::DirectoryExists(EditorRepoRelative)
+            || Path.StartsWith(TEXT("physics/")))
+        {
+            return EditorRepoRelative;
+        }
+#endif
         // A self-contained macOS app keeps the project payload under
         // Contents/UE/<Project>/Binaries/Mac while the Mach-O executable is
         // under Contents/MacOS. Windows keeps these locations closer, but the
@@ -680,13 +2437,16 @@ bool URaftSimWaterRuntimeAdapter::ConfigureDevTankWindow(
 
 bool URaftSimWaterRuntimeAdapter::ConfigureRiverWindow(
     const FString& CookedFieldsManifestDir, const FString& BandId,
-    FVector2D WindowCenterM, FVector2D WindowExtentM, float RoughnessManning)
+    FVector2D WindowCenterM, FVector2D WindowExtentM, float RoughnessManning,
+    bool bRecenterHydraulicCrux)
 {
 #if RAFTSIM_HAS_LIVE_SOLVER
     FString Error;
     LiveWindow = FRaftSimLiveWaterWindow::CreateFromCookedFields(
         ResolveRuntimeDataPath(CookedFieldsManifestDir), BandId,
-        WindowCenterM, WindowExtentM, RoughnessManning, Error);
+        WindowCenterM, WindowExtentM, RoughnessManning, Error,
+        bRecenterHydraulicCrux);
+    LastFixedWindowExtentM = WindowExtentM;
     LastHandoffTransferredCellCount = 0;
     bLastHandoffPreservedState = false;
     if (!LiveWindow.IsValid())
@@ -713,7 +2473,17 @@ bool URaftSimWaterRuntimeAdapter::ConfigureMovingRiverWindow(
     const FString& CookedFieldsManifestDir, const FString& BandId,
     FVector2D WindowCenterM, FVector2D WindowExtentM, float RoughnessManning)
 {
+    return ConfigureMovingRiverWindowValidated(CookedFieldsManifestDir,BandId,
+        WindowCenterM,WindowExtentM,RoughnessManning,{});
+}
+
+bool URaftSimWaterRuntimeAdapter::ConfigureMovingRiverWindowValidated(
+    const FString& CookedFieldsManifestDir, const FString& BandId,
+    FVector2D WindowCenterM, FVector2D WindowExtentM, float RoughnessManning,
+    TOptional<FVector2D> RequiredWetPositionM)
+{
 #if RAFTSIM_HAS_LIVE_SOLVER
+    if (RequiredWetPositionM.IsSet() && RequiredWetPositionM.GetValue().ContainsNaN()) return false;
     FString Error;
     TUniquePtr<FRaftSimLiveWaterWindow> Candidate =
         FRaftSimLiveWaterWindow::CreateFromCookedFields(
@@ -726,25 +2496,47 @@ bool URaftSimWaterRuntimeAdapter::ConfigureMovingRiverWindow(
             LogTemp, Error,
             TEXT("RaftSim moving river window '%s' failed to load from %s: %s"),
             *BandId, *CookedFieldsManifestDir, *Error);
-        Status = ERaftSimWaterRuntimeStatus::Faulted;
+        if (!RequiredWetPositionM.IsSet()) Status = ERaftSimWaterRuntimeStatus::Faulted;
         return false;
     }
 
-    LastHandoffTransferredCellCount = 0;
+    int32 TransferredCellCount = 0;
+    if (LiveWindow.IsValid())
+    {
+        TransferredCellCount = Candidate->TransferOverlapStateFrom(*LiveWindow);
+    }
+    if (RequiredWetPositionM.IsSet())
+    {
+        const auto Sample = Candidate->Sample(RequiredWetPositionM.GetValue());
+        if (!Sample.bValid || !Sample.bWet) return false;
+    }
+    LastHandoffTransferredCellCount = TransferredCellCount;
     bLastHandoffPreservedState = false;
     if (LiveWindow.IsValid())
     {
-        LastHandoffTransferredCellCount = Candidate->TransferOverlapStateFrom(*LiveWindow);
-        if (LastHandoffTransferredCellCount <= 0)
+        if (TransferredCellCount <= 0)
         {
-            UE_LOG(
-                LogTemp, Error,
-                TEXT("RaftSim rejected non-overlapping moving-window handoff for '%s'"),
-                *BandId);
-            return false;
+            // Every caller centres the moving window on the raft itself, so a
+            // zero-overlap replacement means the raft genuinely jumped
+            // (teleport, checkpoint restore, station-walking automation). The
+            // old window is useless there — it no longer covers the raft —
+            // and rejecting the replacement wedged the window permanently:
+            // each retry was equally non-overlapping. Adopt the candidate as
+            // a fresh cold boot instead. State carry is impossible by
+            // definition (nothing overlaps), which is exactly what a cold
+            // start at the new station would have produced anyway.
+            if (!RequiredWetPositionM.IsSet()) UE_LOG(
+                LogTemp, Warning,
+                TEXT("RaftSim moving-window handoff for '%s' has no overlap; "
+                     "rebooting the window cold at station %.1f m"),
+                *BandId,
+                WindowCenterM.X);
         }
-        ++MovingWindowHandoffCount;
-        bLastHandoffPreservedState = true;
+        else
+        {
+            ++MovingWindowHandoffCount;
+            bLastHandoffPreservedState = true;
+        }
     }
     LiveWindow = MoveTemp(Candidate);
     if (Status == ERaftSimWaterRuntimeStatus::Uninitialized ||

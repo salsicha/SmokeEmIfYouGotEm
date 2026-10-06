@@ -47,8 +47,6 @@ bool FRaftSimLiveWaterSmokeSuiteManifestTest::RunTest(const FString& Parameters)
         Root->GetStringField(TEXT("automation_test_name")),
         FString(TEXT("RaftSim.Milestone20.LiveWaterSmokeSuite"))
     );
-    TestEqual(TEXT("status"), Root->GetStringField(TEXT("status")), FString(TEXT("ready_for_unreal_automation_execution")));
-
     const TArray<TSharedPtr<FJsonValue>>* Checks = nullptr;
     if (!Root->TryGetArrayField(TEXT("checks"), Checks) || Checks == nullptr)
     {
@@ -56,6 +54,7 @@ bool FRaftSimLiveWaterSmokeSuiteManifestTest::RunTest(const FString& Parameters)
         return false;
     }
     TestEqual(TEXT("check count"), Checks->Num(), 7);
+    bool bReportSetLockPassed = false;
     for (const TSharedPtr<FJsonValue>& CheckValue : *Checks)
     {
         const TSharedPtr<FJsonObject> Check = CheckValue->AsObject();
@@ -64,8 +63,21 @@ bool FRaftSimLiveWaterSmokeSuiteManifestTest::RunTest(const FString& Parameters)
             AddError(TEXT("Every live-water smoke check must be an object."));
             return false;
         }
-        TestTrue(Check->GetStringField(TEXT("check_id")), Check->GetBoolField(TEXT("passed")));
+        const FString CheckId = Check->GetStringField(TEXT("check_id"));
+        const bool bCheckPassed = Check->GetBoolField(TEXT("passed"));
+        // Only the report-set lock may be blocked: it waits on solver-parity
+        // evidence (d9727606a; mirrors physics/tests/test_milestone20.py).
+        if (CheckId == TEXT("accepted_report_set_lock"))
+        {
+            bReportSetLockPassed = bCheckPassed;
+        }
+        else
+        {
+            TestTrue(CheckId, bCheckPassed);
+        }
     }
+    TestEqual(TEXT("status follows the report-set lock"), Root->GetStringField(TEXT("status")),
+        FString(bReportSetLockPassed ? TEXT("ready_for_unreal_automation_execution") : TEXT("blocked")));
 
     const TArray<TSharedPtr<FJsonValue>>* TargetProfiles = nullptr;
     if (!Root->TryGetArrayField(TEXT("target_profiles"), TargetProfiles)

@@ -79,6 +79,9 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Presentation")
     bool HasBoundEnvironmentActors() const;
 
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Presentation")
+    bool IsCloudLayerVisible() const;
+
 private:
     static FRaftSimPresentationEnvironmentState MakePreset(ERaftSimWeatherVariant Variant);
     void ResolveEnvironmentActors();
@@ -98,6 +101,12 @@ private:
 
     FRaftSimPresentationEnvironmentState CurrentState;
     FRaftSimPresentationEnvironmentState TargetState;
+    /** South Fork keeps sparse high clouds in its clear-morning preset so
+     * Single Layer Water can be reviewed against a changing captured sky. */
+    bool bClearMorningCloudsEnabled = false;
+    /** The map's own clear-weather sky fill when its sky light is tagged
+     * RaftSimAuthoredSkyFill; 0 uses the shared 1.25. */
+    float AuthoredSkyFillIntensity = 0.0f;
     float ElapsedSeconds = 0.0f;
     float TargetSunPitch = -42.0f;
     float TargetSunYaw = -128.0f;

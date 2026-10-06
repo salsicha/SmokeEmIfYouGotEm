@@ -127,7 +127,7 @@ Start after the Python modeling/profiling exit gate.
 Run when high-fidelity comparison is needed.
 
 - Add a minimal standalone C++ Chrono executable outside Unreal.
-- Build `physics/cpp` with the optional `raftsim_chrono_smoke` target when `find_package(Chrono)` succeeds; skip it cleanly when Chrono is unavailable.
+- Build `unreal/Plugins/SEIYGECore/cpp` with the optional `raftsim_chrono_smoke` target when `find_package(Chrono)` succeeds; skip it cleanly when Chrono is unavailable.
 - Use Chrono to compare selected raft/contact/compliance cases against the shipping runtime candidate.
 - Keep Chrono::FSI behind explicit experiment flags.
 

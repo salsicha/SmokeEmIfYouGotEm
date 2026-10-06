@@ -99,7 +99,7 @@ public:
     FString FeatureTuningManifest = TEXT("unreal/Content/RaftSim/River/feature_tuning_editor.json");
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|FeatureTuningShell")
-    FString FeatureForcingDefaults = TEXT("physics/config/feature_forcing_defaults.json");
+    FString FeatureForcingDefaults = TEXT("unreal/Plugins/SEIYGECore/python/config/feature_forcing_defaults.json");
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|FeatureTuningShell")
     FString FlowPresets = TEXT("physics/data/real_world/south_fork_american_chili_bar/flow_presets.json");

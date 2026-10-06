@@ -1,31 +1,3 @@
-{
-  "case_id": "wet_dry_shoreline",
-  "evidence": {
-    "accepted_for_geometry": true,
-    "actual_scenario_id": "wet_dry_shoreline_seed_16",
-    "candidate_label": "m16_baseline_reduced",
-    "comparison_dir": "outputs/m16cmp/c_wetdry/reduced",
-    "diagnostic_only": false,
-    "failing_checks": [],
-    "gate_scenario_id": "wet_dry_shoreline",
-    "milestone18_report": "reports/milestone18/wet_dry_finite_volume_reconstruction_retune.json",
-    "passed": true,
-    "promoted": true,
-    "solver_mode": "reduced",
-    "threshold_passed": true,
-    "threshold_report": "outputs/m16cmp/c_wetdry/reduced/threshold_evaluation.json"
-  },
-  "gate_scenario_id": "wet_dry_shoreline",
-  "milestone18_closure_report": "reports/milestone18/wet_dry_finite_volume_reconstruction_retune.json",
-  "passed": true,
-  "scenarios": [
-    "wet_dry_shoreline"
-  ],
-  "schema_version": "raftsim.milestone16.regression_registry.v0",
-  "solver_modes": [
-    "finite_volume",
-    "reduced"
-  ],
-  "source_report": "reports/milestone16/geometry_validation.json",
-  "title": "Wet/Dry Shorelines"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:f6c44c24b70f2690e95fc88c292f3d7860e2924ca7c2fe11e375d1ac0af9f683
+size 1103

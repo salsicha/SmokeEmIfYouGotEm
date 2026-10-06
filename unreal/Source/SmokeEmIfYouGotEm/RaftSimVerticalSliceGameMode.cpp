@@ -9,7 +9,12 @@
 #include "RaftSimRunManager.h"
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimTrainingDirector.h"
+#include "RaftSimWildlife.h"
 #include "RaftSimVerticalSliceFrontend.h"
+#include "RaftSimJointReconstructionPreview.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "HAL/PlatformMisc.h"
 
 ARaftSimVerticalSliceGameMode::ARaftSimVerticalSliceGameMode()
 {
@@ -18,11 +23,28 @@ ARaftSimVerticalSliceGameMode::ARaftSimVerticalSliceGameMode()
     InitializeScenarioDefinitions();
 }
 
+void ARaftSimVerticalSliceGameMode::StartPlay()
+{
+    FString Manifest;
+    if (FParse::Value(FCommandLine::Get(),TEXT("RaftSimJointReconstructionPreview="),Manifest))
+    {
+        FString Error;
+        if (!RaftSimJointReconstructionPreview::Apply(GetWorld(),Manifest,
+            FParse::Param(FCommandLine::Get(),TEXT("RaftSimEphemeralProfile")),Error))
+        {
+            UE_LOG(LogTemp,Error,TEXT("Joint reconstruction preview refused before BeginPlay: %s"),*Error);
+            FPlatformMisc::RequestExitWithStatus(false,1);return;
+        }
+    }
+    Super::StartPlay();
+}
+
 void ARaftSimVerticalSliceGameMode::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (ARaftSimContentLockDirector::IsPackagedRegressionRequested())
+    if (ARaftSimContentLockDirector::IsPackagedRegressionRequested() ||
+        ARaftSimContentLockDirector::IsReleaseCandidateQARequested())
     {
         GetWorld()->SpawnActor<ARaftSimContentLockDirector>(
             ARaftSimContentLockDirector::StaticClass(), FTransform::Identity);
@@ -104,6 +126,13 @@ void ARaftSimVerticalSliceGameMode::BeginPlay()
     {
         GetWorld()->SpawnActor<ARaftSimRunAudioDirector>(
             ARaftSimRunAudioDirector::StaticClass(), FTransform::Identity);
+    }
+
+    // Each river's wildlife (it stands down on maps with no species table).
+    if (!TActorIterator<ARaftSimWildlifeDirector>(GetWorld()))
+    {
+        GetWorld()->SpawnActor<ARaftSimWildlifeDirector>(
+            ARaftSimWildlifeDirector::StaticClass(), FTransform::Identity);
     }
 
     if (ARaftSimContentLockDirector::IsPerformanceCaptureRequested())

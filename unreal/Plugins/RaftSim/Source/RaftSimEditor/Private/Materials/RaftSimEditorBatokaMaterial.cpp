@@ -1,0 +1,211 @@
+#include "Environment/RaftSimEditorEnvironmentInternal.h"
+
+#include "Materials/MaterialExpressionDesaturation.h"
+#include "Materials/MaterialExpressionNoise.h"
+
+namespace RaftSimEditorEnvironment
+{
+UMaterialExpression* BuildBatokaOrganicBasaltBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor,
+    UMaterialExpression* PrimaryMacroAlbedo,
+    int32 PrimaryMacroOutputIndex,
+    UMaterialExpression* SecondaryMacroAlbedo,
+    int32 SecondaryMacroOutputIndex,
+    UMaterialExpression* DetailAlbedo,
+    int32 DetailOutputIndex)
+{
+    if (!Material || !SourceBaseColor || !PrimaryMacroAlbedo ||
+        !SecondaryMacroAlbedo || !DetailAlbedo)
+    {
+        return nullptr;
+    }
+
+    auto Add = [Material](UMaterialExpression* Expression)
+    {
+        Material->GetExpressionCollection().AddExpression(Expression);
+        return Expression;
+    };
+    auto Scalar = [Material, &Add](const TCHAR* Name, float Value)
+    {
+        UMaterialExpressionScalarParameter* Parameter =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        Parameter->ParameterName = Name;
+        Parameter->DefaultValue = Value;
+        Parameter->Group = TEXT("BatokaOrganicBasaltV16");
+        Add(Parameter);
+        return Parameter;
+    };
+    auto Vector = [Material, &Add](const TCHAR* Name, const FLinearColor& Value)
+    {
+        UMaterialExpressionVectorParameter* Parameter =
+            NewObject<UMaterialExpressionVectorParameter>(Material);
+        Parameter->ParameterName = Name;
+        Parameter->DefaultValue = Value;
+        Parameter->Group = TEXT("BatokaOrganicBasaltV16");
+        Add(Parameter);
+        return Parameter;
+    };
+    auto Multiply = [Material, &Add](
+                        UMaterialExpression* A,
+                        UMaterialExpression* B,
+                        int32 AOutputIndex = 0,
+                        int32 BOutputIndex = 0)
+    {
+        UMaterialExpressionMultiply* Result =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        Result->A.Expression = A;
+        Result->A.OutputIndex = AOutputIndex;
+        Result->B.Expression = B;
+        Result->B.OutputIndex = BOutputIndex;
+        Add(Result);
+        return Result;
+    };
+    auto Lerp = [Material, &Add](
+                    UMaterialExpression* A,
+                    UMaterialExpression* B,
+                    UMaterialExpression* Alpha,
+                    int32 AOutputIndex = 0,
+                    int32 BOutputIndex = 0)
+    {
+        UMaterialExpressionLinearInterpolate* Result =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        Result->A.Expression = A;
+        Result->A.OutputIndex = AOutputIndex;
+        Result->B.Expression = B;
+        Result->B.OutputIndex = BOutputIndex;
+        Result->Alpha.Expression = Alpha;
+        Add(Result);
+        return Result;
+    };
+
+    // The two incommensurate world-aligned albedo projections are blended by
+    // a very-low-frequency world field. This breaks the visible square repeat
+    // without displacing the reviewed terrain or changing collision authority.
+    UMaterialExpressionNoise* MacroAntiTileNoise =
+        NewObject<UMaterialExpressionNoise>(Material);
+    MacroAntiTileNoise->Scale = 0.00013f;
+    MacroAntiTileNoise->bTurbulence = true;
+    MacroAntiTileNoise->Levels = 3;
+    MacroAntiTileNoise->OutputMin = 0.0f;
+    MacroAntiTileNoise->OutputMax = 1.0f;
+    Add(MacroAntiTileNoise);
+    UMaterialExpression* MacroAntiTileAlpha = Multiply(
+        MacroAntiTileNoise,
+        Scalar(TEXT("BatokaMacroAntiTileStrength"), 0.78f));
+    UMaterialExpression* DeTiledMacro = Lerp(
+        PrimaryMacroAlbedo,
+        SecondaryMacroAlbedo,
+        MacroAntiTileAlpha,
+        PrimaryMacroOutputIndex,
+        SecondaryMacroOutputIndex);
+
+    // The macro albedo is a tan aerial rock photo; the cool tint cancels its
+    // red-yellow cast so the walls read as the black-grey Batoka basalt the
+    // photographs and outfitter descriptions show (dark grey ~0.05-0.07),
+    // not desaturated tan.
+    UMaterialExpression* DarkMacro = Multiply(
+        DeTiledMacro,
+        Vector(TEXT("BatokaBasaltTint"), FLinearColor(0.20f, 0.235f, 0.30f, 1.0f)));
+    UMaterialExpression* WeatheredMacro = Multiply(
+        DeTiledMacro,
+        Vector(
+            TEXT("BatokaWeatheredInterflowTint"),
+            FLinearColor(0.30f, 0.27f, 0.28f, 1.0f)));
+    UMaterialExpression* WeatheringAlpha = Multiply(
+        MacroAntiTileNoise,
+        Scalar(TEXT("BatokaWeatheringVariationStrength"), 0.20f));
+    UMaterialExpression* WeatheredSurface =
+        Lerp(DarkMacro, WeatheredMacro, WeatheringAlpha);
+
+    // A separate finer field varies mineral value at roughly cliff-feature
+    // scale. It keeps the result irregular while the explicit bounds prevent
+    // crushed black faces or returning the former chalky highlights.
+    UMaterialExpressionNoise* FineMineralNoise =
+        NewObject<UMaterialExpressionNoise>(Material);
+    FineMineralNoise->Scale = 0.00115f;
+    FineMineralNoise->bTurbulence = true;
+    FineMineralNoise->Levels = 4;
+    FineMineralNoise->OutputMin = 0.0f;
+    FineMineralNoise->OutputMax = 1.0f;
+    Add(FineMineralNoise);
+    UMaterialExpression* MineralValueScale = Lerp(
+        Scalar(TEXT("BatokaMineralShadowScale"), 0.62f),
+        Scalar(TEXT("BatokaMineralHighlightScale"), 0.96f),
+        FineMineralNoise);
+    UMaterialExpression* OrganicMacro =
+        Multiply(WeatheredSurface, MineralValueScale);
+    UMaterialExpression* MacroBaseColor = Lerp(
+        SourceBaseColor,
+        OrganicMacro,
+        Scalar(TEXT("BatokaMacroWeight"), 0.91f));
+
+    UMaterialExpression* ScaledDetail = Multiply(
+        DetailAlbedo,
+        Scalar(TEXT("BatokaDetailColorScale"), 0.72f),
+        DetailOutputIndex);
+    UMaterialExpression* TwoScaleBasalt = Lerp(
+        MacroBaseColor,
+        ScaledDetail,
+        Scalar(TEXT("BatokaDetailColorWeight"), 0.16f));
+
+    // Long erosion staining removes the remaining uniformly sun-bleached wall
+    // without inventing ledges or changing source geometry. The field is
+    // deliberately much broader than the mineral detail and is bounded above
+    // one, so it can only reduce the local albedo energy.
+    UMaterialExpressionNoise* ErosionStainNoise =
+        NewObject<UMaterialExpressionNoise>(Material);
+    ErosionStainNoise->Scale = 0.000035f;
+    ErosionStainNoise->bTurbulence = true;
+    ErosionStainNoise->Levels = 3;
+    ErosionStainNoise->OutputMin = 0.0f;
+    ErosionStainNoise->OutputMax = 1.0f;
+    Add(ErosionStainNoise);
+    UMaterialExpression* ErosionValueScale = Lerp(
+        Scalar(TEXT("BatokaErosionShadowScaleV18"), 0.70f),
+        Scalar(TEXT("BatokaErosionHighlightScaleV18"), 0.98f),
+        ErosionStainNoise);
+    UMaterialExpression* ErodedBasalt = Multiply(TwoScaleBasalt, ErosionValueScale);
+
+    // The drape and both rock photos are warm tan, so the tint alone left
+    // the walls reading tan in game. The observed Batoka walls are black-grey
+    // basalt: remove nearly all the remaining hue and lower the value to
+    // ~0.03 (this project's exposure renders ~0.04 as mid grey in sun), so
+    // the walls read dark grey against the sky, foam and vegetation. At
+    // ~0.02 the sunlit walls rendered at sRGB 51-60 and, once the ledged
+    // walls cast shadows, the shaded faces at sRGB 20-24: black, with almost
+    // no bounce from the sunlit side.
+    UMaterialExpressionDesaturation* NeutralBasalt =
+        NewObject<UMaterialExpressionDesaturation>(Material);
+    NeutralBasalt->Input.Expression = ErodedBasalt;
+    NeutralBasalt->Fraction.Expression = Scalar(TEXT("BatokaBasaltDesaturation"), 0.94f);
+    Add(NeutralBasalt);
+    return Multiply(NeutralBasalt, Scalar(TEXT("BatokaBasaltValueScale"), 0.60f));
+}
+
+UMaterialExpression* BuildBatokaOrganicBasaltColorCoverage(
+    UMaterial* Material,
+    UMaterialExpression* RockSlopeMask)
+{
+    if (!Material || !RockSlopeMask)
+    {
+        return nullptr;
+    }
+    UMaterialExpressionScalarParameter* CoverageFloor =
+        NewObject<UMaterialExpressionScalarParameter>(Material);
+    CoverageFloor->ParameterName = TEXT("BatokaTerrainColorCoverageFloor");
+    CoverageFloor->DefaultValue = 0.62f;
+    CoverageFloor->Group = TEXT("BatokaOrganicBasaltV16");
+    Material->GetExpressionCollection().AddExpression(CoverageFloor);
+    UMaterialExpressionAdd* BiasedCoverage =
+        NewObject<UMaterialExpressionAdd>(Material);
+    BiasedCoverage->A.Expression = RockSlopeMask;
+    BiasedCoverage->B.Expression = CoverageFloor;
+    Material->GetExpressionCollection().AddExpression(BiasedCoverage);
+    UMaterialExpressionSaturate* Coverage =
+        NewObject<UMaterialExpressionSaturate>(Material);
+    Coverage->Input.Expression = BiasedCoverage;
+    Material->GetExpressionCollection().AddExpression(Coverage);
+    return Coverage;
+}
+} // namespace RaftSimEditorEnvironment
