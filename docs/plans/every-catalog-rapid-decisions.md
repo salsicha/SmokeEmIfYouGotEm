@@ -260,6 +260,33 @@ preserved. This is an incremental checkpoint, not all-99 acceptance or a package
 20 FPS claim. Git staging/build access succeeded; that does not establish that
 the earlier tracked-source patch access problem has been repaired.
 
+## Local research exclusions (2026-10-06)
+
+The proposed research-data archive was not committed or uploaded. At the user's
+direction, exact `.gitignore` entries keep these captures, construction inputs
+and five unaccepted map imports local. Files and source manifests remain on disk;
+their checksums, attribution, coordinate systems and inference limitations are
+preserved. The tracked playable Badger map and its v3 runtime are not ignored.
+
+Interpret the retained local versions as follows:
+
+- `catalog_runtime_2026_10_v1` and `v2` remain rejected Badger candidates, retained
+  to explain the interpolation/collision mismatch. Only Badger v3 is registered
+  in the normal frontend and packaging list.
+- `water_boundaries_2021_capture` and `v2` through `v4` are incomplete acquisition
+  records. Their `.partial` files are failed downloads, not usable geospatial
+  inputs. The complete water-classification capture is `v5`.
+- Earlier solver-input versions and terrain/evidence alternatives are preserved
+  as research history, not silently substituted for current runtime inputs.
+- House Rock, Georgie, Sockdolager, Grapevine and Horn Creek map imports and v3
+  runtime files are construction candidates. Their presence does not establish
+  gameplay calibration, final visuals, normal-menu availability or 20 FPS.
+
+When a candidate becomes an accepted playable increment, remove only its exact
+ignore entries and commit the map with all runtime dependencies. Do not force-add
+raw acquisition trees or rejected versions. These exclusions change neither
+gameplay nor difficulty acceptance and do not delete the local research.
+
 ## Next implementation steps
 
 1. Finish Badger's matched native comparisons, including actual entry-hydraulic

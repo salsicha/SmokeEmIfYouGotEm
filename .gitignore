@@ -92,3 +92,41 @@ unreal/Content/RaftSim/Environment/GeneratedLocalReview/
 # Packaged builds are release artifacts, never repo content (GitHub Releases instead)
 unreal/Packaged/
 *.log
+
+# Local Colorado acquisition/construction research; preserve files, do not ship.
+# Exact versioned paths avoid hiding future accepted maps or runtime assets.
+/physics/data/real_world/colorado_river_grand_canyon_rowing/bathymetry_all_rapids_2021/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_construction_windows_2026_10_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_evidence_2026_10_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_evidence_shore_2026_10_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_evidence_wide_2026_10_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_pool_bed_wide_2026_10_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_pool_bed_windows_2026_10_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_runtime_2026_10_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_runtime_2026_10_v2/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_runtime_2026_10_v3/georgie/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_runtime_2026_10_v3/grapevine/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_runtime_2026_10_v3/horn_creek/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_runtime_2026_10_v3/house_rock/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_runtime_2026_10_v3/sockdolager/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_solver_inputs_2026_10_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_solver_inputs_2026_10_v2/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_solver_inputs_2026_10_v3/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_solver_inputs_2026_10_v4/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_solver_inputs_2026_10_v5/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_terrain_10m_capture_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_terrain_3dep_capture_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_terrain_3dep_remaining_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_water_wide_2026_10_v1/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/catalog_water_windows_2026_10_v2/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/sources_all_rapids_2026_10/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/water_boundaries_2021_capture/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/water_boundaries_2021_capture_v2/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/water_boundaries_2021_capture_v3/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/water_boundaries_2021_capture_v4/
+/physics/data/real_world/colorado_river_grand_canyon_rowing/water_boundaries_2021_capture_v5/
+/unreal/Content/RaftSim/Maps/Catalog/L_Colorado_Georgie.umap
+/unreal/Content/RaftSim/Maps/Catalog/L_Colorado_Grapevine.umap
+/unreal/Content/RaftSim/Maps/Catalog/L_Colorado_HornCreek.umap
+/unreal/Content/RaftSim/Maps/Catalog/L_Colorado_HouseRock.umap
+/unreal/Content/RaftSim/Maps/Catalog/L_Colorado_Sockdolager.umap
