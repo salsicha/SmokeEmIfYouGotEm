@@ -1289,9 +1289,20 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     bSouthForkOpticalSmoothingReview = bUsesSouthForkFullReachSingleSurface;
     if (WaterAdapter)
     {
-        // All eight ordinary playable rivers, not a review-only opt-in path.
+        ActiveRapidFeatures.Reset();
+        FString RegistrationError;
+        if(RiverWaterConfig && !RiverWaterConfig->ResolveRapidFeatures(
+            GetWorld()->GetMapName(),*WaterAdapter,ActiveRapidFeatures,RegistrationError))
+        {
+            WaterAdapter->ConfigureFeatureKinematics(false);
+            bRuntimeSurfaceReady=false;
+            UE_LOG(LogTemp,Error,TEXT("Rapid registration refused: %s"),*RegistrationError);
+            return;
+        }
+        // Existing maps plus explicitly chart-bound continuous registrations.
         WaterAdapter->ConfigureFeatureKinematics(bUsesAuthoredRiverPresentation &&
-            GetWorld() && RaftSimWaterFeatureKinematics::IsPlayableRiver(GetWorld()->GetMapName()));
+            GetWorld() && (RaftSimWaterFeatureKinematics::IsPlayableRiver(GetWorld()->GetMapName()) ||
+                !RiverWaterConfig->RegisteredRapidChartFingerprint.IsEmpty()));
     }
     bSpatialBreakingReview = bUsesSouthForkFullReachSingleSurface &&
         GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
@@ -1378,7 +1389,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     // path, not the legacy fixed-lift presentation. The optical-core check
     // below still prevents enabling it on an unsupported carrier.
     bSharedBreakingReliefEnabled = bSpatialBreakingReview ||
-        (RiverWaterConfig && RaftSimRapidChallengeProfiles::HasProfile(GetWorld()->GetMapName())) ||
+        (RiverWaterConfig && !ActiveRapidFeatures.IsEmpty()) ||
         (bUsesMigratedChilkoVolumeCore &&
             CVarRaftSimChilkoSharedBreakingRelief.GetValueOnGameThread() != 0);
     const bool bUsesMigratedColoradoVolumeCore =
@@ -6492,11 +6503,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     }
     if (WaterAdapter->HasFeatureKinematics() && bSharedBreakingReliefEnabled &&
         !bCartesianFlow && RiverCoordinatesM.Num()>0 &&
-        RaftSimRapidChallengeProfiles::HasProfile(GetWorld()->GetMapName()))
+        !ActiveRapidFeatures.IsEmpty())
     {
         FBox2D ActiveBounds(ForceInit);
         for(const FVector2D& P:RiverCoordinatesM)ActiveBounds+=P;
-        const int32 Authored=RaftSimRapidChallengeProfiles::Append(GetWorld()->GetMapName(),ActiveBounds,
+        const int32 Authored=RaftSimRapidChallengeProfiles::Append(ActiveRapidFeatures,ActiveBounds,
             [&](const FVector2D& P,FRaftSimWaterSample& W)
             {return WaterAdapter->SampleWaterFieldAtRiverCoordinates(P,W);},SupportSites);
         static TSet<FString> LoggedChallengeMaps;

@@ -1,6 +1,25 @@
 # Chilko River, Lava Canyon (stations 0-3978 m): observation summary
 
-The full data is in `chilko_lava_canyon_observations.json`. Research date: 2026-09-29.
+The full data is in `lava_canyon_observations_2026_09_29.json`. Research date: 2026-09-29.
+
+## October 6 geographic correction
+
+The geographic interpretation below is retained as historical research, **not
+accepted rapid registration**. BC Whitewater's embedded map places Bidwell at
+51.91166777 N, 123.82121171 W and White Mile at 51.93985538 N, 123.80243227 W.
+The public CalTopo map linked from Camping By Kayak corroborates Bidwell within
+about 63 m along the river (independence of the underlying information is unknown).
+Projection through the actual runtime coordinate map places the current inferred
+Bidwell and White Mile starts approximately 6.08 km and 4.84 km downstream of
+those representative markers. These are not surveyed entrance/exit comparisons.
+The previous claim that the named sequence matches this terrain crop is rejected.
+
+See `catalog_location_evidence_2026_10_06.json` and
+`physics/scripts/audit_chilko_catalog_locations.py`. The runtime-smoothed station
+chart, not the unsmoothed evidence centreline, is authoritative for this comparison.
+The v2 audit supersedes the raw-centreline v1 diagnostic. Preserve captured terrain
+and current playable assets until a geographically corrected replacement is tested.
+Neither Green Mile nor Miracle Canyon has accepted coordinate boundaries yet.
 
 ## Where the reach sits
 - Bidwell Creek mouth is at 51.923 N, 123.818 W (937 m), about 3.5-4.5 km upstream of station 0. BC Whitewater says Bidwell Rapid is about 5 km below the Bidwell Creek put-in and the White Mile is about 3 km after Bidwell. That matches our data: Bidwell at about 690-1000 m, and the White Mile starting at about 3600 m.

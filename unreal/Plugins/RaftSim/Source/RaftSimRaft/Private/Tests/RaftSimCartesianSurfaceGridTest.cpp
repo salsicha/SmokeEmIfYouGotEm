@@ -5,6 +5,9 @@
 #include "Engine/World.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/ScopeExit.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
+#include "HAL/FileManager.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCartesianSurfaceGridTest,
@@ -131,6 +134,34 @@ bool FRaftSimCartesianSurfaceGridTest::RunTest(const FString&)
     TestTrue(TEXT("authored production opt-in enables shared spatial carrier/support crests without review flags"),
         Surface->bSharedBreakingReliefEnabled && Surface->bSpatialBreakingReview && Surface->bSingleLiveWaterSurfaceEnabled);
     TestFalse(TEXT("full-river opt-in does not enable rapid-origin-only refinement"), Surface->bPlayableCrestRefinement);
+    // Exercise the actual production BuildGrid gate with a chart-bound
+    // registration in an unnamed world. The historical map-name allowlist
+    // must not silently turn off the paired relief on continuous maps.
+    const FString ChartPath=FPaths::Combine(FPaths::ProjectSavedDir(),TEXT("Automation"),
+        TEXT("registered-surface-")+FGuid::NewGuid().ToString()+TEXT(".json"));
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(ChartPath),true);
+    ON_SCOPE_EXIT {IFileManager::Get().Delete(*ChartPath);};
+    FString Chart=TEXT("{\"schema\":\"raftsim.curved_river_coordinate_map.v1\",\"world_y_sign\":-1,\"vertical_datum_m\":10,\"points\":[");
+    for(int32 I=0;I<=200;++I)
+    {
+        if(I)Chart+=TEXT(",");
+        Chart+=FString::Printf(TEXT("[%d,%d,0,0,1]"),I*2,I*2);
+    }
+    Chart+=TEXT("]}");
+    if(!FFileHelper::SaveStringToFile(Chart,*ChartPath)||!Water->ConfigureRiverCoordinateMap(ChartPath))return false;
+    Config->bEnableLiveSharedBreakingRelief=false;
+    Config->RegisteredRapidChartFingerprint=Water->GetRiverCoordinateMapFingerprint();
+    Config->RegisteredRapidFeatures={{100.,0.,20.,.8f,4.f,.7f}};
+    Raft->SetActorLocation(FVector(10000.,0.,200.));
+    Surface->BuildGrid();
+    TestTrue(TEXT("chart-bound continuous profile enables actual shared relief"),Surface->bSharedBreakingReliefEnabled);
+    TestTrue(TEXT("chart-bound continuous profile enables immersed feature current"),Water->HasFeatureKinematics());
+    TestEqual(TEXT("actual surface retains registered coordinates"),Surface->ActiveRapidFeatures.Num(),1);
+    Config->RegisteredRapidChartFingerprint=TEXT("different-chart");
+    AddExpectedError(TEXT("Rapid registration refused"),EAutomationExpectedErrorFlags::Contains,1);
+    Surface->BuildGrid();
+    TestFalse(TEXT("wrong chart cannot leave active boat-only feature forces"),Water->HasFeatureKinematics());
+    TestFalse(TEXT("wrong chart marks actual surface unavailable"),Surface->bRuntimeSurfaceReady);
     AddInfo(FString::Printf(TEXT("Actual carrier construction/recenter and rendered-history paths: %d exact overlap vertices across north/west/diagonal moves. Geometry/history regression, not visual realism or full-river flow acceptance."),CheckedOverlap));
     return !HasAnyErrors();
 }

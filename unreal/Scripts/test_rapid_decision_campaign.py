@@ -71,6 +71,27 @@ class DecisionCampaign(unittest.TestCase):
         self.assertEqual(bobo['family'],'unresolved')
         self.assertIn('Upper Pacuare',bobo['construction_review'])
 
+    def test_bienvenidos_identity_is_downstream_of_tres_equis(self):
+        row=next(c for c in build()[0] if c['river']=='pacuare' and c['name']=='Bienvenidos')
+        self.assertEqual(row['guide_km'],3.33)
+        self.assertEqual(row['family'],'train')
+        self.assertEqual(len(row['identity_sources']),2)
+        self.assertIsNone(row['route_coordinates'])
+        self.assertEqual(row['status'],'missing_playable_section')
+        self.assertIn('0.26',row['construction_review'])
+
+    def test_chilko_source_brackets_are_not_playable_boundaries(self):
+        rows={c['name']:c for c in build()[0] if c['river']=='chilko' and
+              c['status']=='missing_playable_section'}
+        self.assertEqual(rows['Green Mile']['location_status'],'sequence_bracket_only')
+        self.assertEqual(len(rows['Green Mile']['source_marker_bracket_lon_lat']),2)
+        self.assertEqual(rows['Miracle Canyon']['location_status'],'name_attested_location_unresolved')
+        for row in rows.values():
+            self.assertIsNone(row['boundary_lon_lat'])
+            self.assertIsNone(row['route_coordinates'])
+            self.assertEqual(row['geographic_acceptance'],'unresolved')
+            self.assertIn('catalog_location_evidence',row['location_evidence_file'])
+
     def test_poor_approach_has_a_matched_ordinary_recovery(self):
         for p in build()[1]:
             for rapid in {t['rapid_id'] for t in p['trials'] if not t.get('portage')}:

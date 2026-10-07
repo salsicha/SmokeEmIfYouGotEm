@@ -861,6 +861,24 @@ void ARaftSimCC0CrewVisualActor::CacheRenderedFaceAnchorVertices()
     bHasRenderedFaceAnchorHeadLocal = !RenderedFaceAnchorHeadLocal.ContainsNaN();
 }
 
+bool ARaftSimCC0CrewVisualActor::GetViewEyeCenterWorld(FVector& OutWorldLocation) const
+{
+    const FTransform* ReferenceHead = ReferenceComponentTransforms.Find(TEXT("head"));
+    if (!bBodyReady || !Body || !bHasRenderedFaceAnchorHeadLocal || !ReferenceHead ||
+        Body->GetBoneIndex(TEXT("head")) == INDEX_NONE)
+    {
+        return false;
+    }
+    FTransform HeadTransform = Body->GetBoneTransformByName(
+        TEXT("head"), EBoneSpaces::ComponentSpace);
+    // First-person visibility collapses this bone to zero scale. Recover the
+    // anatomical landmark in a copy; never unhide/mutate the rendered head.
+    HeadTransform.SetScale3D(ReferenceHead->GetScale3D());
+    OutWorldLocation = Body->GetComponentTransform().TransformPosition(
+        HeadTransform.TransformPosition(RenderedFaceAnchorHeadLocal));
+    return !OutWorldLocation.ContainsNaN();
+}
+
 bool ARaftSimCC0CrewVisualActor::TryGetRenderedFaceEyeCenterWorld(
     FVector& OutWorldLocation) const
 {

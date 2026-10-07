@@ -4,6 +4,19 @@ from build_colorado_catalog_evidence import compose, infer_depth, project
 
 
 class ConstructionEvidenceTests(unittest.TestCase):
+    def test_endpoint_projected_water_does_not_change_real_strip_depth(self):
+        # A wider rectangular crop includes river outside the finite profile.
+        # Nearest-segment projection clamps it to an endpoint, not a huge width.
+        s=np.arange(.5,100.,1.)
+        edge=np.tile(np.minimum(np.arange(1,21),np.arange(20,0,-1))[:,None],(1,len(s)))
+        station=np.broadcast_to(s,edge.shape)
+        baseline=infer_depth(np.ones(edge.shape,bool),edge,station,np.array([0.,100.]),np.array([900.,899.9]),100.)
+        padded_s=np.r_[np.zeros(200),s,np.full(200,100.)]
+        padded_edge=np.tile(edge[:,0,None],(1,len(padded_s)))
+        expanded=infer_depth(np.ones(padded_edge.shape,bool),padded_edge,
+            np.broadcast_to(padded_s,padded_edge.shape),np.array([0.,100.]),np.array([900.,899.9]),100.)
+        np.testing.assert_allclose(expanded[:,200:300],baseline,atol=1e-12,rtol=0)
+
     def test_projection_is_continuous_and_left_positive(self):
         s,n,d=project([[2,3],[8,-4],[10,0]],[[0,0],[5,0],[10,0]],[0,5,10],chunk=1)
         np.testing.assert_allclose(s,[2,8,10]); np.testing.assert_allclose(n,[3,-4,0])

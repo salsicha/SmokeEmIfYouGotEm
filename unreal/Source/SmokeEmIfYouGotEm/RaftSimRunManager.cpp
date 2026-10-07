@@ -2,6 +2,7 @@
 #include "ProfilingDebugging/CsvProfiler.h"
 CSV_DEFINE_CATEGORY(RaftSimTickRunManager,true);
 #include "RaftSimCheckpointStreaming.h"
+#include "RaftSimScenarioWorld.h"
 
 #include "Components/BoxComponent.h"
 #include "Engine/GameInstance.h"
@@ -82,6 +83,13 @@ void ARaftSimRunManager::BeginPlay()
 void ARaftSimRunManager::ConfigureSession(
     const FRaftSimCareerScenarioDefinition& Scenario, ERaftSimGameMode InGameMode)
 {
+    if (!RaftSimScenarioWorld::Matches(GetWorld(), Scenario.LevelName))
+    {
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim run: ignoring session %s for a different map; retaining authored run %s"),
+            *Scenario.ScenarioId.ToString(), *ScenarioId.ToString());
+        return;
+    }
     LastProgressSample.bValid = false;
     ScenarioId = Scenario.ScenarioId;
     GameModeKind = InGameMode;

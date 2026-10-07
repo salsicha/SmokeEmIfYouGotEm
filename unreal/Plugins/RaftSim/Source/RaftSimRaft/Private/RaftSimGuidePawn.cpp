@@ -260,18 +260,15 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
     // Resolve detachment/reboarding before positioning the eye. Otherwise the
     // old seat-local eye offset survives a swimmer move for the whole swim.
     UpdateSwimmingAndRescueAim();
-    // Seat the view on the guide avatar's actual posed head each frame. The
-    // constructor offset was a fixed estimate that landed inside the chest
-    // (2026-08-09 playtest: "all that can be seen is the inside of the life
-    // vest"); the posed head tracks seat, lean, and identity exactly.
+    // The visible production skeleton is taller than the compact gameplay
+    // pose. Follow its anatomical eyes, including while its head is hidden,
+    // rather than putting the camera beside the rendered shoulder/sleeve.
     if (ARaftSimRaftActor* RaftForView = ResolveRaft())
     {
-        FVector HeadWorldCm;
-        if (RaftForView->GetGuideHeadWorldLocationCm(HeadWorldCm))
+        FVector EyeWorldCm;
+        if (RaftForView->GetGuideEyeWorldLocationCm(EyeWorldCm))
         {
-            GuideSeatAnchor->SetWorldLocation(
-                HeadWorldCm + GetActorForwardVector() * 9.0f +
-                GetActorUpVector() * 4.0f);
+            GuideSeatAnchor->SetWorldLocation(EyeWorldCm);
         }
     }
     UpdateSeatedHeading();

@@ -175,6 +175,9 @@ public:
         return bBodyReady && TryGetRenderedFaceEyeCenterWorld(OutWorldLocation);
     }
 
+    /** Anatomical eye anchor, unchanged when first-person rendering hides the head. */
+    bool GetViewEyeCenterWorld(FVector& OutWorldLocation) const;
+
     /** First-person guide seat: collapse the head bone like the boot-hidden
      * feet so the camera can sit in the eye socket. Applied every pose. */
     void SetHeadHiddenForFirstPerson(bool bShouldHide) { bHeadHiddenForFirstPerson = bShouldHide; }

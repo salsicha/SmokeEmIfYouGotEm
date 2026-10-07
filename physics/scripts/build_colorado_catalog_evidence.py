@@ -56,22 +56,32 @@ def project(points, line, stations, chunk=8192):
     return station,lateral,distance
 
 
-def infer_depth(wet, distance_to_edge, station, profile_station, surface, q, cell=1.):
+def infer_depth(wet, distance_to_edge, station, profile_station, surface, q, cell=1., station_origin_m=0.):
     """Manning strip depth hypothesis, not a survey or a solved flow field."""
     if not np.isfinite(q) or q<=0: raise ValueError('Positive discharge required')
+    if not np.isfinite(station_origin_m): raise ValueError('Finite source station origin required')
     step=5.
-    bins=np.arange(0,profile_station[-1]+step,step)
-    ws=np.interp(bins,profile_station,surface)
+    # Adjacent full-river tiles must use the same physical five-metre bins.
+    # Restarting bins at each crop changes cross-section area and inferred bed
+    # within their overlap even when shoreline and profile samples are equal.
+    base=np.floor(station_origin_m/step)*step
+    global_profile=profile_station+station_origin_m
+    bins=np.arange(base,global_profile[-1]+step,step)
+    ws=np.interp(bins,global_profile,surface)
     slope=np.maximum(-np.gradient(gaussian_filter1d(ws,2,mode='nearest'),step),0.0001)
-    ids=np.clip((station/step).astype(int),0,len(bins)-1)
+    ids=np.clip(((station+station_origin_m-base)/step).astype(int),0,len(bins)-1)
+    # Endpoint-clamped projections include upstream/downstream water outside
+    # this finite profile. They are not cross-section samples: counting them
+    # makes inferred depth depend on the rectangular crop's padding.
+    interior=wet&(station>profile_station[0])&(station<profile_station[-1])
     # Area/bin length estimates water width, retaining separate island holes.
-    width=np.bincount(ids[wet],minlength=len(bins))*cell*cell/step
+    width=np.bincount(ids[interior],minlength=len(bins))*cell*cell/step
     shape=np.minimum(1.,distance_to_edge/np.maximum(3.,.15*width[ids]))
-    conveyance=np.bincount(ids[wet],weights=shape[wet]**(5/3),minlength=len(bins))*cell*cell/step
+    conveyance=np.bincount(ids[interior],weights=shape[interior]**(5/3),minlength=len(bins))*cell*cell/step
     roughness=np.where(slope>=.004,.045,.035)
     depth=(q*roughness/np.maximum(np.sqrt(slope)*conveyance,1e-8))**.6
     # Edge construction bins can be truncated; interpolate only from usable bins.
-    valid=(conveyance>1.)&(width>5.)
+    valid=(conveyance>1.)&(width>5.)&(bins>=global_profile[0])&(bins+step<=global_profile[-1])
     if not valid.any(): raise ValueError('No usable wet cross-sections')
     depth=np.interp(bins,bins[valid],depth[valid])
     return np.where(wet,shape*depth[ids],0.)
@@ -99,7 +109,8 @@ def compose(profile, water, bed, terrain_ellipsoid, q=226.534772736, shore_clear
     s=s.reshape(wet.shape); n=n.reshape(wet.shape); d=d.reshape(wet.shape)
     ws=np.interp(s,st,surface)
     edge=distance_transform_edt(wet)
-    model=ws-infer_depth(wet,edge,s,st,surface,q)
+    station_origin=profile.get('source_halo_interval_m',[0.])[0]
+    model=ws-infer_depth(wet,edge,s,st,surface,q,station_origin_m=station_origin)
     # Survey/profile conflict is retained separately; do not pretend a dry sonar
     # sample or an above-surface value is validated riverbed.
     conflict=wet&measured&(original>=ws-.02)
@@ -111,7 +122,7 @@ def compose(profile, water, bed, terrain_ellipsoid, q=226.534772736, shore_clear
         model=np.minimum(ws-.02,model+correction)
         model=np.where(supported,original,model)
     missing=wet&~supported
-    # A 10 m DEM cannot resolve every classified dry island/shore cell. Keep
+    # A terrain DEM need not resolve every classified dry island/shore cell. Keep
     # untouched terrain and a separate inferred correction, not a false survey.
     shore_model=(~wet)&(terrain_ellipsoid<ws+shore_clearance_m)&(distance_transform_edt(~wet)<=10.)
     composite=np.where(wet,model,terrain_ellipsoid)
@@ -147,6 +158,8 @@ def build(profile_path, water_dir, bed_dir, terrain_dir, out, shore_clearance_m=
     wr=next(r for r in wm['windows'] if r['name']==name)
     br=next(r for r in bm['windows'] if r['name']==name)
     tr=next(r for r in tm['windows'] if r['name']==name)
+    if tr['cell_m']<10 and not tr.get('valid_pixel_coverage_verified'):
+        raise ValueError('Fine terrain export lacks verified valid-pixel coverage')
     wp=read_checked(water_dir,dict(wr,sha256=wr['files_sha256'][wr['file']]))
     bp=read_checked(bed_dir,br); tp=read_checked(terrain_dir,tr)
     water=dict(np.load(wp)); bed=dict(np.load(bp))
@@ -156,6 +169,8 @@ def build(profile_path, water_dir, bed_dir, terrain_dir, out, shore_clearance_m=
         if source.crs.to_epsg()!=6404: raise ValueError('Terrain CRS mismatch')
         reproject(rasterio.band(source,1),target,src_transform=source.transform,src_crs=source.crs,
             dst_transform=from_origin(x0,y1,1,1),dst_crs=source.crs,dst_nodata=np.nan,resampling=Resampling.bilinear)
+    if not np.isfinite(target).all() or (target<=0).any():
+        raise ValueError('Missing or zero-filled Colorado terrain; no silent dry-bank fill')
     samples=profile['samples']; st=np.array([p['local_arc_station_m'] for p in samples])
     line=np.array([[p['easting'],p['northing']] for p in samples])
     # The local surveyed geoid supplies a declared, smoothly interpolated
@@ -167,19 +182,34 @@ def build(profile_path, water_dir, bed_dir, terrain_dir, out, shore_clearance_m=
     arrays,receipt=compose(profile,water,bed,terrain,shore_clearance_m=shore_clearance_m)
     arrays['source_regional_terrain_navd88_m']=target
     arrays['interpolated_survey_geoid18_m']=geoid.astype('float32')
+    terrain_sources=[tp]
+    resolution=np.full(target.shape,tr['cell_m'],dtype='float32')
+    if tr.get('source_resolution_mask'):
+        rp=read_checked(terrain_dir,tr['source_resolution_mask']);terrain_sources.append(rp)
+        with rasterio.open(rp) as source:
+            if source.crs.to_epsg()!=6404:raise ValueError('Resolution-mask CRS mismatch')
+            resolution[:]=np.nan
+            reproject(rasterio.band(source,1),resolution,src_transform=source.transform,src_crs=source.crs,
+                dst_transform=from_origin(x0,y1,1,1),dst_crs=source.crs,dst_nodata=np.nan,resampling=Resampling.nearest)
+        if not np.isin(resolution,[1.,10.]).all():raise ValueError('Missing or unsupported native resolution mask')
+    arrays['regional_terrain_source_resolution_m']=resolution
     out.mkdir(parents=True)
     np.savez_compressed(out/'evidence_grid.npz',**arrays)
     manifest=dict(schema='raftsim.colorado_catalog_construction_grid.v1',name=name,
         horizontal_crs='EPSG:6404',vertical_datum='NAD83(2011) ellipsoid',
-        source_files_sha256={str(p.relative_to(ROOT)):sha(p) for p in (profile_path,wp,bp,tp)},
-        class_codes={'0':'regional dry terrain, resampled from 10 m; not boulder geometry',
+        source_files_sha256={str(p.relative_to(ROOT)):sha(p) for p in [profile_path,wp,bp,*terrain_sources]},
+        class_codes={'0':f"regional dry terrain, resampled from {tr['cell_m']} m export; not independently verified boulder geometry",
                      '1':'2021 survey pool bed, no change except float32 serialization',
                      '2':'inferred unsurveyed/conflicting bed, Manning depth with decaying pool residual',
                      '3':'inferred shoreline/island stabilization where coarse terrain is below classified water'},
         conversion='ellipsoid = NAVD88 + profile geoid18; interpolated along nearest centerline segment',
         parameters=dict(target_discharge_cfs=8000,target_discharge_m3s=226.534772736,
+                        regional_terrain_export_cell_m=tr['cell_m'],
+                        regional_terrain_source_resolution_counts={str(float(v)):int((resolution==v).sum()) for v in np.unique(resolution)},
                         profile_discharge_cfs_approx=8400,pool_residual_decay_m=25.,shore_model_radius_m=10.,
-                        inferred_dry_shore_clearance_m=shore_clearance_m),
+                        inferred_dry_shore_clearance_m=shore_clearance_m,
+                        depth_bin_policy='Global five-metre bins; exclude endpoint-clamped projections and incomplete profile-edge bins',
+                        depth_bin_global_station_origin_m=profile.get('source_halo_interval_m',[0.])[0]),
         limitations=['Source DEM water values excluded from bed inference.',
                     'Model bank corrections and missing bathymetry require engine review; no measured rock shapes inferred.',
                     'Classified-water holes can include imagery errors, not necessarily solid boulders.',

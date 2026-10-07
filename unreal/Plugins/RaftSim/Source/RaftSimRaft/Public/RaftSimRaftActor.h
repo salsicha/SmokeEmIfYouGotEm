@@ -84,12 +84,14 @@ class RAFTSIMRAFT_API ARaftSimRaftActor : public AActor
     friend class FRaftSimOarCommandParityTest;
     friend class FRaftSimInputContextIsolationTest;
     friend class FRaftSimCrewOccupancyTest;
+    friend class FRaftSimGuideEyeAnchorTest;
     friend class FRaftSimRescueEquipmentTest;
     friend class FRaftSimPassengerWashoutTest;
     friend class FRaftSimCrewFatigueTest;
     friend class FRaftSimRiverTrialSetup;
     friend class FRaftSimIndependentTrialSetupTest;
     friend class FRaftSimSwampedSeatTest;
+    friend class FRaftSimRescueStreamingTest;
     friend class FRaftSimBackToSeatsTest;
     friend class FRaftSimProductionCapturedRockPin;
     friend class URaftSimOarRigComponent;
@@ -146,6 +148,8 @@ public:
     /** World-space centre of the guide avatar's posed head, for seating the
      * first-person camera on the real anatomy instead of a fixed offset. */
     bool GetGuideHeadWorldLocationCm(FVector& OutCm) const;
+
+    bool GetGuideEyeWorldLocationCm(FVector& OutCm) const;
 
     /** Guide stroke presentation state, for the pawn's first-person paddle. */
     ERaftSimCrewAvatarAction GetGuideStrokeAction() const { return GuideStrokeAction; }
@@ -237,6 +241,9 @@ public:
     /** Number of crew currently in the water as swimmers. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     int32 GetSwimmerCount() const { return Swimmers.Num(); }
+
+    /** Read-only live rescue state, also available in packaged Shipping games. */
+    TConstArrayView<FRaftSimSwimmerRescueFrame> GetSwimmerFrames() const { return Swimmers; }
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
     int32 GetCrewAvatarCount() const { return CrewAvatars.Num(); }

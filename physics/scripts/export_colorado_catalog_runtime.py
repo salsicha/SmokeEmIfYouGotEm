@@ -29,6 +29,12 @@ def checked_cook(inputs,cook,review):
         raise ValueError('Cook did not pass its construction screen')
     if not receipt['construction_screen'] or not all(receipt['construction_screen'].values()):
         raise ValueError('Inconsistent construction screen')
+    if build.get('source_inputs'):
+        cores=receipt.get('registered_core_reviews',[])
+        if (len(cores)!=len(build['source_inputs']) or
+                not receipt['construction_screen'].get('all_registered_cores_pass') or
+                not all(c['construction_screen_passed'] and all(c['construction_screen'].values()) for c in cores)):
+            raise ValueError('Joined cook lacks passing per-core reviews')
     native=json.loads((cook/'manifest.json').read_text())
     if native!=receipt['native_manifest']:raise ValueError('Different native cook')
     if (native['solver_mode']!='finite_volume' or native['flux_scheme']!='hll' or
@@ -88,6 +94,12 @@ def landscape_sample(decoded,rows,cols):
 
 def export(inputs,cook,review,out):
     if out.exists():raise ValueError('Fresh runtime export required')
+    # This exporter constructs one independently stretched 2017-height map.
+    # A common-lattice cook must retain its own encoded chunks instead; quietly
+    # regenerating the legacy heightfield would reopen the collision mismatch.
+    source=json.loads((inputs/'build_report.json').read_text())
+    if source.get('continuous_terrain') is not None:
+        raise ValueError('Continuous terrain cook requires its common-grid runtime assembly, not the legacy catalog exporter')
     build,receipt,native,scenario,f,bed=checked_cook(inputs,cook,review)
     evidence=ROOT/build['construction_directory']
     ev=json.loads((evidence/'manifest.json').read_text())

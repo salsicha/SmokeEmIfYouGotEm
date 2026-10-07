@@ -2,11 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RaftSimRapidFeature.h"
 
 #include "RaftSimRiverWaterConfig.generated.h"
 
 class UMaterialInterface;
 class UTexture2D;
+class URaftSimWaterRuntimeAdapter;
 
 /**
  * Placed in a river map to tell the water runtime to load a cooked steady-state
@@ -51,6 +53,18 @@ public:
     /** Optional dense station/lateral-to-curved-world coordinate map. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming")
     FString CoordinateMapPath;
+
+    /** Imported authored profiles in this map's global hydraulic chart.
+     * Empty identity retains the existing named-map profile behavior. */
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Water|Registration")
+    FString RegisteredRapidChartFingerprint;
+
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Water|Registration")
+    TArray<FRaftSimRapidFeature> RegisteredRapidFeatures;
+
+    /** Resolve once at surface/assessment initialization, never per frame. */
+    bool ResolveRapidFeatures(const FString& Map,const URaftSimWaterRuntimeAdapter& Water,
+        TArray<FRaftSimRapidFeature>& Out,FString& Error) const;
 
     /** M3 full-reach moving-window manifest. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming")

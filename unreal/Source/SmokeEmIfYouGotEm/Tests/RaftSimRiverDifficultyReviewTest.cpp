@@ -111,6 +111,7 @@ private:
     TSet<FString> CrossedGates;
     TSet<int32> NamedSitesSeen,NamedSitesEncountered;
     int32 NamedSitesExpected=0;
+    TArray<FRaftSimRapidFeature> NamedFeatures;
     int32 RescueAttempts=0, RescueCompletionsAtStart=0;
     ERaftSimCrewCommand Command=ERaftSimCrewCommand::Rest;
 };
@@ -212,6 +213,9 @@ bool FRiverDifficultyReview::Update()
     // The put-in config actor may unload on a long world-partitioned reach.
     if(!ConfigCached)
     {
+        FString RegistrationError;
+        if(!Config->ResolveRapidFeatures(Plan->GetStringField(TEXT("map")),*Water,NamedFeatures,RegistrationError))
+        {Test->AddError(RegistrationError);return true;}
         FieldsDirectory=Config->CookedFieldsDir; FlowBand=Config->FlowBand.ToString();
         StreamingManifest=Config->StreamingManifestPath;
         MovingWindow=Config->bEnableMovingWindowStreaming; RecenterCrux=Config->bRecenterHydraulicCrux;
@@ -419,7 +423,6 @@ bool FRiverDifficultyReview::Update()
     FRaftSimWaterSample WaterSample;
     const bool Wet=Water->SampleWaterAtWorldPosition(Position,WaterSample)&&WaterSample.bWet;
     const double Elapsed=Now-Start;
-    const auto& NamedFeatures=RaftSimRapidChallengeProfiles::Features(Plan->GetStringField(TEXT("map")));
     NamedSitesExpected=0;
     for(int32 I=0;I<NamedFeatures.Num();++I)
     {

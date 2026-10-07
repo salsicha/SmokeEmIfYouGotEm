@@ -13,6 +13,7 @@ URaftSimWaterRuntimeAdapter::~URaftSimWaterRuntimeAdapter() = default;
 #include "HAL/PlatformProcess.h"
 #include "HAL/PlatformTime.h"
 #include "Misc/Crc.h"
+#include "Misc/SecureHash.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "ProfilingDebugging/CpuProfilerTrace.h"
@@ -69,6 +70,7 @@ void URaftSimWaterRuntimeAdapter::Configure(const FRaftSimWaterRuntimeConfig& In
     RiverVerticalDatumM = 0.0f;
     RiverWorldYSign = 1.0;
     RiverCoordinateMapPath.Reset();
+    RiverCoordinateMapFingerprint.Reset();
     bRaftSupportSurfaceEnabled = false;
     RaftSupportCarrierOwner.Reset();
     RaftSupportCarrierSampler = {};
@@ -1262,6 +1264,20 @@ float URaftSimWaterRuntimeAdapter::SampleObservedWhitewaterAtRiverCoordinates(
     return FMath::Clamp(Fraction, 0.0f, 1.0f);
 }
 
+bool URaftSimWaterRuntimeAdapter::GetCurvedPresentationBaselineBoundsM(FBox2D& OutBounds) const
+{
+    OutBounds = FBox2D(ForceInit);
+    if (bCartesianWaterCoordinates || !PresentationBaselineField.IsValid()) return false;
+    const auto& Field = PresentationBaselineField;
+    const FVector2D Minimum(Field.RowStationsM[0], Field.LateralOriginM);
+    const FVector2D Maximum(Field.RowStationsM.Last(),
+        Field.LateralOriginM + (Field.Width - 1) * Field.LateralSpacingM);
+    if (Minimum.ContainsNaN() || Maximum.ContainsNaN() ||
+        Maximum.X <= Minimum.X || Maximum.Y <= Minimum.Y) return false;
+    OutBounds = FBox2D(Minimum, Maximum);
+    return true;
+}
+
 bool URaftSimWaterRuntimeAdapter::
     SamplePresentationBaselineFieldAtRiverCoordinates(
         FVector2D StationLateralM,
@@ -1879,6 +1895,7 @@ void URaftSimWaterRuntimeAdapter::RebuildRiverSpatialHash()
 bool URaftSimWaterRuntimeAdapter::ConfigureRiverCoordinateMap(
     const FString& CoordinateMapPath)
 {
+    RiverCoordinateMapFingerprint.Reset();
     RiverCoordinatePoints.Reset();
     bCartesianWaterCoordinates = false;
     RiverSpatialHash.Reset();
@@ -1903,6 +1920,9 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverCoordinateMap(
         UE_LOG(LogTemp, Error, TEXT("RaftSim coordinate map JSON is invalid: %s"), *FullPath);
         return false;
     }
+    const FTCHARToUTF8 FingerprintText(*Text);
+    FSHAHash CoordinateFingerprint;
+    FSHA1::HashBuffer(FingerprintText.Get(),FingerprintText.Length(),CoordinateFingerprint.Hash);
     FString Schema;
     if (!Root->TryGetStringField(TEXT("schema"), Schema) ||
         (Schema != TEXT("raftsim.curved_river_coordinate_map.v1") &&
@@ -1945,6 +1965,7 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverCoordinateMap(
         CartesianWaterBoundsM = FBox2D(FVector2D(Values[0],Values[1]), FVector2D(Values[2],Values[3]));
         bCartesianWaterCoordinates = true;
         RiverCoordinateMapPath = CoordinateMapPath;
+        RiverCoordinateMapFingerprint = CoordinateFingerprint.ToString();
         // Solver XY are east/north relative to the geographic world origin.
         // These are never downstream station/lateral or gameplay progress.
         UE_LOG(LogTemp, Display, TEXT("RaftSim bound Cartesian water map %s"), *CoordinateMapPath);
@@ -2023,6 +2044,7 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverCoordinateMap(
     }
     RebuildRiverSpatialHash();
     RiverCoordinateMapPath = CoordinateMapPath;
+    RiverCoordinateMapFingerprint = CoordinateFingerprint.ToString();
     UE_LOG(
         LogTemp, Display,
         TEXT("RaftSim bound curved river map %s (%d points, datum %.3f m)"),

@@ -9,6 +9,7 @@ class URaftSimShorelineMeshComponent;
 #include "RaftSimShorelineCrests.h"
 #include "RaftSimCommittedWaterClock.h"
 #include "RaftSimWetEdgeCache.h"
+#include "RaftSimRapidFeature.h"
 #include "Tasks/Task.h"
 #include <atomic>
 
@@ -1032,6 +1033,7 @@ private:
     FRaftSimCommittedWaterClock FoamWaterClock;
     bool bFoamUsesCommittedClock=false;
     bool bAuthoredRiverFoamClock=false;
+    TArray<FRaftSimRapidFeature> ActiveRapidFeatures;
     uint64 FoamClockRefreshes=0,FoamClockHolds=0,FoamClockInitializations=0;
     TArray<FBreakingSite> BreakingSites;
     /** One hydraulic jump tracked across refreshes. Detection re-finds and

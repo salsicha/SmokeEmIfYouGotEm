@@ -3,6 +3,7 @@
 CSV_DEFINE_CATEGORY(RaftSimTickRaft,true);
 #include "RaftSimCrewRoster.h"
 #include "RaftSimCapsizePolicy.h"
+#include "RaftSimWorldPositionGuard.h"
 #include "RaftSimAccessoryMesh.h"
 
 #include "Components/SceneComponent.h"
@@ -2150,6 +2151,17 @@ void ARaftSimRaftActor::SetGuideFirstPersonBodyHidden(bool bShouldHide)
     }
 }
 
+bool ARaftSimRaftActor::GetGuideEyeWorldLocationCm(FVector& OutCm) const
+{
+    const ARaftSimCrewAvatarActor* Guide = FindAvatar(TEXT("guide"));
+    if (!Guide)
+    {
+        return false;
+    }
+    OutCm = Guide->GetFirstPersonEyeWorldLocationCm();
+    return !OutCm.ContainsNaN();
+}
+
 bool ARaftSimRaftActor::GetGuideHeadWorldLocationCm(FVector& OutCm) const
 {
     const ARaftSimCrewAvatarActor* Guide = FindAvatar(TEXT("guide"));
@@ -2350,22 +2362,14 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
     if (Output.CommittedPhysicsFrame > 0)
     {
         FVector Location = Output.RaftState.WorldTransform.GetTranslation();
-        // Stability guard: a raft cannot leave the world. If the solver state
-        // diverges (e.g. extreme forced overwash), clamp to a sane envelope and
-        // shed the runaway velocity so rendering and gameplay stay valid.
-        const float kMaxHorizM = 50000.0f * 100.0f; // 50 km
-        const float kMaxDepthCm = 500.0f * 100.0f;  // 500 m
-        if (Location.ContainsNaN() ||
-            FMath::Abs(Location.X) > kMaxHorizM || FMath::Abs(Location.Y) > kMaxHorizM ||
-            FMath::Abs(Location.Z) > kMaxDepthCm)
+        FVector Velocity = Output.RaftState.LinearVelocityMetersPerSecond;
+        if (RaftSimWorldPositionGuard::Recover(Location,Velocity,GetActorLocation()))
         {
-            Location.X = FMath::Clamp(Location.ContainsNaN() ? 0.0f : Location.X, -kMaxHorizM, kMaxHorizM);
-            Location.Y = FMath::Clamp(Location.ContainsNaN() ? 0.0f : Location.Y, -kMaxHorizM, kMaxHorizM);
-            Location.Z = FMath::Clamp(Location.ContainsNaN() ? 0.0f : Location.Z, -kMaxDepthCm, kMaxDepthCm);
-            FRaftSimRaftKinematicState Clamped = RaftAdapter->GetKinematicState();
-            Clamped.WorldTransform.SetTranslation(Location);
-            Clamped.LinearVelocityMetersPerSecond = FVector::ZeroVector;
-            RaftAdapter->SetKinematicState(Clamped);
+            FRaftSimRaftKinematicState Recovered = RaftAdapter->GetKinematicState();
+            Recovered.WorldTransform.SetTranslation(Location);
+            Recovered.LinearVelocityMetersPerSecond = Velocity;
+            RaftAdapter->SetKinematicState(Recovered);
+            UE_LOG(LogTemp,Warning,TEXT("Raft position outside finite engine world; restored previous valid pose"));
         }
         FQuat Rotation = Output.RaftState.WorldTransform.GetRotation().GetNormalized();
         if (Rotation.ContainsNaN() || !FMath::IsFinite(Rotation.SizeSquared()) ||

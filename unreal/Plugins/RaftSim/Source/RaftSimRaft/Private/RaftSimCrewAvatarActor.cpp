@@ -3449,6 +3449,20 @@ FVector ARaftSimCrewAvatarActor::GetPoseHeadWorldLocationCm() const
     return Head ? Head->GetComponentLocation() : GetActorLocation();
 }
 
+FVector ARaftSimCrewAvatarActor::GetFirstPersonEyeWorldLocationCm() const
+{
+    if (const auto* CC0Visual = Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor()))
+    {
+        FVector EyeWorld;
+        if (CC0Visual->GetViewEyeCenterWorld(EyeWorld))
+        {
+            return EyeWorld;
+        }
+    }
+    return GetPoseHeadWorldLocationCm() + GetActorForwardVector() * 9.f +
+        GetActorUpVector() * 4.f;
+}
+
 void ARaftSimCrewAvatarActor::SetFirstPersonHeadHidden(bool bShouldHide)
 {
     if (bFirstPersonHeadHidden == bShouldHide)

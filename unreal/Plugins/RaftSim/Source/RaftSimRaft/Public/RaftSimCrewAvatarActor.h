@@ -244,6 +244,9 @@ public:
      */
     FVector GetPoseHeadWorldLocationCm() const;
 
+    /** Production-rig eyes, with the compact procedural eye offset as fallback. */
+    FVector GetFirstPersonEyeWorldLocationCm() const;
+
     /**
      * Legacy procedural pelvis estimate for adapters without skinned
      * contact samples. CC0 seating uses GetSeatedContactPointsLocalCm.

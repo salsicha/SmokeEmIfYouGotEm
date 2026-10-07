@@ -1,6 +1,7 @@
 #pragma once
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterFeatureKinematics.h"
+#include "RaftSimRapidFeature.h"
 
 // Authored gameplay reconstruction, NOT surveyed hydraulics or extra solver
 // forcing. Positions follow the committed observed_rapids catalogues. These
@@ -10,11 +11,51 @@
 // batoka_run_observed_rapids.json (Director's / Crease / Land of the Giants).
 namespace RaftSimRapidChallengeProfiles
 {
-struct FFeature
+using FFeature = FRaftSimRapidFeature;
+
+inline bool IsValid(const FFeature& F)
 {
-    double Station, Lateral, AngleDegrees;
-    float Height, Length, Spill;
-};
+    return FMath::IsFinite(F.Station) && FMath::IsFinite(F.Lateral) &&
+        FMath::IsFinite(F.AngleDegrees) && FMath::IsFinite(F.Height) &&
+        FMath::IsFinite(F.Length) && FMath::IsFinite(F.Spill) &&
+        F.Height>0.f && F.Height<=1.2f && F.Length>=2.f && F.Length<=7.f &&
+        F.Spill>=0.f && F.Spill<=1.f;
+}
+
+// Both adapters MUST already use the same geographic world origin/CRS.
+// Transfer centre and physical orientation, not a constant station offset.
+// Amplitude, wavelength, spilling and the shared kernel remain unchanged.
+inline bool Register(const URaftSimWaterRuntimeAdapter& Source,
+    const URaftSimWaterRuntimeAdapter& Target,const TArray<FFeature>& Input,
+    TArray<FFeature>& Output,FString& Error)
+{
+    Output.Reset(); Error.Reset();
+    if (!Source.HasRiverCoordinateMap() || !Target.HasRiverCoordinateMap() ||
+        Source.HasCartesianWaterCoordinates() || Target.HasCartesianWaterCoordinates())
+    { Error=TEXT("Rapid registration requires two curved coordinate charts");return false; }
+    TArray<FFeature> Candidate;
+    for(const auto& F:Input)
+    {
+        FVector Position,ST,SL,TT,TL,Check;
+        FVector2D SourceRoundtrip,Registered;
+        if(!IsValid(F) || !Source.RiverToWorldPosition({F.Station,F.Lateral},0.f,Position) ||
+            !Source.WorldToRiverCoordinates(Position,SourceRoundtrip,ST,SL) ||
+            !SourceRoundtrip.Equals({F.Station,F.Lateral},.0001) ||
+            !Target.WorldToRiverCoordinates(Position,Registered,TT,TL) ||
+            !Target.RiverToWorldPosition(Registered,0.f,Check) ||
+            FVector::DistSquared2D(Position,Check)>1.)
+        { Error=TEXT("Rapid feature is invalid, ambiguous or outside the target chart");return false; }
+        const double Angle=FMath::DegreesToRadians(F.AngleDegrees);
+        const FVector WorldDirection=ST*FMath::Cos(Angle)+SL*FMath::Sin(Angle);
+        FFeature Moved=F;
+        Moved.Station=Registered.X;Moved.Lateral=Registered.Y;
+        Moved.AngleDegrees=FMath::RadiansToDegrees(FMath::Atan2(
+            FVector::DotProduct(WorldDirection,TL),FVector::DotProduct(WorldDirection,TT)));
+        if(!IsValid(Moved)) { Error=TEXT("Nonfinite registered rapid");return false; }
+        Candidate.Add(Moved);
+    }
+    Output=MoveTemp(Candidate);return true;
+}
 // Conservative projection of the EXISTING compact relief footprint. This is
 // for observation coverage, not a new navigation gate or a boat-only force.
 inline bool OverlapsReach(const FFeature& F,double Start,double Finish)
@@ -118,11 +159,11 @@ inline const TArray<FFeature>& Features(const FString& Map)
 }
 
 template<typename FSampler>
-inline int32 Append(const FString& Map, const FBox2D& VisibleBounds,
+inline int32 Append(const TArray<FFeature>& Profile, const FBox2D& VisibleBounds,
     FSampler&& Sample, TArray<URaftSimWaterRuntimeAdapter::FSupportBreakingSite>& Sites)
 {
     int32 Added=0;
-    for(const auto& F:Features(Map))
+    for(const auto& F:Profile)
     {
         const FVector2D P(F.Station,F.Lateral);
         if(!VisibleBounds.ExpandBy(40.).IsInside(P))continue;
@@ -140,5 +181,12 @@ inline int32 Append(const FString& Map, const FBox2D& VisibleBounds,
         S.bLocalEnvelopeCap=true;++Added;
     }
     return Added;
+}
+
+template<typename FSampler>
+inline int32 Append(const FString& Map,const FBox2D& Bounds,FSampler&& Sample,
+    TArray<URaftSimWaterRuntimeAdapter::FSupportBreakingSite>& Sites)
+{
+    return Append(Features(Map),Bounds,Forward<FSampler>(Sample),Sites);
 }
 }

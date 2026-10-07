@@ -466,7 +466,21 @@ void ARaftSimWaterSurfaceActor::UpdateCurvedFarFieldWater(float CarrierDrawCover
         : FVector2D(RiverCoordinatesM[FirstDrawn].X + SpacingM, StripMinN + SpacingM);
     const FVector2D HoleMax = FirstDrawn == INDEX_NONE ? FVector2D(-1.0e9, -1.0e9)
         : FVector2D(RiverCoordinatesM[LastDrawn].X - SpacingM, StripMaxN - SpacingM);
-    const FFarFieldWaterKey Key{HoleMin, HoleMax, WaterTextureOriginMeters, SpacingM, 0.0f, DropCm, 0u, FoamScale};
+    FBox2D BaselineBounds;
+    if (!WaterAdapter->GetCurvedPresentationBaselineBoundsM(BaselineBounds))
+    {
+        HideCartesianFarFieldWater();
+        return;
+    }
+    // A continuous coordinate map may describe hundreds of kilometres while
+    // the resident presentation source covers only a short connected reach.
+    // Outside these bounds SamplePresentationBaselineField always returns false.
+    // Retain a dry border cell for identical shoreline clipping and keep the
+    // original globally aligned lattice; do not stretch or invent source water.
+    MinimumStationM = FMath::Max(MinimumStationM, float(BaselineBounds.Min.X - SpacingM));
+    MaximumStationM = FMath::Min(MaximumStationM, float(BaselineBounds.Max.X + SpacingM));
+    const uint32 BoundsHash = HashCombine(GetTypeHash(MinimumStationM), GetTypeHash(MaximumStationM));
+    const FFarFieldWaterKey Key{HoleMin, HoleMax, WaterTextureOriginMeters, SpacingM, 0.0f, DropCm, BoundsHash, FoamScale};
     if (bFarFieldWaterKeyValid && Key == FarFieldWaterKey)
     {
         return;

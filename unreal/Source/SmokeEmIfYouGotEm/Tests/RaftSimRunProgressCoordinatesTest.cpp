@@ -222,6 +222,7 @@ bool FRaftSimReviewStartRangeTest::RunTest(const FString&)
         Run->GetProgressCoordinates(nullptr)->GetRiverStationRangeM(Minimum, Maximum))) return false;
     FRaftSimCareerScenarioDefinition Scenario;
     Scenario.ScenarioId = TEXT("range_test_original");
+    Scenario.LevelName = FName(*PackageName);
     auto* Water = NewObject<URaftSimWaterRuntimeAdapter>(Run);
     const auto* Progress = Run->GetProgressCoordinates(nullptr);
     for (float Station : {Minimum, 8330.f, Maximum - .5f, Maximum})

@@ -17,6 +17,9 @@ reference file for comparing a cook with the evidence surface.
 
 Bed per cell: mean of four bilinear samples of the evidence bed at +-DS/4 in
 the station/lateral frame; class/river/channel: nearest evidence cell.
+With --terrain-manifest, bed instead samples the exact encoded native Landscape
+triangles before initial depth and discharge are calculated. Missing coverage
+or mismatched source/frame is an error, never an extrapolated shore.
 Initial water: the reference surface in channel cells, conveyance velocity.
 Upstream: discharge_profile (h^(5/3) conveyance; rows < 0.15 m carry none);
 downstream: outflow at the reference stage; sides: bank. The solver has no
@@ -58,6 +61,31 @@ def curvature(x, y):
     return (dx * ddy - dy * ddx) / np.maximum((dx * dx + dy * dy) ** 1.5, 1e-12)
 
 
+def canonical_terrain_bed(manifest_path, evidence, xy, river_id, crs, vertical, origin, datum):
+    """Tie the hydraulic bed to the same source and triangles the engine imports."""
+    from export_colorado_continuous_terrain import LandscapeTriangles
+    path=Path(manifest_path).resolve();evidence=Path(evidence).resolve()
+    if path.name!='manifest.json':raise ValueError('Expected canonical terrain manifest.json')
+    terrain=LandscapeTriangles(path.parent);m=terrain.manifest
+    if (m.get('schema')!='raftsim.continuous_landscape.v1' or
+            m.get('river_id')!=river_id or m.get('horizontal_crs')!=crs or
+            m.get('vertical_reference')!=vertical or m.get('world_y_sign')!=-1 or
+            not np.array_equal(m.get('horizontal_origin_m'),origin) or
+            not np.isfinite(datum) or m.get('vertical_datum_m')!=datum):
+        raise ValueError('Canonical terrain and water geographic frames disagree')
+    source=m.get('evidence_source',{})
+    if (source.get('manifest_sha256')!=sha(evidence/'manifest.json') or
+            source.get('grid_sha256')!=sha(evidence/'evidence_grid.npz')):
+        raise ValueError('Canonical terrain and water evidence sources disagree')
+    bed=terrain.sample(xy)
+    if not np.isfinite(bed).all():
+        raise ValueError('Canonical terrain does not cover the entire hydraulic grid')
+    return bed,dict(manifest=str(path),manifest_sha256=sha(path),
+                    sampling='encoded_native_landscape_triangles',
+                    evidence_manifest_sha256=source['manifest_sha256'],
+                    evidence_grid_sha256=source['grid_sha256'])
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('evidence', type=Path)
@@ -70,6 +98,7 @@ def main():
     ap.add_argument('--vertical-reference', required=True)
     ap.add_argument('--vertical-datum-m', type=float, required=True)
     ap.add_argument('--origin', type=float, nargs=2, help='local frame origin (default: west edge, north-south centre of the window)')
+    ap.add_argument('--terrain-manifest', type=Path, help='use the canonical native terrain as the hydraulic bed')
     ap.add_argument('--discharge-m3s', type=float, help='default: evidence manifest parameters.discharge_m3s')
     ap.add_argument('--flow-source', required=True)
     ap.add_argument('--description', required=True)
@@ -87,6 +116,7 @@ def main():
     ev = args.evidence.resolve()
     man = json.loads((ev / 'manifest.json').read_text())
     X0, Y1, NX, NY = man['grid']['x0'], man['grid']['y_top'], man['grid']['nx'], man['grid']['ny']
+    ox, oy = args.origin if args.origin else (X0, Y1 - NY / 2.0)
     Q = args.discharge_m3s or man['parameters']['discharge_m3s']
     DS = args.ds_m
     reach = man['statistics'].get('reach_station_m')
@@ -157,6 +187,13 @@ def main():
             bed += 0.25 * bilinear(bed1, qx, qy); dem += 0.25 * bilinear(dem1, qx, qy)
     cls = nearest(cls1, px, py); river = nearest(river1, px, py); channel = nearest(channel1, px, py)
     assert np.isfinite(bed).all(), 'bed has gaps inside the grid'
+    terrain_receipt=None
+    if args.terrain_manifest:
+        canonical,terrain_receipt=canonical_terrain_bed(args.terrain_manifest,ev,
+            np.stack((px,py),axis=-1),args.river_id,args.crs_label,args.vertical_reference,
+            [ox,oy],args.vertical_datum_m)
+        terrain_receipt['max_difference_from_four_sample_evidence_bed_m']=float(np.max(np.abs(canonical-bed)))
+        bed=canonical
     ratio = 1 - k[:, None] * lats[None, :]
     B = np.ascontiguousarray(bed.T)
     WS = np.broadcast_to(ws_ref[None, :], B.shape)
@@ -192,8 +229,8 @@ def main():
         provenance=dict(evidence_manifest_sha256=sha(ev / 'manifest.json'), evidence_grid_sha256=sha(ev / 'evidence_grid.npz'),
                         submerged_bed_is_inference=True, initial_velocity_is_inferred=True, target_discharge_m3s=Q,
                         flow_source=args.flow_source, measured_velocity=False))
+    if terrain_receipt:sc['metadata']['provenance']['continuous_terrain']=terrain_receipt
     (pkg / 'scenario.json').write_text(json.dumps(sc, indent=2) + '\n')
-    ox, oy = args.origin if args.origin else (X0, Y1 - NY / 2.0)
     cmap = dict(schema='raftsim.curved_river_coordinate_map.v1', river_id=args.river_id, section_id=args.section_id,
                 world_y_sign=-1, vertical_datum_m=args.vertical_datum_m, horizontal_origin_m=[ox, oy], horizontal_crs=args.crs_label,
                 vertical_reference=args.vertical_reference,
@@ -208,6 +245,7 @@ def main():
                  metric_ratio_wet_min_max=[float(ratio[wetc].min()), float(ratio[wetc].max())], wet_cells=int(wet0.sum()),
                  inferred_wet_cells=int((wet0 & (cls.T == 2)).sum()), stage_in=float(ws_ref[0]), stage_out=stage_out, discharge_m3s=Q,
                  origin=[ox, oy])
+    if terrain_receipt:stats['continuous_terrain']=terrain_receipt
     (out / 'build_report.json').write_text(json.dumps(stats, indent=2) + '\n')
     print(json.dumps(stats, indent=1))
 

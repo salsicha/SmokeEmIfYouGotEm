@@ -43,7 +43,33 @@ def selected_windows(index,names):
     return rows
 
 
-def extract(raster, windows, out, names=(), margin_m=80):
+def read_survey_window(source, window, allow_partial=False):
+    """Read only the intersection; retain off-raster cells as unknown, not bed.
+
+    Avoid GDAL boundless VRT reads over the enormous sparse source. Allocate
+    only the explicitly bounded crop and record source-extent coverage.
+    """
+    if window.width*window.height>8_000_000:
+        raise ValueError('Survey crop exceeds memory budget')
+    extent=Window(0,0,source.width,source.height)
+    from rasterio.errors import WindowError
+    try:
+        overlap=window.intersection(extent)
+    except WindowError:
+        overlap=None
+    if not allow_partial and overlap!=window:
+        raise ValueError('Construction window outside source extent')
+    bed=np.full((int(window.height),int(window.width)),np.nan,dtype=np.float32)
+    covered=0
+    if overlap is not None:
+        y=int(overlap.row_off-window.row_off); x=int(overlap.col_off-window.col_off)
+        h,w=int(overlap.height),int(overlap.width)
+        bed[y:y+h,x:x+w]=source.read(1,window=overlap,masked=True).filled(np.nan)
+        covered=h*w
+    return bed,covered
+
+
+def extract(raster, windows, out, names=(), margin_m=80, allow_partial_survey=False):
     if out.exists(): raise ValueError('Fresh bed-crop output required')
     index=json.loads((windows/'index.json').read_text(encoding='utf-8'))
     results=[]
@@ -59,10 +85,7 @@ def extract(raster, windows, out, names=(), margin_m=80):
             bbox=crop_bounds(definition['bounds_epsg6404'],margin_m)
             w=from_bounds(*bbox,transform=source.transform).round_offsets().round_lengths()
             if w.width*w.height>8_000_000: raise ValueError('Crop exceeds bounded memory budget')
-            if w.intersection(Window(0,0,source.width,source.height))!=w:
-                raise ValueError('Construction window outside source extent')
-            band=source.read(1,window=w,masked=True)
-            bed=band.filled(np.nan).astype(np.float32)
+            bed,source_extent_cells=read_survey_window(source,w,allow_partial_survey)
             valid=np.isfinite(bed)
             if np.any(valid & ((bed<300.) | (bed>930.))):
                 raise ValueError('Unexpected source height; refuse datum/raster substitution')
@@ -74,13 +97,16 @@ def extract(raster, windows, out, names=(), margin_m=80):
             sampled=np.array([float(p[0]) if not np.ma.getmaskarray(p)[0] else np.nan
                               for p in source.sample(pts,masked=True)])
             station=np.array([s['local_arc_station_m'] for s in definition['samples']])
-            crux=np.abs(station-definition['rapid_point_local_station_m'])<=200.
+            rapid_station=definition.get('rapid_point_local_station_m')
+            crux=None if rapid_station is None else np.abs(station-rapid_station)<=200.
             # A location sample is not a wet-area or full-width coverage measure.
             result=dict(name=definition['name'],file=key+'.npz',bbox_epsg6404=bbox,
                 shape=list(bed.shape),measured_pool_bed_cells=int(valid.sum()),
+                within_source_raster_extent_cells=source_extent_cells,
+                outside_source_raster_extent_cells=int(bed.size-source_extent_cells),
                 sampled_profile_points=len(pts),profile_points_with_bed=int(np.isfinite(sampled).sum()),
-                rapid_point_plus_minus_200m_samples=int(crux.sum()),
-                rapid_point_plus_minus_200m_samples_with_bed=int(np.isfinite(sampled[crux]).sum()),
+                rapid_point_plus_minus_200m_samples=int(crux.sum()) if crux is not None else None,
+                rapid_point_plus_minus_200m_samples_with_bed=int(np.isfinite(sampled[crux]).sum()) if crux is not None else None,
                 full_channel_bathymetry_coverage=None,
                 sha256=sha(out/(key+'.npz')))
             results.append(result)
@@ -93,6 +119,7 @@ def extract(raster, windows, out, names=(), margin_m=80):
         measured_scope='Multibeam pools near centreline at approximately 8400 cfs; NOT rapids or shallow water',
         missing_data_policy='Preserved as NaN with an explicit measured mask; no interpolation or invented underwater rocks',
         construction_margin_m=margin_m,runnable_maps_created=0,windows=results)
+    manifest['allow_partial_survey']=allow_partial_survey
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2,allow_nan=False)+'\n',encoding='utf-8')
     return manifest
 
@@ -104,5 +131,7 @@ if __name__=='__main__':
     p.add_argument('--out',type=Path,required=True)
     p.add_argument('--names',nargs='*',default=[])
     p.add_argument('--margin-m',type=int,default=80)
+    p.add_argument('--allow-partial-survey',action='store_true',
+                   help='Keep off-raster cells explicitly missing; never infer survey coverage')
     a=p.parse_args()
-    extract(a.raster,a.windows,a.out,a.names,a.margin_m)
+    extract(a.raster,a.windows,a.out,a.names,a.margin_m,a.allow_partial_survey)

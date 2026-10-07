@@ -1,4 +1,5 @@
 #include "RaftSimRiverWaterConfig.h"
+#include "RaftSimRapidChallengeProfiles.h"
 
 #include "Components/BillboardComponent.h"
 #include "Components/ExponentialHeightFogComponent.h"
@@ -6,6 +7,26 @@
 #include "Engine/DirectionalLight.h"
 #include "Engine/ExponentialHeightFog.h"
 #include "EngineUtils.h"
+
+bool ARaftSimRiverWaterConfig::ResolveRapidFeatures(const FString& Map,
+    const URaftSimWaterRuntimeAdapter& Water,TArray<FRaftSimRapidFeature>& Out,FString& Error) const
+{
+    Out.Reset();Error.Reset();
+    if(RegisteredRapidChartFingerprint.IsEmpty())
+    {
+        if(!RegisteredRapidFeatures.IsEmpty())
+        {Error=TEXT("Registered rapids lack coordinate identity");return false;}
+        Out=RaftSimRapidChallengeProfiles::Features(Map);return true;
+    }
+    double Minimum=0.,Maximum=0.;
+    if(RegisteredRapidChartFingerprint!=Water.GetRiverCoordinateMapFingerprint() ||
+        !Water.GetExactRiverStationRangeM(Minimum,Maximum))
+    {Error=TEXT("Registered rapids belong to a different or unavailable coordinate chart");return false;}
+    for(const auto& F:RegisteredRapidFeatures)
+        if(!RaftSimRapidChallengeProfiles::IsValid(F) || F.Station<Minimum || F.Station>Maximum)
+        {Error=TEXT("Invalid registered rapid parameters or station");return false;}
+    Out=RegisteredRapidFeatures;return true;
+}
 
 ARaftSimRiverWaterConfig::ARaftSimRiverWaterConfig()
 {

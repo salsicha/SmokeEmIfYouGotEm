@@ -42,8 +42,9 @@ def definitions(axes):
         'Primary trip observation is from 1997 with uncertain flow; confirm modern feature geometry before fixing a precise line',
         location_evidence='USGS georeferenced construction profile',source_flow_scope='Trip flow not established')
     pacuare=[
-        ('Bienvenidos','unresolved','Resolve which named access-point rapid the catalog means','II+',
-         'Guide has two Bienvenidos; lodge map calls its entry III. Do not silently choose the first name match.'),
+        ('Bienvenidos','train','Read the entry wave train below Tres Equis','II+',
+         'Resolved using the lodge PDF: after Tres Equis and before Linda Vista, matching guide km 3.33, '
+         'not the separate km 0.26 rapid above Tres Equis. Lodge/catalog III versus guide II+ remains a discrepancy.'),
         ('Pyramid Rock','slalom','Choose the shallow left channel','II',
          'Guide describes a rock changed in 2006; lodge map/catalog say III. Preserve the class discrepancy.'),
         ('Pele El Ojo','slalom','Centre approach, then move right of left boulders','III','Requires a timed move away from the boulder field.'),
@@ -63,6 +64,9 @@ def definitions(axes):
             alternative_source=LODGE,source_grade=grade,
             location_evidence='Published guide order/kilometres; exact current-map registration not yet established',
             source_flow_scope='Qualitative water levels, not a verified match to the game 45 m3/s')
+    entries['pacuare','Bienvenidos'].update(guide_km=3.33,
+        location_identity='Lower-run rapid between Tres Equis and Linda Vista; not San Martin Bienvenidos',
+        identity_sources=[PAC,LODGE])
     add('futaleufu','Asleep at the Wheel','hole','Avoid the centre-bottom hydraulic using the right passage',
         'https://www.whitewaterguidebook.com/chile/futaleufu-river-inferno/',
         'Upstream of Terminator and outside the current crop; do not alias an existing Terminator feature',
@@ -70,7 +74,26 @@ def definitions(axes):
     for name in ('Lava Canyon','Green Mile','Miracle Canyon'):
         add('chilko',name,'continuous','Maintain control through linked waves and turns without a reset',CHILKO,
             'Named reach scope and exact boundaries unresolved; the travel account is not a feature-by-feature survey',
-            location_evidence='Published reach names only',
+            location_evidence='See source-indexed Chilko location ledger; no accepted rapid endpoints',
             source_flow_scope='Do not infer a numeric grade for entries whose catalog says guide review required',
             aggregate_reach=(name=='Lava Canyon'))
+    chilko_evidence='physics/data/real_world/chilko_river_bc/observed_rapids/catalog_location_evidence_2026_10_06.json'
+    for name in ('Lava Canyon','Green Mile','Miracle Canyon'):
+        entries['chilko',name].update(location_evidence_file=chilko_evidence,
+            geographic_acceptance='unresolved', boundary_lon_lat=None,
+            source_check='Names attested; actual runtime coordinates expose existing geographic label conflicts. '
+                         'Do not use existing gameplay labels as geographic anchors.')
+    entries['chilko','Green Mile'].update(
+        location_status='sequence_bracket_only',
+        location_evidence='2006 trip sequence places Green Mile after Bidwell and before White Mile; '
+                          'BC Whitewater map points bound the search interval, not the rapid itself',
+        source_marker_bracket_lon_lat=[[-123.821211713868,51.91166777179728],
+                                      [-123.80243226946493,51.93985537976434]])
+    entries['chilko','Miracle Canyon'].update(location_status='name_attested_location_unresolved',
+        location_evidence='2025 eyewitness account names Miracle Canyon but supplies no coordinates. '
+                          'No evidence establishes equivalence to the downstream basalt box canyon.')
+    entries['chilko','Lava Canyon'].update(
+        location_status='aggregate_rafting_reach_distinct_from_geographic_point',
+        location_evidence='Official BC geographic Lava Canyon lies upstream of the Bidwell marker; '
+                          'do not interchange it with the commercial run name or downstream basalt slot.')
     return entries

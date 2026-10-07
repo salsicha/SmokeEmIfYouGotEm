@@ -1,4 +1,4 @@
-"""Export the evidence-based Chilko Lava Canyon cook as runtime data (numpy only).
+"""Export the evidence-based Chilko Lava Canyon cook as runtime data.
 
 Inputs: the evidence folder (build_chilko_evidence_grid.py), the scenario
 root (build_curvilinear_river_scenario.py), the raftsim_water_solver run and
@@ -18,8 +18,8 @@ Outputs under physics/data/real_world/chilko_river_bc:
 
 Frames: NAD83(CSRS) / UTM 10N (EPSG:3157) metres; local = E - x0, N - y_centre;
 the coordinate map declares world_y_sign -1; Unreal Z cm = (CGVD2013 height -
-datum) * 100. Colour: Sentinel-2 L2A true colour at 10 m (WGS 84 / UTM 10N; the
-~1 m NAD83(CSRS) offset is ignored), albedo-scaled like the Futaleufu drape.
+datum) * 100. Colour: Sentinel-2 L2A true colour at 10 m, transformed explicitly
+from EPSG:3157 to the captured EPSG:32610 pixel grid and albedo-scaled.
 Terrain everywhere is the LidarBC bare-earth DEM (measured) except the wetted
 channel, whose bed is inferred.
 """
@@ -38,6 +38,7 @@ from export_futaleufu_evidence_runtime import rel, sha, write_rsbf  # noqa: E402
 from export_hance_evidence_runtime import (bilinear, read_frame, smooth_fill,  # noqa: E402
                                            write_png_rgb, write_png_u16)
 from solver_face_discharge import face_discharge  # noqa: E402
+from build_chilko_evidence_grid import imagery_sampling_points  # noqa: E402
 
 DATA = ROOT / 'physics/data/real_world/chilko_river_bc'
 SRC = DATA / 'chilko_sources_2026_09'
@@ -252,15 +253,20 @@ def main():
     # ---------------- colour: Sentinel-2 true colour (10 m), albedo-scaled
     s2m = json.loads((SRC / 'sentinel2/fetch_manifest.json').read_text())
     item = next(i for i in s2m['items'] if i['npz'] == args.sentinel2)
-    s2 = np.load(SRC / 'sentinel2' / args.sentinel2); sw = item['window_utm_m']
+    s2_path = SRC / 'sentinel2' / args.sentinel2
+    if sha(s2_path) != item['npz_sha256']:
+        raise ValueError('Sentinel capture differs from its verified manifest')
+    s2 = np.load(s2_path)
+    if any(list(s2[k].shape) != item['bands'][k]['shape'] for k in ('red', 'green', 'blue', 'nir')):
+        raise ValueError('Sentinel capture shape differs from its native grid')
     s2_rgb = np.stack([s2[k].astype(np.float64) * 1e-4 - 0.1 for k in ('red', 'green', 'blue')], -1)
-    s2_valid = (s2['red'] > 0) & (s2['green'] > 0) & (s2['blue'] > 0)
-    g_, n_ = s2['green'].astype(np.float64), s2['nir'].astype(np.float64)
-    s2_ndwi = (g_ - n_) / np.maximum(g_ + n_, 1.0)
+    s2_valid = (s2['red'] > 0) & (s2['green'] > 0) & (s2['blue'] > 0) & (s2['nir'] > 0)
+    g_, n_ = [s2[k].astype(np.float64) * 1e-4 - 0.1 for k in ('green', 'nir')]
+    s2_ndwi = (g_ - n_) / np.maximum(g_ + n_, 1e-6)
 
     def sample_colour(E, N):
-        """Linear surface reflectance at UTM 10N points and its validity."""
-        sc_ = (E - sw['xmin']) / 10.0 - 0.5; sr_ = (sw['ymax'] - N) / 10.0 - 0.5
+        """Linear reflectance at EPSG:3157 points; never clamp outside capture."""
+        sr_, sc_ = imagery_sampling_points(E, N, item)
         sat_ = np.stack([bilinear(s2_rgb[..., k], sc_, sr_) for k in range(3)], -1)
         return np.clip(sat_, 0, 1), bilinear(s2_valid.astype(np.float32), sc_, sr_) > 0.99
 
@@ -285,7 +291,8 @@ def main():
     grow = water_px.copy()
     for _ in range(int(round(10.0 / (SPAN_X / DRAPE)))):
         g_ = grow.copy(); g_[1:] |= grow[:-1]; g_[:-1] |= grow[1:]; g_[:, 1:] |= grow[:, :-1]; g_[:, :-1] |= grow[:, 1:]; grow = g_
-    s2_water = bilinear(s2_ndwi, (DE - sw['xmin']) / 10.0 - 0.5, (sw['ymax'] - DN) / 10.0 - 0.5) > 0.0
+    dr_, dc_ = imagery_sampling_points(DE, DN, item)
+    s2_water = (bilinear(s2_ndwi, dc_, dr_) > 0.0) & sv_d
     water_px = water_px | (grow & s2_water)
     keep = ~water_px
     cont = np.zeros_like(alb)

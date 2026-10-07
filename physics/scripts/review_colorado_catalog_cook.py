@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import numpy as np
 from scipy.ndimage import distance_transform_edt
-from build_colorado_catalog_evidence import sha
+from build_colorado_catalog_evidence import ROOT,sha
 from solver_face_discharge import face_discharge
 
 
@@ -46,6 +46,44 @@ def compare(reference,final,previous,step):
         surface_error_per_station_m=[float(v) if np.isfinite(v) else None for v in med])
 
 
+def screen(stats):
+    return dict(surface_abs_p95_below_1m=stats['surface_error_abs_p95_m']<1.,
+        wet_iou_at_least_point9=stats['wet_intersection_over_union']>=.9,
+        discharge_abs_p95_below_5percent=stats['exact_face_discharge_abs_error_p95_fraction']<.05,
+        settling_depth_p95_below_3cm=stats['depth_change_p95_m']<.03)
+
+
+def core_reviews(reference,current,previous,flux,q,step,intervals):
+    """A long joined domain must not average away a failing source core."""
+    results=[]
+    source=np.asarray(reference['source_station'])
+    if (source.ndim!=1 or source.size<2 or not np.isfinite(source).all()
+            or np.any(np.diff(source)<=0)):
+        raise ValueError('Invalid station coverage for registered core')
+    for start,end in intervals:
+        # An overlap is not coverage of the whole registered reach. Require
+        # source samples bracketing both endpoints before evaluating its cells.
+        if (not np.isfinite([start,end]).all() or start>=end
+                or start<source[0] or end>source[-1]):
+            raise ValueError('Incomplete endpoint coverage for registered core')
+        columns=np.flatnonzero((source>=start)&(source<end))
+        if len(columns)<2 or np.any(np.diff(columns)!=1):
+            raise ValueError('Missing or disconnected registered core')
+        sl=slice(columns[0],columns[-1]+1)
+        ref=dict(station=reference['station'][sl],reference_surface=reference['reference_surface'][sl],
+                 classified_water=reference['classified_water'][:,sl])
+        stats=compare(ref,{k:v[:,sl] for k,v in current.items()},
+                      {k:v[:,sl] for k,v in previous.items()},step)
+        local_flux=flux[columns[0]:columns[-1]+2]
+        stats['exact_face_discharge_abs_error_p95_fraction']=float(np.percentile(abs(local_flux-q)/q,95))
+        gates=screen(stats)
+        results.append(dict(source_core_interval_m=[start,end],construction_screen=gates,
+            construction_screen_passed=all(gates.values()),
+            statistics={k:v for k,v in stats.items() if k not in
+                        ('sampled_reference_station_m','surface_error_per_station_m')}))
+    return results
+
+
 def review(inputs,cook,solver,out):
     if out.exists():raise ValueError('Fresh review directory required')
     build=json.loads((inputs/'build_report.json').read_text())
@@ -69,16 +107,21 @@ def review(inputs,cook,solver,out):
         exact_face_discharge_inlet_m3s=float(flux[0]),exact_face_discharge_outlet_m3s=float(flux[-1]),
         exact_face_discharge_range_m3s=[float(flux.min()),float(flux.max())],
         exact_face_discharge_abs_error_p95_fraction=float(np.percentile(abs(flux-q)/q,95)))
-    gates=dict(surface_abs_p95_below_1m=stats['surface_error_abs_p95_m']<1.,
-        wet_iou_at_least_point9=stats['wet_intersection_over_union']>=.9,
-        discharge_abs_p95_below_5percent=stats['exact_face_discharge_abs_error_p95_fraction']<.05,
-        settling_depth_p95_below_3cm=stats['depth_change_p95_m']<.03)
+    gates=screen(stats)
+    intervals=[]
+    for item in build.get('source_inputs',[]):
+        path=ROOT/item['path']/'build_report.json'
+        if sha(path)!=item['sha256']:raise ValueError('Changed registered source core')
+        intervals.append(json.loads(path.read_text())['source_core_interval_m'])
+    cores=core_reviews(reference,current,previous,flux,q,dy,intervals) if intervals else []
+    if cores:gates['all_registered_cores_pass']=all(c['construction_screen_passed'] for c in cores)
     report=dict(schema='raftsim.colorado_catalog_cook_review.v1',name=build['name'],
         scope='Construction-screen thresholds only; not engine, boat, rapid-specific, visual, or FPS acceptance.',
         source_profile_flow_cfs_approx=8400,target_flow_cfs=8000,
         comparison_frames=[p.name for p in frames[-2:]],
         frame_sha256={p.name:sha(p) for p in frames[-2:]},solver_sha256=sha(solver),
         native_manifest=json.loads((cook/'manifest.json').read_text()),statistics=stats,
+        registered_core_reviews=cores,
         construction_screen=gates,construction_screen_passed=all(gates.values()),
         engine_validated=False,class_match='not_established')
     out.mkdir(parents=True)

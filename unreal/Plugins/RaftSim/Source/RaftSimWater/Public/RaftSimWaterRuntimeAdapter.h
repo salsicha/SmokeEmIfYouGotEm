@@ -246,6 +246,8 @@ public:
     bool HasRiverCoordinateMap() const { return bCartesianWaterCoordinates || RiverCoordinatePoints.Num() >= 2; }
 
     bool HasCartesianWaterCoordinates() const { return bCartesianWaterCoordinates; }
+    /** Content identity for serialized feature registration; not a security signature. */
+    const FString& GetRiverCoordinateMapFingerprint() const { return RiverCoordinateMapFingerprint; }
     /** Read-only live hydraulic bounds; the shared render baseline does not expand them. */
     bool GetLiveWaterFieldBoundsM(FBox2D& OutBounds) const;
     bool GetCartesianWaterBoundsM(FBox2D& OutBounds) const
@@ -475,6 +477,10 @@ public:
      */
     bool LoadPresentationBaselineFieldFromFile(const FString& AbsolutePath);
 
+    /** Actual curved presentation coverage, not the full geographic route.
+     * Read-only; neither this bound nor the baseline supplies physics. */
+    bool GetCurvedPresentationBaselineBoundsM(FBox2D& OutBounds) const;
+
     /**
      * Sample the render-only full-reach baseline in station/lateral space.
      * Returns false outside its organic wet mask. Velocity and depth are
@@ -703,6 +709,7 @@ private:
     // Legacy maps omit this and retain their existing +Y convention.
     double RiverWorldYSign = 1.0;
     FString RiverCoordinateMapPath;
+    FString RiverCoordinateMapFingerprint;
 
     bool bRaftSupportSurfaceEnabled = false;
     TWeakObjectPtr<UObject> RaftSupportCarrierOwner;

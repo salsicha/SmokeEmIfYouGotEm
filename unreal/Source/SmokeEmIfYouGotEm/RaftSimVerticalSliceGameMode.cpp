@@ -7,6 +7,7 @@
 #include "RaftSimPresentationDirector.h"
 #include "RaftSimRunAudioDirector.h"
 #include "RaftSimRunManager.h"
+#include "RaftSimScenarioWorld.h"
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimTrainingDirector.h"
 #include "RaftSimWildlife.h"
@@ -59,10 +60,14 @@ void ARaftSimVerticalSliceGameMode::BeginPlay()
     {
         if (Save->GetSave() != nullptr)
         {
-            SessionMode = Save->GetSave()->ActiveGameMode;
-            ActiveScenarioId = Save->GetSave()->Selection.ScenarioId;
             bHasSessionScenario = URaftSimProgressionLibrary::FindScenario(
-                ActiveScenarioId, SessionScenario);
+                Save->GetSave()->Selection.ScenarioId, SessionScenario) &&
+                RaftSimScenarioWorld::Matches(GetWorld(), SessionScenario.LevelName);
+            if (bHasSessionScenario)
+            {
+                SessionMode = Save->GetSave()->ActiveGameMode;
+                ActiveScenarioId = SessionScenario.ScenarioId;
+            }
         }
     }
 
@@ -80,13 +85,17 @@ void ARaftSimVerticalSliceGameMode::BeginPlay()
             ARaftSimRunManager::StaticClass(), FTransform::Identity);
         if (Manager != nullptr)
         {
-            Manager->ScenarioId = ActiveScenarioId;
             RunManager = Manager;
         }
     }
     if (RunManager != nullptr && bHasSessionScenario)
     {
         RunManager->ConfigureSession(SessionScenario, SessionMode);
+    }
+    else if (RunManager != nullptr)
+    {
+        ActiveScenarioId = RunManager->ScenarioId;
+        SessionMode = RunManager->GetGameModeKind();
     }
 
     if (SessionMode == ERaftSimGameMode::TrainingEddy)

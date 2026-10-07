@@ -2,9 +2,8 @@
 
 For scenarios from build_curvilinear_river_scenario.py. Uses the last saved
 frame unless --frame is given. Reports:
-- measured anchors (evidence profile.json `anchors`, e.g. Pacuare contour
-  level crossings): cooked median surface at each anchor station against its
-  elevation - the measured validation;
+- reference anchors (evidence profile.json `anchors`): cooked median surface
+  against each reference elevation, retaining whether the reference is inferred;
 - reference surface (the evidence ws_reference, partly inferred): cooked
   median over wet channel cells per 10 m bin;
 - wet extent: cooked wet (h > 0.05 m) against the evidence wetted mask (IoU);
@@ -26,6 +25,18 @@ from png_numpy import write_png
 from solver_face_discharge import face_discharge
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def anchor_evidence_kind(profile):
+    kind = profile.get('anchor_evidence_kind')
+    inferred = str(profile.get('ws_reference_method', '')).startswith('inferred_')
+    if kind == 'measured' and inferred:
+        raise ValueError('Inferred surface method contradicts measured-anchor claim')
+    if kind in ('measured', 'inferred_dem_surface_reference'):
+        return kind
+    if inferred:
+        return 'inferred_dem_surface_reference'
+    return 'unclassified_reference_not_verified_measurement'
 
 
 def read_frame(path, ny, nx):
@@ -65,6 +76,7 @@ def main():
         if m.any():
             bins.append([float(s0), float(np.median(err[m]))])
     prof = json.loads((args.evidence / 'profile.json').read_text())
+    anchor_kind = anchor_evidence_kind(prof)
     anchors = []
     for a in prof.get('anchors', []):
         if evs[0] <= a['station_m'] <= evs[-1]:
@@ -87,7 +99,9 @@ def main():
     ok = np.isfinite(err)
     report = dict(
         frame=frames[args.frame].name, discharge_target_m3s=Q,
-        measured_anchors=anchors,
+        reference_anchors=anchors,
+        anchor_evidence_kind=anchor_kind,
+        measured_anchors=anchors if anchor_kind == 'measured' else [],
         anchor_error_m_max_abs=float(max((abs(a['error_m']) for a in anchors), default=float('nan'))),
         reference_surface_error_m=dict(median=float(np.median(err[ok])), median_abs=float(np.median(np.abs(err[ok]))),
                                        p90_abs=float(np.percentile(np.abs(err[ok]), 90)), by_bin=bins),
@@ -125,7 +139,7 @@ def main():
     for a in anchors:
         x, y = xy(a['scenario_station_m'], a['elevation_m']); chart[max(y - 4, 0):y + 5, max(x - 4, 0):x + 5] = (0, 150, 0)
     write_png(args.output / 'profile.png', chart)
-    print(json.dumps({k: report[k] for k in ('measured_anchors', 'reference_surface_error_m', 'wet_iou', 'discharge_m3s', 'convergence', 'froude')}, indent=1)[:3000])
+    print(json.dumps({k: report[k] for k in ('anchor_evidence_kind', 'reference_anchors', 'reference_surface_error_m', 'wet_iou', 'discharge_m3s', 'convergence', 'froude')}, indent=1)[:3000])
 
 
 if __name__ == '__main__':

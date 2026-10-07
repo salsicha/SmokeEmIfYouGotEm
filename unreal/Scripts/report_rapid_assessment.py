@@ -2,7 +2,8 @@
 
 Input directories contain native RiverDifficulty trial receipts. The script does
 not infer Class VI from failed automation or treat checkpoint resets as recovery.
-Only four completed variant observations qualify for a provisional game rating.
+Legacy variant observations do not establish a game class. Use source-matched
+decision, approach, timing and recovery campaigns for that separate assessment.
 """
 import argparse
 import html
@@ -127,11 +128,28 @@ OUTCOME_TEXT = {'checkpoint_reset_not_recovery': 'crew lost (swimmers past the r
                 'time_limit_partial': 'ran out of time', 'left_mapped_route': 'left the mapped river'}
 
 
+def evidence_fault(v):
+    if v is None:
+        return None
+    if v['outcome'] in HARNESS_FAULTS:
+        return v['outcome']
+    if not v.get('finite', False):
+        return 'nonfinite or unverified motion'
+    if v.get('high_side_responses', 0) and v.get('assessment_protocol_version', 0) < 8:
+        return 'superseded high-side input'
+    return None
+
+
+def checkpoint_restored(v):
+    return bool(v.get('checkpoint_restores_during_trial', 0) or v.get('checkpoint_restores', 0))
+
+
 def cleared(v):
     """The boat reached the exit, whatever happened on the way."""
     # Deep burials are real here (the Huacas surges hold the raft 1-4 m under
     # and its own support surface agrees), so depth alone does not void a run.
-    return (v is not None and v['outcome'] in ('section_cleared', 'exit_with_unrecovered_crew') and v.get('finite', False))
+    return (v is not None and not evidence_fault(v) and not checkpoint_restored(v)
+            and v['outcome'] in ('section_cleared', 'exit_with_unrecovered_crew'))
 
 
 def clean(v):
@@ -154,8 +172,10 @@ def incident(v):
 def describe(v):
     if v is None:
         return 'not tested'
-    if v['outcome'] in HARNESS_FAULTS:
-        return f"test fault ({v['outcome']})"
+    if evidence_fault(v):
+        return f"test fault ({evidence_fault(v)})"
+    if checkpoint_restored(v):
+        return 'checkpoint restored; not an uninterrupted passage or recovery'
     what = ('clean' if clean(v) else ('got through, ' + (incident(v) or 'not upright at the exit')) if cleared(v)
             else OUTCOME_TEXT.get(v['outcome'], v['outcome'].replace('_', ' ')))
     if not cleared(v) and incident(v):
@@ -164,15 +184,11 @@ def describe(v):
 
 
 def catalogue_range(text):
+    """Parse I-VI labels only; Grand Canyon's numeric scale is not convertible."""
     numbers = [{'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6}[x]
                for x in re.findall(r'\b(VI|IV|V|III|II|I)\b', text)]
     if numbers:
         return min(numbers), max(numbers)
-    scale = re.findall(r'(\d+)(?:\s*[-–]\s*(\d+))?\s*/\s*10', text)
-    if scale:
-        low, high = int(scale[0][0]), int(scale[0][1] or scale[0][0])
-        # Common guide-book reading of the Grand Canyon 1–10 scale; approximate.
-        return max(1, (low + 1)//2), max(1, (high + 1)//2)
     return None
 
 
@@ -191,9 +207,9 @@ def assess(row, data):
     names = ('hands-off', 'center', 'left', 'right', 'missed-turn')
     raw = {name: data.get((row.get('assessment_river',row['river']), trial['id'], name)) for name in names}
     available = [v for v in raw.values() if v]
-    faults = [f"{k}: {v['outcome']}" for k, v in raw.items() if v and v['outcome'] in HARNESS_FAULTS]
+    faults = [f"{k}: {evidence_fault(v)}" for k, v in raw.items() if evidence_fault(v)]
     # A rig fault is missing evidence, never a verdict on the rapid.
-    variants = {k: (None if v and v['outcome'] in HARNESS_FAULTS else v) for k, v in raw.items()}
+    variants = {k: (None if evidence_fault(v) else v) for k, v in raw.items()}
     hands, center, miss = variants['hands-off'], variants['center'], variants['missed-turn']
     lanes = {k: variants[k] for k in ('center', 'left', 'right')}
     tested_lanes = {k: v for k, v in lanes.items() if v}
@@ -209,43 +225,23 @@ def assess(row, data):
         return text
     route = '; '.join(lane(k, v) for k, v in lanes.items())
     if spread is not None:
-        route += f'; clean tracks stay ≥{spread:.1f} m apart through the rapid'
-    if not tested_lanes:
-        c_route = None
-    elif len(clean_lanes) == 3:
-        c_route = 3 if spread is not None and spread < 2. else 2
-    elif len(clean_lanes) == 2:
-        c_route = 3
-    elif len(clean_lanes) == 1:
-        c_route = 4
-    else:
-        c_route = 5 if any(cleared(v) for v in tested_lanes.values()) else 6
+        route += f'; minimum clean-track spread at five sampled transects {spread:.1f} m (not a safe-width envelope)'
 
     # The hands-off run: what the river does with nobody steering.
     hands_text = describe(hands) if hands else 'Not tested'
-    hands_passed_crux = False
     if hands and not cleared(hands):
         furthest = max((x['station_m'] for x in hands.get('samples', [])), default=trial['start_m'])
-        hands_passed_crux = not incident(hands) and furthest >= trial['control_m'] + 10.
-        hands_text += (f"; reached {furthest - trial['start_m']:.0f} of {trial['finish_m'] - trial['start_m']:.0f} m"
-                       + (', past the main feature with no commands' if hands_passed_crux else ''))
+        hands_text += f"; reached {furthest - trial['start_m']:.0f} of {trial['finish_m'] - trial['start_m']:.0f} m"
 
     # 2. How much timely steering and maneuvering it takes. The test driver
-    # corrects toward its lane all the time, so its turn-call share is only an
-    # upper bound; what the boat survives WITHOUT steering caps it.
+    # corrects toward its lane all the time; workload is not necessary timing.
     if center and center.get('elapsed_s'):
         workload = center.get('turn_command_seconds', 0)/max(center['elapsed_s'], 1)
         steering = (f"driver turn calls {100*workload:.0f}% of the center run, {center.get('guide_strokes', 0)} guide strokes, "
                     f"{center.get('crew_command_changes', 0)} crew calls, {center.get('backstroke_seconds', 0):.0f} s backpaddling")
-        c_steer = 2 if workload < .30 else 3 if workload < .50 else 4 if workload < .70 else 5
-        if hands_passed_crux:
-            c_steer = 2
-            steering += '; not required at the main feature (hands-off got past it)'
-        elif clean(miss):
-            c_steer = min(c_steer, 3)
-            steering += '; a 6 s lapse at the entry did no harm, so steering there is not critical'
+        steering += '; observed controller workload, not a steering-timing envelope'
     else:
-        steering, c_steer = 'Not measured', None
+        steering = 'Not measured'
 
     # 3. What happens after a missed turn; 4. whether normal controls recover it.
     if miss and miss.get('mistake_start_s', -1) >= 0:
@@ -265,58 +261,36 @@ def assess(row, data):
         if clean(miss):
             # Got through clean, so normal controls evidently suffice; how long
             # the driver took to settle back on its own lane is not difficulty.
-            c_miss, c_recover = 2, 2
             recovery = ((f"Back on line {resumed:.0f} s after steering resumed{used}" if resumed >= 1.
                          else f"Back on line as soon as steering resumed{used}") if resumed is not None
                         else f"Never fully back on line, but the boat still ran the rapid cleanly{used}")
         elif cleared(miss):
-            c_miss = 4 if (miss.get('capsized_during_trial') or miss.get('pin_seconds', 0) > 3.) else 3
-            c_recover = 4
             recovery = f"Got through with normal controls, but after {incident(miss)}{used}"
+        elif checkpoint_restored(miss) or miss['outcome'] == 'checkpoint_reset_not_recovery':
+            recovery = 'Checkpoint reset; not recovery with normal controls'
         elif not incident(miss):
-            c_miss, c_recover = 3, 4
             recovery = f"Ended {OUTCOME_TEXT.get(miss['outcome'], miss['outcome'].replace('_', ' '))}; normal controls did not free it{used}"
         else:
-            c_miss, c_recover = 5, 5
             recovery = f"Not recovered with normal controls{used}"
     else:
-        consequences, recovery, c_miss, c_recover = 'Missed maneuver not exercised', 'Not established', None, None
+        consequences, recovery = 'Missed maneuver not exercised', 'Not established'
 
-    criteria = {'route': c_route, 'steering': c_steer, 'miss': c_miss, 'recovery': c_recover}
-    status = 'Assessed' if all(v is not None for v in criteria.values()) and hands else 'Incomplete evidence'
+    # Approach success counts and controller workload are observations, not
+    # ordinal river classes. In particular, surviving one hands-off line does
+    # not prove broad easy routes, forgiving timing or recoverable mistakes.
+    criteria = {'route': None, 'steering': None, 'miss': None, 'recovery': None}
+    status = 'Observation coverage complete' if all(variants.values()) else 'Incomplete evidence'
     if faults:
         status += '; test faults: ' + ', '.join(faults)
     game = None
-    if hands and clean(hands):
-        # The definition of Class I: no action needed, nobody swims, no flip.
-        game, rating = 1, 'I — runs clean with no commands at all'
-    elif status.startswith('Assessed'):
-        game = max(2, *criteria.values())
-        hardest = [k for k, v in criteria.items() if v == game]
-        reason = {'route': 'narrow route', 'steering': 'steering workload', 'miss': 'missed-turn consequence',
-                  'recovery': 'recovery'}
-        rating = ('II — needs some action (the hands-off run did not go clean), but every criterion is easy'
-                  if max(criteria.values()) <= 2 else
-                  f"{ROMAN[game]} — set by {', '.join(reason[k] for k in hardest)}" if game < 6
-                  else 'Unresolved — no tested line got through; not graded VI')
-        if game == 6:
-            game = None
-    else:
-        rating = 'Not yet established'
+    rating = 'Not yet established — legacy observations do not grade river class'
 
-    # Compare with the whole catalogued range: the master entry and, where it
-    # differs, the catalogue grade of the modeled section.
-    span = catalogue_range(row['catalog_class'] + ' ' + trial.get('catalog_class', ''))
     if row['catalog_class'].startswith('surf'):
         comparison = 'Catalogue lists a surf wave, not a passage class'
-    elif game is None or span is None:
-        comparison = 'Not compared'
-    elif span[0] <= game <= span[1]:
-        comparison = 'Matches catalogue'
-    elif game < span[0]:
-        comparison = f"Easier than catalogue by {span[0]-game} class{'es' if span[0]-game > 1 else ''}"
+    elif row['river']=='colorado':
+        comparison = 'Not established; Grand Canyon 1–10 ratings are not converted to I–VI'
     else:
-        comparison = f"Harder than catalogue by {game-span[1]} class{'es' if game-span[1] > 1 else ''}"
+        comparison = 'Not established; source-matched decision and recovery evidence required'
     return dict(status=status, rating=rating, game_class=game, criteria=criteria, hands_off=hands_text,
                 comparison=comparison, route=route, steering=steering, consequences=consequences,
                 recovery=recovery, evidence=[v['evidence'] for v in available])
@@ -343,20 +317,18 @@ def main():
         body = []
         river_rows = [r for r in rows if r['river'] == river]
         playable = [r for r in river_rows if r['trial'] and not r['trial'].get('portage')]
-        rated_rows = [r for r in playable if r['game_class']]
-        demanding = ROMAN[max(r['game_class'] for r in rated_rows)] if rated_rows else 'Not established'
-        scope = 'All modeled sections assessed independently; not a continuous descent' if len(rated_rows) == len(playable) else 'Partial evidence; no whole-river grade'
+        observed_rows = [r for r in playable if r['evidence']]
+        scope = 'Observation inventory; not a continuous descent or whole-river grade'
         river_summaries.append('<tr>'+''.join('<td>'+esc(str(c))+'</td>' for c in
-            (river, FLOWS[river], f'{len(rated_rows)}/{len(playable)}', demanding, scope))+'</tr>')
+            (river, FLOWS[river], f'{len(observed_rows)}/{len(playable)}', scope))+'</tr>')
         for row in [r for r in rows if r['river'] == river]:
             evidence = ' '.join(f'<a href="{esc(Path(p).as_uri())}">trial {i+1}</a>' for i, p in enumerate(row['evidence']))
-            scores = ' / '.join(ROMAN.get(row['criteria'].get(k), '–') for k in ('route', 'steering', 'miss', 'recovery'))
-            cells = [row['name'], row['catalog_class'], row['rating'], row['comparison'], row['hands_off'], scores,
+            cells = [row['name'], row['catalog_class'], row['rating'], row['comparison'], row['hands_off'],
                      row['route'], row['steering'], row['consequences'], row['recovery'], row['status']]
             body.append('<tr>'+''.join('<td>'+esc(str(c))+'</td>' for c in cells)+'<td>'+evidence+'</td></tr>')
         sections.append(f'<h2>{esc(river)} — {esc(FLOWS[river])}</h2><div class="table"><table><thead><tr>'+''.join(
             '<th>'+h+'</th>' for h in ('Rapid','Catalog class','In-game class','Comparison','Hands-off run',
-                                    'Criteria 1/2/3/4','1. Route width','2. Steering','3. Missed turn',
+                                    '1. Route observations','2. Steering','3. Missed turn',
                                     '4. Recovery','Coverage/status','Evidence'))+
             '</tr></thead><tbody>'+''.join(body)+'</tbody></table></div>')
     document = '''<!doctype html><html lang="en"><meta charset="utf-8"><title>River difficulty assessment</title>
@@ -367,16 +339,13 @@ def main():
 <p>Scope: six rivers, including both selectable Zambezi maps. Every master catalogue entry plus the detailed authored subrapids is included.
 Catalogue-only markers are not reconstructed rapids. Missing geometry is explicitly not rated. Flow figures are nominal authored band discharges,
 not independent flow-gauge measurements; the procedural full Zambezi has no calibrated discharge.</p>
-<p>Each rapid is scored on four criteria, each on the I–V scale. (1) How narrow and demanding the successful route is: how many of three
-approach lines (center, −4 m, +4 m) run clean, and how far apart the clean tracks stay (all three clean II, converging tracks or two clean III,
-one clean IV, none clean V). (2) How much timely steering it takes: the test driver's turn-call share on the center line is only an upper bound,
-because it corrects toward its lane constantly (&lt;30% II, &lt;50% III, &lt;70% IV, else V); if the hands-off boat gets past the main feature
-without an incident it is II, and if a six-second steering lapse at the entry does no harm it is at most III. (3) What a missed turn costs:
-six seconds with no steering at the entry (clean II, swimmers III, flip or pin IV, swimmers or flip without getting through V).
-(4) Whether normal controls recover it: paddling, backpaddling, high-side and reflip only (a clean missed-turn run shows they do: II; getting through only after swimmers, a flip or a pin: IV; not getting through: V). Clean means through the section upright, nobody out
-of the boat and no pin over 3 s. A fifth run is hands-off: placed on the center line with no commands at all. A clean hands-off run is
-Class I by definition. Otherwise the in-game class is the hardest of the four criteria, never below II. No clean line at all is left
-unresolved, not called VI. Grand Canyon 1–10 ratings are compared through the common guide-book reading (roughly half the number).
+<p>This legacy inventory preserves four kinds of observations: sampled approach tracks, controller commands, consequences of a six-second
+steering omission, and recovery attempts with normal controls. It does not assign river classes. A clean hands-off run demonstrates only that
+one tested approach passed without commands; it does not establish Class I, a broad successful-route envelope or forgiving timing.
+Three approach lines and controller workload likewise do not establish the documented decisions of a real rapid. A class comparison requires
+the separate source-matched decision campaign: genuinely different approaches, measured success and failure boundaries, early/late/absent
+steering, documented hazards and completed recovery trials. Failed automation is not Class VI. Grand Canyon's numeric ratings remain on their
+own scale, without conversion to I–VI. Clean means through the section upright, nobody out of the boat and no pin over 3 s.
 Tests start independently at checkpoints, then use actual game physics and ordinary crew/guide commands. Cold checkpoint activation gets at most three setup attempts before failure.
 The legacy test IDs “left/right” mean −4/+4 m in map coordinates, not bank directions; the report uses the signed offsets.
 They sample approaches, not the entire navigable width. A six-second steering omission begins 12 m before the rapid control station.
@@ -384,20 +353,20 @@ The driver scouts live water depth across a raft-sized footprint to seek a wet o
 It uses a 12 m lookahead, extending it to 40 m after 15 s without new downstream progress, and three-second ordinary backstroke attempts after longer stalls.
 Troublemaker additionally has an explicit depth-scouted slalom route and a 24 m initial lookahead; the test starts upstream enough to approach its first rock rather than spawning beside it.
 All movement along those waypoints is produced by normal controls, never by assigning boat transforms. Actual passing tracks, not the waypoint spacing, determine the reported spread.
-Protocol 8 adds the hands-off run and uses the player's production high-side command, including its uphill-side selection; older trials that used the defective test-driver high-side input are excluded from grading.
+Protocol 8 adds the hands-off run and uses the player's production high-side command; older trials with high-side responses are retained as linked evidence but excluded from usable observations.
 Observed command workload is not proof that every command was necessary. A recovered route requires being upright, with no swimmers/pin, within 2 m of target;
 that instant alone is not a completed recovery unless the section also clears. No checkpoint reset counts as recovery.</p>
-<p>Ratings are provisional gameplay estimates, not human skill certification or real-river safety advice. Headless trials do not validate rendering;
+<p>This inventory reports observations, not class ratings, human skill certification or real-river safety advice. Headless trials do not validate rendering;
 South Fork must be rendered for its GPU water detail. Fixed-step tests are not FPS benchmarks. No untested rapid is assigned a difficulty by copying the catalogue.</p>
 <p>Controller failures and timeouts must be diagnosed before grading. The 
 <a href="https://site-media.americanwhitewater.org/Scale-of-River-Difficulty-Safety-Code-2024.pdf">American Whitewater scale</a>
 is only a qualitative reference. <a href="https://home.nps.gov/grca/learn/photosmultimedia/b-roll_hd22.htm">Grand Canyon uses a distinct 1–10 convention</a>;
-its comparison here is approximate.</p>
-<h2>River-level coverage</h2><p>The most demanding tested section is shown below; this is not an average, a certified whole-river class, or a grade for unmodeled reaches.</p>
-<div class="table"><table><thead><tr><th>River / scene</th><th>Nominal flow</th><th>Rated / modeled</th><th>Most demanding qualified result so far</th><th>Scope</th></tr></thead><tbody>'''+''.join(river_summaries)+'</tbody></table></div>'+''.join(sections)+'</html>'
-    rated = sum(bool(r['game_class']) for r in rows)
+no numeric conversion is used here.</p>
+<h2>River-level coverage</h2><p>Receipt coverage includes failed and superseded trials; it does not imply completed validation or a whole-river grade.</p>
+<div class="table"><table><thead><tr><th>River / scene</th><th>Nominal flow</th><th>With receipts / modeled</th><th>Scope</th></tr></thead><tbody>'''+''.join(river_summaries)+'</tbody></table></div>'+''.join(sections)+'</html>'
+    observed = sum(bool(r['evidence']) for r in rows)
     modeled = sum(bool(r['trial']) and not r['trial'].get('portage', False) for r in rows)
-    progress = f"{'WORKING REPORT' if rated < modeled else 'PROVISIONAL ASSESSMENT'} — {rated}/{modeled} runnable modeled rapid/scene sections rated; {len(data)} completed native trial receipts. Pending and unresolved entries are not assigned invented grades."
+    progress = f"OBSERVATION INVENTORY — {observed}/{modeled} runnable modeled rapid/scene sections have receipts; {len(data)} native trial receipts. These legacy variants do not establish a river class or a catalog match."
     document = document.replace('ASSESSMENT_PROGRESS', progress)
     (args.output/'report.html').write_text(document, encoding='utf-8')
     print(json.dumps({'master_entries': sum(r['master_catalog'] for r in rows), 'total_rows': len(rows),
