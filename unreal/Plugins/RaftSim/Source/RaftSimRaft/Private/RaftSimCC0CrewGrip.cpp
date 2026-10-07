@@ -67,11 +67,6 @@ FVector TowardPalmAxis(const FVector& Candidate, const FVector& Direction, const
     return FVector::DotProduct(Moved, Palm) >= 0.0f ? Axis : -Axis;
 }
 
-bool HasHeldGrip(const FRaftSimCrewAvatarPose& Pose)
-{
-    return Pose.bShowPaddle || Pose.bOarGrip;
-}
-
 int32 GripShapeKey(bool bLeft, float RadiusCm)
 {
     return (bLeft ? 1 : 0) | (FMath::RoundToInt(RadiusCm * 100.0f) << 1);

@@ -248,6 +248,10 @@ private:
     void ApplyPaddleGripPose(const FRaftSimCrewAvatarPose& Pose);
     void ApplyFingerChain(bool bLeft, const TCHAR* Digit, float GripAlpha);
     // Grip solver (RaftSimCC0CrewGrip.cpp).
+    /** Both hands hold equipment: the crew paddle, or an oar rower's two
+     * handles. (One definition for both source files: as file-local copies
+     * they collided once unity builds merged the two.) */
+    static bool HasHeldGrip(const FRaftSimCrewAvatarPose& Pose) { return Pose.bShowPaddle || Pose.bOarGrip; }
     bool ResolveHandAnatomy(bool bLeft, FVector& OutWristCm, FVector& OutFingers, FVector& OutThumb,
         FVector& OutPalm, float& OutHandedness) const;
     float MeasurePalmSurfaceOffsetCm(bool bLeft) const;

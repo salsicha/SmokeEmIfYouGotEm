@@ -16,12 +16,6 @@
 
 namespace
 {
-// Both hands hold equipment: the crew paddle, or an oar rower's two handles.
-bool HasHeldGrip(const FRaftSimCrewAvatarPose& Pose)
-{
-    return Pose.bShowPaddle || Pose.bOarGrip;
-}
-
 const TCHAR* GuideMeshPath = TEXT(
     "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Guide."
     "SK_RaftSim_CC0_Guide");
