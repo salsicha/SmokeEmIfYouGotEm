@@ -41,8 +41,8 @@ bool FRaftSimRigidCrewPaddleTest::RunTest(const FString&)
         // outboard thigh (2026-10-07).
         const double RestAuthoredLength = FVector(8, 97, -3.5).Size();
         TestTrue(TEXT("rest top, blade height and grip distances are unchanged"),
-            Idle.PaddleTopCm.Equals(FVector(22, -45 * Side, 51.7), 0.0001) &&
-            FMath::Abs(Idle.PaddleBottomCm.Z - 48.2) < 0.0001 &&
+            Idle.PaddleTopCm.Equals(FVector(22, -45 * Side, 55.4), 0.0001) &&
+            FMath::Abs(Idle.PaddleBottomCm.Z - 51.9) < 0.0001 &&
             FVector::Distance(Side < 0 ? Idle.RightHandCm : Idle.LeftHandCm, Idle.PaddleTopCm) < 0.0001 &&
             FMath::Abs(FVector::Distance(Side < 0 ? Idle.LeftHandCm : Idle.RightHandCm, Idle.PaddleTopCm) - 0.63 * RestAuthoredLength) < 0.0001);
         const auto Catch = URaftSimCrewAvatarPoseLibrary::EvaluatePose(ERaftSimCrewAvatarAction::ForwardStroke, 0, Side);

@@ -1412,13 +1412,48 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
                     BodyScale);
         }
     }
-    SetSegmentBone(TEXT("thigh_l"), TEXT("calf_l"), Pose.LeftHipCm, Pose.LeftKneeCm,
+    // Two-bone leg solve on this body's own thigh and calf: the hips and the
+    // planted feet stay where the pose puts them, and the knee goes where
+    // both bones reach, bent the way the pose's knee points. Aiming each
+    // rest-length bone at the pose's knee (laid out for a 34-35 cm thigh;
+    // these bodies' run 41) left the thigh's end 7-8 cm from the calf's
+    // root, so the knee skin folded through itself and the ankle sheared off
+    // the shin ("the ankles and knees look broken", 2026-10-07).
+    const auto SolveKnee = [this](const FVector& HipCm, const FVector& PoseKneeCm, const FVector& FootCm,
+        const TCHAR* ThighBone, const TCHAR* CalfBone, const TCHAR* FootBone)
+    {
+        const FTransform* RestThigh = ReferenceComponentTransforms.Find(ThighBone);
+        const FTransform* RestCalf = ReferenceComponentTransforms.Find(CalfBone);
+        const FTransform* RestFoot = ReferenceComponentTransforms.Find(FootBone);
+        if (!RestThigh || !RestCalf || !RestFoot)
+        {
+            return PoseKneeCm;
+        }
+        const double ThighCm = FVector::Distance(RestThigh->GetLocation(), RestCalf->GetLocation()) * BodyScale;
+        const double CalfCm = FVector::Distance(RestCalf->GetLocation(), RestFoot->GetLocation()) * BodyScale;
+        const FVector HipToFoot = FootCm - HipCm;
+        const FVector Along = HipToFoot.GetSafeNormal();
+        const FVector Bend = FVector::VectorPlaneProject(PoseKneeCm - HipCm, Along).GetSafeNormal();
+        if (Along.IsNearlyZero() || Bend.IsNearlyZero())
+        {
+            return PoseKneeCm;
+        }
+        const double Reach = FMath::Clamp(HipToFoot.Size(), FMath::Abs(ThighCm - CalfCm) + 0.1, ThighCm + CalfCm - 0.1);
+        const double AlongCm = (ThighCm * ThighCm - CalfCm * CalfCm + Reach * Reach) / (2.0 * Reach);
+        const double OutCm = FMath::Sqrt(FMath::Max(ThighCm * ThighCm - AlongCm * AlongCm, 0.0));
+        return HipCm + Along * AlongCm + Bend * OutCm;
+    };
+    const FVector LeftKneeCm = SolveKnee(Pose.LeftHipCm, Pose.LeftKneeCm, Pose.LeftFootCm,
+        TEXT("thigh_l"), TEXT("calf_l"), TEXT("foot_l"));
+    const FVector RightKneeCm = SolveKnee(Pose.RightHipCm, Pose.RightKneeCm, Pose.RightFootCm,
+        TEXT("thigh_r"), TEXT("calf_r"), TEXT("foot_r"));
+    SetSegmentBone(TEXT("thigh_l"), TEXT("calf_l"), Pose.LeftHipCm, LeftKneeCm,
         LegFacingTwistDegrees);
-    SetSegmentBone(TEXT("calf_l"), TEXT("foot_l"), Pose.LeftKneeCm, Pose.LeftFootCm,
+    SetSegmentBone(TEXT("calf_l"), TEXT("foot_l"), LeftKneeCm, Pose.LeftFootCm,
         LegFacingTwistDegrees);
-    SetSegmentBone(TEXT("thigh_r"), TEXT("calf_r"), Pose.RightHipCm, Pose.RightKneeCm,
+    SetSegmentBone(TEXT("thigh_r"), TEXT("calf_r"), Pose.RightHipCm, RightKneeCm,
         LegFacingTwistDegrees);
-    SetSegmentBone(TEXT("calf_r"), TEXT("foot_r"), Pose.RightKneeCm, Pose.RightFootCm,
+    SetSegmentBone(TEXT("calf_r"), TEXT("foot_r"), RightKneeCm, Pose.RightFootCm,
         LegFacingTwistDegrees);
     // In river sandals the bare foot stands at its rest size on the footbed,
     // turned with its sandal (both read the host's footwear yaw). Under the

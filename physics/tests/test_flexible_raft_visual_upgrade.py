@@ -158,7 +158,7 @@ REVIEW_PATH = (
 )
 PRODUCTION_RAFT_REVIEW_PATH = (
     REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
-    "m9_production_paddle_raft_v12_review.json"
+    "m9_production_paddle_raft_v3_drings_review.json"
 )
 PRODUCTION_BOULDER_BUILD_SCRIPT = (
     REPO_ROOT / "unreal/Scripts/build_production_river_boulder.py"
@@ -1516,10 +1516,12 @@ def test_production_raft_review_is_hash_locked_and_fail_closed() -> None:
     assert review["marketing_approved"] is False
     assert review["release_media_approved"] is False
     assert review["runtime_asset"]["collision_enabled"] is False
-    assert review["runtime_asset"]["authored_lod0_triangles"] == 38344
+    # Generator v3: D-rings on bonded pads with webbing tabs, kept light
+    # because this rest mesh is also the physics hull's swept surface.
+    assert review["runtime_asset"]["authored_lod0_triangles"] == 40232
     assert review["source"]["fbx_sha256"] == manifest["fbx_sha256"]
     assert review["source"]["blend_sha256"] == manifest["blend_sha256"]
-    assert review["automation"]["succeeded"] == 3
+    assert review["automation"]["succeeded"] == 6
     assert review["automation"]["succeeded_with_warnings"] == 1
     assert review["automation"]["failed"] == 0
     assert capture.is_file()

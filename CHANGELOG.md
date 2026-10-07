@@ -38,6 +38,20 @@ All notable changes to this project are recorded here, newest first. Versioning 
   - **Flip line** (`build_production_guide_flip_line.py`): the guide wears
     two snug wraps of tubular webbing at the vest hem with a locking
     carabiner, replacing the loose procedural loop round the hips.
+  - **Knees and ankles:** the legs bend on each body's own thigh and calf.
+    The rendered thighs are about 41 cm, the pose's 34-35 cm, and aiming
+    each bone at the pose's knee left the thigh's end 7-8 cm from the
+    calf's root: the knee skin folded through itself and the ankle sheared
+    off the shin. A two-bone solve keeps the hips and planted feet and puts
+    the knee where both bones reach; the resting paddle rides higher on the
+    higher thighs.
+  - **D-rings** (raft generator v3): each D-ring sits on a bonded pad with
+    webbing tabs round its bar, and the perimeter line runs through the
+    rings. The detail is kept light (40,232 triangles against 38,344): the
+    rest mesh is also the physics hull. The FBX is exported from a
+    centimetre scene; Interchange applies the 100x node scale Blender wrote
+    for a metre scene and had imported a 430 m raft. The flip-line test now
+    waits for a capsized hull to stop rolling before calming the water.
   - **Sunglasses:** everyone wears sport sunglasses.
   - **Throw bag:** a rescue throw bag modelled on the common commercial
     design (red body, mesh drain band, flared top with a barrel-lock

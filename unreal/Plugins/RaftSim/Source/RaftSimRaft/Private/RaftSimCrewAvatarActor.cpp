@@ -1321,11 +1321,12 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             // Z 36-40 ran 10-13 cm inside them, hands and all ("the paddle
             // shaft and hand that grips the t grip clip through the
             // thighs"). It now clears the highest thigh by about 1 cm and
-            // dips toward the blade over the lower outboard thigh. (1.2 cm
-            // higher since the seat sinks 3.5 cm into the tube: the lower
-            // seat lifts the knees and the thighs' tops by about that much.)
-            Pose.PaddleTopCm = FVector(22.0f, -45.0f * Side, 51.7f);
-            Pose.PaddleBottomCm = FVector(30.0f, 52.0f * Side, 48.2f);
+            // dips toward the blade over the lower outboard thigh. (4.9 cm
+            // higher than that measurement: the seat sinks 3.5 cm into the
+            // tube, and the legs now bend on the bodies' own 41 cm thighs,
+            // which carries the knees and the thighs' tops higher.)
+            Pose.PaddleTopCm = FVector(22.0f, -45.0f * Side, 55.4f);
+            Pose.PaddleBottomCm = FVector(30.0f, 52.0f * Side, 51.9f);
             // Resting hands drape over the SHAFT, not the T-grip: an exact
             // T-grip anchor selects the crossbar-axis grip solve, and with
             // the shaft laid laterally the crossbar points fore-aft, so the

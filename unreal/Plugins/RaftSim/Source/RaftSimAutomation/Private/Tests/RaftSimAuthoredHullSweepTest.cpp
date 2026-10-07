@@ -39,8 +39,8 @@ bool FRaftSimAuthoredHullSurfaceSweepTest::RunTest(const FString&)
         DeformProductionRaftRestMesh(Rest,.28f,Segments,Condition,Deformed,&Cache);
         FRaftSimHullGeometry Hull;
         if(!ExportHullGeometry(Deformed,FTransform(FVector(0,0,-28)),Hull))return false;
-        TestEqual(TEXT("all authored vertices swept"),Hull.VerticesM.Num(),26610);
-        TestEqual(TEXT("all authored triangles swept"),Hull.Faces.Num(),38344);
+        TestEqual(TEXT("all authored vertices swept"),Hull.VerticesM.Num(),30393);
+        TestEqual(TEXT("all authored triangles swept"),Hull.Faces.Num(),40232);
         TestEqual(TEXT("all authored material sections included"),Hull.Sections.Num(),5);
         if(Phase==0)NominalVertices=Hull.VerticesM;
         TArray<FVector> Start,End;double Expected=1.;
@@ -76,7 +76,7 @@ bool FRaftSimHullGroupedBroadPhaseTest::RunTest(const FString&)
     TArray<FMeshData> Rest;
     FRaftSimHullGeometry Hull;
     if(!ExtractProductionRaftRestMesh(Asset,Rest) || !ExportHullGeometry(Rest,FTransform(FVector(0,0,-28)),Hull))return false;
-    TestEqual(TEXT("all production faces retained"),Hull.Faces.Num(),38344);
+    TestEqual(TEXT("all production faces retained"),Hull.Faces.Num(),40232);
     UWorld* World=UWorld::CreateWorld(EWorldType::Editor,false);if(!World)return false;
     ON_SCOPE_EXIT{World->DestroyWorld(false);World->RemoveFromRoot();};
     auto* Ground=World->SpawnActor<AStaticMeshActor>();if(!Ground)return false;

@@ -146,7 +146,7 @@ bool FRaftSimRescueEquipmentTest::RunTest(const FString&)
             Seen.Contains(ERaftSimFlipLinePhase::Attaching) && Seen.Contains(ERaftSimFlipLinePhase::Crossing) && Seen.Contains(ERaftSimFlipLinePhase::Pulling));
         TestEqual(TEXT("physical righting completes"),Raft->GetFlipLinePhase(),ERaftSimFlipLinePhase::Completed);
         TestTrue(TEXT("integrated hull actually upright"),Raft->GetActorUpVector().Z>.65f);
-        TestEqual(TEXT("production hull has all faces"),Runtime->GetHullGeometry().Faces.Num(),38344);
+        TestEqual(TEXT("production hull has all faces"),Runtime->GetHullGeometry().Faces.Num(),40232);
         TestEqual(TEXT("righting preserves all swimmers"),Raft->GetSwimmerCount(),CrewCount);
         TestFalse(TEXT("guide cannot self throw"),Raft->BeginRescue(ERaftSimRescueMethod::ThrowLine));
         bool Boarded=false;

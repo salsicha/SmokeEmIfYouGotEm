@@ -88,7 +88,7 @@ bool FRaftSimPassengerWashoutTest::RunTest(const FString&)
     Wet=false;Runtime->StepRaftDynamics(1.f/120.f);
     TestTrue(TEXT("two lost passengers remove 150kg from physical crew load"),
         FMath::IsNearlyEqual(Runtime->GetLastFlexibleStepTelemetry().OccupiedCrewMassKg,235.));
-    TestEqual(TEXT("full production hull retained"),Runtime->GetHullGeometry().Faces.Num(),38344);
+    TestEqual(TEXT("full production hull retained"),Runtime->GetHullGeometry().Faces.Num(),40232);
     // Use normal water drift, haul and boarding after the breaker has passed.
     Wet=true;ImpactHip=FVector(100000,0,0);Flow=FVector::ZeroVector;
     for(int I=0;I<900 && Raft->GetRescueInteractionState().Phase!=ERaftSimRescueInteractionPhase::ReadyForReentry;++I)

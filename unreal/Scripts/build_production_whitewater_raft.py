@@ -17,7 +17,7 @@ import math
 from pathlib import Path
 
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -25,7 +25,11 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Rafts/ProductionPaddleRaft"
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_ProductionPaddleRaft.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_ProductionPaddleRaft.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_paddle_raft_manifest.json"
-GENERATOR_VERSION = 2
+GENERATOR_VERSION = 3
+# D-ring stations along each side tube and their height on its skin, in
+# degrees above the tube's outboard equator.
+D_RING_STATIONS_CM = (-135.0, -82.0, -26.0, 30.0, 86.0, 139.0)
+D_RING_ELEVATION_DEGREES = 22.0
 MATERIAL_NAMES = [
     "RaftTube",
     "RaftFloor",
@@ -289,12 +293,57 @@ def add_torus(
     return obj
 
 
+def place_on_frame(obj: bpy.types.Object, origin: Vector, along: Vector, up: Vector, out: Vector) -> None:
+    """Carry a piece built about the world origin onto a surface frame: its
+    X onto along, Y onto up, Z onto out, and its origin onto origin."""
+    frame = Matrix((
+        (along.x, up.x, out.x, origin.x),
+        (along.y, up.y, out.y, origin.y),
+        (along.z, up.z, out.z, origin.z),
+        (0.0, 0.0, 0.0, 1.0),
+    ))
+    obj.data.transform(frame)
+    obj.data.update()
+
+
+def tube_surface_frame(
+    path: list[tuple[Vector, Vector, float, float]],
+    x: float,
+    side: float,
+    elevation_degrees: float,
+) -> tuple[Vector, Vector, Vector, Vector]:
+    """A point on the outer tube's skin beside x, elevation_degrees above the
+    tube's outboard equator, with its frame: along the tube, up the skin
+    (perpendicular to along, in the skin) and out of the skin."""
+    centre, tangent, radius, _rise = min(
+        (sample for sample in path if sample[0].y * side > 0.0),
+        key=lambda sample: abs(sample[0].x - x),
+    )
+    up = Vector((0.0, 0.0, 1.0))
+    outward = up.cross(tangent).normalized()
+    if outward.y * side < 0.0:
+        outward = -outward
+    ring_up = tangent.cross(outward).normalized()
+    if ring_up.z < 0.0:
+        ring_up = -ring_up
+    angle = math.radians(elevation_degrees)
+    normal = (outward * math.cos(angle) + ring_up * math.sin(angle)).normalized()
+    point = centre + normal * radius
+    along = tangent.normalized()
+    skin_up = normal.cross(along).normalized()
+    if skin_up.z < 0.0:
+        skin_up = -skin_up
+        along = -along
+    return point, along, skin_up, normal
+
+
 def add_box(
     name: str,
     location: tuple[float, float, float],
     dimensions: tuple[float, float, float],
     piece_material: bpy.types.Material,
     bevel_width: float,
+    bevel_segments: int = 4,
 ) -> bpy.types.Object:
     bpy.ops.mesh.primitive_cube_add(size=1.0, location=location)
     obj = bpy.context.object
@@ -303,7 +352,7 @@ def add_box(
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     bevel = obj.modifiers.new("MoldedEdge", "BEVEL")
     bevel.width = bevel_width
-    bevel.segments = 4
+    bevel.segments = bevel_segments
     bpy.context.view_layer.objects.active = obj
     bpy.ops.object.modifier_apply(modifier=bevel.name)
     obj.data.materials.append(piece_material)
@@ -331,12 +380,38 @@ def build_details(
 
     # Raised perimeter grab line follows the tube rest centreline and remains
     # deformable at runtime because it is part of the same source topology.
-    grab_points: list[tuple[float, float, float]] = []
-    for sample_index in range(0, len(path), 5):
-        centre, _tangent, radius, _rise = path[sample_index]
+    # Along the sides it runs through the D-rings' openings and sags a little
+    # between them, as a perimeter line laced through its rings does.
+    def end_route(sample: tuple[Vector, Vector, float, float]) -> Vector:
+        centre, _tangent, radius, _rise = sample
         outward = Vector((centre.x / 188.0, centre.y / 73.0, 0.0)).normalized()
-        point = centre + outward * (radius + 1.5) + Vector((0.0, 0.0, 5.8))
-        grab_points.append(tuple(point))
+        return centre + outward * (radius + 1.5) + Vector((0.0, 0.0, 5.8))
+
+    def side_route(x: float, side: float) -> Vector:
+        nearest = min(abs(x - ring_x) for ring_x in D_RING_STATIONS_CM)
+        half_gap = 28.0
+        sag = 0.5 - 0.5 * math.cos(math.pi * min(nearest / half_gap, 1.0))
+        elevation = D_RING_ELEVATION_DEGREES - 1.3 - 6.0 * sag
+        origin, _along, _up, out = tube_surface_frame(path, x, side, elevation)
+        return origin + out * (1.15 + 0.4 * sag)
+
+    grab_points: list[tuple[float, float, float]] = []
+    side_reach = max(abs(x) for x in D_RING_STATIONS_CM) + 10.0
+    sides_done: set[float] = set()
+    for sample_index in range(0, len(path), 5):
+        sample = path[sample_index]
+        x = sample[0].x
+        if abs(x) <= side_reach:
+            side = 1.0 if sample[0].y > 0.0 else -1.0
+            if side not in sides_done:
+                sides_done.add(side)
+                # The loop runs bow to stern along +Y, stern to bow along -Y.
+                steps = int(2 * side_reach / 5.0)
+                for step in range(steps + 1):
+                    station = side_reach - 2 * side_reach * step / steps
+                    grab_points.append(tuple(side_route(station * side, side)))
+            continue
+        grab_points.append(tuple(end_route(sample)))
     details.append(
         add_curve(
             "PerimeterGrabLine",
@@ -391,33 +466,59 @@ def build_details(
                 )
             )
 
-    # Twelve 2-inch-class attachment rings with broad bonded pads.
+    # Twelve 2-inch-class D-rings, each hung from a webbing tab on a bonded
+    # patch laid on the tube's skin. The former rings were whole tori placed
+    # at a fixed height off a buried ellipsoid: the tube curves away, so each
+    # ring sank into the skin at its foot and stood 3 cm proud at its crown,
+    # with nothing visibly holding it ("the D rings don't seem connected to
+    # the boat", 2026-10-07). Now the patch follows the skin, the ring's
+    # straight bar runs through the tab at the patch's top edge, and the D
+    # hangs down against the tube as a resting ring does.
     for side in (-1.0, 1.0):
-        for ring_index, x in enumerate((-135.0, -82.0, -26.0, 30.0, 86.0, 139.0)):
-            y = side * 97.5
-            z = 38.0 + 3.5 * (abs(x) / 139.0) ** 3
-            details.append(
-                add_uv_sphere(
-                    f"DRingPad_{side:+.0f}_{ring_index:02d}",
-                    (x, side * 96.0, z),
-                    (6.2, 1.0, 5.3),
+        for ring_index, x in enumerate(D_RING_STATIONS_CM):
+            origin, along, skin_up, out = tube_surface_frame(path, x, side, D_RING_ELEVATION_DEGREES)
+            pad = add_uv_sphere(
+                f"DRingPad_{side:+.0f}_{ring_index:02d}",
+                (0.0, 0.0, 0.0),
+                (6.4, 5.6, 0.55),
+                materials["RaftRubber"],
+                # Low: this rest mesh is also the physics hull's swept surface.
+                segments=16,
+                rings=6,
+            )
+            place_on_frame(pad, origin + out * 0.12, along, skin_up, out)
+            details.append(pad)
+            bar_up, bar_out = 1.9, 1.15
+            ring_points = [
+                (-2.3, bar_up), (0.0, bar_up), (2.3, bar_up), (2.75, 0.4), (2.2, -2.0),
+                (0.0, -3.2), (-2.2, -2.0), (-2.75, 0.4),
+            ]
+            ring = add_curve(
+                f"StainlessDRing_{side:+.0f}_{ring_index:02d}",
+                [(a, u, bar_out) for a, u in ring_points],
+                0.5,
+                materials["RaftMetal"],
+                bevel_resolution=2,
+                cyclic=True,
+            )
+            place_on_frame(ring, origin, along, skin_up, out)
+            details.append(ring)
+            # The tab: webbing folded over the bar, sewn to the patch.
+            for name, centre_up, centre_out, size in (
+                ("Under", bar_up - 0.2, 0.55, (3.4, 2.6, 0.32)),
+                ("Over", bar_up + 0.15, bar_out + 0.62, (3.4, 1.5, 0.32)),
+                ("Fold", bar_up + 0.95, bar_out * 0.5 + 0.35, (3.4, 0.32, 1.7)),
+            ):
+                tab = add_box(
+                    f"DRingTab{name}_{side:+.0f}_{ring_index:02d}",
+                    (0.0, 0.0, 0.0),
+                    size,
                     materials["RaftRubber"],
-                    segments=20,
-                    rings=10,
+                    0.08,
+                    bevel_segments=1,
                 )
-            )
-            details.append(
-                add_torus(
-                    f"StainlessDRing_{side:+.0f}_{ring_index:02d}",
-                    (x, y, z + 2.0),
-                    3.6,
-                    0.58,
-                    materials["RaftMetal"],
-                    (math.pi / 2.0, 0.0, 0.0),
-                    major_segments=24,
-                    minor_segments=8,
-                )
-            )
+                place_on_frame(tab, origin + skin_up * centre_up + out * centre_out, along, skin_up, out)
+                details.append(tab)
 
     # Four carry handles, one on each port/starboard quarter of each kicked
     # end. Each arch remains on its own side rather than crossing the center.
@@ -564,6 +665,13 @@ def validate(mesh_object: bpy.types.Object) -> dict[str, object]:
 def main() -> None:
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
     reset_scene()
+    # One Blender unit is one centimetre. In a metre scene the FBX exporter
+    # puts the metre-to-centimetre factor (100) on the object node; the old
+    # FBX importer ignored node transforms, but Interchange applies them and
+    # imported a 430 m raft.
+    bpy.context.scene.unit_settings.system = "METRIC"
+    bpy.context.scene.unit_settings.scale_length = 0.01
+    bpy.context.scene.unit_settings.length_unit = "CENTIMETERS"
     materials = {
         "RaftTube": material("RaftTube", (0.12, 0.018, 0.022, 1.0), 0.52),
         "RaftFloor": material("RaftFloor", (0.035, 0.038, 0.04, 1.0), 0.66),

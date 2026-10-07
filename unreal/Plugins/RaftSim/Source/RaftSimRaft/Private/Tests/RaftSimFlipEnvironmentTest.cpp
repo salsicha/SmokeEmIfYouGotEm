@@ -88,7 +88,7 @@ bool FRaftSimProductionCapturedRockPin::RunTest(const FString&)
             const bool Good=RaftSimRaftMesh::ExportHullGeometry(Prepared,Datum,H);
             if(Good)Exact.Remember(Rest,Body.TubeRadiusMeters,Segments,C,Datum,Prepared,H);return Good;
         },[]{}))return false;
-    TestEqual(TEXT("actual full original hull triangles"),Runtime->GetHullGeometry().Faces.Num(),38344);
+    TestEqual(TEXT("actual full original hull triangles"),Runtime->GetHullGeometry().Faces.Num(),40232);
     const FQuat Q=FRotator(0,90,0).Quaternion();double Half=0.;
     for(const auto& V:Runtime->GetHullGeometry().VerticesM)Half=FMath::Max(Half,Q.RotateVector(V).X);
     FVector P((-.6-Half-.4)*100.,0,0);P.Z=Scene.Surface(P,0.)*100.+20.;
@@ -173,8 +173,8 @@ bool FRaftSimHullPrepareCacheTest::RunTest(const FString&)
     if(!TestTrue(TEXT("copy controls load the original production asset"),RaftSimRaftMesh::ExtractProductionRaftRestMesh(Asset,Original)))return false;
     FRaftSimHullGeometry OriginalHull;
     if(!TestTrue(TEXT("copy controls export the actual full indexed hull"),RaftSimRaftMesh::ExportHullGeometry(Original,FTransform::Identity,OriginalHull)))return false;
-    TestEqual(TEXT("copy controls retain all production vertices"),OriginalHull.VerticesM.Num(),26610);
-    TestEqual(TEXT("copy controls retain all production faces"),OriginalHull.Faces.Num(),38344);
+    TestEqual(TEXT("copy controls retain all production vertices"),OriginalHull.VerticesM.Num(),30393);
+    TestEqual(TEXT("copy controls retain all production faces"),OriginalHull.Faces.Num(),40232);
     TestEqual(TEXT("copy controls retain all five material sections"),Original.Num(),5);
     // Use the original asset's actual indexed hull for query/order costs; the
     // numerical enclosure fixture is not a substitute for this native pilot.
@@ -465,7 +465,7 @@ bool FRaftSimRockPinContactReplay::RunTest(const FString& SecondaryPath)
     for(const auto& V:J->GetArrayField(TEXT("after_vertices")))After.VerticesM.Add(Vec(V->AsArray()));
     for(const auto& F:J->GetArrayField(TEXT("faces"))){const auto V=Vec(F->AsArray());Before.Faces.Add(FIntVector(V.X,V.Y,V.Z));}
     After.Faces=Before.Faces;Before.Sections={{0,Before.VerticesM.Num(),0,Before.Faces.Num()}};After.Sections=Before.Sections;
-    if(!TestTrue(TEXT("replay retains actual full production hull, not a proxy"),Before.VerticesM.Num()==26610 && Before.Faces.Num()==38344 && Before.IsValid() && After.IsValid()))return false;
+    if(!TestTrue(TEXT("replay retains actual full production hull, not a proxy"),Before.VerticesM.Num()==30393 && Before.Faces.Num()==40232 && Before.IsValid() && After.IsValid()))return false;
     const auto Previous=Body(J->GetObjectField(TEXT("previous")));auto State=Body(J->GetObjectField(TEXT("predicted")));
     FRaftSimHullGroundArcQuery ArcQuery;
     if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimRockPinArcCandidate")))
