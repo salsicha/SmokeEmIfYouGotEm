@@ -49,15 +49,19 @@ def load_and_verify_manifest() -> tuple[dict[str, object], Path]:
     if manifest.get("material_slots") != EXPECTED_SLOTS:
         raise RuntimeError(f"Unexpected source slots: {manifest.get('material_slots')}")
     construction = manifest.get("construction", {})
-    # Generator v14: a low-profile front-entry guide vest (two slim front
+    # Generator v15: a low-profile front-entry guide vest (two slim front
     # foam panels either side of the zip, one back panel, dark side panels).
+    # Its shoulder straps are per-wearer meshes of their own
+    # (import_production_pfd_shoulder_straps.py), fitted to each body's
+    # shoulders; the vest keeps only their buckles and anchors.
     expected_counts = {
         "front_foam_panels": 2,
         "back_panels": 1,
         "side_panels": 2,
         "side_wings": 0,
-        "padded_shoulder_straps": 2,
+        "padded_shoulder_straps": 0,
         "shoulder_adjustment_buckles": 2,
+        "shoulder_strap_anchors": 2,
         "side_adjustment_straps": 4,
         "side_adjustment_buckles": 4,
         "adjustment_points": 6,
@@ -161,7 +165,7 @@ def configure_and_audit(
     if not (
         28.0 <= dimensions[0] <= 44.0
         and 32.0 <= dimensions[1] <= 44.0
-        and 40.0 <= dimensions[2] <= 56.0
+        and 30.0 <= dimensions[2] <= 56.0
     ):
         raise RuntimeError(
             f"PFD import has implausible centimetre bounds: {dimensions}"

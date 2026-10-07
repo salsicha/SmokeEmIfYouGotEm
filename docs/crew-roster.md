@@ -84,14 +84,20 @@ How it is built:
   the clothed bodies have no wetsuit slot.
 - The guide's eyewear is hidden in the first-person view.
 
-The vest (`build_production_whitewater_pfd.py` v14) is a low-profile
+The vest (`build_production_whitewater_pfd.py` v15) is a low-profile
 front-entry whitewater guide vest:
 - **Construction:** two slim front foam panels (2.4 cm) either side of a
   centre zip and one back panel (1.9 cm), thinning toward the side seams;
   dark side panels under four side adjustment straps with ladder-lock
-  buckles; padded shoulder straps with adjusters; a zippered chest pocket,
-  a lash tab, reflective strips and a blank back label. The armholes are
-  large and the hem is short, so it rides above the seat.
+  buckles; shoulder straps with adjusters; a zippered chest pocket, a lash
+  tab, reflective strips and a blank back label. The armholes are large and
+  the hem is short, so it rides above the seat; the panels stop 20 cm above
+  the hem.
+- **Shoulder straps** (`build_production_pfd_shoulder_straps.py`): each
+  wearer has their own pair, 4 cm wide, fitted over their own shoulders
+  inboard by the neck, from the front panel tops to the back panel. They
+  are a separate mesh, a child of the vest in its frame, wearing the vest's
+  materials.
 - **Fit:** the inner surface follows the five seated torsos, measured from
   the posed bodies, with 6 mm clearance; every strap is built on top of
   whatever lies under it, so none sinks into the foam or the body.
@@ -107,8 +113,11 @@ front-entry whitewater guide vest:
 
 Each paddler holds the paddle as a rafter does: the inboard hand caps the
 T-grip palm-down, fingers over the crossbar, and the outboard hand grips the
-shaft about 66 cm down, thumb up toward the T-grip and knuckles out over the
-water, on either side of the boat.
+shaft about 66 cm down, knuckles out over the water, on either side of the
+boat. The fingers close together round the bar, and each thumb wraps the
+other way round it, its pad on the index finger: under the T-grip's
+crossbar, and round the shaft. Each grip turns about its bar toward the
+forearm carrying it, so the wrists stay straight through the stroke.
 - **Catch:** they lean well forward from the hips and turn the
   paddle-side shoulder ahead. The top hand is stacked out over the blade
   about 45 cm ahead, at forehead height, and the shaft stands near
@@ -202,8 +211,9 @@ Rigged gear (`ARaftSimRaftActor::BuildRaftGear`):
 - **Movement:** individual paddling styles are not modelled. The crew
   paddles in sync on the guide's call.
 - **Voices:** chatter is text only. The crew still has no recorded voice.
-- **Vest fit:** the vest is one rigid shell. It is fitted to the resting
-  seated chest and does not flex with the stroke. Its shoulder straps
-  clear the tallest shoulders, so on Kwame and Ingrid they stand 2-4 cm
-  proud, and resting forearms touch the vest's lower front corners.
+- **Vest fit:** the vest and its straps are rigid. They are fitted to the
+  resting seated chest and do not flex with the stroke: as a raised arm
+  lifts its shoulder the strap touches it by up to 3 mm, the shell meets
+  the torso by up to 1 cm mid-stroke, and resting forearms touch the
+  vest's lower front corners.
 - **Gear is rigid:** the bag and lines do not flex with the tubes.

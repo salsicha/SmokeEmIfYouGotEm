@@ -226,16 +226,19 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
     assert manifest["source_inputs"] == []
     # Generator v14: a low-profile front-entry whitewater guide vest fitted
     # to the five seated torsos ("the life vests don't seem to be modern
-    # white water vests", 2026-10-07).
-    assert manifest["generator_version"] == 14
+    # white water vests", 2026-10-07). v15: the padded shoulder straps are
+    # fitted per wearer as separate meshes ("the vest shoulder straps seem
+    # too high"); the shell keeps their buckles and back anchors.
+    assert manifest["generator_version"] == 15
     assert manifest["construction"] == {
         "style": "low-profile front-entry whitewater guide vest",
         "front_foam_panels": 2,
         "back_panels": 1,
         "side_panels": 2,
         "side_wings": 0,
-        "padded_shoulder_straps": 2,
+        "padded_shoulder_straps": 0,
         "shoulder_adjustment_buckles": 2,
+        "shoulder_strap_anchors": 2,
         "side_adjustment_straps": 4,
         "side_adjustment_buckles": 4,
         "adjustment_points": 6,

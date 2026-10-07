@@ -540,6 +540,11 @@ private:
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> PfdBuckle;
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Production")
     TObjectPtr<UStaticMeshComponent> ProductionPfd;
+    /** The vest's shoulder straps, fitted to this wearer's own shoulders
+     * (build_production_pfd_shoulder_straps.py). A child of the vest in its
+     * own frame, wearing the vest's materials. */
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Production")
+    TObjectPtr<UStaticMeshComponent> ProductionPfdShoulderStraps;
     UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> PfdShellMaterialInstance;
     UPROPERTY(Transient)

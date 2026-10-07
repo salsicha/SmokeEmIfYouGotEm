@@ -2,8 +2,10 @@
 
 A modern guide/rafting vest: slim contoured foam front and back panels, a front
 zip with one large zippered chest pocket, a short cut that rides above the seat,
-large open armholes, padded shoulder straps with front adjusters, closed side
-panels under side adjustment straps, small reflective accents and a lash tab.
+large open armholes, closed side panels under side adjustment straps, small
+reflective accents and a lash tab. The padded shoulder straps are fitted to
+each wearer as separate meshes (build_production_pfd_shoulder_straps.py); this
+shell carries their chest-tab ladder-locks and back-panel anchors.
 
 The local origin is the deterministic torso centre used by
 ``ARaftSimCrewAvatarActor`` (X toward the face, Z up the spine, centimetres).
@@ -31,7 +33,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd"
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_pfd_manifest.json"
-GENERATOR_VERSION = 14
+GENERATOR_VERSION = 15
 MATERIAL_NAMES = [
     "PfdShell",
     "PfdWebbing",
@@ -57,17 +59,15 @@ UV_CM_PER_REPEAT = 30.0
 # [--update-source]` re-measures it from torso-vertices-{1..5}.csv dumps; the
 # table below is the fit to the seated rest-pose dumps of 2026-10-07
 # (tmp/crew-round3-b).
-#
-# The shoulder straps rest on the highest of the five shoulders, so on the
-# wearers whose shoulders sit lower in this frame they stand a few cm proud.
 # ---------------------------------------------------------------------------
 ENVELOPE_CLEARANCE_CM = 0.6
 ENVELOPE_ROLLING_BALL_CM = 30.0
 ENVELOPE_DZ_CM = 2.0
 ENVELOPE_ANGLE_STEP_DEG = 7.5
-SHOULDER_STRAP_Y_CM = 13.0
-SHOULDER_STRIPS = 4
-SHOULDER_HEAD_CUT_Z_CM = 32.0
+# The shoulder straps' plane: inboard over the trapezius, between the neck
+# and its steep rise (|y| <= 10) and the acromion (|y| >= 17), so a raised
+# paddling arm's deltoid passes outboard of the strap, never under it.
+SHOULDER_STRAP_Y_CM = 12.0
 # >>> fitted envelope
 ENVELOPE_AXIS_X_CM = 1.55
 ENVELOPE_Z0_CM = -18.0
@@ -97,51 +97,6 @@ ENVELOPE_RADIUS_CM: tuple[tuple[float, ...], ...] = (
     (8.46, 8.53, 8.76, 9.16, 9.77, 10.67, 11.97, 13.12, 14.80, 16.44, 15.96, 15.61, 15.54, 15.73, 16.21, 17.02, 18.25, 20.03, 18.89, 17.45, 16.02, 15.02, 14.37, 14.00, 13.88),
     (8.32, 8.39, 8.61, 9.00, 9.61, 10.49, 11.76, 12.92, 14.60, 16.24, 15.76, 15.42, 15.35, 15.55, 16.03, 16.84, 18.05, 19.83, 18.69, 17.25, 15.82, 14.83, 14.19, 13.82, 13.70),
     (8.27, 8.34, 8.56, 8.95, 9.55, 10.43, 11.70, 12.85, 14.53, 16.18, 15.69, 15.36, 15.29, 15.49, 15.97, 16.77, 17.99, 19.76, 18.63, 17.19, 15.76, 14.77, 14.13, 13.76, 13.65),
-)
-# Shoulder-strap footprint, inner to outer strip: body outline (x, z)
-# under each strip plus clearance.
-SHOULDER_CLEAR_OUTLINES_XZ: tuple[tuple[tuple[float, float], ...], ...] = (
-    (
-        (-13.03, 30.71), (-12.64, 19.63), (-12.64, 19.61), (-12.40, 15.56), (-12.40, 15.55),
-        (-12.25, 13.65), (-12.01, 13.21), (-11.81, 13.06), (-11.44, 12.93), (-1.47, 12.90),
-        (8.77, 12.89), (8.79, 12.89), (9.31, 12.91), (9.54, 12.96), (9.82, 13.08),
-        (9.88, 13.11), (10.30, 13.34), (10.57, 13.66), (10.58, 14.08), (10.11, 15.54),
-        (10.10, 15.57), (9.54, 16.99), (9.49, 17.08), (6.98, 21.27), (4.34, 25.66),
-        (4.29, 25.73), (2.80, 27.58), (2.79, 27.60), (1.70, 28.84), (1.40, 29.03),
-        (0.57, 29.27), (0.56, 29.27), (-0.19, 29.47), (-0.21, 29.47), (-8.71, 31.42),
-        (-8.87, 31.44), (-12.42, 31.35), (-12.73, 31.26), (-12.95, 31.03),
-    ),
-    (
-        (-12.40, 15.61), (-12.40, 15.55), (-12.25, 13.65), (-12.06, 13.25), (-11.64, 13.08),
-        (-1.48, 12.90), (-1.47, 12.90), (9.59, 12.89), (9.90, 12.97), (10.13, 13.20),
-        (10.22, 13.51), (10.21, 15.04), (10.19, 15.17), (10.12, 15.48), (10.10, 15.57),
-        (9.54, 16.99), (9.52, 17.03), (8.75, 18.59), (8.71, 18.65), (4.75, 24.67),
-        (4.75, 24.69), (4.55, 24.96), (4.52, 25.00), (3.07, 26.78), (3.04, 26.80),
-        (1.90, 28.03), (1.74, 28.16), (-0.66, 29.45), (-0.87, 29.51), (-9.34, 30.79),
-        (-9.42, 30.80), (-10.35, 30.81), (-10.77, 30.65), (-10.98, 30.26), (-12.17, 19.88),
-        (-12.17, 19.87), (-12.36, 17.90), (-12.36, 17.86),
-    ),
-    (
-        (-12.36, 17.90), (-12.33, 17.63), (-11.41, 15.13), (-11.38, 15.07), (-11.18, 14.65),
-        (-10.81, 13.90), (-10.65, 13.69), (-10.36, 13.46), (-10.08, 13.33), (-9.40, 13.20),
-        (-9.37, 13.20), (-7.53, 12.94), (-7.45, 12.94), (5.47, 12.89), (9.59, 12.89),
-        (9.94, 12.99), (10.17, 13.27), (10.20, 13.63), (10.13, 14.00), (10.12, 14.05),
-        (8.79, 18.49), (8.74, 18.60), (7.87, 20.25), (7.82, 20.33), (3.05, 26.73),
-        (2.90, 26.87), (1.76, 27.65), (1.71, 27.68), (-1.40, 29.41), (-1.66, 29.49),
-        (-5.05, 29.74), (-5.11, 29.75), (-6.79, 29.71), (-7.19, 29.55), (-9.85, 27.18),
-        (-10.02, 26.92), (-11.73, 22.11), (-11.76, 22.02), (-12.17, 19.93), (-12.17, 19.87),
-    ),
-    (
-        (-11.44, 17.80), (-11.42, 17.55), (-11.28, 17.09), (-11.27, 17.05), (-9.98, 13.58),
-        (-9.62, 13.21), (-9.00, 12.97), (-8.77, 12.92), (-2.08, 12.91), (7.78, 12.91),
-        (7.97, 12.94), (8.16, 13.00), (8.20, 13.02), (8.45, 13.12), (8.48, 13.13),
-        (8.66, 13.22), (9.02, 13.68), (9.03, 13.76), (9.04, 13.84), (9.08, 15.89),
-        (9.08, 15.90), (9.08, 16.33), (9.05, 16.52), (7.92, 20.15), (7.86, 20.28),
-        (6.92, 21.85), (6.87, 21.92), (5.80, 23.29), (5.78, 23.32), (3.26, 26.27),
-        (3.15, 26.37), (0.82, 28.02), (0.70, 28.09), (-3.13, 29.67), (-3.36, 29.72),
-        (-5.09, 29.75), (-5.33, 29.70), (-7.23, 28.94), (-7.35, 28.88), (-9.78, 27.23),
-        (-10.02, 26.92), (-10.62, 25.20), (-10.65, 25.06),
-    ),
 )
 # <<< fitted envelope
 
@@ -850,16 +805,40 @@ def ribbon_frame(result: RibbonResult, fraction: float):
     return point, np.stack([along, across, normal]), theta, z, index
 
 
+def surface_axes(theta: float, z: float):
+    """Envelope point, outward normal, unit up-slope and across directions.
+
+    (along, across, normal) is right-handed, as add_rounded_block expects.
+    """
+    point, normal, _, d_z = envelope_frame(theta, z)
+    along = d_z - normal * float(np.dot(d_z, normal))
+    along /= np.linalg.norm(along)
+    across = np.cross(normal, along)
+    return point, normal, along, across
+
+
+def footprint_offset(layers: SurfaceLayers, theta: float, z: float, half_across: float, half_along: float) -> float:
+    """Highest outer-surface offset under a small block lying at (theta, z)."""
+    speed = float(np.linalg.norm(envelope_frame(theta, z)[2]))
+    d_theta, d_z = np.meshgrid(
+        np.linspace(-half_across, half_across, 9) / speed, np.linspace(-half_along, half_along, 7)
+    )
+    return float(layers.outer_offset(theta + d_theta.ravel(), z + d_z.ravel()).max())
+
+
 # ---------------------------------------------------------------------------
 # Vest layout
 # ---------------------------------------------------------------------------
 # Heights are vest-local cm. The hem sits at the seated waist so the vest
-# rides above the seat; the armholes open from just under the armpit.
+# rides above the seat; the armholes open from just under the armpit. The
+# chest tabs and the back panel top stay a few cm under the lowest of the
+# five shoulder lines (Crew03: 23.6 cm at the strap, 19.8 cm 18 cm out), so
+# seen from behind or the side only the fitted straps cross the shoulders.
 VEST_BOTTOM_Z_CM = -14.0
 ARMPIT_Z_CM = 3.0
-FRONT_NECK_Z_CM = 16.0
-FRONT_SHOULDER_Z_CM = 22.0
-BACK_TOP_Z_CM = 22.0
+FRONT_NECK_Z_CM = 14.5
+FRONT_SHOULDER_Z_CM = 20.0
+BACK_TOP_Z_CM = 20.0
 # Angles are degrees about the envelope axis: 0 front centre, 90 the +Y
 # flank, 180 the spine.
 FRONT_ZIP_HALF_GAP_DEG = 2.4
@@ -869,9 +848,11 @@ SEAM_GAP_DEG = 0.05
 FRONT_FOAM_CM = 2.4
 BACK_FOAM_CM = 1.9
 SIDE_FOAM_CM = 0.9
-SHOULDER_STRAP_WIDTH_CM = 5.6
-SHOULDER_STRAP_FOAM_CM = 1.0
+# The chest tab and back-panel shoulder for each strap sit where the shell
+# reaches the strap's plane (SHOULDER_STRAP_Y_CM) this far below their tops.
 SHOULDER_STRAP_OVERLAP_CM = 4.5
+SHOULDER_BUCKLE_DROP_CM = 2.6
+SHOULDER_ANCHOR_DROP_CM = 3.0
 WEBBING_WIDTH_CM = 2.5
 WEBBING_THICKNESS_CM = 0.18
 STRAP_GAP_CM = 0.04
@@ -1018,176 +999,12 @@ def offset_convex_polygon(
     return np.asarray(result)
 
 
-def chain_over_shoulder(outline: np.ndarray, front_z: float, back_z: float) -> np.ndarray:
-    """Counter-clockwise run of the outline from the chest, over the top, to the back."""
-    count = len(outline)
-    middle_x = 0.5 * (outline[:, 0].min() + outline[:, 0].max())
-    front_index = back_index = None
-    for k in range(count):
-        a, b = outline[k], outline[(k + 1) % count]
-        if a[0] > middle_x and a[1] < front_z <= b[1]:
-            front_index = k
-        if a[0] < middle_x and a[1] >= back_z > b[1]:
-            back_index = k
-    if front_index is None or back_index is None:
-        raise RuntimeError("Shoulder strap path does not span the chest and back panels")
-
-    def crossing(k: int, z: float) -> np.ndarray:
-        a, b = outline[k], outline[(k + 1) % count]
-        return a + (b - a) * ((z - a[1]) / (b[1] - a[1]))
-
-    chain = [crossing(front_index, front_z)]
-    k = (front_index + 1) % count
-    while k != (back_index + 1) % count:
-        chain.append(outline[k])
-        k = (k + 1) % count
-    chain.append(crossing(back_index, back_z))
-    chain = np.asarray(chain)
-    lengths = np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(chain, axis=0), axis=-1))])
-    samples = np.linspace(0.0, lengths[-1], max(int(lengths[-1] / 0.6), 2) + 1)
-    return np.stack([np.interp(samples, lengths, chain[:, 0]), np.interp(samples, lengths, chain[:, 1])], -1)
-
-
-def convex_exit_distance(polygon: np.ndarray, points: np.ndarray, directions: np.ndarray) -> np.ndarray:
-    """Farthest boundary hit of a convex polygon along each point's line (-inf on a miss)."""
-    start = polygon
-    edge = np.roll(polygon, -1, axis=0) - polygon
-    offset = start[None, :, :] - points[:, None, :]
-    denominator = directions[:, None, 0] * edge[None, :, 1] - directions[:, None, 1] * edge[None, :, 0]
-    with np.errstate(divide="ignore", invalid="ignore"):
-        s = (offset[..., 0] * edge[None, :, 1] - offset[..., 1] * edge[None, :, 0]) / denominator
-        u = (offset[..., 0] * directions[:, None, 1] - offset[..., 1] * directions[:, None, 0]) / denominator
-    valid = (np.abs(denominator) > 1e-12) & (u >= -1e-9) & (u <= 1.0 + 1e-9)
-    return np.where(valid, s, -np.inf).max(axis=1)
-
-
-def supporting_slope_at_zero(points: np.ndarray) -> float:
-    """Slope of the line resting on the upper hull of (a, h) points at a = 0."""
-    if len(points) < 2:
-        return 0.0
-    hull: list[tuple[float, float]] = []
-    for point in sorted(map(tuple, points.tolist())):
-        while len(hull) >= 2:
-            (ox, oy), (ax, ay) = hull[-2], hull[-1]
-            if (ax - ox) * (point[1] - oy) - (ay - oy) * (point[0] - ox) >= 0.0:
-                hull.pop()
-            else:
-                break
-        hull.append(point)
-    for (ax, ay), (bx, by) in zip(hull, hull[1:]):
-        if ax <= 0.0 <= bx and bx > ax:
-            return (by - ay) / (bx - ax)
-    return 0.0
-
-
-def pillow_profile(half_width: float, thickness: float, count: int = 28) -> np.ndarray:
-    """Counter-clockwise padded-strap section with its flat face at h = 0."""
-    angles = np.linspace(-math.pi / 2.0, 1.5 * math.pi, count, endpoint=False)
-    c = np.cos(angles)
-    s = np.sin(angles)
-    half_height = thickness * 0.5
-    return np.stack(
-        [
-            half_width * np.sign(c) * np.abs(c) ** 0.3,
-            half_height + half_height * np.sign(s) * np.abs(s) ** 0.45,
-        ],
-        -1,
-    )
-
-
-def build_shoulder_strap(
-    builder: MeshBuilder,
-    side: float,
-    foam_points: np.ndarray,
-) -> dict[str, np.ndarray]:
-    """Padded strap draped over the shoulder, clear of body and foam beneath.
-
-    The strap's footprint is split into lateral strips. In each, the measured
-    shoulder outline (with its clearance) and the chest/back foam the strap is
-    sewn onto are projected onto the strap's sagittal plane. The strap's path
-    follows the convex outline of all strips; at every station its flat face
-    then rolls about the path onto the strips' heights like a plank resting
-    on the sloping trapezius, so it hugs the shoulder without entering it.
-    """
-    centre_y = side * SHOULDER_STRAP_Y_CM
-    half = SHOULDER_STRAP_WIDTH_CM * 0.5
-    edges = np.linspace(-half, half, len(SHOULDER_CLEAR_OUTLINES_XZ) + 1)
-    lateral = side * (foam_points[:, 1] - centre_y)  # + away from the neck
-    strip_hulls = []
-    for j, body in enumerate(SHOULDER_CLEAR_OUTLINES_XZ):
-        in_strip = (lateral >= edges[j] - 0.3) & (lateral <= edges[j + 1] + 0.3)
-        strip_hulls.append(
-            convex_hull_2d(np.concatenate([foam_points[in_strip][:, [0, 2]], np.asarray(body, dtype=float)]))
-        )
-    outline = offset_convex_polygon(convex_hull_2d(np.concatenate(strip_hulls)), STRAP_GAP_CM)
-    chain = chain_over_shoulder(
-        outline,
-        FRONT_SHOULDER_Z_CM - SHOULDER_STRAP_OVERLAP_CM,
-        BACK_TOP_Z_CM - SHOULDER_STRAP_OVERLAP_CM,
-    )
-    tangent2 = np.gradient(chain, axis=0)
-    tangent2 /= np.linalg.norm(tangent2, axis=-1, keepdims=True)
-    normal2 = np.stack([tangent2[:, 1], -tangent2[:, 0]], -1)
-    # How far along the station normal each strip's obstacles reach.
-    reach = np.stack(
-        [convex_exit_distance(hull, chain, normal2) for hull in strip_hulls], -1
-    ) + STRAP_GAP_CM
-    slopes = np.zeros(len(chain))
-    for i in range(len(chain)):
-        known = np.isfinite(reach[i])
-        support = np.stack(
-            [np.concatenate([edges[:-1][known], edges[1:][known]]), np.concatenate([reach[i][known]] * 2)], -1
-        )
-        slopes[i] = supporting_slope_at_zero(support)
-    slopes = np.convolve(np.pad(slopes, 4, mode="edge"), np.ones(9) / 9.0, mode="valid")
-    slopes = np.clip(slopes, -0.8, 0.8)
-    # Lowest flat face with that roll that still clears every strip.
-    starts = np.broadcast_to(edges[:-1], reach.shape)
-    ends = np.broadcast_to(edges[1:], reach.shape)
-    lift = np.nanmax(
-        np.where(
-            np.isfinite(reach),
-            np.maximum(reach - slopes[:, None] * starts, reach - slopes[:, None] * ends),
-            np.nan,
-        ),
-        axis=1,
-    )
-    path = np.stack([chain[:, 0], np.full(len(chain), centre_y), chain[:, 1]], -1)
-    tangent = np.stack([tangent2[:, 0], np.zeros(len(chain)), tangent2[:, 1]], -1)
-    up = np.stack([normal2[:, 0], np.zeros(len(chain)), normal2[:, 1]], -1)
-    outward = np.array([0.0, side, 0.0])
-    across = outward[None, :] + up * slopes[:, None]
-    across /= np.linalg.norm(across, axis=-1, keepdims=True)
-    face_normal = up - outward[None, :] * slopes[:, None]
-    face_normal /= np.linalg.norm(face_normal, axis=-1, keepdims=True)
-    # Profiles must run counter-clockwise about the direction of travel.
-    flip = np.sign((np.cross(across, face_normal) * tangent).sum(-1))[:, None]
-    across = across * flip
-    base = path + up * lift[:, None]
-    profile = pillow_profile(half, SHOULDER_STRAP_FOAM_CM)
-    rings = (
-        base[:, None, :]
-        + across[:, None, :] * profile[None, :, 0:1]
-        + face_normal[:, None, :] * profile[None, :, 1:2]
-    )
-    lengths = np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(chain, axis=0), axis=-1))])
-    perimeter = np.concatenate(
-        [[0.0], np.cumsum(np.linalg.norm(np.diff(np.vstack([profile, profile[:1]]), axis=0), axis=-1))]
-    )
-    uvs = np.stack(np.broadcast_arrays(perimeter[None, :], lengths[:, None]), -1)
-    builder.begin_piece(f"PaddedShoulderStrap_{side:+.0f}", "strap")
-    add_ring_sweep(builder, rings, "PfdShell", uvs, cap_material="PfdLabel")
-    builder.end_piece()
-    return {"path": base, "tangent": tangent, "up": face_normal, "across": across, "length": lengths}
-
-
 def build_vest(builder: MeshBuilder) -> dict[str, object]:
     layers = SurfaceLayers()
     foam_panels = [front_panel(1.0), front_panel(-1.0), back_panel(), side_panel(1.0), side_panel(-1.0)]
     for panel in foam_panels:
         build_foam_panel(builder, panel)
         layers.add(panel)
-    foam_points = builder.points().copy()
     foam_only = SurfaceLayers(layers.panels)
 
     # One large zippered chest pocket on the right front panel, sewn on top
@@ -1242,26 +1059,55 @@ def build_vest(builder: MeshBuilder) -> dict[str, object]:
     add_rounded_block(builder, "ChestPocketZipPull", point + axes[2] * (pocket_zip.base[max(index - 3, 0): index + 4].max() + 0.22 + 0.04 + 0.18),
                       axes, (1.0, 0.5, 0.18))
 
-    # Padded shoulder straps with a ladder-lock adjuster on each front end
-    # and the adjustment tail lying on the chest panel below it.
-    straps = {}
+    # The padded shoulder straps are fitted to each wearer
+    # (build_production_pfd_shoulder_straps.py): one rigid strap could only
+    # rest on the highest shoulders and stood proud of the rest. The shared
+    # shell carries their mounts: a ladder-lock on each chest tab, its
+    # adjustment tail hanging below, and a sewn webbing anchor on the back
+    # panel. Each strap is routed to meet them.
+    mounts: dict[str, dict[str, list[float]]] = {}
     for side in (1.0, -1.0):
-        strap = build_shoulder_strap(builder, side, foam_points)
-        straps[side] = strap
-        k = int(np.searchsorted(strap["length"], 2.4))
+        z_buckle = FRONT_SHOULDER_Z_CM - SHOULDER_BUCKLE_DROP_CM
+        theta = shoulder_strap_theta(z_buckle)
+        theta = theta if side > 0.0 else 360.0 - theta
+        point, normal, along, across = surface_axes(theta, z_buckle)
+        half_extents = (1.0, 1.75, 0.24)
+        base = footprint_offset(layers, theta, z_buckle, half_extents[1] + 0.2, half_extents[0] + 0.2)
+        centre = point + normal * (base + STRAP_GAP_CM + half_extents[2])
         add_rounded_block(
             builder,
             f"ShoulderAdjustBuckle_{side:+.0f}",
-            strap["path"][k] + strap["up"][k] * (SHOULDER_STRAP_FOAM_CM + 0.05 + 0.24),
-            np.stack([strap["tangent"][k], strap["across"][k], strap["up"][k]]),
-            (1.25, 1.75, 0.24),
+            centre,
+            np.stack([along, across, normal]),
+            half_extents,
         )
-        tail_top = FRONT_SHOULDER_Z_CM - SHOULDER_STRAP_OVERLAP_CM - 0.4
-        theta = shoulder_strap_theta(tail_top)
-        theta = theta if side > 0.0 else 360.0 - theta
         add_surface_ribbon(builder, f"ShoulderAdjustTail_{side:+.0f}",
-                           [(theta, tail_top), (theta, tail_top - 6.5)],
+                           [(theta, z_buckle - half_extents[0] - 0.3), (theta, z_buckle - 7.5)],
                            WEBBING_WIDTH_CM, WEBBING_THICKNESS_CM, "PfdWebbing", layers)
+        z_anchor = BACK_TOP_Z_CM - SHOULDER_ANCHOR_DROP_CM
+        back_theta = shoulder_strap_theta(z_anchor, back=True)
+        back_theta = back_theta if side > 0.0 else 360.0 - back_theta
+        anchor = add_surface_ribbon(
+            builder,
+            f"ShoulderStrapAnchor_{side:+.0f}",
+            [(back_theta, z_anchor - 2.0), (back_theta, BACK_TOP_Z_CM - 1.2)],
+            WEBBING_WIDTH_CM,
+            WEBBING_THICKNESS_CM,
+            "PfdWebbing",
+            layers,
+        )
+        key = "+1" if side > 0.0 else "-1"
+        mounts[f"front_buckle_{key}"] = {
+            # The strap's webbing enters the buckle at its top edge.
+            "point": [round(float(v), 4) for v in centre + along * half_extents[0]],
+            "normal": [round(float(v), 4) for v in normal],
+        }
+        top = anchor.base[-1].max() + WEBBING_THICKNESS_CM
+        anchor_point = surface_offset_point(anchor.theta[-1], anchor.z[-1], top)
+        mounts[f"back_anchor_{key}"] = {
+            "point": [round(float(v), 4) for v in anchor_point],
+            "z_range": [round(z_anchor - 2.0, 3), round(BACK_TOP_Z_CM - 1.2, 3)],
+        }
 
     # Side adjustment: webbing anchored on the back panel runs forward OVER
     # the side panel, through a ladder-lock on the front panel, and its tail
@@ -1303,7 +1149,7 @@ def build_vest(builder: MeshBuilder) -> dict[str, object]:
                            0.9, 0.06, "PfdReflective", layers, gap=0.02, taut=False, role="accent")
     add_surface_ribbon(builder, "BlankBackLabel", [(172.0, BACK_TOP_Z_CM - 8.5), (188.0, BACK_TOP_Z_CM - 8.5)],
                        3.2, 0.08, "PfdLabel", layers, gap=0.02, taut=False, role="accent")
-    return {"foam_panels": [panel.name for panel in foam_panels], "layers": layers}
+    return {"foam_panels": [panel.name for panel in foam_panels], "layers": layers, "mounts": mounts}
 
 
 # ---------------------------------------------------------------------------
@@ -1443,7 +1289,7 @@ def torso_only(points: np.ndarray, axis_x: float) -> np.ndarray:
 
 
 def fit_envelope(torso_dir: Path) -> dict[str, object]:
-    global ENVELOPE_AXIS_X_CM, ENVELOPE_Z0_CM, ENVELOPE_RADIUS_CM, SHOULDER_CLEAR_OUTLINES_XZ
+    global ENVELOPE_AXIS_X_CM, ENVELOPE_Z0_CM, ENVELOPE_RADIUS_CM
     bodies = [load_torso_points(torso_dir / f"torso-vertices-{i}.csv") for i in range(1, 6)]
     mirror = np.array([1.0, -1.0, 1.0])
     whole = np.concatenate(bodies)
@@ -1546,22 +1392,6 @@ def fit_envelope(torso_dir: Path) -> dict[str, object]:
     # panels actually cut on that first envelope.
     solve(points[fit_coverage(folded, points[:, 2])])
     clearance = solve(points[panel_coverage(folded, points[:, 2])])
-    # The shoulder strap's footprint in lateral strips (inner to outer),
-    # each projected onto the strap's sagittal plane with its clearance.
-    # Every body vertex counts here (neck, trapezius), not just torso; the
-    # head and hair above the jaw line hang beside the strap, never under it.
-    half = SHOULDER_STRAP_WIDTH_CM * 0.5
-    edges = np.linspace(-half, half, SHOULDER_STRIPS + 1)
-    lateral = whole[:, 1] - SHOULDER_STRAP_Y_CM
-    high = (whole[:, 2] >= min(FRONT_SHOULDER_Z_CM, BACK_TOP_Z_CM) - SHOULDER_STRAP_OVERLAP_CM - 4.0) & (
-        whole[:, 2] <= SHOULDER_HEAD_CUT_Z_CM
-    )
-    outlines = []
-    for j in range(SHOULDER_STRIPS):
-        strip = whole[high & (lateral >= edges[j] - 0.5) & (lateral <= edges[j + 1] + 0.5)][:, [0, 2]]
-        outline = convex_hull_2d(offset_convex_polygon(convex_hull_2d(strip), ENVELOPE_CLEARANCE_CM, step=0.6, arc_step_deg=30.0))
-        outlines.append(tuple((round(float(x), 2), round(float(z), 2)) for x, z in outline))
-    SHOULDER_CLEAR_OUTLINES_XZ = tuple(outlines)
     report = {}
     for index, (body, torso) in enumerate(zip(bodies, torsos), start=1):
         report[index] = {"vertices": len(body), "torso_vertices": len(torso)}
@@ -1573,15 +1403,6 @@ def fitted_envelope_source() -> str:
     rows = ",\n".join(
         "    (" + ", ".join(f"{value:.2f}" for value in row) + ")" for row in ENVELOPE_RADIUS_CM
     )
-    outlines = "".join(
-        "    (\n"
-        + "".join(
-            "        " + ", ".join(f"({x:.2f}, {z:.2f})" for x, z in outline[i : i + 5]) + ",\n"
-            for i in range(0, len(outline), 5)
-        )
-        + "    ),\n"
-        for outline in SHOULDER_CLEAR_OUTLINES_XZ
-    )
     return (
         "# >>> fitted envelope\n"
         f"ENVELOPE_AXIS_X_CM = {ENVELOPE_AXIS_X_CM:.2f}\n"
@@ -1590,10 +1411,6 @@ def fitted_envelope_source() -> str:
         "# to 180 degrees (spine) by ENVELOPE_ANGLE_STEP_DEG.\n"
         "ENVELOPE_RADIUS_CM: tuple[tuple[float, ...], ...] = (\n"
         f"{rows},\n)\n"
-        "# Shoulder-strap footprint, inner to outer strip: body outline (x, z)\n"
-        "# under each strip plus clearance.\n"
-        "SHOULDER_CLEAR_OUTLINES_XZ: tuple[tuple[tuple[float, float], ...], ...] = (\n"
-        f"{outlines})\n"
         "# <<< fitted envelope\n"
     )
 
@@ -1654,7 +1471,7 @@ def validate(mesh_object: bpy.types.Object, open_edges: int) -> dict[str, object
     if not (
         26.0 <= dimensions[0] <= 44.0
         and 30.0 <= dimensions[1] <= 44.0
-        and 36.0 <= dimensions[2] <= 56.0
+        and 30.0 <= dimensions[2] <= 56.0
     ):
         raise RuntimeError(f"Production PFD bounds are implausible: {tuple(dimensions)}")
     triangles = sum(len(polygon.vertices) - 2 for polygon in mesh_object.data.polygons)
@@ -1700,7 +1517,7 @@ def main() -> None:
         "PfdLabel": material("PfdLabel", (0.08, 0.085, 0.09, 1.0), 0.68),
     }
     builder = MeshBuilder()
-    build_vest(builder)
+    layout = build_vest(builder)
     mesh_object = builder.to_object("SM_RaftSim_WhitewaterRescuePfd", materials)
     open_edges = orient_outward(mesh_object)
     audit = validate(mesh_object, open_edges)
@@ -1760,8 +1577,11 @@ def main() -> None:
             "back_panels": 1,
             "side_panels": 2,
             "side_wings": 0,
-            "padded_shoulder_straps": 2,
+            # The padded straps are separate per-wearer meshes
+            # (SM_RaftSim_PfdShoulderStraps_*); this shell carries their mounts.
+            "padded_shoulder_straps": 0,
             "shoulder_adjustment_buckles": 2,
+            "shoulder_strap_anchors": 2,
             "side_adjustment_straps": 4,
             "side_adjustment_buckles": 4,
             "adjustment_points": 6,
@@ -1778,7 +1598,6 @@ def main() -> None:
             "front_panel_foam_thickness_cm": FRONT_FOAM_CM,
             "back_panel_foam_thickness_cm": BACK_FOAM_CM,
             "side_panel_foam_thickness_cm": SIDE_FOAM_CM,
-            "shoulder_strap_foam_thickness_cm": SHOULDER_STRAP_FOAM_CM,
             "webbing_width_cm": WEBBING_WIDTH_CM,
             "webbing_thickness_cm": WEBBING_THICKNESS_CM,
             "strap_surface_gap_cm": STRAP_GAP_CM,
@@ -1789,6 +1608,13 @@ def main() -> None:
             "inner_surface": "convex envelope of the five seated crew torsos (runtime fit scale removed), mirrored, plus clearance",
             "envelope_clearance_cm": ENVELOPE_CLEARANCE_CM,
             "straps": "every strap, buckle and webbing piece rides on the outer surface of what lies beneath it",
+            "panel_tops_cm": {"front_tab": FRONT_SHOULDER_Z_CM, "back": BACK_TOP_Z_CM},
+        },
+        "shoulder_straps": {
+            "meshes": "SM_RaftSim_PfdShoulderStraps_{Crew01,Crew02,Crew03,Crew04,Guide}",
+            "generator": "unreal/Scripts/build_production_pfd_shoulder_straps.py",
+            "strap_plane_y_cm": SHOULDER_STRAP_Y_CM,
+            "mounts": layout["mounts"],
         },
         "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native.",
         # Vertex ranges let fit audits test foam, straps and hardware apart.

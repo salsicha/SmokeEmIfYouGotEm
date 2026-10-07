@@ -1739,6 +1739,11 @@ ARaftSimCrewAvatarActor::ARaftSimCrewAvatarActor()
     ProductionPfd->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     ProductionPfd->SetCastShadow(true);
     ProductionPfd->SetVisibility(false, true);
+    ProductionPfdShoulderStraps = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProductionPfdShoulderStraps"));
+    ProductionPfdShoulderStraps->SetupAttachment(ProductionPfd);
+    ProductionPfdShoulderStraps->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    ProductionPfdShoulderStraps->SetCastShadow(true);
+    ProductionPfdShoulderStraps->SetVisibility(false);
     ProductionFlipLine = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProductionFlipLine"));
     ProductionFlipLine->SetupAttachment(ProductionPfd);
     ProductionFlipLine->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -1793,8 +1798,8 @@ void ARaftSimCrewAvatarActor::SetProductionBodyOnlyShadowMode(bool bEnabled)
         }
     }
     for (UStaticMeshComponent* Equipment : {
-             ProductionPfd.Get(), ProductionHelmet.Get(), ProductionHelmetStraps.Get(),
-             ProductionLeftBoot.Get(), ProductionRightBoot.Get()})
+             ProductionPfd.Get(), ProductionPfdShoulderStraps.Get(), ProductionHelmet.Get(),
+             ProductionHelmetStraps.Get(), ProductionLeftBoot.Get(), ProductionRightBoot.Get()})
     {
         if (Equipment)
         {
@@ -3050,6 +3055,17 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
         ProductionHelmetStraps->SetStaticMesh(LoadObject<UStaticMesh>(nullptr, *FString::Printf(
             TEXT("/Game/RaftSim/Equipment/Production/SM_RaftSim_HelmetStraps_%s.SM_RaftSim_HelmetStraps_%s"), *Wearer, *Wearer)));
     }
+    if (ProductionPfdShoulderStraps)
+    {
+        // One shared pair of straps sat high on the narrow shoulders and
+        // pinned the arm raised to the T-grip ("the vest shoulder straps
+        // seem too high, also the arm holding the t grip is tucked under the
+        // shoulder strap", 2026-10-07): each wearer's straps follow their
+        // own shoulders, inboard by the neck.
+        const FString Wearer = bGuide ? FString(TEXT("Guide")) : FString::Printf(TEXT("Crew%02d"), VariantIndex + 1);
+        ProductionPfdShoulderStraps->SetStaticMesh(LoadObject<UStaticMesh>(nullptr, *FString::Printf(
+            TEXT("/Game/RaftSim/Equipment/Production/SM_RaftSim_PfdShoulderStraps_%s.SM_RaftSim_PfdShoulderStraps_%s"), *Wearer, *Wearer)));
+    }
     if (ProductionFlipLine)
     {
         // Only the guide wears a flip line ("the guide should have a
@@ -3077,6 +3093,14 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
                 TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet_White.M_RaftSim_Helmet_White")))
         {
             ProductionPfd->SetMaterial(3, Reflective);
+        }
+        if (ProductionPfdShoulderStraps)
+        {
+            // The straps share the vest's slots, its shell tint included.
+            for (int32 Slot = 0; Slot < ProductionPfd->GetNumMaterials(); ++Slot)
+            {
+                ProductionPfdShoulderStraps->SetMaterial(Slot, ProductionPfd->GetMaterial(Slot));
+            }
         }
     }
     RebuildSafetyGearMeshes();
@@ -3445,6 +3469,10 @@ void ARaftSimCrewAvatarActor::SetProceduralVisualVisible(bool bVisible)
     if (ProductionPfd)
     {
         ProductionPfd->SetVisibility(bHasProductionPfd, true);
+    }
+    if (ProductionPfdShoulderStraps)
+    {
+        ProductionPfdShoulderStraps->SetVisibility(bHasProductionPfd && ProductionPfdShoulderStraps->GetStaticMesh());
     }
     if (ProductionHelmet)
     {

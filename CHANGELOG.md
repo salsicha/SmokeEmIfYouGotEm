@@ -38,6 +38,19 @@ All notable changes to this project are recorded here, newest first. Versioning 
   - **Flip line** (`build_production_guide_flip_line.py`): the guide wears
     two snug wraps of tubular webbing at the vest hem with a locking
     carabiner, replacing the loose procedural loop round the hips.
+  - **Vest shoulder straps** (PFD generator v15,
+    `build_production_pfd_shoulder_straps.py`): each wearer's straps are
+    fitted to their own shoulders, 4 cm wide and inboard by the neck, and
+    the panels stop lower. One shared pair had stood high off the narrow
+    shoulders and pinned the arm raised to the T-grip under it.
+  - **Thumbs:** the fingers close together round the bar and each thumb
+    wraps the other way round it, its pad on the index finger: under the
+    T-grip's crossbar, and opposed to the fingers round the shaft. The
+    thumb had pointed up the shaft and lay beside the T-grip.
+  - **Wrists:** each grip turns about its bar toward the forearm carrying
+    it, and a raised elbow swings about the shoulder-wrist line on its own
+    bone lengths. Mid-stroke wrists had bent and twisted to impossible
+    angles.
   - **Knees and ankles:** the legs bend on each body's own thigh and calf.
     The rendered thighs are about 41 cm, the pose's 34-35 cm, and aiming
     each bone at the pose's knee left the thigh's end 7-8 cm from the

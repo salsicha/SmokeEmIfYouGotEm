@@ -312,8 +312,8 @@ def test_production_pfd_is_low_profile_body_fitted_whitewater_vest() -> None:
     build_source = PRODUCTION_PFD_BUILD_SCRIPT.read_text(encoding="utf-8")
     manifest = json.loads(PRODUCTION_PFD_MANIFEST.read_text(encoding="utf-8"))
 
-    assert "GENERATOR_VERSION = 14" in build_source
-    assert manifest["generator_version"] == 14
+    assert "GENERATOR_VERSION = 15" in build_source
+    assert manifest["generator_version"] == 15
     # One rigid shell fitted to the envelope of all five seated crew torsos.
     assert "ENVELOPE_RADIUS_CM" in build_source
     assert "--fit-torsos" in build_source
@@ -323,14 +323,25 @@ def test_production_pfd_is_low_profile_body_fitted_whitewater_vest() -> None:
     assert '"ProtectiveBackUpperCell"' not in build_source
     assert "ShoulderFoamBand" not in build_source
     # Modern low-profile guide vest: slim front/back foam, closed sides,
-    # padded shoulders, side straps over the side panels, one big pocket.
+    # side straps over the side panels, one big pocket. The padded shoulder
+    # straps are fitted per wearer (separate meshes); the shell carries their
+    # chest-tab buckles and back anchors, under every wearer's shoulder line.
     construction = manifest["construction"]
     assert construction["front_foam_panels"] == 2
     assert construction["back_panels"] == 1
     assert construction["side_panels"] == 2
     assert construction["side_wings"] == 0
-    assert construction["padded_shoulder_straps"] == 2
+    assert construction["padded_shoulder_straps"] == 0
     assert construction["shoulder_adjustment_buckles"] == 2
+    assert construction["shoulder_strap_anchors"] == 2
+    assert manifest["fit"]["panel_tops_cm"] == {"front_tab": 20.0, "back": 20.0}
+    assert manifest["dimensions_cm"][2] < 36.0
+    assert set(manifest["shoulder_straps"]["mounts"]) == {
+        "front_buckle_+1",
+        "front_buckle_-1",
+        "back_anchor_+1",
+        "back_anchor_-1",
+    }
     assert construction["side_adjustment_straps"] == 4
     assert construction["side_adjustment_buckles"] == 4
     assert construction["front_zip"] == 1
