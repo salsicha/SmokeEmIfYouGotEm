@@ -1838,7 +1838,7 @@ UStaticMesh* CreateSouthForkLiveOakWoodyCanopyMesh(
             const float Ring = FMath::Sqrt(FMath::Max(0.0f, 1.0f - Z * Z));
             return FVector(Ring * FMath::Cos(Azimuth), Ring * FMath::Sin(Azimuth), Z);
         };
-        constexpr int32 SpraysPerTerminal = 10;
+        constexpr int32 SpraysPerTerminal = 16;
         for (int32 TerminalIndex = 0; TerminalIndex < TerminalBranches.Num(); ++TerminalIndex)
         {
             const FTerminalBranch& Terminal = TerminalBranches[TerminalIndex];
@@ -1847,8 +1847,8 @@ UStaticMesh* CreateSouthForkLiveOakWoodyCanopyMesh(
             for (int32 SprayIndex = 0; SprayIndex < SpraysPerTerminal; ++SprayIndex)
             {
                 const int32 Seed = Terminal.Seed + 7919 + SprayIndex * 131;
-                const float SprayHeight = FMath::Lerp(70.0f, 105.0f, Noise01(Seed + 1)) * LeafCardScale;
-                const float SprayWidth = FMath::Lerp(85.0f, 130.0f, Noise01(Seed + 2)) * LeafCardScale;
+                const float SprayHeight = FMath::Lerp(50.0f, 75.0f, Noise01(Seed + 1)) * LeafCardScale;
+                const float SprayWidth = FMath::Lerp(60.0f, 95.0f, Noise01(Seed + 2)) * LeafCardScale;
                 const FVector Center =
                     FMath::Lerp(Terminal.Start, Terminal.End, FMath::Lerp(0.35f, 1.0f, Noise01(Seed + 6))) +
                     Along * TwigLength * 0.25f * Noise01(Seed + 7) +

@@ -828,13 +828,13 @@ def test_live_oak_crown_family_v3_review_is_isolated_and_fail_closed():
     assert sprays["supersedes_asset_hashes_of"] == (
         "m9_live_oak_crown_family_v212_review.json"
     )
-    assert sprays["authoring"]["leaf_geometry"]["sprays_per_terminal"] == 10
-    assert "SpraysPerTerminal = 10" in canopy_source
+    assert sprays["authoring"]["leaf_geometry"]["sprays_per_terminal"] == 16
+    assert "SpraysPerTerminal = 16" in canopy_source
     assert "bLeafSprays" in canopy_source
     for form in sprays["authoring"]["forms"].values():
         lod_triangles = form["lod_triangles"]
         assert lod_triangles[0] > lod_triangles[1] > lod_triangles[2] > 0
-        assert form["leaf_sprays"] == 10 * form["terminal_branches"]
+        assert form["leaf_sprays"] == 16 * form["terminal_branches"]
     assert all(value is False for value in sprays["authority"].values())
     for key, path in asset_paths.items():
         assert path.is_file()

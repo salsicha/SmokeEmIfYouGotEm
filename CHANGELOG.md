@@ -60,6 +60,12 @@ All notable changes to this project are recorded here, newest first. Versioning 
     shape, not a ball, and the loose coil at the stern is gone.
   - **Bow line:** tied to the bow grab line with a round turn and two half
     hitches, coiled and wrapped into a neat hank along the bow tube.
+  - **Trees:** the white alder and both placed ponderosa forms are rebuilt
+    as leaf-spray trees (`RaftSimEditorSouthForkSprayTrees.cpp`): twigs off
+    the branches carry clusters of small leaf sprays instead of large flat
+    cards, so the alder reads as a leafy crown and the pine as a dark,
+    needled cone. The live oaks carry 16 smaller sprays per branch tip
+    (was 10 larger ones) for a finer, deeper-green crown.
   - **Review** (`RaftSim.Crew.GearReview`): first-person captures through
     the player's camera while the guide paddles, forward, back and
     steering, with an arm-coverage audit; a look down onto each nape; the
