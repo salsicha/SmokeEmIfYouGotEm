@@ -323,6 +323,27 @@ public:
             }
             if (MidStrokeShotIndex >= 4 * MidStrokeShots)
             {
+                // Each paddler's torso and arms mid-stroke in the vest mesh's
+                // frame, the T-grip arm raised: a shoulder strap must stay
+                // inboard of the raised deltoid, not over it.
+                for (int32 Index = 0; bCapture && Index < 4; ++Index)
+                {
+                    const auto* Visual = Cast<ARaftSimCC0CrewVisualActor>(Crew[Index]->GetProductionVisualActor());
+                    TArray<UStaticMeshComponent*> Meshes;
+                    Crew[Index]->GetComponents(Meshes);
+                    UStaticMeshComponent** Vest = Meshes.FindByPredicate([](const UStaticMeshComponent* M)
+                    { return M->GetStaticMesh() && M->GetStaticMesh()->GetName() == TEXT("SM_RaftSim_WhitewaterRescuePfd"); });
+                    if (!Visual || !Vest) continue;
+                    const FBox VestBox = (*Vest)->GetStaticMesh()->GetBoundingBox().ExpandBy(FVector(10., 10., 16.));
+                    FString Torso = TEXT("x,y,z\n");
+                    for (const FVector& P : Visual->GetPosedBodyVerticesWorldCmForValidation())
+                    {
+                        const FVector L = (*Vest)->GetComponentTransform().InverseTransformPosition(P);
+                        if (VestBox.IsInside(L)) Torso += FString::Printf(TEXT("%.3f,%.3f,%.3f\n"), L.X, L.Y, L.Z);
+                    }
+                    IFileManager::Get().MakeDirectory(*Dir, true);
+                    FFileHelper::SaveStringToFile(Torso, *(Dir / FString::Printf(TEXT("torso-vertices-stroke-%d.csv"), Index + 1)));
+                }
                 UGameplayStatics::SetGlobalTimeDilation(World, 1.f);
                 bMidStrokeDone = true;
                 return false;

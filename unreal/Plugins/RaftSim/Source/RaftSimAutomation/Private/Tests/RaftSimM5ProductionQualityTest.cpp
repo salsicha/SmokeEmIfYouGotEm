@@ -1355,9 +1355,10 @@ bool FRaftSimM5StartRescueCommand::Update()
             // The grip solve bends each finger through its own joints
             // (RaftSimCC0CrewGrip.cpp), so a pad lands within half a
             // centimetre of the bar rather than being forced onto it (which
-            // had bent fingers backwards), and the thumb rests over the
-            // index finger's middle segment in a power grip, within 2 cm of
-            // that target.
+            // had bent fingers backwards), and the thumb wraps the bar the
+            // other way to rest over the index finger's middle segment,
+            // within 2.25 cm of that target (it stays off the fingers on the
+            // way round, the widest T-grip crossbar costing most).
             Test->TestTrue(
                 FString::Printf(
                     TEXT("CC0 crew body %s seats every distal finger pad on its "
@@ -1371,7 +1372,7 @@ bool FRaftSimM5StartRescueCommand::Update()
                          "(maximum error %.3f cm)"),
                     *It->GetName(),
                     It->GetMaximumPaddleThumbContactErrorCm()),
-                It->GetMaximumPaddleThumbContactErrorCm() <= 2.0f);
+                It->GetMaximumPaddleThumbContactErrorCm() <= 2.25f);
             // Each palm faces its handle and every finger bends toward its
             // palm (2026-10-07: the palms had faced away, fingers bent back).
             Test->TestTrue(

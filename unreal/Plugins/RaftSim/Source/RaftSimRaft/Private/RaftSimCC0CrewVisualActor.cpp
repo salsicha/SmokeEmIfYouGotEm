@@ -1208,10 +1208,11 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // side-correct paddle handle.
     const bool bPalmTarget = HasHeldGrip(Pose) || Pose.BoardingPalmSupportBlend > 0.f ||
         Pose.BoardingPaddleGripBlend > 0.f;
-    const FVector LeftWristCm = bPalmTarget
+    GripForearmHint[0] = GripForearmHint[1] = FVector::ZeroVector;
+    FVector LeftWristCm = bPalmTarget
         ? ResolvePaddleGripWristCm(true, Pose, Pose.LeftHandCm)
         : Pose.LeftHandCm;
-    const FVector RightWristCm = bPalmTarget
+    FVector RightWristCm = bPalmTarget
         ? ResolvePaddleGripWristCm(false, Pose, Pose.RightHandCm)
         : Pose.RightHandCm;
     // The shoulder girdle follows a reaching arm. The rig's shoulder joint is
@@ -1257,8 +1258,8 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
             ? ClavicleRootCm + (Reached - ClavicleRootCm).GetSafeNormal() * ClavicleCm
             : Reached;
     };
-    const FVector LeftArmShoulderCm = GirdleShoulder(true, LeftShoulderCm, LeftWristCm, LeftClavicleRoot);
-    const FVector RightArmShoulderCm = GirdleShoulder(false, RightShoulderCm, RightWristCm, RightClavicleRoot);
+    FVector LeftArmShoulderCm = GirdleShoulder(true, LeftShoulderCm, LeftWristCm, LeftClavicleRoot);
+    FVector RightArmShoulderCm = GirdleShoulder(false, RightShoulderCm, RightWristCm, RightClavicleRoot);
     // Two-bone elbows on the rig's own upper-arm and forearm lengths. The
     // former elbow, 48 % of the way to the wrist, kept every arm straight:
     // a hand brought in toward the chin (the T-grip) compressed the whole
@@ -1333,14 +1334,53 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // on the elbow's drop below the shoulder; the forearm still reaches the
     // true wrist, so hands stay put and the arm simply bends more. The old
     // 9 cm bound was fighting the compressed-torso chest, not the deltoid.
-    const auto ClampElbowDrop = [](const FVector& ShoulderCm, FVector ElbowCm)
+    // The elbow swings up about the shoulder-wrist line, keeping both bone
+    // lengths: raised straight up it no longer met the forearm's own length,
+    // so the hand came away from the forearm at the wrist (the same tear as
+    // the knees', "both wrists look broken", 2026-10-07).
+    const auto ClampElbowDrop = [](const FVector& ShoulderCm, const FVector& WristCm, const FVector& ElbowCm)
     {
         constexpr float kMaxElbowDropCm = 24.0f;
-        ElbowCm.Z = FMath::Max(ElbowCm.Z, ShoulderCm.Z - kMaxElbowDropCm);
-        return ElbowCm;
+        const float Floor = ShoulderCm.Z - kMaxElbowDropCm;
+        const FVector Along = (WristCm - ShoulderCm).GetSafeNormal();
+        if (ElbowCm.Z >= Floor || Along.IsNearlyZero())
+        {
+            return ElbowCm;
+        }
+        FVector Highest = ElbowCm;
+        for (float Step = 5.0f; Step <= 180.0f; Step += 5.0f)
+        {
+            for (const float Sign : {1.0f, -1.0f})
+            {
+                const FVector Candidate = ShoulderCm + (ElbowCm - ShoulderCm).RotateAngleAxis(Sign * Step, Along);
+                if (Candidate.Z >= Floor)
+                {
+                    return Candidate;
+                }
+                if (Candidate.Z > Highest.Z)
+                {
+                    Highest = Candidate;
+                }
+            }
+        }
+        return Highest;
     };
-    LeftElbow = ClampElbowDrop(LeftArmShoulderCm, LeftElbow);
-    RightElbow = ClampElbowDrop(RightArmShoulderCm, RightElbow);
+    LeftElbow = ClampElbowDrop(LeftArmShoulderCm, LeftWristCm, LeftElbow);
+    RightElbow = ClampElbowDrop(RightArmShoulderCm, RightWristCm, RightElbow);
+    // Second pass: each held grip turns about its bar toward the forearm
+    // just solved (TurnGripTowardForearm), which moves its wrist; re-solve
+    // the shoulders and elbows for the new wrists.
+    if (bPalmTarget && HasHeldGrip(Pose))
+    {
+        GripForearmHint[0] = (LeftWristCm - LeftElbow).GetSafeNormal();
+        GripForearmHint[1] = (RightWristCm - RightElbow).GetSafeNormal();
+        LeftWristCm = ResolvePaddleGripWristCm(true, Pose, Pose.LeftHandCm);
+        RightWristCm = ResolvePaddleGripWristCm(false, Pose, Pose.RightHandCm);
+        LeftArmShoulderCm = GirdleShoulder(true, LeftShoulderCm, LeftWristCm, LeftClavicleRoot);
+        RightArmShoulderCm = GirdleShoulder(false, RightShoulderCm, RightWristCm, RightClavicleRoot);
+        LeftElbow = ClampElbowDrop(LeftArmShoulderCm, LeftWristCm, SolveElbow(true, LeftArmShoulderCm, LeftWristCm));
+        RightElbow = ClampElbowDrop(RightArmShoulderCm, RightWristCm, SolveElbow(false, RightArmShoulderCm, RightWristCm));
+    }
     // A gripping hand turns about its forearm as the forearm turns it:
     // pronation and supination roll the forearm, so it takes most of the
     // twist and the wrist only the rest. Set on the hand alone, the whole

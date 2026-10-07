@@ -252,6 +252,10 @@ private:
      * handles. (One definition for both source files: as file-local copies
      * they collided once unity builds merged the two.) */
     static bool HasHeldGrip(const FRaftSimCrewAvatarPose& Pose) { return Pose.bShowPaddle || Pose.bOarGrip; }
+    /** Each gripping forearm's direction (elbow to wrist) from the arm solve's
+     * first pass, or zero; ResolveGripBar turns the grip toward it. */
+    FVector GripForearmHint[2] = {FVector::ZeroVector, FVector::ZeroVector};
+    void TurnGripTowardForearm(bool bLeft, FRaftSimCC0GripBar& Bar, float Handedness, float Share, float MaxDegrees) const;
     bool ResolveHandAnatomy(bool bLeft, FVector& OutWristCm, FVector& OutFingers, FVector& OutThumb,
         FVector& OutPalm, float& OutHandedness) const;
     float MeasurePalmSurfaceOffsetCm(bool bLeft) const;

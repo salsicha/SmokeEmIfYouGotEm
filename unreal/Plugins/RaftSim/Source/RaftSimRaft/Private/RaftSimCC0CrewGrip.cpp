@@ -7,7 +7,9 @@
 // out mirrored. The wrist is placed so the bar lies across the palm just
 // below the knuckles, the fingers flex toward the palm until their pads sit
 // on the bar, the thumb closes round the other way over the fingers, and the
-// forearm takes most of any twist so the wrist does not wring.
+// forearm takes most of any twist so the wrist does not wring. Each grip
+// turns about its bar toward the forearm that carries it, so the wrist bends
+// only as far as a real one.
 //
 // The former solver treated the palm as the back of the hand: every grip
 // pressed the back of the hand to the handle and wrapped the fingers round it
@@ -39,6 +41,10 @@ constexpr float PalmCompressionCm = 0.25f;
 // Off a capped T-grip the shaft leaves the crossbar between the middle and
 // ring fingers: the fist sits this far toward the index side.
 constexpr float TGripFistOffsetCm = 0.9f;
+// A gripping finger closes this share of the way to the middle finger's line:
+// the bodies' rest hands are spread, and gripped that way the fingers stood
+// apart round the shaft like a claw.
+constexpr float GripFingerAdduction = 0.85f;
 // Relaxed curl of an open or fisted hand off any handle.
 constexpr float RelaxedFingerCurlDegrees[] = {42.0f, 62.0f, 42.0f};
 constexpr float RelaxedThumbCurlDegrees[] = {15.0f, 25.0f};
@@ -212,6 +218,7 @@ bool ARaftSimCC0CrewVisualActor::ResolveGripBar(
             const FVector Knuckles = FVector::VectorPlaneProject(Outboard + FVector::UpVector * 0.35f, OutBar.ThumbAxis)
                 .GetSafeNormal(SMALL_NUMBER, FVector::UpVector);
             OutBar.PalmFacing = -Knuckles;
+            TurnGripTowardForearm(bLeft, OutBar, Handedness, 0.8f, 70.0f);
             return true;
         }
         // The T-grip hand caps the T: the palm presses down the shaft when
@@ -239,7 +246,43 @@ bool ARaftSimCC0CrewVisualActor::ResolveGripBar(
     {
         OutBar.CenterCm -= OutBar.ThumbAxis * TGripFistOffsetCm;
     }
+    // The T-grip palm stays on top of the crossbar (the thumb under it), so it
+    // turns only part way.
+    TurnGripTowardForearm(bLeft, OutBar, Handedness, Pose.bOarGrip ? 0.6f : 0.5f, Pose.bOarGrip ? 45.0f : 40.0f);
     return true;
+}
+
+void ARaftSimCC0CrewVisualActor::TurnGripTowardForearm(
+    bool bLeft,
+    FRaftSimCC0GripBar& Bar,
+    float Handedness,
+    float Share,
+    float MaxDegrees) const
+{
+    // A hand round a bar can turn about it; a real one turns so the back of
+    // the hand runs on from the forearm. Grips set by the bar alone (palm
+    // flat down on the T, knuckles always out on the shaft) bent the wrists
+    // to impossible angles mid-stroke ("both wrists look broken and twisted
+    // at impossible angles", 2026-10-07). Turn the grip about the bar by a
+    // share of the angle between the hand's line (wrist to knuckles) and the
+    // forearm's, as seen down the bar.
+    const FVector Forearm = GripForearmHint[bLeft ? 0 : 1];
+    const FVector Axis = Bar.ThumbAxis.GetSafeNormal();
+    const FVector HandLine = (FVector::CrossProduct(Axis, Bar.PalmFacing) * Handedness).GetSafeNormal();
+    const FVector Wanted = FVector::VectorPlaneProject(Forearm, Axis).GetSafeNormal();
+    if (Forearm.IsNearlyZero() || Axis.IsNearlyZero() || HandLine.IsNearlyZero() || Wanted.IsNearlyZero())
+    {
+        return;
+    }
+    const float Angle = FMath::RadiansToDegrees(FMath::Acos(FMath::Clamp(
+        static_cast<float>(FVector::DotProduct(HandLine, Wanted)), -1.0f, 1.0f)));
+    const float Turn = FMath::Min(Angle * Share, MaxDegrees);
+    // Whichever sense of turn brings the hand's line toward the forearm.
+    const FQuat Plus(Axis, FMath::DegreesToRadians(Turn));
+    const FQuat Minus(Axis, -FMath::DegreesToRadians(Turn));
+    const FQuat Chosen = FVector::DotProduct(Plus.RotateVector(HandLine), Wanted) >=
+        FVector::DotProduct(Minus.RotateVector(HandLine), Wanted) ? Plus : Minus;
+    Bar.PalmFacing = Chosen.RotateVector(Bar.PalmFacing).GetSafeNormal();
 }
 
 FQuat ARaftSimCC0CrewVisualActor::ResolveGripHandDelta(bool bLeft, const FRaftSimCC0GripBar& Bar) const
@@ -312,6 +355,11 @@ const FRaftSimCC0HandGripShape& ARaftSimCC0CrewVisualActor::ResolveHandGripShape
             Reference.GetScale3D()).GetRelativeTransform(*RefHand));
     };
     FVector PhalanxMid[2];
+    TArray<FVector, TInlineAllocator<28>> FingerPoints;
+    const auto InPalmPlane = [&Palm](const FVector& V) { return FVector::VectorPlaneProject(V, Palm).GetSafeNormal(); };
+    const FName MiddleBones[] = {DigitBone(TEXT("middle"), 1, bLeft), DigitBone(TEXT("middle"), 2, bLeft)};
+    const FVector MiddleLine = ReferenceComponentTransforms.Contains(MiddleBones[0]) && ReferenceComponentTransforms.Contains(MiddleBones[1])
+        ? InPalmPlane(Location(MiddleBones[1]) - Location(MiddleBones[0])) : Fingers;
     for (int32 FingerIndex = 0; FingerIndex < UE_ARRAY_COUNT(GripFingers); ++FingerIndex)
     {
         const TCHAR* Digit = GripFingers[FingerIndex];
@@ -321,7 +369,17 @@ const FRaftSimCC0HandGripShape& ARaftSimCC0CrewVisualActor::ResolveHandGripShape
         {
             continue;
         }
-        const FVector J1 = Location(Bones[0]), J2 = Location(Bones[1]), J3 = Location(Bones[2]);
+        // Close the finger toward the middle finger's line, about the palm's
+        // normal at its knuckle, before it flexes round the bar.
+        const FVector J1 = Location(Bones[0]);
+        const FVector Own = InPalmPlane(Location(Bones[1]) - J1);
+        const float Spread = FMath::RadiansToDegrees(FMath::Acos(FMath::Clamp(
+            static_cast<float>(FVector::DotProduct(Own, MiddleLine)), -1.0f, 1.0f))) * GripFingerAdduction;
+        const FQuat AddPlus(Palm, FMath::DegreesToRadians(Spread)), AddMinus(Palm, -FMath::DegreesToRadians(Spread));
+        const FQuat Add = FVector::DotProduct(AddPlus.RotateVector(Own), MiddleLine) >=
+            FVector::DotProduct(AddMinus.RotateVector(Own), MiddleLine) ? AddPlus : AddMinus;
+        const FVector J2 = J1 + Add.RotateVector(Location(Bones[1]) - J1);
+        const FVector J3 = J1 + Add.RotateVector(Location(Bones[2]) - J1);
         const FVector Tip = J3 + (J3 - J2) * 0.85;
         const double PadRadius = RadiusCm + FingerPadHalfThicknessCm[FingerIndex];
         // Knuckle (MCP) and middle (PIP) flexion; the end joint follows the
@@ -374,49 +432,122 @@ const FRaftSimCC0HandGripShape& ARaftSimCC0CrewVisualActor::ResolveHandGripShape
         FVector P2, P3, PTip;
         Pose(BestA, BestB, P2, P3, PTip);
         const float C = FMath::Min(0.8f * BestB, 80.0f);
-        AddBone(Bones[0], FQuat(FlexAxis, FMath::DegreesToRadians(BestA)), J1);
-        AddBone(Bones[1], FQuat(FlexAxis, FMath::DegreesToRadians(BestA + BestB)), P2);
-        AddBone(Bones[2], FQuat(FlexAxis, FMath::DegreesToRadians(BestA + BestB + C)), P3);
+        AddBone(Bones[0], FQuat(FlexAxis, FMath::DegreesToRadians(BestA)) * Add, J1);
+        AddBone(Bones[1], FQuat(FlexAxis, FMath::DegreesToRadians(BestA + BestB)) * Add, P2);
+        AddBone(Bones[2], FQuat(FlexAxis, FMath::DegreesToRadians(BestA + BestB + C)) * Add, P3);
         Shape.MaximumPadErrorCm = FMath::Max(Shape.MaximumPadErrorCm,
             static_cast<float>(FMath::Abs(RadialCm((P3 + PTip) * 0.5, Bar, Thumb) - PadRadius)));
         if (FingerIndex < 2)
         {
             PhalanxMid[FingerIndex] = (P2 + P3) * 0.5;
         }
+        FingerPoints.Append({J1, P2, P3, PTip, (J1 + P2) * 0.5, (P2 + P3) * 0.5, (P3 + PTip) * 0.5});
     }
-    // The thumb closes round the bar the other way, its pad over the middle
-    // phalanges of the index and middle fingers.
+    // The thumb closes round the bar the other way, opposed to the fingers:
+    // its end curls round the bar and its pad rests on the outside of the
+    // index finger's middle segment, as in a fist round a handle. The search
+    // swings the whole thumb at its base (round the bar, across it, and about
+    // its own length) and bends its two joints, keeping every part of it
+    // outside the bar and off the fingers. One swing aimed straight at the
+    // pad left the thumb pointing up the shaft and beside the T-grip ("the
+    // thumb should go under the t grip", "the thumb should oppose the fingers
+    // and wrap about the shaft the other way", 2026-10-07).
     const FName ThumbBones[] = {DigitBone(TEXT("thumb"), 1, bLeft), DigitBone(TEXT("thumb"), 2, bLeft), DigitBone(TEXT("thumb"), 3, bLeft)};
     if (ReferenceComponentTransforms.Contains(ThumbBones[0]) && ReferenceComponentTransforms.Contains(ThumbBones[1]) &&
         ReferenceComponentTransforms.Contains(ThumbBones[2]))
     {
         const FVector T1 = Location(ThumbBones[0]), T2 = Location(ThumbBones[1]), T3 = Location(ThumbBones[2]);
         const FVector TTip = T3 + (T3 - T2) * 0.85;
-        const FVector Over = (PhalanxMid[0] + PhalanxMid[1]) * 0.5;
-        const FVector Outward = FVector::VectorPlaneProject(Over - Bar, Thumb).GetSafeNormal();
-        const FVector Target = Over + Outward * (FingerPadHalfThicknessCm[0] + ThumbPadHalfThicknessCm);
-        const FVector ThumbFlexAxis = TowardPalmAxis(FVector::CrossProduct((TTip - T1).GetSafeNormal(), Palm), (TTip - T1).GetSafeNormal(), Palm);
-        float BestFlex = 0.0f;
-        double BestMiss = TNumericLimits<double>::Max();
-        FQuat BestSwing = FQuat::Identity;
-        for (float Flex = 0.0f; Flex <= 70.0f; Flex += 1.0f)
+        const FVector Over = PhalanxMid[0];
+        const FVector Target = Over + FVector::VectorPlaneProject(Over - Bar, Thumb).GetSafeNormal() *
+            (FingerPadHalfThicknessCm[0] + ThumbPadHalfThicknessCm);
+        const FVector Length = (TTip - T1).GetSafeNormal();
+        const FVector ThumbFlexAxis = TowardPalmAxis(FVector::CrossProduct(Length, Palm), Length, Palm);
+        const FVector Across = FVector::CrossProduct(Thumb, Length).GetSafeNormal();
+        struct FThumbPose { FQuat Swing; FVector Axis, P2, P3, PTip; };
+        const auto PoseThumb = [&](float Round, float Over_, float Roll, float Mcp, float Ip)
         {
-            const float EndFlex = FMath::Min(1.1f * Flex, 75.0f);
-            const FVector P3 = T2 + FQuat(ThumbFlexAxis, FMath::DegreesToRadians(Flex)).RotateVector(T3 - T2);
-            const FVector PTip = P3 + FQuat(ThumbFlexAxis, FMath::DegreesToRadians(Flex + EndFlex)).RotateVector(TTip - T3);
-            const FVector Pad = (P3 + PTip) * 0.5;
-            const FQuat Swing = FQuat::FindBetweenNormals((Pad - T1).GetSafeNormal(), (Target - T1).GetSafeNormal());
-            const double Miss = FVector::Distance(T1 + Swing.RotateVector(Pad - T1), Target);
-            if (Miss < BestMiss) { BestMiss = Miss; BestFlex = Flex; BestSwing = Swing; }
+            FThumbPose Out;
+            Out.Swing = FQuat(Thumb, FMath::DegreesToRadians(Round)) * FQuat(Across, FMath::DegreesToRadians(Over_)) *
+                FQuat(Length, FMath::DegreesToRadians(Roll));
+            Out.Axis = Out.Swing.RotateVector(ThumbFlexAxis);
+            Out.P2 = T1 + Out.Swing.RotateVector(T2 - T1);
+            const FQuat Base(Out.Axis, FMath::DegreesToRadians(Mcp));
+            Out.P3 = Out.P2 + Base.RotateVector(Out.Swing.RotateVector(T3 - T2));
+            const FVector Tip = Out.P2 + Base.RotateVector(Out.Swing.RotateVector(TTip - T2));
+            Out.PTip = Out.P3 + FQuat(Out.Axis, FMath::DegreesToRadians(FMath::Min(Ip, 80.0f))).RotateVector(Tip - Out.P3);
+            return Out;
+        };
+        const auto ThumbCost = [&](float Round, float Over_, float Roll, float Mcp, float Ip)
+        {
+            const FThumbPose P = PoseThumb(Round, Over_, Roll, Mcp, Ip);
+            const FVector Pad = (P.P3 + P.PTip) * 0.5;
+            double Cost = FVector::DistSquared(Pad, Target) +
+                4.0 * FMath::Square(RadialCm(Pad, Bar, Thumb) - (RadiusCm + ThumbPadHalfThicknessCm));
+            const FVector Samples[] = {P.P2, (P.P2 + P.P3) * 0.5, P.P3, P.PTip, (T1 + P.P2) * 0.5, Pad};
+            for (int32 SampleIndex = 0; SampleIndex < UE_ARRAY_COUNT(Samples); ++SampleIndex)
+            {
+                const double Inside = RadialCm(Samples[SampleIndex], Bar, Thumb) - (RadiusCm + 0.75);
+                if (Inside < 0.0)
+                {
+                    Cost += 60.0 * Inside * Inside;
+                }
+                if (SampleIndex == UE_ARRAY_COUNT(Samples) - 1)
+                {
+                    continue; // The pad rests on the index finger.
+                }
+                for (const FVector& Finger : FingerPoints)
+                {
+                    const double Gap = FVector::Distance(Samples[SampleIndex], Finger) - 1.55;
+                    if (Gap < 0.0)
+                    {
+                        Cost += 15.0 * Gap * Gap;
+                    }
+                }
+            }
+            // The end of the thumb curls round the bar, not along it.
+            Cost += 2.0 * FMath::Square(FVector::DotProduct((P.PTip - P.P3).GetSafeNormal(), Thumb));
+            Cost += 0.0004 * (Round * Round + Over_ * Over_ + Roll * Roll);
+            return Cost;
+        };
+        float Best[5] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+        double BestCost = TNumericLimits<double>::Max();
+        for (float Round = -90.0f; Round <= 90.0f; Round += 15.0f)
+            for (float Over_ = -60.0f; Over_ <= 60.0f; Over_ += 15.0f)
+                for (float Roll = -45.0f; Roll <= 45.0f; Roll += 15.0f)
+                    for (float Mcp = 0.0f; Mcp <= 60.0f; Mcp += 15.0f)
+                        for (float Ip = 0.0f; Ip <= 80.0f; Ip += 20.0f)
+                        {
+                            const double Cost = ThumbCost(Round, Over_, Roll, Mcp, Ip);
+                            if (Cost < BestCost)
+                            {
+                                BestCost = Cost;
+                                Best[0] = Round; Best[1] = Over_; Best[2] = Roll; Best[3] = Mcp; Best[4] = Ip;
+                            }
+                        }
+        for (const float Step : {5.0f, 2.0f})
+        {
+            const float Start[5] = {Best[0], Best[1], Best[2], Best[3], Best[4]};
+            for (int32 Code = 0; Code < 243; ++Code)
+            {
+                float Trial[5];
+                for (int32 Param = 0, Rest = Code; Param < 5; ++Param, Rest /= 3)
+                {
+                    Trial[Param] = Start[Param] + Step * static_cast<float>(Rest % 3 - 1);
+                }
+                const double Cost = ThumbCost(Trial[0], Trial[1], Trial[2], Trial[3], Trial[4]);
+                if (Cost < BestCost)
+                {
+                    BestCost = Cost;
+                    FMemory::Memcpy(Best, Trial, sizeof(Best));
+                }
+            }
         }
-        const float EndFlex = FMath::Min(1.1f * BestFlex, 75.0f);
-        const FQuat Flex2(ThumbFlexAxis, FMath::DegreesToRadians(BestFlex));
-        const FQuat Flex3(ThumbFlexAxis, FMath::DegreesToRadians(BestFlex + EndFlex));
-        const FVector P3 = T2 + Flex2.RotateVector(T3 - T2);
-        AddBone(ThumbBones[0], BestSwing, T1);
-        AddBone(ThumbBones[1], BestSwing * Flex2, T1 + BestSwing.RotateVector(T2 - T1));
-        AddBone(ThumbBones[2], BestSwing * Flex3, T1 + BestSwing.RotateVector(P3 - T1));
-        Shape.ThumbPadErrorCm = static_cast<float>(BestMiss);
+        const FThumbPose P = PoseThumb(Best[0], Best[1], Best[2], Best[3], Best[4]);
+        AddBone(ThumbBones[0], P.Swing, T1);
+        AddBone(ThumbBones[1], FQuat(P.Axis, FMath::DegreesToRadians(Best[3])) * P.Swing, P.P2);
+        AddBone(ThumbBones[2], FQuat(P.Axis, FMath::DegreesToRadians(Best[3] + FMath::Min(Best[4], 80.0f))) * P.Swing, P.P3);
+        Shape.ThumbPadErrorCm = static_cast<float>(FVector::Distance((P.P3 + P.PTip) * 0.5, Target));
     }
     UE_LOG(LogTemp, Display, TEXT("RaftSim CC0 grip shape %s hand radius=%.2fcm palm_surface=%.2fcm pad_error=%.2fcm thumb_error=%.2fcm"),
         bLeft ? TEXT("left") : TEXT("right"), RadiusCm, MeasurePalmSurfaceOffsetCm(bLeft), Shape.MaximumPadErrorCm, Shape.ThumbPadErrorCm);
@@ -560,19 +691,23 @@ float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleThumbContactErrorCm(const 
         {
             return TNumericLimits<float>::Max();
         }
-        // The thumb pad rides on the index and middle fingers' middle
-        // phalanges, outside the bar.
-        const auto Mid = [&](const TCHAR* Digit)
-        {
-            return (Body->GetBoneTransformByName(DigitBone(Digit, 2, bLeft), EBoneSpaces::ComponentSpace).GetLocation() +
-                Body->GetBoneTransformByName(DigitBone(Digit, 3, bLeft), EBoneSpaces::ComponentSpace).GetLocation()) * 0.5 * BodyScale;
-        };
-        const FVector Over = (Mid(TEXT("index")) + Mid(TEXT("middle"))) * 0.5;
+        // The thumb pad rests on the outside of the index finger's middle
+        // phalanx, outside the bar.
+        const FVector Over = (Body->GetBoneTransformByName(DigitBone(TEXT("index"), 2, bLeft), EBoneSpaces::ComponentSpace).GetLocation() +
+            Body->GetBoneTransformByName(DigitBone(TEXT("index"), 3, bLeft), EBoneSpaces::ComponentSpace).GetLocation()) * 0.5 * BodyScale;
         const FVector Target = Over + FVector::VectorPlaneProject(Over - Bar.CenterCm, Bar.ThumbAxis).GetSafeNormal() *
             (FingerPadHalfThicknessCm[0] + ThumbPadHalfThicknessCm);
-        const FVector T2 = Body->GetBoneTransformByName(DigitBone(TEXT("thumb"), 2, bLeft), EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
-        const FVector T3 = Body->GetBoneTransformByName(DigitBone(TEXT("thumb"), 3, bLeft), EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
-        const FVector Pad = T3 + (T3 - T2) * 0.425;
+        // The pad as the solve places it: halfway along the end segment,
+        // carried by the posed end bone (its own bend included).
+        const FTransform* RefT2 = ReferenceComponentTransforms.Find(DigitBone(TEXT("thumb"), 2, bLeft));
+        const FTransform* RefT3 = ReferenceComponentTransforms.Find(DigitBone(TEXT("thumb"), 3, bLeft));
+        if (!RefT2 || !RefT3)
+        {
+            return TNumericLimits<float>::Max();
+        }
+        const FVector RefPad = RefT3->GetLocation() + (RefT3->GetLocation() - RefT2->GetLocation()) * 0.425;
+        const FVector Pad = Body->GetBoneTransformByName(DigitBone(TEXT("thumb"), 3, bLeft), EBoneSpaces::ComponentSpace)
+            .TransformPosition(RefT3->InverseTransformPosition(RefPad)) * BodyScale;
         Maximum = FMath::Max(Maximum, static_cast<float>(FVector::Distance(Pad, Target)));
     }
     return Maximum;
