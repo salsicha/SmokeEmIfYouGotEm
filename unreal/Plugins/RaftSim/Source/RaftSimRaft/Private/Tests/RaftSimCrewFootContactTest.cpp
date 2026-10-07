@@ -176,7 +176,7 @@ bool FRaftSimCrewFootContactTest::RunTest(const FString&)
         }
         Host->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
         TestTrue(TEXT("fitting feet preserves actual glute contact"),
-            FMath::Abs(Raft->GetCrewSeatContactClearanceCm(Host)+1.0f) < 0.05f);
+            FMath::Abs(Raft->GetCrewSeatContactClearanceCm(Host) + ARaftSimRaftActor::RenderedSeatContactCompressionCm) < 0.05f);
         const FVector Seat = Host->GetRootComponent()->GetRelativeLocation();
         TArray<FVector> Before;
         for (auto* Boot : Boots) Before.Add(Boot->GetComponentLocation());

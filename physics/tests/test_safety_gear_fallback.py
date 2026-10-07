@@ -188,7 +188,11 @@ def test_project_owned_production_helmet_source_and_import_are_hash_locked() -> 
     assert manifest["rear_occipital_shell"] is True
     # Rear coverage belongs to the continuous bowl, not the old added bun.
     assert '"RearOccipitalShell"' not in build_script
-    assert "+ 0.17 * facing_rear" in build_script
+    # Full-cut whitewater shell: down over the ears and the back of the skull,
+    # not a skate-style bowl that stops above them.
+    assert manifest["rim_height_cm"]["ear_cover"] < -8.0
+    assert manifest["rim_height_cm"]["occiput"] < -6.0
+    assert manifest["ear_drainage_ports"] == 4
     assert "molded rear skull coverage" in import_script
     assert manifest["retention_anchor_count"] == 4
     assert 8_000 <= manifest["polygon_count"] <= 20_000
@@ -213,9 +217,6 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
     assert "rescue_tether_rings" in build_script
     assert "ShoulderFoamBand" not in build_script
     assert "add_swept_shoulder_bridge" not in build_script
-    assert "add_side_webbing_arc" in build_script
-    assert "add_crowned_foam_panel" in build_script
-    assert "rounded_outline" in build_script
     assert '"PfdShell"' in build_script
     assert "EXPECTED_SLOTS = [" in import_script
     assert '"PfdReflective"' in import_script
@@ -223,50 +224,32 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
         "Project-owned deterministic source art; no external mesh or texture input."
     )
     assert manifest["source_inputs"] == []
-    assert manifest["construction"]["front_carrier_panels"] == 2
-    assert manifest["construction"]["back_carrier_panels"] == 1
-    assert manifest["construction"]["front_foam_panels"] == 4
-    assert manifest["construction"]["shoulder_foam_pads"] == 0
-    assert manifest["construction"]["shoulder_webbing_runs"] == 2
-    assert manifest["construction"]["side_webbing_connectors"] == 4
-    assert manifest["construction"]["side_adjustment_sliders"] == 4
-    assert manifest["construction"]["shoulder_adjustment_points"] == 4
-    assert manifest["construction"]["adjustment_points"] == 8
-    assert manifest["construction"]["front_backup_webbing_runs"] == 4
-    assert manifest["construction"]["quick_release_rescue_belts"] == 1
-    assert manifest["construction"]["rescue_tether_rings"] == 1
-    assert manifest["soft_geometry"] == {
-        "outline_corner_rounding": "four-pass closed Chaikin",
-        "outline_corner_rounding_passes": 4,
-        "flat_exterior_foam_faces": 0,
-        "crown_profile": "eleven-ring soft cosine loft",
-        "carrier_shell_thickness_cm": 0.7,
-        "front_panel_foam_thickness_cm": 3.0,
-        "front_panel_edge_roll_cm": 0.75,
-        "front_panel_crown_depth_cm": 0.65,
-        "front_panel_lateral_wrap_depth_cm": 3.0,
-        "back_panel_foam_thickness_cm": 2.4,
-        "back_panel_edge_roll_cm": 0.65,
-        "back_panel_crown_depth_cm": 0.75,
-        "back_panel_lateral_wrap_depth_cm": 3.2,
-        "rigid_side_foam_wings": 0,
-        "side_webbing_connector_profile": "curved torso-following fabric",
-        "seated_torso_taper": (
-            "front leans in up to 5.5 cm above mid-chest; back moves in up to 4.3 cm "
-            "over the lumbar curve (measured on the five seated CC0 bodies)"
-        ),
-        "side_webbing_connector_thickness_cm": 0.22,
-        "side_webbing_connector_height_cm": 1.05,
-        "front_pocket_flat_exterior_faces": 0,
-        "front_pocket_crown_depth_cm": 0.12,
-        "front_backup_webbing_profile": "curved torso-following fabric",
-        "rescue_belt_profile": "flat torso-following webbing",
-        "rescue_belt_thickness_cm": 0.36,
-        "duplicate_tubular_side_adjustment_runs": 0,
-        "smooth_shaded": True,
+    # Generator v14: a low-profile front-entry whitewater guide vest fitted
+    # to the five seated torsos ("the life vests don't seem to be modern
+    # white water vests", 2026-10-07).
+    assert manifest["generator_version"] == 14
+    assert manifest["construction"] == {
+        "style": "low-profile front-entry whitewater guide vest",
+        "front_foam_panels": 2,
+        "back_panels": 1,
+        "side_panels": 2,
+        "side_wings": 0,
+        "padded_shoulder_straps": 2,
+        "shoulder_adjustment_buckles": 2,
+        "side_adjustment_straps": 4,
+        "side_adjustment_buckles": 4,
+        "adjustment_points": 6,
+        "front_zip": 1,
+        "front_pockets": 1,
+        "front_lash_tabs": 1,
+        "reflective_accents": 4,
+        "blank_back_labels": 1,
+        "quick_release_rescue_belts": 0,
+        "rescue_tether_rings": 0,
     }
-    assert manifest["construction"]["back_panels"] == 2
-    assert manifest["construction"]["rear_flex_channels"] == 1
+    assert manifest["soft_geometry"]["front_panel_foam_thickness_cm"] <= 2.5
+    assert manifest["soft_geometry"]["back_panel_foam_thickness_cm"] <= 2.0
+    assert manifest["open_edges"] == 0
     assert manifest["material_slots"] == [
         "PfdShell",
         "PfdWebbing",
@@ -274,8 +257,8 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
         "PfdReflective",
         "PfdLabel",
     ]
-    assert 10_000 <= manifest["vertex_count"] <= 25_000
-    assert 10_000 <= manifest["polygon_count"] <= 25_000
+    assert 20_000 <= manifest["vertex_count"] <= 60_000
+    assert 20_000 <= manifest["polygon_count"] <= 60_000
     fbx = REPO_ROOT / manifest["fbx"]
     blend = REPO_ROOT / manifest["blend"]
     assert hashlib.sha256(fbx.read_bytes()).hexdigest() == manifest["fbx_sha256"]

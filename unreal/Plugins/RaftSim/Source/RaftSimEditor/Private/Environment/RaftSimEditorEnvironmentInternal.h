@@ -961,6 +961,48 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     FString& OutSummary);
 
+// One riparian tree form for the leaf-spray generator.
+struct FSouthForkSprayTreeForm
+{
+    const TCHAR* Token;
+    float HeightCm;
+    float WidthCm;
+    int32 StemCount;
+    float StemBaseRadiusCm;
+    float StemSplayDegrees;
+    float StemTopFraction;
+    float CrownBaseFraction;
+    int32 BranchLevels;
+    int32 BranchesPerLevel;
+    float BranchPitchBaseDegrees;
+    float BranchPitchTopDegrees;
+    bool bConicalCrown;
+    int32 TwigsPerBranch;
+    int32 SpraysPerTerminal;
+    float SprayHeightMinCm;
+    float SprayHeightMaxCm;
+    float SprayWidthMinCm;
+    float SprayWidthMaxCm;
+    int32 SeedSalt;
+};
+
+// White alder and ponderosa built like the live oaks' leaf sprays
+// (2026-10-07): a real stem and branch scaffold whose branch ends and twigs
+// carry many small sprays from the species' branch atlas, in place of one
+// full-tree photo plane ringed by vertical cards, which read as a flat
+// cut-out sheet. Sprays face out of the crown and their normals lean toward
+// its ellipsoid. The mesh is written over the placed package and keeps that
+// package's former top and base, because every placed instance was scaled
+// from those bounds when it was installed. The caller sets the LODs.
+UStaticMesh* CreateSouthForkSprayTreeMesh(
+    UWorld* World,
+    const FString& PackagePath,
+    const FSouthForkSprayTreeForm& Form,
+    UMaterialInterface* BarkMaterial,
+    UMaterialInterface* LeafMaterial,
+    int32 LeafAtlasTileCount,
+    FString& OutSummary);
+
 /** Two drifting world-position projections and the noise mask that picks
  * between them, so a world-aligned wall rock never repeats on a lattice. */
 struct FRaftSimWallRockBreakup

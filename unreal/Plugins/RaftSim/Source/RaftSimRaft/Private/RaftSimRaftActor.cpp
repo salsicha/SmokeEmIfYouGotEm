@@ -151,10 +151,11 @@ ARaftSimRaftActor::ARaftSimRaftActor()
     ThrowBagVisual->SetupAttachment(Root);
     ThrowBagVisual->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     ThrowBagVisual->SetVisibility(false);
-    // A grapefruit-sized stuff sack, matching the bag stowed on the stern tube.
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> BagMesh(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+    // The stowed bag's size: a rope-packed sack 14 cm across and about 30 cm
+    // long, flying bottom first with the line paying out of its top.
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> BagMesh(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
     if (BagMesh.Succeeded()) ThrowBagVisual->SetStaticMesh(BagMesh.Object);
-    ThrowBagVisual->SetRelativeScale3D(FVector(.13, .13, .13));
+    ThrowBagVisual->SetRelativeScale3D(FVector(.14, .14, .30));
 
     SternSeatAttachPoint = CreateDefaultSubobject<USceneComponent>(TEXT("SternSeatAttachPoint"));
     SternSeatAttachPoint->SetupAttachment(Root);
@@ -866,61 +867,280 @@ void ARaftSimRaftActor::BuildRaftGear(const FBox& HullBoundsCm)
         RaftGear->SetCastShadow(true);
     }
     const float TubeCm = TubeRadiusM * kCmPerM;
-    const float TopZ = HullBoundsCm.Max.Z;
-    // Section 0: the guide's throw bag, a grapefruit-sized stuff sack sitting
-    // on the stern tube beside the guide's hip where the guide can reach it,
-    // its drawstring cinched over the coiled rope.
-    FAccessoryMesh Bag, Rope, Webbing;
-    const FVector BagBase(HullBoundsCm.Min.X + 1.05f * TubeCm, -27.0f, TopZ - 1.8f);
-    constexpr int32 BagSides = 14;
-    constexpr int32 BagRings = 8;
-    constexpr float BagRadius = 6.5f;
-    constexpr float BagHeight = 13.0f;
-    for (int32 Ring = 0; Ring < BagRings; ++Ring)
+    // Everything below is placed in RaftVisual's own frame, on the surfaces
+    // it actually renders: the highest vertex of one section in a column.
+    auto SurfaceTopZ = [this](int32 SectionIndex, float X, float Y, float HalfX, float HalfY, float Fallback)
     {
-        // Round as the rope packs it, flattened where it sits and gathered
-        // at the cinched mouth.
-        const float T0 = float(Ring) / BagRings, T1 = float(Ring + 1) / BagRings;
-        auto RadiusAt = [](float T) { return BagRadius * FMath::Sqrt(1.0f - 0.75f * FMath::Square(2.0f * T - 1.0f)); };
-        Bag.Tube(BagBase + FVector(0, 0, BagHeight * T0), BagBase + FVector(0, 0, BagHeight * T1),
-            0.5f * (RadiusAt(T0) + RadiusAt(T1)), BagSides);
-    }
-    // Drawstring collar and the rope showing at the mouth.
-    for (int32 Segment = 0; Segment < 14; ++Segment)
-    {
-        auto Ring = [&](int32 Index, float R, float Z)
+        const FProcMeshSection* Section = RaftVisual->GetProcMeshSection(SectionIndex);
+        if (!Section)
         {
-            const float Angle = UE_TWO_PI * Index / 14.0f;
-            return BagBase + FVector(R * FMath::Cos(Angle), R * FMath::Sin(Angle), Z);
-        };
-        Rope.Tube(Ring(Segment, BagRadius * 0.52f, BagHeight + 0.3f), Ring(Segment + 1, BagRadius * 0.52f, BagHeight + 0.3f), 0.55f, 5);
-        Rope.Tube(Ring(Segment, BagRadius * 0.28f, BagHeight + 0.9f), Ring(Segment + 1, BagRadius * 0.28f, BagHeight + 0.9f), 0.5f, 5);
-    }
-    // Cord lock on the drawstring.
-    Webbing.Box(BagBase + FVector(BagRadius * 0.55f, 0, BagHeight + 0.4f), FVector::ForwardVector, FVector::RightVector, FVector::UpVector,
-        FVector(0.8f, 0.6f, 1.1f));
-    // Coiled bow and stern lines (painters) lying on the tube tops.
-    auto Coil = [&](const FVector& Center, float Radius, int32 Loops)
-    {
-        for (int32 Loop = 0; Loop < Loops; ++Loop)
+            return Fallback;
+        }
+        float Top = -BIG_NUMBER;
+        for (const FProcMeshVertex& Vertex : Section->ProcVertexBuffer)
         {
-            const float R = Radius * (1.0f - 0.07f * Loop);
-            for (int32 Segment = 0; Segment < 20; ++Segment)
+            if (FMath::Abs(Vertex.Position.X - X) <= HalfX && FMath::Abs(Vertex.Position.Y - Y) <= HalfY)
             {
-                auto P = [&](int32 Index)
-                {
-                    const float Angle = UE_TWO_PI * Index / 20.0f + Loop * 0.6f;
-                    return Center + FVector(R * FMath::Cos(Angle), 0.8f * R * FMath::Sin(Angle), 1.5f * Loop + 0.4f * FMath::Sin(Angle * 2.0f));
-                };
-                Rope.Tube(P(Segment), P(Segment + 1), 0.9f, 5);
+                Top = FMath::Max(Top, float(Vertex.Position.Z));
             }
         }
+        return Top > -BIG_NUMBER ? Top : Fallback;
     };
-    Coil(FVector(HullBoundsCm.Max.X - 0.9f * TubeCm, 0.0f, TopZ + 0.8f), 13.0f, 3);
-    Coil(FVector(HullBoundsCm.Min.X + 0.9f * TubeCm, 0.75f * TubeCm, TopZ + 0.8f), 12.0f, 3);
+    // Sections 0-2 are the stowed throw bag (hidden together while it is out
+    // on the water); section 3 is the bow line.
+    FAccessoryMesh Bag, BagTrim, BagRope, BowLine;
+
+    // The guide's throw bag, after the common rescue bag (NRS Standard Rescue:
+    // red Cordura, internal foam flotation, a mesh drain panel at the bottom,
+    // a flared nylon top cinched by a barrel-lock drawstring, 75 ft of 3/8"
+    // yellow floating line whose end comes out of the top on a figure-eight
+    // loop). It stands on the floor beside the guide's hip, inboard of the
+    // seat and aft of the feet, where the guide can reach it without moving
+    // ("put it on the boat floor next to the guide", 2026-10-07).
+    const float GuideSide = CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0 ? -1.0f : 1.0f;
+    const FTransform VisualToActor = RaftVisual->GetRelativeTransform();
+    const FVector GuideSeat = VisualToActor.InverseTransformPosition(RaftSimCrewSeatLayout::AnchorCm(0, true, GuideSide < 0.0f));
+    const FVector BagXY(GuideSeat.X + 5.0f, GuideSeat.Y - GuideSide * 36.0f, 0.0f);
+    const FVector BagBase(BagXY.X, BagXY.Y,
+        SurfaceTopZ(1, BagXY.X, BagXY.Y, 7.0f, 7.0f, HullBoundsCm.Min.Z + 0.4f * TubeCm) - 0.5f);
+    const FVector Up = FVector::UpVector;
+    // The rope end drapes over the rim toward the crew, where it shows.
+    const FVector Drape = FVector(0.5f, -GuideSide * 0.85f, 0.0f).GetSafeNormal();
+    const FVector Across = FVector::CrossProduct(Up, Drape);
+    auto OnBag = [&](float Height, float Radius, const FVector& Direction)
+    {
+        return BagBase + Up * Height + Direction * Radius;
+    };
+    // Body: rope-packed and slightly barrel-sided, gathered at the neck.
+    Bag.Lathe(BagBase, Up, {{0.0f, 0.0f}, {0.2f, 4.5f}, {0.6f, 6.3f}, {1.4f, 6.9f}, {4.0f, 7.0f}, {10.0f, 7.15f},
+        {16.0f, 7.2f}, {22.0f, 7.05f}, {25.0f, 6.8f}, {26.6f, 5.8f}, {27.6f, 4.4f}}, 20);
+    // Black mesh drain panel round the foot of the bag.
+    BagTrim.Lathe(BagBase, Up, {{1.5f, 7.0f}, {1.9f, 7.15f}, {6.8f, 7.22f}, {7.2f, 7.05f}}, 20);
+    // Flared nylon top, its inner wall turning back down into the bag.
+    BagTrim.Lathe(BagBase, Up, {{27.2f, 4.6f}, {28.2f, 4.4f}, {29.6f, 5.0f}, {31.0f, 6.0f}, {32.0f, 6.6f},
+        {32.4f, 6.55f}, {31.8f, 6.1f}, {30.6f, 4.9f}, {29.8f, 4.2f}}, 20);
+    // Drawstring round the gathered neck and down to its barrel lock.
+    {
+        TArray<FVector> Neck;
+        for (int32 Index = 0; Index < 18; ++Index)
+        {
+            const float Angle = UE_TWO_PI * Index / 18.0f;
+            const FVector Out = Drape * FMath::Cos(Angle) + Across * FMath::Sin(Angle);
+            Neck.Add(OnBag(27.5f + 0.15f * FMath::Sin(3.0f * Angle), 4.75f, Out));
+        }
+        BagTrim.Sweep(Neck, 0.28f, 5, true);
+        const FVector LockSide = (Drape * 0.35f + Across).GetSafeNormal();
+        for (const float Offset : {-0.45f, 0.45f})
+        {
+            const FVector Start = (LockSide + Drape * 0.1f * Offset).GetSafeNormal();
+            BagTrim.Sweep({OnBag(27.5f, 4.9f, Start), OnBag(26.6f, 6.3f, LockSide),
+                OnBag(25.4f, 7.55f, LockSide) + FVector::CrossProduct(Up, LockSide) * Offset},
+                0.26f, 5);
+            BagTrim.Sweep({OnBag(23.2f, 7.65f, LockSide) + FVector::CrossProduct(Up, LockSide) * Offset,
+                OnBag(21.4f, 7.6f, LockSide) + FVector::CrossProduct(Up, LockSide) * (Offset * 1.6f)}, 0.26f, 5);
+        }
+        BagTrim.Lathe(OnBag(23.1f, 7.85f, LockSide), Up,
+            {{0.0f, 0.0f}, {0.15f, 0.62f}, {0.5f, 0.78f}, {1.9f, 0.78f}, {2.25f, 0.62f}, {2.4f, 0.0f}}, 10);
+    }
+    // Sewn webbing grab handle near the foot, on the side away from the crew.
+    {
+        const FVector Out = -Drape;
+        TArray<FVector> Strap;
+        for (int32 Index = 0; Index <= 8; ++Index)
+        {
+            const float T = float(Index) / 8.0f;
+            Strap.Add(OnBag(FMath::Lerp(2.5f, 11.0f, T), 7.25f + 1.6f * FMath::Sin(PI * T), Out));
+        }
+        for (int32 Index = 0; Index + 1 < Strap.Num(); ++Index)
+        {
+            const FVector Along = Strap[Index + 1] - Strap[Index];
+            BagTrim.Box((Strap[Index] + Strap[Index + 1]) * 0.5f, Along, FVector::CrossProduct(Along, Out), Out,
+                FVector(0.5f * float(Along.Size()) + 0.05f, 1.25f, 0.13f));
+        }
+    }
+    // The rope end: out of the top, a figure-eight knot, and its loop laid
+    // over the rim and down the side.
+    {
+        const float RopeR = 0.5f;
+        BagRope.Sweep({OnBag(29.5f, 0.6f, Across), OnBag(32.0f, 0.4f, Across), OnBag(33.6f, 0.2f, Drape)}, RopeR, 6);
+        BagRope.Lathe(OnBag(33.3f, 0.3f, Drape), (Up + Drape * 0.35f).GetSafeNormal(),
+            {{0.0f, 0.0f}, {0.3f, 1.0f}, {1.2f, 1.35f}, {2.2f, 1.25f}, {2.9f, 0.8f}, {3.2f, 0.0f}}, 10);
+        // (radius, height) along the loop's centre: off the knot, over the
+        // rim, and hanging down the side against the bag.
+        const TArray<FVector2f> Centre = {{0.6f, 36.0f}, {3.5f, 36.0f}, {6.0f, 34.6f}, {7.1f, 32.6f},
+            {7.2f, 29.6f}, {7.35f, 26.6f}, {7.55f, 24.6f}};
+        TArray<FVector> Eye, Back;
+        constexpr int32 Steps = 22;
+        for (int32 Step = 0; Step <= Steps; ++Step)
+        {
+            const float U = float(Step) / Steps * (Centre.Num() - 1);
+            const int32 I = FMath::Min(int32(U), Centre.Num() - 2);
+            const float F = U - I;
+            const FVector2f P0 = Centre[FMath::Max(I - 1, 0)], P1 = Centre[I], P2 = Centre[I + 1],
+                P3 = Centre[FMath::Min(I + 2, Centre.Num() - 1)];
+            const FVector2f P = 0.5f * ((2.0f * P1) + (P2 - P0) * F + (2.0f * P0 - 5.0f * P1 + 4.0f * P2 - P3) * F * F +
+                (3.0f * P1 - P0 - 3.0f * P2 + P3) * F * F * F);
+            const float T = float(Step) / Steps;
+            const float Half = 2.6f * FMath::Sqrt(FMath::Max(0.0f, 1.0f - FMath::Square(2.0f * T - 1.0f))) + 0.3f * (1.0f - T);
+            const FVector Point = OnBag(P.Y, P.X, Drape);
+            Eye.Add(Point + Across * Half);
+            Back.Insert(Point - Across * Half, 0);
+        }
+        Eye.Append(Back);
+        BagRope.Sweep(Eye, RopeR, 6, true);
+    }
+
+    // Bow line, tied off neatly: the standing end made fast round the bow
+    // grab line with a round turn and two half hitches, the rest flaked into
+    // a coil, collapsed into a hank, wrapped and laid along the top of the bow
+    // tube between the carry handles — nothing loose to snag a swimmer.
+    {
+        float CrestX = HullBoundsCm.Max.X - TubeCm, CrestZ = HullBoundsCm.Max.Z, FrontX = HullBoundsCm.Max.X - 1.0f;
+        if (const FProcMeshSection* Tube = RaftVisual->GetProcMeshSection(0))
+        {
+            float BestZ = -BIG_NUMBER, BestFront = -BIG_NUMBER;
+            for (const FProcMeshVertex& Vertex : Tube->ProcVertexBuffer)
+            {
+                if (Vertex.Position.X < 0.0f || FMath::Abs(Vertex.Position.Y) > 4.0f)
+                {
+                    continue;
+                }
+                if (Vertex.Position.Z > BestZ)
+                {
+                    BestZ = float(Vertex.Position.Z);
+                    CrestX = float(Vertex.Position.X);
+                }
+                BestFront = FMath::Max(BestFront, float(Vertex.Position.X));
+            }
+            if (BestZ > -BIG_NUMBER)
+            {
+                CrestZ = BestZ;
+                FrontX = BestFront;
+            }
+        }
+        const float BowR = FMath::Max(FrontX - CrestX, 10.0f);
+        const FVector BowCentre(CrestX, 0.0f, CrestZ - BowR);
+        // The grab line rounds the bow outboard of the skin and a little above
+        // the tube's equator; find it among the rigging if it is there.
+        FVector Grab = BowCentre + FVector(BowR + 1.5f, 0.0f, 5.8f);
+        if (const FProcMeshSection* Rigging = RaftVisual->GetProcMeshSection(2))
+        {
+            FVector Sum = FVector::ZeroVector;
+            int32 Count = 0;
+            for (const FProcMeshVertex& Vertex : Rigging->ProcVertexBuffer)
+            {
+                if (FMath::Abs(Vertex.Position.Y) < 2.5f && Vertex.Position.X > CrestX + 0.6f * BowR)
+                {
+                    Sum += FVector(Vertex.Position);
+                    ++Count;
+                }
+            }
+            if (Count > 0)
+            {
+                Grab = Sum / Count;
+            }
+        }
+        constexpr float LineR = 0.62f; // 1/2" line
+        // A point on the bow tube's skin, Angle degrees forward of its crest.
+        auto OnBow = [&](float Angle, float Y, float Lift)
+        {
+            const float Radians = FMath::DegreesToRadians(Angle);
+            return BowCentre + FVector((BowR + Lift) * FMath::Sin(Radians), Y, (BowR + Lift) * FMath::Cos(Radians));
+        };
+        // The hank: loops collapsed side by side, each a long stadium, their
+        // planes fanned round the hank's axis so the strands pack in a bundle.
+        const FVector HankCentre = OnBow(-4.0f, 0.0f, 3.0f);
+        constexpr int32 Loops = 7;
+        constexpr float HankHalfLength = 17.0f;
+        const float WrapCentreY = 9.0f, WrapHalfWidth = 2.6f;
+        auto Pinch = [&](float Y)
+        {
+            return 1.0f - 0.5f * FMath::SmoothStep(0.0f, 1.0f, 1.0f - FMath::Clamp((FMath::Abs(Y - WrapCentreY) - WrapHalfWidth) / 4.0f, 0.0f, 1.0f));
+        };
+        for (int32 Loop = 0; Loop < Loops; ++Loop)
+        {
+            const float Fan = PI * (Loop + 0.5f) / Loops;
+            const FVector Spread = FVector(FMath::Cos(Fan), 0.0f, FMath::Sin(Fan));
+            const float Width = (Loop % 2 ? 1.55f : 2.25f);
+            const float Length = HankHalfLength + 0.7f * FMath::Sin(2.3f * Loop);
+            TArray<FVector> Points;
+            for (int32 Step = 0; Step < 36; ++Step)
+            {
+                const float T = UE_TWO_PI * Step / 36.0f;
+                const float C = FMath::Cos(T), S = FMath::Sin(T);
+                const float Y = Length * FMath::Sign(C) * FMath::Pow(FMath::Abs(C), 0.35f);
+                Points.Add(HankCentre + FVector(0.0f, Y, 0.0f) + Spread * (Width * S * Pinch(Y)));
+            }
+            BowLine.Sweep(Points, LineR, 6, true);
+        }
+        // Five tight wraps round the hank, the tail tucked back through.
+        {
+            TArray<FVector> Wraps;
+            const float WrapR = 2.25f * 0.5f + 2.0f * LineR;
+            constexpr int32 Turns = 5;
+            for (int32 Step = 0; Step <= Turns * 12; ++Step)
+            {
+                const float T = float(Step) / (Turns * 12);
+                const float Angle = UE_TWO_PI * Turns * T;
+                Wraps.Add(HankCentre + FVector(WrapR * FMath::Cos(Angle), WrapCentreY - WrapHalfWidth + 2.0f * WrapHalfWidth * T,
+                    WrapR * FMath::Sin(Angle)));
+            }
+            Wraps.Add(HankCentre + FVector(0.0f, WrapCentreY + WrapHalfWidth + 2.5f, 0.4f));
+            Wraps.Add(HankCentre + FVector(-0.6f, HankHalfLength - 2.5f, 0.2f));
+            BowLine.Sweep(Wraps, LineR, 6);
+        }
+        // Standing part: off the hank's near end, forward over the bow and
+        // down its face to the grab line.
+        const float KnotY = -3.0f;
+        const float GrabAngle = FMath::RadiansToDegrees(FMath::Atan2(Grab.X - BowCentre.X, Grab.Z - BowCentre.Z));
+        TArray<FVector> Standing = {HankCentre + FVector(0.8f, -HankHalfLength + 1.0f, -0.6f),
+            HankCentre + FVector(3.0f, -HankHalfLength - 1.5f, -1.4f)};
+        for (int32 Step = 1; Step <= 8; ++Step)
+        {
+            const float T = float(Step) / 8.0f;
+            Standing.Add(OnBow(FMath::Lerp(10.0f, GrabAngle - 6.0f, T),
+                FMath::Lerp(-HankHalfLength - 2.0f, KnotY - 1.0f, FMath::Min(T / 0.6f, 1.0f)), LineR + 0.1f));
+        }
+        Standing.Add(Grab + FVector(0.0f, KnotY - 1.0f, 1.2f + 2.0f * LineR));
+        BowLine.Sweep(Standing, LineR, 6);
+        // Round turn on the grab line (which runs athwartships at the bow).
+        {
+            TArray<FVector> Turn;
+            const float TurnR = 1.2f + LineR;
+            for (int32 Step = 0; Step <= 24; ++Step)
+            {
+                const float T = float(Step) / 24.0f;
+                const float Angle = PI * 0.5f + UE_TWO_PI * 2.0f * T;
+                Turn.Add(Grab + FVector(TurnR * FMath::Cos(Angle), KnotY - 0.8f + 2.6f * T, TurnR * FMath::Sin(Angle)));
+            }
+            // Out of the turn and up beside the standing part into the hitches.
+            Turn.Add(Grab + FVector(-0.4f, KnotY + 2.4f, 3.4f));
+            Turn.Add(OnBow(GrabAngle - 7.0f, KnotY + 0.4f, LineR + 0.9f));
+            BowLine.Sweep(Turn, LineR, 6);
+        }
+        // Two half hitches round the standing part, snugged up to the turn.
+        for (int32 Hitch = 0; Hitch < 2; ++Hitch)
+        {
+            const float Angle = GrabAngle - 10.0f - 3.5f * Hitch;
+            const FVector Centre = OnBow(Angle, KnotY - 1.0f, LineR + 0.1f);
+            const float Radians = FMath::DegreesToRadians(Angle);
+            const FVector Axis(FMath::Cos(Radians), 0.0f, -FMath::Sin(Radians));
+            const FVector U = FVector::CrossProduct(Axis, FVector::RightVector).GetSafeNormal();
+            const FVector V = FVector::CrossProduct(Axis, U);
+            TArray<FVector> Ring;
+            for (int32 Step = 0; Step < 12; ++Step)
+            {
+                const float Turn = UE_TWO_PI * Step / 12.0f;
+                Ring.Add(Centre + (U * FMath::Cos(Turn) + V * FMath::Sin(Turn)) * (2.0f * LineR + 0.15f) +
+                    Axis * (0.5f * LineR * FMath::Sin(Turn)));
+            }
+            BowLine.Sweep(Ring, LineR, 6, true);
+        }
+    }
     Bag.Commit(RaftGear, 0);
-    Rope.Commit(RaftGear, 1);
-    Webbing.Commit(RaftGear, 2);
+    BagTrim.Commit(RaftGear, 1);
+    BagRope.Commit(RaftGear, 2);
+    BowLine.Commit(RaftGear, 3);
     auto Tinted = [this](const TCHAR* Path, const FLinearColor& Tint) -> UMaterialInterface*
     {
         UMaterialInterface* Base = LoadObject<UMaterialInterface>(nullptr, Path);
@@ -932,13 +1152,16 @@ void ARaftSimRaftActor::BuildRaftGear(const FBox& HullBoundsCm)
         Instance->SetVectorParameterValue(TEXT("BaseTint"), Tint);
         return Instance;
     };
-    // Rescue-red bag, yellow floating throw rope, black cord lock.
+    // Rescue-red bag with black trim and yellow floating throw line; a blue
+    // bow line so it reads apart from the yellow perimeter line.
     RaftGear->SetMaterial(0, Tinted(TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD"),
         FLinearColor(0.30f, 0.010f, 0.006f)));
-    RaftGear->SetMaterial(1, Tinted(TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftRigging.M_RaftSim_RaftRigging"),
-        FLinearColor(0.45f, 0.30f, 0.010f)));
-    RaftGear->SetMaterial(2, LoadObject<UMaterialInterface>(nullptr,
+    RaftGear->SetMaterial(1, LoadObject<UMaterialInterface>(nullptr,
         TEXT("/Game/RaftSim/Materials/M_RaftSim_PFDWebbing.M_RaftSim_PFDWebbing")));
+    RaftGear->SetMaterial(2, Tinted(TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftRigging.M_RaftSim_RaftRigging"),
+        FLinearColor(0.45f, 0.30f, 0.010f)));
+    RaftGear->SetMaterial(3, Tinted(TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftRigging.M_RaftSim_RaftRigging"),
+        FLinearColor(0.015f, 0.05f, 0.20f)));
 }
 
 bool ARaftSimRaftActor::GetRenderedFloorCenterWorldZCm(float& OutWorldZCm) const
@@ -1291,11 +1514,13 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
         SeatCm, Avatar->GetSeatedContactPointsLocalCm(), RenderedSeatZCm);
     if (bRenderedContact)
     {
-        // Fit the actual posed glute to the triangle directly beneath it.
-        // A small overlap represents compressed neoprene, not a guessed
-        // correction to an unrelated procedural body's pelvis extent.
-        constexpr float RenderedContactCompressionCm = 1.0f;
-        SeatCm.Z = RenderedSeatZCm - RenderedContactCompressionCm;
+        // Fit the actual posed glute to the triangle directly beneath it,
+        // then let both give: a seated person's buttocks and an inflated
+        // tube flatten into each other. One centimetre left a round seat
+        // touching a round tube along a line, daylight down both sides ("the
+        // crew butts are not sitting fully on the boat", 2026-10-07); 3.5 cm
+        // gives a contact patch about 25 cm wide.
+        SeatCm.Z = RenderedSeatZCm - RenderedSeatContactCompressionCm;
     }
     else if (bTubeFound)
     {
@@ -1325,15 +1550,15 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     Avatar->SetActorRelativeRotation(FRotator::ZeroRotator);
     Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
     // Foot fitting moves thigh-weighted glute vertices. Reconcile the actual
-    // body contact without changing the existing one-centimetre compression.
+    // body contact without changing the seat compression.
     if (bRenderedContact)
     {
         for (int32 Iteration = 0; Iteration < 8; ++Iteration)
         {
             const float Clearance = GetCrewSeatContactClearanceCm(Avatar);
             if (!FMath::IsFinite(Clearance) || FMath::Abs(Clearance) > 10.0f ||
-                FMath::Abs(Clearance+1.0f) < 0.01f) break;
-            SeatCm.Z += -1.0f-Clearance;
+                FMath::Abs(Clearance + RenderedSeatContactCompressionCm) < 0.01f) break;
+            SeatCm.Z += -RenderedSeatContactCompressionCm - Clearance;
             Avatar->SetActorRelativeLocation(SeatCm);
             Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
         }

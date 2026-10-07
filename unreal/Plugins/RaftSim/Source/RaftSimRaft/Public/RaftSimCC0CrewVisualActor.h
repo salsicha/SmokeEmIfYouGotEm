@@ -9,6 +9,28 @@ class UPoseableMeshComponent;
 class UProceduralMeshComponent;
 class USceneComponent;
 
+/** A bar one hand closes round: the paddle shaft, the T-grip's crossbar or an
+ * oar handle (RaftSimCC0CrewGrip.cpp). */
+struct FRaftSimCC0GripBar
+{
+    FVector CenterCm = FVector::ZeroVector;
+    /** Along the bar, toward the thumb's side of the fist. */
+    FVector ThumbAxis = FVector::ZeroVector;
+    /** The way the palm faces: from the hand toward the bar. */
+    FVector PalmFacing = FVector::ZeroVector;
+    float RadiusCm = 0.0f;
+};
+
+/** One hand's finger and thumb bones closed round a bar of one radius, as
+ * transforms relative to the reference hand bone. */
+struct FRaftSimCC0HandGripShape
+{
+    TArray<FName> Bones;
+    TArray<FTransform> HandRelative;
+    float MaximumPadErrorCm = 0.0f;
+    float ThumbPadErrorCm = 0.0f;
+};
+
 /**
  * Packaged CC0 human body used by the production guide/crew adapter.
  *
@@ -67,11 +89,28 @@ public:
         return MaximumPaddleThumbContactErrorCm;
     }
 
-    /** Worst middle-finger/thumb radial dot; negative means opposed. */
+    /** Worst alignment of a gripping palm with the direction to its bar
+     * (1: the palm faces the bar squarely). */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
-    float GetMaximumPaddleThumbOppositionDot() const
+    float GetMinimumPaddlePalmFacingDot() const
     {
-        return MaximumPaddleThumbOppositionDot;
+        return MinimumPaddlePalmFacingDot;
+    }
+
+    /** Worst alignment of a gripping finger's curl with its palm (positive:
+     * the finger bends toward the palm, as a finger can). */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMinimumPaddleFingerCurlTowardPalm() const
+    {
+        return MinimumPaddleFingerCurlTowardPalm;
+    }
+
+    /** Largest twist left to a gripping wrist after the forearm takes its
+     * share, in degrees. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumGripWristTwistDegrees() const
+    {
+        return MaximumGripWristTwistDegrees;
     }
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
@@ -208,17 +247,20 @@ private:
     void MeasureVestFit();
     void ApplyPaddleGripPose(const FRaftSimCrewAvatarPose& Pose);
     void ApplyFingerChain(bool bLeft, const TCHAR* Digit, float GripAlpha);
-    void ApplyFingerChainAroundGrip(
-        bool bLeft,
-        const TCHAR* Digit,
-        const FVector& GripCenterCm,
-        const FVector& GripAxis,
-        bool bUpperTGrip);
-    void ApplyOpposedThumbPadToGrip(
-        bool bLeft,
-        const FVector& GripCenterCm,
-        const FVector& GripAxis,
-        bool bUpperTGrip);
+    // Grip solver (RaftSimCC0CrewGrip.cpp).
+    bool ResolveHandAnatomy(bool bLeft, FVector& OutWristCm, FVector& OutFingers, FVector& OutThumb,
+        FVector& OutPalm, float& OutHandedness) const;
+    float MeasurePalmSurfaceOffsetCm(bool bLeft) const;
+    bool ResolveGripBar(bool bLeft, const FRaftSimCrewAvatarPose& Pose, FRaftSimCC0GripBar& OutBar) const;
+    FQuat ResolveGripHandDelta(bool bLeft, const FRaftSimCC0GripBar& Bar) const;
+    FVector ResolveGripPointInReferenceHandCm(bool bLeft, float RadiusCm) const;
+    FVector ResolveGripWristCm(bool bLeft, const FRaftSimCC0GripBar& Bar) const;
+    const FRaftSimCC0HandGripShape& ResolveHandGripShape(bool bLeft, float RadiusCm) const;
+    void ApplyHandGripShape(bool bLeft, float RadiusCm);
+    float ForearmTwistDegrees(bool bLeft, const FVector& ElbowCm, const FVector& WristCm,
+        const FQuat& HandRotation) const;
+    void MeasurePaddleGripOrientation(const FRaftSimCrewAvatarPose& Pose, float& OutMinimumPalmFacingDot,
+        float& OutMinimumFingerCurlTowardPalm) const;
     void SetPaddleGripHandTransform(
         bool bLeft,
         const FRaftSimCrewAvatarPose& Pose,
@@ -238,15 +280,12 @@ private:
     FQuat ResolvePaddleGripHandRotation(
         bool bLeft,
         const FRaftSimCrewAvatarPose& Pose) const;
-    FVector ResolvePaddleGripAxis(
-        const FRaftSimCrewAvatarPose& Pose,
-        const FVector& DesiredGripCm) const;
     bool IsUpperTGrip(
         const FRaftSimCrewAvatarPose& Pose,
         const FVector& DesiredGripCm) const;
     float MeasurePaddleGripAnchorErrorCm(
         bool bLeft,
-        const FVector& DesiredGripCm) const;
+        const FRaftSimCrewAvatarPose& Pose) const;
     float MeasureMinimumPaddleFingerClosureDegrees(
         const FRaftSimCrewAvatarPose& Pose,
         bool bUpperTGrip) const;
@@ -254,8 +293,6 @@ private:
     float MeasureMaximumPaddleFingerContactErrorCm(
         const FRaftSimCrewAvatarPose& Pose) const;
     float MeasureMaximumPaddleThumbContactErrorCm(
-        const FRaftSimCrewAvatarPose& Pose) const;
-    float MeasureMaximumPaddleThumbOppositionDot(
         const FRaftSimCrewAvatarPose& Pose) const;
 
     UPROPERTY(VisibleAnywhere)
@@ -284,7 +321,15 @@ private:
     float MaximumPaddleGripAnchorErrorCm = 0.0f;
     float MaximumPaddleFingerContactErrorCm = 0.0f;
     float MaximumPaddleThumbContactErrorCm = 0.0f;
-    float MaximumPaddleThumbOppositionDot = -1.0f;
+    float MinimumPaddlePalmFacingDot = 1.0f;
+    float MinimumPaddleFingerCurlTowardPalm = 1.0f;
+    float MaximumGripWristTwistDegrees = 0.0f;
+    /** The action being posed: a resting paddle lies flat across the lap. */
+    ERaftSimCrewAvatarAction PoseAction = ERaftSimCrewAvatarAction::SeatedIdle;
+    /** Finger shapes per hand and bar radius, and each palm's surface depth;
+     * both depend on the loaded body and are reset with its reference pose. */
+    mutable TMap<int32, FRaftSimCC0HandGripShape> HandGripShapes;
+    mutable float PalmSurfaceOffsetCm[2] = {-1.0f, -1.0f};
     float MinimumUpperPaddleFingerClosureDegrees = 0.0f;
     float MinimumLowerPaddleFingerClosureDegrees = 0.0f;
     float MinimumPaddleThumbClosureDegrees = 0.0f;

@@ -36,13 +36,14 @@ bool FRaftSimRigidCrewPaddleTest::RunTest(const FString&)
     for (int32 Side : {-1, 1})
     {
         const auto Idle = URaftSimCrewAvatarPoseLibrary::EvaluatePose(ERaftSimCrewAvatarAction::SeatedIdle, 0, Side);
-        // The resting line lies on the thighs, not in them (2026-10-06), and
-        // each hand holds it beside a thigh.
+        // The resting line lies on the thighs, not in them (2026-10-06); the
+        // upper hand holds the T-grip and the lower one the shaft beside the
+        // outboard thigh (2026-10-07).
         const double RestAuthoredLength = FVector(8, 97, -3.5).Size();
         TestTrue(TEXT("rest top, blade height and grip distances are unchanged"),
-            Idle.PaddleTopCm.Equals(FVector(22, -45 * Side, 50.5), 0.0001) &&
-            FMath::Abs(Idle.PaddleBottomCm.Z - 47.0) < 0.0001 &&
-            FMath::Abs(FVector::Distance(Side < 0 ? Idle.RightHandCm : Idle.LeftHandCm, Idle.PaddleTopCm) - 0.08 * RestAuthoredLength) < 0.0001 &&
+            Idle.PaddleTopCm.Equals(FVector(22, -45 * Side, 51.7), 0.0001) &&
+            FMath::Abs(Idle.PaddleBottomCm.Z - 48.2) < 0.0001 &&
+            FVector::Distance(Side < 0 ? Idle.RightHandCm : Idle.LeftHandCm, Idle.PaddleTopCm) < 0.0001 &&
             FMath::Abs(FVector::Distance(Side < 0 ? Idle.LeftHandCm : Idle.RightHandCm, Idle.PaddleTopCm) - 0.63 * RestAuthoredLength) < 0.0001);
         const auto Catch = URaftSimCrewAvatarPoseLibrary::EvaluatePose(ERaftSimCrewAvatarAction::ForwardStroke, 0, Side);
         const auto Finish = URaftSimCrewAvatarPoseLibrary::EvaluatePose(ERaftSimCrewAvatarAction::ForwardStroke, 0.58f, Side);

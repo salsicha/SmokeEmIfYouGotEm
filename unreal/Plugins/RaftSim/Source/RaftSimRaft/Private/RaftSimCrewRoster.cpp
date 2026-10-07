@@ -84,6 +84,11 @@ TArray<FRaftSimCrewIdentity> BuildRoster()
         Kwame.Bottom.AccentColor = FLinearColor(0.55f, 0.36f, 0.030f);
         Kwame.Bottom.PrintAmount = 1.0f;
         Kwame.Bottom.PrintScaleCm = 18.0f;
+        // Everyone on the water wears sunglasses (2026-10-07): Kwame's are
+        // matte black wraparounds with smoke lenses.
+        Kwame.bWearsSunglasses = true;
+        Kwame.EyewearFrameColor = FLinearColor(0.012f, 0.012f, 0.014f);
+        Kwame.LensColor = FLinearColor(0.020f, 0.022f, 0.024f);
         Kwame.WetsuitTint = FLinearColor(0.010f, 0.011f, 0.012f);
         Kwame.JacketColor = FLinearColor(0.10f, 0.20f, 0.010f);
         Kwame.Nerves = 0.12f;
@@ -123,10 +128,11 @@ TArray<FRaftSimCrewIdentity> BuildRoster()
         Kenji.Bottom = Garment(TEXT("stone walking shorts"), FLinearColor(0.22f, 0.20f, 0.16f), 0.80f, 0.03f);
         Kenji.WetsuitTint = FLinearColor(0.008f, 0.012f, 0.022f);
         Kenji.JacketColor = FLinearColor(0.060f, 0.064f, 0.070f);
+        // Prescription sunglasses: the thin titanium frame with grey-green
+        // tinted lenses.
         Kenji.bWearsSunglasses = true;
-        Kenji.bClearLenses = true;
         Kenji.EyewearFrameColor = FLinearColor(0.25f, 0.25f, 0.27f);
-        Kenji.LensColor = FLinearColor(0.30f, 0.32f, 0.33f);
+        Kenji.LensColor = FLinearColor(0.030f, 0.040f, 0.030f);
         Kenji.Nerves = 0.35f;
         Kenji.SwimAbility = ERaftSimCrewSwimAbility::Average;
         // Steady eyes front; the occasional look at the gorge walls.
@@ -194,6 +200,10 @@ TArray<FRaftSimCrewIdentity> BuildRoster()
         Amara.Top = Garment(TEXT("oversized lavender T-shirt"), FLinearColor(0.28f, 0.20f, 0.46f), 0.88f, 0.08f);
         Amara.Bottom = Garment(TEXT("charcoal running shorts"), FLinearColor(0.035f, 0.035f, 0.040f), 0.60f, 0.0f);
         Amara.WetsuitTint = FLinearColor(0.011f, 0.010f, 0.012f);
+        // Tortoiseshell-brown sport frame with brown lenses.
+        Amara.bWearsSunglasses = true;
+        Amara.EyewearFrameColor = FLinearColor(0.085f, 0.035f, 0.012f);
+        Amara.LensColor = FLinearColor(0.060f, 0.030f, 0.012f);
         Amara.JacketColor = FLinearColor(0.30f, 0.020f, 0.060f);
         Amara.Nerves = 0.80f;
         Amara.SwimAbility = ERaftSimCrewSwimAbility::Weak;

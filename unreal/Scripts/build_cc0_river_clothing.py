@@ -13,7 +13,9 @@ per person -- a top and a bottom -- from the body surface itself:
   flaring toward loose hems) and solidified to fabric thickness;
 - body faces fully under a garment take the garment's slot (anything that
   pokes through while posed shows the same fabric), and the rest of the
-  former wetsuit -- forearms, lower legs, feet -- becomes skin.
+  former wetsuit -- forearms, lower legs, feet -- becomes skin;
+- a top's collar closes in to hug the neck, and its skin weights are
+  smoothed round the neckline so the collar moves as one band.
 
 The shells keep the body's skeleton and weights, so the poseable mesh drives
 them like the body. One correction to those weights: the seat's midline
@@ -40,7 +42,7 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 
-GENERATOR_VERSION = 3
+GENERATOR_VERSION = 4
 
 # Sides: MPFB's game_engine rig puts the character's left at +X; the front
 # faces -Y; metres, rest pose standing in an A-pose.
@@ -99,6 +101,18 @@ PREVIEW_COLOURS = {"top": (0.55, 0.62, 0.68, 1.0), "bottom": (0.30, 0.31, 0.24, 
 # joints, the neighbourhood each pass averages over, the number of passes,
 # and the height over which the change fades out at the top and bottom.
 SEAT_FILL = {"half_width": 0.05, "below": 0.16, "above": 0.04, "radius": 0.035, "passes": 25, "fade": 0.03}
+# A top's collar (metres): the band below the neckline that closes in on the
+# neck, the shell's offset at the neckline itself (just over the fabric's
+# thickness, which solidify lays inward), and the weight-smoothing passes.
+COLLAR_BAND = 0.04
+COLLAR_OFFSET = FABRIC_THICKNESS + 0.002
+COLLAR_WEIGHT_BAND = 0.02
+COLLAR_WEIGHT_PASSES = 6
+# Body faces right under the snug collar wear the shirt, so skin that moves
+# through the collar band while posed reads as fabric (the general
+# COVER_MARGIN left a ring of skin there that showed through in patches).
+NECKLINE_COVER_MARGIN = 0.002
+MAX_INFLUENCES = 4
 
 
 def _arguments() -> argparse.Namespace:
@@ -157,6 +171,8 @@ class Garment:
         self.kind = kind
         self.spec = spec
         self.excluded = HAND_BONES if kind == "top" else ARM_BONES | {"head", "neck_01"}
+        # A top's neckline plane (point, outward normal); None for a bottom.
+        self.neckline: tuple[Vector, Vector] | None = None
         # A top hangs over the bottom garment's waistband (set by main()).
         self.under_waist_z: float | None = None
         self.under_offset = 0.0
@@ -174,6 +190,7 @@ class Garment:
             neck_base = bones.head["neck_01"]
             neckline = (Vector((0.0, neck_base.y, neck_base.z - 0.016)), Vector((0.0, -0.45, 1.0)))
             self.cuts.append((neckline[0], neckline[1].normalized(), None))
+            self.neckline = (neckline[0], neckline[1].normalized())
             hem = (Vector((0.0, 0.0, spec["hem_z"])), Vector((0.0, 0.0, -1.0)))
             self.cuts.append((hem[0], hem[1], None))
             self.hems.append((hem[0], hem[1], None, flare * 0.6, 0.12))
@@ -218,7 +235,8 @@ class Garment:
         for point, normal, bone_filter in self.cuts:
             if bone_filter is not None and dominant not in bone_filter:
                 continue
-            if (position - point).dot(normal) > -margin:
+            cut_margin = NECKLINE_COVER_MARGIN if self.neckline is not None and point is self.neckline[0] else margin
+            if (position - point).dot(normal) > -cut_margin:
                 return False
         return True
 
@@ -297,6 +315,26 @@ def _build_shell(body: bpy.types.Object, garment: Garment, dominant: list[str],
                          context="FACES")
         bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
 
+    # The collar hugs the neck: within COLLAR_BAND of the neckline the shell
+    # closes in to just over the fabric's thickness, and its skin weights are
+    # smoothed round and across the band. Pushed out a full offset, the
+    # collar stood off the neck and from above showed a dark trench behind
+    # it; and the cut edge mixed neck and spine weights vertex by vertex, so
+    # with the head bowed the collar went saw-toothed ("the crew necks
+    # aren't attached to the back, there is a gap where the spine would
+    # be", 2026-10-07).
+    collar: dict = {}
+    if garment.neckline is not None:
+        point, normal = garment.neckline
+        for vertex in bm.verts:
+            depth = -(vertex.co - point).dot(normal)
+            if depth < COLLAR_BAND:
+                collar[vertex] = max(depth, 0.0)
+        deform = bm.verts.layers.deform.active
+        if deform is not None:
+            edge = {vertex: depth for vertex, depth in collar.items() if depth < COLLAR_WEIGHT_BAND}
+            _smooth_weights(edge, deform, COLLAR_WEIGHT_PASSES)
+
     bm.normal_update()
     spec = garment.spec
     rest = {vertex: (vertex.co.copy(), vertex.normal.copy()) for vertex in bm.verts}
@@ -313,11 +351,14 @@ def _build_shell(body: bpy.types.Object, garment: Garment, dominant: list[str],
             distance = (vertex.co - point).dot(normal)  # <= 0 inside
             ramp = max(0.0, min(1.0, 1.0 + distance / length))
             extra = max(extra, flare * ramp * ramp * (3.0 - 2.0 * ramp))
-        vertex.co += vertex.normal * (offset + extra)
+        push = offset + extra
+        if vertex in collar:
+            push = COLLAR_OFFSET + (push - COLLAR_OFFSET) * _smoothstep(collar[vertex] / COLLAR_BAND)
+        vertex.co += vertex.normal * push
         # Relaxing below pulls the shell back in on convex body parts; keep
         # most of the offset, and over the bottom garment's waistband keep
         # the top clear of it.
-        floor = 0.6 * offset
+        floor = min(0.6 * offset, push)
         if garment.under_waist_z is not None and vertex.co.z < garment.under_waist_z + 0.02:
             floor = max(floor, garment.under_offset + FABRIC_THICKNESS + 0.003)
         minimum[vertex] = floor
@@ -391,6 +432,33 @@ def _return_strays_to_body(shell: bpy.types.Object, body: bpy.types.Object, spec
 def _smoothstep(t: float) -> float:
     t = min(1.0, max(0.0, t))
     return t * t * (3.0 - 2.0 * t)
+
+
+def _smooth_weights(region: dict, deform, passes: int) -> None:
+    """Average each region vertex's skin weights with its edge neighbours'
+    (neighbours outside the region anchor it), keeping the strongest
+    MAX_INFLUENCES and renormalising."""
+    for _ in range(passes):
+        updated = {}
+        for vertex in region:
+            neighbours = [edge.other_vert(vertex) for edge in vertex.link_edges]
+            if not neighbours:
+                continue
+            mixed: dict[int, float] = {}
+            for group, weight in vertex[deform].items():
+                mixed[group] = mixed.get(group, 0.0) + 0.5 * weight
+            for neighbour in neighbours:
+                for group, weight in neighbour[deform].items():
+                    mixed[group] = mixed.get(group, 0.0) + 0.5 * weight / len(neighbours)
+            strongest = sorted(mixed.items(), key=lambda item: -item[1])[:MAX_INFLUENCES]
+            total = sum(weight for _, weight in strongest)
+            if total > 0.0:
+                updated[vertex] = [(group, weight / total) for group, weight in strongest]
+        for vertex, weights in updated.items():
+            layer = vertex[deform]
+            layer.clear()
+            for group, weight in weights:
+                layer[group] = weight
 
 
 def _fill_seat_thigh_share(mesh: bpy.types.Object, bones: Bones) -> int:

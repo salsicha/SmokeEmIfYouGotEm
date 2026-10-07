@@ -89,11 +89,11 @@ HAIR_TEXTURES = {
 # dresses the MPFB bodies in FBX/ (verified below as its inputs) and writes
 # the dressed FBXs, hashed here, to Dressed/.
 CHARACTERS = {
-    "Guide": ("young_lightskinned_male_diffuse.png", "d722dff3b82883439597bbe019f2265e095bbdbd749a1486cc5d81750357aaee"),
-    "Crew01": ("young_darkskinned_male_diffuse.png", "416ee3745c86291062e444a98b9a6734b79059e0a297e671842587fbc033dbfd"),
-    "Crew02": ("young_lightskinned_male_diffuse3.png", "7b167ec24dcbf9621860ccdcb783055819c843ae53c1901ba93360ebf3cd96c8"),
-    "Crew03": ("young_lightskinned_female_diffuse.png", "335b6701c914e3d9654015eeae7c4ca43f8166826804fc6c8783dc23231092e3"),
-    "Crew04": ("young_darkskinned_female_diffuse.png", "41543f63ca531adab71b55dd1972544331f2823bb657ce22f91ebc6b23471e55"),
+    "Guide": ("young_lightskinned_male_diffuse.png", "6e46abfdac7c8bc501fe2c205b56a3388c5c3411883bf9fc87a6e0a7a81fcdeb"),
+    "Crew01": ("young_darkskinned_male_diffuse.png", "2d7e0bee10901c652fdb2ab44da7778a40e43ee22c5c4a377d541a1aff3de26a"),
+    "Crew02": ("young_lightskinned_male_diffuse3.png", "4f6f4bfbdcef6737727d3688efeadce0c993accdbd952990cea4017507d045f9"),
+    "Crew03": ("young_lightskinned_female_diffuse.png", "f75fd3987a0f141cd56f6dec6e59cc27797419973bdf632d0a01bd93abec7fd4"),
+    "Crew04": ("young_darkskinned_female_diffuse.png", "a2a961d9029700010d738ee5133d7ee356973ff62bb6633b834088c4401d8f8f"),
 }
 UNDRESSED_BODY_SHA256 = {
     "Guide": "49506857a5f208ab8a6f911931ee7dbfd72fc589f6bfd6ee6f4673a3d65a3f2f",

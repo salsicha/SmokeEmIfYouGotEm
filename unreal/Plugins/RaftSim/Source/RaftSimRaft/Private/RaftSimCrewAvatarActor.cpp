@@ -1172,27 +1172,44 @@ void ApplyMirroredPaddleGrip(
     float SeatSide,
     float LowerHandAlpha = 0.55f);
 
-// One forward stroke, landmarks only. Catch (Wave 1): leaning forward with
-// the paddle-side shoulder rotated ahead, the blade planted 60 cm forward
-// with the shaft leaning forward at its foot. Power: the blade travels back
-// to the hip while the top hand drives forward and a little down, standing
-// the shaft past vertical by the exit. Recovery: the blade lifts clear and
-// swings forward low over the water.
+// One forward stroke, landmarks only, driven from the torso and core as a
+// rafter paddles (2026-10-07: "a person leans forward and the paddle goes
+// vertically into the water, and for the pull back part of the stroke, the
+// body goes from a lean forward position to a lean back position").
+// - Catch (Wave 1): leaning well forward with the paddle-side shoulder turned
+//   ahead, the top hand stacked out over the water above the blade, which
+//   plants 62 cm ahead just outside the tube with the shaft near vertical.
+// - Power: the torso pulls back through upright to a slight lean back,
+//   carrying both hands with it; the blade travels back to the hip still
+//   near vertical.
+// - Recovery: the blade lifts clear and swings forward low over the water
+//   as the paddler leans forward again.
+// The T-grip hand stays out in front of the body the whole way: about 45 cm
+// ahead at forehead height at the catch, at chin height ahead of the chest at
+// the exit, 36-40 cm from the head and 70 degrees off the line of sight. Held
+// beside the ear at eye height, as it was, the top arm crossed just in front
+// of the face, the hand pressed into the jaw, and from the guide's eye the
+// arm filled the view ("when paddling the guide's arm covers the camera",
+// 2026-10-07). The blade root sits a hand's depth under the surface so the
+// lower top hand still meets a near-vertical shaft; the rigid-paddle pass
+// solves the blade's horizontal reach for the 120 cm shaft.
 void ApplyForwardStroke(FRaftSimCrewAvatarPose& Pose, float Side, float Wave, float RecoveryLiftCm)
 {
     const float Catch = 0.5f * (1.0f + Wave);
     const float RecoveryAlpha = RecoveryLiftCm / StrokeRecoveryLiftPeakCm;
-    Pose.TorsoRotation.Pitch = -6.0f - 12.0f * Catch;
+    // Negative pitch leans the torso forward.
+    Pose.TorsoRotation.Pitch = FMath::Lerp(8.0f, -28.0f, Catch);
     // Negative yaw turns the +Y (starboard) shoulder forward: the paddle
-    // side leads at the catch. The former sign rotated the inboard shoulder
-    // forward instead.
-    Pose.TorsoRotation.Yaw = -Side * (2.0f + 10.0f * Catch);
+    // side leads at the catch and swings back past square at the exit.
+    Pose.TorsoRotation.Yaw = -Side * FMath::Lerp(-4.0f, 14.0f, Catch);
     Pose.TorsoRotation.Roll = -Side * (2.0f + 3.0f * (1.0f - Catch));
-    Pose.TorsoCenterCm.X += 6.0f * Catch;
-    Pose.PaddleTopCm.X = FMath::Lerp(14.0f, 40.0f, Catch) + 6.0f * RecoveryAlpha;
-    Pose.PaddleTopCm.Z = FMath::Lerp(98.0f, 103.0f, Catch) + 5.0f * RecoveryAlpha;
-    Pose.PaddleBottomCm.X = FMath::Lerp(2.0f, 60.0f, Catch) + 24.0f * RecoveryAlpha;
-    Pose.PaddleBottomCm.Z = -10.0f + RecoveryLiftCm;
+    Pose.TorsoCenterCm.X += FMath::Lerp(-3.0f, 8.0f, Catch);
+    Pose.PaddleTopCm.X = FMath::Lerp(20.0f, 45.0f, Catch);
+    Pose.PaddleTopCm.Y = FMath::Lerp(28.0f, 26.0f, Catch) * Side;
+    Pose.PaddleTopCm.Z = FMath::Lerp(93.0f, 102.0f, Catch) + 6.0f * RecoveryAlpha;
+    Pose.PaddleBottomCm.X = FMath::Lerp(-4.0f, 62.0f, Catch) + 24.0f * RecoveryAlpha;
+    Pose.PaddleBottomCm.Y = 50.0f * Side;
+    Pose.PaddleBottomCm.Z = -16.0f + RecoveryLiftCm;
     ApplyMirroredPaddleGrip(Pose, Side);
 }
 
@@ -1304,9 +1321,11 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             // Z 36-40 ran 10-13 cm inside them, hands and all ("the paddle
             // shaft and hand that grips the t grip clip through the
             // thighs"). It now clears the highest thigh by about 1 cm and
-            // dips toward the blade over the lower outboard thigh.
-            Pose.PaddleTopCm = FVector(22.0f, -45.0f * Side, 50.5f);
-            Pose.PaddleBottomCm = FVector(30.0f, 52.0f * Side, 47.0f);
+            // dips toward the blade over the lower outboard thigh. (1.2 cm
+            // higher since the seat sinks 3.5 cm into the tube: the lower
+            // seat lifts the knees and the thighs' tops by about that much.)
+            Pose.PaddleTopCm = FVector(22.0f, -45.0f * Side, 51.7f);
+            Pose.PaddleBottomCm = FVector(30.0f, 52.0f * Side, 48.2f);
             // Resting hands drape over the SHAFT, not the T-grip: an exact
             // T-grip anchor selects the crossbar-axis grip solve, and with
             // the shaft laid laterally the crossbar points fore-aft, so the
@@ -1314,13 +1333,15 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             // the t-grip look twisted"). Off the 2 cm T-grip window both
             // hands take the along-shaft grip: knuckles down the shaft,
             // palms resting on it from above. Fingers curl under the shaft,
-            // so each hand holds it where no thigh lies beneath: the upper
-            // hand just inboard of the inboard thigh, clear of the T-grip's
-            // crossbar, and the lower hand just outboard of the outboard
-            // thigh.
+            // so the lower hand holds it where no thigh lies beneath, just
+            // outboard of the outboard thigh. The upper hand keeps hold of
+            // the T-grip, palm down on top of it and fingers round its end,
+            // inboard of the inboard thigh (2026-10-07: "the hand that should
+            // be holding the t grip isn't"). The grip solver lays that hand
+            // on the flat T with its forearm turned palm-down, so its wrist
+            // no longer wrenches round the crossbar.
             {
-                const FVector RestUpperHandCm = FMath::Lerp(
-                    Pose.PaddleTopCm, Pose.PaddleBottomCm, 0.08f);
+                const FVector RestUpperHandCm = Pose.PaddleTopCm;
                 const FVector RestLowerHandCm = FMath::Lerp(
                     Pose.PaddleTopCm, Pose.PaddleBottomCm, 0.63f);
                 if (Side < 0.0f)
@@ -1346,11 +1367,23 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             // never returning an already-articulated pose; upper-body
             // articulation is applied exactly once after the action
             // landmarks are complete.
-            ApplyForwardStroke(Pose, Side, -Wave, StrokeRecoveryLiftCm(NormalizedPhase));
+            const float BackLiftCm = StrokeRecoveryLiftCm(NormalizedPhase);
+            ApplyForwardStroke(Pose, Side, -Wave, BackLiftCm);
             // Sit up and turn toward the blade behind instead of reaching
             // forward over the knees.
             Pose.TorsoRotation.Pitch *= -0.5f;
             Pose.TorsoRotation.Yaw = Side * 10.0f;
+            // The top hand works against the blade: ahead of the chest while
+            // the blade plants behind the hip, drawn back to the chest as the
+            // lower hand drives the blade forward. The forward stroke's top
+            // hand travels with its blade, and run backwards it ended at
+            // eye height far forward of a guide leaning back, the sleeve
+            // filling the first-person view.
+            const float BladeForward = 0.5f * (1.0f - Wave);
+            Pose.PaddleTopCm.X = FMath::Lerp(30.0f, 22.0f, BladeForward);
+            Pose.PaddleTopCm.Z = FMath::Lerp(94.0f, 91.0f, BladeForward) +
+                6.0f * BackLiftCm / StrokeRecoveryLiftPeakCm;
+            ApplyMirroredPaddleGrip(Pose, Side);
             break;
         }
         case ERaftSimCrewAvatarAction::TurnLeft:
@@ -1705,6 +1738,11 @@ ARaftSimCrewAvatarActor::ARaftSimCrewAvatarActor()
     ProductionPfd->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     ProductionPfd->SetCastShadow(true);
     ProductionPfd->SetVisibility(false, true);
+    ProductionFlipLine = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProductionFlipLine"));
+    ProductionFlipLine->SetupAttachment(ProductionPfd);
+    ProductionFlipLine->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    ProductionFlipLine->SetCastShadow(true);
+    ProductionFlipLine->SetVisibility(false);
     ProductionHelmet = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProductionHelmet"));
     ProductionHelmet->SetupAttachment(Root);
     ProductionHelmet->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -3010,6 +3048,13 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
         const FString Wearer = bGuide ? FString(TEXT("Guide")) : FString::Printf(TEXT("Crew%02d"), VariantIndex + 1);
         ProductionHelmetStraps->SetStaticMesh(LoadObject<UStaticMesh>(nullptr, *FString::Printf(
             TEXT("/Game/RaftSim/Equipment/Production/SM_RaftSim_HelmetStraps_%s.SM_RaftSim_HelmetStraps_%s"), *Wearer, *Wearer)));
+    }
+    if (ProductionFlipLine)
+    {
+        // Only the guide wears a flip line ("the guide should have a
+        // flip-line around his waist, but it should be snug", 2026-10-07).
+        ProductionFlipLine->SetStaticMesh(bGuide ? LoadObject<UStaticMesh>(nullptr,
+            TEXT("/Game/RaftSim/Equipment/Production/SM_RaftSim_GuideFlipLine.SM_RaftSim_GuideFlipLine")) : nullptr);
     }
     if (ProductionPfd)
     {
@@ -4726,7 +4771,9 @@ void ARaftSimCrewAvatarActor::BuildPersonalAccessories()
             // sits back toward the temple.
             const FVector Right = FVector(-0.17f, S, 0.0f).GetSafeNormal() * S;
             const FVector Up = FVector::UpVector;
-            Lenses.Lens(Center, Right, Up, 2.75f, 2.0f, 0.22f);
+            // Wide and shallow like a river sport wrap (5.5 x 3.3 cm); at
+            // 4 cm tall the round lenses read as swim goggles.
+            Lenses.Lens(Center, Right, Up, 2.75f, 1.65f, 0.22f);
             // Rim: a ring of short tubes round the lens edge.
             constexpr int32 RimSegments = 16;
             for (int32 Segment = 0; Segment < RimSegments; ++Segment)
@@ -4736,7 +4783,7 @@ void ARaftSimCrewAvatarActor::BuildPersonalAccessories()
                     const float Angle = UE_TWO_PI * Index / RimSegments;
                     const float C = FMath::Cos(Angle);
                     const float Squircle = FMath::Pow(FMath::Abs(C), 0.8f) * FMath::Sign(C);
-                    return Center + Right * (2.95f * Squircle) + Up * (2.2f * FMath::Sin(Angle));
+                    return Center + Right * (2.95f * Squircle) + Up * (1.85f * FMath::Sin(Angle));
                 };
                 Frame.Tube(Edge(Segment), Edge(Segment + 1), 0.24f, 5);
             }
@@ -4785,7 +4832,12 @@ void ARaftSimCrewAvatarActor::BuildPersonalAccessories()
         Sheath.Commit(RescueKnife, 0);
         Handle.Commit(RescueKnife, 1);
     }
-    BuildPfdSidePanels();
+    if (ProductionFlipLine && ProductionFlipLine->GetStaticMesh())
+    {
+        // Blue tubular webbing; the carabiner keeps its imported steel.
+        ProductionFlipLine->SetMaterial(0, TintedAccessoryMaterial(this,
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftRigging.M_RaftSim_RaftRigging"), FLinearColor(0.02f, 0.06f, 0.22f)));
+    }
     EyewearFrame->SetMaterial(0, TintedAccessoryMaterial(this,
         TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"), Identity.EyewearFrameColor));
     UMaterialInstanceDynamic* LensMaterial = TintedAccessoryMaterial(this,
@@ -4837,13 +4889,14 @@ void ARaftSimCrewAvatarActor::UpdatePersonalAccessories()
     if (Identity.bRescueKit && bUsingProductionVisual && ProductionPfd && ProductionPfd->IsVisible() &&
         ProductionPfd->GetStaticMesh() && !bFirstPersonBodyHidden)
     {
-        const FBox Bounds = ProductionPfd->GetStaticMesh()->GetBoundingBox();
         const FTransform PfdTransform = ProductionPfd->GetComponentTransform();
-        const FVector Size = Bounds.GetSize();
-        // Front face of the vest: the whistle tied off high on one chest
-        // panel and hanging, the knife's sheath on the other panel's lash tab.
-        const FVector WhistleLocal(Bounds.Max.X - 0.4f, Bounds.Min.Y + 0.30f * Size.Y, Bounds.Min.Z + 0.76f * Size.Z);
-        const FVector KnifeLocal(Bounds.Max.X + 0.2f, Bounds.Max.Y - 0.33f * Size.Y, Bounds.Min.Z + 0.62f * Size.Z);
+        // On the v14 vest's measured front (vest-local cm): the whistle hangs
+        // from the chest pocket's zip pull (16.1 cm forward at z 8), the
+        // knife's sheath is clipped to the lash tab across the zip (15.6 cm
+        // forward over z 4-12) with its handle hanging below. Anchors taken
+        // from the bounds floated 2-4 cm off the slimmer panels.
+        const FVector WhistleLocal(16.45f, -7.0f, 8.0f);
+        const FVector KnifeLocal(16.6f, 6.45f, 5.0f);
         const FQuat Rotation = PfdTransform.GetRotation();
         RescueWhistle->SetWorldLocationAndRotation(PfdTransform.TransformPosition(WhistleLocal), Rotation);
         RescueKnife->SetWorldLocationAndRotation(PfdTransform.TransformPosition(KnifeLocal), Rotation);
@@ -4851,112 +4904,14 @@ void ARaftSimCrewAvatarActor::UpdatePersonalAccessories()
     }
     RescueWhistle->SetVisibility(bShowKit);
     RescueKnife->SetVisibility(bShowKit);
-    if (PfdSidePanels && ProductionPfd)
+    if (ProductionFlipLine)
     {
-        PfdSidePanels->SetVisibility(ProductionPfd->IsVisible() && HasProductionWhitewaterPfd());
-        // The vest's shell material (and so its colour) is set after the
-        // accessories are built on some appearance paths.
-        if (PfdSidePanels->GetMaterial(0) != ProductionPfd->GetMaterial(0))
-        {
-            PfdSidePanels->SetMaterial(0, ProductionPfd->GetMaterial(0));
-        }
+        ProductionFlipLine->SetVisibility(bStowedFlipLineVisible && HasProductionFlipLine() &&
+            ProductionPfd && ProductionPfd->IsVisible() && HasProductionWhitewaterPfd());
     }
 }
 
-void ARaftSimCrewAvatarActor::BuildPfdSidePanels()
+bool ARaftSimCrewAvatarActor::HasProductionFlipLine() const
 {
-    if (!ProductionPfd)
-    {
-        return;
-    }
-    if (!PfdSidePanels)
-    {
-        // Rescue vests close the flanks with foam side panels under the
-        // arms; the vest mesh had only two thin adjustment straps a side, so
-        // the torso showed through in profile. Built in the vest's own
-        // frame along its side-strap path (build_production_whitewater_pfd.py),
-        // just inside the straps so they still read on top.
-        PfdSidePanels = NewObject<UProceduralMeshComponent>(this, TEXT("PfdSidePanels"));
-        PfdSidePanels->SetupAttachment(ProductionPfd);
-        PfdSidePanels->RegisterComponent();
-        PfdSidePanels->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        PfdSidePanels->SetCastShadow(true);
-        static const FVector2D SidePath[] = {
-            {-13.8f, 13.2f}, {-10.5f, 15.2f}, {-6.0f, 16.5f}, {0.0f, 17.0f},
-            {6.0f, 16.5f}, {10.5f, 15.2f}, {13.8f, 13.2f}};
-        constexpr int32 PathCount = UE_ARRAY_COUNT(SidePath);
-        constexpr float BottomZ = -13.0f;
-        constexpr float TopZ = 5.0f;
-        constexpr float OuterInsetCm = 0.05f;
-        constexpr float InnerInsetCm = 1.35f;
-        constexpr float EdgeRollCm = 0.6f;
-        RaftSimAccessoryMesh::FAccessoryMesh Panels;
-        for (int32 Side = -1; Side <= 1; Side += 2)
-        {
-            // Cross-section rings (lateral inset, height, normal mix): a
-            // slab with rolled top and bottom edges.
-            struct FRing
-            {
-                float Inset;
-                float Z;
-                float NormalOut;
-                float NormalUp;
-            };
-            const FRing Rings[] = {
-                {InnerInsetCm, BottomZ + EdgeRollCm, -0.3f, -1.0f},
-                {OuterInsetCm + EdgeRollCm, BottomZ, 0.4f, -1.0f},
-                {OuterInsetCm, BottomZ + EdgeRollCm, 1.0f, -0.3f},
-                {OuterInsetCm, TopZ - EdgeRollCm, 1.0f, 0.3f},
-                {OuterInsetCm + EdgeRollCm, TopZ, 0.4f, 1.0f},
-                {InnerInsetCm, TopZ - EdgeRollCm, -0.3f, 1.0f},
-            };
-            constexpr int32 RingCount = UE_ARRAY_COUNT(Rings);
-            const int32 Base = Panels.Vertices.Num();
-            for (int32 Point = 0; Point < PathCount; ++Point)
-            {
-                const FVector2D P(SidePath[Point].X, SidePath[Point].Y * Side);
-                const FVector2D Prev(SidePath[FMath::Max(Point - 1, 0)].X, SidePath[FMath::Max(Point - 1, 0)].Y * Side);
-                const FVector2D Next(SidePath[FMath::Min(Point + 1, PathCount - 1)].X,
-                    SidePath[FMath::Min(Point + 1, PathCount - 1)].Y * Side);
-                const FVector2D Tangent = (Next - Prev).GetSafeNormal();
-                FVector2D Out(-Tangent.Y, Tangent.X);
-                if (Out.Y * Side < 0.0f)
-                {
-                    Out = -Out;
-                }
-                for (const FRing& Ring : Rings)
-                {
-                    const FVector2D XY = P - Out * Ring.Inset;
-                    const FVector Normal =
-                        FVector(Out.X, Out.Y, 0.0f) * Ring.NormalOut + FVector::UpVector * Ring.NormalUp;
-                    // Follow the vest's seated taper, as its side straps do.
-                    Panels.Add(RaftSimVestShape::ApplySeatedTaper(FVector(XY.X, XY.Y, Ring.Z)), Normal,
-                        FVector2D(static_cast<float>(Point) / (PathCount - 1), (Ring.Z - BottomZ) / (TopZ - BottomZ)));
-                }
-            }
-            for (int32 Point = 0; Point + 1 < PathCount; ++Point)
-            {
-                for (int32 Ring = 0; Ring < RingCount; ++Ring)
-                {
-                    const int32 NextRing = (Ring + 1) % RingCount;
-                    const int32 A = Base + Point * RingCount + Ring;
-                    const int32 B = Base + Point * RingCount + NextRing;
-                    const int32 C = Base + (Point + 1) * RingCount + Ring;
-                    const int32 D = Base + (Point + 1) * RingCount + NextRing;
-                    Panels.Triangles.Append({A, C, B, B, C, D});
-                }
-            }
-            // End caps where the panel tucks under the front and back carriers.
-            for (const int32 Point : {0, PathCount - 1})
-            {
-                const int32 First = Base + Point * RingCount;
-                for (int32 Ring = 1; Ring + 1 < RingCount; ++Ring)
-                {
-                    Panels.Triangles.Append({First, First + Ring, First + Ring + 1});
-                }
-            }
-        }
-        Panels.Commit(PfdSidePanels, 0);
-    }
-    PfdSidePanels->SetMaterial(0, ProductionPfd->GetMaterial(0));
+    return ProductionFlipLine && ProductionFlipLine->GetStaticMesh() != nullptr;
 }

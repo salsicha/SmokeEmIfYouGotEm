@@ -5,6 +5,8 @@
 // -RaftSimCrewReviewDir= is given; the stroke and framing checks always run.
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
+#include "Camera/PlayerCameraManager.h"
+#include "GameFramework/PlayerController.h"
 #include "Components/PoseableMeshComponent.h"
 #include "ProceduralMeshComponent.h"
 #include "Rendering/SkeletalMeshRenderData.h"
@@ -38,13 +40,92 @@ UWorld* FindGameWorld()
     return nullptr;
 }
 
-enum class EShot : uint8 { Face, Chin, GripOutboard, GripFront, TGrip, Shoulders, Feet, Seat, HipsBack, HipsOutboard, TopHand, ShaftHand, Count };
+enum class EShot : uint8 { Face, Chin, GripOutboard, GripFront, TGrip, Shoulders, Feet, Seat, HipsBack, HipsOutboard, TopHand, ShaftHand, NeckBack, Count };
 const TCHAR* ShotName(EShot Shot)
 {
     static const TCHAR* Names[] = {TEXT("face"), TEXT("chin"), TEXT("grip-outboard"), TEXT("grip-front"),
         TEXT("tgrip"), TEXT("shoulders"), TEXT("feet"), TEXT("seat"), TEXT("hips-back"), TEXT("hips-outboard"),
-        TEXT("top-hand"), TEXT("shaft-hand")};
+        TEXT("top-hand"), TEXT("shaft-hand"), TEXT("neck-back")};
     return Names[uint8(Shot)];
+}
+
+// Whole-body framings of one seated crew member, all from out over the water
+// so no other paddler stands between camera and subject: front three-quarter,
+// side, rear three-quarter and high.
+constexpr int32 PortraitShots = 4;
+const TCHAR* PortraitName(int32 Shot)
+{
+    static const TCHAR* Names[] = {TEXT("front3q"), TEXT("side"), TEXT("rear3q"), TEXT("high")};
+    return Names[Shot % PortraitShots];
+}
+// Torso is the pose's torso centre; the frame (45 deg FOV) runs from the seat
+// to the helmet.
+void FramePortrait(int32 Shot, const FVector& Torso, const FVector& Fwd, const FVector& Out, const FVector& Up,
+    FVector& Eye, FVector& Focus)
+{
+    Focus = Torso + Up * 22.;
+    switch (Shot % PortraitShots)
+    {
+    case 0: Eye = Focus + Fwd * 150. + Out * 130. + Up * 30.; break;
+    case 1: Eye = Focus + Out * 205. + Fwd * 12. + Up * 12.; break;
+    case 2: Eye = Focus - Fwd * 145. + Out * 145. + Up * 40.; break;
+    default: Eye = Focus + Fwd * 95. + Out * 85. + Up * 170.; break;
+    }
+}
+
+// Posed vertices whose strongest skin weight is on a bone Keep accepts.
+TArray<FVector> DominantBoneVertices(const ARaftSimCC0CrewVisualActor* Visual, TFunctionRef<bool(const FString&)> Keep)
+{
+    TArray<FVector> Out;
+    UPoseableMeshComponent* Body = Visual
+        ? const_cast<ARaftSimCC0CrewVisualActor*>(Visual)->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
+    const USkeletalMesh* Mesh = Body ? Cast<USkeletalMesh>(Body->GetSkinnedAsset()) : nullptr;
+    const FSkeletalMeshRenderData* Data = Mesh ? Mesh->GetResourceForRendering() : nullptr;
+    const FSkinWeightVertexBuffer* Weights = Body ? Body->GetSkinWeightBuffer(0) : nullptr;
+    if (!Data || Data->LODRenderData.IsEmpty() || !Weights) return Out;
+    const FReferenceSkeleton& Ref = Mesh->GetRefSkeleton();
+    const TArray<FVector> Posed = Visual->GetPosedBodyVerticesWorldCmForValidation();
+    for (const FSkelMeshRenderSection& Section : Data->LODRenderData[0].RenderSections)
+        for (uint32 V = Section.BaseVertexIndex; V < Section.BaseVertexIndex + Section.NumVertices && V < uint32(Posed.Num()); ++V)
+        {
+            int32 Best = INDEX_NONE; float BestWeight = 0.f;
+            for (uint32 I = 0; I < Weights->GetMaxBoneInfluences(); ++I)
+            {
+                const float W = Weights->GetBoneWeight(V, I) / 65535.f;
+                if (W > BestWeight) { BestWeight = W; Best = Weights->GetBoneIndex(V, I); }
+            }
+            if (Best != INDEX_NONE && Section.BoneMap.IsValidIndex(Best) && Keep(Ref.GetBoneName(Section.BoneMap[Best]).ToString()))
+                Out.Add(Posed[V]);
+        }
+    return Out;
+}
+
+// Smallest gap (cm) between the skin of the T-grip hand and forearm and the
+// skin of the head. Meshes that interpenetrate leave vertex pairs closer than
+// their own spacing, so under about 1 cm reads as touching or inside.
+double TopHandFaceGapCm(const ARaftSimCrewAvatarActor* Avatar)
+{
+    const auto* Visual = Cast<ARaftSimCC0CrewVisualActor>(Avatar->GetProductionVisualActor());
+    if (!Visual) return TNumericLimits<double>::Max();
+    const FRaftSimCrewAvatarPose& Pose = Avatar->GetPublishedCrewPose();
+    const FString Suffix = FVector::DistSquared(Pose.LeftHandCm, Pose.PaddleTopCm) < FVector::DistSquared(Pose.RightHandCm, Pose.PaddleTopCm)
+        ? TEXT("_l") : TEXT("_r");
+    const TArray<FVector> Arm = DominantBoneVertices(Visual, [&Suffix](const FString& Bone)
+    {
+        return Bone.EndsWith(Suffix) && (Bone.StartsWith(TEXT("hand")) || Bone.StartsWith(TEXT("lowerarm")) ||
+            Bone.StartsWith(TEXT("thumb")) || Bone.StartsWith(TEXT("index")) || Bone.StartsWith(TEXT("middle")) ||
+            Bone.StartsWith(TEXT("ring")) || Bone.StartsWith(TEXT("pinky")));
+    });
+    const TArray<FVector> Head = DominantBoneVertices(Visual, [](const FString& Bone) { return Bone == TEXT("head"); });
+    FBox ArmBox(Arm);
+    ArmBox = ArmBox.ExpandBy(6.);
+    double Gap = TNumericLimits<double>::Max();
+    for (const FVector& H : Head)
+    {
+        if (!ArmBox.IsInside(H)) continue;
+        for (const FVector& A : Arm) Gap = FMath::Min(Gap, FVector::Distance(H, A));
+    }
+    return Gap;
 }
 
 class FCrewGearReview final : public IAutomationLatentCommand
@@ -81,15 +162,154 @@ public:
         const bool bCapture = FParse::Value(FCommandLine::Get(), TEXT("RaftSimCrewReviewDir="), Dir);
         const int32 PaddlerShots = 4 * int32(EShot::Count);
         // Whole-boat views after the per-paddler sweep: the guide's seat
-        // looking forward (the default play view), the stern beside it, and
-        // the stowed throw bag.
-        const int32 Total = PaddlerShots + 3;
+        // looking forward (the default play view), the stern beside it, the
+        // stowed throw bag (wide and close), the tied-off bow line (the hank
+        // and the knot) and a side-tube D-ring.
+        const int32 Total = PaddlerShots + 7;
         // Mid-stroke close-ups: every paddler held at the middle of the
         // power phase, with world time slowed to a crawl so all frames show
         // the same instant. (A paused world also stops the view following
         // the review camera.) Each hand from out over the water and from
-        // ahead or above, then both hands together.
-        constexpr int32 MidStrokeShots = 5;
+        // ahead or above, then both hands together, then the whole paddler.
+        constexpr int32 MidStrokeShots = 5 + PortraitShots;
+        // Stroke sweep: every paddler held at twenty points round the forward
+        // stroke, measuring how close the T-grip hand and forearm come to the
+        // face. The hand must ride beside the face, never into the jaw.
+        constexpr int32 SweepPhases = 20;
+        // The guide's own first-person view while paddling: the player's
+        // camera itself, in the guide's eye with the head hidden as in play,
+        // with each stroke started through the same call the player's keys
+        // make and filmed live. (The whole-boat "guide-view" sits 20 cm ahead
+        // of the face, so it never showed an arm passing close to the eye.)
+        struct FFirstPersonStroke { const TCHAR* Name; int32 Kind; float Scale; };
+        static const FFirstPersonStroke FirstPersonStrokes[] = {
+            {TEXT("forward"), 0, 1.0f}, {TEXT("back"), 0, -1.0f},
+            {TEXT("steer-left"), 1, -1.0f}, {TEXT("steer-right"), 1, 1.0f}};
+        constexpr int32 FirstPersonStrokeCount = UE_ARRAY_COUNT(FirstPersonStrokes);
+        constexpr int32 FirstPersonFrames = 42, FirstPersonCaptureEvery = 6;
+        if (ShotIndex >= Total && FirstPersonIndex <= FirstPersonStrokeCount)
+        {
+            UGameplayStatics::SetGlobalTimeDilation(World, 1.0f);
+            ARaftSimCrewAvatarActor* Guide = Crew.Last();
+            if (FirstPersonIndex == FirstPersonStrokeCount || !Player->GetPawn())
+            {
+                if (FramesOnShot == 0)
+                {
+                    for (int32 Stroke = 0; Stroke < FirstPersonStrokeCount; ++Stroke)
+                        UE_LOG(LogTemp, Display, TEXT("CREW_FP_AUDIT stroke=%s max_arm_coverage=%.3f nearest_arm_cm=%.1f"),
+                            FirstPersonStrokes[Stroke].Name, MaxFirstPersonCoverage[Stroke],
+                            NearestFirstPersonArmCm[Stroke] == TNumericLimits<double>::Max() ? -1. : NearestFirstPersonArmCm[Stroke]);
+                    Player->SetViewTarget(Camera);
+                    Raft->IssueCrewCommand(ERaftSimCrewCommand::AllForward);
+                }
+                // Let the crew's reaction delay run out in live time: the held
+                // stages after this freeze the clock, and an order still
+                // pending then never lands (the crew sat at rest through them).
+                if (++FramesOnShot >= 60)
+                {
+                    FirstPersonIndex = FirstPersonStrokeCount + 1;
+                    FramesOnShot = 0;
+                }
+                return false;
+            }
+            const FFirstPersonStroke& Stroke = FirstPersonStrokes[FirstPersonIndex];
+            if (Player->GetViewTarget() != Player->GetPawn()) Player->SetViewTarget(Player->GetPawn());
+            Player->SetControlRotation(FRotator(-8., RaftFrame.Rotator().Yaw, 0.));
+            if (FramesOnShot == 0)
+            {
+                Raft->IssueCrewCommand(ERaftSimCrewCommand::Rest);
+                if (Stroke.Kind == 0) Raft->ApplyPaddleStroke(ERaftSimPaddleSide::Both, Stroke.Scale);
+                else Raft->ApplyGuideSteerStroke(Stroke.Scale);
+            }
+            // How much of the frame the guide's own arms fill, and how close
+            // they come to the lens: each arm vertex in view splats a disc its
+            // skin spacing wide onto a 48x27 grid.
+            const FVector Eye = Player->PlayerCameraManager->GetCameraLocation();
+            const FRotator View = Player->PlayerCameraManager->GetCameraRotation();
+            const double HalfTan = FMath::Tan(FMath::DegreesToRadians(Player->PlayerCameraManager->GetFOVAngle() * 0.5));
+            const auto* Visual = Cast<ARaftSimCC0CrewVisualActor>(Guide->GetProductionVisualActor());
+            const TArray<FVector> Arms = DominantBoneVertices(Visual, [](const FString& Bone)
+            {
+                return Bone.StartsWith(TEXT("upperarm")) || Bone.StartsWith(TEXT("lowerarm")) || Bone.StartsWith(TEXT("hand")) ||
+                    Bone.StartsWith(TEXT("thumb")) || Bone.StartsWith(TEXT("index")) || Bone.StartsWith(TEXT("middle")) ||
+                    Bone.StartsWith(TEXT("ring")) || Bone.StartsWith(TEXT("pinky")) || Bone.StartsWith(TEXT("clavicle"));
+            });
+            const FMatrix ViewAxes = FRotationMatrix(View);
+            const FVector F = ViewAxes.GetUnitAxis(EAxis::X), R = ViewAxes.GetUnitAxis(EAxis::Y), U = ViewAxes.GetUnitAxis(EAxis::Z);
+            constexpr int32 GridW = 48, GridH = 27;
+            TBitArray<> Covered(false, GridW * GridH);
+            double Nearest = TNumericLimits<double>::Max();
+            for (const FVector& P : Arms)
+            {
+                const FVector D = P - Eye;
+                const double Depth = FVector::DotProduct(D, F);
+                if (Depth < 1.) continue;
+                // Screen x in [-1, 1] across the width; y scaled to 16:9.
+                const double X = FVector::DotProduct(D, R) / Depth / HalfTan, Y = FVector::DotProduct(D, U) / Depth / HalfTan * (16. / 9.);
+                if (FMath::Abs(X) > 1.05 || FMath::Abs(Y) > 1.05) continue;
+                Nearest = FMath::Min(Nearest, D.Size());
+                const double Splat = 1.6 / Depth / HalfTan * 0.5 * GridW;
+                const int32 CX = int32((X * 0.5 + 0.5) * GridW), CY = int32((0.5 - Y * 0.5) * GridH);
+                const int32 Reach = FMath::Clamp(int32(Splat), 0, 12);
+                for (int32 GY = CY - Reach; GY <= CY + Reach; ++GY)
+                    for (int32 GX = CX - Reach; GX <= CX + Reach; ++GX)
+                        if (GX >= 0 && GX < GridW && GY >= 0 && GY < GridH && FMath::Square(GX - CX) + FMath::Square(GY - CY) <= FMath::Square(Reach) + 1)
+                            Covered[GY * GridW + GX] = true;
+            }
+            int32 Cells = 0;
+            for (int32 Cell = 0; Cell < GridW * GridH; ++Cell) Cells += Covered[Cell] ? 1 : 0;
+            const double Coverage = Cells / double(GridW * GridH);
+            MaxFirstPersonCoverage[FirstPersonIndex] = FMath::Max(MaxFirstPersonCoverage[FirstPersonIndex], Coverage);
+            NearestFirstPersonArmCm[FirstPersonIndex] = FMath::Min(NearestFirstPersonArmCm[FirstPersonIndex], Nearest);
+            if (FramesOnShot % FirstPersonCaptureEvery == 3)
+            {
+                UE_LOG(LogTemp, Display, TEXT("CREW_FP_FRAME stroke=%s frame=%d action=%d eye_lag_cm=%.1f arm_coverage=%.3f nearest_arm_cm=%.1f"),
+                    Stroke.Name, FramesOnShot, int32(Guide->GetAvatarAction()),
+                    FVector::Distance(Eye, Guide->GetFirstPersonEyeWorldLocationCm()), Coverage,
+                    Nearest == TNumericLimits<double>::Max() ? -1. : Nearest);
+                if (bCapture)
+                {
+                    IFileManager::Get().MakeDirectory(*Dir, true);
+                    FScreenshotRequest::RequestScreenshot(
+                        Dir / FString::Printf(TEXT("guide-fp-%s-%02d.png"), Stroke.Name, FramesOnShot), true, false);
+                }
+            }
+            if (++FramesOnShot >= FirstPersonFrames) { FramesOnShot = 0; ++FirstPersonIndex; }
+            return false;
+        }
+        if (ShotIndex >= Total && SweepIndex <= SweepPhases)
+        {
+            UGameplayStatics::SetGlobalTimeDilation(World, 0.0001f);
+            if (SweepIndex == SweepPhases)
+            {
+                for (int32 Index = 0; Index < 4; ++Index)
+                {
+                    UE_LOG(LogTemp, Display, TEXT("CREW_FACE_AUDIT paddler=%d min_hand_face_gap_cm=%.2f at_phase=%.2f"),
+                        Index + 1, MinHandFaceGapCm[Index], WorstHandFacePhase[Index]);
+                    Test->TestTrue(FString::Printf(TEXT("paddler %d's T-grip hand stays out of the face through the stroke (%.2f cm at phase %.2f)"),
+                        Index + 1, MinHandFaceGapCm[Index], WorstHandFacePhase[Index]), MinHandFaceGapCm[Index] > 1.0);
+                }
+                ++SweepIndex;
+                return false;
+            }
+            const float Phase = SweepIndex / float(SweepPhases);
+            for (int32 Index = 0; Index < 4; ++Index)
+                Crew[Index]->SetAvatarActionPhaseForValidation(ERaftSimCrewAvatarAction::ForwardStroke, Phase);
+            if (++FramesOnShot >= 2)
+            {
+                double Gaps[4];
+                for (int32 Index = 0; Index < 4; ++Index)
+                {
+                    const double Gap = Gaps[Index] = TopHandFaceGapCm(Crew[Index]);
+                    if (Gap < MinHandFaceGapCm[Index]) { MinHandFaceGapCm[Index] = Gap; WorstHandFacePhase[Index] = Phase; }
+                }
+                UE_LOG(LogTemp, Display, TEXT("CREW_FACE_SWEEP phase=%.2f gaps_cm=%.1f,%.1f,%.1f,%.1f"),
+                    Phase, Gaps[0], Gaps[1], Gaps[2], Gaps[3]);
+                FramesOnShot = 0;
+                ++SweepIndex;
+            }
+            return false;
+        }
         if (ShotIndex >= Total && !bMidStrokeDone)
         {
             const float Mid = 0.5f * (URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseStart() +
@@ -125,16 +345,32 @@ public:
             };
             const FVector Top = HandAt(bLeftTop), Shaft = HandAt(!bLeftTop);
             static const TCHAR* Names[] = {TEXT("top-hand-outboard"), TEXT("top-hand-above"), TEXT("shaft-hand-outboard"),
-                TEXT("shaft-hand-front"), TEXT("hands")};
+                TEXT("shaft-hand-front"), TEXT("top-hand-face")};
             FVector Eye, Focus;
             float Fov = 32.f;
-            switch (MidStrokeShotIndex % MidStrokeShots)
+            const int32 Shot = MidStrokeShotIndex % MidStrokeShots;
+            FString ShotLabel = Shot < 5 ? FString(Names[Shot]) : FString::Printf(TEXT("body-%s"), PortraitName(Shot - 5));
+            switch (Shot)
             {
             case 0: Focus = Top; Eye = Top + Out * 40. + Fwd * 30. + Up * 10.; break;
             case 1: Focus = Top; Eye = Top + Up * 42. + Fwd * 22. - Out * 12.; break;
             case 2: Focus = Shaft; Eye = Shaft + Out * 40. + Fwd * 24. + Up * 8.; break;
             case 3: Focus = Shaft; Eye = Shaft + Fwd * 42. + Out * 12. + Up * 6.; break;
-            default: Focus = (Top + Shaft) * .5; Eye = Focus + Out * 95. + Fwd * 55. + Up * 20.; Fov = 42.f; break;
+            case 4:
+            {
+                // Straight in front of the face at hand height: the gap
+                // between the T-grip hand and the jaw shows across the frame.
+                const FVector Head = Avatar->GetActorTransform().TransformPosition(Pose.HeadCenterCm);
+                Focus = (Top + Head) * .5;
+                Eye = Focus + Fwd * 65. + Up * 4.;
+                Fov = 40.f;
+                break;
+            }
+            default:
+                FramePortrait(Shot - 5, Avatar->GetActorTransform().TransformPosition(Pose.TorsoCenterCm),
+                    Fwd, Out, Up, Eye, Focus);
+                Fov = 45.f;
+                break;
             }
             Camera->GetCameraComponent()->SetFieldOfView(Fov);
             Camera->SetActorLocationAndRotation(Eye, (Focus - Eye).Rotation());
@@ -142,7 +378,7 @@ public:
             {
                 IFileManager::Get().MakeDirectory(*Dir, true);
                 FScreenshotRequest::RequestScreenshot(Dir / FString::Printf(TEXT("paddler%d-midstroke-%s.png"),
-                    MidStrokeShotIndex / MidStrokeShots + 1, Names[MidStrokeShotIndex % MidStrokeShots]), true, false);
+                    MidStrokeShotIndex / MidStrokeShots + 1, *ShotLabel), true, false);
             }
             if (FramesOnShot >= 5) { FramesOnShot = 0; ++MidStrokeShotIndex; }
             return false;
@@ -163,9 +399,10 @@ public:
         {
             if (Now - RestStart < 3.) return false;
             // Per paddler: the lap from above, the thighs from inboard, the
-            // seat from behind and from outboard; then the rear seats as the
-            // guide sees them over the stern.
-            constexpr int32 RestPaddlerShots = 4 * 4;
+            // seat from behind and from outboard, then the whole paddler; then
+            // the rear seats as the guide sees them over the stern.
+            constexpr int32 RestShotsEach = 5 + PortraitShots;
+            constexpr int32 RestPaddlerShots = 4 * RestShotsEach;
             if (RestShotIndex <= RestPaddlerShots)
             {
                 FVector Eye, Focus;
@@ -173,22 +410,30 @@ public:
                 const FVector Fwd = RaftFrame.GetUnitAxis(EAxis::X), Up = RaftFrame.GetUnitAxis(EAxis::Z);
                 if (RestShotIndex < RestPaddlerShots)
                 {
-                    const ARaftSimCrewAvatarActor* Avatar = Crew[RestShotIndex / 4];
+                    const ARaftSimCrewAvatarActor* Avatar = Crew[RestShotIndex / RestShotsEach];
                     const FTransform Frame = Avatar->GetActorTransform();
                     const FRaftSimCrewAvatarPose& Pose = Avatar->GetPublishedCrewPose();
                     const double Side = RaftFrame.InverseTransformPosition(Avatar->GetActorLocation()).Y >= 0. ? 1. : -1.;
                     const FVector Out = RaftFrame.GetUnitAxis(EAxis::Y) * Side;
                     const FVector Lap = Frame.TransformPosition((Pose.PaddleTopCm + Pose.PaddleBottomCm) * .5);
                     const FVector Seat = Frame.TransformPosition(Pose.TorsoCenterCm) - Up * 22.;
-                    static const TCHAR* Names[] = {TEXT("rest-lap"), TEXT("rest-thighs"), TEXT("rest-hips-back"), TEXT("rest-hips-outboard")};
-                    switch (RestShotIndex % 4)
+                    static const TCHAR* Names[] = {TEXT("rest-lap"), TEXT("rest-thighs"), TEXT("rest-hips-back"), TEXT("rest-hips-outboard"),
+                        TEXT("rest-neck-back")};
+                    const FVector Head = Frame.TransformPosition(Pose.HeadCenterCm);
+                    const int32 Shot = RestShotIndex % RestShotsEach;
+                    switch (Shot)
                     {
                     case 0: Focus = Lap; Eye = Lap + Fwd * 60. + Up * 55. - Out * 10.; break;
                     case 1: Focus = Lap - Up * 4.; Eye = Focus - Out * 70. + Fwd * 15. + Up * 6.; break;
                     case 2: Focus = Seat; Eye = Seat - Fwd * 75. + Up * 6.; break;
-                    default: Focus = Seat; Eye = Seat + Out * 75. - Fwd * 12. + Up * 6.; break;
+                    case 3: Focus = Seat; Eye = Seat + Out * 75. - Fwd * 12. + Up * 6.; break;
+                    case 4: Focus = Head - Up * 12. - Fwd * 3.; Eye = Head - Fwd * 32. + Up * 38. + Out * 12.; break;
+                    default:
+                        FramePortrait(Shot - 5, Frame.TransformPosition(Pose.TorsoCenterCm), Fwd, Out, Up, Eye, Focus);
+                        break;
                     }
-                    Name = FString::Printf(TEXT("paddler%d-%s"), RestShotIndex / 4 + 1, Names[RestShotIndex % 4]);
+                    Name = FString::Printf(TEXT("paddler%d-%s"), RestShotIndex / RestShotsEach + 1,
+                        Shot < 5 ? Names[Shot] : *FString::Printf(TEXT("rest-body-%s"), PortraitName(Shot - 5)));
                 }
                 else
                 {
@@ -260,6 +505,10 @@ public:
                                 FName(*FString::Printf(TEXT("%s_%02d_%s"), Digit, Segment, S)), EBoneSpaces::WorldSpace), 1.5) - 0.9);
                 const FString FingerText = Fingers < 1.e6 ? FString::Printf(TEXT("%.2f"), Fingers) : FString(TEXT("none_over_thigh"));
                 UE_LOG(LogTemp, Display, TEXT("CREW_REST_AUDIT paddler=%d shaft_above_thighs_cm=%.2f fingers_above_thighs_cm=%s"), Index + 1, Shaft, *FingerText);
+                UE_LOG(LogTemp, Display, TEXT("CREW_GRIP_SOLVE rest paddler=%d palm_facing=%.3f finger_curl=%.3f wrist_twist_deg=%.1f anchor_cm=%.2f pad_cm=%.2f thumb_cm=%.2f"),
+                    Index + 1, Visual->GetMinimumPaddlePalmFacingDot(), Visual->GetMinimumPaddleFingerCurlTowardPalm(),
+                    Visual->GetMaximumGripWristTwistDegrees(), Visual->GetMaximumPaddleGripAnchorErrorCm(),
+                    Visual->GetMaximumPaddleFingerContactErrorCm(), Visual->GetMaximumPaddleThumbContactErrorCm());
                 Test->TestTrue(FString::Printf(TEXT("paddler %d's resting paddle lies on, not in, the thighs (%.2f cm)"), Index + 1, Shaft), Shaft > 0.);
                 Test->TestTrue(FString::Printf(TEXT("paddler %d's resting hands stay out of the thighs (%.2f cm)"), Index + 1, Fingers), Fingers > 0.);
             }
@@ -282,6 +531,24 @@ public:
                         if (L.Size() < 26.) Csv += FString::Printf(TEXT("%.3f,%.3f,%.3f\n"), L.X, L.Y, L.Z);
                     }
                     FFileHelper::SaveStringToFile(Csv, *(Dir / FString::Printf(TEXT("head-vertices-%d.csv"), Index + 1)));
+                    // The seated torso and waist in the vest mesh's own frame
+                    // (scale included), so a vest or waist line can be fitted
+                    // to every body: any vest surface must stay outside these.
+                    UStaticMeshComponent** Vest = Meshes.FindByPredicate([](const UStaticMeshComponent* M)
+                    { return M->GetStaticMesh() && M->GetStaticMesh()->GetName() == TEXT("SM_RaftSim_WhitewaterRescuePfd"); });
+                    if (Vest)
+                    {
+                        const FBox VestBox = (*Vest)->GetStaticMesh()->GetBoundingBox().ExpandBy(FVector(10., 10., 16.));
+                        FString Torso = TEXT("x,y,z\n");
+                        for (const FVector& P : Visual->GetPosedBodyVerticesWorldCmForValidation())
+                        {
+                            const FVector L = (*Vest)->GetComponentTransform().InverseTransformPosition(P);
+                            if (VestBox.IsInside(L)) Torso += FString::Printf(TEXT("%.3f,%.3f,%.3f\n"), L.X, L.Y, L.Z);
+                        }
+                        FFileHelper::SaveStringToFile(Torso, *(Dir / FString::Printf(TEXT("torso-vertices-%d.csv"), Index + 1)));
+                        UE_LOG(LogTemp, Display, TEXT("CREW_VEST_FRAME paddler=%d scale=%s location=%s rotation=%s"), Index + 1,
+                            *(*Vest)->GetRelativeScale3D().ToString(), *(*Vest)->GetRelativeLocation().ToString(), *(*Vest)->GetRelativeRotation().ToString());
+                    }
                     // Hip-region skin and clothing: posed in the avatar frame
                     // beside each vertex's rest position, so a stray vertex can
                     // be traced back to its source mesh and weights.
@@ -326,6 +593,13 @@ public:
             // palm faces, and whether the shaft hand's thumb points up the
             // shaft. Arm stretch is tracked over every paddling frame.
             const bool bLogGrip = ShotIndex == 0 && FramesOnShot == 0;
+            if (bLogGrip)
+                for (int32 Index = 0; Index + 1 < Crew.Num() && Index < 4; ++Index)
+                    if (const auto* Visual = Cast<ARaftSimCC0CrewVisualActor>(Crew[Index]->GetProductionVisualActor()))
+                        UE_LOG(LogTemp, Display, TEXT("CREW_GRIP_SOLVE paddler=%d palm_facing=%.3f finger_curl=%.3f wrist_twist_deg=%.1f anchor_cm=%.2f pad_cm=%.2f thumb_cm=%.2f"),
+                            Index + 1, Visual->GetMinimumPaddlePalmFacingDot(), Visual->GetMinimumPaddleFingerCurlTowardPalm(),
+                            Visual->GetMaximumGripWristTwistDegrees(), Visual->GetMaximumPaddleGripAnchorErrorCm(),
+                            Visual->GetMaximumPaddleFingerContactErrorCm(), Visual->GetMaximumPaddleThumbContactErrorCm());
             for (int32 Index = 0; Index + 1 < Crew.Num() && Index < 4; ++Index)
             {
                 const auto* Visual = Cast<ARaftSimCC0CrewVisualActor>(Crew[Index]->GetProductionVisualActor());
@@ -408,6 +682,11 @@ public:
                 break;
             }
             case EShot::HipsBack: Focus = Torso - Up * 22.; Eye = Focus - Fwd * 75. + Up * 6.; Fov = 40.f; break;
+            // The back of the neck where it meets the shoulders, as the guide
+            // sees it from the stern.
+            // Steeply down over the vest's back collar onto the nape; from
+            // lower the vest hides the neck.
+            case EShot::NeckBack: Focus = Head - Up * 12. - Fwd * 3.; Eye = Head - Fwd * 32. + Up * 38. + Out * 12.; Fov = 35.f; break;
             default: Focus = Torso - Up * 22.; Eye = Focus + Out * 75. - Fwd * 12. + Up * 6.; Fov = 40.f; break;
             }
             Name = FString::Printf(TEXT("paddler%d-%s"), ShotIndex / int32(EShot::Count) + 1, ShotName(Shot));
@@ -419,6 +698,21 @@ public:
             const FRaftSimCrewAvatarPose& Pose = Guide->GetPublishedCrewPose();
             const FVector Fwd = RaftFrame.GetUnitAxis(EAxis::X), Up = RaftFrame.GetUnitAxis(EAxis::Z);
             const FVector Head = Frame.TransformPosition(Pose.HeadCenterCm);
+            // Centre of one RaftGear section in the world.
+            const auto GearCentre = [Raft](int32 SectionIndex, FVector Fallback)
+            {
+                TArray<UProceduralMeshComponent*> Gear;
+                Raft->GetComponents(Gear);
+                for (UProceduralMeshComponent* Mesh : Gear)
+                {
+                    const FProcMeshSection* Section = Mesh->GetName() == TEXT("RaftGear") ? Mesh->GetProcMeshSection(SectionIndex) : nullptr;
+                    if (!Section || Section->ProcVertexBuffer.IsEmpty()) continue;
+                    FVector Sum = FVector::ZeroVector;
+                    for (const FProcMeshVertex& V : Section->ProcVertexBuffer) Sum += FVector(V.Position);
+                    Fallback = Mesh->GetComponentTransform().TransformPosition(Sum / Section->ProcVertexBuffer.Num());
+                }
+                return Fallback;
+            };
             if (ShotIndex == PaddlerShots)
             {
                 Eye = Head + Fwd * 20. + Up * 12.; Focus = Eye + Fwd * 300. - Up * 70.; Fov = 70.f;
@@ -430,23 +724,48 @@ public:
                 Eye = Focus + Fwd * 130. + Up * 95.; Fov = 50.f;
                 Name = TEXT("stern");
             }
+            else if (ShotIndex == PaddlerShots + 4)
+            {
+                // The bow line is section 3 of the raft's rigged gear.
+                Focus = GearCentre(3, RaftFrame.TransformPosition(FVector(190., 0., 45.)));
+                Eye = Focus - Fwd * 70. + Up * 45. + RaftFrame.GetUnitAxis(EAxis::Y) * 35.; Fov = 45.f;
+                Name = TEXT("bowline");
+            }
+            else if (ShotIndex == PaddlerShots + 5)
+            {
+                // The standing part down the bow face to its knot on the grab line.
+                Focus = GearCentre(3, RaftFrame.TransformPosition(FVector(190., 0., 45.))) + Fwd * 22. - Up * 14.;
+                Eye = Focus + Fwd * 75. + Up * 20. + RaftFrame.GetUnitAxis(EAxis::Y) * 30.; Fov = 40.f;
+                Name = TEXT("bowline-knot");
+            }
+            else if (ShotIndex == PaddlerShots + 6)
+            {
+                // A D-ring on the starboard tube: on its pad, webbing tabs
+                // round its bar, the perimeter line through it.
+                Focus = RaftFrame.TransformPosition(FVector(30., 98., 10.));
+                Eye = Focus - Fwd * 30. + RaftFrame.GetUnitAxis(EAxis::Y) * 55. + Up * 18.; Fov = 40.f;
+                Name = TEXT("dring");
+            }
             else
             {
-                // The stowed bag is section 0 of the raft's rigged gear.
-                FVector Bag = Frame.TransformPosition(Pose.TorsoCenterCm);
-                TArray<UProceduralMeshComponent*> Gear;
-                Raft->GetComponents(Gear);
-                for (UProceduralMeshComponent* Mesh : Gear)
+                // The stowed bag is section 0 of the raft's rigged gear: with
+                // the guide, then close from inboard.
+                const FVector Bag = GearCentre(0, Frame.TransformPosition(Pose.TorsoCenterCm));
+                const double Side = RaftFrame.InverseTransformPosition(Bag).Y >= 0. ? 1. : -1.;
+                const FVector Out = RaftFrame.GetUnitAxis(EAxis::Y) * Side;
+                if (ShotIndex == PaddlerShots + 2)
                 {
-                    const FProcMeshSection* Section = Mesh->GetName() == TEXT("RaftGear") ? Mesh->GetProcMeshSection(0) : nullptr;
-                    if (!Section || Section->ProcVertexBuffer.IsEmpty()) continue;
-                    FVector Sum = FVector::ZeroVector;
-                    for (const FProcMeshVertex& V : Section->ProcVertexBuffer) Sum += FVector(V.Position);
-                    Bag = Mesh->GetComponentTransform().TransformPosition(Sum / Section->ProcVertexBuffer.Num());
+                    Focus = (Bag + Frame.TransformPosition(Pose.TorsoCenterCm)) * .5;
+                    Eye = Focus + Fwd * 110. + Up * 80. - Out * 60.; Fov = 50.f;
+                    Name = TEXT("throwbag");
                 }
-                Focus = (Bag + Frame.TransformPosition(Pose.TorsoCenterCm)) * .5;
-                Eye = Focus + Fwd * 110. + Up * 80. - RaftFrame.GetUnitAxis(EAxis::Y) * 60.; Fov = 50.f;
-                Name = TEXT("throwbag");
+                else
+                {
+                    // Down from inboard, clear of the guide's legs.
+                    Focus = Bag + Up * 4.;
+                    Eye = Focus + Fwd * 18. + Up * 55. - Out * 42.; Fov = 45.f;
+                    Name = TEXT("throwbag-close");
+                }
             }
         }
         Camera->GetCameraComponent()->SetFieldOfView(Fov);
@@ -466,7 +785,12 @@ private:
     ACameraActor* Camera = nullptr;
     double Start = -1., PaddleStart = 0.;
     bool bPaddling = false;
-    int32 ShotIndex = 0, FramesOnShot = 0, RestShotIndex = 0, MidStrokeShotIndex = 0;
+    int32 ShotIndex = 0, FramesOnShot = 0, RestShotIndex = 0, MidStrokeShotIndex = 0, SweepIndex = 0, FirstPersonIndex = 0;
+    double MaxFirstPersonCoverage[4] = {}, NearestFirstPersonArmCm[4] = {TNumericLimits<double>::Max(), TNumericLimits<double>::Max(),
+        TNumericLimits<double>::Max(), TNumericLimits<double>::Max()};
+    double MinHandFaceGapCm[4] = {TNumericLimits<double>::Max(), TNumericLimits<double>::Max(),
+        TNumericLimits<double>::Max(), TNumericLimits<double>::Max()};
+    float WorstHandFacePhase[4] = {};
     bool bResting = false, bMidStrokeHeld = false, bMidStrokeDone = false;
     double RestStart = 0.;
     float MaxUpperStretchCm[8] = {}, MaxForearmStretchCm[8] = {};

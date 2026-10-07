@@ -308,48 +308,48 @@ def test_raft_art_review_mode_is_explicitly_evidence_only() -> None:
     assert "M5_RescueProduction.png" in source
 
 
-def test_production_rescue_pfd_uses_tapered_soft_cell_source_art() -> None:
+def test_production_pfd_is_low_profile_body_fitted_whitewater_vest() -> None:
     build_source = PRODUCTION_PFD_BUILD_SCRIPT.read_text(encoding="utf-8")
     manifest = json.loads(PRODUCTION_PFD_MANIFEST.read_text(encoding="utf-8"))
 
-    assert "GENERATOR_VERSION = 12" in build_source
-    assert '"FrontCarrier_' in build_source
-    assert '"RearCarrier"' in build_source
-    assert '"ProtectiveBackUpperCell"' in build_source
-    assert '"ProtectiveBackLumbarCell"' in build_source
-    assert "lateral_wrap_depth=3.2" in build_source
-    assert "former single\n    # 31.5 x 42 cm plate" in build_source
+    assert "GENERATOR_VERSION = 14" in build_source
+    assert manifest["generator_version"] == 14
+    # One rigid shell fitted to the envelope of all five seated crew torsos.
+    assert "ENVELOPE_RADIUS_CM" in build_source
+    assert "--fit-torsos" in build_source
+    assert manifest["fit"]["envelope_clearance_cm"] >= 0.4
+    # The old lumpy vertical-cell rescue vest is gone.
+    assert "add_crowned_foam_panel" not in build_source
+    assert '"ProtectiveBackUpperCell"' not in build_source
     assert "ShoulderFoamBand" not in build_source
-    assert manifest["generator_version"] == 12
-    assert manifest["construction"]["front_carrier_panels"] == 2
-    assert manifest["construction"]["back_carrier_panels"] == 1
-    assert manifest["construction"]["back_panels"] == 2
-    assert manifest["construction"]["rear_flex_channels"] == 1
-    assert manifest["soft_geometry"]["flat_exterior_foam_faces"] == 0
-    assert manifest["soft_geometry"]["outline_corner_rounding_passes"] == 4
-    assert manifest["soft_geometry"]["crown_profile"] == (
-        "eleven-ring soft cosine loft"
-    )
-    assert manifest["soft_geometry"]["carrier_shell_thickness_cm"] == 0.7
-    assert manifest["soft_geometry"]["front_panel_foam_thickness_cm"] == 3.0
-    assert manifest["soft_geometry"]["front_panel_crown_depth_cm"] == 0.65
-    assert manifest["soft_geometry"]["front_panel_lateral_wrap_depth_cm"] == 3.0
-    assert manifest["soft_geometry"]["back_panel_foam_thickness_cm"] == 2.4
-    assert manifest["soft_geometry"]["back_panel_crown_depth_cm"] == 0.75
-    assert manifest["soft_geometry"]["back_panel_lateral_wrap_depth_cm"] == 3.2
-    assert manifest["construction"]["side_wings"] == 0
-    assert manifest["construction"]["side_webbing_connectors"] == 4
-    assert manifest["soft_geometry"]["rigid_side_foam_wings"] == 0
-    assert manifest["soft_geometry"]["rescue_belt_profile"] == (
-        "flat torso-following webbing"
-    )
-    assert manifest["soft_geometry"]["duplicate_tubular_side_adjustment_runs"] == 0
-    assert manifest["soft_geometry"]["front_pocket_flat_exterior_faces"] == 0
-    assert manifest["soft_geometry"]["front_backup_webbing_profile"] == (
-        "curved torso-following fabric"
-    )
-    assert manifest["construction"]["shoulder_foam_pads"] == 0
-    assert manifest["construction"]["shoulder_webbing_runs"] == 2
+    # Modern low-profile guide vest: slim front/back foam, closed sides,
+    # padded shoulders, side straps over the side panels, one big pocket.
+    construction = manifest["construction"]
+    assert construction["front_foam_panels"] == 2
+    assert construction["back_panels"] == 1
+    assert construction["side_panels"] == 2
+    assert construction["side_wings"] == 0
+    assert construction["padded_shoulder_straps"] == 2
+    assert construction["shoulder_adjustment_buckles"] == 2
+    assert construction["side_adjustment_straps"] == 4
+    assert construction["side_adjustment_buckles"] == 4
+    assert construction["front_zip"] == 1
+    assert construction["front_pockets"] == 1
+    assert construction["front_lash_tabs"] == 1
+    assert construction["quick_release_rescue_belts"] == 0
+    assert manifest["soft_geometry"]["front_panel_foam_thickness_cm"] <= 2.5
+    assert manifest["soft_geometry"]["back_panel_foam_thickness_cm"] <= 2.0
+    # Every piece is a closed solid, so strap clearances are measurable.
+    assert manifest["open_edges"] == 0
+    roles = {piece["role"] for piece in manifest["pieces"].values()}
+    assert {"foam", "pocket", "strap", "hardware"} <= roles
+    assert manifest["material_slots"] == [
+        "PfdShell",
+        "PfdWebbing",
+        "PfdHardware",
+        "PfdReflective",
+        "PfdLabel",
+    ]
     assert manifest["ownership"] == (
         "Project-owned deterministic source art; no external mesh or texture input."
     )

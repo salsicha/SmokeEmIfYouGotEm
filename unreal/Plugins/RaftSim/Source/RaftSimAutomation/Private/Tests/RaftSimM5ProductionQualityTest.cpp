@@ -116,12 +116,14 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
         const FVector DimensionsCm = ProductionHelmet->GetBoundingBox().GetSize();
         TestEqual(TEXT("production helmet has four authored material slots"),
                   ProductionHelmet->GetStaticMaterials().Num(), 4);
-        // The shell alone: its face and chin straps are fitted per wearer
-        // (SM_RaftSim_HelmetStraps_*), so it stands about 19 cm tall.
-        TestTrue(TEXT("production helmet has plausible centimetre bounds"),
+        // The shell alone (its straps are fitted per wearer,
+        // SM_RaftSim_HelmetStraps_*). A full-cut whitewater shell comes down
+        // over the ears and the back of the skull, so it stands about 26 cm
+        // tall; a skate-style bowl that stops above the ears is under 20.
+        TestTrue(TEXT("production helmet has full-cut centimetre bounds"),
                  DimensionsCm.X >= 24.0f && DimensionsCm.X <= 35.0f &&
                  DimensionsCm.Y >= 24.0f && DimensionsCm.Y <= 35.0f &&
-                 DimensionsCm.Z >= 15.0f && DimensionsCm.Z <= 30.0f);
+                 DimensionsCm.Z >= 23.0f && DimensionsCm.Z <= 30.0f);
         for (const TCHAR* Wearer : {TEXT("Crew01"), TEXT("Crew02"), TEXT("Crew03"), TEXT("Crew04"), TEXT("Guide")})
         {
             TestNotNull(*FString::Printf(TEXT("helmet straps fitted to %s exist"), Wearer),
@@ -771,10 +773,14 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
         TEXT("forward recovery lifts the blade clear of the planted power path"),
         ForwardRecovery.PaddleBottomCm.Z - ForwardCatch.PaddleBottomCm.Z >= 24.0f);
     TestTrue(
+        // 0.25 cm: the catch plants a near-vertical shaft, where the rigid
+        // shaft's horizontal reach is steep in the blade's height, so the
+        // last 0.03 cm of recovery lift at phase 0.9999 still moves the
+        // blade 0.14 cm.
         TEXT("forward stroke remains continuous across the normalized cycle seam"),
-        FVector::Distance(ForwardCycleSeam.PaddleTopCm, ForwardCatch.PaddleTopCm) < 0.1f &&
+        FVector::Distance(ForwardCycleSeam.PaddleTopCm, ForwardCatch.PaddleTopCm) < 0.25f &&
             FVector::Distance(ForwardCycleSeam.PaddleBottomCm, ForwardCatch.PaddleBottomCm) <
-                0.1f);
+                0.25f);
     for (const FRaftSimCrewAvatarPose* StrokePose :
          {&ForwardCatch, &ForwardFinish, &ForwardRecovery})
     {
@@ -1346,27 +1352,51 @@ bool FRaftSimM5StartRescueCommand::Update()
                     *It->GetName(),
                     It->GetMaximumPaddleGripAnchorErrorCm()),
                 It->GetMaximumPaddleGripAnchorErrorCm() <= 0.25f);
+            // The grip solve bends each finger through its own joints
+            // (RaftSimCC0CrewGrip.cpp), so a pad lands within half a
+            // centimetre of the bar rather than being forced onto it (which
+            // had bent fingers backwards), and the thumb rests over the
+            // index finger's middle segment in a power grip, within 2 cm of
+            // that target.
             Test->TestTrue(
                 FString::Printf(
                     TEXT("CC0 crew body %s seats every distal finger pad on its "
                          "shaft/T-grip handle (maximum error %.3f cm)"),
                     *It->GetName(),
                     It->GetMaximumPaddleFingerContactErrorCm()),
-                It->GetMaximumPaddleFingerContactErrorCm() <= 0.25f);
+                It->GetMaximumPaddleFingerContactErrorCm() <= 0.5f);
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("CC0 crew body %s seats both thumb pads on their "
-                         "shaft/T-grip handles (maximum error %.3f cm)"),
+                    TEXT("CC0 crew body %s rests both thumbs over their fingers "
+                         "(maximum error %.3f cm)"),
                     *It->GetName(),
                     It->GetMaximumPaddleThumbContactErrorCm()),
-                It->GetMaximumPaddleThumbContactErrorCm() <= 0.25f);
+                It->GetMaximumPaddleThumbContactErrorCm() <= 2.0f);
+            // Each palm faces its handle and every finger bends toward its
+            // palm (2026-10-07: the palms had faced away, fingers bent back).
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("CC0 crew body %s keeps thumbs opposed across both "
-                         "handles (maximum radial dot %.3f)"),
+                    TEXT("CC0 crew body %s faces both palms onto their handles "
+                         "(minimum dot %.3f)"),
                     *It->GetName(),
-                    It->GetMaximumPaddleThumbOppositionDot()),
-                It->GetMaximumPaddleThumbOppositionDot() <= -0.80f);
+                    It->GetMinimumPaddlePalmFacingDot()),
+                It->GetMinimumPaddlePalmFacingDot() >= 0.90f);
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("CC0 crew body %s curls every gripping finger toward its "
+                         "palm (minimum dot %.3f)"),
+                    *It->GetName(),
+                    It->GetMinimumPaddleFingerCurlTowardPalm()),
+                It->GetMinimumPaddleFingerCurlTowardPalm() >= 0.50f);
+            // Within the forearm's own turn (about 80 degrees each way), far
+            // from the extra half and full turns the old solve put in.
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("CC0 crew body %s leaves its gripping wrists under 70 "
+                         "degrees of twist (maximum %.1f)"),
+                    *It->GetName(),
+                    It->GetMaximumGripWristTwistDegrees()),
+                It->GetMaximumGripWristTwistDegrees() <= 70.0f);
         }
         Test->TestTrue(
             FString::Printf(TEXT("CC0 crew body %s selected packaged mesh"), *It->GetName()),

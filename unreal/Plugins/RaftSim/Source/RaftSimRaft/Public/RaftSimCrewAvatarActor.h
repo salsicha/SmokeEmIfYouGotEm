@@ -289,6 +289,12 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     bool HasProductionWhitewaterPfd() const;
 
+    /** True when this avatar wears the guide's fitted flip line. */
+    bool HasProductionFlipLine() const;
+    /** Shows the flip line wrapped at the waist; the raft hides it while the
+     * line is out (unclipped for a righting pull or trailing a swim). */
+    void SetStowedFlipLineVisible(bool bVisible) { bStowedFlipLineVisible = bVisible; }
+
     /** True when the visible PFD shell owns its live water-response material instance. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     bool HasLivePfdMaterialResponse() const;
@@ -479,8 +485,6 @@ private:
      * whistle and river knife), built once and fitted to the solved face
      * and chest frames every tick. */
     void BuildPersonalAccessories();
-    /** Foam side panels between the vest's front and back carriers. */
-    void BuildPfdSidePanels();
     void UpdatePersonalAccessories();
     void UpdatePfdMaterialResponse(float DeltaSeconds);
     void ApplyPfdMaterialWetness();
@@ -576,10 +580,12 @@ private:
     UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> RescueWhistle;
     UPROPERTY(Transient) TObjectPtr<UProceduralMeshComponent> RescueKnife;
 
-    /** Closes the production vest's sides under the arms (child of the vest,
-     * so it shares the vest's fit and colour). */
+    /** The guide's flip line: two snug wraps of tubular webbing at the vest
+     * hem, closed by a locking carabiner (build_production_guide_flip_line.py).
+     * A child of the vest in the vest's own frame, so it shares its fit. */
     UPROPERTY(Transient)
-    TObjectPtr<UProceduralMeshComponent> PfdSidePanels;
+    TObjectPtr<UStaticMeshComponent> ProductionFlipLine;
+    bool bStowedFlipLineVisible = true;
 
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Animation")
     ERaftSimCrewAvatarAction CurrentAction = ERaftSimCrewAvatarAction::SeatedIdle;

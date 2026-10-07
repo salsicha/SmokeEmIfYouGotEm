@@ -114,6 +114,10 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Validation")
     float GetCrewSeatContactClearanceCm(ARaftSimCrewAvatarActor* Avatar) const;
 
+    /** How far a seated body's underside sinks into the tube it sits on:
+     * the buttocks and the inflated tube flatten into each other. */
+    static constexpr float RenderedSeatContactCompressionCm = 3.5f;
+
     /** Apply one paddle stroke impulse. ForwardScale in [-1, 1]; negative = back-paddle. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void ApplyPaddleStroke(ERaftSimPaddleSide Side, float ForwardScale);
@@ -649,9 +653,13 @@ private:
     void BuildRaftVisual();
     /** Resolve RaftRig (map, console override) and size the crew for it. */
     void ResolveRaftRig();
-    /** Rigged gear on the hull: the guide's throw bag at the stern and coiled
-     * bow and stern lines (presentation only, no collision). */
+    /** Rigged gear on the hull: the guide's throw bag on the floor beside the
+     * guide and the bow line, tied off and coiled on the bow tube
+     * (presentation only, no collision). */
     void BuildRaftGear(const FBox& HullBoundsCm);
+    /** RaftGear sections 0..N-1 are the stowed throw bag (body, trim, rope
+     * end); they hide together while the bag is out. */
+    static constexpr int32 RaftGearThrowBagSectionCount = 3;
     void UpdateFlexibleRaftVisual();
     void ConfigureSharedHullGeometryReview();
     bool PrepareSharedHullGeometry(const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out);

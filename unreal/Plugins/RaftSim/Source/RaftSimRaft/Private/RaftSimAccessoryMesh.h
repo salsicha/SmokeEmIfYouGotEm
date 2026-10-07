@@ -5,10 +5,11 @@
 
 /** Small procedural props (crew accessories, raft gear): tubes, lenses and
  * boxes, committed with both windings so they never vanish to winding. */
-/** The production vest's seated-torso taper (vest-local cm), as built into
- * SM_RaftSim_WhitewaterRescuePfd by build_production_whitewater_pfd.py v13:
- * the front leans in above mid-chest, the back moves in over the lumbar
- * curve, both blended out across the flanks. Keep the two in step. */
+/** The v13 production vest's seated-torso taper (vest-local cm): the front
+ * leans in above mid-chest, the back moves in over the lumbar curve, both
+ * blended out across the flanks. The v14 vest is fitted to the torsos as the
+ * crew visual places them with this reference, so it stays the fit's
+ * reference surface. */
 namespace RaftSimVestShape
 {
 inline float FrontTaperCm(float Z)
@@ -150,6 +151,100 @@ struct FAccessoryMesh
                 else
                 {
                     Triangles.Append({V0, V1, V2, V0, V2, V3});
+                }
+            }
+        }
+    }
+
+    /** Surface of revolution about Axis through Base. Profile holds (height,
+     * radius) pairs from bottom to top; a zero radius closes that end. */
+    void Lathe(const FVector& Base, const FVector& Axis, const TArray<FVector2f>& Profile, int32 Sides = 16)
+    {
+        const FVector A = Axis.GetSafeNormal();
+        const FVector U = FVector::CrossProduct(A, FMath::Abs(A.Z) < 0.9f ? FVector::UpVector : FVector::ForwardVector)
+            .GetSafeNormal();
+        const FVector V = FVector::CrossProduct(A, U);
+        const int32 Base0 = Vertices.Num();
+        for (int32 Ring = 0; Ring < Profile.Num(); ++Ring)
+        {
+            // Normal from the profile's local slope (outward, tipped along the axis).
+            const FVector2f Below = Profile[FMath::Max(Ring - 1, 0)], Above = Profile[FMath::Min(Ring + 1, Profile.Num() - 1)];
+            const float Rise = Above.X - Below.X, Spread = Above.Y - Below.Y;
+            for (int32 Side = 0; Side <= Sides; ++Side)
+            {
+                const float Angle = UE_TWO_PI * Side / Sides;
+                const FVector Out = U * FMath::Cos(Angle) + V * FMath::Sin(Angle);
+                Add(Base + A * Profile[Ring].X + Out * Profile[Ring].Y, Out * Rise - A * Spread,
+                    FVector2D(float(Side) / Sides, float(Ring) / FMath::Max(Profile.Num() - 1, 1)));
+            }
+        }
+        for (int32 Ring = 0; Ring + 1 < Profile.Num(); ++Ring)
+        {
+            for (int32 Side = 0; Side < Sides; ++Side)
+            {
+                const int32 P = Base0 + Ring * (Sides + 1) + Side, Q = P + Sides + 1;
+                Triangles.Append({P, Q, P + 1, P + 1, Q, Q + 1});
+            }
+        }
+    }
+
+    /** Rope or cord swept along a polyline, rings shared between spans and
+     * carried along without twisting; open ends are capped. */
+    void Sweep(const TArray<FVector>& Points, float R, int32 Sides = 6, bool bClosed = false)
+    {
+        const int32 Count = Points.Num();
+        if (Count < 2)
+        {
+            return;
+        }
+        auto TangentAt = [&](int32 I)
+        {
+            const FVector Prev = bClosed ? Points[(I - 1 + Count) % Count] : Points[FMath::Max(I - 1, 0)];
+            const FVector Next = bClosed ? Points[(I + 1) % Count] : Points[FMath::Min(I + 1, Count - 1)];
+            return (Next - Prev).GetSafeNormal();
+        };
+        FVector T = TangentAt(0);
+        FVector U = FVector::CrossProduct(T, FMath::Abs(T.Z) < 0.9f ? FVector::UpVector : FVector::ForwardVector).GetSafeNormal();
+        const int32 Base0 = Vertices.Num();
+        const int32 Rings = bClosed ? Count + 1 : Count;
+        float Along = 0.0f;
+        for (int32 Ring = 0; Ring < Rings; ++Ring)
+        {
+            const int32 I = Ring % Count;
+            const FVector NewT = TangentAt(I);
+            // Parallel transport: rotate the previous frame onto the new tangent.
+            U = (U - NewT * FVector::DotProduct(U, NewT)).GetSafeNormal();
+            T = NewT;
+            const FVector V = FVector::CrossProduct(T, U);
+            if (Ring > 0)
+            {
+                Along += float(FVector::Distance(Points[I], Points[(Ring - 1) % Count]));
+            }
+            for (int32 Side = 0; Side <= Sides; ++Side)
+            {
+                const float Angle = UE_TWO_PI * Side / Sides;
+                const FVector Out = U * FMath::Cos(Angle) + V * FMath::Sin(Angle);
+                Add(Points[I] + Out * R, Out, FVector2D(Along / 6.0f, float(Side) / Sides));
+            }
+        }
+        for (int32 Ring = 0; Ring + 1 < Rings; ++Ring)
+        {
+            for (int32 Side = 0; Side < Sides; ++Side)
+            {
+                const int32 P = Base0 + Ring * (Sides + 1) + Side, Q = P + Sides + 1;
+                Triangles.Append({P, P + 1, Q, P + 1, Q + 1, Q});
+            }
+        }
+        if (!bClosed)
+        {
+            for (int32 End = 0; End < 2; ++End)
+            {
+                const int32 Ring = End ? Count - 1 : 0;
+                const FVector Normal = TangentAt(Ring) * (End ? 1.0f : -1.0f);
+                const int32 Hub = Add(Points[Ring], Normal, FVector2D(0.5f, 0.5f));
+                for (int32 Side = 0; Side < Sides; ++Side)
+                {
+                    Triangles.Append({Hub, Base0 + Ring * (Sides + 1) + Side, Base0 + Ring * (Sides + 1) + Side + 1});
                 }
             }
         }

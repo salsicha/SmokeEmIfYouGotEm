@@ -405,8 +405,9 @@ void ARaftSimRaftActor::BuildRopeMesh(const TArray<FVector>& WorldPointsCm, cons
 void ARaftSimRaftActor::UpdateRescueLineVisual()
 {
     UpdateGuideWaistLine();
-    // The stowed bag leaves the stern tube while it is out on the water.
-    if (RaftGear && RaftGear->GetNumSections() > 0) RaftGear->SetMeshSectionVisible(0, !bThrowBagDeployed);
+    // The stowed bag leaves the floor while it is out on the water.
+    for (int32 Section = 0; RaftGear && Section < FMath::Min(RaftGearThrowBagSectionCount, RaftGear->GetNumSections()); ++Section)
+        RaftGear->SetMeshSectionVisible(Section, !bThrowBagDeployed);
     if (ThrowBagVisual && RaftGear && RaftGear->GetMaterial(0) && ThrowBagVisual->GetMaterial(0) != RaftGear->GetMaterial(0))
         ThrowBagVisual->SetMaterial(0, RaftGear->GetMaterial(0));
     TArray<FVector> Points;

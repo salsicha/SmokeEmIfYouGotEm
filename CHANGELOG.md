@@ -6,6 +6,52 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- Crew, gear and raft review fixes (2026-10-07):
+  - **Hand grips rebuilt** (`RaftSimCC0CrewGrip.cpp`): every hold is solved
+    against the bar it holds. The palm faces the T-grip crossbar or shaft,
+    the fingers wrap it with their pads on its surface, the thumb opposes
+    them, and the forearm takes 65% of the wrist's twist. The old solve
+    treated the back of the hand as the palm, so fingers bent backwards and
+    wrists turned an extra half turn. At rest the top hand holds the T-grip.
+  - **Paddle stroke:** the paddler leans well forward to plant the blade
+    near vertical and pulls back through upright to a lean back, from the
+    torso and core. The top hand stays out in front of the body, 36-40 cm
+    from the head: it had ridden beside the ear at eye height, so the top
+    arm crossed the face and, from the guide's eye, filled the view. Back
+    strokes draw the top hand back against the blade.
+  - **Shoulders:** a reaching shoulder stays on its collarbone; Ingrid's
+    bare shoulder no longer tears away from the arm mid-stroke.
+  - **Seats:** the crew sit 3.5 cm into the tube with a full contact patch,
+    and the resting paddle line is 1.2 cm higher to stay on the thighs.
+  - **Collars** (clothing generator v4): the shirt collar hugs the neck,
+    covered in shirt fabric under it, with its weights smoothed round the
+    neckline. It had stood 1.3 cm off the neck, a dark trench behind it
+    where the spine should be, and went saw-toothed when the head bowed.
+  - **Helmets** (generator v9): a full-cut whitewater shell with moulded ear
+    covers, a low occipital tail and a short peak, clearing every wearer's
+    hair; the per-wearer chin straps are refitted to it.
+  - **Vests** (PFD generator v14): a low-profile front-entry guide vest,
+    slim front panels either side of a zip, side adjustment straps, padded
+    shoulder straps and a chest pocket, fitted to the five seated torsos
+    with every strap built on top of the foam. The procedural side slabs
+    are gone, and the whistle and knife sit on the pocket and lash tab.
+  - **Flip line** (`build_production_guide_flip_line.py`): the guide wears
+    two snug wraps of tubular webbing at the vest hem with a locking
+    carabiner, replacing the loose procedural loop round the hips.
+  - **Sunglasses:** everyone wears sport sunglasses.
+  - **Throw bag:** a rescue throw bag modelled on the common commercial
+    design (red body, mesh drain band, flared top with a barrel-lock
+    drawstring, yellow line out of the top on a figure-eight loop, grab
+    handle) stands on the floor beside the guide. The thrown bag is a bag
+    shape, not a ball, and the loose coil at the stern is gone.
+  - **Bow line:** tied to the bow grab line with a round turn and two half
+    hitches, coiled and wrapped into a neat hank along the bow tube.
+  - **Review** (`RaftSim.Crew.GearReview`): first-person captures through
+    the player's camera while the guide paddles, forward, back and
+    steering, with an arm-coverage audit; a look down onto each nape; the
+    throw bag, bow line, knot and a D-ring; and the hand-to-face gap at
+    twenty points round the stroke.
+
 - Crew gear and grips:
   - **Grips:** the T-grip hand caps the crossbar palm-down, and the shaft
     hand holds the shaft thumb-up toward the T-grip, knuckles out, on either
@@ -25,8 +71,6 @@ All notable changes to this project are recorded here, newest first. Versioning 
   - **Clothing:** the clothing generator returns any shell vertex that
     solidify throws off the body. One stuck out behind Ingrid's seat, and
     the guide's shirt had two.
-  - **Throw bag:** the throw bag is grapefruit-sized and sits on the stern
-    tube beside the guide, and the yellow bow drybag is gone.
   - **Seat:** seated, a fin of fabric no longer sticks out between the
     buttocks. MPFB weights the cleft and perineum almost wholly to the
     pelvis while the buttocks beside them follow the thighs, so as the

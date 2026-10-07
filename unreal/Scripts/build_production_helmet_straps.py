@@ -5,12 +5,13 @@ Run with Blender, not the system Python::
     Blender --background --python unreal/Scripts/build_production_helmet_straps.py
 
 The shell (build_production_whitewater_helmet.py) carries the four retention
-anchors. Each wearer gets their own strap set in the shell's mesh frame: a
-front and a rear strap from each side's anchors down to a junction below the
-ear, and one chin strap from junction to junction passing UNDER the chin with
-its buckle. One shared set either cut through the deeper chins or hung loose
-under the shallower ones ("the helmet chin straps should go under the chin,
-not cut through it", 2026-10-05).
+anchors at the lower corners of its ear covers. Each wearer gets their own
+strap set in the shell's mesh frame: a front and a rear strap from each side's
+anchors down to a junction below the ear cover, and one chin strap from
+junction to junction passing UNDER the chin with its buckle. One shared set
+either cut through the deeper chins or hung loose under the shallower ones
+("the helmet chin straps should go under the chin, not cut through it",
+2026-10-05).
 
 Each head is read from its dressed CC0 FBX and placed in the helmet frame with
 the same fit the game uses (ARaftSimCC0CrewVisualActor: rendered eye centre,
@@ -35,7 +36,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 CHARACTER_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Characters/CC0Production/Dressed"
 OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionHelmet/Straps"
 MANIFEST_PATH = OUTPUT_ROOT / "production_helmet_straps_manifest.json"
-GENERATOR_VERSION = 1
+GENERATOR_VERSION = 2
 
 # (character, anchor drop cm, anchor back cm, shell scale): the per-variant
 # fit in RaftSimCC0CrewVisualActor.cpp (CrewHelmetAnchorDropsCm,
@@ -51,10 +52,14 @@ FITS = [
 SKULL_CENTRE_OFFSET = (-2.6, 0.0, 5.7)
 REFERENCE_FIT = 0.96
 
-# Shell anchors (helmet frame, +X forward, +Y left, +Z up): the front pair at
-# the temples and the rear pair behind the ears.
-FRONT_ANCHOR = (6.4, 10.6, 1.5)
-REAR_ANCHOR = (-7.0, 9.5, 0.0)
+# Shell anchors (helmet frame, +X forward, +Y left, +Z up): the lower ends of
+# the webbing tabs inside the full-cut shell's ear covers, in front of and
+# behind the ear (retention_anchors_cm in the helmet manifest, generator v9).
+FRONT_ANCHOR = (3.44, 11.83, -7.72)
+REAR_ANCHOR = (-6.3, 11.28, -8.56)
+# The junction hangs below the ear cover's rim (z -9.0) so the Y straps clear
+# its lower edge instead of running along it.
+JUNCTION_Z = -11.0
 CLEARANCE = 0.5
 STRAP_WIDTH = 1.5
 STRAP_THICKNESS = 0.22
@@ -166,10 +171,10 @@ def route(head: np.ndarray) -> dict[str, np.ndarray]:
     # The straps never reach below the chin; keep the chest out of the fit.
     head = head[head[:, 2] > -21.0]
     x, y, z = head.T
-    # Junction below each ear lobe, outside the jaw at that height.
-    jaw = (x > -2.5) & (x < 2.5) & (np.abs(z + 9.5) < 1.0)
+    # Junction below each ear cover, outside the jaw at that height.
+    jaw = (x > -2.5) & (x < 2.5) & (np.abs(z - JUNCTION_Z) < 1.0)
     junction_y = float(np.abs(y[jaw]).max()) + CLEARANCE + 0.2
-    junction = np.array([0.3, junction_y, -9.5])
+    junction = np.array([0.3, junction_y, JUNCTION_Z])
     # The chin strap lies in the plane through both junctions and the point
     # under the chin. Its path is the offset hull of the head's section in
     # that plane, from one junction round under the chin to the other.
@@ -181,7 +186,9 @@ def route(head: np.ndarray) -> dict[str, np.ndarray]:
     normal = np.cross(u_axis, v_axis)
     base = junction * np.array([1.0, 0.0, 1.0])
     rel = head - base
-    slab = np.abs(rel @ normal) < 0.7
+    # The section spans the ribbon's full width: with the lower v2 junction a
+    # narrower slab let Crew03's bob tips reach the chin strap's edges.
+    slab = np.abs(rel @ normal) < 0.5 * STRAP_WIDTH + 0.1
     section = np.column_stack([rel[slab] @ u_axis, rel[slab] @ v_axis])
     section = section[section[:, 1] > -1.0]
     hull = resample(np.vstack([h := offset_polygon(convex_hull(section), CLEARANCE), h[:1]]), 0.4)
@@ -200,6 +207,8 @@ def route(head: np.ndarray) -> dict[str, np.ndarray]:
             straps[f"{name}_{label}"] = side_clear(head, resample(np.array([a, j]), 0.5), side)
     straps["buckle"] = chin_loop[int(np.argmin(chin_loop[:, 2]))]
     straps["chin_point"] = chin
+    straps["chin_normal"] = normal
+    straps["chin_centre"] = base + hull[:, 0].mean() * u_axis + hull[:, 1].mean() * v_axis
     return straps
 
 
@@ -230,12 +239,19 @@ def ribbon(bm: bmesh.types.BMesh, path: np.ndarray, face_normal_hint: np.ndarray
 def build(name: str, straps: dict[str, np.ndarray], materials) -> bpy.types.Object:
     bm = bmesh.new()
     # Side straps lie on the side of the face; the chin strap's face turns
-    # away from the jaw it wraps.
+    # away from the jaw it wraps, within the strap's own plane, so its width
+    # straddles the section it was routed around (a hint off that plane
+    # tilted the edges into Crew03's bob tips).
     for key in ("front_left", "rear_left", "front_right", "rear_right"):
         side = 1.0 if key.endswith("left") else -1.0
         ribbon(bm, straps[key], np.array([0.0, side, 0.0]), 0)
-    centre = np.array([straps["chin"][:, 0].mean(), 0.0, -4.0])
-    ribbon(bm, straps["chin"], lambda p: np.array(p) - centre, 0)
+    normal, centre = straps["chin_normal"], straps["chin_centre"]
+
+    def chin_outward(point) -> np.ndarray:
+        offset = np.array(point) - centre
+        return offset - normal * float(offset @ normal)
+
+    ribbon(bm, straps["chin"], chin_outward, 0)
     # Side-release buckle under the chin and a keeper at each junction.
     buckle = Vector(straps["buckle"])
     for centre_point, size in ((buckle + Vector((0.0, 0.0, -0.35)), (1.6, 2.4, 0.5)),):

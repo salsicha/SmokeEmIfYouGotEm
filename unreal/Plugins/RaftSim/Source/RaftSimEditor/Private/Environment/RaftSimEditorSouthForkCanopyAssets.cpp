@@ -1,4 +1,5 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
+#include "Materials/MaterialExpressionDesaturation.h"
 #include "Materials/MaterialExpressionMax.h"
 #include "Materials/MaterialExpressionPerInstanceRandom.h"
 
@@ -889,7 +890,9 @@ UMaterial* CreateSouthForkIslandTreeFoliageMaterialV1Review(
 UMaterial* CreateSouthForkCanopyBarkMaterial(
     const FString& SpeciesAssetName,
     const FSouthForkCanopyBarkTextureSet& Textures,
-    FString& OutSummary)
+    FString& OutSummary,
+    const FLinearColor& BarkTintColor = FLinearColor(0.86f, 0.84f, 0.78f, 1.0f),
+    float BarkDesaturation = 0.0f)
 {
     if (!Textures.IsComplete())
     {
@@ -965,13 +968,31 @@ UMaterial* CreateSouthForkCanopyBarkMaterial(
         NewObject<UMaterialExpressionConstant3Vector>(Material),
         -360,
         -120);
-    BarkTint->Constant = FLinearColor(0.86f, 0.84f, 0.78f, 1.0f);
+    BarkTint->Constant = BarkTintColor;
     UMaterialExpressionMultiply* TintedAlbedo = AddExpression(
         NewObject<UMaterialExpressionMultiply>(Material),
         -120,
         -180);
     TintedAlbedo->A.Expression = AlbedoSample;
     TintedAlbedo->B.Expression = BarkTint;
+    if (BarkDesaturation > 0.0f)
+    {
+        // Another species' bark from the same scan: greyed toward its
+        // luminance before the tint sets the new colour.
+        UMaterialExpressionDesaturation* Greyed = AddExpression(
+            NewObject<UMaterialExpressionDesaturation>(Material),
+            -360,
+            -200);
+        Greyed->Input.Expression = AlbedoSample;
+        Greyed->LuminanceFactors = FLinearColor(0.3f, 0.59f, 0.11f, 0.0f);
+        UMaterialExpressionConstant* Fraction = AddExpression(
+            NewObject<UMaterialExpressionConstant>(Material),
+            -480,
+            -160);
+        Fraction->R = BarkDesaturation;
+        Greyed->Fraction.Expression = Fraction;
+        TintedAlbedo->A.Expression = Greyed;
+    }
     UMaterialExpressionPerInstanceRandom* InstanceRandom = AddExpression(
         NewObject<UMaterialExpressionPerInstanceRandom>(Material),
         -360,
@@ -2201,6 +2222,118 @@ UStaticMesh* CreateSouthForkCanopyPhotoPatchVolumeMesh(
 }
 } // namespace
 
+// The placed white alder and the two placed ponderosa forms as spray trees,
+// written over their placed packages, with their own bark and foliage
+// materials. Bark comes from the live-oak scan: greyed and lightened for
+// white alder's smooth pale bark, warmed toward cinnamon for ponderosa's
+// plates.
+bool CreateSouthForkRiparianSprayTreeAssets(
+    UWorld* World,
+    UStaticMesh*& OutWhiteAlderMesh,
+    UStaticMesh*& OutPonderosaMatureMesh,
+    UStaticMesh*& OutPonderosaIntermediateMesh,
+    FString& OutSummary)
+{
+    constexpr TCHAR TextureRoot[] =
+        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Textures/"
+             "T_RaftSim_SouthForkInteriorLiveOakCrownFamilyV3Review_");
+    FSouthForkCanopyBarkTextureSet BarkTextures;
+    BarkTextures.Albedo = LoadObject<UTexture2D>(nullptr, *FString::Printf(
+        TEXT("%sBarkAlbedo.T_RaftSim_SouthForkInteriorLiveOakCrownFamilyV3Review_BarkAlbedo"), TextureRoot));
+    BarkTextures.Normal = LoadObject<UTexture2D>(nullptr, *FString::Printf(
+        TEXT("%sBarkNormal.T_RaftSim_SouthForkInteriorLiveOakCrownFamilyV3Review_BarkNormal"), TextureRoot));
+    BarkTextures.Packed = LoadObject<UTexture2D>(nullptr, *FString::Printf(
+        TEXT("%sBarkAORoughnessHeight.T_RaftSim_SouthForkInteriorLiveOakCrownFamilyV3Review_BarkAORoughnessHeight"),
+        TextureRoot));
+    const FSouthForkCanopyBranchTextureSet AlderBranches =
+        CreateSouthForkCanopyBranchTextureSet(
+            TEXT("SouthForkWhiteAlderBranchAtlasV1"),
+            WhiteAlderBranchAlbedoOpacityRelativePath,
+            WhiteAlderBranchNormalRelativePath,
+            WhiteAlderBranchPackedRelativePath,
+            OutSummary);
+    const FSouthForkCanopyBranchTextureSet PonderosaBranches =
+        CreateSouthForkCanopyBranchTextureSet(
+            TEXT("SouthForkPonderosaBranchAtlasV1"),
+            PonderosaBranchAlbedoOpacityRelativePath,
+            PonderosaBranchNormalRelativePath,
+            PonderosaBranchPackedRelativePath,
+            OutSummary);
+    UMaterial* AlderBark = CreateSouthForkCanopyBarkMaterial(
+        TEXT("SouthForkWhiteAlderSprays"), BarkTextures, OutSummary,
+        FLinearColor(2.1f, 2.1f, 2.0f, 1.0f), /*BarkDesaturation=*/0.9f);
+    UMaterial* PonderosaBark = CreateSouthForkCanopyBarkMaterial(
+        TEXT("SouthForkPonderosaSprays"), BarkTextures, OutSummary,
+        FLinearColor(1.6f, 0.8f, 0.55f, 1.0f));
+    // The calibrated foliage path the live oaks use: crown-normal sprays,
+    // matt leaves and a weak transmission tint.
+    UMaterial* AlderLeaves = AlderBranches.IsComplete()
+        ? CreateSouthForkCanopyBranchMaterial(
+            TEXT("SouthForkWhiteAlderSprays"),
+            AlderBranches.AlbedoOpacity, AlderBranches.Normal, AlderBranches.Packed,
+            FLinearColor(0.82f, 0.90f, 0.76f, 1.0f),
+            FLinearColor(0.036f, 0.064f, 0.020f, 1.0f),
+            OutSummary,
+            /*bCalibratedReviewLighting=*/true)
+        : nullptr;
+    UMaterial* PonderosaNeedles = PonderosaBranches.IsComplete()
+        ? CreateSouthForkCanopyBranchMaterial(
+            TEXT("SouthForkPonderosaSprays"),
+            PonderosaBranches.AlbedoOpacity, PonderosaBranches.Normal, PonderosaBranches.Packed,
+            FLinearColor(0.76f, 0.82f, 0.70f, 1.0f),
+            FLinearColor(0.020f, 0.040f, 0.012f, 1.0f),
+            OutSummary,
+            /*bCalibratedReviewLighting=*/true)
+        : nullptr;
+    if (!BarkTextures.IsComplete() || !AlderBark || !PonderosaBark || !AlderLeaves || !PonderosaNeedles)
+    {
+        OutSummary += TEXT("South Fork riparian spray-tree materials are incomplete.\n");
+        return false;
+    }
+    const FString MeshRoot = TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/");
+    // White alder: a clump of three pale stems, ascending branches, an oval
+    // crown of leafy sprigs.
+    const FSouthForkSprayTreeForm WhiteAlder{
+        TEXT("WhiteAlder"), 1350.0f, 840.0f,
+        /*StemCount=*/3, /*StemBaseRadiusCm=*/11.0f, /*StemSplayDegrees=*/7.0f, /*StemTopFraction=*/0.86f,
+        /*CrownBaseFraction=*/0.28f, /*BranchLevels=*/9, /*BranchesPerLevel=*/3,
+        /*BranchPitchBaseDegrees=*/48.0f, /*BranchPitchTopDegrees=*/62.0f, /*bConicalCrown=*/false,
+        /*TwigsPerBranch=*/5, /*SpraysPerTerminal=*/10,
+        /*SprayHeightCm=*/55.0f, 80.0f, /*SprayWidthCm=*/60.0f, 90.0f, /*SeedSalt=*/61};
+    // Ponderosa: one straight bole bare to about 40%, whorls of level to
+    // drooping branches narrowing to the top, needle tufts at the ends.
+    const FSouthForkSprayTreeForm PonderosaMature{
+        TEXT("PonderosaMature"), 2200.0f, 1050.0f,
+        1, 30.0f, 0.0f, 0.98f,
+        0.38f, 12, 5,
+        -8.0f, 22.0f, true,
+        4, 9,
+        75.0f, 110.0f, 80.0f, 120.0f, 73};
+    const FSouthForkSprayTreeForm PonderosaIntermediate{
+        TEXT("PonderosaIntermediate"), 1650.0f, 820.0f,
+        1, 22.0f, 0.0f, 0.98f,
+        0.34f, 11, 5,
+        -6.0f, 24.0f, true,
+        4, 9,
+        70.0f, 100.0f, 75.0f, 110.0f, 79};
+    // Near/mid/far LODs as the live oaks have.
+    auto Build = [&](const TCHAR* AssetName, const FSouthForkSprayTreeForm& Form,
+                     UMaterialInterface* Bark, UMaterialInterface* Leaves) -> UStaticMesh*
+    {
+        UStaticMesh* Mesh = CreateSouthForkSprayTreeMesh(
+            World, MeshRoot + AssetName, Form, Bark, Leaves, /*LeafAtlasTileCount=*/12, OutSummary);
+        return Mesh && ConfigureSouthForkLiveOakReviewLods(Mesh, OutSummary) ? Mesh : nullptr;
+    };
+    OutWhiteAlderMesh = Build(
+        TEXT("SM_RaftSim_SouthForkWhiteAlder_ConnectedCrownV2"), WhiteAlder, AlderBark, AlderLeaves);
+    OutPonderosaMatureMesh = Build(
+        TEXT("SM_RaftSim_SouthForkPonderosaMature_ConnectedCrownV1"), PonderosaMature, PonderosaBark, PonderosaNeedles);
+    OutPonderosaIntermediateMesh = Build(
+        TEXT("SM_RaftSim_SouthForkPonderosaIntermediate_ConnectedCrownV1"), PonderosaIntermediate, PonderosaBark,
+        PonderosaNeedles);
+    return OutWhiteAlderMesh && OutPonderosaMatureMesh && OutPonderosaIntermediateMesh;
+}
+
 bool CreateSouthForkGeneratedCanopyAssets(
     UWorld* World,
     UStaticMesh*& OutPonderosaMeshA,
@@ -2310,16 +2443,10 @@ bool CreateSouthForkGeneratedCanopyAssets(
     {
         return false;
     }
-    OutPonderosaMeshA = CreateSouthForkConnectedCrownMesh(
-        World, TEXT("SouthForkPonderosaMature"),
-        /*WidthCm=*/1050.0f, /*HeightCm=*/2200.0f,
-        ESouthForkConnectedCrownForm::Ponderosa,
-        PonderosaMaterialA, PonderosaBranchMaterial, OutSummary);
-    OutPonderosaMeshB = CreateSouthForkConnectedCrownMesh(
-        World, TEXT("SouthForkPonderosaIntermediate"),
-        /*WidthCm=*/820.0f, /*HeightCm=*/1650.0f,
-        ESouthForkConnectedCrownForm::Ponderosa,
-        PonderosaMaterialB, PonderosaBranchMaterial, OutSummary);
+    // The placed white alder and the mature and intermediate ponderosa are
+    // spray trees (2026-10-07); the other profiles keep connected crowns.
+    const bool bSprayTrees = CreateSouthForkRiparianSprayTreeAssets(
+        World, OutWhiteAlderMesh, OutPonderosaMeshA, OutPonderosaMeshB, OutSummary);
     OutPonderosaMeshC = CreateSouthForkConnectedCrownMesh(
         World, TEXT("SouthForkPonderosaYounger"),
         /*WidthCm=*/590.0f, /*HeightCm=*/1120.0f,
@@ -2330,21 +2457,16 @@ bool CreateSouthForkGeneratedCanopyAssets(
         /*WidthCm=*/1250.0f, /*HeightCm=*/920.0f,
         ESouthForkConnectedCrownForm::BroadTree,
         OakMaterial, OakBranchMaterial, OutSummary);
-    OutWhiteAlderMesh = CreateSouthForkConnectedCrownMesh(
-        World, TEXT("SouthForkWhiteAlder"),
-        /*WidthCm=*/840.0f, /*HeightCm=*/1350.0f,
-        ESouthForkConnectedCrownForm::BroadTree,
-        AlderMaterial, AlderBranchMaterial, OutSummary);
     OutDeerbrushMesh = CreateSouthForkConnectedCrownMesh(
         World, TEXT("SouthForkDeerbrush"),
         /*WidthCm=*/330.0f, /*HeightCm=*/230.0f,
         ESouthForkConnectedCrownForm::Shrub,
         DeerbrushMaterial, DeerbrushBranchMaterial, OutSummary);
-    const bool bCreated = OutPonderosaMeshA && OutPonderosaMeshB &&
+    const bool bCreated = bSprayTrees && OutPonderosaMeshA && OutPonderosaMeshB &&
         OutPonderosaMeshC && OutInteriorLiveOakMesh && OutWhiteAlderMesh &&
         OutDeerbrushMesh;
     OutSummary += bCreated
-        ? TEXT("Created project-owned connected-crown candidates for all six South Fork canopy profiles, including thirty-six-spray V2 broadleaf volumes.\n")
+        ? TEXT("Created project-owned South Fork canopy profiles: spray trees for the placed white alder and mature and intermediate ponderosa, connected crowns for the younger ponderosa, live oak and deerbrush.\n")
         : TEXT("Failed to create project-owned South Fork canopy assets.\n");
     return bCreated;
 }
@@ -2724,6 +2846,16 @@ bool FRaftSimEditorModule::RefreshSouthForkGeneratedCanopyAssets(FString& OutSum
         return RaftSimEditorEnvironment::
             CreateSouthForkLiveOakCrownFamilyV3ReviewAssets(
                 World, OutSummary);
+    }
+    if (FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimOnlyRiparianSprayTrees")))
+    {
+        UStaticMesh* WhiteAlderMesh = nullptr;
+        UStaticMesh* PonderosaMatureMesh = nullptr;
+        UStaticMesh* PonderosaIntermediateMesh = nullptr;
+        return RaftSimEditorEnvironment::CreateSouthForkRiparianSprayTreeAssets(
+            World, WhiteAlderMesh, PonderosaMatureMesh, PonderosaIntermediateMesh, OutSummary);
     }
     if (FParse::Param(
             FCommandLine::Get(),

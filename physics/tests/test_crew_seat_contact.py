@@ -12,7 +12,11 @@ def test_seat_uses_rendered_body_and_tube_triangles():
         "void ARaftSimRaftActor::InitializeCrewSeatingForValidation")[0]
     assert seat.index("SetAvatarAction") < seat.index("ComputeRenderedSeatOriginZCm")
     assert "Avatar->GetSeatedContactPointsLocalCm()" in seat
-    assert "RenderedContactCompressionCm = 1.0f" in seat
+    # The rendered seat sinks 3.5 cm into the tube for a full contact patch
+    # ("the crew butts are not sitting fully on the boat", 2026-10-07).
+    assert "SeatCm.Z = RenderedSeatZCm - RenderedSeatContactCompressionCm;" in seat
+    header = (ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimRaftActor.h").read_text(encoding="utf-8")
+    assert "RenderedSeatContactCompressionCm = 3.5f" in header
     body = (PRIVATE / "RaftSimCC0CrewVisualActor.cpp").read_text(encoding="utf-8")
     sampling = body.split("GetSeatedContactPointsLocalCm() const")[1].split("void ARaftSimCC0")[0]
     assert "GetParentActor()" in sampling  # actor owner can be the raft, not the avatar

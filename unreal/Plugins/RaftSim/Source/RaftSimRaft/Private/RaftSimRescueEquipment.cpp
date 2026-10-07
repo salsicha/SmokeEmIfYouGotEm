@@ -477,8 +477,16 @@ void ARaftSimRaftActor::UpdateGuideWaistLine()
 {
     // The guide's flip line lives double-wrapped round the waist, closed by
     // a locking carabiner at the front, whenever it is not in use.
-    const auto* Guide=FindAvatar(TEXT("guide"));
+    auto* Guide=FindAvatar(TEXT("guide"));
     const bool bWorn=Guide && !FlipLineRopeVisible() && !Guide->IsHidden();
+    // The fitted line on the guide's vest replaces these procedural wraps,
+    // which hung loose 20 cm out round the hips.
+    if (Guide && Guide->HasProductionFlipLine())
+    {
+        Guide->SetStowedFlipLineVisible(bWorn);
+        if (GuideWaistLineVisual) GuideWaistLineVisual->SetVisibility(false);
+        return;
+    }
     if (!GuideWaistLineVisual && bWorn)
     {
         GuideWaistLineVisual=NewObject<UProceduralMeshComponent>(this,TEXT("GuideWaistLine"));

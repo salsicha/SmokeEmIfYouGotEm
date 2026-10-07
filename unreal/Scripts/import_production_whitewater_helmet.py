@@ -134,8 +134,8 @@ def configure_and_audit(
         bounds.max.y - bounds.min.y,
         bounds.max.z - bounds.min.z,
     ]
-    # Generator v8 moves the face and chin straps to per-wearer meshes, so the
-    # shell alone stands about 19 cm tall.
+    # The straps are per-wearer meshes; the full-cut v9 shell alone, down over
+    # the ears and the back of the skull, stands about 26 cm tall.
     if not (24.0 <= dimensions[0] <= 35.0 and 24.0 <= dimensions[1] <= 35.0 and 15.0 <= dimensions[2] <= 30.0):
         raise RuntimeError(f"Helmet import has implausible centimetre bounds: {dimensions}")
     nanite_fallback_triangles = mesh.get_num_triangles(0)

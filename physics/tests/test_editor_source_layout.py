@@ -2130,9 +2130,26 @@ def test_full_reach_far_field_breaks_up_grid_and_repeated_tree_silhouettes():
         "SouthForkDeerbrush",
     ):
         assert species_name in canopy_source
-    assert canopy_source.count("ESouthForkConnectedCrownForm::Ponderosa,") == 3
-    assert canopy_source.count("ESouthForkConnectedCrownForm::BroadTree,") == 3
+    # The placed white alder and mature/intermediate ponderosa are leaf-spray
+    # trees (2026-10-07); the younger ponderosa, live oak and deerbrush keep
+    # connected crowns.
+    assert canopy_source.count("ESouthForkConnectedCrownForm::Ponderosa,") == 1
+    assert canopy_source.count("ESouthForkConnectedCrownForm::BroadTree,") == 2
     assert canopy_source.count("ESouthForkConnectedCrownForm::Shrub,") == 1
+    spray_source = (
+        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
+        "RaftSimEditorSouthForkSprayTrees.cpp"
+    ).read_text(encoding="utf-8")
+    assert "CreateSouthForkRiparianSprayTreeAssets(" in canopy_source
+    assert "RaftSimOnlyRiparianSprayTrees" in canopy_source
+    for package in (
+        "SM_RaftSim_SouthForkWhiteAlder_ConnectedCrownV2",
+        "SM_RaftSim_SouthForkPonderosaMature_ConnectedCrownV1",
+        "SM_RaftSim_SouthForkPonderosaIntermediate_ConnectedCrownV1",
+    ):
+        assert package in canopy_source
+    assert "TargetTopZ = static_cast<float>(Bounds.Max.Z);" in spray_source
+    assert "TargetBaseZ = static_cast<float>(Bounds.Min.Z);" in spray_source
     assert "constexpr int32 StandardBranchCardCount = 12;" in canopy_source
     assert "constexpr int32 VolumetricBroadBranchCardCount = 36;" in canopy_source
     assert "const int32 CorePlaneCount = bVolumetricBroadCrown ? 1 : 2;" in canopy_source
@@ -2152,8 +2169,9 @@ def test_full_reach_far_field_breaks_up_grid_and_repeated_tree_silhouettes():
     assert "PonderosaMaterialB" in canopy_source
     assert "PonderosaMaterialC" in canopy_source
     assert (
-        "connected-crown candidates for all six South Fork canopy profiles, "
-        "including thirty-six-spray V2 broadleaf volumes"
+        "spray trees for the placed white alder and mature and intermediate "
+        "ponderosa, connected crowns for the younger ponderosa, live oak and "
+        "deerbrush"
         in canopy_source
     )
     material_source = read_photoreal_material_source(REPO_ROOT)

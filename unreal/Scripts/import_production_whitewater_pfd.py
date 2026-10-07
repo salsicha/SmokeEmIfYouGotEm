@@ -49,28 +49,25 @@ def load_and_verify_manifest() -> tuple[dict[str, object], Path]:
     if manifest.get("material_slots") != EXPECTED_SLOTS:
         raise RuntimeError(f"Unexpected source slots: {manifest.get('material_slots')}")
     construction = manifest.get("construction", {})
+    # Generator v14: a low-profile front-entry guide vest (two slim front
+    # foam panels either side of the zip, one back panel, dark side panels).
     expected_counts = {
-        "front_carrier_panels": 2,
-        "back_carrier_panels": 1,
-        "front_foam_panels": 4,
-        "back_panels": 2,
-        "rear_flex_channels": 1,
+        "front_foam_panels": 2,
+        "back_panels": 1,
+        "side_panels": 2,
         "side_wings": 0,
-        "side_webbing_connectors": 4,
-        "side_adjustment_sliders": 4,
-        "shoulder_adjustment_points": 4,
-        "shoulder_foam_pads": 0,
-        "shoulder_webbing_runs": 2,
-        "front_pockets": 2,
+        "padded_shoulder_straps": 2,
+        "shoulder_adjustment_buckles": 2,
+        "side_adjustment_straps": 4,
+        "side_adjustment_buckles": 4,
+        "adjustment_points": 6,
         "front_zip": 1,
-        "backup_buckles": 2,
-        "front_backup_webbing_runs": 4,
-        "adjustment_points": 8,
-        "quick_release_rescue_belts": 1,
-        "rescue_tether_rings": 1,
-        "reflective_chest_zones": 2,
-        "blank_back_placards": 1,
-        "front_lash_tabs": 3,
+        "front_pockets": 1,
+        "front_lash_tabs": 1,
+        "reflective_accents": 4,
+        "blank_back_labels": 1,
+        "quick_release_rescue_belts": 0,
+        "rescue_tether_rings": 0,
     }
     for field, expected in expected_counts.items():
         if construction.get(field) != expected:
@@ -162,7 +159,7 @@ def configure_and_audit(
     ]
     fallback_triangles = mesh.get_num_triangles(0)
     if not (
-        32.0 <= dimensions[0] <= 44.0
+        28.0 <= dimensions[0] <= 44.0
         and 32.0 <= dimensions[1] <= 44.0
         and 40.0 <= dimensions[2] <= 56.0
     ):
