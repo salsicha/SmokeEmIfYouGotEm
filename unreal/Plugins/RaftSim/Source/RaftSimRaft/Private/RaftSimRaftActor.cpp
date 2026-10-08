@@ -265,36 +265,8 @@ void ARaftSimRaftActor::PoseOarRigForValidation(float Phase, float LeftDirection
     }
 }
 
-void ARaftSimRaftActor::BeginPlay()
+FRaftSimRaftBodyConfig ARaftSimRaftActor::MakeProductionBodyConfig() const
 {
-    Super::BeginPlay();
-    ResolveRaftRig();
-
-    // A-3 authoritative path: configure the bridge subsystem from this
-    // actor's properties, then mirror the adapter's kinematic state.
-    Bridge = nullptr;
-    RaftAdapter = nullptr;
-    const UGameInstance* GameInstance = GetGameInstance();
-    if (GameInstance == nullptr)
-    {
-        return;
-    }
-    URaftSimPhysicsBridgeSubsystem* BridgeSubsystem =
-        GameInstance->GetSubsystem<URaftSimPhysicsBridgeSubsystem>();
-    if (BridgeSubsystem == nullptr)
-    {
-        return;
-    }
-
-    // Dev water config: the report gate governs river-water approval claims,
-    // not the genuine-solver window, so the gate requirement is disabled.
-    FRaftSimWaterRuntimeConfig WaterConfig;
-    WaterConfig.bRequireAcceptedReportManifest = false;
-    // Deterministic stepping and replay hashes remain available, but gameplay
-    // must not append a JSON line to disk on every fixed water tick. Validation
-    // tools opt into capture explicitly when they need an audit artifact.
-    WaterConfig.bEnableDeterministicCapture = false;
-
     // The rigid-body support stage integrates one combined body, so its mass
     // and inertia must include the occupied crew represented by D2. The flex
     // model below keeps MassKg as the dry raft mass and applies the same crew
@@ -345,6 +317,61 @@ void ARaftSimRaftActor::BeginPlay()
     BodyConfig.ForwardSlicingDragCoefficient = ForwardSlicingDragCoefficient;
     BodyConfig.HeaveDampingNsPerM = HeaveDampingNsPerM;
     BodyConfig.AngularDampingPerSecond = AngularDampingPerSecond;
+    return BodyConfig;
+}
+
+void ARaftSimRaftActor::ConfigureProductionFlexModel(URaftSimChronoRuntimeAdapter& Adapter) const
+{
+    const float DryMassKg = MassKg + URaftSimOarRigComponent::GetRigLoadKg(ResolvedRaftRig);
+    // D1-D4 flexible-raft stack with the actual production crew load bound to
+    // seats. Commands now move the same masses that the avatars depict.
+    FRaftSimFlexParameters FlexParameters;
+    FlexParameters.MassKg = DryMassKg;
+    FlexParameters.LengthM = FootprintLengthM;
+    FlexParameters.WidthM = FootprintWidthM;
+    FlexParameters.TubeRadiusM = TubeRadiusM;
+    FlexParameters.GuideMassKg = kGuideMassKg;
+    FlexParameters.PassengerMassKg = kPassengerMassKg;
+    FlexParameters.PassengerCount = PaddlerCount;
+    Adapter.ConfigureFlexibleRaftModel(
+        FlexParameters, IsSoloOarRig()
+            ? RaftSimCrewSeatLayout::BuildOarRowerSeats(FlexParameters)
+            : RaftSimCrewSeatLayout::BuildNormalSeats(FlexParameters,
+                CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0), 18000.0,
+        /*bBodyMassIncludesAllSeats=*/true);
+}
+
+void ARaftSimRaftActor::BeginPlay()
+{
+    Super::BeginPlay();
+    ResolveRaftRig();
+
+    // A-3 authoritative path: configure the bridge subsystem from this
+    // actor's properties, then mirror the adapter's kinematic state.
+    Bridge = nullptr;
+    RaftAdapter = nullptr;
+    const UGameInstance* GameInstance = GetGameInstance();
+    if (GameInstance == nullptr)
+    {
+        return;
+    }
+    URaftSimPhysicsBridgeSubsystem* BridgeSubsystem =
+        GameInstance->GetSubsystem<URaftSimPhysicsBridgeSubsystem>();
+    if (BridgeSubsystem == nullptr)
+    {
+        return;
+    }
+
+    // Dev water config: the report gate governs river-water approval claims,
+    // not the genuine-solver window, so the gate requirement is disabled.
+    FRaftSimWaterRuntimeConfig WaterConfig;
+    WaterConfig.bRequireAcceptedReportManifest = false;
+    // Deterministic stepping and replay hashes remain available, but gameplay
+    // must not append a JSON line to disk on every fixed water tick. Validation
+    // tools opt into capture explicitly when they need an audit artifact.
+    WaterConfig.bEnableDeterministicCapture = false;
+
+    const FRaftSimRaftBodyConfig BodyConfig = MakeProductionBodyConfig();
 
     FRaftSimWaterRaftCouplingPolicy CouplingPolicy;
     BridgeSubsystem->ConfigureBridge(
@@ -502,22 +529,7 @@ void ARaftSimRaftActor::BeginPlay()
         return;
     }
 
-    // D1-D4 flexible-raft stack with the actual production crew load bound to
-    // seats. Commands now move the same masses that the avatars depict.
-    FRaftSimFlexParameters FlexParameters;
-    FlexParameters.MassKg = DryMassKg;
-    FlexParameters.LengthM = FootprintLengthM;
-    FlexParameters.WidthM = FootprintWidthM;
-    FlexParameters.TubeRadiusM = TubeRadiusM;
-    FlexParameters.GuideMassKg = kGuideMassKg;
-    FlexParameters.PassengerMassKg = kPassengerMassKg;
-    FlexParameters.PassengerCount = PaddlerCount;
-    Adapter->ConfigureFlexibleRaftModel(
-        FlexParameters, IsSoloOarRig()
-            ? RaftSimCrewSeatLayout::BuildOarRowerSeats(FlexParameters)
-            : RaftSimCrewSeatLayout::BuildNormalSeats(FlexParameters,
-                CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0), 18000.0,
-        /*bBodyMassIncludesAllSeats=*/true);
+    ConfigureProductionFlexModel(*Adapter);
 
     // Seed the adapter in the local water frame. Starting a floating raft at
     // zero world velocity while the material immediately advects at the live
@@ -1729,7 +1741,10 @@ void ARaftSimRaftActor::IssueCrewCommand(ERaftSimCrewCommand Command)
 
 int32 ARaftSimRaftActor::ResolveHighSideDirection() const
 {
-    const FVector Flow = GetActorQuat().UnrotateVector(SampleWaterVelocityMps(GetActorLocation()));
+    // The river's own current, a metre down under any surface recirculation:
+    // a hole's breaking wave rolls back upstream at the surface, but the
+    // tube to weight is still the downstream one.
+    const FVector Flow = GetActorQuat().UnrotateVector(SampleWaterVelocityMps(GetActorLocation() - FVector(0.0, 0.0, 100.0)));
     // The tube about to hit a rock is the one the current is carrying onto
     // it: weight goes there so it cannot ride up the rock while the upstream
     // tube is pulled under. Only a rock abeam and close enough to matter.

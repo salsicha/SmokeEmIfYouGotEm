@@ -21,31 +21,65 @@ All notable changes to this project are recorded here, newest first. Versioning 
     crew. Test tank only (`splash`).
   - **Hole physics** (`RaftSimHolePourOver.h`, `RaftSimHoleWave.h`). The hull
     now meets two things:
-    - the water falling over the pour-over, which runs down the face at the
-      speed the drop gives it, sqrt(U^2 + 2 g dh);
-    - the breaking wave's pile, the same shape as the drawn one. The hull
-      floats on it, is carried by its water rolling back upstream, and is
-      pushed down its slopes. This uses a new optional surface-slope force on
-      the hull: each tube point's buoyancy B also pushes -B times the slope.
+    - **the water falling over the pour-over.** Like any falling sheet it
+      keeps the speed it came over the crest with and gains only downward
+      speed from the drop, sqrt(2 g dh). It drives down whatever it lands
+      on: a tube, or the people sitting there.
+    - **the breaking wave below it**, the same shape as the drawn one. Its
+      white water is mostly air. A hull sinks into it, bearing on it like
+      solid water a third as deep, and is pushed down its slopes by a new
+      optional surface-slope force (each tube point's buoyancy B also pushes
+      -B times the slope). Its water rolls back upstream over it, and in the
+      roller under it down to 0.8 of its height, at about its wave speed,
+      0.62 sqrt(g H). So a bigger hole holds harder, not just falls harder.
 
-    A raft that drifts in should stall on the pile's front and slide back
-    into the trough under the falling water. A crew paddling forward should
-    carry over it. Nothing forces a flip or a washout: the hull's own drag,
-    upper-face, swamping and capsize rules decide.
+    Nothing forces a flip or a washout: the hull's own drag, upper-face,
+    swamping and capsize rules decide. In the test hole (a 0.8 m pour-over
+    on a 2 m/s current):
+    - **Drifting in**, the raft is stopped by the wave and held, its stern
+      under the falling water. The crew's weight keeps it from flipping.
+      The same holds drifting in backwards, with the bow under.
+    - **Paddling forward**, the crew punch through.
+    - **Side-on**, the paddlers on the side under the falling water are
+      washed out.
+    - **Side-on with a high-side**, everyone stays in and the raft doesn't
+      flip.
+
+    Smaller holes flush a raft. Bigger ones keep and flip it, and at 1.2 m
+    even a paddling crew can't get out.
 
     In game it is off by default (`RaftSim.HoleWaterPhysics 1` to try it)
     until it has been checked on the rivers. It is always on in the test
-    tank, which now also has a real crewed raft: `crew` (production seats,
-    play's capsize gate and paddler washouts), `paddle` (crew paddle
-    forward), `yaw=D` and `seconds=N`.
+    tank, which now also has a real crewed raft. Options:
+    - `crew`: production seats, play's capsize gate and washouts;
+    - `paddle`: the crew paddle forward;
+    - `highside`: the crew high-side;
+    - `crest=H`: a pour-over H metres high;
+    - `yaw=D` and `seconds=N`.
+  - **The guide can be washed out**, by the same impact and swamping rules as
+    the paddlers but holding on twice as long as a braced paddler. Guides sit
+    at the stern, so a stern held under a hole's falling water can take the
+    guide; punching through a hole doesn't.
+  - **High-side direction** comes from the river's current a metre down, under
+    any surface recirculation. In a hole's roller the surface water runs
+    upstream, which would have sent the crew to the upstream tube.
+  - `ARaftSimRaftActor::MakeProductionBodyConfig` and
+    `ConfigureProductionFlexModel`: the raft body and crew-loaded flexible
+    model that play gives the physics runtime, now shared with labs and
+    tests.
   - **Test tank fixes:**
     - With `noraft`, the hidden raft is moved out of the scene. Left in
       place, it blotted a raft-shaped gap out of the wave.
     - With the wave shown, the old roller and crest-spray particles are no
       longer created at all; they had been starting by themselves.
-  - **Test:** `RaftSim.Physics.HoleWater` checks the falling water's speed and
-    direction, the pile matching the drawn wave, and the push the pile gives
-    a hull.
+  - **Tests:**
+    - `RaftSim.Physics.HoleWater` checks the falling water's speed and
+      direction, the pile matching the drawn wave, and the push the pile
+      gives a hull.
+    - `RaftSim.Physics.HoleKeeper` runs the production raft and crew through
+      the test hole headless: drifting in, backwards, paddling, side-on and
+      high-siding. `-RaftSimHoleSweep` reports the same five across hole
+      sizes instead.
 - Crew, gear and raft review fixes (2026-10-07):
   - **Hand grips rebuilt** (`RaftSimCC0CrewGrip.cpp`): every hold is solved
     against the bar it holds. The palm faces the T-grip crossbar or shaft,

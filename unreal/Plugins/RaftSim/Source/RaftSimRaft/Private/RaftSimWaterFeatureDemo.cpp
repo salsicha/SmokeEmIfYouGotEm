@@ -1,7 +1,7 @@
 // Small engine-rendered controls of the same authored feature current and
 // production raft dynamics used by South Fork. No scripted boat trajectories.
 #include "RaftSimWaterFeatureKinematics.h"
-#include "RaftSimHolePourOver.h"
+#include "RaftSimHoleLab.h"
 #include "RaftSimEddyDemoBoundary.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimChronoRuntimeAdapter.h"
@@ -72,9 +72,12 @@ struct FWaterFeatureDemo : TSharedFromThis<FWaterFeatureDemo>
     double CollisionRecordingStart=-1.;
     double CollisionWarmupEndSeconds=0.;
     int32 ExcludedWaterCells=0,HiddenFoamPatches=0,ContactImpulses=0,ContactQueries=0,BlockedTracerSteps=0;
-    URaftSimWaterRuntimeAdapter::FSupportBreakingSite HoleSite;
+    // The test hole, shared with the hole tests (hole and froth kinds).
+    TOptional<FRaftSimHoleLab> Lab;
     // Optional crashing churn in the hole ("churn"), and its spray pulse.
     TWeakObjectPtr<URaftSimHoleChurnComponent> Churn;
+    // The breaking wave's look: the churn draws it, the hull meets it.
+    FRaftSimHoleChurnLook HoleLook;
     // Optional water thrown over the crew when the raft is hit ("splash").
     TWeakObjectPtr<URaftSimRaftSplashComponent> Splash;
     double LastChurnSeconds=-1.;
@@ -91,9 +94,6 @@ struct FWaterFeatureDemo : TSharedFromThis<FWaterFeatureDemo>
     double DurationSeconds=12.;
     double FirstCapsizeSeconds=-1.,FirstSwimmerSeconds=-1.;
     int32 MaximumSwimmers=0;
-    // The hole's breaking wave as the hull meets it: the one the churn draws.
-    RaftSimHoleWave::FShape Wave;
-    double WaveToeM=0.;
     double Duration() const { return Kind==TEXT("eddy") && !bCollisionControl ? 18.0 : DurationSeconds; }
 
     void UpdateFoamGeometry()
@@ -137,39 +137,23 @@ struct FWaterFeatureDemo : TSharedFromThis<FWaterFeatureDemo>
 
     float Surface(const FVector& P) const
     {
-        if (Kind==TEXT("eddy")) return 0.f;
-        const TArray<URaftSimWaterRuntimeAdapter::FSupportBreakingSite> Sites={HoleSite};
-        return URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
-            FVector2D(P.X*.01,P.Y*.01),Sites,1.f,.25f);
+        return Kind==TEXT("eddy") ? 0.f : float(Lab->SurfaceM(P));
     }
     FVector FlowVelocity(const FVector& P,bool bSurface) const
     {
-        using namespace RaftSimWaterFeatureKinematics;
-        const double H=Surface(P),Depth=H+1.8;
-        const double Z=bSurface ? 1.0 : FMath::Clamp((P.Z*.01+1.8)/Depth,0.0,1.0);
-        if(Kind==TEXT("eddy"))return RaftSimEddyDemoBoundary::Velocity(P);
-        return FVector(2.,0,0)+HoleDelta(P.X*.01,P.Y*.01,Z,Depth,2.,1.);
+        return Kind==TEXT("eddy") ? RaftSimEddyDemoBoundary::Velocity(P) : Lab->FlowMps(P,bSurface);
     }
+    // In the hole, with the water falling over the pour-over.
     FVector Velocity(const FVector& P,bool bSurface) const
     {
-        const FVector Flow=FlowVelocity(P,bSurface);
-        if(Kind!=TEXT("hole"))return Flow;
-        // The water falling down the pour-over's face into the hole, as the
-        // game's hull water has it.
-        const auto Site=RaftSimHolePourOver::FSite::FromCrestLength(FVector2D::ZeroVector,FVector2D(1.,0.),HoleSite.PhysicalCrestLengthMeters);
-        const double Here=Surface(P);
-        return RaftSimHolePourOver::Velocity(Site,bSurface ? FVector(P.X*.01,P.Y*.01,Here) : P*.01,Flow,Here,
-            FVector::ForwardVector,FVector::RightVector,[this](const FVector2D& Q,double& S,FVector& V)
-            {const FVector C(Q.X*100.,Q.Y*100.,0.);S=Surface(C);V=FlowVelocity(C,true);return true;});
+        return Kind==TEXT("hole") ? Lab->VelocityMps(P,bSurface) : FlowVelocity(P,bSurface);
     }
-    // What the hull floats on and is carried by: the water, the pour-over's
-    // falling water and the breaking wave's pile.
+    // What the hull floats on and is carried by: in the hole, the water, the
+    // pour-over's falling water and the breaking wave's pile.
     RaftSimHoleWave::FHullWater HullWater(const FVector& P) const
     {
-        const double Water=Surface(P);const FVector Flow=Velocity(P,false);
-        RaftSimHoleWave::FHullWater Out;Out.SurfaceM=Water;Out.VelocityMps=Flow;
-        if(Kind==TEXT("hole"))
-            RaftSimHoleWave::Apply(Wave,P.X*.01,P.Y*.01,P.Z*.01,WaveToeM,Water,Flow,FVector::ForwardVector,FVector::RightVector,Out);
+        if(Kind==TEXT("hole"))return Lab->Hull(P);
+        RaftSimHoleWave::FHullWater Out;Out.SurfaceM=Surface(P);Out.VelocityMps=Velocity(P,false);
         return Out;
     }
     void Tick()
@@ -369,9 +353,26 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
     Demo->bCollisionControl=Demo->Kind==TEXT("eddy") && Args.Num()>2 && Args[2]==TEXT("collision");
     Demo->bMirroredEddy=Demo->Kind==TEXT("eddy") && Args.Num()>2 && Args[2]==TEXT("mirror");
     Demo->Label=Args.Num()>1 ? Args[1] : TEXT("shared-feature-")+Args[0];
-    Demo->HoleSite.RiverCoordinatesMeters=FVector2D::ZeroVector;Demo->HoleSite.Intensity=1.f;
-    Demo->HoleSite.PhysicalCrestHeightMeters=.8f;Demo->HoleSite.PhysicalCrestLengthMeters=2.f;
-    Demo->HoleSite.SpillingFraction=1.f;Demo->HoleSite.bLocalEnvelopeCap=true;
+    {
+        // The breaking wave the hull meets is the one the churn draws (or
+        // would draw: the default look when no churn is shown). "crest=H":
+        // a pour-over H metres high, with the breaking wave a site that high
+        // gets in game.
+        FRaftSimHoleChurnSite WaveSite;FString PresetName;
+        if(const FString* WaveArg=Args.FindByPredicate([](const FString& Arg){return Arg.StartsWith(TEXT("churn"));}))
+            WaveArg->Split(TEXT("="),nullptr,&PresetName);
+        Demo->HoleLook=FRaftSimHoleChurnLook::Preset(PresetName);
+        double CrestM=.8;
+        if(const FString* CrestArg=Args.FindByPredicate([](const FString& Arg){return Arg.StartsWith(TEXT("crest="));}))
+        {
+            CrestM=FMath::Clamp(FCString::Atod(**CrestArg+6),.2,1.2);
+            const auto Site=RaftSimHoleWave::FShape::ForCrest(CrestM,2.,1.);
+            Demo->HoleLook.WaveHeightCm=float(Site.HeightM*100.);Demo->HoleLook.ThrowCm=float(Site.ThrowM*100.);
+            Demo->HoleLook.RollCmPerSecond=float(Site.RollMps*100.);
+        }
+        WaveSite.Look=Demo->HoleLook;
+        Demo->Lab.Emplace(URaftSimHoleChurnComponent::ShapeOf(WaveSite),float(CrestM),2.f);
+    }
     ARaftSimRaftActor* Boat=nullptr;
     for(TActorIterator<ARaftSimRaftActor> It(World);It;++It){Boat=*It;break;}
     // "crew": the crew riding in the raft stay visible (they are attached to it).
@@ -415,16 +416,6 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
         Demo->Dynamics->ConfigureFlexibleRaftModel(Flex,{});
     }
     TWeakPtr<FWaterFeatureDemo> Weak=Demo;
-    {
-        // The breaking wave the hull meets is the one the churn draws (or
-        // would draw: the default look when no churn is shown).
-        FRaftSimHoleChurnSite WaveSite;FString PresetName;
-        if(const FString* WaveArg=Args.FindByPredicate([](const FString& Arg){return Arg.StartsWith(TEXT("churn"));}))
-            WaveArg->Split(TEXT("="),nullptr,&PresetName);
-        WaveSite.Look=FRaftSimHoleChurnLook::Preset(PresetName);
-        Demo->Wave=URaftSimHoleChurnComponent::ShapeOf(WaveSite);
-        RaftSimHoleWave::ToeM(Demo->Wave,[&Demo](double Along,double& WaterM){WaterM=Demo->Surface(FVector(Along*100.,0.,0.));return true;},Demo->WaveToeM);
-    }
     Demo->Dynamics->SetWaterSurfaceSampler([Weak](const FVector& P,float& H){auto D=Weak.Pin();if(!D || (D->Kind==TEXT("eddy") && RaftSimEddyDemoBoundary::Solid(P)))return false;H=D->HullWater(P).SurfaceM*100.;return true;});
     // Down the slope of the breaking wave's pile, back into the trough.
     if(Demo->Kind==TEXT("hole"))
@@ -436,6 +427,8 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
     if(Demo->bCrewRaft && !Boat->BindIsolatedFlipRuntime(Demo->Dynamics.Get(),false))
     {UE_LOG(LogTemp,Error,TEXT("Hole crew run requires the production raft"));return;}
     if(Demo->bPaddle)Boat->IssueCrewCommand(ERaftSimCrewCommand::AllForward);
+    // "highside": the crew throw their weight onto the downstream tube.
+    if(Demo->bCrewRaft && Args.Contains(TEXT("highside")))Boat->IssueCrewCommand(ERaftSimCrewCommand::HighSide);
     if(Demo->Kind==TEXT("eddy"))
     {
         const FVector Scale=Boat->GetActorScale3D();
@@ -533,8 +526,7 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
             auto* Churn=NewObject<URaftSimHoleChurnComponent>(Apparatus);
             Churn->SetupAttachment(Water);Churn->RegisterComponent();Churn->SetTranslucentSortPriority(2);
             FRaftSimHoleChurnSite Site;Site.Seed=61001;
-            FString PresetName;ChurnArg->Split(TEXT("="),nullptr,&PresetName);
-            Site.Look=FRaftSimHoleChurnLook::Preset(PresetName);
+            Site.Look=Demo->HoleLook;
             Churn->Configure(Site,[Weak](const FVector& P){auto D=Weak.Pin();return D ? D->Surface(P)*100.f : 0.f;},
                 LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/RaftSim/Materials/M_RaftSim_BreakingWaterLip.M_RaftSim_BreakingWaterLip")));
             Demo->Churn=Churn;

@@ -17,6 +17,7 @@ class ARaftSimCrewAvatarActor;
 struct FRaftSimFlexCrewAction;
 enum class ERaftSimCrewAvatarAction : uint8;
 class URaftSimChronoRuntimeAdapter;
+struct FRaftSimRaftBodyConfig;
 class URaftSimPhysicsBridgeSubsystem;
 namespace RaftSimHullPrepareCache {struct FCache;}
 namespace RaftSimRaftMesh {class FImmutableProductionRestMesh;}
@@ -109,6 +110,12 @@ public:
     /** Uses the gameplay mesh/seat path without starting river physics. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Validation")
     void InitializeCrewSeatingForValidation();
+
+    /** The body play gives the bridge's raft runtime: the raft with its crew
+     * aboard. Labs and validation configure isolated runtimes with it. */
+    FRaftSimRaftBodyConfig MakeProductionBodyConfig() const;
+    /** The flexible-raft model play gives it: the crew's masses on their seats. */
+    void ConfigureProductionFlexModel(URaftSimChronoRuntimeAdapter& Adapter) const;
 
     /** Minimum signed glute-to-tube clearance; negative is compression. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Validation")

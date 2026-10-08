@@ -151,8 +151,7 @@ RaftSimHoleWave::FHullWater WithHoles(URaftSimWaterRuntimeAdapter& Water, const 
         RaftSimHoleWave::FHullWater OnPile;
         if (ToeM > TNumericLimits<double>::Lowest() &&
             RaftSimHoleWave::Apply(Wave, Along, AcrossM, WorldPositionCm.Z * 0.01, ToeM, Here.SurfaceHeightMeters,
-                Hull.VelocityMps, Downstream, Across, OnPile) &&
-            OnPile.SurfaceM > Hull.SurfaceM)
+                Hull.VelocityMps, Downstream, Across, OnPile))
         {
             Hull = OnPile;
         }

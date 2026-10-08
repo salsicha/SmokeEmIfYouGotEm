@@ -93,6 +93,8 @@ RaftSimHoleWave::FShape URaftSimHoleChurnComponent::ShapeOf(const FRaftSimHoleCh
     Shape.CrestBowPerSquareMeter = Site.CrestBowCmPerSquareMeter * 0.01;
     Shape.RollMps = Site.Look.RollCmPerSecond * 0.01;
     Shape.Intensity = Site.Intensity;
+    // As deep as the wave is high, as for a site's own pile (ForCrest).
+    Shape.ReturnDepthM = 0.8 * Shape.HeightM;
     return Shape;
 }
 

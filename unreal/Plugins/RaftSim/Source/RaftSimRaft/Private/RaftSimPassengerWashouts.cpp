@@ -10,9 +10,14 @@ void ARaftSimRaftActor::UpdatePassengerWashouts(float DeltaSeconds)
     // Bound hitch exposure: a stale field sample cannot supply a long impact.
     const float Dt = FMath::Min(DeltaSeconds, .05f);
     const auto& K = RaftAdapter->GetKinematicState();
-    for (int32 Index = 0; Index < PaddlerCount; ++Index)
+    const FName GuideId(TEXT("guide"));
+    // The paddlers, then the guide at the stern: a stern driven under a
+    // hole's falling water can take the guide too ("since the stern is where
+    // the guide sits he might get washed out", 2026-10-08).
+    for (int32 Index = 0; Index <= PaddlerCount; ++Index)
     {
-        const FName Id(*FString::Printf(TEXT("paddler_%d"), Index + 1));
+        const bool bGuide = Index == PaddlerCount;
+        const FName Id = bGuide ? GuideId : FName(*FString::Printf(TEXT("paddler_%d"), Index + 1));
         auto* Avatar = FindAvatar(Id);
         float& Exposure = PassengerWashImpulseNs.FindOrAdd(Id);
         if (!Avatar || Avatar->GetAttachParentActor() != this ||
@@ -33,7 +38,10 @@ void ARaftSimRaftActor::UpdatePassengerWashouts(float DeltaSeconds)
         const double Depth = Wet ? Water.SurfaceHeightM - Hip.Z * .01 : 0.;
         const auto Action = Avatar->GetAvatarAction();
         // Bracing low or high-siding means a hand on the line and feet tucked:
-        // twice the budget for either mechanism, never immunity.
+        // twice the budget for either mechanism, never immunity. The guide,
+        // wedged in at the stern with a hand on the frame, holds on twice as
+        // long again: a stern dipped punching through a hole leaves them
+        // aboard, one held under the falling water may not.
         const bool Braced = Action == ERaftSimCrewAvatarAction::Brace ||
             Action == ERaftSimCrewAvatarAction::HighSidePort || Action == ERaftSimCrewAvatarAction::HighSideStarboard ||
             Avatar->HasHighSideTransfer();
@@ -53,12 +61,12 @@ void ARaftSimRaftActor::UpdatePassengerWashouts(float DeltaSeconds)
             Swamped += float(Carry) * Dt;
         }
         else Swamped = FMath::Max(0.f, Swamped - 3.f * Dt);
-        if (Swamped >= (Braced ? 1.4f : .6f))
+        if (Swamped >= (bGuide ? 2.8f : Braced ? 1.4f : .6f))
         {
             const float Held = Swamped;
             Swamped = Exposure = 0.f;
             // They leave with the water around them, not with the hull.
-            SpawnSwimmers(1, false, Id, Relative * .5);
+            SpawnSwimmers(1, bGuide, Id, Relative * .5);
             UE_LOG(LogTemp, Display, TEXT("PASSENGER_SWAMPED id=%s depth_m=%.3f relative_mps=%.3f held_s=%.2f braced=%d"),
                 *Id.ToString(), Depth, Relative.Size(), Held, Braced);
             continue;
@@ -71,11 +79,11 @@ void ARaftSimRaftActor::UpdatePassengerWashouts(float DeltaSeconds)
         // must overcome grip. Bracing doubles the impulse budget, not immunity.
         const double Force = FMath::Min(1800., .5 * 1000. * .45 * FMath::Min(Depth, .65) * Relative.SizeSquared());
         Exposure += float(Force) * Dt;
-        if (Exposure < (Braced ? 440.f : 220.f)) continue;
+        if (Exposure < (bGuide ? 880.f : Braced ? 440.f : 220.f)) continue;
 
         const float DeliveredImpulse = Exposure;
         Exposure = Swamped = 0.f;
-        SpawnSwimmers(1, false, Id, Relative * .4);
+        SpawnSwimmers(1, bGuide, Id, Relative * .4);
         UE_LOG(LogTemp, Display, TEXT("PASSENGER_WASHOUT id=%s depth_m=%.3f relative_mps=%.3f impulse_ns=%.1f braced=%d"),
             *Id.ToString(), Depth, Relative.Size(), DeliveredImpulse, Braced);
     }

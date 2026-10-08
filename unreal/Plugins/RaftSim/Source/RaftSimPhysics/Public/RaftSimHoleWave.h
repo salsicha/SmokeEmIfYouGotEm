@@ -41,6 +41,12 @@ struct FShape
     double RollMps = 1.7;
     /** 0..1: how strongly the hole breaks. Scales the pile and its roll. */
     double Intensity = 1.0;
+    /** The white water is part air: it bears a hull like solid water this
+     * share of its depth. */
+    double BearingFraction = 0.3;
+    /** Under the white water the solid water runs back upstream too, down
+     * to this depth below the water's own surface: the roller. */
+    double ReturnDepthM = 0.6;
 
     /** The pile below a pour-over CrestHeightM high whose face runs over
      * CrestLengthM (the crest relief's own dimensions). */
@@ -54,6 +60,11 @@ struct FShape
         Shape.ThrowM = 0.6 * Shape.HeightM;
         Shape.HalfWidthM = 1.1 * FMath::Clamp(Length, 3.0, 5.0);
         Shape.Intensity = FMath::Clamp(Intensity, 0.0, 1.0);
+        // A breaking wave's water moves at about its wave speed, sqrt(g H),
+        // and its roller is about as deep as the wave is high: a bigger
+        // hole holds harder, not just falls harder.
+        Shape.RollMps = 0.62 * FMath::Sqrt(9.81 * Shape.HeightM);
+        Shape.ReturnDepthM = 0.8 * Shape.HeightM;
         return Shape;
     }
 
@@ -95,9 +106,6 @@ struct FShape
     }
 };
 
-/** The white water bears like solid water this much of its depth. */
-constexpr double Aeration = 0.6;
-
 /** The trough's lowest water: the least of the water on the centre line
  * where the front lands, under the lip and under the crest. WaterAt gives
  * the water's surface (m) Along the centre line, false where dry. */
@@ -135,6 +143,12 @@ struct FHullWater
  * trough's lowest water is ToeM. Downstream3/Across3 are the hole's flow
  * frame in world space (horizontal, unit). Returns false off the pile, with
  * Out holding the water unchanged.
+ *
+ * The white water is mostly air: a hull sinks into it rather than riding up
+ * on it, and the water running back upstream in the roller under it is what
+ * stops a boat. Riding high on a pile that bore it like solid water, a
+ * drifting raft's bow stood up and the stern, still in the current, walked
+ * it over the top.
  */
 inline bool Apply(const FShape& Shape, double Along, double Across, double PointZM, double ToeM, double WaterM,
     const FVector& BaseVelocityMps, const FVector& Downstream3, const FVector& Across3, FHullWater& Out)
@@ -142,27 +156,30 @@ inline bool Apply(const FShape& Shape, double Along, double Across, double Point
     Out.SurfaceM = WaterM;
     Out.VelocityMps = BaseVelocityMps;
     Out.Slope = FVector2D::ZeroVector;
-    const double Top = ToeM + Shape.TopAboveToe(Along, Across);
-    const double Rise = Aeration * (Top - WaterM);
-    if (Rise <= 0.0)
+    const double AboveToe = Shape.TopAboveToe(Along, Across);
+    if (AboveToe <= 0.0)
     {
         return false;
     }
-    Out.SurfaceM = WaterM + Rise;
-    // The pile's slope, from its own shape: steep up its front, gently down
-    // its back.
+    const double Rise = Shape.BearingFraction * (ToeM + AboveToe - WaterM);
     constexpr double Step = 0.05;
-    const double AlongSlope = Aeration * (Shape.TopAboveToe(Along + Step, Across) - Shape.TopAboveToe(Along - Step, Across)) / (2.0 * Step);
-    const double AcrossSlope = Aeration * (Shape.TopAboveToe(Along, Across + Step) - Shape.TopAboveToe(Along, Across - Step)) / (2.0 * Step);
-    const FVector World = Downstream3 * AlongSlope + Across3 * AcrossSlope;
-    Out.Slope = FVector2D(World.X, World.Y);
-    // Its water rolls upstream along its top: up the back, over the crest,
-    // down the front. Deeper than the water's own surface the hole's own
-    // current takes over.
-    const FVector Rolling = (-Downstream3 - FVector::UpVector * AlongSlope / Aeration).GetSafeNormal() *
+    const double AlongRise = (Shape.TopAboveToe(Along + Step, Across) - Shape.TopAboveToe(Along - Step, Across)) / (2.0 * Step);
+    if (Rise > 0.0)
+    {
+        Out.SurfaceM = WaterM + Rise;
+        // The pile's slope, from its own shape: steep up its front, gently
+        // down its back.
+        const double AcrossRise = (Shape.TopAboveToe(Along, Across + Step) - Shape.TopAboveToe(Along, Across - Step)) / (2.0 * Step);
+        const FVector World = (Downstream3 * AlongRise + Across3 * AcrossRise) * Shape.BearingFraction;
+        Out.Slope = FVector2D(World.X, World.Y);
+    }
+    // Its water rolls upstream along its top (up the back, over the crest,
+    // down the front) and runs back upstream under it. Deeper than that the
+    // hole's own current takes over.
+    const FVector Rolling = (-Downstream3 - FVector::UpVector * AlongRise).GetSafeNormal() *
         (Shape.RollMps * Shape.Intensity * Shape.Lateral(Across)) + Across3 * FVector::DotProduct(BaseVelocityMps, Across3);
-    const double InPile = FMath::SmoothStep(WaterM - 0.3, WaterM, PointZM);
-    Out.VelocityMps = FMath::Lerp(BaseVelocityMps, Rolling, InPile);
+    const double InRoller = FMath::SmoothStep(WaterM - Shape.ReturnDepthM, WaterM - 0.5 * Shape.ReturnDepthM, PointZM);
+    Out.VelocityMps = FMath::Lerp(BaseVelocityMps, Rolling, InRoller);
     return true;
 }
 }

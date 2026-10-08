@@ -5,14 +5,15 @@
 /**
  * The water falling over a hole's pour-over, as the hull feels it.
  *
- * Water going over a hole's crest falls down the face into the trough and
- * speeds up as it drops: its speed is the approach speed plus what the drop
- * gives it, sqrt(U^2 + 2 g dh), and it runs down the face. Below the trough
- * the hole's roller (the breaking wave) runs back upstream at the surface,
- * so a raft without way on is stopped there and pushed back into this
- * falling water. A tube under it is driven down and in, and anyone sitting
- * in it is hit by it. The raft's own drag, upper-face and swamping loads do
- * the rest: no force, torque or flip is prescribed here.
+ * Water going over a hole's crest falls into the trough. Like any falling
+ * sheet it keeps the speed U it came over the crest with and gains only
+ * downward speed from the drop, sqrt(2 g dh): it drives what it lands on
+ * down, at sqrt(U^2 + 2 g dh) in all. Below the trough the hole's breaking
+ * wave rolls back upstream at the surface (RaftSimHoleWave.h), so a raft
+ * without way on is stopped there and pushed back into this falling water.
+ * A tube under it is driven down, and anyone sitting there is hit by it. The
+ * raft's own drag, upper-face and swamping loads do the rest: no force,
+ * torque or flip is prescribed here.
  *
  * The drop is measured on the water surface the hull already floats on (the
  * surface at the crest of the same flow line against the surface here), so
@@ -97,10 +98,12 @@ inline FVector Velocity(const FSite& Site, const FVector& PointM, const FVector&
         return BaseVelocityMps;
     }
     const double ApproachMps = FMath::Max(FVector::DotProduct(CrestVelocityMps, Downstream3), 0.0);
-    const double SpeedMps = FMath::Sqrt(ApproachMps * ApproachMps + 2.0 * 9.81 * DropM);
-    // Down the face from the crest to here; across-flow is the water's own.
-    const FVector Direction = (Downstream3 * Along - FVector::UpVector * DropM).GetSafeNormal();
-    const FVector Falling = Direction * SpeedMps + Across3 * FVector::DotProduct(BaseVelocityMps, Across3);
+    // Free fall from the crest: the speed it came over with, and down. Sent
+    // down the face at full speed instead, it shoved a raft in the trough
+    // back out of the hole rather than driving its tube under. Across the
+    // flow the water keeps its own speed.
+    const FVector Falling = Downstream3 * ApproachMps - FVector::UpVector * FMath::Sqrt(2.0 * 9.81 * DropM) +
+        Across3 * FVector::DotProduct(BaseVelocityMps, Across3);
     // Over the crest the sheet gathers. At the foot of the face it dives
     // under the breaking wave's pile (RaftSimHoleWave.h), whose own water
     // rolls back upstream on top: carried on along the surface, the sheet
