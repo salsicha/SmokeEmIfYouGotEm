@@ -19,14 +19,24 @@ then correctly refused the already occupied `continuous-rapid-registration-nativ
 test label, preserving that October 6 report without running or claiming fresh
 controls. The original pipeline is terminal, not a live watcher.
 
-Native validation now awaits `tmp/futaleufu-canopy-repair-resume-v1`, launched
-through `tmp/resume_futaleufu_canopy_repair_v1.ps1` in exec session 80467. It
-checks the completed build, unchanged source hashes and shared-engine/resource
-readiness, then uses the fresh `futaleufu-canopy-repair-controls-v1` label for
-all 12 native calibration controls. No duplicate build is scheduled. Only a
-passing fresh report permits canopy apply plus independent reload,
-expanded-domain flow/audit, then full Chilko hydraulic inputs. Inspect this
-resume process and its receipts rather than restarting the terminal pipeline.
+The fresh `futaleufu-canopy-repair-controls-v1` native run has now passed all
+12 requested tests, including Cartesian rapid registration, transported flow
+frames, and both live-crop boundary controls. The native process exited zero;
+all six recorded DLL hashes remained unchanged. The report has 11 clean
+successes and one success with an HTTP connectivity-check timeout warning,
+with zero errors, failed, skipped or unfinished tests. The build includes
+concurrent uncommitted changes from the other task: this evidence is bound to
+its recorded DLL hashes, not a clean build of the commit alone. See the
+[native control receipt](../../physics/data/real_world/futaleufu_river_chile/review/continuous_rapid_native_controls_2026_10_08.json).
+These NullRHI controls are not rendered-map, whole-river or packaged 20 FPS
+acceptance.
+
+The single live `tmp/futaleufu-canopy-repair-resume-v1` process, launched through
+`tmp/resume_futaleufu_canopy_repair_v1.ps1` in exec session 80467, has advanced
+to `tmp/futaleufu-buffer-canopy-serial-v3`: guarded native canopy apply plus
+independent reload, then expanded-domain flow/audit and full Chilko hydraulic
+inputs. No duplicate build is scheduled. Inspect this resume process and its
+actual native receipts rather than restarting the terminal pipeline.
 Earlier serial-v1/v2 and Chilko queue-v10/v11 attempts are terminal and preserved, not
 live jobs. Inspect the pipeline's actual process and receipts before starting
 anything else. Diagnosis: `tmp/futaleufu-canopy-residency-v1.json`, SHA256
