@@ -1,7 +1,8 @@
 """Continuous three-arm stage/width construction from native captured pixels.
 
-All output stages and bank spans are INFERRED. GLO-30 is an edited DSM, not
-bathymetry; ten-metre optical classifications are not surveyed banks. Keep raw
+All stages are INFERRED. Mainstem banks use captured OSM mapping; unmapped
+tributary banks use spectral span inference. GLO-30 is an edited DSM, not
+bathymetry; neither mapping nor classification is a surveyed bank. Keep raw
 support and every fallback alongside the construction values. No discharge,
 bed excavation or native hydraulic acceptance is asserted here.
 """
@@ -13,9 +14,12 @@ import numpy as np
 import shapely
 from scipy.ndimage import distance_transform_edt
 
-from build_futaleufu_corridor_sources import ROOT, sha
+from build_futaleufu_corridor_sources import ROOT, BASE, sha
 from build_futaleufu_corridor_water_reference import classify, consensus, route_components
 from build_pacuare_evidence_grid import pava_nonincreasing
+from futaleufu_planform import load_planform, mapped_span
+
+PLANFORM_CAPTURE=BASE/'futaleufu_sources_2026_09/osm/futaleufu_overpass.json'
 
 
 def fit_stage(raw, weights, junction, incoming):
@@ -106,6 +110,8 @@ def build(source_folder, network_path, output):
             network.get('schema') != 'raftsim.futaleufu_confluence_network.v1'):
         raise ValueError('Verified native sources and captured confluence required')
     pins = {manifest_path: sha(manifest_path), network_path: sha(network_path)}
+    pins[PLANFORM_CAPTURE]=sha(PLANFORM_CAPTURE)
+    planform=shapely.union_all([g for _,_,g in load_planform(PLANFORM_CAPTURE)])
     for item in (source, network):
         for relative, digest in item['sources_sha256'].items():
             path = (ROOT/relative).resolve(); path.relative_to(ROOT)
@@ -201,16 +207,39 @@ def build(source_folder, network_path, output):
                 easting_m=shapely.get_x(center),northing_m=shapely.get_y(center),
                 left_m=np.interp(sample_s,middle,lo),right_m=np.interp(sample_s,middle,hi),
                 raw_section_stage_m=np.array(raw),fitted_section_stage_m=fit,
-                section_station_m=middle,span_interpolated=span_inferred).items():
+                section_station_m=middle,spectral_span_interpolated=span_inferred).items():
             arrays[name+'_'+key]=value
         for i,r in enumerate(records):
             r['inferred_stage_m']=float(fit[i]);r['stage_adjustment_m']=float(fit[i]-raw[i])
-            r['span_interpolated']=bool(span_inferred[i])
+            r['spectral_span_interpolated']=bool(span_inferred[i])
+        # Mainstem source mapping covers dark water missed by NDWI, and its
+        # disconnected cross-section components preserve islands/side pools.
+        # Rio Azul lacks mapped banks except where it overlaps the confluence;
+        # do not borrow the mainstem footprint for its tributary width.
+        mapped_samples=0
+        if name!='rio_azul':
+            before=shapely.line_interpolate_point(line,np.maximum(sample_s-1,0))
+            after=shapely.line_interpolate_point(line,np.minimum(sample_s+1,line.length))
+            tangent=np.c_[shapely.get_x(after)-shapely.get_x(before),shapely.get_y(after)-shapely.get_y(before)]
+            normals=np.c_[-tangent[:,1],tangent[:,0]]/np.linalg.norm(tangent,axis=1)[:,None]
+            spans=[]
+            for point,normal in zip(np.c_[shapely.get_x(center),shapely.get_y(center)],normals):
+                span=mapped_span(planform,point,normal)
+                if span is None:
+                    raise ValueError(f'Captured mainstem route leaves mapped water: {name}')
+                spans.append(span)
+            spans=np.asarray(spans)
+            arrays[name+'_left_m'],arrays[name+'_right_m']=spans[:,0],spans[:,1]
+            mapped_samples=len(spans)
+        arrays[name+'_bank_span_mapped']=np.full(len(sample_s),mapped_samples>0,dtype=bool)
         summaries[name]=dict(length_m=float(line.length),samples=len(sample_s),sections=records,stage_anchors=anchors,
             fallback_stage_sections=sum(r['kind']=='near_route_dsm_fallback' for r in records),
-            interpolated_span_sections=int(span_inferred.sum()),
+            interpolated_span_sections=0 if mapped_samples else int(span_inferred.sum()),
+            spectral_interpolated_span_sections=int(span_inferred.sum()),
             stage_adjustment_max_abs_m=float(np.max(abs(fit-np.array(raw)))),
-            width_m_p10_p50_p90=np.percentile(hi-lo,[10,50,90]).tolist(),
+            width_m_p10_p50_p90=np.percentile(arrays[name+'_right_m']-arrays[name+'_left_m'],[10,50,90]).tolist(),
+            bank_span_basis='captured_OSM_component_containing_route' if mapped_samples else 'spectral_span_with_explicit_interpolation',
+            mapped_bank_samples=mapped_samples,
             stage_start_m=float(sample_z[0]),stage_end_m=float(sample_z[-1]),
             maximum_inferred_interval_slope=float(np.max(-np.diff(sample_z)/np.diff(sample_s))))
     if not all(sha(p)==digest for p,digest in pins.items()):
@@ -222,17 +251,18 @@ def build(source_folder, network_path, output):
         profile_sha256=sha(output/'profile.npz'),junction_stage_m=junction_stage,
         junction_support_pixels=int(junction_support.sum()),branches=summaries,
         vertical_reference='EGM2008; edited GLO-30 DSM-based inference, not observed local stage',
+        mapped_planform_source=PLANFORM_CAPTURE.relative_to(ROOT).as_posix(),
         construction_policy=dict(section_length_m=50,profile_sample_m=10,stage_anchor_interval_m=200,
             junction_support_radius_m=40,near_route_fallback_radius_m=20,
-            bank_span='5th/95th native water lateral percentiles plus half-cell; missing spans linearly interpolated, endpoints held',
+            bank_span='Mainstem: exact captured OSM water component containing route at each sample, islands retained. Unmapped Rio Azul: 5th/95th native water lateral percentiles plus half-cell; missing spans linearly interpolated, endpoints held.',
             stage='Quality-prioritized 200 m DSM anchors; weighted nonincreasing regression, exactly constrained to a common inferred junction stage',
             ownership='Closest captured branch and clamped segment station; endpoint caps excluded from section evidence'),
         attribution=dict(route=network['rights'],optical=source['optical_attribution'],
             optical_license=source['optical_license'],dsm_license_url=source['dsm']['license_url'],
             dsm_distribution_requires_article_6_notices=True),
-        limitations=['Every stage and bank span is inferred; raw DSM and spectral evidence retained separately.',
+        limitations=['Every stage is inferred; OSM banks are mapped, not surveyed or image-date shoreline. Raw DSM and spectral evidence retained separately.',
             'Near-route DSM fallback can contain canopy; no bare-earth or underwater measurement implied.',
-            'Missing optical spans are flagged, not proof of dry river or permission to narrow a channel.',
+            'Missing optical spans are flagged, not proof of dry river or permission to narrow a channel. Mapped mainstem banks override spectral spans only, not the retained raw DSM stage observations.',
             'Monotone stage is construction scaffolding, not a solved free surface; rapid drops still need local evidence and hydraulic checks.',
             'Interpolated width and stage do not establish bank stability, nonfolding cross-sections or boat passage.'],
         unknown_optical_observations=int((3-counts).sum()),discharge_assigned=False,

@@ -85,15 +85,24 @@ def test_three_arm_builder_has_exact_common_stage_and_source_guards(tmp_path):
             rio_azul=[[0,100,800],[500,500,500]],upstream_mainstem=[[0,500,900],[400,500,500]],
             downstream_mainstem=[[0,500,500],[400,500,100]]).items()})
     npth=tmp_path/'network.json';npth.write_text(json.dumps(network))
-    with patch('build_futaleufu_channel_profile.ROOT',tmp_path):
+    capture=tmp_path/'capture.json';capture.write_text('{}')
+    import shapely
+    with patch('build_futaleufu_channel_profile.ROOT',tmp_path), \
+         patch('build_futaleufu_channel_profile.PLANFORM_CAPTURE',capture), \
+         patch('build_futaleufu_channel_profile.load_planform',return_value=[('way',1,shapely.box(450,0,550,1000))]):
         result=build(source,npth,tmp_path/'out')
         assert result['installed_in_engine'] is False and result['bed_constructed'] is False
+        assert result['branches']['upstream_mainstem']['mapped_bank_samples']==41
+        assert result['branches']['upstream_mainstem']['interpolated_span_sections']==0
         with np.load(tmp_path/'out/profile.npz') as arrays:
             ends=[]
             for name in network['branches']:
                 stage=arrays[name+'_stage_m']
                 assert np.isfinite(stage).all() and np.all(np.diff(stage)<=0)
                 assert np.all(arrays[name+'_right_m']>arrays[name+'_left_m'])
+                if name!='rio_azul':
+                    assert arrays[name+'_bank_span_mapped'].all()
+                    np.testing.assert_allclose(arrays[name+'_right_m']-arrays[name+'_left_m'],100)
                 ends.append(stage[0 if name=='downstream_mainstem' else -1])
             assert ends==[result['junction_stage_m']]*3
         with pytest.raises(ValueError,match='Fresh'):build(source,npth,tmp_path/'out')
