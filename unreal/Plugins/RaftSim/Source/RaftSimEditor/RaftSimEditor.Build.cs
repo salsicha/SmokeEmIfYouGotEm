@@ -58,6 +58,7 @@ public class RaftSimEditor : ModuleRules
             "NiagaraShader",
             "EnhancedInput",
             "RaftSimRaft",
+            "RaftSimPhysics",
             "RaftSimWater",
             "RaftSimWaterDetail",
             "Projects",
