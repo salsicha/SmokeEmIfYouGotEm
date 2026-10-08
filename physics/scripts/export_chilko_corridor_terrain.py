@@ -33,7 +33,7 @@ def corridor_chunks(line, origin, buffer_m, *, spacing_m=SPACING):
                                                 *(origin + [(i+1)*span, (j+1)*span])))]
 
 
-def export(terrain, profile, out, origin, datum, buffer_m=600., discharge=45., roughness=.045, depth_profile=None, *, spacing_m=SPACING):
+def export(terrain, profile, out, origin, datum, buffer_m=600., discharge=45., roughness=.045, depth_profile=None, *, spacing_m=SPACING, chunk_window=None):
     policy=support_policy(spacing_m)
     span=(VERTICES-1)*spacing_m
     out = Path(out).resolve()
@@ -42,6 +42,13 @@ def export(terrain, profile, out, origin, datum, buffer_m=600., discharge=45., r
     model = CorridorBed(terrain, profile, discharge, roughness, depth_profile=depth_profile)
     origin = np.asarray(origin, dtype=float)
     indices = corridor_chunks(model.line, origin, buffer_m, spacing_m=spacing_m)
+    if chunk_window is not None:
+        if (len(chunk_window)!=4 or any(type(v) is not int for v in chunk_window) or
+                chunk_window[0]>chunk_window[2] or chunk_window[1]>chunk_window[3]):
+            raise ValueError('Integer inclusive chunk window xmin ymin xmax ymax required')
+        xmin,ymin,xmax,ymax=chunk_window
+        indices=[(i,j) for i,j in indices if xmin<=i<=xmax and ymin<=j<=ymax]
+        if not indices:raise ValueError('Chunk window does not intersect the captured route corridor')
     grid=model.receipt.get('available_channel_depth',{}).get('capacity_grid')
     if grid is not None:
         from chilko_encoded_capacity import validate_capacity_grid
@@ -93,6 +100,11 @@ def export(terrain, profile, out, origin, datum, buffer_m=600., discharge=45., r
         maximum_height_quantization_error_m=max_quantization_error,
         scope='Complete corridor initial terrain/bed candidate, not accepted river hydraulics or rapid geometry',
         vegetation_complete=False, engine_validated=False, full_river_complete=False)
+    if chunk_window is not None:
+        manifest['geographic_scope']=dict(source_route_interval_m=[0.,model.line.length],
+            chunk_window_inclusive=list(chunk_window),buffer_m=buffer_m,
+            frame='Bounded subset of the unchanged full-route geographic lattice; not full-route coverage')
+        manifest['scope']='Bounded native-registration terrain candidate; not complete corridor or accepted hydraulics'
     (out/'manifest.json').write_text(json.dumps(manifest, indent=2, allow_nan=False)+'\n')
     # This reader independently verifies every common edge and encoded tile.
     LandscapeTriangles(out)

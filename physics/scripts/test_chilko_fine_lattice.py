@@ -89,7 +89,11 @@ def test_one_metre_png_export_seams_and_native_chunk_ownership(tmp_path):
         receipt=dict(terrain_manifest_sha256=sha(source),profile_manifest=str(profile),profile_manifest_sha256=sha(profile)))
     out=tmp_path/'encoded'
     with patch('export_chilko_corridor_terrain.CorridorBed',return_value=m):
-        manifest=export(terrain,tmp_path,out,[0,0],900.,buffer_m=100,spacing_m=1.)
+        manifest=export(terrain,tmp_path,out,[0,0],900.,buffer_m=100,spacing_m=1.,chunk_window=[-1,-1,2,0])
+    assert manifest['geographic_scope']['chunk_window_inclusive']==[-1,-1,2,0]
+    assert 'route_interval_m' not in manifest['geographic_scope']
+    assert 'Bounded' in manifest['scope']
+    assert len(manifest['chunks'])==8
     assert manifest['landscape']['span_m']==126
     assert manifest['landscape']['scale_xyz'][:2]==[100,100]
     assert manifest['inference_support_policy']==support_policy(1.)
@@ -106,3 +110,12 @@ def test_one_metre_png_export_seams_and_native_chunk_ownership(tmp_path):
     manifest['landscape']['spacing_m']=2.
     (out/'manifest.json').write_text(json.dumps(manifest))
     with pytest.raises(ValueError): LandscapeTriangles(out)
+
+
+@pytest.mark.parametrize('window', [[0,0,1], [1,0,0,1], [0,2,1,1], [0.,0,1,1], [True,0,1,1], [100,100,101,101]])
+def test_bad_or_nonintersecting_window_fails_before_writing(tmp_path,window):
+    m=model();m.receipt={}
+    with patch('export_chilko_corridor_terrain.CorridorBed',return_value=m):
+        with pytest.raises(ValueError,match='chunk window|Chunk window'):
+            export('terrain','profile',tmp_path/'out',[0,0],900.,spacing_m=1.,chunk_window=window)
+    assert not (tmp_path/'out').exists()
