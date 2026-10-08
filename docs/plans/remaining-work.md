@@ -1,5 +1,33 @@
 # Remaining requested work
 
+October 8, 23:15 UTC handoff correction (supersedes live-job wording below):
+`tmp/full-river-long-handoff-v1` is terminal with a preserved failure receipt,
+not a running river pipeline. The full Chilko input builder started but stopped
+after 28.344 seconds when another task launched UnrealBuildTool (PID 31764).
+Memory and disk were above their unchanged floors. This was an intentional
+owned-process stop, not a terrain error or evidence of completed hydraulic
+inputs. All 4,772 verified one-metre terrain chunks remain available. Do not
+repeat their export or automatically restart the input builder while the other
+task continues engine work.
+
+The preceding `tmp/futaleufu-expanded-native-long-v1` likewise terminated when
+shared engine work appeared. It preserved complete native snapshots at 32 and
+62 seconds; the 62-second snapshot still requires independent geographic and
+numerical audit. It did not complete its requested 332-second advance. Keep
+the original failure receipts and incomplete outputs; do not promote these
+fields or describe either interrupted job as live.
+
+Progress commit `87fed098c` binds continuous Cartesian water windows to actual
+geographic launch coordinates while keeping downstream run progress on its
+separate, hash-checked route. It also adds a snapshot auditor that checks the
+actual short/long sampling schedule and distinguishes an interrupted checkpoint
+from a completed run without granting restart or map acceptance. Twenty-two
+targeted Python regressions passed. The five native runtime-binding/frame tests
+remain queued in `tmp/continuous-runtime-binding-queue-v1` (wrapper PID 11696,
+exec session 50758 at this observation). Verify that handle and its terminal
+receipts before relying on this status or launching any build. Rendered full
+descents, normal-map promotion and packaged 20 FPS acceptance remain outstanding.
+
 October 8 canopy residency repair: the first native apply reached the full
 Futaleufu map but stopped before modifying foliage because the Python loader
 expected only its three requested actors to be resident. A separate read-only
