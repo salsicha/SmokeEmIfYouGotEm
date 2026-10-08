@@ -29,6 +29,7 @@ import numpy as np
 from build_pacuare_evidence_dressing import dilate, nearest_distance
 from build_pacuare_evidence_grid import box_mean, edt_inside
 from png_numpy import write_png
+from futaleufu_imagery import load_reflectance,sample_cover,grid
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / 'physics/data/real_world/futaleufu_river_chile/futaleufu_sources_2026_09'
@@ -73,13 +74,16 @@ def main():
     # forest cover from Sentinel-2 (10 m) on the 1 m window
     fm = json.loads((SRC / 'sentinel2/fetch_manifest.json').read_text())
     item = next(i for i in fm['items'] if i['npz'] == args.sentinel2)
-    w = item['window_utm_m']; z = np.load(SRC / 'sentinel2' / args.sentinel2)
-    Gr, R, N = [z[k].astype(np.float32) * 1e-4 - 0.1 for k in ('green', 'red', 'nir')]
+    reflectance,valid = load_reflectance(SRC / 'sentinel2',item)
+    Gr, R, N = [reflectance[k] for k in ('green', 'red', 'nir')]
     ndvi = (N - R) / np.maximum(N + R, 1e-3)
     forest10 = (ndvi > args.ndvi_min) & (Gr < args.green_max)
-    cc = np.clip(((X0 + np.arange(NX) + 0.5 - w['xmin']) / 10.0).astype(int), 0, forest10.shape[1] - 1)
-    rr = np.clip(((w['ymax'] - (Y1 - np.arange(NY) - 0.5)) / 10.0).astype(int), 0, forest10.shape[0] - 1)
-    forest = forest10[rr][:, cc]
+    forest = np.empty((NY,NX),dtype=bool)
+    east = (X0+np.arange(NX)+.5)[None,:]
+    for start in range(0,NY,128):
+        stop=min(start+128,NY)
+        north=(Y1-np.arange(start,stop)-.5)[:,None]
+        forest[start:stop]=sample_cover(forest10,valid,east,north,item)
     forest = box_mean(forest.astype(np.float32), 15) > 0.5
     gy, gx = np.gradient(dem)
     slope = np.degrees(np.arctan(np.hypot(gx, gy)))
@@ -122,6 +126,8 @@ def main():
         forms={'0': 'the reach canopy form A (species INFERRED)', '1': 'the reach canopy form B (species INFERRED)'},
         inputs=dict(evidence_manifest=rel(args.evidence / 'manifest.json'), evidence_grid_sha256=sha(args.evidence / 'evidence_grid.npz'),
                     sentinel2=args.sentinel2, sentinel2_sha256=item['npz_sha256'],
+                    sentinel2_native_grid={k:grid(item)[k] for k in ('x0','y0','cell_m','shape')},
+                    sentinel2_sampling='Nearest captured pixel; strict pixel-centre coverage and nodata support, no requested-rectangle transform or clamp',
                     terrain_manifest=rel(args.terrain_manifest), terrain_manifest_sha256=sha(args.terrain_manifest)),
         parameters=dict(ndvi_min=args.ndvi_min, green_max=args.green_max, majority_window_m=31, channel_clearance_m=args.channel_clearance_m,
                         spacing_m=args.spacing_m, max_slope_deg=args.max_slope_deg, understory_reach_m=args.understory_reach_m,

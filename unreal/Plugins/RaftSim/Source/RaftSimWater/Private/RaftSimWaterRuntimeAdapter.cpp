@@ -2205,7 +2205,14 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
             EvaluateSegment(LastWorldToRiverSegment + Offset);
         }
     }
-    else
+    // Adaptive charts may have many sub-metre segments within an eight-metre
+    // query step. The fixed segment neighbourhood is only a seed: never
+    // return its clipped endpoint when it failed to reconstruct the query.
+    // Keep the fast exact local path; use the existing global search on a
+    // miss. This also makes forward/reverse hull sampling agree at junctions.
+    constexpr double NearbyExactToleranceSquaredM2 = 1.0e-4; // existing 1 cm tolerance
+    if (!bCanUseNearbySeed || BestSegment == INDEX_NONE ||
+        BestDistanceSquared > NearbyExactToleranceSquaredM2)
     {
         const FIntPoint CenterKey = RiverSpatialHashKey(PositionM);
         TSet<int32> CandidateSegments;

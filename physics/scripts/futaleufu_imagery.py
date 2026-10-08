@@ -67,3 +67,14 @@ def require_sample_support(valid,rows,cols):
     c=np.minimum(np.floor(cols).astype(int),valid.shape[1]-2)
     if not (valid[r,c]&valid[r+1,c]&valid[r,c+1]&valid[r+1,c+1]).all():
         raise ValueError('Requested evidence touches Sentinel nodata; source coverage review required')
+
+
+def sample_cover(cover,valid,east,north,item):
+    """Nearest native-pixel categorical cover, without rectangle shift/clamp."""
+    cover,valid=np.asarray(cover),np.asarray(valid)
+    shape=tuple(grid(item)['shape'])
+    if cover.shape!=shape or valid.shape!=shape or cover.dtype.kind!='b' or valid.dtype.kind!='b':
+        raise ValueError('Aligned boolean native cover and validity required')
+    rows,cols=sampling_points(east,north,item)
+    require_sample_support(valid,rows,cols)
+    return cover[np.floor(rows+.5).astype(int),np.floor(cols+.5).astype(int)]

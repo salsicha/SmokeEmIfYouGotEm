@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 import numpy as np
-from futaleufu_imagery import grid, sampling_points, load_reflectance, require_sample_support, BANDS
+from futaleufu_imagery import grid, sampling_points, load_reflectance, require_sample_support, sample_cover, BANDS
 
 
 class ImageryTests(unittest.TestCase):
@@ -23,6 +23,22 @@ class ImageryTests(unittest.TestCase):
         item['window_utm_m']=dict(xmin=-1e9,ymax=1e9)
         rr,cc=sampling_points(np.array([[733145.,733175.]]),np.array([[5215165.],[5215145.]]),item)
         np.testing.assert_array_equal(r,rr);np.testing.assert_array_equal(c,cc)
+
+    def test_cover_uses_native_grid_not_requested_rectangle(self):
+        item=self.item();cover=np.zeros((4,5),bool);cover[1,1]=True;valid=np.ones_like(cover)
+        east=np.array([733152.5,733160.5]);north=5215159.5
+        np.testing.assert_array_equal(sample_cover(cover,valid,east,north,item),[True,False])
+        # Former formula assigned the first position to the adjacent west pixel.
+        old_col=((east-item['window_utm_m']['xmin'])/10).astype(int)
+        self.assertEqual(old_col[0],0)
+        shifted=item.copy();shifted['window_utm_m']=dict(xmin=0,ymax=0)
+        np.testing.assert_array_equal(sample_cover(cover,valid,east,north,shifted),[True,False])
+
+    def test_cover_refuses_missing_or_misaligned_evidence(self):
+        item=self.item();cover=np.ones((4,5),bool);valid=cover.copy();valid[0,0]=False
+        with self.assertRaises(ValueError):sample_cover(cover,valid,733145.,5215165.,item)
+        with self.assertRaises(ValueError):sample_cover(cover,np.ones_like(cover),733144.,5215165.,item)
+        with self.assertRaises(ValueError):sample_cover(cover.astype(float),np.ones_like(cover),733145.,5215165.,item)
 
     def test_outside_and_nonfinite_never_clamp(self):
         for e,n in ((733144.,5215165.),(733186.,5215165.),(733145.,5215166.),
