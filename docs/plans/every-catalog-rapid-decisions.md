@@ -5455,3 +5455,47 @@ Both guards are terminal; no substitute build or repeated comparison is needed.
 The next resource gap is full79M-cell native stepping/capture peak memory and
 output size, distinct from the already-passed zero-step full-domain inspection.
 A4 remains the only production cook; keep its bound binary/inputs untouched.
+
+### 2026-10-07 cell-wise offline capture diagnostics
+
+The requested checkpoint was pushed as `2aa37c4b5` on main. Continued work
+removes four full-domain diagnostic arrays from streamed captures; normals and
+Froude are evaluated with the same double-precision arithmetic for each written
+cell/probe. Buffered output remains an independent reference. No flow equations,
+precision, acceptance gates, scene settings or loaded DLLs were changed.
+
+Isolated build exec8409 completed with all7CTest suites passing. New exact
+buffered/streamed comparisons cover2x2,31x3,3x137 and127x65 grids, nonlinear
+edge gradients, dry/tiny wet cells, signed zero, changing states, alternate
+gravity/tolerance and oblique probes. Frozen-binary oracle exec6006 also passed:
+2Python tests/27subtests,0skips across all three flux schemes and analytic plus
+small/parallel wet-dry cases. Initial test compile used the read-only mask
+accessor; corrected to the fixture's mutable byte storage before these runs.
+
+Actual Colorado1274x167 replay exec10424 completed200steps per run in
+old/new/new/old order. Every compressed frame, manifest and validation file
+is byte-identical. Old peak commitment42,700,800/42,676,224 bytes; new
+35,901,440/35,946,496 bytes. Times14.547/16.109s old versus13.641/16.375s new
+overlap other editor activity, so no speed/FPS inference. Durable receipt:
+`review/native_cellwise_capture_2026_10_07.json` (all source/binary/log identities).
+Full79,030,458-cell accounting removes2,528,974,656 bytes, lowering the capture
+array lower bound to12,444,482,660 bytes. Actual full-grid capture peak still
+requires measurement; this arithmetic excludes runtime overhead and reserves.
+
+Existing full-grid one-step/two-capture diagnostic exec23440 remains guarded,
+script `tmp/check_colorado_full_step_capture_v9.py`, outputs
+`tmp/colorado-full-step-capture-v9`. At this checkpoint only `launch.json`
+exists: it has NOT started the native solver. It waits for60seconds engine-idle,
+17.5GiB available commitment,16GiB physical and44GiB disk, then times out with
+a deferred receipt after30minutes. It still binds the unchanged row-scratch-v1
+binary, not the new cell-capture binary. Do not modify its inputs/binary/script
+or start a duplicate. The new isolated executable is
+`tmp/colorado-cell-capture-build-v1/raftsim_water_solver.exe`; a later lower-RAM
+check must wait for the existing job's terminal state and preserve its evidence.
+
+A4 exec70425/solver11252 continues, last observed38400/48000 steps. Other task
+most recently used editor34820 (`tmp/neck-e/native.log`); do not stop, pause or
+message it. Its three crew source edits remain excluded. This turn is verified
+progress, not a river acceptance or goal completion. Next: actual full-grid
+step/capture resource evidence, hydraulic review, continuous normal-map updates,
+then rendered/navigation/rescue and packaged20FPS validation.
