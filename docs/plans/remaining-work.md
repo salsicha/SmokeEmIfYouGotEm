@@ -12,11 +12,22 @@ Python and native C++ now select the exact requested external packages, reject
 missing/duplicate targets, and leave unrelated resident actors outside the
 mutation and retained-metadata scopes. The 42 exact exclusions, retained
 transforms, render/native agreement, save allowlist and whole-scene byte checks
-are unchanged. All 27 focused Python regressions pass. Native validation is
-pending the guarded `tmp/futaleufu-canopy-repair-pipeline-v3` sequence: fresh
-editor build, 12 native calibration controls, canopy apply plus independent
-reload, expanded-domain flow/audit, then full Chilko hydraulic inputs. Earlier
-serial-v1/v2 and Chilko queue-v10/v11 attempts are terminal and preserved, not
+are unchanged. All 27 focused Python regressions pass. The guarded editor build
+in `tmp/futaleufu-buffer-canopy-editor-v3` succeeded on October 8 (exit zero,
+target up to date after the other task's full rebuild). Its original pipeline
+then correctly refused the already occupied `continuous-rapid-registration-native-v1`
+test label, preserving that October 6 report without running or claiming fresh
+controls. The original pipeline is terminal, not a live watcher.
+
+Native validation now awaits `tmp/futaleufu-canopy-repair-resume-v1`, launched
+through `tmp/resume_futaleufu_canopy_repair_v1.ps1` in exec session 80467. It
+checks the completed build, unchanged source hashes and shared-engine/resource
+readiness, then uses the fresh `futaleufu-canopy-repair-controls-v1` label for
+all 12 native calibration controls. No duplicate build is scheduled. Only a
+passing fresh report permits canopy apply plus independent reload,
+expanded-domain flow/audit, then full Chilko hydraulic inputs. Inspect this
+resume process and its receipts rather than restarting the terminal pipeline.
+Earlier serial-v1/v2 and Chilko queue-v10/v11 attempts are terminal and preserved, not
 live jobs. Inspect the pipeline's actual process and receipts before starting
 anything else. Diagnosis: `tmp/futaleufu-canopy-residency-v1.json`, SHA256
 `0c59f4c1112648bc6136f63b89fb671099b7aeaf6e473327da0ec4fe2eb50ae2`.
