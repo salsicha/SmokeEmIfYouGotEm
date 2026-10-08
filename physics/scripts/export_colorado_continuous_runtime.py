@@ -199,7 +199,7 @@ def _export(inputs,cook,review,out,river_id,*,frame_loader=None):
                       velocity=[float(np.median(frame[k][inlet, 0])) for k in ('u', 'v')]),
                   dict(edge='east', kind='outflow', stage=float(np.median(frame['eta'][outlet, -1]))),
                   dict(edge='south', kind='bank'), dict(edge='north', kind='bank')]
-    terrain_bytes=sum((terrain_folder[c['heightfield']]).stat().st_size for c in triangles.manifest['chunks'])
+    terrain_bytes=sum((terrain_folder/c['heightfield']).stat().st_size for c in triangles.manifest['chunks'])
     required=grid['ny']*grid['nx']*26+grid['nx']*4+terrain_bytes+mapping_path.stat().st_size+1048576
     parent=out.parent
     while not parent.exists():parent=parent.parent

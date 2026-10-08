@@ -10,7 +10,7 @@ from unittest.mock import patch
 import numpy as np
 
 from export_colorado_continuous_runtime import (registered_queries,registered_query_blocks,
-    validate_runtime_geometry,write_fields,export,BAND)
+    validate_runtime_geometry,write_fields,export,_export,BAND,sha)
 
 
 def legacy_field_bytes(grid,station,frame,bed):
@@ -94,6 +94,50 @@ class ContinuousRuntime(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'construction screen'):
                     export(root/'inputs', root/'cook', root/'review.json', out)
             self.assertFalse(out.exists())
+
+    def test_complete_export_counts_real_terrain_files_before_creating_output(self):
+        # Exercise the full orchestrator, not just write_fields: a Path was
+        # accidentally indexed as a dictionary in the terrain-size guard.
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);inputs=root/'inputs';inputs.mkdir()
+            terrain=root/'terrain';terrain.mkdir();shared=root/'shared';shared.mkdir()
+            mapping=json.dumps(self.mapping)
+            (inputs/'coordinate_map.json').write_text(mapping)
+            (shared/'coordinate_map.json').write_text(mapping)
+            (shared/'manifest.json').write_text('{}')
+            manifest=dict(self.terrain,chunks=[dict(heightfield='tile.png')])
+            (terrain/'manifest.json').write_text(json.dumps(manifest))
+            tile=b'fixture terrain payload';(terrain/'tile.png').write_bytes(tile)
+            review=root/'review.json';review.write_text('{}')
+            (inputs/'build_report.json').write_text('{}')
+            build=dict(name='Colorado fixture',source_core_interval_m=[8.,14.],
+                continuous_terrain=dict(manifest='terrain/manifest.json',sha256=sha(terrain/'manifest.json')),
+                shared_hydraulic_frame=dict(manifest='shared/manifest.json',sha256=sha(shared/'manifest.json')))
+            bed=np.ones((3,4));frame=dict(h=bed,eta=bed*2,u=bed,v=bed*0,wet=bed)
+            scenario=dict(grid=self.grid,fixed_dt=.05,roughness=.04)
+            native=dict(scenario_id='fixture')
+            receipt=dict(solver_sha256='fixture',statistics=dict(exact_face_discharge_target_m3s=226.5))
+            class Terrain:
+                def __init__(self,folder):self.manifest=manifest
+                def sample(self,points):return np.ones(points.shape[:2])
+            required=12*26+4*4+len(tile)+len(mapping.encode())+1048576
+            with patch('export_colorado_continuous_runtime.ROOT',root), \
+                 patch('export_colorado_continuous_runtime.checked_cook',return_value=(build,receipt,native,scenario,frame,bed)), \
+                 patch('export_colorado_continuous_runtime.LandscapeTriangles',Terrain), \
+                 patch('export_colorado_continuous_runtime.shutil.disk_usage') as usage:
+                usage.return_value.free=40*1024**3+required-1
+                with self.assertRaisesRegex(ValueError,'terrain/field disk headroom'):
+                    _export(inputs,root/'cook',review,root/'too-small','colorado_river_grand_canyon_rowing')
+                self.assertFalse((root/'too-small').exists())
+                usage.return_value.free=40*1024**3+required
+                out=root/'export'
+                result=_export(inputs,root/'cook',review,out,'colorado_river_grand_canyon_rowing')
+            self.assertEqual((out/'terrain/tile.png').read_bytes(),tile)
+            self.assertEqual((out/'coordinate_map.json').read_text(),mapping)
+            self.assertFalse(result['engine_validated']);self.assertFalse(result['full_river_coverage'])
+            for name,digest in result['files_sha256'].items():self.assertEqual(sha(out/name),digest)
+            for name,data in legacy_field_bytes(self.grid,np.array([8.,10.,12.,14.]),frame,bed).items():
+                self.assertEqual((out/'cooked_flow_fields'/name).read_bytes(),data)
 
     def test_flow_band_is_explicit_and_cannot_escape_export(self):
         station,_=registered_queries(self.mapping,self.terrain,self.grid)
