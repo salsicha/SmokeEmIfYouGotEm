@@ -39,16 +39,20 @@ static bool RelativeFile(const FString& Name, FString& Absolute)
     return FPaths::FileExists(Absolute);
 }
 
-// Reuse each river's own small-scale material detail, never a geographic drape.
+// Geographic appearance must stay registered; only actual small-scale detail may tile.
 static UMaterial* TerrainMaterial(const RaftSimContinuousRiver::FSpec* River=nullptr)
 {
     const bool Chilko=River && River->bChilko;
     const bool Futaleufu=River && River->bFutaleufu;
+    // The legacy Futaleufu "detail" asset is actually a whole-valley image.
+    // Never repeat that photograph every 3.5 m. The source-pinned V2 material
+    // registers the full native optical rectangle once in this river's frame.
+    if (Futaleufu)
+        return LoadObject<UMaterial>(nullptr,TEXT("/Game/RaftSim/Materials/Catalog/M_FutaleufuContinuousGroundV2.M_FutaleufuContinuousGroundV2"));
     // A new asset version preserves already-saved maps. World-XY projection
     // stretches a texel vertically over an entire cliff; use the same detail
     // texture on three world planes without modifying any terrain geometry.
-    const FString ObjectName = Futaleufu ? TEXT("M_FutaleufuContinuousGroundV1") :
-        Chilko ? TEXT("M_ChilkoContinuousGroundV2") : TEXT("M_ColoradoCatalogGroundV2");
+    const FString ObjectName = Chilko ? TEXT("M_ChilkoContinuousGroundV2") : TEXT("M_ColoradoCatalogGroundV2");
     const FString PackageName = TEXT("/Game/RaftSim/Materials/Catalog/")+ObjectName;
     if (UMaterial* Existing = LoadObject<UMaterial>(nullptr, *(PackageName+TEXT(".")+ObjectName))) return Existing;
     const FString TextureName=TEXT("T_RaftSim_")+(River ? River->DetailStem : FString(TEXT("ColoradoRiver")))+TEXT("_TerrainDetailAlbedo");
@@ -78,7 +82,7 @@ static UMaterial* TerrainMaterial(const RaftSimContinuousRiver::FSpec* River=nul
         Weight->Input.Expression=SquaredNormal;
         Weight->R=Axis==0; Weight->G=Axis==1; Weight->B=Axis==2; Weight->A=false;
         auto* Sample=NewObject<UMaterialExpressionTextureSampleParameter2D>(M);
-        Sample->ParameterName=Futaleufu ? TEXT("FutaleufuGroundDetail") : Chilko ? TEXT("ChilkoGroundDetail") : TEXT("ColoradoGroundDetail");
+        Sample->ParameterName=Chilko ? TEXT("ChilkoGroundDetail") : TEXT("ColoradoGroundDetail");
         Sample->Texture=Albedo; Sample->Coordinates.Expression=UV; Sample->SamplerType=SAMPLERTYPE_Color;
         auto* Weighted=NewObject<UMaterialExpressionMultiply>(M);
         Weighted->A.Expression=Sample; Weighted->B.Expression=Weight;

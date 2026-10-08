@@ -130,6 +130,8 @@ inline bool Frame(const TSharedPtr<FJsonObject>& J, const FSpec& Spec,
         !FMath::IsFinite(X) || !FMath::IsFinite(Y) || !FMath::IsFinite(Datum))
     { Error=TEXT("Invalid geographic origin or local vertical offset"); return false; }
     Origin=FVector2D(X,Y);
+    if (Spec.bFutaleufu && Origin!=FVector2D(739986.,5195961.5))
+    { Error=TEXT("Futaleufu captured colour requires the reviewed shared corridor origin"); return false; }
     return true;
 }
 }

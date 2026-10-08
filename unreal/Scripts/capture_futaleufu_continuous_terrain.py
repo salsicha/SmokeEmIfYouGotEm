@@ -58,6 +58,13 @@ try:
     resident=[a for a in actors.get_all_level_actors() if isinstance(a,unreal.LandscapeStreamingProxy)]
     state['loaded_terrain_proxies']=len(resident)
     if len(resident)!=177:raise RuntimeError('Actual resident streaming proxies differ from 177: '+str(len(resident)))
+    state['terrain_materials']={}
+    for actor in resident:
+        material=actor.get_editor_property('landscape_material')
+        name=material.get_path_name() if material else 'None'
+        state['terrain_materials'][name]=state['terrain_materials'].get(name,0)+1
+    expected=os.environ.get('RAFTSIM_TERRAIN_REVIEW_MATERIAL')
+    if expected and state['terrain_materials']!={expected:177}:raise RuntimeError('Saved terrain material mismatch')
     state['terrain_bounds']=[dict(name=a.get_name(),bounds=str(a.get_actor_bounds(False))) for a in resident]
     levels.editor_set_viewport_realtime(False)
     levels.editor_set_viewport_realtime(True)

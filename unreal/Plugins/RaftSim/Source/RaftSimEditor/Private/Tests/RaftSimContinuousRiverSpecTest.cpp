@@ -74,6 +74,11 @@ bool FRaftSimFutaleufuContinuousTerrainFrameTest::RunTest(const FString& Paramet
     TestTrue(TEXT("Southern UTM18 and source geoid frame accepted"),Frame(J,Spec,XY,Datum,Error));
     TestEqual(TEXT("Continuous river origin is not recentered"),XY,FVector2D(739986.,5195961.5));
     TestEqual(TEXT("Local vertical offset retained"),Datum,150.);
+    J->SetArrayField(TEXT("horizontal_origin_m"),
+        {MakeShared<FJsonValueNumber>(739987.),MakeShared<FJsonValueNumber>(5195961.5)});
+    TestFalse(TEXT("Changed origin cannot silently misregister captured colour"),Frame(J,Spec,XY,Datum,Error));
+    J->SetArrayField(TEXT("horizontal_origin_m"),
+        {MakeShared<FJsonValueNumber>(739986.),MakeShared<FJsonValueNumber>(5195961.5)});
     J->SetStringField(TEXT("horizontal_crs"),TEXT("EPSG:32618"));
     TestFalse(TEXT("Northern hemisphere cannot substitute"),Frame(J,Spec,XY,Datum,Error));
     J->SetStringField(TEXT("horizontal_crs"),TEXT("EPSG:32718"));
