@@ -12,6 +12,8 @@ if($busy.Count){throw 'Shared engine busy; no competing native controls launched
 $tests=@('RaftSim.Review.IndependentTrialSetup','RaftSim.Review.TrialSteeringSchedule','RaftSim.Review.TrialStallRecovery',
     'RaftSim.Review.TrialRockApproach','RaftSim.Physics.CommittedHullContactTotals',
     'RaftSim.Water.RapidChallengeProfiles','RaftSim.Progression.LinkedRunBoundaries',
+    'RaftSim.Continuous.RapidRegistration','RaftSim.Continuous.RapidFeatureFrame',
+    'RaftSim.Continuous.CartesianRapidRegistration',
     'RaftSim.M3.PinballCropBoundary','RaftSim.M3.ChilkoCropBoundary')
 $arguments=@("$root/unreal/SmokeEmIfYouGotEm.uproject",'/Game/RaftSim/Maps/L_RaftSimTestTank',
     '-unattended','-nop4','-nosplash','-NoSound','-NullRHI','-RaftSimEphemeralProfile',
@@ -19,6 +21,7 @@ $arguments=@("$root/unreal/SmokeEmIfYouGotEm.uproject",'/Game/RaftSim/Maps/L_Raf
     "-ReportExportPath=$out","-abslog=$out/native.log")
 $hashes=[ordered]@{}
 foreach($path in @('unreal/Binaries/Win64/UnrealEditor-SmokeEmIfYouGotEm.dll',
+    'unreal/Plugins/RaftSim/Binaries/Win64/UnrealEditor-RaftSimEditor.dll',
     'unreal/Plugins/RaftSim/Binaries/Win64/UnrealEditor-RaftSimPhysics.dll',
     'unreal/Plugins/RaftSim/Binaries/Win64/UnrealEditor-RaftSimWater.dll',
     'unreal/Plugins/RaftSim/Binaries/Win64/UnrealEditor-RaftSimRaft.dll',
