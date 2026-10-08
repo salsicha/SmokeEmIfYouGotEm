@@ -29,7 +29,11 @@ enum class ERaftSimSynthVoiceKind : uint8
     Hull,
     Crew,
     Ambience,
-    Music
+    Music,
+    /** A hole: water falling into its trough and the foam pile tumbling back
+     * onto it, a deep churning rumble under the roar; its crashes come from
+     * the hole's own churn (HoleCrash). */
+    HoleChurn
 };
 
 /** One-shot sounds a voice can be asked to play. */
@@ -39,7 +43,10 @@ enum class ERaftSimSynthEvent : uint8
     OarCatch,
     OarRelease,
     HullThump,
-    HullSlap
+    HullSlap,
+    /** A section of a hole's foam pile collapsing onto the incoming water:
+     * a deep thump, a heavy wash, a burst of big bubbles and a spray hiss. */
+    HoleCrash
 };
 
 namespace RaftSimSynth

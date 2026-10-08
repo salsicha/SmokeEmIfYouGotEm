@@ -6,7 +6,7 @@ public class RaftSimRaft : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "EnhancedInput", "Niagara", "RaftSimCore", "RaftSimPhysics", "RaftSimInput", "RaftSimWater", "RaftSimCrew", "ProceduralMeshComponent" });
-        PrivateDependencyModuleNames.AddRange(new[] { "Json", "InputCore", "HairStrandsCore", "Slate", "SlateCore", "MovieSceneCapture", "Landscape", "RaftSimWaterDetail", "RenderCore", "RHI" });
+        PrivateDependencyModuleNames.AddRange(new[] { "Json", "InputCore", "HairStrandsCore", "Slate", "SlateCore", "MovieSceneCapture", "Landscape", "RaftSimWaterDetail", "RenderCore", "RHI", "RaftSimAudio", "AudioMixer" });
         if (Target.bBuildEditor)
         {
             // Transient in-game terrain alignment diagnostic; absent from packaged games.

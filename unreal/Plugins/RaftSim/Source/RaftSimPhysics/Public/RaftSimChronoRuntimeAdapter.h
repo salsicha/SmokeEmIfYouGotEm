@@ -268,6 +268,18 @@ public:
     void SetWaterSurfaceSampler(
         TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> InSampler);
 
+    /**
+     * Optional slope of the water surface the hull floats on (rise per
+     * metre, world X and Y) at a world position in centimeters. Water
+     * pressure on a hull in a sloping surface pushes it downhill: each tube
+     * point's buoyancy B also pushes -B times the slope. This is how a hole's
+     * trough holds a boat (the water piled up behind it is a slope back
+     * into the hole) and how a boat surfs a wave. Unbound, the hull feels
+     * only vertical buoyancy.
+     */
+    void SetWaterSurfaceSlopeSampler(
+        TFunction<bool(const FVector& WorldPositionCm, FVector2D& OutSlope)> InSampler);
+
     /** Tube support points whose water cell sampled dry on the last support
      * pass — the direct instrument for fall-through-the-wet-mask sinks. */
     int32 GetLastDrySupportPointCount() const { return LastDrySupportPointCount; }
@@ -408,6 +420,7 @@ private:
 
     // Buoyancy support stage (plain C++ members; deterministic).
     TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> WaterSurfaceSampler;
+    TFunction<bool(const FVector& WorldPositionCm, FVector2D& OutSlope)> WaterSurfaceSlopeSampler;
     int32 LastDrySupportPointCount = 0;
     float LastWetSupportSurfaceZCm = 0.0f;
     bool bHasLastWetSupportSurface = false;

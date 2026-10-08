@@ -55,6 +55,12 @@ void URaftSimChronoRuntimeAdapter::SetWaterSurfaceSampler(
     WaterSurfaceSampler = MoveTemp(InSampler);
 }
 
+void URaftSimChronoRuntimeAdapter::SetWaterSurfaceSlopeSampler(
+    TFunction<bool(const FVector& WorldPositionCm, FVector2D& OutSlope)> InSampler)
+{
+    WaterSurfaceSlopeSampler = MoveTemp(InSampler);
+}
+
 void URaftSimChronoRuntimeAdapter::SetGroundSurfaceSampler(
     TFunction<bool(
         const FVector& WorldPositionCm,
@@ -625,7 +631,17 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
             }
             SubmergedFraction += Saturation / static_cast<double>(TubeSamplePointsM.Num());
             DragPointSaturation[PointIndex] = Saturation;
-            const FVector PointForceN(0.0, 0.0, PerPointBuoyancyN * Saturation);
+            FVector PointForceN(0.0, 0.0, PerPointBuoyancyN * Saturation);
+            // The same pressure, on a sloping surface, pushes the point
+            // downhill (-B times the slope): a hole's trough holds a boat.
+            FVector2D Slope;
+            if (WaterSurfaceSlopeSampler && WaterSurfaceSlopeSampler(WorldPointM * 100.0, Slope) &&
+                !Slope.ContainsNaN())
+            {
+                Slope = Slope.GetClampedToMaxSize(1.0);
+                PointForceN.X = -PointForceN.Z * Slope.X;
+                PointForceN.Y = -PointForceN.Z * Slope.Y;
+            }
             ForceN += PointForceN;
             TorqueNm += FVector::CrossProduct(WorldOffset, PointForceN);
         }

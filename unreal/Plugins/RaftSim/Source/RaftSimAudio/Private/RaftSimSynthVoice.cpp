@@ -352,7 +352,7 @@ FVoice::FVoice(ERaftSimSynthVoiceKind InKind, uint32 Seed, float InSampleRate)
     State->Intensity.Init(0.25f, SampleRate, 0.0f);
     State->Surge.Init(0.4f, SampleRate, 0.0f);
     State->Distance.Init(0.6f, SampleRate, 0.0f);
-    State->Bubbles.Init(Kind == ERaftSimSynthVoiceKind::Whitewater ? 128 : 64);
+    State->Bubbles.Init(Kind == ERaftSimSynthVoiceKind::Whitewater || Kind == ERaftSimSynthVoiceKind::HoleChurn ? 128 : 64);
     State->DriveFilter.Set(FBiquad::EType::Bandpass, 380.0f, 0.7f, SampleRate);
 }
 
@@ -416,6 +416,21 @@ void FVoice::Render(float* Out, int32 NumFrames)
                 S.ThumpTime = 0.0f;
                 S.Bursts.Next().Start(FBiquad::EType::Lowpass, 380.0f, 0.7f, 0.002f, 0.05f, 0.7f * Strength, Fs);
                 break;
+            case ERaftSimSynthEvent::HoleCrash:
+                // The pile's top slamming down: the trough's deep thump, a
+                // heavy wash rolling over, big bubbles closing as the air is
+                // driven under, and spray hissing off the top.
+                S.ThumpAmp = FMath::Max(S.ThumpAmp * 0.4f, 0.0f) + 0.45f * Strength;
+                S.ThumpTime = 0.0f;
+                S.Bursts.Next().Start(FBiquad::EType::Lowpass, Rng.Range(900.0f, 1500.0f), 0.6f,
+                    Rng.Range(0.05f, 0.09f), Rng.Range(0.5f, 0.9f), 0.85f * Strength, Fs);
+                S.Bursts.Next().Start(FBiquad::EType::Highpass, Rng.Range(2400.0f, 3200.0f), 0.7f,
+                    0.02f, Rng.Range(0.25f, 0.4f), 0.3f * Strength, Fs);
+                for (int32 Bubble = 0; Bubble < 24; ++Bubble)
+                {
+                    S.Bubbles.Spawn(Rng, 1.5f, 8.0f, 0.15f, 0.12f * Strength, Fs);
+                }
+                break;
             case ERaftSimSynthEvent::HullSlap:
                 S.Bursts.Next().Start(FBiquad::EType::Bandpass, Rng.Range(800.0f, 1400.0f), 0.8f,
                     0.001f, 0.035f, 0.6f * Strength, Fs);
@@ -453,6 +468,11 @@ void FVoice::Render(float* Out, int32 NumFrames)
                     break;
                 case ERaftSimSynthVoiceKind::Spray:
                     S.ToneHigh.Set(FBiquad::EType::Highpass, 2800.0f, 0.6f, Fs);
+                    break;
+                case ERaftSimSynthVoiceKind::HoleChurn:
+                    S.ToneLow.Set(FBiquad::EType::Lowpass, 1200.0f + 3800.0f * I, 0.6f, Fs);
+                    S.ToneHigh.Set(FBiquad::EType::Highpass, 40.0f, 0.6f, Fs);
+                    S.RumbleLow.Set(FBiquad::EType::Lowpass, 110.0f, 0.7f, Fs);
                     break;
                 case ERaftSimSynthVoiceKind::Hull:
                     S.Scrape.Set(FBiquad::EType::Bandpass, 650.0f + 400.0f * I, 0.9f, Fs);
@@ -519,6 +539,41 @@ void FVoice::Render(float* Out, int32 NumFrames)
                         Rng.Range(0.05f, 0.09f), Rng.Range(0.35f, 0.6f), Rng.Range(0.6f, 1.0f) * 0.6f, Fs);
                 }
                 Signal = (Roar * CrackleGain + Rumble) * SurgeGain + S.Bubbles.Process(Fs) + S.Bursts.Process(Rng);
+                Signal *= (0.35f + 0.65f * I) * 0.8f;
+                break;
+            }
+            case ERaftSimSynthVoiceKind::HoleChurn:
+            {
+                // A hole: darker than open whitewater, with a heavy low churn
+                // that throbs as the pile works (Surge follows its crashes),
+                // big bubbles from the air driven under, and rare stray
+                // breaks; its real crashes arrive as HoleCrash events.
+                if (Rng.Uniform() < (90.0f + 1800.0f * I) / Fs)
+                {
+                    S.Bubbles.Spawn(Rng, 0.8f, 9.0f, 0.1f, 0.07f, Fs);
+                }
+                const float Roar = S.ToneLow.Process(S.ToneHigh.Process(S.Pink.Process(White))) * 0.45f;
+                const float Throb = 1.0f + (0.25f + 0.5f * Surge) *
+                    (S.SlowSurge.Process(Rng, 0.25f, Fs) + 0.7f * S.FastSurge.Process(Rng, 1.1f, Fs));
+                const float Rumble = S.RumbleLow.Process(S.Brown) * (0.6f + 0.6f * I) * 0.3f * FMath::Max(0.3f, Throb);
+                if (Rng.Uniform() < (0.15f + 0.35f * I) / Fs)
+                {
+                    S.Bursts.Next().Start(FBiquad::EType::Lowpass, Rng.Range(1400.0f, 2400.0f), 0.6f,
+                        Rng.Range(0.05f, 0.09f), Rng.Range(0.3f, 0.5f), Rng.Range(0.4f, 0.7f) * 0.5f, Fs);
+                }
+                float Thump = 0.0f;
+                if (S.ThumpAmp > 1.0e-4f)
+                {
+                    const float Freq = 42.0f + 34.0f * FMath::Exp(-S.ThumpTime / 0.08f);
+                    S.ThumpPhase = FMath::Fmod(S.ThumpPhase + Freq / Fs, 1.0f);
+                    Thump = FMath::Sin(TwoPi * S.ThumpPhase) * S.ThumpAmp * FMath::Exp(-S.ThumpTime / 0.22f);
+                    S.ThumpTime += 1.0f / Fs;
+                    if (S.ThumpTime > 1.5f)
+                    {
+                        S.ThumpAmp = 0.0f;
+                    }
+                }
+                Signal = Roar * FMath::Max(0.4f, Throb) + Rumble + Thump + S.Bubbles.Process(Fs) + S.Bursts.Process(Rng);
                 Signal *= (0.35f + 0.65f * I) * 0.8f;
                 break;
             }

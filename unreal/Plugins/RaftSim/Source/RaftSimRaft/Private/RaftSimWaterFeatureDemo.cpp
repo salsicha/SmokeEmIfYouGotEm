@@ -1,6 +1,7 @@
 // Small engine-rendered controls of the same authored feature current and
 // production raft dynamics used by South Fork. No scripted boat trajectories.
 #include "RaftSimWaterFeatureKinematics.h"
+#include "RaftSimHolePourOver.h"
 #include "RaftSimEddyDemoBoundary.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimChronoRuntimeAdapter.h"
@@ -8,6 +9,9 @@
 #include "RaftSimRaftActor.h"
 #include "RaftSimWaterVfxActor.h"
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimHoleChurn.h"
+#include "RaftSimRaftSplash.h"
+#include "AudioMixerBlueprintLibrary.h"
 #include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimCameraPresentation.h"
 #include "RaftSimScreenRecorderSubsystem.h"
@@ -21,6 +25,7 @@
 #include "Engine/StaticMesh.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
+#include "Camera/PlayerCameraManager.h"
 #include "GameFramework/HUD.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
@@ -68,7 +73,28 @@ struct FWaterFeatureDemo : TSharedFromThis<FWaterFeatureDemo>
     double CollisionWarmupEndSeconds=0.;
     int32 ExcludedWaterCells=0,HiddenFoamPatches=0,ContactImpulses=0,ContactQueries=0,BlockedTracerSteps=0;
     URaftSimWaterRuntimeAdapter::FSupportBreakingSite HoleSite;
-    double Duration() const { return Kind==TEXT("eddy") && !bCollisionControl ? 18.0 : 12.0; }
+    // Optional crashing churn in the hole ("churn"), and its spray pulse.
+    TWeakObjectPtr<URaftSimHoleChurnComponent> Churn;
+    // Optional water thrown over the crew when the raft is hit ("splash").
+    TWeakObjectPtr<URaftSimRaftSplashComponent> Splash;
+    double LastChurnSeconds=-1.;
+    // "sound": the hole's own voice plays, and the engine's audio output is
+    // recorded beside the video.
+    bool bRecordSound=false;
+    float RaftHalfLengthCm=0.f,RaftHalfWidthCm=0.f;
+    // "noraft": the raft is not drawn, so nothing is kept out of its way.
+    bool bNoRaft=false;
+    // "crew": the real raft rides the hole, crew seats and masses as in play,
+    // with play's capsize gate and paddler washouts. "paddle": the crew
+    // paddle forward from the start. "seconds=N": run for N seconds.
+    bool bCrewRaft=false,bPaddle=false;
+    double DurationSeconds=12.;
+    double FirstCapsizeSeconds=-1.,FirstSwimmerSeconds=-1.;
+    int32 MaximumSwimmers=0;
+    // The hole's breaking wave as the hull meets it: the one the churn draws.
+    RaftSimHoleWave::FShape Wave;
+    double WaveToeM=0.;
+    double Duration() const { return Kind==TEXT("eddy") && !bCollisionControl ? 18.0 : DurationSeconds; }
 
     void UpdateFoamGeometry()
     {
@@ -116,13 +142,35 @@ struct FWaterFeatureDemo : TSharedFromThis<FWaterFeatureDemo>
         return URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
             FVector2D(P.X*.01,P.Y*.01),Sites,1.f,.25f);
     }
-    FVector Velocity(const FVector& P,bool bSurface) const
+    FVector FlowVelocity(const FVector& P,bool bSurface) const
     {
         using namespace RaftSimWaterFeatureKinematics;
         const double H=Surface(P),Depth=H+1.8;
         const double Z=bSurface ? 1.0 : FMath::Clamp((P.Z*.01+1.8)/Depth,0.0,1.0);
         if(Kind==TEXT("eddy"))return RaftSimEddyDemoBoundary::Velocity(P);
         return FVector(2.,0,0)+HoleDelta(P.X*.01,P.Y*.01,Z,Depth,2.,1.);
+    }
+    FVector Velocity(const FVector& P,bool bSurface) const
+    {
+        const FVector Flow=FlowVelocity(P,bSurface);
+        if(Kind!=TEXT("hole"))return Flow;
+        // The water falling down the pour-over's face into the hole, as the
+        // game's hull water has it.
+        const auto Site=RaftSimHolePourOver::FSite::FromCrestLength(FVector2D::ZeroVector,FVector2D(1.,0.),HoleSite.PhysicalCrestLengthMeters);
+        const double Here=Surface(P);
+        return RaftSimHolePourOver::Velocity(Site,bSurface ? FVector(P.X*.01,P.Y*.01,Here) : P*.01,Flow,Here,
+            FVector::ForwardVector,FVector::RightVector,[this](const FVector2D& Q,double& S,FVector& V)
+            {const FVector C(Q.X*100.,Q.Y*100.,0.);S=Surface(C);V=FlowVelocity(C,true);return true;});
+    }
+    // What the hull floats on and is carried by: the water, the pour-over's
+    // falling water and the breaking wave's pile.
+    RaftSimHoleWave::FHullWater HullWater(const FVector& P) const
+    {
+        const double Water=Surface(P);const FVector Flow=Velocity(P,false);
+        RaftSimHoleWave::FHullWater Out;Out.SurfaceM=Water;Out.VelocityMps=Flow;
+        if(Kind==TEXT("hole"))
+            RaftSimHoleWave::Apply(Wave,P.X*.01,P.Y*.01,P.Z*.01,WaveToeM,Water,Flow,FVector::ForwardVector,FVector::RightVector,Out);
+        return Out;
     }
     void Tick()
     {
@@ -149,7 +197,13 @@ struct FWaterFeatureDemo : TSharedFromThis<FWaterFeatureDemo>
         int32 Steps=0;
         while(!bFailed && Debt>=1./120. && Steps<240 && Seconds<Duration())
         {
-            if(!Dynamics->StepRaftDynamics(1.f/120.f)){bFailed=true;break;}
+            if(bCrewRaft ? !Boat->AdvanceIsolatedFlipDemo(1.f/120.f,true) : !Dynamics->StepRaftDynamics(1.f/120.f)){bFailed=true;break;}
+            if(bCrewRaft)
+            {
+                if(FirstCapsizeSeconds<0. && Boat->GetRaftMode()!=ERaftSimRaftMode::Upright)FirstCapsizeSeconds=Seconds;
+                if(FirstSwimmerSeconds<0. && Boat->GetSwimmerCount()>0)FirstSwimmerSeconds=Seconds;
+                MaximumSwimmers=FMath::Max(MaximumSwimmers,Boat->GetSwimmerCount());
+            }
             if(Kind==TEXT("eddy"))
             {
                 const auto& Contact=Dynamics->GetLastHullContact();
@@ -190,6 +244,28 @@ struct FWaterFeatureDemo : TSharedFromThis<FWaterFeatureDemo>
         }
         if(Kind==TEXT("eddy"))Boat->RefreshIsolatedFeatureHull();
         Boat->SetActorTransform(Dynamics->GetKinematicState().WorldTransform);
+        // The crew's poses and their paddle strokes, on play's frame clock.
+        if(bCrewRaft)Boat->RefreshIsolatedFlipVisual(float(Steps/120.));
+        // Hidden where it rides, the raft still blotted out a raft-shaped
+        // piece of the hole's wave ("a boat sized gap in the crashing wave",
+        // 2026-10-08); moved far below the tank, it takes nothing with it.
+        // Its dynamics run on, unchanged.
+        if(bNoRaft)Boat->SetActorLocation(FVector(0,0,-100000));
+        const float PresentationDt=LastChurnSeconds<0. ? 0.f : float(Now-LastChurnSeconds);LastChurnSeconds=Now;
+        FVector View=FVector::ZeroVector;
+        if(APlayerController* Player=W->GetFirstPlayerController())
+            if(Player->PlayerCameraManager)View=Player->PlayerCameraManager->GetCameraLocation();
+        if(Churn.IsValid())
+        {
+            if(!bNoRaft)Churn->SetRaftExclusion(Boat->GetActorTransform(),RaftHalfLengthCm,RaftHalfWidthCm);
+            Churn->Advance(PresentationDt,View);
+        }
+        if(Splash.IsValid() && !bNoRaft)
+        {
+            Splash->TrackRaft(Boat->GetActorTransform(),Dynamics->GetKinematicState().LinearVelocityMetersPerSecond*100.,
+                RaftHalfLengthCm,RaftHalfWidthCm);
+            Splash->Advance(PresentationDt,View);
+        }
         if(!bSprayAudited && Seconds>=2.)
         {
             bSprayAudited=true;
@@ -206,21 +282,31 @@ struct FWaterFeatureDemo : TSharedFromThis<FWaterFeatureDemo>
             Foam->UpdateMeshSection_LinearColor(0,FoamVertices,FoamNormals,FoamUV,FoamColors,FoamTangents);
         }
         if(GEngine)GEngine->AddOnScreenDebugMessage(7441,.2f,FColor::White,
-            FString::Printf(TEXT("%s | shared authored current + production hull forces | t=%.2fs | no paddle"),*Kind,Seconds));
+            FString::Printf(TEXT("%s | shared authored current + production hull forces | t=%.2fs | %s"),*Kind,Seconds,bPaddle ? TEXT("paddling forward") : TEXT("no paddle")));
         if(!bRecording && Seconds>1.)
         {
             auto* Recorder=W->GetGameInstance()->GetSubsystem<URaftSimScreenRecorderSubsystem>();
             bRecording=Recorder && Recorder->StartRecording();
             if(!bRecording){bFailed=true;UE_LOG(LogTemp,Error,TEXT("Feature demo recorder unavailable"));}
+            else if(bRecordSound)UAudioMixerBlueprintLibrary::StartRecordingOutput(W,float(Duration()));
         }
         if(bFailed || Seconds>=Duration())
         {
             RecordMotion(true);
             W->GetTimerManager().ClearTimer(Timer);
             if(bRecording)W->GetGameInstance()->GetSubsystem<URaftSimScreenRecorderSubsystem>()->StopRecording();
+            if(bRecording && bRecordSound)UAudioMixerBlueprintLibrary::StopRecordingOutput(W,EAudioRecordingExportType::WavFile,
+                Label,FPaths::ProjectSavedDir()/TEXT("WaterFeatureDemo"));
             auto Report=MakeShared<FJsonObject>();Report->SetStringField(TEXT("schema"),TEXT("raftsim.engine_feature_demo.v1"));
             Report->SetStringField(TEXT("feature"),Kind);Report->SetBoolField(TEXT("failed"),bFailed);
-            Report->SetStringField(TEXT("scope"),TEXT("Authored isolated current; production CustomReducedRigidBody, no pose forcing, no paddle. Not surveyed hydraulics, final optics, river acceptance or FPS measurement."));
+            Report->SetStringField(TEXT("scope"),FString::Printf(TEXT("Authored isolated current with the pour-over's falling water; production CustomReducedRigidBody, no pose forcing, %s%s. Not surveyed hydraulics, final optics, river acceptance or FPS measurement."),
+                bPaddle ? TEXT("crew paddling forward") : TEXT("no paddle"),bCrewRaft ? TEXT(", production crew seats with play's capsize gate and paddler washouts") : TEXT("")));
+            if(bCrewRaft)
+            {
+                Report->SetNumberField(TEXT("first_capsize_seconds"),FirstCapsizeSeconds);
+                Report->SetNumberField(TEXT("first_swimmer_seconds"),FirstSwimmerSeconds);
+                Report->SetNumberField(TEXT("maximum_swimmers"),MaximumSwimmers);
+            }
             Report->SetNumberField(TEXT("simulated_seconds"),Seconds);Report->SetNumberField(TEXT("unprocessed_seconds"),Debt);
             Report->SetStringField(TEXT("motion_sampling"),TEXT("Actual fixed-step integrated states; no interpolation. Video remains actual render-frame capture."));
             if(Kind==TEXT("eddy"))
@@ -258,6 +344,11 @@ struct FWaterFeatureDemo : TSharedFromThis<FWaterFeatureDemo>
             Row->SetNumberField(TEXT("boat_u_mps"),S.LinearVelocityMetersPerSecond.X);
             Row->SetNumberField(TEXT("boat_v_mps"),S.LinearVelocityMetersPerSecond.Y);
             Row->SetNumberField(TEXT("water_u_mps"),V.X);Row->SetNumberField(TEXT("water_v_mps"),V.Y);
+            if(bCrewRaft)
+            {
+                Row->SetNumberField(TEXT("swimmers"),Boat->GetSwimmerCount());
+                Row->SetBoolField(TEXT("capsized"),Boat->GetRaftMode()!=ERaftSimRaftMode::Upright);
+            }
             TArray<TSharedPtr<FJsonValue>> TracerRows;
             for(int32 I=0;I<FMath::Min(16,Tracers.Num());++I)
             {
@@ -282,26 +373,69 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
     Demo->HoleSite.PhysicalCrestHeightMeters=.8f;Demo->HoleSite.PhysicalCrestLengthMeters=2.f;
     Demo->HoleSite.SpillingFraction=1.f;Demo->HoleSite.bLocalEnvelopeCap=true;
     ARaftSimRaftActor* Boat=nullptr;
+    for(TActorIterator<ARaftSimRaftActor> It(World);It;++It){Boat=*It;break;}
+    // "crew": the crew riding in the raft stay visible (they are attached to it).
+    const bool bKeepCrew=Args.Contains(TEXT("crew"));
     for(TActorIterator<AActor> It(World);It;++It)
     {
-        if(auto* R=Cast<ARaftSimRaftActor>(*It)){Boat=R;continue;}
+        if(*It==Boat)continue;
+        if(bKeepCrew && Boat && It->IsAttachedTo(Boat))continue;
         if(It->FindComponentByClass<UMeshComponent>())It->SetActorHiddenInGame(true);
     }
     if(!Boat)Boat=World->SpawnActor<ARaftSimRaftActor>();
     if(!Boat){UE_LOG(LogTemp,Error,TEXT("Feature demo needs production raft visual"));return;}
-    Boat->SetActorTickEnabled(false);Boat->SetActorHiddenInGame(false);Demo->Boat=Boat;
+    // "noraft": the raft still rides the current but is not drawn, so the
+    // hole itself can be seen.
+    Demo->bNoRaft=Args.Contains(TEXT("noraft"));
+    Boat->SetActorTickEnabled(false);Boat->SetActorHiddenInGame(Demo->bNoRaft);Demo->Boat=Boat;
     Demo->Dynamics=TStrongObjectPtr<URaftSimChronoRuntimeAdapter>(NewObject<URaftSimChronoRuntimeAdapter>());
     FRaftSimRaftBodyConfig Body;
+    URaftSimChronoRuntimeAdapter* Reference=nullptr;
     if(auto* Bridge=World->GetGameInstance()->GetSubsystem<URaftSimPhysicsBridgeSubsystem>())
-        if(Bridge->GetRaftRuntime())Body=Bridge->GetRaftRuntime()->GetRaftBodyConfig();
+        if((Reference=Bridge->GetRaftRuntime())!=nullptr)Body=Reference->GetRaftBodyConfig();
     Body.Runtime=ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
-    FRaftSimFlexParameters Flex;Flex.MassKg=Body.MassKg;Flex.LengthM=Body.LengthMeters;Flex.WidthM=Body.WidthMeters;
-    Flex.TubeRadiusM=Body.TubeRadiusMeters;Flex.GuideMassKg=0;Flex.PassengerMassKg=0;Flex.PassengerCount=0;
-    Demo->Dynamics->ConfigureRaftBody(Body);Demo->Dynamics->ConfigureFlexibleRaftModel(Flex,{});
+    for(const FString& Arg:Args)
+    {
+        FString Value;
+        if(Arg.StartsWith(TEXT("seconds=")) && Arg.Split(TEXT("="),nullptr,&Value))
+            Demo->DurationSeconds=FMath::Clamp(FCString::Atod(*Value),6.,40.);
+    }
+    Demo->bCrewRaft=Demo->Kind==TEXT("hole") && Args.Contains(TEXT("crew"));
+    Demo->bPaddle=Demo->bCrewRaft && Args.Contains(TEXT("paddle"));
+    Demo->Dynamics->ConfigureRaftBody(Body);
+    if(Demo->bCrewRaft)
+    {
+        if(!Reference){UE_LOG(LogTemp,Error,TEXT("Hole crew run needs the production raft runtime"));return;}
+        Demo->Dynamics->ConfigureFlexibleRaftModel(Reference->GetFlexibleParameters(),Reference->GetFlexibleSeats(),18000.,true);
+    }
+    else
+    {
+        FRaftSimFlexParameters Flex;Flex.MassKg=Body.MassKg;Flex.LengthM=Body.LengthMeters;Flex.WidthM=Body.WidthMeters;
+        Flex.TubeRadiusM=Body.TubeRadiusMeters;Flex.GuideMassKg=0;Flex.PassengerMassKg=0;Flex.PassengerCount=0;
+        Demo->Dynamics->ConfigureFlexibleRaftModel(Flex,{});
+    }
     TWeakPtr<FWaterFeatureDemo> Weak=Demo;
-    Demo->Dynamics->SetWaterSurfaceSampler([Weak](const FVector& P,float& H){auto D=Weak.Pin();if(!D || (D->Kind==TEXT("eddy") && RaftSimEddyDemoBoundary::Solid(P)))return false;H=D->Surface(P)*100.;return true;});
+    {
+        // The breaking wave the hull meets is the one the churn draws (or
+        // would draw: the default look when no churn is shown).
+        FRaftSimHoleChurnSite WaveSite;FString PresetName;
+        if(const FString* WaveArg=Args.FindByPredicate([](const FString& Arg){return Arg.StartsWith(TEXT("churn"));}))
+            WaveArg->Split(TEXT("="),nullptr,&PresetName);
+        WaveSite.Look=FRaftSimHoleChurnLook::Preset(PresetName);
+        Demo->Wave=URaftSimHoleChurnComponent::ShapeOf(WaveSite);
+        RaftSimHoleWave::ToeM(Demo->Wave,[&Demo](double Along,double& WaterM){WaterM=Demo->Surface(FVector(Along*100.,0.,0.));return true;},Demo->WaveToeM);
+    }
+    Demo->Dynamics->SetWaterSurfaceSampler([Weak](const FVector& P,float& H){auto D=Weak.Pin();if(!D || (D->Kind==TEXT("eddy") && RaftSimEddyDemoBoundary::Solid(P)))return false;H=D->HullWater(P).SurfaceM*100.;return true;});
+    // Down the slope of the breaking wave's pile, back into the trough.
+    if(Demo->Kind==TEXT("hole"))
+        Demo->Dynamics->SetWaterSurfaceSlopeSampler([Weak](const FVector& P,FVector2D& Slope)
+        {auto D=Weak.Pin();if(!D)return false;Slope=D->HullWater(P).Slope;return true;});
     Demo->Dynamics->SetFlexibleWaterFieldSampler([Weak](const FVector& P,FRaftSimFlexUniformWater& Out)
-    {auto D=Weak.Pin();if(!D)return false;Out.bWet=!(D->Kind==TEXT("eddy") && RaftSimEddyDemoBoundary::Solid(P));Out.SurfaceHeightM=D->Surface(P);Out.VelocityMps=D->Velocity(P,false);return true;});
+    {auto D=Weak.Pin();if(!D)return false;Out.bWet=!(D->Kind==TEXT("eddy") && RaftSimEddyDemoBoundary::Solid(P));
+     const auto Hull=D->HullWater(P);Out.SurfaceHeightM=Hull.SurfaceM;Out.VelocityMps=Hull.VelocityMps;return true;});
+    if(Demo->bCrewRaft && !Boat->BindIsolatedFlipRuntime(Demo->Dynamics.Get(),false))
+    {UE_LOG(LogTemp,Error,TEXT("Hole crew run requires the production raft"));return;}
+    if(Demo->bPaddle)Boat->IssueCrewCommand(ERaftSimCrewCommand::AllForward);
     if(Demo->Kind==TEXT("eddy"))
     {
         const FVector Scale=Boat->GetActorScale3D();
@@ -315,6 +449,17 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
     // Within the block's downstream shadow, slightly off the exact symmetric
     // separatrix so the shared current can select the upper return branch.
     FVector Start=Demo->Kind==TEXT("eddy") ? FVector(1600,160,0) : FVector(440,0,0);
+    // "entry": the raft comes down on the current and drops into the hole.
+    const bool bEntry=Demo->Kind==TEXT("hole") && Args.Contains(TEXT("entry"));
+    if(bEntry){Start=FVector(-900,0,0);Initial.LinearVelocityMetersPerSecond=FVector(2.2,0,0);}
+    // "yaw=D": the raft points D degrees off the current (rafts rarely
+    // meet a hole dead straight).
+    double YawDegrees=Demo->bCollisionControl || bEntry ? 0. : Demo->Kind==TEXT("eddy") ? (Demo->bMirroredEddy ? -35. : 35.) : 10.;
+    for(const FString& Arg:Args)
+    {
+        FString Value;
+        if(Arg.StartsWith(TEXT("yaw=")) && Arg.Split(TEXT("="),nullptr,&Value))YawDegrees=FCString::Atod(*Value);
+    }
     if(Demo->bMirroredEddy)Start.Y=-Start.Y;
     if(Demo->bCollisionControl)
     {
@@ -324,7 +469,7 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
         Initial.LinearVelocityMetersPerSecond=FVector(4,0,0);
     }
     FVector StartPose=Start;StartPose.Z=Demo->Surface(Start)*100.;Initial.WorldTransform.SetLocation(StartPose);
-    Initial.WorldTransform.SetRotation(FRotator(0,Demo->bCollisionControl ? 0. : Demo->Kind==TEXT("eddy") ? (Demo->bMirroredEddy ? -35. : 35.) : 10.,0).Quaternion());
+    Initial.WorldTransform.SetRotation(FRotator(0,YawDegrees,0).Quaternion());
     Demo->Dynamics->SetKinematicState(Initial);
     // Recording pre-roll must show this state, not the tank's original pose.
     Boat->SetActorTransform(Initial.WorldTransform);
@@ -380,6 +525,35 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
             {const int32 I=A*(CurlSteps+1)+B;LT.Append({I,I+CurlSteps+1,I+1,I+1,I+CurlSteps+1,I+CurlSteps+2});}
         }
         Lip->CreateMeshSection_LinearColor(0,LV,LT,LN,LU,LC,LTan,false);
+        // "churn" or "churn=<preset>": the hole's froth as a wave crashing
+        // back upstream in place, in one of the reviewed looks (roll, plunge, big).
+        const FString* ChurnArg=Args.FindByPredicate([](const FString& Arg){return Arg.StartsWith(TEXT("churn"));});
+        if(ChurnArg)
+        {
+            auto* Churn=NewObject<URaftSimHoleChurnComponent>(Apparatus);
+            Churn->SetupAttachment(Water);Churn->RegisterComponent();Churn->SetTranslucentSortPriority(2);
+            FRaftSimHoleChurnSite Site;Site.Seed=61001;
+            FString PresetName;ChurnArg->Split(TEXT("="),nullptr,&PresetName);
+            Site.Look=FRaftSimHoleChurnLook::Preset(PresetName);
+            Churn->Configure(Site,[Weak](const FVector& P){auto D=Weak.Pin();return D ? D->Surface(P)*100.f : 0.f;},
+                LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/RaftSim/Materials/M_RaftSim_BreakingWaterLip.M_RaftSim_BreakingWaterLip")));
+            Demo->Churn=Churn;
+            // The breaking wave replaces the static glassy lip.
+            Lip->SetVisibility(false);
+            Demo->bRecordSound=Args.Contains(TEXT("sound"));
+            if(Demo->bRecordSound)Churn->EnableSound(61001u);
+        }
+        Demo->RaftHalfLengthCm=float(Body.LengthMeters*.5+Body.TubeRadiusMeters)*100.f*1.05f;
+        Demo->RaftHalfWidthCm=float(Body.WidthMeters*.5)*100.f*1.05f;
+        if(Args.Contains(TEXT("splash")))
+        {
+            auto* Splash=NewObject<URaftSimRaftSplashComponent>(Apparatus);
+            Splash->SetupAttachment(Water);Splash->RegisterComponent();Splash->SetTranslucentSortPriority(4);
+            Splash->Configure([Weak](const FVector& P,float& HeightCm,FVector& VelocityCm)
+                {auto D=Weak.Pin();if(!D)return false;HeightCm=D->Surface(P)*100.f;VelocityCm=D->Velocity(P,true)*100.;return true;},
+                LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/RaftSim/Materials/M_RaftSim_NiagaraWaterParticle.M_RaftSim_NiagaraWaterParticle")));
+            Demo->Splash=Splash;
+        }
         Lip->SetMaterial(0,LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/RaftSim/Materials/M_RaftSim_BreakingWaterLip.M_RaftSim_BreakingWaterLip")));
         if(auto* Material=Lip->CreateAndSetMaterialInstanceDynamic(0))
         {
@@ -441,7 +615,11 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
     }
     if(Demo->Kind!=TEXT("eddy"))
     {
-        for(const TCHAR* SystemName : {TEXT("NS_RaftSim_RapidRoller"),TEXT("NS_RaftSim_RapidCrestSpray")})
+        // The breaking wave replaces the roller and carries no spray of its
+        // own: random puffs shooting off a hole read as unrealistic. Not
+        // created at all, since a Niagara component starts by itself once
+        // it has its asset (it left a dark roller smudge on the wave).
+        for(const TCHAR* SystemName : {TEXT("NS_RaftSim_RapidRoller"),TEXT("NS_RaftSim_RapidCrestSpray")})if(!Demo->Churn.IsValid())
         {
             auto* Effect=NewObject<UNiagaraComponent>(Apparatus);Effect->SetupAttachment(Water);Effect->RegisterComponent();
             const FString Path=FString::Printf(TEXT("/Game/RaftSim/VFX/Water/%s.%s"),SystemName,SystemName);
@@ -453,14 +631,34 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
                     ARaftSimWaterVfxActor::ComputeRapidSourcePlaneRotation(Effect->GetForwardVector()));
                 Effect->SetVariableFloat(TEXT("User.SpawnRate"),Demo->Kind==TEXT("froth") ? 600.f : 240.f);
                 Effect->AddWorldOffset(FVector(0.,0.,30.));
-                Effect->SetWorldScale3D(FVector(1.,2.,1.));Effect->Activate(true);
+                Effect->SetWorldScale3D(FVector(1.,2.,1.));
+                Effect->Activate(true);
                 Demo->Spray.Add(Effect);
             }
         }
     }
     auto* Camera=World->SpawnActor<ACameraActor>(FVector(1000,-1200,1000),FRotator(-33,140,0));
     if(Demo->Kind==TEXT("eddy"))Camera->SetActorLocation(Demo->bCollisionControl ? FVector(-1200,-1400,1200) : FVector(2400,-2500,2500));
-    const FVector Focus=Demo->bCollisionControl ? FVector(-200,0,0) : Demo->Kind==TEXT("eddy") ? FVector(1600,250,0) : FVector(550,0,0);
+    // "close": low, below the hole and off to one side, looking back
+    // upstream at the pile's face with the crest behind it.
+    const bool bClose=Demo->Kind!=TEXT("eddy") && Args.Contains(TEXT("close"));
+    if(bClose)Camera->SetActorLocation(FVector(860,-520,230));
+    // "raftcam": beside the raft held in the hole, to see water thrown over it.
+    const bool bRaftCam=Demo->Kind!=TEXT("eddy") && Args.Contains(TEXT("raftcam"));
+    if(bRaftCam)Camera->SetActorLocation(FVector(820,-560,300));
+    // "side": across the river, low, square to the flow: the wave's face in
+    // profile, breaking back toward the pour-over.
+    const bool bSide=Demo->Kind!=TEXT("eddy") && Args.Contains(TEXT("side"));
+    if(bSide)Camera->SetActorLocation(FVector(220,-820,170));
+    // "upstream": a paddler's approach, above the pour-over looking down
+    // the tongue into the hole's falling face.
+    // "top": straight down over the hole, to check the wave's shape.
+    const bool bTop=Demo->Kind!=TEXT("eddy") && Args.Contains(TEXT("top"));
+    if(bTop)Camera->SetActorLocation(FVector(231,1,950));
+    const bool bUpstream=Demo->Kind!=TEXT("eddy") && Args.Contains(TEXT("upstream"));
+    if(bUpstream)Camera->SetActorLocation(FVector(-560,-260,420));
+    const FVector Focus=Demo->bCollisionControl ? FVector(-200,0,0) : Demo->Kind==TEXT("eddy") ? FVector(1600,250,0) :
+        bClose ? FVector(110,0,10) : bRaftCam ? FVector(330,0,40) : bSide ? FVector(220,0,30) : bUpstream ? FVector(230,0,30) : bTop ? FVector(230,0,0) : FVector(550,0,0);
     Camera->SetActorRotation((Focus-Camera->GetActorLocation()).Rotation());
     RaftSimCameraPresentation::Configure(Camera->GetCameraComponent());World->GetFirstPlayerController()->SetViewTarget(Camera);
     Camera->GetCameraComponent()->SetFieldOfView(60.f);

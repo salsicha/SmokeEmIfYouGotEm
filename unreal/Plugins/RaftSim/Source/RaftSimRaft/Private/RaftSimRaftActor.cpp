@@ -2146,6 +2146,23 @@ float ARaftSimRaftActor::GetPaddleWaterPurchase() const
     // blades actually plant; a half-beached raft keeps half its purchase,
     // and a firmly grounded hull keeps only enough bite to work itself off
     // a gravel touch, not to drive overland.
+#if !UE_BUILD_SHIPPING
+    // An isolated lab raft's blades plant in that lab's own water.
+    if (RaftAdapter && (!Bridge || RaftAdapter != Bridge->GetRaftRuntime()))
+    {
+        float LabPurchase = 0.0f;
+        for (const float Side : {-1.0f, 1.0f})
+        {
+            FRaftSimFlexUniformWater Field;
+            if (RaftAdapter->SampleBoundFlexibleWater(GetActorLocation() + GetActorRightVector() * 165.0f * Side, Field) &&
+                Field.bWet)
+            {
+                LabPurchase += 0.5f;
+            }
+        }
+        return LabPurchase;
+    }
+#endif
     if (Bridge == nullptr)
     {
         return 1.0f;
@@ -2195,6 +2212,14 @@ float ARaftSimRaftActor::GetPaddlePropulsionShortfall(
     // over the water. Keeps strokes honest: they close the gap to hull
     // speed instead of compounding without bound.
     FVector WaterVelocityMps = FVector::ZeroVector;
+#if !UE_BUILD_SHIPPING
+    // An isolated lab raft paddles over that lab's own current.
+    if (RaftAdapter && (!Bridge || RaftAdapter != Bridge->GetRaftRuntime()))
+    {
+        WaterVelocityMps = SampleWaterVelocityMps(GetActorLocation());
+    }
+    else
+#endif
     if (Bridge != nullptr)
     {
         if (const URaftSimWaterRuntimeAdapter* Water = Bridge->GetWaterRuntime())
@@ -2650,7 +2675,7 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
 }
 
 #if !UE_BUILD_SHIPPING
-bool ARaftSimRaftActor::AdvanceIsolatedFlipDemo(float Dt)
+bool ARaftSimRaftActor::AdvanceIsolatedFlipDemo(float Dt, bool bPassengerWashouts)
 {
     if(!RaftAdapter || !RaftAdapter->StepRaftDynamics(Dt))return false;
     SetActorTransform(RaftAdapter->GetKinematicState().WorldTransform);
@@ -2660,6 +2685,7 @@ bool ARaftSimRaftActor::AdvanceIsolatedFlipDemo(float Dt)
     {
         EnterCapsize(); // Real crew ejection/occupancy/rescue lifecycle.
     }
+    if(bPassengerWashouts)UpdatePassengerWashouts(Dt);
     if(RaftMode!=ERaftSimRaftMode::Upright)DriftSwimmers(Dt);
     return true;
 }

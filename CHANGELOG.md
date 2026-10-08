@@ -6,6 +6,46 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- Holes (2026-10-08, in progress):
+  - **Breaking wave** (`RaftSimHoleChurn.{h,cpp}`): a hole's froth is drawn as
+    the wave it is, crashing back upstream in place. A white roller stands
+    across the trough below the pour-over. Its water rolls up its back, over
+    the crest and down a curling front onto the incoming water, and the lip
+    throws out and falls back in sections along the span. There is no spray.
+    It has its own sound: a steady roar with irregular crashes (new
+    `HoleChurn` voice and `HoleCrash` event in the procedural synth).
+    It is shown in the test tank only for now (`RaftSim.FeatureDemo hole
+    <label> churn[=roll|plunge|big]`).
+  - **Water over the crew** (`RaftSimRaftSplash.{h,cpp}`): when the raft hits
+    a hole or wave hard, a sheet and droplets of water are thrown over the
+    crew. Test tank only (`splash`).
+  - **Hole physics** (`RaftSimHolePourOver.h`, `RaftSimHoleWave.h`). The hull
+    now meets two things:
+    - the water falling over the pour-over, which runs down the face at the
+      speed the drop gives it, sqrt(U^2 + 2 g dh);
+    - the breaking wave's pile, the same shape as the drawn one. The hull
+      floats on it, is carried by its water rolling back upstream, and is
+      pushed down its slopes. This uses a new optional surface-slope force on
+      the hull: each tube point's buoyancy B also pushes -B times the slope.
+
+    A raft that drifts in should stall on the pile's front and slide back
+    into the trough under the falling water. A crew paddling forward should
+    carry over it. Nothing forces a flip or a washout: the hull's own drag,
+    upper-face, swamping and capsize rules decide.
+
+    In game it is off by default (`RaftSim.HoleWaterPhysics 1` to try it)
+    until it has been checked on the rivers. It is always on in the test
+    tank, which now also has a real crewed raft: `crew` (production seats,
+    play's capsize gate and paddler washouts), `paddle` (crew paddle
+    forward), `yaw=D` and `seconds=N`.
+  - **Test tank fixes:**
+    - With `noraft`, the hidden raft is moved out of the scene. Left in
+      place, it blotted a raft-shaped gap out of the wave.
+    - With the wave shown, the old roller and crest-spray particles are no
+      longer created at all; they had been starting by themselves.
+  - **Test:** `RaftSim.Physics.HoleWater` checks the falling water's speed and
+    direction, the pile matching the drawn wave, and the push the pile gives
+    a hull.
 - Crew, gear and raft review fixes (2026-10-07):
   - **Hand grips rebuilt** (`RaftSimCC0CrewGrip.cpp`): every hold is solved
     against the bar it holds. The palm faces the T-grip crossbar or shaft,

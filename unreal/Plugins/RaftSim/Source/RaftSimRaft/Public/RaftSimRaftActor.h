@@ -171,7 +171,8 @@ public:
     bool BindIsolatedFeatureHull(URaftSimChronoRuntimeAdapter* Runtime);
     void RefreshIsolatedFeatureHull();
     /** Execute the normal actor capsize lifecycle on its bound real runtime. */
-    bool AdvanceIsolatedFlipDemo(float Dt);
+    /** bPassengerWashouts: the paddlers' washout rules run too, as in play. */
+    bool AdvanceIsolatedFlipDemo(float Dt, bool bPassengerWashouts = false);
     bool BindIsolatedFlipRuntime(URaftSimChronoRuntimeAdapter* Runtime,bool bFullHullExport);
     void RefreshIsolatedFlipVisual(float Dt);
     bool HasScriptedCapsizeTransition() const {return CapsizeTransitionRemainingSeconds>0.f;}
