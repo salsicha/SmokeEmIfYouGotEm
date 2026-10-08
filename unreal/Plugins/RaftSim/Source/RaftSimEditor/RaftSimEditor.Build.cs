@@ -42,6 +42,7 @@ public class RaftSimEditor : ModuleRules
             "AssetTools",
             "Landscape",
             "LandscapeEditor",
+            "Foliage",
             "LevelEditor",
             "Chaos",
             "GeometryCollectionEngine",
