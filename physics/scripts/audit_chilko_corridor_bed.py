@@ -13,6 +13,7 @@ from shapely.geometry import LineString
 
 from chilko_corridor_terrain import CorridorTerrain
 from chilko_corridor_bed import source_water_reference
+from chilko_triangle_ownership import POLICY, preserve_triangle_support
 from review_chilko_continuous_cook import verify_terrain_sources
 from plan_lidarbc_corridor_capture import route_xy
 from export_colorado_continuous_terrain import LandscapeTriangles, VERTICES, SPACING, sha
@@ -46,6 +47,9 @@ def audit(folder, terrain_folder, profile_folder, out):
     receipt = m['evidence_source']
     model=verify_terrain_sources(receipt)
     if model is None:raise ValueError('Full-route source planform required for bed audit')
+    support_policy = m.get('inference_support_policy')
+    if support_policy not in (None, POLICY):
+        raise ValueError('Unknown triangle inference-support policy')
     if (sha(source.folder/'manifest.json') != receipt['terrain_manifest_sha256'] or
             sha(profile_folder/'manifest.json') != receipt['profile_manifest_sha256'] or
             sha(profile_folder/'profile.npz') != receipt['profile_sha256']):
@@ -71,6 +75,11 @@ def audit(folder, terrain_folder, profile_folder, out):
         east, north = np.meshgrid(chunk['origin_m'][0]+np.arange(VERTICES)*SPACING,
                                   chunk['origin_m'][1]-np.arange(VERTICES)*SPACING)
         xy = np.stack((east, north), axis=-1)
+        if support_policy:
+            expected = preserve_triangle_support(model, xy, model.sample(xy))
+            for key in ('height_m', 'inferred_bed', 'inference_support_veto'):
+                if key not in r or not np.array_equal(r[key], expected[key]):
+                    raise ValueError('Exported triangle-support ownership differs from source')
         original, kind = source.sample(xy)
         if (not np.array_equal(original, r['source_height_m']) or
                 not np.array_equal(kind, r['source_kind'])):
@@ -126,6 +135,7 @@ def audit(folder, terrain_folder, profile_folder, out):
             deficient_sections=rejected, negative_center_reference_depth_count=int((np.array(centre_depth)<0).sum())),
         source_ownership_passed=True, shared_edges_passed=True,
         ownership_policy=ownership_policy,
+        inference_support_policy=support_policy,
         scope='Initial-reference geometric diagnostic only, not solved discharge/stage, boat footprint, named rapids or playable acceptance',
         engine_validated=False, navigation_validated=False)
     if sha(folder/'manifest.json') != manifest_hash: raise ValueError('Canonical terrain changed during audit')

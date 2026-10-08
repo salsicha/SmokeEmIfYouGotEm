@@ -11,6 +11,7 @@ import numpy as np
 import shapely
 
 from chilko_corridor_bed import CorridorBed
+from chilko_triangle_ownership import POLICY, preserve_triangle_support
 from export_colorado_continuous_terrain import (
     VERTICES, SPACING, SPAN, HEIGHT_BASE, HEIGHT_RANGE, LandscapeTriangles,
     encode_height, sha, write_png_u16)
@@ -44,7 +45,8 @@ def export(terrain, profile, out, origin, datum, buffer_m=600., discharge=45., r
         west, south = origin + np.array([i, j]) * SPAN
         east, north = np.meshgrid(west + np.arange(VERTICES)*SPACING,
                                   south + SPAN - np.arange(VERTICES)*SPACING)
-        result = model.sample(np.stack((east, north), axis=-1))
+        xy = np.stack((east, north), axis=-1)
+        result = preserve_triangle_support(model, xy, model.sample(xy))
         encoded = encode_height(result['height_m'])
         decoded = HEIGHT_BASE + encoded.astype(float) * HEIGHT_RANGE / 65535.
         max_quantization_error = max(max_quantization_error, float(abs(decoded-result['height_m']).max()))
@@ -76,6 +78,7 @@ def export(terrain, profile, out, origin, datum, buffer_m=600., discharge=45., r
             scale_xyz=[SPACING*100, SPACING*100, HEIGHT_RANGE*100/512*65536/65535]),
         geographic_scope=dict(route_interval_m=[0., model.line.length], buffer_m=buffer_m,
             frame='Exact EPSG:3157 FWA route arclength; no rapid boundaries assigned'),
+        inference_support_policy=POLICY,
         chunks=chunks, incomplete_source_chunks=[], shared_edge_max_encoded_difference=0,
         vertex_counts_including_shared_edges=dict(source_kind=sources, inferred_bed=inferred_count),
         source_kind=model.terrain.manifest['source_kind'], maximum_inferred_cut_m=max_cut,
