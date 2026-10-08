@@ -69,8 +69,14 @@ def definitions(axes):
         identity_sources=[PAC,LODGE])
     add('futaleufu','Asleep at the Wheel','hole','Avoid the centre-bottom hydraulic using the right passage',
         'https://www.whitewaterguidebook.com/chile/futaleufu-river-inferno/',
-        'Upstream of Terminator and outside the current crop; do not alias an existing Terminator feature',
-        source_grade='III',source_flow_scope='Guide class differs from III-IV catalog; flow and raft context must be compared')
+        'Upstream of Terminator and outside the old crop, but downstream of the Rio Azul confluence '
+        'inside the full route. Reject the historical catalog-order slot on the Azul tributary; '
+        'do not alias an existing Terminator feature or turn a source-distance span into rapid bounds.',
+        source_grade='III in Whitewater Guidebook; IV in GoRafting',
+        source_flow_scope='Guides differ; neither establishes a numeric flow matching the game',
+        location_evidence_file='physics/data/real_world/futaleufu_river_chile/review/guide_distance_locations_2026_10_08.json',
+        location_status='mainstem_source_distance_estimates_not_verified_rapid_boundaries',
+        alternative_source='https://gorafting.com/chile/futaleufu-river/')
     for name in ('Lava Canyon','Green Mile','Miracle Canyon'):
         add('chilko',name,'continuous','Maintain control through linked waves and turns without a reset',CHILKO,
             'Named reach scope and exact boundaries unresolved; the travel account is not a feature-by-feature survey',
