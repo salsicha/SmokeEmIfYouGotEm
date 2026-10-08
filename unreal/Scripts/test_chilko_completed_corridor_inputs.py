@@ -1,9 +1,29 @@
 import copy
 import unittest
-from build_chilko_completed_corridor_inputs import validate_export
+from build_chilko_completed_corridor_inputs import validate_export, require_idle_headroom, watchdog_failure
 
 
 class FullTerrainHandoffTests(unittest.TestCase):
+    def test_shared_work_refuses_launch_and_stops_only_owned_builder(self):
+        healthy=dict(available_physical_bytes=10*1024**3,available_commit_bytes=10*1024**3,free_disk_bytes=48*1024**3)
+        busy=[dict(ProcessId=123,Name='UnrealEditor.exe')]
+        with self.assertRaisesRegex(ValueError,'do not overlap'):
+            require_idle_headroom(healthy,busy)
+        self.assertIn('only owned',watchdog_failure(healthy,busy,0))
+        require_idle_headroom(healthy,[])
+        self.assertIsNone(watchdog_failure(healthy,[],0))
+
+    def test_launch_and_runtime_reserves_remain_unchanged(self):
+        healthy=dict(available_physical_bytes=10*1024**3,available_commit_bytes=10*1024**3,free_disk_bytes=48*1024**3)
+        for key,launch,runtime in (('available_physical_bytes',8,3),('available_commit_bytes',8,3),('free_disk_bytes',43,40)):
+            with self.subTest(key=key):
+                require_idle_headroom({**healthy,key:launch*1024**3},[])
+                with self.assertRaises(ValueError):require_idle_headroom({**healthy,key:launch*1024**3-1},[])
+                self.assertIsNone(watchdog_failure({**healthy,key:runtime*1024**3},[],0))
+                self.assertIsNotNone(watchdog_failure({**healthy,key:runtime*1024**3-1},[],0))
+        self.assertIsNone(watchdog_failure(healthy,[],8*3600))
+        self.assertIn('time bound',watchdog_failure(healthy,[],8*3600+.01))
+
     def fixture(self):
         request=dict(expected_chunks=4772,route_length_m=55723.04503105954,spacing_m=1.,buffer_m=600.)
         completed=dict(inputs_unchanged=True,chunks=4772,maximum_shared_edge_encoded_difference=0)

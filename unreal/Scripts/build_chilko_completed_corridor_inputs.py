@@ -9,6 +9,23 @@ import subprocess
 import sys
 import time
 from qualify_futaleufu_native_ports import ROOT, sha, resources
+from continue_futaleufu_native_flow import shared_native_work
+
+
+def require_idle_headroom(current, busy):
+    if busy:
+        raise ValueError('Shared engine/build/cook work is active; do not overlap full Chilko input construction')
+    if min(current['available_physical_bytes'],current['available_commit_bytes'])<8*1024**3 or current['free_disk_bytes']<43*1024**3:
+        raise ValueError('Full-input resource reserve unavailable')
+
+
+def watchdog_failure(current, busy, elapsed):
+    if busy: return 'Shared work appeared; stopped only owned Chilko input builder'
+    if min(current['available_physical_bytes'],current['available_commit_bytes'])<3*1024**3:
+        return 'Owned builder memory reserve reached'
+    if current['free_disk_bytes']<40*1024**3: return 'Owned builder disk reserve reached'
+    if elapsed>8*3600: return 'Owned builder time bound reached'
+    return None
 
 
 def validate_export(request, completion, manifest):
@@ -40,7 +57,8 @@ def run(export_job, canonical, output, job):
     validate_export(request,completion,manifest)
     if sha(manifest_path)!=completion['manifest_sha256']:raise ValueError('Terrain completion hash differs')
     pins={ROOT/p:h for p,h in request['inputs_sha256'].items()}
-    for p in (completion_path,request_path,manifest_path,Path(__file__).resolve()):
+    for p in (completion_path,request_path,manifest_path,Path(__file__).resolve(),
+              ROOT/'unreal/Scripts/continue_futaleufu_native_flow.py'):
         digest=sha(p)
         if p in pins and pins[p]!=digest:raise ValueError('Conflicting source pin')
         pins[p]=digest
@@ -49,8 +67,7 @@ def run(export_job, canonical, output, job):
             if sha(p)!=h:raise ValueError('Input source changed: '+str(p))
     verify()
     r=resources()
-    if min(r['available_physical_bytes'],r['available_commit_bytes'])<8*1024**3 or r['free_disk_bytes']<43*1024**3:
-        raise ValueError('Full-input resource reserve unavailable')
+    require_idle_headroom(r,shared_native_work())
     script=ROOT/'physics/scripts/build_chilko_corridor_scenario.py'
     if script not in pins:raise ValueError('Hydraulic builder must belong to pinned export source set')
     command=[sys.executable,'-u',str(script),'--terrain',str(ROOT/'tmp/chilko-full-corridor-conditioned-terrain-v1'),
@@ -61,6 +78,14 @@ def run(export_job, canonical, output, job):
         with (job/name).open('x') as stream:json.dump(value,stream,indent=2,allow_nan=False)
     save('request.json',dict(command=command,full_route=True,initial_resources=r,
         sources_sha256={p.relative_to(ROOT).as_posix():h for p,h in pins.items()},timeout_seconds=8*3600))
+    try:
+        verify()
+        r=resources();busy=shared_native_work()
+        save('prelaunch.json',dict(resources=r,shared_work=busy))
+        require_idle_headroom(r,busy)
+    except Exception as exc:
+        save('failure.json',dict(stage='prelaunch',native_process_started=False,failure=str(exc)))
+        raise
     minimum=r.copy();started=time.monotonic();failure=None
     with (job/'build.log').open('x') as log:
         child=subprocess.Popen(command,cwd=ROOT,stdout=log,stderr=subprocess.STDOUT)
@@ -68,10 +93,16 @@ def run(export_job, canonical, output, job):
         while child.poll() is None:
             try:child.wait(timeout=5)
             except subprocess.TimeoutExpired:
-                current=resources();minimum={k:min(minimum[k],current[k]) for k in current}
-                if min(current['available_physical_bytes'],current['available_commit_bytes'])<3*1024**3:failure='Owned builder memory reserve reached'
-                if current['free_disk_bytes']<40*1024**3:failure='Owned builder disk reserve reached'
-                if time.monotonic()-started>8*3600:failure='Owned builder time bound reached'
+                try:
+                    current=resources();busy=shared_native_work(child.pid)
+                    minimum={k:min(minimum[k],current[k]) for k in current}
+                    elapsed=time.monotonic()-started
+                    with (job/'resources.jsonl').open('a') as telemetry:
+                        telemetry.write(json.dumps(dict(elapsed_seconds=elapsed,resources=current,
+                                                        shared_work=busy),allow_nan=False)+'\n')
+                    failure=watchdog_failure(current,busy,elapsed)
+                except Exception as exc:
+                    failure='Owned builder guard observation failed: '+str(exc)
                 if failure:child.terminate();child.wait(timeout=30);break
     receipt=dict(exit_code=child.returncode,elapsed_seconds=time.monotonic()-started,minimum_resources=minimum)
     try:
