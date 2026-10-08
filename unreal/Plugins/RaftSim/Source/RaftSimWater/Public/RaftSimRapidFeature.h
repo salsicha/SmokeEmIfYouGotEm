@@ -13,6 +13,9 @@ struct RAFTSIMWATER_API FRaftSimRapidFeature
     UPROPERTY() float Height = 0.f;
     UPROPERTY() float Length = 0.f;
     UPROPERTY() float Spill = 0.f;
+    // Downstream in the bound hydraulic chart, distinct from a diagonal
+    // crest normal. Missing legacy properties retain curved positive-X flow.
+    UPROPERTY() double FlowAxisDegrees = 0.;
 
     FRaftSimRapidFeature() = default;
     FRaftSimRapidFeature(double S,double Y,double A,float H,float L,float F)

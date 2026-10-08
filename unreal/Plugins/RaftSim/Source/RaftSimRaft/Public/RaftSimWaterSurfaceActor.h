@@ -1034,6 +1034,7 @@ private:
     bool bFoamUsesCommittedClock=false;
     bool bAuthoredRiverFoamClock=false;
     TArray<FRaftSimRapidFeature> ActiveRapidFeatures;
+    bool bActiveRapidFeaturesRegistered = false;
     uint64 FoamClockRefreshes=0,FoamClockHolds=0,FoamClockInitializations=0;
     TArray<FBreakingSite> BreakingSites;
     /** One hydraulic jump tracked across refreshes. Detection re-finds and

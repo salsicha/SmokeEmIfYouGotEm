@@ -29,12 +29,15 @@ bool ARaftSimRiverWaterConfig::ResolveRapidFeatures(const FString& Map,
         Out=RaftSimRapidChallengeProfiles::Features(Map);return true;
     }
     double Minimum=0.,Maximum=0.;
+    FBox2D Bounds(ForceInit);
+    const bool Cartesian=Water.HasCartesianWaterCoordinates();
     if(RegisteredRapidChartFingerprint!=Water.GetRiverCoordinateMapFingerprint() ||
-        !Water.GetExactRiverStationRangeM(Minimum,Maximum))
+        !(Cartesian ? Water.GetCartesianWaterBoundsM(Bounds) : Water.GetExactRiverStationRangeM(Minimum,Maximum)))
     {Error=TEXT("Registered rapids belong to a different or unavailable coordinate chart");return false;}
     for(const auto& F:RegisteredRapidFeatures)
-        if(!RaftSimRapidChallengeProfiles::IsValid(F) || F.Station<Minimum || F.Station>Maximum)
-        {Error=TEXT("Invalid registered rapid parameters or station");return false;}
+        if(!RaftSimRapidChallengeProfiles::IsValid(F) ||
+            (Cartesian ? !Bounds.IsInsideOrOn(FVector2D(F.Station,F.Lateral)) : F.Station<Minimum || F.Station>Maximum))
+        {Error=TEXT("Invalid registered rapid parameters or coordinates");return false;}
     Out=RegisteredRapidFeatures;return true;
 }
 

@@ -1287,6 +1287,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             TEXT("south_fork_american_chili_bar/full_hydraulics"),
             ESearchCase::IgnoreCase);
     bSouthForkOpticalSmoothingReview = bUsesSouthForkFullReachSingleSurface;
+    bActiveRapidFeaturesRegistered=false;
     if (WaterAdapter)
     {
         ActiveRapidFeatures.Reset();
@@ -1300,6 +1301,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             return;
         }
         // Existing maps plus explicitly chart-bound continuous registrations.
+        bActiveRapidFeaturesRegistered=RiverWaterConfig && !RiverWaterConfig->RegisteredRapidChartFingerprint.IsEmpty();
         WaterAdapter->ConfigureFeatureKinematics(bUsesAuthoredRiverPresentation &&
             GetWorld() && (RaftSimWaterFeatureKinematics::IsPlayableRiver(GetWorld()->GetMapName()) ||
                 !RiverWaterConfig->RegisteredRapidChartFingerprint.IsEmpty()));
@@ -6502,7 +6504,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
     }
     if (WaterAdapter->HasFeatureKinematics() && bSharedBreakingReliefEnabled &&
-        !bCartesianFlow && RiverCoordinatesM.Num()>0 &&
+        (!bCartesianFlow || bActiveRapidFeaturesRegistered) && RiverCoordinatesM.Num()>0 &&
         !ActiveRapidFeatures.IsEmpty())
     {
         FBox2D ActiveBounds(ForceInit);

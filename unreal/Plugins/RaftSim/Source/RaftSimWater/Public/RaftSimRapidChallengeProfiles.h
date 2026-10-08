@@ -2,6 +2,7 @@
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterFeatureKinematics.h"
 #include "RaftSimRapidFeature.h"
+#include "RaftSimRapidFeatureFrame.h"
 
 // Authored gameplay reconstruction, NOT surveyed hydraulics or extra solver
 // forcing. Positions follow the committed observed_rapids catalogues. These
@@ -16,7 +17,7 @@ using FFeature = FRaftSimRapidFeature;
 inline bool IsValid(const FFeature& F)
 {
     return FMath::IsFinite(F.Station) && FMath::IsFinite(F.Lateral) &&
-        FMath::IsFinite(F.AngleDegrees) && FMath::IsFinite(F.Height) &&
+        FMath::IsFinite(F.AngleDegrees) && FMath::IsFinite(F.FlowAxisDegrees) && FMath::IsFinite(F.Height) &&
         FMath::IsFinite(F.Length) && FMath::IsFinite(F.Spill) &&
         F.Height>0.f && F.Height<=1.2f && F.Length>=2.f && F.Length<=7.f &&
         F.Spill>=0.f && F.Spill<=1.f;
@@ -30,9 +31,8 @@ inline bool Register(const URaftSimWaterRuntimeAdapter& Source,
     TArray<FFeature>& Output,FString& Error)
 {
     Output.Reset(); Error.Reset();
-    if (!Source.HasRiverCoordinateMap() || !Target.HasRiverCoordinateMap() ||
-        Source.HasCartesianWaterCoordinates() || Target.HasCartesianWaterCoordinates())
-    { Error=TEXT("Rapid registration requires two curved coordinate charts");return false; }
+    if (!Source.HasRiverCoordinateMap() || !Target.HasRiverCoordinateMap())
+    { Error=TEXT("Rapid registration requires two bound coordinate charts");return false; }
     TArray<FFeature> Candidate;
     for(const auto& F:Input)
     {
@@ -45,12 +45,11 @@ inline bool Register(const URaftSimWaterRuntimeAdapter& Source,
             !Target.RiverToWorldPosition(Registered,0.f,Check) ||
             FVector::DistSquared2D(Position,Check)>1.)
         { Error=TEXT("Rapid feature is invalid, ambiguous or outside the target chart");return false; }
-        const double Angle=FMath::DegreesToRadians(F.AngleDegrees);
-        const FVector WorldDirection=ST*FMath::Cos(Angle)+SL*FMath::Sin(Angle);
         FFeature Moved=F;
         Moved.Station=Registered.X;Moved.Lateral=Registered.Y;
-        Moved.AngleDegrees=FMath::RadiansToDegrees(FMath::Atan2(
-            FVector::DotProduct(WorldDirection,TL),FVector::DotProduct(WorldDirection,TT)));
+        if(!RaftSimRapidFeatureFrame::ReexpressAngle(F.AngleDegrees,ST,SL,TT,TL,Moved.AngleDegrees) ||
+            !RaftSimRapidFeatureFrame::ReexpressAngle(F.FlowAxisDegrees,ST,SL,TT,TL,Moved.FlowAxisDegrees))
+        { Error=TEXT("Rapid registration requires finite orthonormal chart bases");return false; }
         if(!IsValid(Moved)) { Error=TEXT("Nonfinite registered rapid");return false; }
         Candidate.Add(Moved);
     }
@@ -220,11 +219,13 @@ inline int32 Append(const TArray<FFeature>& Profile, const FBox2D& VisibleBounds
     int32 Added=0;
     for(const auto& F:Profile)
     {
+        if(!IsValid(F))continue;
         const FVector2D P(F.Station,F.Lateral);
         if(!VisibleBounds.ExpandBy(40.).IsInside(P))continue;
         FRaftSimWaterSample W;
         if(!Sample(P,W) || !W.bWet || !FMath::IsFinite(W.DepthMeters) || W.DepthMeters<.35f ||
-            W.VelocityMetersPerSecond.ContainsNaN() || W.VelocityMetersPerSecond.X<.75f)continue;
+            W.VelocityMetersPerSecond.ContainsNaN() ||
+            RaftSimRapidFeatureFrame::DownstreamSpeed(W.VelocityMetersPerSecond,F.FlowAxisDegrees)<.75)continue;
         // Replace a local detector duplicate, do not pile a second crest on
         // top. All unrelated measured/live sites are retained.
         Sites.RemoveAll([&](const auto& S){return (S.RiverCoordinatesMeters-P).SizeSquared()<9.;});
