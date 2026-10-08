@@ -1,5 +1,43 @@
 # Remaining requested work
 
+October 8 latest handoff (supersedes the next-step wording in the older
+October 8 investigations below): the complete Chilko depth fit and native
+one-metre terrain export have finished. All 4,772 terrain chunks cover the
+55,723.045 m route with a 600 m corridor buffer, unchanged pinned inputs and
+zero encoded differences on shared edges. Maximum inferred bed cut is
+6.742165 m; maximum height-encoding error is 0.018311 m. These remain source
+terrain plus explicitly inferred underwater geometry, not measured bathymetry.
+See [the completed terrain receipt](../../physics/data/real_world/chilko_river_bc/review/full_reference_terrain_2026_10_08.json).
+The next Chilko construction step is the already queued full 25,552 x 257
+hydraulic-input build, not another depth fit or terrain export. Inspect
+`tmp/chilko-full-input-queue-v10` and its live process before starting work.
+
+Futaleufu's original 332-second native continuation finished numerically but
+failed geographic bank containment: five closed exterior faces were wet at
+the final snapshot. All nine sampled failure locations across the first and
+last failing snapshots have adjacent unchanged terrain below the actual
+water surface; the old sparse domain ended before the bank. The prepared
+repair adds two dry support layers (2,960 tiles, 6,329 total), preserving
+every original physical input and adding no initial water or momentum.
+Independent package verification passed; a new native solve is still required.
+See [the diagnosis and exact-input repair receipt](../../physics/data/real_world/futaleufu_river_chile/review/closed_bank_domain_repair_2026_10_08.json).
+Do not promote either the old 32-second fields or the failed 332-second run as
+long-run bank-stable. The queued expanded-domain 2-second cold start plus
+30-second continuation is only an initial gate, not final hydraulic acceptance.
+
+The full editor target rebuilt successfully in 460.11 seconds after the shared
+engine became idle (`tmp/futaleufu-buffer-canopy-editor-v2`). It includes the
+native foliage updater and Cartesian rapid-axis transport. Compilation is not
+runtime proof: the new `RaftSim.Continuous.RapidFeatureFrame` and
+`RaftSim.Continuous.CartesianRapidRegistration` automation tests still need a
+fresh native run. All 23 focused Python checks for domain preservation,
+continuation auditing, terrain handoff and canopy-update contracts pass.
+The existing serial queue is canopy apply/reload, expanded-domain flow/audit,
+then Chilko hydraulic inputs. Inspect its live processes and receipts rather
+than duplicating jobs; other-task engine recordings must finish without
+interruption. None of these results establishes normal playable-map delivery,
+whole-river navigation, final rapid calibration or packaged 20 FPS acceptance.
+
 October 8 follow-up: the remaining Chilko 35650 m pinch was traced to reference
 resolution, not a reason to weaken the source classifier. A fresh full-route
 profile at native one-metre station spacing completed in 278.188 s with all
