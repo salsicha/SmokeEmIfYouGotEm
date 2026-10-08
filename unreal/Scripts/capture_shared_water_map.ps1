@@ -5,10 +5,11 @@ Either mode records runtime evidence, not visual or performance acceptance.
 No quality overrides, replacement hulls, scripted boat paths or solver opt-ins.
 #>
 param(
-    [Parameter(Mandatory=$true)][ValidatePattern('^L_[A-Za-z0-9_]+$')][string]$Map,
+    [Parameter(Mandatory=$true)][ValidatePattern('^(?:Continuous/)?L_[A-Za-z0-9_]+$')][string]$Map,
     [Parameter(Mandatory=$true)][ValidatePattern('^[a-zA-Z0-9_.-]+$')][string]$Label,
     [ValidateRange(2400,9600)][int]$ProfileFrames=2400,
-    [ValidateRange(-1,100000)][int]$StationM=-1,
+    # Actual limits remain enforced by the native loaded coordinate chart.
+    [ValidateRange(-1,2147483647)][int]$StationM=-1,
     [ValidateRange(60,2400)][int]$TimeoutS=900,
     [ValidateRange(8.25,110)][double]$RecordingStartS=12,
     [ValidateRange(10,119)][double]$RecordingEndS=22,
@@ -19,6 +20,19 @@ param(
     [switch]$EddyEntry
 )
 $ErrorActionPreference='Stop'
+function Get-RaftSimCaptureMapIdentity {
+    param([string]$RequestedMap,[string]$NativeLog)
+    if($RequestedMap -cnotmatch '^(?:Continuous/)?L_[A-Za-z0-9_]+$'){
+        throw 'Unsupported capture map path'
+    }
+    $package='/Game/RaftSim/Maps/'+$RequestedMap
+    if($NativeLog -notmatch ('LogLoad: LoadMap: '+[regex]::Escape($package)+'(?:\?|\s|$)')){
+        throw 'Requested map package not confirmed by native load log'
+    }
+    # FeatureAudit reports UWorld's leaf map name, not its package directory.
+    # Verify the full loaded package above before comparing that leaf name.
+    return ($RequestedMap.Split('/') | Select-Object -Last 1)
+}
 function Get-RaftSimCompleteFeatureAudit {
     param($Audit,[double]$RequestedSeconds,[string]$ExpectedMap)
     # Read genuine timer receipts only. A longer requested command does not
@@ -61,6 +75,9 @@ function Get-RaftSimCompleteFeatureAudit {
 if($RecordingEndS -le $RecordingStartS){throw 'Recording must end after its start'}
 if($RecordingEndS -ge $FeatureAuditSeconds){throw 'Motion audit must extend past the finalized recording'}
 $root=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+if(-not (Test-Path -LiteralPath (Join-Path $root "unreal/Content/RaftSim/Maps/$Map.umap") -PathType Leaf)){
+    throw 'Requested map asset is missing; no native capture started'
+}
 $out=Join-Path $root "tmp/$Label"
 if(Test-Path -LiteralPath $out){throw "Fresh capture directory required: $out"}
 if(Test-Path -LiteralPath (Join-Path $root "unreal/Saved/WaterFeatureDemo/$Label.json")){throw 'Feature audit label already exists'}
@@ -73,7 +90,8 @@ New-Item -ItemType Directory -Path $out | Out-Null
 $binary='C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe'
 $workingDirectory=$root
 $projectArguments=@((Join-Path $root 'unreal/SmokeEmIfYouGotEm.uproject'))
-$executionScope='Editor-hosted actual production map'
+$continuousCandidate=$Map.StartsWith('Continuous/',[StringComparison]::Ordinal)
+$executionScope=if($continuousCandidate){'Editor-hosted continuous candidate; not production or packaged acceptance'}else{'Editor-hosted actual production map'}
 if($PackagedRoot -ne ''){
     $stage=[IO.Path]::GetFullPath($PackagedRoot)
     $allowed=[IO.Path]::GetFullPath((Join-Path $root 'tmp'))+[IO.Path]::DirectorySeparatorChar
@@ -83,7 +101,7 @@ if($PackagedRoot -ne ''){
     if(-not (Test-Path -LiteralPath (Join-Path $stage 'SmokeEmIfYouGotEm/Content/Paks') -PathType Container)){throw 'Cooked package missing'}
     $workingDirectory=$stage
     $projectArguments=@()
-    $executionScope='Packaged actual production map (direct diagnostic map launch, not Boot/menu acceptance)'
+    $executionScope=if($continuousCandidate){'Packaged continuous candidate; not production or Boot/menu acceptance'}else{'Packaged actual production map (direct diagnostic map launch, not Boot/menu acceptance)'}
 }
 $commands="csv.UseLegacyFrameTime 0,csv.TargetFrameRateOverride 20,CsvCategory FMsgLogf disable,raftsim.RecordingDir $out"
 if($StationM -ge 0){$commands+=",RaftSim.PlaceAtStation $StationM"}
@@ -133,7 +151,7 @@ $receipt=[ordered]@{
     motion_audit_world_seconds=$FeatureAuditSeconds;diagnostic_overview_camera=[bool]$Overview
     diagnostic_physical_clearance_audit=[bool]$ClearanceAudit
     scope="$executionScope; recording and world-timer motion are evidence, not pixel, dense collision, normal-launch or FPS acceptance."
-    packaged_root=$PackagedRoot;binary=$binary
+    packaged_root=$PackagedRoot;binary=$binary;continuous_candidate=$continuousCandidate
     launched_at=(Get-Date).ToUniversalTime().ToString('o');arguments=$argsList
     binary_sha256=(Get-FileHash -LiteralPath $binary -Algorithm SHA256).Hash.ToLower()
     # These are linked editor-build provenance, not loaded packaged modules.
@@ -155,6 +173,13 @@ $receipt | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath "$out/launch.json"
 if($process.ExitCode -ne 0){throw "Native map process exited $($process.ExitCode)"}
 if((Get-FileHash -LiteralPath $binary -Algorithm SHA256).Hash.ToLower() -ne $receipt['binary_sha256']){throw 'Native executable changed during capture'}
 $log=Get-Content -LiteralPath "$out/engine.log" -Raw
+$nativeMap=Get-RaftSimCaptureMapIdentity $Map $log
+if($StationM -ge 0){
+    $placements=[regex]::Matches($log,'LogTemp: Display: PlaceAtStation single setup: station=([^ ]+)')
+    if($placements.Count -ne 1 -or [double]::Parse($placements[0].Groups[1].Value,[Globalization.CultureInfo]::InvariantCulture) -ne $StationM){
+        throw 'Exactly one requested native station placement required'
+    }
+}
 $errors=@([regex]::Matches($log,'(?m)^.*\bLog\w+: (?:Error|Fatal):[^\r\n]*') | ForEach-Object {$_.Value})
 $feature=if($PackagedRoot -eq ''){Join-Path $root "unreal/Saved/WaterFeatureDemo/$Label.json"}else{Join-Path $workingDirectory "SmokeEmIfYouGotEm/Saved/WaterFeatureDemo/$Label.json"}
 $video=@(Get-ChildItem -LiteralPath $out -Filter '*.mp4')
@@ -164,6 +189,6 @@ $csv=@([regex]::Matches($log,'LogCsvProfiler: Display: Capture Ended\. Writing C
     csv_files=@($csv | ForEach-Object {$_.Groups[1].Value.Trim()})} | ConvertTo-Json -Depth 4
 if($errors.Count -or -not (Test-Path -LiteralPath $feature) -or $video.Count -ne 1 -or $csv.Count -ne 1){throw 'Incomplete or error-bearing map evidence; no acceptance claimed'}
 $audit=Get-Content -LiteralPath $feature -Raw | ConvertFrom-Json
-$receipt['native_timer_duration_observation']=Get-RaftSimCompleteFeatureAudit $audit $FeatureAuditSeconds $Map
+$receipt['native_timer_duration_observation']=Get-RaftSimCompleteFeatureAudit $audit $FeatureAuditSeconds $nativeMap
 $receipt['feature_motion_sha256']=(Get-FileHash -LiteralPath $feature -Algorithm SHA256).Hash.ToLower()
 $receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath "$out/launch.json" -Encoding UTF8

@@ -11,10 +11,9 @@ from pathlib import Path
 
 import numpy as np
 from scipy.ndimage import distance_transform_edt, map_coordinates
-from scipy.spatial import cKDTree
 
 from build_colorado_catalog_evidence import ROOT, sha
-from export_colorado_continuous_runtime import registered_queries
+from cooked_water_clearance import CookedWaterClearance
 from export_colorado_continuous_terrain import LandscapeTriangles, load_sources
 
 MESH_ROOT = '/Game/RaftSim/Environment/ColoradoRun/Vegetation/Meshes/'
@@ -45,6 +44,30 @@ def eligible(height, slope, source_distance, water_distance):
             (slope < np.tan(np.deg2rad(30))) &
             (source_distance >= 12.) & (source_distance <= 180.) &
             (water_distance >= 12.))
+
+
+def terrain_support_slope(sample, xy, height):
+    """Conservative local placement slope, including folds hidden by averaging.
+
+    Preserve the central gradient on planar ground, but also test eight
+    one-sided one-metre offsets (diagonals have sqrt(2) m length). This is an
+    art-placement screen on the actual Landscape triangles, not a surveyed
+    vegetation footprint or a substitute for rendered root validation.
+    """
+    xy=np.asarray(xy,dtype=float);height=np.asarray(height,dtype=float)
+    if xy.ndim!=2 or xy.shape[1]!=2 or height.shape!=(len(xy),):
+        raise ValueError('Expected matching terrain positions and heights')
+    offsets=np.array([[1,0],[-1,0],[0,1],[0,-1],
+                      [1,1],[1,-1],[-1,1],[-1,-1]],dtype=float)
+    neighbours=np.asarray(sample(xy[:,None,:]+offsets[None,:,:]),dtype=float)
+    if neighbours.shape!=(len(xy),len(offsets)):
+        raise ValueError('Terrain sampler returned incorrect neighbour shape')
+    central=np.hypot((neighbours[:,0]-neighbours[:,1])/2,
+                     (neighbours[:,2]-neighbours[:,3])/2)
+    sided=np.max(np.abs(neighbours-height[:,None])/np.linalg.norm(offsets,axis=1),axis=1)
+    result=np.maximum(central,sided)
+    known=np.isfinite(xy).all(axis=1)&np.isfinite(height)&np.isfinite(neighbours).all(axis=1)
+    return np.where(known,result,np.inf)
 
 
 class SourceWaterClearance:
@@ -100,10 +123,9 @@ def build(runtime):
     grid = dict(nx=g['nx'], ny=g['ny'], dx=g['dx_m'], dy=g['dy_m'],
                 origin_x=g['origin_x_m'], origin_y=g['origin_y_m'])
     mapping = json.loads((runtime/'coordinate_map.json').read_text())
-    _, water_xy = registered_queries(mapping, terrain, grid)
     arrays = flow['bands'][0]['arrays']
-    wet = np.load(fields/arrays['wet_mask']['file']).astype(bool)
-    tree = cKDTree(water_xy[wet])
+    wet = np.load(fields/arrays['wet_mask']['file'],allow_pickle=False,mmap_mode='r')
+    cooked_clearance = CookedWaterClearance(mapping,terrain,grid,wet)
     origin = np.asarray(terrain['horizontal_origin_epsg6404_m'])
     chunks = []
     total = 0
@@ -113,12 +135,11 @@ def build(runtime):
         xy = rows[:, :2]
         if not len(xy): continue
         z = triangles.sample(xy)
-        dx = (triangles.sample(xy+[1.,0.])-triangles.sample(xy-[1.,0.]))/2
-        dy = (triangles.sample(xy+[0.,1.])-triangles.sample(xy-[0.,1.]))/2
+        slope = terrain_support_slope(triangles.sample,xy,z)
         distance, covered = source_clearance.sample(xy)
         # Subtract a cell diagonal so clearance is to wet cell area, not centres.
-        actual_distance = tree.query(xy)[0]-np.hypot(grid['dx'],grid['dy'])
-        keep = covered & eligible(z,np.hypot(dx,dy),distance,actual_distance)
+        actual_distance = cooked_clearance.sample(xy)
+        keep = covered & eligible(z,slope,distance,actual_distance)
         instances=[]
         for row, height in zip(rows[keep], z[keep]):
             world = (row[:2]-origin)*[100.,-100.]
@@ -134,6 +155,7 @@ def build(runtime):
         source_policy='Art-directed sparse dryland vegetation; not surveyed species or individual plants.',
         collision_policy='Nonblocking decorative cover only; never rapid obstacles or bank collision.',
         minimum_water_clearance_m=12.,maximum_slope_degrees=30.,
+        slope_policy='Maximum of central gradient and eight one-sided one-metre cardinal/diagonal terrain offsets; unknown support excluded',
         meshes=[MESH_ROOT+n+'.'+n for n in MESHES],mesh_files_sha256=mesh_files,
         cull_start_cm=45000,cull_end_cm=65000,chunks=chunks,instance_count=total,
         rendered_validated=False,performance_validated=False)

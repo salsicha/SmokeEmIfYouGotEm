@@ -8,13 +8,14 @@ import argparse
 import json
 from pathlib import Path
 import numpy as np
+import shapely
 from scipy.ndimage import distance_transform_edt,map_coordinates
-from scipy.spatial import cKDTree
 
 from build_colorado_catalog_evidence import ROOT,sha
-from build_colorado_continuous_dressing import candidates
-from export_colorado_continuous_runtime import registered_queries
+from build_colorado_continuous_dressing import candidates, terrain_support_slope
+from cooked_water_clearance import CookedWaterClearance
 from export_colorado_continuous_terrain import LandscapeTriangles
+from review_chilko_continuous_cook import verify_terrain_sources
 
 MESH_ROOT='/Game/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/'
 MESHES=['SM_RaftSim_Temperate_ConiferTree_A_OpaqueV1','SM_RaftSim_Temperate_ConiferTree_B_OpaqueV1',
@@ -24,6 +25,37 @@ MESHES=['SM_RaftSim_Temperate_ConiferTree_A_OpaqueV1','SM_RaftSim_Temperate_Coni
 def eligible(z,slope,source_distance,solved_distance):
     return (np.isfinite(z)&np.isfinite(slope)&np.isfinite(source_distance)&np.isfinite(solved_distance)&
             (slope<np.tan(np.deg2rad(30)))&(source_distance>=12)&(source_distance<=350)&(solved_distance>=12))
+
+
+def source_clearance_sampler(source):
+    """Keep full-route polygon support separate from legacy raster windows."""
+    model = verify_terrain_sources(source)
+    if model is not None:
+        def sample(xy):
+            # Distance to the polygon AREA is zero inside any mapped branch.
+            # Distance to only its boundary would wrongly plant large islands
+            # of trees in wide water. Actual solved water is checked separately.
+            xy=np.asarray(xy,dtype=float)
+            if xy.ndim!=2 or xy.shape[1]!=2:raise ValueError('Expected geographic point pairs')
+            finite=np.isfinite(xy).all(axis=1)
+            distance=np.full(len(xy),np.nan)
+            distance[finite]=shapely.distance(shapely.points(xy[finite]),model.polygon)
+            return distance
+        return sample, dict(source_terrain_manifest_sha256=source['terrain_manifest_sha256'],
+            source_profile_manifest_sha256=source['profile_manifest_sha256'],
+            source_planform_sha256=source['planform_sha256'],
+            source_water_policy='Exact verified full FWA polygon area plus separately checked solved water; not surveyed canopy')
+    evidence=json.loads(Path(source['manifest']).read_text());g=evidence['grid']
+    with np.load(source['grid'],allow_pickle=False) as data:
+        source_water=data['river']|data['channel']|data['mapped_planform_core']
+    distances=distance_transform_edt(~source_water)
+    def sample(xy):
+        r=g['y_top']-xy[:,1]-.5;c=xy[:,0]-g['x0']-.5
+        covered=(r>=0)&(r<=g['ny']-1)&(c>=0)&(c<=g['nx']-1)
+        clearance=np.full(len(xy),np.nan)
+        clearance[covered]=map_coordinates(distances,[r[covered],c[covered]],order=1,prefilter=False)-np.sqrt(2)
+        return clearance
+    return sample, dict(evidence_manifest_sha256=source['manifest_sha256'],evidence_grid_sha256=source['grid_sha256'])
 
 
 def build(runtime):
@@ -37,34 +69,22 @@ def build(runtime):
         if sha(path)!=digest:raise ValueError('Changed runtime dependency')
     triangles=LandscapeTriangles(runtime/'terrain');terrain=triangles.manifest
     source=terrain['evidence_source']
-    for key in ('manifest','grid'):
-        if sha(Path(source[key]))!=source[key+'_sha256']:raise ValueError('Changed terrain evidence')
-    evidence=json.loads(Path(source['manifest']).read_text());g=evidence['grid']
-    with np.load(source['grid'],allow_pickle=False) as data:
-        source_water=data['river']|data['channel']|data['mapped_planform_core']
-    distances=distance_transform_edt(~source_water)
+    source_clearance, source_receipt = source_clearance_sampler(source)
     fields=runtime/'cooked_flow_fields';flow=json.loads((fields/'manifest.json').read_text());f=flow['grid']
     grid=dict(nx=f['nx'],ny=f['ny'],dx=f['dx_m'],dy=f['dy_m'],origin_x=f['origin_x_m'],origin_y=f['origin_y_m'])
     mapping=json.loads((runtime/'coordinate_map.json').read_text())
-    _,water_xy=registered_queries(mapping,terrain,grid)
-    wet=np.load(fields/flow['bands'][0]['arrays']['wet_mask']['file'],allow_pickle=False).astype(bool)
-    if not wet.any():raise ValueError('No solved water for vegetation exclusion')
-    tree=cKDTree(water_xy[wet]);origin=np.asarray(terrain['horizontal_origin_m']);chunks=[];total=0
+    wet=np.load(fields/flow['bands'][0]['arrays']['wet_mask']['file'],allow_pickle=False,mmap_mode='r')
+    cooked_clearance=CookedWaterClearance(mapping,terrain,grid,wet)
+    origin=np.asarray(terrain['horizontal_origin_m']);chunks=[];total=0
     for chunk in terrain['chunks']:
         corner=np.asarray(chunk['origin_m'])-[0,252]
         rows=candidates(corner,seed_prefix='chilko-conifer-shrub-v1',probability=.55)
         if not len(rows):continue
         xy=rows[:,:2];z=triangles.sample(xy)
-        sx=(triangles.sample(xy+[1,0])-triangles.sample(xy-[1,0]))/2
-        sy=(triangles.sample(xy+[0,1])-triangles.sample(xy-[0,1]))/2
-        r=g['y_top']-xy[:,1]-.5;c=xy[:,0]-g['x0']-.5
-        covered=(r>=0)&(r<=g['ny']-1)&(c>=0)&(c<=g['nx']-1)
-        clearance=np.full(len(rows),np.nan)
-        # Subtract the full source-cell diagonal for a conservative distance
-        # to water area, not just a possibly more distant cell centre.
-        clearance[covered]=map_coordinates(distances,[r[covered],c[covered]],order=1,prefilter=False)-np.sqrt(2)
-        solved=tree.query(xy)[0]-np.hypot(grid['dx'],grid['dy'])
-        keep=eligible(z,np.hypot(sx,sy),clearance,solved);instances=[]
+        slope=terrain_support_slope(triangles.sample,xy,z)
+        clearance=source_clearance(xy)
+        solved=cooked_clearance.sample(xy)
+        keep=eligible(z,slope,clearance,solved);instances=[]
         for row,height in zip(rows[keep],z[keep]):
             world=(row[:2]-origin)*[100,-100]
             instances.append(dict(mesh=int(row[4]),location_cm=[*world.tolist(),(float(height)-terrain['vertical_datum_m'])*100],
@@ -76,10 +96,11 @@ def build(runtime):
         mesh_files[path.relative_to(ROOT).as_posix()]=sha(path)
     return dict(schema='raftsim.chilko_continuous_dressing.v1',river_id='chilko_river_bc',
         runtime_sha256=sha(runtime/'manifest.json'),terrain_sha256=sha(runtime/'terrain/manifest.json'),
-        evidence_manifest_sha256=source['manifest_sha256'],evidence_grid_sha256=source['grid_sha256'],
+        **source_receipt,
         source_policy='Art-directed conifer and riparian shrub cover; not measured canopy, species or individual plants.',
         collision_policy='Nonblocking decorative vegetation; bank and rock collision remain native terrain.',
         minimum_water_clearance_m=12.,maximum_slope_degrees=30.,
+        slope_policy='Maximum of central gradient and eight one-sided one-metre cardinal/diagonal terrain offsets; unknown support excluded',
         meshes=[MESH_ROOT+n+'.'+n for n in MESHES],mesh_files_sha256=mesh_files,
         cull_start_cm=45000,cull_end_cm=65000,chunks=chunks,instance_count=total,
         rendered_validated=False,performance_validated=False)

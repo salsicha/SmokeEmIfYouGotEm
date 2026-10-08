@@ -48,6 +48,22 @@ def load(directory,profile):
     original=ROOT/m['source_profile']
     if sha(original)!=m['source_profile_sha256']:raise ValueError('Changed captured source profile')
     arrays=dict(np.load(directory/'frame.npz',allow_pickle=False))
+    if 'source_endpoint_anchor' in m:
+        from anchor_colorado_terminal_frame import source_end_caps
+        caps=source_end_caps(read_profile(original))
+        direction=np.asarray(caps['directions'][-1])
+        if (m['source_endpoint_anchor']['source_end_caps']!=caps or
+                arrays['source_global_station_m'][-1]!=caps['stations'][-1] or
+                not np.array_equal(arrays['east_north_m'][-1],caps['positions'][-1]) or
+                not np.array_equal(arrays['normal_east_north'][-1],[-direction[1],direction[0]])):
+            raise ValueError('Terminal frame does not match captured endpoint and end plane')
+        if 'source_start_anchor' in m:
+            direction=np.asarray(caps['directions'][0])
+            if (m['source_start_anchor']['source_end_caps']!=caps or
+                    arrays['source_global_station_m'][0]!=caps['stations'][0] or
+                    not np.array_equal(arrays['east_north_m'][0],caps['positions'][0]) or
+                    not np.array_equal(arrays['normal_east_north'][0],[-direction[1],direction[0]])):
+                raise ValueError('Initial frame does not match captured endpoint and end plane')
     return select_window(arrays,profile),json.loads((directory/'coordinate_map.json').read_text()),m
 
 

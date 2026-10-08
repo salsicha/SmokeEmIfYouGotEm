@@ -20,7 +20,7 @@ from export_hance_evidence_runtime import write_png_u16
 BAND='steady_8000cfs_2021'
 
 
-def checked_cook(inputs,cook,review):
+def checked_cook(inputs,cook,review,*,frame_loader=None):
     build=json.loads((inputs/'build_report.json').read_text())
     for name,digest in build['files_sha256'].items():
         if sha(inputs/name)!=digest:raise ValueError('Changed solver input')
@@ -47,11 +47,15 @@ def checked_cook(inputs,cook,review):
         if sha(cook/'frames'/name)!=digest:raise ValueError('Changed reviewed frame')
     scenario=json.loads((inputs/'scenario/scenario.json').read_text())
     grid=scenario['grid'];shape=(grid['ny'],grid['nx'])
-    frame=load_frame(cook/'frames'/receipt['comparison_frames'][-1],shape)
-    bed=np.load(inputs/'scenario/bed.npy')
-    wet=frame['h']>0
-    if not np.allclose((frame['eta']-frame['h'])[wet],bed[wet],atol=1e-6,rtol=0):
-        raise ValueError('Cook does not belong to this bed')
+    frame=(frame_loader or load_frame)(cook/'frames'/receipt['comparison_frames'][-1],shape)
+    bed=np.load(inputs/'scenario/bed.npy',mmap_mode='r',allow_pickle=False)
+    # Preserve the bed comparison, including all positive-depth cells, while
+    # avoiding full-domain subtraction and fancy-index copies.
+    rows=max(1,262144//shape[1])
+    for start in range(0,shape[0],rows):
+        sl=slice(start,start+rows);wet=frame['h'][sl]>0
+        if not np.allclose((frame['eta'][sl]-frame['h'][sl])[wet],bed[sl][wet],atol=1e-6,rtol=0):
+            raise ValueError('Cook does not belong to this bed')
     return build,receipt,native,scenario,frame,bed
 
 

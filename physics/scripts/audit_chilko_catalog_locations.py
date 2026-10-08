@@ -15,6 +15,16 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / 'physics/data/real_world/chilko_river_bc'
 
 
+def unique_object(pairs):
+    """Refuse evidence silently lost through duplicate JSON keys at any depth."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f'Duplicate geographic evidence key: {key}')
+        result[key] = value
+    return result
+
+
 def project(point, xy, station):
     xy, station, point = map(np.asarray, (xy, station, point))
     if (xy.ndim != 2 or xy.shape[1] != 2 or len(xy) < 2 or
@@ -64,17 +74,54 @@ def validate_identity_checks(evidence):
     return checks
 
 
-def audit():
+def corrected_anchor_stationing(route, parent_hash, anchors, entries):
+    """Reproject fixed source points; never subtract a blanket route-length delta.
+
+    Unverified rapid identities and interval boundaries stay unverified. This
+    receipt is for a candidate route, not authorization to change game labels.
+    """
+    from correct_chilko_route import lineage, projected, route_points, sha
+    route=Path(route)
+    receipt,_=lineage(route)
+    if receipt['parent_route']['sha256']!=parent_hash:
+        raise ValueError('Corrected stationing has a different original route')
+    xy=projected(route_points(json.loads(route.read_text())))
+    station=np.r_[0.,np.cumsum(np.linalg.norm(np.diff(xy,axis=0),axis=1))]
+    result={}
+    for anchor in anchors:
+        row=project(projected([anchor['lon_lat']])[0],xy,station)
+        result[anchor['id']]=dict(id=anchor['id'],lon_lat=anchor['lon_lat'],**row,
+            previous_terrain_route_station_m=anchor['terrain_route_station_m'],
+            station_change_m=row['route_station_m']-anchor['terrain_route_station_m'])
+    brackets=[]
+    for entry in entries:
+        if 'upstream_anchor' not in entry:continue
+        values=[result[entry[key]]['route_station_m'] for key in ('upstream_anchor','downstream_anchor')]
+        if values[0]>=values[1]:raise ValueError('Corrected source marker sequence reverses')
+        brackets.append(dict(name=entry['name'], sources=entry['sources'],
+            location_status=entry['location_status'],
+            upstream_anchor=entry['upstream_anchor'],downstream_anchor=entry['downstream_anchor'],
+            marker_station_bracket_m_not_rapid_bounds=values,
+            rapid_boundary_coordinates=None, runtime_placement_authorized=False))
+    return dict(route=dict(path=str(route.resolve()),sha256=sha(route)),
+        route_length_m=float(station[-1]),station_frame='EPSG:3157 corrected geographic route; not numerical chart or lake-outlet kilometres',
+        anchors=list(result.values()),sequence_brackets=brackets,
+        named_rapid_boundaries_established=False,runtime_assets_changed=False,
+        qualification='Same published geographic points on the corrected candidate; point precision and unresolved naming are unchanged')
+
+
+def audit(corrected_route=None):
     paths = {
         'evidence': DATA / 'observed_rapids/catalog_location_evidence_2026_10_06.json',
         'route': DATA / 'production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json',
         'route_geometry': DATA / 'production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_centerline.geojson',
+        'route_alignment': DATA / 'production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_alignment_evidence_2026_10_07.json',
         'current_coordinate_map': DATA / 'terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_runtime_coordinate_map.json',
         'terrain_manifest': DATA / 'terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_terrain_manifest.json',
         'current_rapids': DATA / 'observed_rapids/lava_canyon_observed_rapids.json',
     }
     raw = {key: path.read_bytes() for key, path in paths.items()}
-    data = {key: json.loads(blob) for key, blob in raw.items()}
+    data = {key: json.loads(blob, object_pairs_hook=unique_object) for key, blob in raw.items()}
     identity_checks = validate_identity_checks(data['evidence'])
     samples = data['route']['samples']
     transform = Transformer.from_crs(4326, 3157, always_xy=True)
@@ -91,6 +138,20 @@ def audit():
     if not np.allclose(station, np.r_[0., np.cumsum(distances)], atol=.001, rtol=0):
         raise ValueError('Stored stationing no longer matches the declared spherical frame')
     terrain_station = np.r_[0., np.cumsum(np.linalg.norm(np.diff(xy, axis=0), axis=1))]
+    alignment = data['route_alignment']
+    if (alignment['route_sha256'] != hashlib.sha256(raw['route_geometry']).hexdigest() or
+            alignment.get('observation_crs') != 'EPSG:32610' or
+            alignment.get('named_rapid_placement_authorized') is not False or
+            alignment.get('automatic_route_replacement_authorized') is not False):
+        raise ValueError('Route alignment evidence changed identity or authorized unsupported placement')
+    image_to_terrain = Transformer.from_crs(32610, 3157, always_xy=True)
+    image_checks = []
+    for observation in alignment['observations']:
+        if 'indicative_channel_point_m' not in observation:
+            continue
+        image_checks.append(dict(id=observation['id'], **project(
+            image_to_terrain.transform(*observation['indicative_channel_point_m']), xy, terrain_station),
+            qualification='Indicative 10 m imagery spot check, not surveyed banks or a replacement route vertex'))
     anchors = {p['id']: dict(p, **project(transform.transform(*p['lon_lat']), xy, station))
                for p in data['evidence']['anchors']}
     for anchor in anchors.values():
@@ -127,13 +188,16 @@ def audit():
                 anchors[entry[key]]['terrain_route_station_m']
                 for key in ('upstream_anchor', 'downstream_anchor')]
         entries.append(row)
-    return dict(schema='raftsim.chilko_catalog_location_audit.v2', runtime_ready=False,
+    result=dict(schema='raftsim.chilko_catalog_location_audit.v2', runtime_ready=False,
         source_inputs={key: dict(path=str(paths[key].relative_to(ROOT)),
             sha256=hashlib.sha256(blob).hexdigest()) for key, blob in raw.items()},
         route_origin='Existing FWA lodge-to-Taseko construction route; not lake-outlet river kilometres',
         route_station_frame='Stored spherical-distance stationing, radius 6371000 m; not terrain-grid chainage',
         terrain_route_station_frame='EPSG:3157 segment arc length on the same FWA vertices; not smoothed runtime chainage',
         route_lengths_m=dict(stored=float(station[-1]), terrain_projected=float(terrain_station[-1])),
+        route_alignment_status=alignment['status'],
+        route_alignment_scope=alignment['scope'],
+        route_alignment_spot_checks=image_checks,
         current_station_frame='Actual Gaussian-smoothed runtime coordinate map, not unsmoothed evidence centreline stationing',
         anchors=list(anchors.values()), entries=entries, identity_checks=identity_checks,
         qualitative_location_constraints=data['evidence'].get('qualitative_location_constraints', []),
@@ -142,13 +206,18 @@ def audit():
         current_centreline_route_extent_m=[project(current[i, :2], xy, station)['route_station_m'] for i in (0, -1)],
         geographic_acceptance='blocked_by_existing_label_conflict_and_unresolved_boundaries',
         modified_runtime_assets=False)
+    if corrected_route is not None:
+        result['corrected_candidate_stationing']=corrected_anchor_stationing(corrected_route,
+            hashlib.sha256(raw['route_geometry']).hexdigest(),list(anchors.values()),entries)
+    return result
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, required=True)
+    parser.add_argument('--corrected-route',type=Path,help='Also project unchanged published points onto a lineage-verified corrected candidate')
     args = parser.parse_args()
-    result = audit()
+    result = audit(args.corrected_route)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open('x', encoding='utf-8') as stream:
         json.dump(result, stream, indent=2, allow_nan=False)

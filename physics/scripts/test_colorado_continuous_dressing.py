@@ -1,10 +1,37 @@
 import unittest
 import numpy as np
-from build_colorado_continuous_dressing import candidates, eligible, SourceWaterClearance
+from build_colorado_continuous_dressing import candidates, eligible, SourceWaterClearance, terrain_support_slope
 from scipy.ndimage import distance_transform_edt, map_coordinates
 
 
 class DressingTests(unittest.TestCase):
+    def test_support_preserves_arbitrary_planar_gradient(self):
+        xy=np.array([[0.,0.],[37.,-91.],[-252.,252.]])
+        for gx,gy in ((0,0),(.2,.3),(-.8,.1),(.4,-.4)):
+            sample=lambda p: 100+gx*p[...,0]+gy*p[...,1]
+            np.testing.assert_allclose(terrain_support_slope(sample,xy,sample(xy)),np.hypot(gx,gy),atol=1e-12)
+
+    def test_ridge_and_hollow_cannot_cancel_to_flat(self):
+        xy=np.array([[0.,0.]])
+        for sign in (-1.,1.):
+            sample=lambda p: 100+sign*np.abs(p[...,0])
+            slope=terrain_support_slope(sample,xy,sample(xy))
+            np.testing.assert_allclose(slope,[1.])
+            self.assertFalse(eligible(sample(xy),slope,np.array([20.]),np.array([20.]))[0])
+
+    def test_diagonal_fold_is_checked(self):
+        xy=np.array([[0.,0.]])
+        sample=lambda p: 100+np.minimum(np.abs(p[...,0]),np.abs(p[...,1]))
+        np.testing.assert_allclose(terrain_support_slope(sample,xy,sample(xy)),[1/np.sqrt(2)])
+
+    def test_unknown_support_and_invalid_shapes_refused(self):
+        xy=np.array([[0.,0.],[10.,10.]])
+        sample=lambda p: np.where((p[...,0]==1)&(p[...,1]==1),np.nan,100.)
+        slope=terrain_support_slope(sample,xy,np.array([100.,100.]))
+        self.assertTrue(np.isinf(slope[0]));self.assertEqual(slope[1],0.)
+        with self.assertRaises(ValueError):terrain_support_slope(sample,xy,np.array([100.]))
+        with self.assertRaises(ValueError):terrain_support_slope(lambda p: np.ones(len(p)),xy,np.array([100.,100.]))
+
     def test_source_clearance_cache_preserves_overlap_minimum_after_eviction(self):
         sources=[]
         for i in range(6):

@@ -56,6 +56,15 @@ def compare(a,b,origin_a,origin_b,seam,half_width=100.):
         measured_bed_cells_in_either_tile=int((wet&(A['measured_pool_bed_mask']|B['measured_pool_bed_mask'])).sum()))
 
 
+def screen(stats):
+    """A matching bed alone cannot hide a discontinuous water reference."""
+    differences=[stats[key]['maximum_m'] for key in
+                 ('bed_difference','reference_surface_difference')]
+    return bool(stats['shared_wet_cells']>0 and
+                stats['shoreline_disagreement_cells']==0 and
+                all(np.isfinite(value) and 0<=value<=.1 for value in differences))
+
+
 def review(first,second,origin_a,origin_b,seam,out):
     arrays=[];sources=[]
     for path in (first,second):
@@ -68,8 +77,8 @@ def review(first,second,origin_a,origin_b,seam,out):
     report=dict(schema='raftsim.colorado_continuous_bed_seam.v1',sources=sources,
         source_global_origins_m=[origin_a,origin_b],seam_global_station_m=seam,
         half_width_m=100.,statistics=stats,
-        bed_screen_passed=(stats['bed_difference']['maximum_m']<=.1 and
-                           stats['shoreline_disagreement_cells']==0),
+        bed_screen_passed=screen(stats),
+        screen_policy='Both wet-bed and reference-surface maximum differences <=0.1 m; no shoreline disagreement',
         scope='Shared one-metre construction bed near handoff; not rendered Landscape or cooked-flow continuity',
         engine_seam_validated=False)
     out.parent.mkdir(parents=True,exist_ok=True)

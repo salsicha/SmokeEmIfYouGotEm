@@ -12,10 +12,12 @@ No recording is enabled. Refuses to run while another
 game, editor, build or hydraulic cook is live.
 #>
 param(
-    [Parameter(Mandatory = $true)][ValidatePattern('^L_[A-Za-z0-9_]+$')][string]$Map,
+    [Parameter(Mandatory = $true)][ValidatePattern('^(?:Continuous/)?L_[A-Za-z0-9_]+$')][string]$Map,
     [Parameter(Mandatory = $true)][ValidatePattern('^[a-zA-Z0-9_.-]+$')][string]$Label,
     [ValidateRange(300, 2400)][int]$ProfileFrames = 1200,
-    [ValidateRange(-1, 100000)][int]$StationM = -1,
+    # Full Colorado extends beyond 453 km. The native command checks the
+    # loaded chart's actual range; the wrapper must not truncate it at 100 km.
+    [ValidateRange(-1, 2147483647)][int]$StationM = -1,
     [int]$TimeoutS = 900,
     [string]$PackagedRoot = '',
     [ValidatePattern('^[a-zA-Z0-9_. ;=-]*$')][string]$DiagnosticExecCmds = '',
@@ -35,7 +37,8 @@ if(-not (Test-Path -LiteralPath (Join-Path $root "unreal/Content/RaftSim/Maps/$M
 $gameBinary = 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe'
 $workingDirectory=$root
 $projectArguments=@("`"$project`"")
-$executionScope='Editor-hosted direct production-map launch'
+$continuousCandidate=$Map.StartsWith('Continuous/',[StringComparison]::Ordinal)
+$executionScope=if($continuousCandidate){'Editor-hosted continuous candidate; not production or packaged acceptance'}else{'Editor-hosted direct production-map launch'}
 $logFile = Join-Path $root "unreal/Saved/Logs/$Label.log"
 $csvDir = Join-Path $root 'unreal/Saved/Profiling/CSV'
 if($PackagedRoot -ne ''){
@@ -48,7 +51,7 @@ if($PackagedRoot -ne ''){
     $workingDirectory=$stage
     $projectArguments=@()
     $csvDir=Join-Path $gameRoot 'Saved/Profiling/CSV'
-    $executionScope='Packaged direct production-map launch, not Boot/menu acceptance'
+    $executionScope=if($continuousCandidate){'Packaged continuous candidate, not production or Boot/menu acceptance'}else{'Packaged direct production-map launch, not Boot/menu acceptance'}
 }
 $receipt = Join-Path $root "unreal/Saved/RaftSimValidation/$Label-frame-audit.json"
 if (Test-Path -LiteralPath $logFile) { throw "Log already exists: $logFile" }
@@ -122,6 +125,7 @@ $result = [ordered]@{
     schema = 'raftsim.reference_map_frame_audit.v1'; label = $Label; map = $Map; station_m = $StationM
     game_binary_sha256 = $binaryHash; diagnostic_exec_cmds = $DiagnosticExecCmds; csv = $csv
     execution_scope=$executionScope; packaged_root=$PackagedRoot; game_binary=$gameBinary
+    continuous_candidate=$continuousCandidate
     placement_scope=$(if($StationM -ge 0){'One diagnostic placement at 4 s, CSV includes setup; no subsequent placement or guidance'}else{'Authored spawn; no diagnostic placement'})
     frames_total = $times.Count; audited_frames = $window.Count
     mean_ms = [Math]::Round(($window | Measure-Object -Average).Average, 3); p95_ms = [Math]::Round($p95, 3)

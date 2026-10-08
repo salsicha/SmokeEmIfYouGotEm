@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from build_chilko_corridor_profile import channel_section, surface_reference, bridge_short_reference_gaps
+from build_chilko_corridor_profile import channel_section, surface_reference, bridge_short_reference_gaps, reference_weights
 
 
 class CorridorProfileTests(unittest.TestCase):
@@ -40,11 +40,26 @@ class CorridorProfileTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'width'):channel_section(x,np.ones(len(x),bool),h,k)
 
     def test_diagnostic_gaps_are_not_silently_interpolated(self):
-        sections=[dict(reference_m=100.,support_count=4),None,dict(reference_m=101.,support_count=4)]
+        sections=[dict(reference_m=100.,support_count=4,native_support_count=4),None,
+                  dict(reference_m=101.,support_count=4,native_support_count=4)]
         raw,ref,support=surface_reference(sections)
         np.testing.assert_array_equal(support,[True,False,True])
         self.assertTrue(np.isnan(raw[1]));self.assertTrue(np.isnan(ref[1]))
         np.testing.assert_array_equal(ref[[0,2]],[100.5,100.5])
+
+    def test_resampled_coarse_surface_does_not_outvote_native_surface(self):
+        coarse=dict(reference_m=95.,support_count=30,native_support_count=0)
+        native=dict(reference_m=100.,support_count=30,native_support_count=30)
+        raw,ref,support=surface_reference([coarse,native])
+        np.testing.assert_array_equal(raw,[95.,100.])
+        np.testing.assert_allclose(ref,(95./900.+100.)/(1.+1./900.))
+        self.assertLess(100.-ref[1],.006)
+        np.testing.assert_array_equal(support,[True,True])
+        np.testing.assert_allclose(reference_weights([coarse,native]),[30./900.,30.])
+
+    def test_invalid_support_provenance_is_not_silently_native(self):
+        with self.assertRaises(ValueError):
+            surface_reference([dict(reference_m=100.,support_count=2,native_support_count=3)])
 
     def test_explicit_short_gap_stage_inference_preserves_source(self):
         stations=np.arange(6)*4.;raw=np.array([100,np.nan,np.nan,np.nan,np.nan,99.8])

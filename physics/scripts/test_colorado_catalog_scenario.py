@@ -4,6 +4,20 @@ from build_colorado_catalog_scenario import frame,sample_grid,checked_roughness,
 
 
 class ScenarioFrameTests(unittest.TestCase):
+    def test_detached_exterior_halo_islands_do_not_invalidate_complete_core(self):
+        take=covered_source_slice([True,False,True,True,True,False,True],
+                                  [100,102,104,106,108,110,112],[104,108])
+        self.assertEqual((take.start,take.stop),(2,5))
+        # Exact core boundaries are mandatory; neither an internal gap nor a
+        # requested endpoint in a missing halo can be silently trimmed away.
+        for core in ([102,108],[104,110],[100,108],[104,112]):
+            with self.assertRaises(ValueError):
+                covered_source_slice([True,False,True,True,True,False,True],
+                                     [100,102,104,106,108,110,112],core)
+        with self.assertRaises(ValueError):
+            covered_source_slice([True,False,True,True,True,False,True],
+                                 [100,102,104,106,108,110,112])
+
     def test_coverage_trims_only_exterior_halo_and_preserves_complete_core(self):
         take=covered_source_slice([False,True,True,True,False],[8000,8200,8400,8600,8800],[8200,8600])
         self.assertEqual((take.start,take.stop),(1,4))

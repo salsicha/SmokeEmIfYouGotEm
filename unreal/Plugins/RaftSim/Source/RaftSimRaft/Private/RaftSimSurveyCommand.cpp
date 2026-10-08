@@ -31,12 +31,14 @@
 #include "HAL/PlatformMisc.h"
 #include "LandscapeProxy.h"
 #include "Misc/Paths.h"
+#include "String/LexFromString.h"
 #include "RaftSimCameraPresentation.h"
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRockObstacleActor.h"
 #include "RaftSimRunCoordinateProvider.h"
+#include "RaftSimRiverWaterConfig.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterFeatureKinematics.h"
@@ -1016,16 +1018,27 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
 // this installs no repeating timer, station hops, camera, capture or guidance.
 static void HandlePlaceAtStation(const TArray<FString>& Args,UWorld* World)
 {
-    if(!World || Args.Num()!=1 ||
-        !RaftSimWaterFeatureKinematics::IsPlayableRiver(World->GetMapName()))return;
-    const float Station=FCString::Atof(*Args[0]);
-    if(!FMath::IsFinite(Station))return;
+    if(!World || Args.Num()!=1)return;
+    float Station=0.f;
+    if(!LexTryParseString(Station,*Args[0]) || !FMath::IsFinite(Station))
+    {
+        UE_LOG(LogTemp,Error,TEXT("PlaceAtStation requires one finite numeric station; nothing moved"));
+        return;
+    }
     const TWeakObjectPtr<UWorld> WeakWorld=World;
     FTimerHandle InitialPlacement;
     World->GetTimerManager().SetTimer(InitialPlacement,FTimerDelegate::CreateLambda([WeakWorld,Station]
     {
         UWorld* W=WeakWorld.Get();
         auto* Water=FindWater(W);auto* Raft=FindRaft(W);
+        ARaftSimRiverWaterConfig* Config=nullptr;
+        int32 ConfigCount=0;
+        if(W)for(TActorIterator<ARaftSimRiverWaterConfig> It(W);It;++It){Config=*It;++ConfigCount;}
+        if(!W || !Water || ConfigCount!=1 || !Config->AllowsRiverDiagnostics(W->GetMapName(),*Water))
+        {
+            UE_LOG(LogTemp,Error,TEXT("PlaceAtStation refused missing, ambiguous or unregistered river identity; nothing moved"));
+            return;
+        }
         const auto* Axis=W && Water ? FindSurveyAxis(W,Water) : nullptr;
         float Min=0,Max=0;FVector P,Ahead;
         if(!W || !Water || !Raft || !Axis || !Axis->GetRiverStationRangeM(Min,Max) ||

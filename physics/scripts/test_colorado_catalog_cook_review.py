@@ -1,9 +1,65 @@
 import unittest
 import numpy as np
-from review_colorado_catalog_cook import compare,core_reviews
+from review_colorado_catalog_cook import compare,core_reviews,validate_native_frame,validate_native_source
 
 
 class CookReviewTests(unittest.TestCase):
+    def test_native_validation_block_boundaries_preserve_refusals(self):
+        bed=np.full((7,11),900.)
+        grid=dict(nx=11,ny=7,dx=2.,dy=2.,origin_x=1000.,origin_y=-6.)
+        rows,cols=np.indices(bed.shape)
+        frame=dict(x=grid['origin_x']+cols*2.,y=rows*2.-6.,h=np.ones(bed.shape),
+                   eta=bed+1.,u=np.ones(bed.shape),v=np.zeros(bed.shape),
+                   hu=np.ones(bed.shape),hv=np.zeros(bed.shape),wet=np.ones(bed.shape))
+        initial={('depth' if k=='h' else k):v.copy() for k,v in frame.items() if k not in ('x','y')}
+        for budget in (11,22,77,262144):
+            validate_native_frame(frame,bed,grid,initial,max_points=budget)
+            for field in frame:
+                bad={k:v.copy() for k,v in frame.items()};bad[field][-1,-1]=np.nan
+                with self.subTest(budget=budget,field=field),self.assertRaises(ValueError):
+                    validate_native_frame(bad,bed,grid,initial,max_points=budget)
+            bad_initial={k:v.copy() for k,v in initial.items()};bad_initial['hv'][-1,-1]+=.01
+            with self.assertRaisesRegex(ValueError,'saved initial'):
+                validate_native_frame(frame,bed,grid,bad_initial,max_points=budget)
+        with self.assertRaisesRegex(ValueError,'block budget'):
+            validate_native_frame(frame,bed,grid,max_points=10)
+
+    def test_native_first_frame_must_match_bed_grid_and_restart(self):
+        bed=np.full((2,3),900.)
+        grid=dict(nx=3,ny=2,dx=2.,dy=2.,origin_x=1000000.,origin_y=-2.)
+        rows,cols=np.indices(bed.shape)
+        frame=dict(x=grid['origin_x']+cols*2,y=rows*2-2.,h=np.ones(bed.shape),
+                   eta=bed+1,u=np.ones(bed.shape),v=np.zeros(bed.shape),
+                   hu=np.ones(bed.shape),hv=np.zeros(bed.shape),wet=np.ones(bed.shape))
+        initial={('depth' if k=='h' else k):v.copy() for k,v in frame.items() if k not in ('x','y')}
+        validate_native_frame(frame,bed,grid,initial)
+        for key in frame:
+            bad={k:v.copy() for k,v in frame.items()};bad[key][0,0]=np.nan
+            with self.subTest(nonfinite=key),self.assertRaises(ValueError):
+                validate_native_frame(bad,bed,grid,initial)
+        for key in ('x','eta','hu'):
+            bad={k:v.copy() for k,v in frame.items()};bad[key][0,0]+=.01
+            with self.subTest(changed=key),self.assertRaises(ValueError):
+                validate_native_frame(bad,bed,grid,initial)
+
+    def test_native_configuration_and_validation_cannot_be_omitted(self):
+        native=dict(solver_mode='finite_volume',boundary_mode='scenario',flux_scheme='hll',
+            spatial_order=2,cfl=.2,feature_strength_scale=0,roughness_scale=1,
+            bed_slope_source_scale=1,preserve_initial_mass=False,disable_fixture_calibrations=True,
+            experimental_west_discharge_m3s=-1,experimental_west_supercritical_stage=False,
+            scenario_id='test')
+        validation=dict(passed=True,finite_state=True,velocity_limit_reached=False)
+        scenario=dict(metadata=dict(scenario_id='test'))
+        validate_native_source(native,validation,scenario)
+        for key in native:
+            bad=native.copy();del bad[key]
+            with self.subTest(missing=key),self.assertRaises(ValueError):
+                validate_native_source(bad,validation,scenario)
+        for key in validation:
+            bad=validation.copy();bad[key]=not bad[key]
+            with self.subTest(validation=key),self.assertRaises(ValueError):
+                validate_native_source(native,bad,scenario)
+
     def test_joined_average_cannot_hide_bad_core(self):
         source=np.zeros((10,101),bool);source[2:8]=True
         wet=source.copy();wet[:,:10]=True

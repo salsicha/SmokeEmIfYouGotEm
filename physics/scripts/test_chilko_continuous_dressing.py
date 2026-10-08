@@ -1,10 +1,32 @@
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 import numpy as np
-from build_chilko_continuous_dressing import eligible, MESHES, MESH_ROOT
+from shapely.geometry import box
+from build_chilko_continuous_dressing import eligible, MESHES, MESH_ROOT, source_clearance_sampler, terrain_support_slope
 from build_colorado_continuous_dressing import candidates
 
 
 class ChilkoDressingTests(unittest.TestCase):
+    def test_chilko_rejects_folded_ground_with_zero_average_slope(self):
+        xy=np.array([[0.,0.]])
+        sample=lambda p:100+np.abs(p[...,0])
+        slope=terrain_support_slope(sample,xy,sample(xy))
+        self.assertFalse(eligible(sample(xy),slope,np.array([20.]),np.array([20.]))[0])
+
+    def test_full_route_polygon_excludes_water_interior_not_just_its_edge(self):
+        source=dict(terrain_manifest_sha256='terrain',profile_manifest_sha256='profile',planform_sha256='polygon')
+        with patch('build_chilko_continuous_dressing.verify_terrain_sources',
+                   return_value=SimpleNamespace(polygon=box(0,0,100,100))):
+            sample,receipt=source_clearance_sampler(source)
+        xy=np.array([[50,50],[0,0],[112,50],[111.99,50],[50,-20],[np.nan,0]])
+        distance=sample(xy)
+        np.testing.assert_allclose(distance[:5],[0,0,12,11.99,20],atol=1e-10)
+        self.assertTrue(np.isnan(distance[-1]))
+        np.testing.assert_array_equal(eligible(np.ones(6),np.zeros(6),distance,np.full(6,30.)),
+                                     [False,False,True,False,True,False])
+        self.assertEqual(receipt['source_planform_sha256'],'polygon')
+
     def test_both_water_sources_steep_and_unknown_ground_exclude_plants(self):
         z=np.full(10,100.); z[4]=np.nan
         slope=np.zeros(10); slope[3]=np.tan(np.deg2rad(30)); slope[5]=np.nan

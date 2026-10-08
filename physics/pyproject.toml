@@ -38,6 +38,9 @@ research = [
 ]
 geospatial = [
   "rasterio>=1.4,<2",
+  "pyproj>=3.6,<4",
+  "scipy>=1.11,<2",
+  "shapely>=2,<3",
 ]
 
 [tool.setuptools.packages.find]

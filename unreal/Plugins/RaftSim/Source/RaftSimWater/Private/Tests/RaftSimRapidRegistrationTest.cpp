@@ -1,4 +1,5 @@
 #include "RaftSimRapidChallengeProfiles.h"
+#include "RaftSimGeographicTakeout.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "Engine/World.h"
 #include "Misc/AutomationTest.h"
@@ -55,6 +56,19 @@ bool FRaftSimRapidRegistrationTest::RunTest(const FString&)
     FString Error;
     TestFalse(TEXT("unloaded maps refuse"),Register(*Source,*Target,Input,Output,Error));
     if(!Source->ConfigureRiverCoordinateMap(A)||!Target->ConfigureRiverCoordinateMap(B))return false;
+    FVector2D Takeout;FString TakeoutError;
+    TestTrue(TEXT("takeout native projection resolves left bank"),RaftSimGeographicTakeout::Resolve(
+        *Source,{10000.,-500.},{20000.,0.},{0.,350.},20.,Takeout,TakeoutError));
+    TestTrue(TEXT("takeout uses actual chart coordinates"),Takeout.Equals({100.,5.},1.e-6));
+    TestFalse(TEXT("takeout outside cooked interval refuses"),RaftSimGeographicTakeout::Resolve(
+        *Source,{10000.,-500.},{20000.,0.},{0.,90.},20.,Takeout,TakeoutError));
+    TestTrue(TEXT("failed takeout clears prior result"),Takeout.IsZero());
+    TestFalse(TEXT("takeout wrong bank refuses"),RaftSimGeographicTakeout::Resolve(
+        *Source,{10000.,500.},{20000.,0.},{0.,350.},20.,Takeout,TakeoutError));
+    TestFalse(TEXT("takeout downstream of rapid refuses"),RaftSimGeographicTakeout::Resolve(
+        *Source,{25000.,-500.},{20000.,0.},{0.,350.},20.,Takeout,TakeoutError));
+    TestFalse(TEXT("unloaded takeout chart refuses"),RaftSimGeographicTakeout::Resolve(
+        *Empty,{10000.,-500.},{20000.,0.},{0.,350.},20.,Takeout,TakeoutError));
     if(!TestTrue(TEXT("native coordinate registration"),Register(*Source,*Target,Input,Output,Error)))
     {AddError(Error);return false;}
     TestEqual(TEXT("all sites retained"),Output.Num(),Input.Num());
@@ -78,11 +92,17 @@ bool FRaftSimRapidRegistrationTest::RunTest(const FString&)
     auto* Config=World->SpawnActor<ARaftSimRiverWaterConfig>();
     if(!Config)return false;
     TArray<FFeature> Resolved;
+    TestTrue(TEXT("legacy diagnostic access retained"),Config->AllowsRiverDiagnostics(TEXT("L_Hance"),*Target));
+    TestFalse(TEXT("a continuous-looking name grants no diagnostic access"),Config->AllowsRiverDiagnostics(TEXT("L_Colorado_Continuous"),*Target));
     TestTrue(TEXT("existing map profiles remain available"),Config->ResolveRapidFeatures(TEXT("L_Hance"),*Target,Resolved,Error));
     TestEqual(TEXT("legacy profile count unchanged"),Resolved.Num(),Features(TEXT("L_Hance")).Num());
     Config->RegisteredRapidFeatures=Output;
+    TestFalse(TEXT("unidentified sites deny even legacy diagnostic access"),Config->AllowsRiverDiagnostics(TEXT("L_Hance"),*Target));
     TestFalse(TEXT("serialized sites require chart identity"),Config->ResolveRapidFeatures(TEXT("L_Hance"),*Target,Resolved,Error));
     Config->RegisteredRapidChartFingerprint=Target->GetRiverCoordinateMapFingerprint();
+    TestTrue(TEXT("verified continuous chart grants diagnostic access"),Config->AllowsRiverDiagnostics(TEXT("L_Colorado_Continuous"),*Target));
+    TestFalse(TEXT("wrong continuous chart denies diagnostic access"),Config->AllowsRiverDiagnostics(TEXT("L_Colorado_Continuous"),*Source));
+    TestFalse(TEXT("unloaded chart denies diagnostic access"),Config->AllowsRiverDiagnostics(TEXT("L_Colorado_Continuous"),*Empty));
     TestTrue(TEXT("continuous map resolves its own registered sites"),Config->ResolveRapidFeatures(TEXT("L_Colorado_Continuous"),*Target,Resolved,Error));
     TestEqual(TEXT("registered profile count"),Resolved.Num(),Input.Num());
     TestFalse(TEXT("wrong chart refuses"),Config->ResolveRapidFeatures(TEXT("L_Hance"),*Source,Resolved,Error));
@@ -97,6 +117,7 @@ bool FRaftSimRapidRegistrationTest::RunTest(const FString&)
     AddExpectedError(TEXT("coordinate map schema is unsupported"),EAutomationExpectedErrorFlags::Contains,1);
     TestFalse(TEXT("bad reload refuses"),Target->ConfigureRiverCoordinateMap(B));
     TestTrue(TEXT("bad reload clears old identity"),Target->GetRiverCoordinateMapFingerprint().IsEmpty());
+    TestFalse(TEXT("failed chart reload revokes diagnostic access"),Config->AllowsRiverDiagnostics(TEXT("L_Colorado_Continuous"),*Target));
     TestFalse(TEXT("bad reload invalidates registered sites"),Config->ResolveRapidFeatures(TEXT("L_Colorado_Continuous"),*Target,Resolved,Error));
     return !HasAnyErrors();
 }
@@ -123,6 +144,8 @@ bool FRaftSimRapidRegistrationSourcesTest::RunTest(const FString&)
         FString Map;
         if(Name==TEXT("Badger Creek"))Map=TEXT("L_Colorado_BadgerCreek");
         else if(Name==TEXT("House Rock"))Map=TEXT("L_Colorado_HouseRock");
+        else if(Name==TEXT("Soap Creek"))Map=TEXT("L_Colorado_SoapCreek");
+        else if(Name==TEXT("Georgie"))Map=TEXT("L_Colorado_Georgie");
         else if(Name==TEXT("Hance"))Map=TEXT("L_Hance");else continue;
         auto* Source=NewObject<URaftSimWaterRuntimeAdapter>();
         const FString Path=FPaths::Combine(FPaths::GetPath(Assembly),Reach->GetStringField(TEXT("rebased_chart")));
@@ -146,8 +169,8 @@ bool FRaftSimRapidRegistrationSourcesTest::RunTest(const FString&)
         AddInfo(FString::Printf(TEXT("Registered %s: %d sites; maximum centre error %.9f cm"),*Name,Output.Num(),MaxError));
         Count+=Output.Num();++ReachCount;
     }
-    TestEqual(TEXT("all three production source reaches exercised"),ReachCount,3);
-    TestEqual(TEXT("all production source sites exercised"),Count,68);
+    TestEqual(TEXT("all five production source reaches exercised"),ReachCount,5);
+    TestEqual(TEXT("all production source sites exercised"),Count,94);
     return !HasAnyErrors();
 }
 #endif

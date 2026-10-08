@@ -5,6 +5,18 @@ which follows South Fork. Implemented 2026-09-27 as the geographic
 `L_UpperHuacas` (Upper Huacas to Lower Pinball). Not accepted; see
 `docs/reconstruction-review-2026-09-07/pacuare-huacas-evidence.md`.
 
+**October 7 source-rights correction:** the official SNIT conditions explicitly
+do not authorize commercial use of geographic information or derived products.
+The earlier Huacas capture manifest's attribution-only/unclear-redistribution
+interpretation is superseded by
+`physics/data/real_world/pacuare_river_costa_rica/review/snit_rights_review_2026_10_07.json`.
+Preserve the captured files and historical receipts, but do not claim the
+IGN/SNIT-derived terrain, rocks or vegetation are cleared for commercial
+shipment. The user has been asked to choose replacement sources, applicable
+separate permission, or confirm a strictly noncommercial project. OSM and
+Copernicus evidence retain their separate licences; no new SNIT capture or
+source substitution was started pending that decision.
+
 ## Objective
 
 Reconstruct the Pacuare run's rapids, including boulder positions, rock islands,

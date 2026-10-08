@@ -1,5 +1,6 @@
 import copy
 import json
+import io
 import struct
 import tempfile
 import unittest
@@ -8,7 +9,29 @@ from unittest.mock import patch
 
 import numpy as np
 
-from export_colorado_continuous_runtime import registered_queries, write_fields, export, BAND
+from export_colorado_continuous_runtime import (registered_queries,registered_query_blocks,
+    validate_runtime_geometry,write_fields,export,BAND)
+
+
+def legacy_field_bytes(grid,station,frame,bed):
+    """Frozen pre-streaming serialization oracle, not a runtime alternative."""
+    wet=frame['wet']>.5;h=frame['h'];speed=np.hypot(frame['u'],frame['v'])
+    result={}
+    for name,array,dtype in [('bed',bed,'<f4'),('h',h,'<f4'),
+            ('u',np.where(wet,frame['u'],0),'<f4'),('v',np.where(wet,frame['v'],0),'<f4'),
+            ('wet_mask',wet,'u1')]:
+        stream=io.BytesIO();np.save(stream,np.ascontiguousarray(array,dtype=dtype))
+        result[f'{BAND}/{name}.npy']=stream.getvalue()
+    froude=np.where(h>.05,speed/np.sqrt(9.81*np.maximum(h,.05)),0)
+    energy=np.clip(.6*np.clip((speed-.5)/2.5,0,1)+.4*np.clip((froude-.5)/.5,0,1),0,1)
+    support_wet=wet&(h>.05);stream=io.BytesIO()
+    stream.write(struct.pack('<IIiiff',0x52534246,1,*bed.shape,grid['origin_y'],grid['dy']))
+    for array,dtype in [(station,'<f4'),(np.where(support_wet,frame['eta'],bed).T,'<f4'),
+                        (energy.T,'<f4'),(support_wet.T,'u1')]:
+        array=np.ascontiguousarray(array,dtype=dtype)
+        stream.write(struct.pack('<i',array.size));stream.write(array.tobytes())
+    result[f'support_band_field_{BAND}.bin']=stream.getvalue()
+    return result
 
 
 class ContinuousRuntime(unittest.TestCase):
@@ -82,6 +105,71 @@ class ContinuousRuntime(unittest.TestCase):
             self.assertNotIn(BAND,baseline['file'])
             with self.assertRaisesRegex(ValueError,'Unsafe flow band'):
                 write_fields(Path(directory)/'other',self.grid,station,frame,bed,'../bad')
+
+    def test_blocked_queries_exact_original_arithmetic(self):
+        mapping=copy.deepcopy(self.mapping)
+        for row in mapping['points']:
+            angle=row[0]/123.;row[1]=np.sin(angle)*212.25;row[2]=np.cos(angle)*98.17
+            row[3]=np.sin(angle);row[4]=np.cos(angle)
+        station,expected=registered_queries(mapping,self.terrain,self.grid)
+        for size in (3,7,12,100):
+            actual=np.empty_like(expected);count=0
+            for sl,queries in registered_query_blocks(mapping,self.terrain,self.grid,block_cells=size):
+                self.assertLessEqual(queries.shape[0]*queries.shape[1],size)
+                actual[:,sl]=queries;count+=queries.shape[1]
+            self.assertEqual(count,len(station));np.testing.assert_array_equal(actual,expected)
+        with self.assertRaisesRegex(ValueError,'complete cross-section'):
+            list(registered_query_blocks(mapping,self.terrain,self.grid,block_cells=2))
+
+    def test_streamed_bytes_equal_legacy_for_all_block_sizes(self):
+        rng=np.random.default_rng(987123);ny,nx=7,19
+        # Noncontiguous and negative strides match disk-backed and transposed callers.
+        bed=(rng.random((nx,ny))*2300+100.).T[:,::-1]
+        h=(rng.random((nx,ny))*3).T;h[0,:5]=[0.,.049,.05,.051,2.]
+        frame=dict(h=h,eta=bed+h,u=rng.normal(size=(nx,ny)).T*6,
+                   v=rng.normal(size=(nx,ny)).T*3,wet=(h>.049).astype(float))
+        station=np.arange(nx)*2.+12000.
+        grid=dict(nx=nx,ny=ny,origin_y=-6.,dy=2.)
+        expected=legacy_field_bytes(grid,station,frame,bed)
+        with tempfile.TemporaryDirectory() as directory:
+            for size in (19,41,500):
+                folder=Path(directory)/str(size)
+                write_fields(folder,grid,station,frame,bed,block_cells=size)
+                for name,data in expected.items():
+                    self.assertEqual((folder/name).read_bytes(),data,name)
+
+    def test_geometry_checks_every_block_and_keeps_original_gates(self):
+        _,queries=registered_queries(self.mapping,self.terrain,self.grid)
+        bed=queries[:,:,0]+queries[:,:,1];frame=dict(wet=np.ones(bed.shape))
+        class Terrain:
+            manifest=self.terrain
+            def sample(self,points):return points[:,:,0]+points[:,:,1]
+        triangles=Terrain()
+        station,error=validate_runtime_geometry(self.mapping,triangles,self.grid,frame,bed,block_cells=3)
+        self.assertEqual(error,0.);self.assertEqual(len(station),4)
+        for column in (0,1,3):
+            changed=bed.copy();changed[2,column]+=.001
+            with self.assertRaisesRegex(ValueError,'terrain triangles'):
+                validate_runtime_geometry(self.mapping,triangles,self.grid,frame,changed,block_cells=3)
+            wet=frame['wet'].copy();wet[:,column]=0
+            with self.assertRaisesRegex(ValueError,'Dry cross-section'):
+                validate_runtime_geometry(self.mapping,triangles,self.grid,dict(wet=wet),bed,block_cells=3)
+
+    def test_nonfinite_or_low_disk_refused_before_fields_created(self):
+        station,_=registered_queries(self.mapping,self.terrain,self.grid)
+        bed=np.ones((3,4));frame=dict(h=bed,eta=bed*2,u=bed,v=bed*0,wet=bed)
+        with tempfile.TemporaryDirectory() as directory:
+            folder=Path(directory)/'fields'
+            for key in frame:
+                bad={k:v.copy() for k,v in frame.items()};bad[key][-1,-1]=np.nan
+                with self.assertRaisesRegex(ValueError,'Nonfinite'):
+                    write_fields(folder,self.grid,station,bad,bed,block_cells=4)
+                self.assertFalse(folder.exists())
+            with patch('export_colorado_continuous_runtime.shutil.disk_usage') as usage:
+                usage.return_value.free=40*1024**3
+                with self.assertRaisesRegex(ValueError,'forty GiB reserve'):
+                    write_fields(folder,self.grid,station,frame,bed)
+            self.assertFalse(folder.exists())
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from review_colorado_continuous_bed_seam import compare
+from review_colorado_continuous_bed_seam import compare,screen
 
 
 class BedSeam(unittest.TestCase):
@@ -15,11 +15,30 @@ class BedSeam(unittest.TestCase):
         result=compare(self.tile(0,0),self.tile(5,5),0,5,7,2)
         self.assertEqual(result['bed_difference']['maximum_m'],0)
         self.assertEqual(result['shared_wet_cells'],20)
+        self.assertTrue(screen(result))
 
     def test_real_height_error_not_hidden_by_source_identity(self):
         b=self.tile(5,5);b['bed_ellipsoid_m']+=.5
         result=compare(self.tile(0,0),b,0,5,7,2)
         self.assertEqual(result['bed_difference']['maximum_m'],.5)
+        self.assertFalse(screen(result))
+
+    def test_reference_jump_rejected_even_when_bed_matches(self):
+        b=self.tile(5,5);b['reference_surface_ellipsoid_m']+=.5
+        result=compare(self.tile(0,0),b,0,5,7,2)
+        self.assertEqual(result['bed_difference']['maximum_m'],0)
+        self.assertFalse(screen(result))
+
+    def test_empty_nonfinite_and_changed_shoreline_rejected(self):
+        import copy
+        result=compare(self.tile(0,0),self.tile(5,5),0,5,7,2)
+        for key in ('bed_difference','reference_surface_difference'):
+            for value in (float('nan'),float('inf'),-.1):
+                changed=copy.deepcopy(result);changed[key]['maximum_m']=value
+                self.assertFalse(screen(changed))
+        for key,value in (('shared_wet_cells',0),('shoreline_disagreement_cells',1)):
+            changed=copy.deepcopy(result);changed[key]=value
+            self.assertFalse(screen(changed))
 
     def test_missing_overlap_and_shifted_lattice_refused(self):
         for x in (10,.5):

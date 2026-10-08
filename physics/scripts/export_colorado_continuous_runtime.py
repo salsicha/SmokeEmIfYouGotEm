@@ -16,9 +16,11 @@ import numpy as np
 from build_colorado_catalog_evidence import ROOT, sha
 from export_colorado_catalog_runtime import BAND, checked_cook
 from export_colorado_continuous_terrain import LandscapeTriangles
+from chilko_native_friction import runtime_friction_fields
+from native_frame_io import NativeFrameStore
 
 
-def registered_queries(mapping, terrain, grid):
+def _registered_geometry(mapping, terrain, grid):
     generic=terrain.get('schema')=='raftsim.continuous_landscape.v1'
     origin_key='horizontal_origin_m' if generic else 'horizontal_origin_epsg6404_m'
     if generic and (terrain.get('river_id')!='chilko_river_bc' or
@@ -50,55 +52,124 @@ def registered_queries(mapping, terrain, grid):
     if not np.allclose(np.linalg.norm(selected[:, 3:5], axis=1), 1., atol=1e-8, rtol=0):
         raise ValueError('Nonunit hydraulic normal')
     lateral = grid['origin_y'] + np.arange(grid['ny'])*grid['dy']
+    return station,selected,lateral,origin
+
+
+def registered_queries(mapping, terrain, grid):
+    station,selected,lateral,origin=_registered_geometry(mapping,terrain,grid)
     xy = selected[None, :, 1:3] + lateral[:, None, None]*selected[None, :, 3:5]
     return station, xy + origin
 
 
-def write_fields(folder, grid, station, frame, bed, band_id=BAND):
+def registered_query_blocks(mapping,terrain,grid,*,block_cells=262144):
+    """Exact original arithmetic, retaining only neighbouring station columns."""
+    station,selected,lateral,origin=_registered_geometry(mapping,terrain,grid)
+    if not isinstance(block_cells,int) or block_cells<len(lateral):
+        raise ValueError('Query block must contain one complete cross-section')
+    columns=max(1,block_cells//len(lateral))
+    for start in range(0,len(station),columns):
+        sl=slice(start,min(start+columns,len(station)))
+        xy=selected[None,sl,1:3]+lateral[:,None,None]*selected[None,sl,3:5]
+        yield sl,xy+origin
+
+
+def validate_runtime_geometry(mapping,triangles,grid,frame,bed,*,block_cells=262144):
+    station,_,_,_=_registered_geometry(mapping,triangles.manifest,grid)
+    error=0.
+    for sl,queries in registered_query_blocks(mapping,triangles.manifest,grid,block_cells=block_cells):
+        rendered=triangles.sample(queries);source=bed[:,sl]
+        if not np.isfinite(rendered).all() or not np.allclose(rendered,source,atol=1e-8,rtol=0):
+            raise ValueError('Cook bed differs from encoded shared terrain triangles')
+        error=max(error,float(abs(rendered-source).max()))
+        if not np.allclose(source.astype('<f4').astype(float),source,atol=.01,rtol=0):
+            raise ValueError('Runtime bed precision exceeds one centimetre')
+        if not np.all((frame['wet'][:,sl]>.5).any(axis=0)):
+            raise ValueError('Dry cross-section interrupts the water corridor')
+    return station,error
+
+
+def write_fields(folder, grid, station, frame, bed, band_id=BAND,*,block_cells=262144):
     """Preserve solved state; serialize the actual native support surface."""
     if not re.fullmatch(r'[A-Za-z0-9_]+',band_id):raise ValueError('Unsafe flow band')
     ny, nx = bed.shape
     if (ny, nx) != (grid['ny'], grid['nx']):
         raise ValueError('Runtime grid shape mismatch')
-    wet = frame['wet'] > .5
-    h = frame['h']
-    speed = np.hypot(frame['u'], frame['v'])
+    if (not isinstance(block_cells,int) or block_cells<max(ny,nx) or
+            np.shape(station)!=(nx,) or not np.isfinite(station).all() or
+            max(nx,ny*nx)>np.iinfo(np.int32).max):
+        raise ValueError('Invalid runtime block, station axis or support field count')
+    for key in ('wet','h','u','v','eta'):
+        if np.shape(frame[key])!=bed.shape:raise ValueError('Nonfinite or incomplete runtime field')
+    rows=max(1,block_cells//nx);columns=max(1,block_cells//ny)
+    for start in range(0,ny,rows):
+        sl=slice(start,start+rows)
+        if not all(np.isfinite(a[sl]).all() for a in (bed,*(frame[k] for k in ('wet','h','u','v','eta')))):
+            raise ValueError('Nonfinite or incomplete runtime field')
+    # Five NPY fields plus the original station-major support binary. Keep the
+    # same disk reserve as frame review before allocating any output files.
+    parent=folder.parent
+    while not parent.exists():parent=parent.parent
+    if shutil.disk_usage(parent).free<ny*nx*26+nx*4+1048576+40*1024**3:
+        raise ValueError('Insufficient runtime disk headroom; forty GiB reserve required')
     folder.mkdir(parents=True)
     band = folder/band_id
     band.mkdir()
     arrays = {}
-    for name, array, dtype in [('bed', bed, '<f4'), ('h', h, '<f4'),
-            ('u', np.where(wet, frame['u'], 0), '<f4'),
-            ('v', np.where(wet, frame['v'], 0), '<f4'), ('wet_mask', wet, 'u1')]:
-        array = np.ascontiguousarray(array, dtype=dtype)
-        if array.shape != bed.shape or not np.isfinite(array).all():
-            raise ValueError('Nonfinite or incomplete runtime field')
+    for name,dtype in [('bed','<f4'),('h','<f4'),('u','<f4'),('v','<f4'),('wet_mask','u1')]:
         path = band/(name+'.npy')
-        np.save(path, array)
+        with path.open('xb') as stream:
+            np.lib.format.write_array_header_1_0(stream,dict(descr=np.dtype(dtype).str,
+                fortran_order=False,shape=(ny,nx)))
+            for start in range(0,ny,rows):
+                sl=slice(start,start+rows)
+                if name=='bed':array=bed[sl]
+                elif name=='h':array=frame['h'][sl]
+                elif name=='wet_mask':array=frame['wet'][sl]>.5
+                else:array=np.where(frame['wet'][sl]>.5,frame[name][sl],0)
+                array=np.ascontiguousarray(array,dtype=dtype)
+                if not np.isfinite(array).all():raise ValueError('Nonfinite or incomplete runtime field')
+                stream.write(memoryview(array).cast('B'))
         arrays[name] = dict(file=f'{band_id}/{path.name}', sha256=sha(path),
                            shape=[ny, nx], dtype='uint8' if dtype == 'u1' else 'float32')
-    froude = np.where(h > .05, speed/np.sqrt(9.81*np.maximum(h, .05)), 0)
-    energy = np.clip(.6*np.clip((speed-.5)/2.5, 0, 1)+.4*np.clip((froude-.5)/.5, 0, 1), 0, 1)
-    support_wet = wet & (h > .05)
     baseline = folder/f'support_band_field_{band_id}.bin'
-    with baseline.open('wb') as stream:
+    with baseline.open('xb') as stream:
         stream.write(struct.pack('<IIiiff', 0x52534246, 1, ny, nx, grid['origin_y'], grid['dy']))
-        for array, dtype in [(station, '<f4'), (np.where(support_wet, frame['eta'], bed).T, '<f4'),
-                             (energy.T, '<f4'), (support_wet.T, 'u1')]:
-            array = np.ascontiguousarray(array, dtype=dtype)
-            stream.write(struct.pack('<i', array.size)); stream.write(array.tobytes())
+        stream.write(struct.pack('<i',nx))
+        stream.write(memoryview(np.ascontiguousarray(station,dtype='<f4')).cast('B'))
+        # Each component is station-major, not the NPY row-major layout.
+        for name,dtype in [('surface','<f4'),('energy','<f4'),('wet','u1')]:
+            stream.write(struct.pack('<i',ny*nx))
+            for start in range(0,nx,columns):
+                sl=(slice(None),slice(start,start+columns));h=frame['h'][sl]
+                support_wet=(frame['wet'][sl]>.5)&(h>.05)
+                if name=='surface':array=np.where(support_wet,frame['eta'][sl],bed[sl])
+                elif name=='wet':array=support_wet
+                else:
+                    speed=np.hypot(frame['u'][sl],frame['v'][sl])
+                    froude=np.where(h>.05,speed/np.sqrt(9.81*np.maximum(h,.05)),0)
+                    array=np.clip(.6*np.clip((speed-.5)/2.5,0,1)+.4*np.clip((froude-.5)/.5,0,1),0,1)
+                array=np.ascontiguousarray(array.T,dtype=dtype)
+                if not np.isfinite(array).all():raise ValueError('Nonfinite runtime support field')
+                stream.write(memoryview(array).cast('B'))
     return arrays, dict(file=baseline.name, sha256=sha(baseline))
 
 
 def export(inputs, cook, review, out, river_id='colorado_river_grand_canyon_rowing'):
     if out.exists():
         raise ValueError('Fresh continuous runtime export required')
+    if river_id=='colorado_river_grand_canyon_rowing':
+        with NativeFrameStore(inputs.parent) as store:
+            return _export(inputs,cook,review,out,river_id,frame_loader=store.load)
+    return _export(inputs,cook,review,out,river_id)
+
+
+def _export(inputs,cook,review,out,river_id,*,frame_loader=None):
     chilko=river_id=='chilko_river_bc'
     if chilko:
         from review_chilko_continuous_cook import checked_cook as checked_chilko
         build,receipt,native,scenario,frame,bed=checked_chilko(inputs,cook,review)
     elif river_id=='colorado_river_grand_canyon_rowing':
-        build, receipt, native, scenario, frame, bed = checked_cook(inputs, cook, review)
+        build, receipt, native, scenario, frame, bed = checked_cook(inputs, cook, review,frame_loader=frame_loader)
     else:raise ValueError('Unsupported continuous river')
     band_id=scenario['metadata']['flow_band'] if chilko else BAND
     section_id='chilko_continuous' if chilko else 'colorado_continuous'
@@ -117,25 +188,23 @@ def export(inputs, cook, review, out, river_id='colorado_river_grand_canyon_rowi
         if mapping != json.loads(original_map.read_text()):
             raise ValueError('Input coordinate map differs from full shared frame')
     grid = scenario['grid']
-    station, queries = registered_queries(mapping, triangles.manifest, grid)
-    rendered_bed = triangles.sample(queries)
-    if not np.isfinite(rendered_bed).all() or not np.allclose(rendered_bed, bed, atol=1e-8, rtol=0):
-        raise ValueError('Cook bed differs from encoded shared terrain triangles')
-    if not np.allclose(bed.astype('<f4').astype(float), bed, atol=.01, rtol=0):
-        raise ValueError('Runtime bed precision exceeds one centimetre')
-    wet = frame['wet'] > .5
-    if not np.all(wet.any(axis=0)):
-        raise ValueError('Dry cross-section interrupts the water corridor')
+    station,terrain_error=validate_runtime_geometry(mapping,triangles,grid,frame,bed)
     # These are the existing runtime end-boundary conventions; interior moving
     # windows receive the actual per-cell cooked ghost states.
-    inlet = wet[:, 0] & (frame['h'][:, 0] > .05)
-    outlet = wet[:, -1] & (frame['h'][:, -1] > .05)
+    inlet = (frame['wet'][:, 0]>.5) & (frame['h'][:, 0] > .05)
+    outlet = (frame['wet'][:, -1]>.5) & (frame['h'][:, -1] > .05)
     if not inlet.any() or not outlet.any():
         raise ValueError('Dry runtime boundary')
     boundaries = [dict(edge='west', kind='inflow', stage=float(np.median(frame['eta'][inlet, 0])),
                       velocity=[float(np.median(frame[k][inlet, 0])) for k in ('u', 'v')]),
                   dict(edge='east', kind='outflow', stage=float(np.median(frame['eta'][outlet, -1]))),
                   dict(edge='south', kind='bank'), dict(edge='north', kind='bank')]
+    terrain_bytes=sum((terrain_folder[c['heightfield']]).stat().st_size for c in triangles.manifest['chunks'])
+    required=grid['ny']*grid['nx']*26+grid['nx']*4+terrain_bytes+mapping_path.stat().st_size+1048576
+    parent=out.parent
+    while not parent.exists():parent=parent.parent
+    if shutil.disk_usage(parent).free<required+40*1024**3:
+        raise ValueError('Insufficient runtime terrain/field disk headroom; forty GiB reserve required')
     out.mkdir(parents=True)
     fields = out/'cooked_flow_fields'
     arrays, baseline = write_fields(fields, grid, station, frame, bed, band_id)
@@ -149,7 +218,7 @@ def export(inputs, cook, review, out, river_id='colorado_river_grand_canyon_rowi
                   origin_x_m=grid['origin_x'], origin_y_m=grid['origin_y'],
                   layout='row_major_c_order', downstream_axis='+x'), solver=solver,
         bands=[dict(band_id=band_id, directory=band_id, scenario_id=native['scenario_id'],
-            effective_manning_n=scenario['roughness'], manning_n=scenario['roughness'],
+            **runtime_friction_fields(scenario),
             discharge_target_m3s=receipt['statistics']['exact_face_discharge_target_m3s'],
             discharge_target_cfs=receipt['statistics']['exact_face_discharge_target_m3s']/0.028316846592 if chilko else 8000., runtime_boundaries=boundaries, arrays=arrays,
             presentation_baseline=baseline,
@@ -157,7 +226,10 @@ def export(inputs, cook, review, out, river_id='colorado_river_grand_canyon_rowi
         provenance=dict(continuous_terrain=build['continuous_terrain'],
                         shared_hydraulic_frame=build.get('shared_hydraulic_frame'),
                         source_inputs=build.get('source_inputs', []),
-                        native_continuation=build.get('native_continuation')),
+                        native_continuation=build.get('native_continuation'),
+                        bed_edit_warm_start=build.get('bed_edit_warm_start'),
+                        input_build_report_sha256=sha(inputs/'build_report.json'),
+                        construction_review_sha256=sha(review)),
         runtime_boundary_note='Only original reach ends use median solved stage/velocity; interior moving crops use cooked ghosts.',
         engine_validated=False, class_match='not_established')
     (fields/'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
@@ -182,7 +254,7 @@ def export(inputs, cook, review, out, river_id='colorado_river_grand_canyon_rowi
         source_inputs=inputs.relative_to(ROOT).as_posix(), source_cook=cook.relative_to(ROOT).as_posix(),
         source_review_sha256=sha(review), source_core_interval_m=None if chilko else build['source_core_interval_m'],
         hydraulic_station_range_m=[float(station[0]), float(station[-1])],
-        terrain_solver_bed_max_error_m=float(abs(rendered_bed-bed).max()),
+        terrain_solver_bed_max_error_m=terrain_error,
         files_sha256={p.relative_to(out).as_posix(): sha(p) for p in out.rglob('*') if p.is_file()},
         limitations=['Construction screening is not boat, shoreline animation or performance acceptance.',
                      'Full geographic coordinate coverage does not imply full terrain or water coverage.',

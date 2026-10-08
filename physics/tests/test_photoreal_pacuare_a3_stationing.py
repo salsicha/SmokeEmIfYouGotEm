@@ -65,7 +65,8 @@ def test_pacuare_a3_stationing_status_tracks_all_order_only_rapids():
     assert records["Upper Huacas"]["stationing_kind"] == (
         "provisional_downstream_order_interpolation"
     )
-    assert records["Upper Huacas"]["station_m_from_order_interpolation"] == 6562.5
+    # This remains a deliberately unaccepted order scaffold, not guide km 12.85.
+    assert records["Upper Huacas"]["station_m_from_order_interpolation"] == 11484.375
     assert records["Dos Montanas"]["aliases"] == ["Dos Montañas"]
     assert records["Dos Montanas"]["exact_geometry_status"] == (
         "blocked_pending_aerial_digitizing_and_guide_review"

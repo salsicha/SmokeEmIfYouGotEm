@@ -7,20 +7,20 @@ EGM2008 heights; TanDEM-X 2011-2015 with water bodies edited flat and
 monotonic), and the OSM centreline with chainage. Frame: UTM 18S
 (EPSG:32718) metres.
 
-The Terminator has no published coordinate. Its GoRafting chainage puts it
-near OSM 74.2 km; the Sentinel-2 whitewater agrees (the largest persistent
-whitewater between 66 and 80 km lies at 74.0-75.0 km on all three dates, and
-the same test lights up at the OSM El Trono node).
+GoRafting's approximate chainage provides a Terminator search area near
+OSM 74.2 km. Persistent bright water is supporting appearance evidence,
+not unique proof of the rapid's name or entrance/exit boundaries.
 
 What is measured and what is inferred:
 - wetted extent: water (NDWI) or whitewater in at least two of the three
-  Sentinel-2 dates, bilinear from 10 m to 1 m (measured, +-5 m edges);
+  Sentinel-2 dates, bilinear from 10 m to 1 m (inferred classification;
+  resampling adds no source resolution, and edge accuracy is unverified);
 - whitewater: bright neutral water pixels, mean over the dates (measured
   appearance; flows on the image dates unknown);
 - water-surface anchors: the GLO-30 edited water surface along the midline
   (median of channel-interior cells per 50 m, forced non-increasing), every
-  --anchor-spacing-m (measured with editing: TanDEM-X epoch, flow unknown,
-  about +-2 m);
+  --anchor-spacing-m (edited DSM-based inference: TanDEM-X epoch, flow and
+  local water-height accuracy unknown; not measured bathymetry);
 - surface between anchors: each drop spread by the whitewater share plus a
   small base weight (INFERRED);
 - terrain: GLO-30 bicubic beyond --bank-blend-m of the water; the bank zone
@@ -48,6 +48,7 @@ from build_pacuare_evidence_grid import (arc_resample, box_mean, edt_inside, foa
 from geo_frames import tm_forward, tm_inverse, utm
 from png_numpy import write_png
 from tiff_numpy import read_geotiff
+from futaleufu_imagery import load_reflectance, sampling_points, require_sample_support
 
 ROOT = Path(__file__).resolve().parents[2]
 RIVER = ROOT / 'physics/data/real_world/futaleufu_river_chile'
@@ -164,14 +165,13 @@ def main():
     wet_frac = np.zeros((NY, NX)); white_frac = np.zeros((NY, NX)); rgb = None
     dates = []
     for it in fm['items']:
-        w = it['window_utm_m']; z = np.load(SRC / 'sentinel2' / it['npz'])
-        refl = {k: z[k].astype(np.float32) * 1e-4 - 0.1 for k in ('blue', 'green', 'red', 'nir')}
+        refl, valid = load_reflectance(SRC / 'sentinel2', it)
         B, Gn, R, N = refl['blue'], refl['green'], refl['red'], refl['nir']
         ndwi = (Gn - N) / np.maximum(Gn + N, 1e-3)
         white = (B > 0.22) & (Gn > 0.22) & (R > 0.18) & (np.abs(B - R) < 0.12)
         water = (ndwi > 0.05) | white
-        fc = (xc - w['xmin']) / 10.0 - 0.5; fr = (w['ymax'] - yc) / 10.0 - 0.5
-        FR, FC = np.meshgrid(fr, fc, indexing='ij')
+        FR, FC = sampling_points(xc[None,:], yc[:,None], it)
+        require_sample_support(valid, FR, FC)
         wet_frac += bilinear(water.astype(np.float32), FR, FC)
         white_frac += bilinear(white.astype(np.float32), FR, FC)
         if it is fm['items'][-1]:
@@ -424,6 +424,9 @@ def main():
                     centreline=dict(path=str((SRC / 'osm/futaleufu_centreline.json').relative_to(ROOT).as_posix()),
                                     sha256=sha(SRC / 'osm/futaleufu_centreline.json'))),
         sources_manifest_sha256=sha(SRC / 'manifest.json'),
+        sentinel_fetch_manifest_sha256=sha(SRC / 'sentinel2/fetch_manifest.json'),
+        imagery_sampling='Captured native band origins and pixel centres, not requested crop bounds; SHA256, grid, radiometry and bilinear nodata support verified',
+        evidence_limits='10 m imagery resampled to 1 m does not establish metre-scale shorelines, boulder geometry or unique named-rapid boundaries; image-date discharge and local DSM water-height accuracy are unverified',
         class_codes={'0': 'dry ground: Copernicus GLO-30 (measured surface model, includes forest canopy) beyond the bank zone; '
                               'bank zone harmonic between the water edge and GLO-30 (inferred shape)',
                      '2': 'bed: discharge-consistent depth for the planning discharge (inferred)',

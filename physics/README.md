@@ -11,7 +11,82 @@ cd physics
 pytest
 ```
 
+## Geospatial Reconstruction Tools
+
+Install the declared, locked optional dependencies before running the terrain,
+coordinate, planform and riverbed builders:
+
+```bash
+cd physics
+uv sync --extra geospatial --locked
+uv run --extra geospatial --locked python -m unittest discover -s scripts -p "test_chilko*.py"
+```
+
+The extra includes Rasterio, PyProj, SciPy and Shapely. Reconstruction scripts
+consume captured source manifests and preserve source/provenance checks; a
+successful terrain export does not certify a cooked field, playable map,
+rapid classification or frame-rate target. Use fresh output directories for
+candidates and retain failed candidates for comparison.
+
+Colorado terrain capture keeps native resolution separate from export spacing.
+`scripts/fetch_colorado_terrain_windows.py --cell-m 1 --allow-partial-fine
+--allow-empty-fine` records a complete catalogue with no native fine source as
+an explicit absence receipt, without requesting an unlocked image export or
+inventing an empty surveyed raster. Unknown resolutions, incompatible datums
+and incomplete catalogues still fail. `scripts/blend_colorado_terrain_coverage.py`
+verifies that receipt and the captured coarse raster before resampling; its
+per-pixel resolution map continues to identify every fallback pixel as coarse.
+An absent fine source is not evidence of metre-scale accuracy. Construction
+seam reviews require both bed and water-reference continuity, not matching
+bed elevations alone.
+
+For the reviewed Chilko branch correction, `scripts/correct_chilko_route.py`
+accepts `--bridge-topology-connectors --retire-reviewed-bar-branches` only with
+the original route, captured FWA network, dated alignment review and unchanged
+captured image pixels available. Retirement is bounded to the two recorded
+review areas; the retained 20 m channel half-width is an explicit inference,
+not surveyed banks. Original mapping outside those areas is preserved. The
+derived policy is bound into the profile, bed and solver-input receipts: rebuild
+all dependent artifacts together, never pair a new shoreline with an old bed
+or cooked field. See the current candidate and validation results in
+[the continuous-river plan](../docs/plans/every-catalog-rapid-decisions.md).
+
+`scripts/calibrate_chilko_corridor_depth.py --inputs INPUTS --cook COOK
+--review REVIEW_JSON --out FRESH_DEPTH_DIRECTORY` supports one bounded
+capacity experiment after an independently reviewed native run has settled.
+It projects each wet, source-owned sample into the geographic route (not its
+numerical row), then deepens the existing inferred channel only where the
+median surface error is positive. The fixed policy uses 20 m bins, 30 m
+smoothing, 150 m endpoint tapers and at most 0.75 m additional amplitude, still
+bounded by the original 10 m maximum. Missing samples do not authorize edits.
+The loader checks the parent profile and native evidence hashes and rejects
+outside-interval, negative or excessive edits. This does not change captured
+ground, mapped-water ownership, route identity or source reference stages.
+Pass the result to `export_chilko_corridor_terrain.py --depth-profile`, rebuild
+both full and local inputs, run the independent terrain/window checks, and
+perform a fresh native cook before runtime export. Old capacity/flow statistics
+are not valid evidence for the changed candidate.
+
+`scripts/warm_start_chilko_depth_cook.py --candidate NEW_INPUTS --previous OLD_INPUTS
+--cook OLD_COOK --review OLD_REVIEW_JSON --out FRESH_INPUT_DIRECTORY` can initialize
+that bounded changed-bed test from its reviewed, settled parent. It preserves
+depth, velocity, momentum and wetness exactly, moving the surface with the new
+bed rather than adding water to retain the old surface. Grid, geographic mapping,
+reference fields, resistance and all boundaries must remain identical; the depth
+candidate must name that same native review/frame. This is a changed-geometry
+initial guess, not exact continuation or an accepted flow field. A fresh native
+cook and independent review under unchanged thresholds are still required.
+
 ## Package Layout
+
+Large continuous-map contracts must pass `--probe-directory FRESH_DIRECTORY`
+to `scripts/build_colorado_continuous_map_contract.py`. This writes every wet
+cell's original float64 collision probe into a hash-bound, terrain-chunk-owned
+binary stream instead of a full-river JSON list. The importer validates all
+identities, counts and geographic ownership before creating the world, then
+streams the probes again against real complex collision during chunk import.
+The 10 cm native tolerance is unchanged. Small existing JSON contracts remain
+supported; neither representation certifies navigation, rendering or FPS.
 
 ```text
 physics/

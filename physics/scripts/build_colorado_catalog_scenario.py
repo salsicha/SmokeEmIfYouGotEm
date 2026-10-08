@@ -14,6 +14,7 @@ from scipy.interpolate import PchipInterpolator
 from scipy.ndimage import map_coordinates
 from build_colorado_catalog_evidence import DATA,ROOT,sha
 from build_hance_curvilinear_scenario import gauss_smooth
+from chilko_native_friction import with_manning_friction
 
 TEMPLATE=DATA/'scenario_hance/low_release_planning/scenario.json'
 Q=226.534772736
@@ -79,24 +80,51 @@ def covered_source_slice(inside, source_station, core=None):
         raise ValueError('Invalid source coverage axis')
     idx=np.flatnonzero(inside)
     if not len(idx):raise ValueError('No completely source-backed cross-sections')
+    if core is not None:
+        core=np.asarray(core,dtype=float)
+        if core.shape!=(2,) or not np.isfinite(core).all() or core[0]>=core[1]:
+            raise ValueError('Invalid required source core')
+        # A detached valid island beyond a missing EXTERIOR halo is not part
+        # of the required run. Select one contiguous complete component that
+        # brackets the entire core; never bridge a gap or discard core cells.
+        groups=np.split(idx,np.flatnonzero(np.diff(idx)>1)+1)
+        complete=[g for g in groups if source_station[g[0]]<=core[0] and source_station[g[-1]]>=core[1]]
+        if len(complete)==1:
+            return slice(int(complete[0][0]),int(complete[0][-1])+1)
     gaps=np.flatnonzero(~inside[idx[0]:idx[-1]+1])+idx[0]
     if len(gaps):
         raise ValueError(f'Curved strip has missing source/terrain coverage between '
                          f'{source_station[gaps[0]]:.3f} and {source_station[gaps[-1]]:.3f} m; '
                          'expand the registered capture or split the construction window, never fill the gap')
     if core is not None:
-        core=np.asarray(core,dtype=float)
-        if core.shape!=(2,) or not np.isfinite(core).all() or core[0]>=core[1]:
-            raise ValueError('Invalid required source core')
         if source_station[idx[0]]>core[0] or source_station[idx[-1]]<core[1]:
             raise ValueError('Source coverage does not bracket the complete required core; do not cook partial coverage')
     return slice(int(idx[0]),int(idx[-1])+1)
 
 
-def build(evidence,profile_path,water_dir,out,match_landscape=False,roughness=.04,terrain_chunks=None,shared_frame=None):
+def checked_terrain_snapshot(folder,snapshot=None):
+    """Borrow a fixed terrain snapshot; batch callers must close with verify_unchanged.
+
+    Candidate receipts always bind the loaded manifest, never a newer on-disk
+    manifest. Native export still independently validates every heightfield.
+    """
+    from export_colorado_continuous_terrain import LandscapeTriangles
+    if snapshot is None:return LandscapeTriangles(folder)
+    if (not isinstance(snapshot,LandscapeTriangles) or
+            snapshot.folder!=Path(folder).resolve() or
+            sha(snapshot.folder/'manifest.json')!=snapshot.manifest_sha256):
+        raise ValueError('Wrong or changed terrain snapshot')
+    return snapshot
+
+
+def build(evidence,profile_path,water_dir,out,match_landscape=False,roughness=.04,terrain_chunks=None,shared_frame=None,terrain_snapshot=None,reviewed_lateral_interval=None):
     roughness=checked_roughness(roughness)
     if match_landscape and terrain_chunks is not None:
         raise ValueError('Choose legacy Landscape or continuous chunks, not both')
+    if terrain_snapshot is not None and terrain_chunks is None:
+        raise ValueError('Terrain snapshot requires its registered directory')
+    if reviewed_lateral_interval is not None and (shared_frame is None or terrain_chunks is None):
+        raise ValueError('Reviewed lateral domains require a shared chart and registered terrain')
     if out.exists():raise ValueError('Fresh solver-input directory required')
     manifest=json.loads((evidence/'manifest.json').read_text())
     if sha(evidence/'evidence_grid.npz')!=manifest['evidence_grid_sha256']:
@@ -107,28 +135,35 @@ def build(evidence,profile_path,water_dir,out,match_landscape=False,roughness=.0
         raise ValueError('Profile changed after composition')
     wm=json.loads((water_dir/'manifest.json').read_text())
     width=next(r for r in wm['windows'] if r['name']==profile['name'])
-    intervals=[a for row in width['widths'] for a in row['classified_water_intervals_lateral_m']]
-    if not intervals or any(w['transect_truncated'] for w in width['widths']):
-        raise ValueError('Unbounded or missing water transects')
-    half=float(np.ceil((max(abs(v) for a in intervals for v in a)+20)/2)*2)
-    if half>250:raise ValueError('Curved strip wider than reviewed 500 m limit')
+    if reviewed_lateral_interval is None:
+        intervals=[a for row in width['widths'] for a in row['classified_water_intervals_lateral_m']]
+        if not intervals or any(w['transect_truncated'] for w in width['widths']):
+            raise ValueError('Unbounded or missing water transects')
+        half=float(np.ceil((max(abs(v) for a in intervals for v in a)+20)/2)*2)
+        if half>250:raise ValueError('Curved strip wider than reviewed 500 m limit')
+        lateral=np.arange(-half,half+2.,2.)
+    else:
+        if profile.get('source_core_interval_m') is None:
+            raise ValueError('Reviewed lateral domain requires its complete registered source core')
+        from review_colorado_hydraulic_domain import construction_lateral_axis
+        lateral=construction_lateral_axis(width,reviewed_lateral_interval)
     g=dict(np.load(evidence/'evidence_grid.npz')); step=2.
-    shared_mapping=None;shared_receipt=None
+    shared_mapping=None;shared_receipt=None;source_caps=None
     if shared_frame is not None:
         if terrain_chunks is None:raise ValueError('Shared hydraulic frame requires common terrain chunks')
         from build_colorado_shared_hydraulic_frame import load
-        (station,xy,normal,curvature,source_s),shared_mapping,_=load(shared_frame.resolve(),profile)
+        (station,xy,normal,curvature,source_s),shared_mapping,frame_manifest=load(shared_frame.resolve(),profile)
+        if 'source_endpoint_anchor' in frame_manifest:
+            source_caps=frame_manifest['source_endpoint_anchor']['source_end_caps']
         shared_receipt=dict(manifest=shared_frame.resolve().relative_to(ROOT).as_posix()+'/manifest.json',
                             sha256=sha(shared_frame/'manifest.json'))
     else:
         station,xy,normal,curvature,source_s=frame(profile,step)
-    lateral=np.arange(-half,half+step,step)
     queries=xy[:,None,:]+normal[:,None,:]*lateral[None,:,None]
     bed=sample_grid(g['bed_ellipsoid_m'],queries,g['corner_east_north_m'])
     terrain_receipt=None
     if terrain_chunks is not None:
-        from export_colorado_continuous_terrain import LandscapeTriangles
-        triangles=LandscapeTriangles(terrain_chunks)
+        triangles=checked_terrain_snapshot(terrain_chunks,terrain_snapshot)
         source_match=any(
             row['evidence']==evidence.relative_to(ROOT).as_posix() and
             row['evidence_manifest_sha256']==sha(evidence/'manifest.json') and
@@ -138,7 +173,7 @@ def build(evidence,profile_path,water_dir,out,match_landscape=False,roughness=.0
         if not source_match:raise ValueError('Terrain chunks do not contain this registered construction input')
         bed=np.where(np.isfinite(bed),triangles.sample(queries),np.nan)
         terrain_receipt=dict(manifest=triangles.folder.relative_to(ROOT).as_posix()+'/manifest.json',
-                             sha256=sha(triangles.folder/'manifest.json'))
+                             sha256=triangles.manifest_sha256)
     if match_landscape:
         # Close the geometry handoff: the export's 2017-height Landscape is
         # interpolated once here and the native solver cooks THAT bed. Keeping
@@ -164,6 +199,13 @@ def build(evidence,profile_path,water_dir,out,match_landscape=False,roughness=.0
     if not wet.any() or ratio[wet].min()<=.1:
         raise ValueError('Curved wet strip folds or is empty; needs a different registered frame')
     if wet[:,0].any() or wet[:,-1].any():raise ValueError('Water clipped at lateral domain boundary')
+    domain_coverage=None
+    if reviewed_lateral_interval is not None or (shared_mapping is not None and profile.get('source_core_interval_m') is not None):
+        from review_colorado_hydraulic_domain import source_footprint_coverage
+        domain_coverage=source_footprint_coverage(g,profile,xy,normal,lateral,end_caps=source_caps)
+        if not domain_coverage['complete_classified_core_coverage']:
+            raise ValueError('Reviewed chart omits '+str(domain_coverage['uncovered_classified_source_core_cells'])+
+                             ' classified source-core water cells; never remove an off-chart channel')
     depth=np.where(wet,ws[:,None]-bed,0.)
     conveyance=(depth**(5/3)).sum(axis=1)*step
     if np.any(conveyance<=0):raise ValueError('Dry cross-section disconnects the hydraulic domain')
@@ -178,7 +220,7 @@ def build(evidence,profile_path,water_dir,out,match_landscape=False,roughness=.0
     inlet_u=np.where(active,Q*inlet**(2/3)/(np.where(active,inlet,0)**(5/3)).sum()/step,0.)
     ghost=np.column_stack([B[:,0],inlet,inlet_u,np.zeros_like(inlet)])
     scenario=copy.deepcopy(json.loads(TEMPLATE.read_text()))
-    scenario.update(grid=dict(nx=len(station),ny=len(lateral),dx=step,dy=step,origin_x=float(station[0]),origin_y=-half),
+    scenario.update(grid=dict(nx=len(station),ny=len(lateral),dx=step,dy=step,origin_x=float(station[0]),origin_y=float(lateral[0])),
         roughness=roughness,fixed_dt=.05,duration=600.,feature_count=0,probe_count=0)
     scenario['boundaries']=[dict(edge='west',kind='discharge_profile',ghost_cells=np.tile(ghost,(2,1)).tolist(),
         metadata=dict(target_discharge_m3s=Q,distribution='h^(5/3) initial conveyance hypothesis')),
@@ -191,6 +233,11 @@ def build(evidence,profile_path,water_dir,out,match_landscape=False,roughness=.0
         confidence_score=.25,coordinate_reference_system='curved station/river-left grid in EPSG:6404; ellipsoid metres',
         provenance=dict(construction_manifest_sha256=sha(evidence/'manifest.json'),profile_sha256=sha(profile_path),
             target_discharge_m3s=Q,measured_velocity=False,rapid_obstacles_validated=False))
+    # New continuous-corridor resistance is inferred Manning n. The native
+    # damping field is g*n*n, not n. Leave existing standalone legacy builds
+    # and already cooked packages unchanged; never convert at runtime twice.
+    if shared_mapping is not None:
+        scenario=with_manning_friction(scenario,roughness)
     datum=float(np.floor(ws.min()/10)*10)
     origin=[float(g['corner_east_north_m'][0]),float(g['corner_east_north_m'][1]-g['bed_ellipsoid_m'].shape[0]/2)]
     mapping=dict(schema='raftsim.curved_river_coordinate_map.v1',river_id='colorado_river',section_id='catalog_'+key,
@@ -204,7 +251,10 @@ def build(evidence,profile_path,water_dir,out,match_landscape=False,roughness=.0
     np.savez_compressed(pkg/'initial_state.npz',depth=h,eta=B+h,u=u,v=v,hu=h*u,hv=h*v,wet=h>1e-6)
     for name in ('features','probes'):(pkg/(name+'.json')).write_text(json.dumps({name:[]})+'\n')
     (pkg/'scenario.json').write_text(json.dumps(scenario,indent=2)+'\n')
-    (out/'coordinate_map.json').write_text(json.dumps(mapping,indent=2)+'\n')
+    # The complete shared river chart is large and repeated in each standalone
+    # input. Compact JSON retains every coordinate without hundreds of copies
+    # of presentation whitespace or mutable cross-package hardlinks.
+    (out/'coordinate_map.json').write_text(json.dumps(mapping,separators=(',',':'))+'\n')
     np.savez_compressed(out/'reference.npz',station=station,lateral=lateral,source_station=source_s,
         reference_surface=ws,classified_water=classified.T,metric_ratio=ratio.T,
         class_code=sample_grid(g['class_code'],queries,g['corner_east_north_m'],True).T.astype('uint8'))
@@ -228,6 +278,15 @@ def build(evidence,profile_path,water_dir,out,match_landscape=False,roughness=.0
         landscape_collision_triangles_validated=False,
         files_sha256={str(p.relative_to(out)):sha(p) for p in out.rglob('*') if p.is_file()},
         solved=False,playable_map_created=False,accepted=False)
+    if shared_mapping is not None:
+        receipt['friction']=scenario['metadata']['provenance']['friction']
+        receipt['roughness_scope']='Inferred Manning n; scenario stores g*n*n. Not measured; requires fresh native and engine validation.'
+    if domain_coverage is not None:receipt['source_core_coverage']=domain_coverage
+    if reviewed_lateral_interval is not None:
+        receipt['reviewed_lateral_domain']=dict(lateral_interval_m=[float(lateral[0]),float(lateral[-1])],
+            original_symmetric_transects_truncated=any(w['transect_truncated'] for w in width['widths']),
+            source_coverage=domain_coverage,wet_edges_dry=True,wet_folding_gate_passed=True,
+            policy='Explicit bounded domain; unchanged 500 m total-width, full source-core, terrain, wet-edge and wet-folding gates')
     (out/'build_report.json').write_text(json.dumps(receipt,indent=2)+'\n')
     print(json.dumps({k:v for k,v in receipt.items() if k!='files_sha256'},indent=2),flush=True)
     return receipt
@@ -243,4 +302,5 @@ if __name__=='__main__':
     terrain_group.add_argument('--terrain-chunks',type=Path)
     p.add_argument('--shared-frame',type=Path)
     p.add_argument('--roughness',type=float,default=.04)
-    a=p.parse_args();build(a.evidence.resolve(),a.profile.resolve(),a.water.resolve(),a.out.resolve(),a.match_landscape,a.roughness,a.terrain_chunks,a.shared_frame)
+    p.add_argument('--reviewed-lateral-interval',type=float,nargs=2,metavar=('MIN','MAX'))
+    a=p.parse_args();build(a.evidence.resolve(),a.profile.resolve(),a.water.resolve(),a.out.resolve(),a.match_landscape,a.roughness,a.terrain_chunks,a.shared_frame,reviewed_lateral_interval=a.reviewed_lateral_interval)

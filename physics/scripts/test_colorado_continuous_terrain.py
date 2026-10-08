@@ -9,6 +9,42 @@ from export_colorado_continuous_terrain import (TerrainMosaic,encode_height,HEIG
 
 
 class ContinuousTerrain(unittest.TestCase):
+    def test_reused_snapshot_remains_bound_to_loaded_manifest_and_heightfields(self):
+        from build_colorado_catalog_scenario import checked_terrain_snapshot
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp);self.write_chunks(folder);terrain=LandscapeTriangles(folder)
+            self.assertIs(checked_terrain_snapshot(folder,terrain),terrain)
+            terrain.verify_unchanged()
+            with self.assertRaisesRegex(ValueError,'Wrong or changed'):
+                checked_terrain_snapshot(folder/'other',terrain)
+            manifest=folder/'manifest.json';original=manifest.read_bytes()
+            manifest.write_bytes(original+b'\n')
+            with self.assertRaisesRegex(ValueError,'Wrong or changed'):
+                checked_terrain_snapshot(folder,terrain)
+            with self.assertRaisesRegex(ValueError,'manifest changed'):
+                terrain.verify_unchanged()
+            manifest.write_bytes(original)
+            heightfield=folder/terrain.manifest['chunks'][0]['heightfield']
+            heightfield.write_bytes(heightfield.read_bytes()+b'changed')
+            with self.assertRaisesRegex(ValueError,'heightfield changed'):
+                terrain.verify_unchanged()
+
+    def test_full_route_prefilter_preserves_global_owner_and_exact_edges(self):
+        sources=[self.source(i*100,[i*100,i*100+20]) for i in range(378)]
+        mosaic=TerrainMosaic(list(reversed(sources)))
+        east=np.array([12500.,12510.,12520.,np.nan,float('inf')])
+        north=np.full(east.shape,10.)
+        np.testing.assert_array_equal(mosaic.candidate_indices(east,north),[125])
+        actual,owner=mosaic.sample(east,north)
+        expected,_=TerrainMosaic([sources[125]]).sample(east,north)
+        np.testing.assert_array_equal(actual,expected)
+        np.testing.assert_array_equal(owner,[125,125,125,-1,-1])
+        self.assertEqual(mosaic.candidate_indices(np.array([]),np.array([])).size,0)
+        self.assertEqual(mosaic.candidate_indices(np.array([np.nan]),np.array([0.])).size,0)
+        # A sparse batch spanning the entire route must retain every intersected
+        # source, not just the tile containing its first/last query.
+        np.testing.assert_array_equal(mosaic.candidate_indices(np.array([0.,37720.]),np.array([10.,10.])),np.arange(378))
+
     def test_mosaic_samples_only_covered_queries_with_identical_owner_rule(self):
         from scipy.ndimage import map_coordinates
         sources=[self.source(0,[0,20]),self.source(10,[20,30])]

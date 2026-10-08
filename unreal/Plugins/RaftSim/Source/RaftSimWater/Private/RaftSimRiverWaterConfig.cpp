@@ -8,6 +8,16 @@
 #include "Engine/ExponentialHeightFog.h"
 #include "EngineUtils.h"
 
+bool ARaftSimRiverWaterConfig::AllowsRiverDiagnostics(const FString& Map,
+    const URaftSimWaterRuntimeAdapter& Water) const
+{
+    if(!RaftSimWaterFeatureKinematics::IsPlayableRiver(Map) && RegisteredRapidChartFingerprint.IsEmpty())
+        return false;
+    TArray<FRaftSimRapidFeature> Checked;
+    FString Error;
+    return ResolveRapidFeatures(Map,Water,Checked,Error);
+}
+
 bool ARaftSimRiverWaterConfig::ResolveRapidFeatures(const FString& Map,
     const URaftSimWaterRuntimeAdapter& Water,TArray<FRaftSimRapidFeature>& Out,FString& Error) const
 {

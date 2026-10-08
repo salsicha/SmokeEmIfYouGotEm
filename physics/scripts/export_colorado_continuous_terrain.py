@@ -5,6 +5,7 @@ per-chunk stretching/normalization, clamped missing terrain or copied foliage.
 Uncovered chunks are reported, not filled or silently called complete.
 """
 import argparse
+import hashlib
 import json
 from collections import OrderedDict
 from pathlib import Path
@@ -72,13 +73,36 @@ class TerrainMosaic:
         self.sources=sorted(sources,key=lambda s:s['core'][0])
         if len({tuple(s['core']) for s in self.sources})!=len(self.sources):
             raise ValueError('Duplicate source cores')
+        bounds=[]
+        for source in self.sources:
+            if 'bounds' in source:x,y,h,w=source['bounds']
+            else:
+                x,y=source['grid']['corner_east_north_m']
+                h,w=source['grid']['bed_ellipsoid_m'].shape
+            if not np.isfinite([x,y,h,w]).all() or min(h,w)<=0:
+                raise ValueError('Invalid source terrain footprint')
+            bounds.append([x,y-h,x+w,y])
+        self.bounds=np.asarray(bounds,dtype=float).reshape(-1,4)
+
+    def candidate_indices(self,east,north):
+        # A Landscape chunk is tiny compared with the full 453 km river. Test
+        # the batch bounding box once, instead of allocating a full per-query
+        # coverage mask for hundreds of geographically irrelevant sources.
+        # Preserve global indices/order: overlapping-core ownership is unchanged.
+        finite=np.isfinite(east)&np.isfinite(north)
+        if not finite.any():return np.empty(0,dtype=int)
+        x0,x1=east[finite].min(),east[finite].max()
+        y0,y1=north[finite].min(),north[finite].max()
+        b=self.bounds
+        return np.flatnonzero((b[:,0]<=x1)&(b[:,2]>=x0)&(b[:,1]<=y1)&(b[:,3]>=y0))
 
     def sample(self,east,north):
         east,north=np.broadcast_arrays(np.asarray(east,dtype=float),np.asarray(north,dtype=float))
         height=np.full(east.shape,np.nan)
         owner=np.full(east.shape,-1,dtype=np.int32)
         score=np.full(east.shape,np.inf)
-        for index,source in enumerate(self.sources):
+        for index in self.candidate_indices(east,north):
+            source=self.sources[index]
             g=source['grid']
             if 'bounds' in source:x,y,h,w=source['bounds']
             else:
@@ -131,7 +155,9 @@ class LandscapeTriangles:
     def __init__(self,folder):
         from PIL import Image
         self.folder=Path(folder).resolve()
-        self.manifest=json.loads((self.folder/'manifest.json').read_text())
+        manifest_bytes=(self.folder/'manifest.json').read_bytes()
+        self.manifest_sha256=hashlib.sha256(manifest_bytes).hexdigest()
+        self.manifest=json.loads(manifest_bytes)
         m=self.manifest;layout=m['landscape']
         generic=m.get('schema')=='raftsim.continuous_landscape.v1'
         if generic:
@@ -176,6 +202,14 @@ class LandscapeTriangles:
             if ((left is not None and not np.array_equal(encoded[:,0],left[:,-1])) or
                     (below is not None and not np.array_equal(encoded[-1,:],below[0,:]))):
                 raise ValueError('Decoded Landscape boundary is discontinuous')
+
+    def verify_unchanged(self):
+        """Close a reused sampling batch against the exact loaded snapshot."""
+        if sha(self.folder/'manifest.json')!=self.manifest_sha256:
+            raise ValueError('Terrain manifest changed after snapshot')
+        for chunk in self.manifest['chunks']:
+            if sha(self.folder/chunk['heightfield'])!=chunk['sha256']:
+                raise ValueError('Terrain heightfield changed after snapshot')
 
     def sample(self,xy):
         from export_colorado_catalog_runtime import landscape_sample

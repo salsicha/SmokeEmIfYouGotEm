@@ -11,12 +11,12 @@ from pathlib import Path
 
 import numpy as np
 import shapely
-from pyproj import Transformer
-from shapely.geometry import shape
-from shapely.ops import transform
+from shapely.geometry import LineString
 
 from build_pacuare_evidence_grid import pava_nonincreasing
-from capture_chilko_fwa_polygon import validate_polygon
+from chilko_planform import load_planform, route_planform_policy
+from correct_chilko_route import compatible_capture_route
+from chilko_corridor_chart import directions_at_source_points
 from chilko_corridor_terrain import CorridorTerrain
 from mosaic_lidarbc_crops import sha
 from plan_lidarbc_corridor_capture import route_xy
@@ -62,13 +62,30 @@ def channel_section(lateral, mapped, height, kind):
         surface_source_kind=int(kind[support].max()))
 
 
+def reference_weights(sections):
+    """Resolution-based inference weights, not a statistical accuracy estimate.
+
+    Resampling one 30 m fallback pixel to 900 one-metre pixels must not grant
+    900 native observations' influence on the common longitudinal reference.
+    Conditioned fallback remains coarse; it does not become a LiDAR sample.
+    """
+    weights=[]
+    for row in sections:
+        if row is None or not np.isfinite(row['reference_m']):continue
+        total=row['support_count'];native=row['native_support_count']
+        if not np.isfinite([total,native]).all() or not 0<=native<=total or total<=0:
+            raise ValueError('Finite native/coarse reference support counts required')
+        weights.append(native+(total-native)/900.)
+    return np.asarray(weights,dtype=float)
+
+
 def surface_reference(sections):
     """Record unsupported sections as missing, never interpolate through them."""
     supported=np.array([r is not None and np.isfinite(r['reference_m']) for r in sections])
     raw=np.array([r['reference_m'] if r else np.nan for r in sections])
     result=np.full(raw.shape,np.nan)
     if supported.any():
-        weights=np.array([r['support_count'] for r in sections if r and np.isfinite(r['reference_m'])])
+        weights=reference_weights(sections)
         result[supported]=pava_nonincreasing(raw[supported],weights)
     return raw,result,supported
 
@@ -96,19 +113,13 @@ def bridge_short_reference_gaps(station, reference):
     return result,records
 
 
-def build(terrain_path,route,planform,out,step=4.,diagnostic_gaps=False,bridge_short_gaps=False):
+def build(terrain_path,route,planform,out,step=4.,diagnostic_gaps=False,bridge_short_gaps=False,chart_directions=False):
     if out.exists():raise ValueError('Fresh corridor profile required')
     if not np.isfinite(step) or not 1<=step<=10:raise ValueError('Bounded positive route spacing required')
     terrain=CorridorTerrain(terrain_path);receipt=sha(terrain.folder/'manifest.json')
-    if not terrain.conditioned or terrain.manifest['route_sha256']!=sha(route):
+    if not terrain.conditioned or not compatible_capture_route(route,terrain.manifest['route_sha256']):
         raise ValueError('Verified conditioned terrain on the same FWA route required')
-    metadata=json.loads(planform.with_suffix('.json').read_text())
-    if (metadata.get('schema')!='raftsim.chilko_fwa_polygon_capture.v1' or
-            metadata.get('horizontal_crs')!='EPSG:4326' or metadata.get('sha256')!=sha(planform)):
-        raise ValueError('Unverified source planform')
-    data=json.loads(planform.read_text());validate_polygon(data,metadata['waterbody_key'])
-    polygon=transform(Transformer.from_crs(4326,3157,always_xy=True).transform,shape(data['features'][0]['geometry']))
-    if not polygon.is_valid:raise ValueError('Invalid source polygon; do not silently repair it')
+    polygon=load_planform(planform,route)
     shapely.prepare(polygon)
     xy=route_xy(route);chain=np.r_[0,np.cumsum(np.linalg.norm(np.diff(xy,axis=0),axis=1))]
     station=np.r_[np.arange(0,chain[-1],step),chain[-1]]
@@ -116,6 +127,7 @@ def build(terrain_path,route,planform,out,step=4.,diagnostic_gaps=False,bridge_s
     tangent=np.gradient(points,station,axis=0);norm=np.linalg.norm(tangent,axis=1)
     if (norm<1e-6).any():raise ValueError('Degenerate source route direction')
     normal=np.c_[-tangent[:,1],tangent[:,0]]/norm[:,None]
+    if chart_directions:normal=directions_at_source_points(LineString(xy),points)
     lateral=np.arange(-320,321,1.);sections=[];rejected=[]
     for start in range(0,len(points),256):
         p=points[start:start+256,None,:]+lateral[None,:,None]*normal[start:start+256,None,:]
@@ -141,7 +153,8 @@ def build(terrain_path,route,planform,out,step=4.,diagnostic_gaps=False,bridge_s
     if not supported.any() or not np.isfinite(reference[supported]).all() or (np.diff(reference[supported])>1e-8).any():
         raise ValueError('Invalid inferred global surface')
     if bridge_short_gaps and any(r['reason']!='Insufficient supported channel interior' for r in rejected):
-        raise ValueError('Only narrow mapped branches may use bounded stage inference')
+        failures=[r for r in rejected if r['reason']!='Insufficient supported channel interior']
+        raise ValueError('Only narrow mapped branches may use bounded stage inference: '+json.dumps(failures))
     reference,gap_records=bridge_short_reference_gaps(station,reference) if bridge_short_gaps else (reference,[])
     valid_sections=[r for r in sections if r]
     have_section=np.array([r is not None for r in sections])
@@ -162,8 +175,13 @@ def build(terrain_path,route,planform,out,step=4.,diagnostic_gaps=False,bridge_s
         source_terrain=dict(manifest=str(terrain.folder/'manifest.json'),sha256=receipt),
         route=dict(path=str(route.resolve()),sha256=sha(route)),
         planform=dict(path=str(planform.resolve()),sha256=sha(planform),metadata_sha256=sha(planform.with_suffix('.json'))),
+        planform_policy=route_planform_policy(route),
+        cross_section_direction_policy=('Shared full-route 320 m Gaussian numerical chart, 64 m endpoint extension; directions projected onto exact geographic anchors, not measured flow' if chart_directions else 'Raw exact-route finite-difference tangent'),
         profile_sha256=sha(out/'profile.npz'),
-        inference='Low channel-interior DEM samples within 0.25 m of interior p20, median then global weighted nonincreasing regression; no water-level survey',
+        inference='Low channel-interior DEM samples within 0.25 m of interior p20, median then global resolution-weighted nonincreasing regression; no water-level survey',
+        regression_weight_policy=dict(native_1m_support_weight=1.,coarse_30m_support_weight=1./900.,
+            conditioned_fallback_remains_coarse=True,
+            qualification='Resolution-based inference weight, not measured sensor accuracy or independent statistical samples'),
         terrain_source_kind=terrain.manifest['source_kind'],
         regression_abs_adjustment_p95_m=float(np.percentile(abs(reference[supported]-raw[supported]),95)),
         regression_abs_adjustment_max_m=float(abs(reference[supported]-raw[supported]).max()),
@@ -183,6 +201,7 @@ if __name__=='__main__':
     for name in ('terrain','route','planform','out'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--diagnostic-gaps',action='store_true',help='Record ALL unsupported sections as NaN; never a complete construction profile')
     p.add_argument('--bridge-short-reference-gaps',action='store_true',help='Explicit inferred stage across narrow branches only: source anchors at most 20 m apart and 0.25 m drop')
-    a=p.parse_args();r=build(a.terrain,a.route,a.planform,a.out,diagnostic_gaps=a.diagnostic_gaps,bridge_short_gaps=a.bridge_short_reference_gaps)
+    p.add_argument('--chart-directions',action='store_true',help='Orient exact route anchors across the existing shared full-domain numerical chart')
+    a=p.parse_args();r=build(a.terrain,a.route,a.planform,a.out,diagnostic_gaps=a.diagnostic_gaps,bridge_short_gaps=a.bridge_short_reference_gaps,chart_directions=a.chart_directions)
     print(json.dumps({k:v for k,v in r.items() if k!='rejected_source_sections'},indent=2))
     print('unsupported_source_sections',len(r['rejected_source_sections']))

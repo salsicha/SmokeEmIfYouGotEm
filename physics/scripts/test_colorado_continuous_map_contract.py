@@ -1,11 +1,12 @@
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 import numpy as np
 
-from build_colorado_continuous_map_contract import ROOT, build, sha, rapid_profile_sources
+from build_colorado_continuous_map_contract import ROOT, build, sha, rapid_profile_sources, geographic_takeout
 from build_colorado_continuous_assembly import rebase_chart
 
 
@@ -89,6 +90,78 @@ class ContinuousMapContract(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'actual cooked coverage'):
             self.call(finish=250.)
 
+    def test_full_colorado_requires_geographic_takeout(self):
+        path=self.root/'manifest.json'; manifest=json.loads(path.read_text())
+        manifest['full_river_coverage']=True;path.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ValueError,'source-identified Pearce Ferry'):
+            self.call()
+
+    def takeout_fixture(self):
+        spec=dict(schema='raftsim.colorado_takeout_request.v1')
+        for key in ('source_chart','evidence','osm'):
+            path=self.root/(key+'.source');path.write_text(key)
+            spec[key]=path.relative_to(ROOT).as_posix()
+        request=self.root/'takeout-request.json';request.write_text(json.dumps(spec))
+        receipt=dict(takeout=dict(projected_epsg6404_m=[326.,305.]),
+                     downstream_rapid=dict(projected_epsg6404_m=[340.,300.]),
+                     runtime_finish_station_m=None,runtime_ready=False)
+        return request,spec,receipt
+
+    def test_takeout_binds_sources_and_reflects_north_once(self):
+        request,spec,receipt=self.takeout_fixture()
+        with patch('build_colorado_continuous_map_contract.register_takeout',return_value=receipt) as register:
+            result=build(self.root,'L_Colorado_ContractUnitTest',112.,126.,takeout_request=request)
+        register.assert_called_once_with(b'source_chart',b'evidence',b'osm')
+        takeout=result['geographic_takeout']
+        self.assertEqual(takeout['takeout_world_xy_cm'],[12600.,-500.])
+        self.assertEqual(takeout['downstream_rapid_world_xy_cm'],[14000.,0.])
+        self.assertEqual(takeout['cooked_station_interval_m'],[100.,138.])
+        self.assertEqual(takeout['coordinate_map_sha256'],sha(self.root/'coordinate_map.json'))
+        self.assertIsNone(takeout['source_registration']['runtime_finish_station_m'])
+        for key in ('source_chart','evidence','osm'):
+            self.assertEqual(result['files_sha256'][spec[key]],sha(ROOT/spec[key]))
+        self.assertEqual(result['files_sha256'][request.relative_to(ROOT).as_posix()],sha(request))
+
+    def test_takeout_does_not_accept_an_unverified_receipt(self):
+        request,_,_=self.takeout_fixture()
+        mapping=json.loads((self.root/'coordinate_map.json').read_text())
+        with patch('build_colorado_continuous_map_contract.register_takeout',side_effect=ValueError('source changed')):
+            with self.assertRaisesRegex(ValueError,'source changed'):
+                geographic_takeout(request,mapping,{})
+
+    def test_colorado_takeout_cannot_be_attached_to_chilko(self):
+        self.chilko_fixture()
+        with self.assertRaisesRegex(ValueError,'cannot be used for Chilko'):
+            build(self.root,'L_Chilko_ContractUnitTest',112.,126.,takeout_request=self.root/'takeout.json')
+
+    def test_changed_takeout_source_cannot_be_bound_after_reading(self):
+        request,spec,receipt=self.takeout_fixture()
+        mapping=json.loads((self.root/'coordinate_map.json').read_text())
+        def change_source(*args):
+            (ROOT/spec['osm']).write_text('changed')
+            return receipt
+        files={}
+        with patch('build_colorado_continuous_map_contract.register_takeout',side_effect=change_source):
+            with self.assertRaisesRegex(ValueError,'changed during registration'):
+                geographic_takeout(request,mapping,files)
+        self.assertEqual(files,{})
+
+    def test_takeout_request_cannot_change_between_parse_and_source_binding(self):
+        request,_,receipt=self.takeout_fixture()
+        mapping=json.loads((self.root/'coordinate_map.json').read_text())
+        original_read=Path.read_text
+        def change_after_read(path,*args,**kwargs):
+            text=original_read(path,*args,**kwargs)
+            if path==request:
+                path.write_text(text+'\n')
+            return text
+        files={}
+        with patch.object(Path,'read_text',change_after_read), \
+             patch('build_colorado_continuous_map_contract.register_takeout',return_value=receipt):
+            with self.assertRaisesRegex(ValueError,'changed during registration'):
+                geographic_takeout(request,mapping,files)
+        self.assertEqual(files,{})
+
     def test_nanite_selection_changes_no_physical_contract(self):
         baseline=self.call()
         candidate=build(self.root,'L_Colorado_ContractUnitTest',112.,126.,nanite_terrain=True)
@@ -168,12 +241,34 @@ class ContinuousMapContract(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'Changed original rapid chart'):
             rapid_profile_sources(path,mapping,{})
 
+    def test_soap_creek_profile_is_registered_not_silently_omitted(self):
+        path,mapping,original,rebased,manifest=self.source_assembly()
+        manifest['source_reaches'][0]['name']='Soap Creek'
+        path.write_text(json.dumps(manifest))
+        files={}
+        self.assertEqual(rapid_profile_sources(path,mapping,files),[
+            dict(map='L_Colorado_SoapCreek',coordinate_map=rebased.relative_to(ROOT).as_posix())])
+        for p in (path,original,rebased):self.assertEqual(files[p.relative_to(ROOT).as_posix()],sha(p))
+
     def test_duplicate_and_empty_source_profiles_refused(self):
         path,mapping,_,_,manifest=self.source_assembly()
         manifest['source_reaches']*=2; path.write_text(json.dumps(manifest))
         with self.assertRaisesRegex(ValueError,'Duplicate rapid source'):
             rapid_profile_sources(path,mapping,{})
         manifest['source_reaches']=[]; path.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ValueError,'No supported production'):
+            rapid_profile_sources(path,mapping,{})
+
+    def test_georgie_uses_its_verified_source_chart_not_24_half_mile(self):
+        path,mapping,original,rebased,manifest=self.source_assembly()
+        manifest['source_reaches'][0]['name']='Georgie'
+        path.write_text(json.dumps(manifest))
+        files={}
+        self.assertEqual(rapid_profile_sources(path,mapping,files),[
+            dict(map='L_Colorado_Georgie',coordinate_map=rebased.relative_to(ROOT).as_posix())])
+        for p in (path,original,rebased):self.assertEqual(files[p.relative_to(ROOT).as_posix()],sha(p))
+        manifest['source_reaches'][0]['name']='24 1/2 Mile'
+        path.write_text(json.dumps(manifest))
         with self.assertRaisesRegex(ValueError,'No supported production'):
             rapid_profile_sources(path,mapping,{})
 

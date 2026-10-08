@@ -1,9 +1,72 @@
+import json
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
-from audit_chilko_catalog_locations import audit, project, runtime_centreline, validate_identity_checks
+from audit_chilko_catalog_locations import audit, project, runtime_centreline, unique_object, validate_identity_checks, corrected_anchor_stationing
 
 
 class ChilkoLocations(unittest.TestCase):
+    def test_courtroom_narrative_does_not_supply_rapid_coordinates(self):
+        result = audit()
+        source = 'kuhne_white_mile_trial_preview_2025'
+        self.assertFalse(any(a['source'] == source for a in result['anchors']))
+        for entry in result['entries']:
+            self.assertIsNone(entry['boundary_lon_lat'])
+            self.assertNotIn(source, entry['sources'])
+        self.assertFalse(result['runtime_ready'])
+
+    def test_ecological_site_map_does_not_create_a_rapid_anchor(self):
+        result = audit()
+        lead = next(item for item in result['rejected_location_leads']
+                    if item['source'] == 'ucd_site2_map_2011')
+        self.assertFalse(lead['coordinate_placement_authorized'])
+        self.assertIn('Green Mile', lead['not_an_authorized_alias_for'])
+        self.assertIn('Miracle Canyon', lead['not_an_authorized_alias_for'])
+        self.assertFalse(any(a['source'] == 'ucd_site2_map_2011'
+                             for a in result['anchors']))
+        for entry in result['entries']:
+            self.assertNotIn('ucd_site2_map_2011', entry['sources'])
+        self.assertFalse(result['runtime_ready'])
+
+    def test_corrected_brackets_preserve_distinct_unresolved_names(self):
+        anchors = [dict(id='up', lon_lat=[-123.8, 51.9], terrain_route_station_m=0),
+                   dict(id='down', lon_lat=[-123.8, 51.91], terrain_route_station_m=1000)]
+        entries = [dict(name=name, sources=['trip'], location_status='sequence_bracket_only',
+                        upstream_anchor='up', downstream_anchor='down')
+                   for name in ('Green Mile', 'White Kilometer')]
+        with patch('correct_chilko_route.lineage', return_value=(dict(parent_route=dict(sha256='parent')), None)), \
+             patch.object(Path, 'read_text', return_value='{}'), \
+             patch('correct_chilko_route.route_points', return_value=[[-123.8,51.9],[-123.8,51.91]]), \
+             patch('correct_chilko_route.sha', return_value='candidate'):
+            result = corrected_anchor_stationing('candidate.geojson', 'parent', anchors, entries)
+        brackets = result['sequence_brackets']
+        self.assertEqual([b['name'] for b in brackets], ['Green Mile', 'White Kilometer'])
+        self.assertEqual(brackets[0]['marker_station_bracket_m_not_rapid_bounds'],
+                         brackets[1]['marker_station_bracket_m_not_rapid_bounds'])
+        for bracket in brackets:
+            self.assertEqual(bracket['sources'], ['trip'])
+            self.assertIsNone(bracket['rapid_boundary_coordinates'])
+            self.assertFalse(bracket['runtime_placement_authorized'])
+
+    def test_valid_stationing_does_not_certify_obsolete_branch_alignment(self):
+        result = audit()
+        self.assertEqual(result['route_alignment_status'], 'source_branch_alignment_requires_correction')
+        check = next(row for row in result['route_alignment_spot_checks']
+                     if row['id'] == 'downstream_bar_loop')
+        self.assertAlmostEqual(check['point_to_route_m'], 182.3036816, places=3)
+        self.assertAlmostEqual(check['route_station_m'], 6398.8117953, places=3)
+        self.assertFalse(result['runtime_ready'])
+        self.assertFalse(result['modified_runtime_assets'])
+
+    def test_duplicate_source_keys_cannot_silently_replace_evidence(self):
+        with self.assertRaisesRegex(ValueError, 'Duplicate geographic evidence key: trip'):
+            json.loads('{"sources":{"trip":{"url":"a"},"trip":{"url":"b"}}}',
+                       object_pairs_hook=unique_object)
+        self.assertEqual(json.loads('{"a":{"url":"same"},"b":{"url":"same"}}',
+                                    object_pairs_hook=unique_object),
+                         {'a': {'url': 'same'}, 'b': {'url': 'same'}})
+
     def test_stored_and_terrain_chainage_are_explicitly_distinct(self):
         result = audit()
         self.assertAlmostEqual(result['route_lengths_m']['stored'], 55845.695680, places=3)

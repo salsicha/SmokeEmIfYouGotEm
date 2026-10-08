@@ -14,17 +14,25 @@ import numpy as np
 
 from build_colorado_catalog_evidence import ROOT, sha
 from review_colorado_catalog_cook import load_frame
+from native_frame_io import native_frame_paths
 from build_colorado_catalog_scenario import checked_roughness
+from chilko_native_friction import validate_friction, with_manning_friction
 
 
 def roughness_sensitivity(scenario, value):
     """Change only the declared resistance hypothesis, never saved fields."""
     result = copy.deepcopy(scenario)
+    friction=scenario.get('metadata',{}).get('provenance',{}).get('friction')
+    if friction is not None:validate_friction(scenario,friction['inferred_manning_n'])
     if value is None:
         return result, None
     value = checked_roughness(value)
-    original = checked_roughness(scenario['roughness'])
-    result['roughness'] = value
+    if friction is not None:
+        original=checked_roughness(friction['inferred_manning_n'])
+        result=with_manning_friction(scenario,value)
+    else:
+        original = checked_roughness(scenario['roughness'])
+        result['roughness'] = value
     return result, dict(parameter='roughness', original=original, candidate=value,
         scope='Uniform inferred resistance sensitivity, not measured resistance; bed, boundaries and saved state unchanged.')
 
@@ -63,9 +71,7 @@ def prepare(inputs, cook, out, roughness=None):
     if (scenario.get('cascading') or any(set(b)-allowed or b['kind'] not in
             ('discharge_profile', 'outflow', 'bank', 'wall') for b in scenario['boundaries'])):
         raise ValueError('Continuation requires explicitly constant boundaries')
-    frame_name = Path(native['frames'][-1])
-    if frame_name.parent != Path('frames') or frame_name.suffix != '.csv':
-        raise ValueError('Invalid final frame path')
+    frame_name = native_frame_paths(cook,native)[-1].relative_to(cook)
     grid = scenario['grid']; bed = np.load(inputs/'scenario/bed.npy')
     frame = load_frame(cook/frame_name, bed.shape)
     if (not np.array_equal(frame['x'], np.broadcast_to(grid['origin_x']+np.arange(grid['nx'])*grid['dx'], bed.shape)) or
@@ -90,6 +96,8 @@ def prepare(inputs, cook, out, roughness=None):
     if sensitivity is not None:
         result['native_continuation']['parameter_sensitivity'] = sensitivity
         result['roughness_hypothesis'] = sensitivity['candidate']
+        if 'friction' in scenario.get('metadata',{}).get('provenance',{}):
+            result['friction']=scenario['metadata']['provenance']['friction']
     result['files_sha256'] = {p.relative_to(out).as_posix(): sha(p) for p in out.rglob('*') if p.is_file()}
     (out/'build_report.json').write_text(json.dumps(result, indent=2)+'\n')
     return result['native_continuation']

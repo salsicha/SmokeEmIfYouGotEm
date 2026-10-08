@@ -2,12 +2,14 @@
 // analytic channel burn, invented collision proxy or provisional flow field.
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 #include "Environment/RaftSimContinuousRiverSpec.h"
+#include "Environment/RaftSimContinuousCollisionProbes.h"
 #include "Materials/RaftSimLiquidDataset.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/WorldSettings.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimRapidChallengeProfiles.h"
+#include "RaftSimGeographicTakeout.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "RaftSimRescueStreamingComponent.h"
 #include "LandscapeSubsystem.h"
@@ -23,6 +25,7 @@
 #include "UObject/GarbageCollection.h"
 #include "UObject/StrongObjectPtr.h"
 #include "Misc/ScopeExit.h"
+#include "Materials/MaterialExpressionDivide.h"
 #include "FileHelpers.h"
 
 namespace RaftSimCatalogMap
@@ -40,7 +43,10 @@ static bool RelativeFile(const FString& Name, FString& Absolute)
 static UMaterial* TerrainMaterial(const RaftSimContinuousRiver::FSpec* River=nullptr)
 {
     const bool Chilko=River && River->bChilko;
-    const FString ObjectName = Chilko ? TEXT("M_ChilkoContinuousGroundV1") : TEXT("M_ColoradoCatalogGroundV1");
+    // A new asset version preserves already-saved maps. World-XY projection
+    // stretches a texel vertically over an entire cliff; use the same detail
+    // texture on three world planes without modifying any terrain geometry.
+    const FString ObjectName = Chilko ? TEXT("M_ChilkoContinuousGroundV2") : TEXT("M_ColoradoCatalogGroundV2");
     const FString PackageName = TEXT("/Game/RaftSim/Materials/Catalog/")+ObjectName;
     if (UMaterial* Existing = LoadObject<UMaterial>(nullptr, *(PackageName+TEXT(".")+ObjectName))) return Existing;
     const FString TextureName=TEXT("T_RaftSim_")+(Chilko ? FString(TEXT("Chilko")) : FString(TEXT("ColoradoRiver")))+TEXT("_TerrainDetailAlbedo");
@@ -51,17 +57,49 @@ static UMaterial* TerrainMaterial(const RaftSimContinuousRiver::FSpec* River=nul
     UMaterial* M = NewObject<UMaterial>(Package,*ObjectName,RF_Public|RF_Standalone);
     M->SetShadingModel(MSM_DefaultLit);
     auto* Position = NewObject<UMaterialExpressionWorldPosition>(M);
-    auto* Coordinates = NewObject<UMaterialExpressionComponentMask>(M);
-    Coordinates->Input.Expression=Position; Coordinates->R=true; Coordinates->G=true;
     auto* Scale = NewObject<UMaterialExpressionMultiply>(M);
-    Scale->A.Expression=Coordinates; Scale->ConstB=1.0f/350.0f;
-    auto* Sample = NewObject<UMaterialExpressionTextureSampleParameter2D>(M);
-    Sample->ParameterName=Chilko ? TEXT("ChilkoGroundDetail") : TEXT("ColoradoGroundDetail"); Sample->Texture=Albedo;
-    Sample->Coordinates.Expression=Scale; Sample->SamplerType=SAMPLERTYPE_Color;
-    auto* Roughness=NewObject<UMaterialExpressionConstant>(M); Roughness->R=.86f;
-    for (UMaterialExpression* E : TArray<UMaterialExpression*>{Position,Coordinates,Scale,Sample,Roughness})
+    Scale->A.Expression=Position; Scale->ConstB=1.0f/350.0f;
+    auto* Normal=NewObject<UMaterialExpressionVertexNormalWS>(M);
+    auto* SquaredNormal=NewObject<UMaterialExpressionMultiply>(M);
+    SquaredNormal->A.Expression=Normal; SquaredNormal->B.Expression=Normal;
+    for(UMaterialExpression* E:TArray<UMaterialExpression*>{Position,Scale,Normal,SquaredNormal})
         M->GetExpressionCollection().AddExpression(E);
-    M->GetEditorOnlyData()->BaseColor.Expression=Sample;
+    UMaterialExpression* ColorSum=nullptr;
+    UMaterialExpression* WeightSum=nullptr;
+    for(int32 Axis=0;Axis<3;++Axis)
+    {
+        auto* UV=NewObject<UMaterialExpressionComponentMask>(M);
+        UV->Input.Expression=Scale;
+        // X normal -> YZ, Y normal -> XZ, Z normal -> XY.
+        UV->R=Axis!=0; UV->G=Axis!=1; UV->B=Axis!=2; UV->A=false;
+        auto* Weight=NewObject<UMaterialExpressionComponentMask>(M);
+        Weight->Input.Expression=SquaredNormal;
+        Weight->R=Axis==0; Weight->G=Axis==1; Weight->B=Axis==2; Weight->A=false;
+        auto* Sample=NewObject<UMaterialExpressionTextureSampleParameter2D>(M);
+        Sample->ParameterName=Chilko ? TEXT("ChilkoGroundDetail") : TEXT("ColoradoGroundDetail");
+        Sample->Texture=Albedo; Sample->Coordinates.Expression=UV; Sample->SamplerType=SAMPLERTYPE_Color;
+        auto* Weighted=NewObject<UMaterialExpressionMultiply>(M);
+        Weighted->A.Expression=Sample; Weighted->B.Expression=Weight;
+        for(UMaterialExpression* E:TArray<UMaterialExpression*>{UV,Weight,Sample,Weighted})
+            M->GetExpressionCollection().AddExpression(E);
+        if(!ColorSum){ColorSum=Weighted;WeightSum=Weight;}
+        else
+        {
+            auto* AddColor=NewObject<UMaterialExpressionAdd>(M);
+            AddColor->A.Expression=ColorSum; AddColor->B.Expression=Weighted;
+            auto* AddWeight=NewObject<UMaterialExpressionAdd>(M);
+            AddWeight->A.Expression=WeightSum; AddWeight->B.Expression=Weight;
+            M->GetExpressionCollection().AddExpression(AddColor);
+            M->GetExpressionCollection().AddExpression(AddWeight);
+            ColorSum=AddColor;WeightSum=AddWeight;
+        }
+    }
+    auto* Blend=NewObject<UMaterialExpressionDivide>(M);
+    Blend->A.Expression=ColorSum; Blend->B.Expression=WeightSum;
+    M->GetExpressionCollection().AddExpression(Blend);
+    auto* Roughness=NewObject<UMaterialExpressionConstant>(M); Roughness->R=.86f;
+    M->GetExpressionCollection().AddExpression(Roughness);
+    M->GetEditorOnlyData()->BaseColor.Expression=Blend;
     M->GetEditorOnlyData()->Roughness.Expression=Roughness;
     M->PostEditChange(); FAssetRegistryModule::AssetCreated(M); Package->MarkPackageDirty();
     const FString Filename=FPackageName::LongPackageNameToFilename(PackageName,FPackageName::GetAssetPackageExtension());
@@ -120,6 +158,38 @@ static bool RegisterRapidProfiles(ARaftSimRiverWaterConfig& Water,const TSharedP
     return Water.ResolveRapidFeatures(TEXT(""),*Target,Validated,Error);
 }
 
+static bool ResolveGeographicFinish(const TSharedPtr<FJsonObject>& J,double Start,double& Finish,FString& Error)
+{
+    RaftSimContinuousRiver::FSpec River;
+    if(!RaftSimContinuousRiver::Resolve(J,River,Error))return false;
+    if(!J->HasField(TEXT("geographic_takeout")))
+    {
+        bool Full=false;
+        if(River.RiverId==TEXT("colorado_river_grand_canyon_rowing") &&
+            J->TryGetBoolField(TEXT("full_river_coverage"),Full) && Full)
+        {Error=TEXT("Full Colorado run requires mapped Pearce Ferry takeout");return false;}
+        return true;
+    }
+    const auto G=J->GetObjectField(TEXT("geographic_takeout"));
+    if(!G || G->GetStringField(TEXT("schema"))!=TEXT("raftsim.native_geographic_takeout.v1") ||
+        River.RiverId!=TEXT("colorado_river_grand_canyon_rowing"))return false;
+    FString Path;
+    if(!RelativeFile(J->GetStringField(TEXT("coordinate_map")),Path) ||
+        !FRaftSimLiquidDataset::Hash(Path).Equals(G->GetStringField(TEXT("coordinate_map_sha256")),ESearchCase::IgnoreCase))
+    {Error=TEXT("Takeout target chart identity changed");return false;}
+    const auto& A=G->GetArrayField(TEXT("takeout_world_xy_cm"));
+    const auto& B=G->GetArrayField(TEXT("downstream_rapid_world_xy_cm"));
+    const auto& C=G->GetArrayField(TEXT("cooked_station_interval_m"));
+    if(A.Num()!=2 || B.Num()!=2 || C.Num()!=2)return false;
+    auto* Adapter=NewObject<URaftSimWaterRuntimeAdapter>();FVector2D Registered;
+    if(!Adapter->ConfigureRiverCoordinateMap(Path) || !RaftSimGeographicTakeout::Resolve(*Adapter,
+        {A[0]->AsNumber(),A[1]->AsNumber()},{B[0]->AsNumber(),B[1]->AsNumber()},
+        {C[0]->AsNumber(),C[1]->AsNumber()},Start,Registered,Error))return false;
+    Finish=Registered.X;
+    UE_LOG(LogTemp,Display,TEXT("Geographic Pearce Ferry finish station=%.9f left_lateral=%.9f ramp_docking_accepted=0"),Finish,Registered.Y);
+    return true;
+}
+
 static bool AddRuntime(UWorld* World, const TSharedPtr<FJsonObject>& J, FString& Error)
 {
     RaftSimContinuousRiver::FSpec River;
@@ -127,7 +197,8 @@ static bool AddRuntime(UWorld* World, const TSharedPtr<FJsonObject>& J, FString&
     const auto Launch=J->GetObjectField(TEXT("launch"));
     const auto& XYZ=Launch->GetArrayField(TEXT("location_cm"));
     const double Start=Launch->GetNumberField(TEXT("station_m"));
-    const double Finish=J->GetNumberField(TEXT("finish_station_m"));
+    double Finish=J->GetNumberField(TEXT("finish_station_m"));
+    if(!ResolveGeographicFinish(J,Start,Finish,Error))return false;
     if (XYZ.Num()!=3 || !FMath::IsFinite(Start) || !FMath::IsFinite(Finish) || Finish<=Start ||
         Launch->GetNumberField(TEXT("minimum_footprint_depth_m"))<1.) return false;
     const FVector LaunchCm(XYZ[0]->AsNumber(),XYZ[1]->AsNumber(),XYZ[2]->AsNumber());
@@ -466,6 +537,7 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
     {
         FString Path;FIntPoint Index;FVector Location;TArray<uint16> Heights;
         TArray<FVector> WetProbes;TSharedPtr<FJsonObject> Dressing;
+        FString WetProbePath,WetProbeHash;int64 WetProbeCount=0;
     };
     TArray<FChunk> Inputs;
     TMap<FIntPoint,int32> Indices;
@@ -522,6 +594,46 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
     TArray<TStrongObjectPtr<UStaticMesh>> DressingMeshes;
     if(Runtime)
     {
+        if(Runtime->HasField(TEXT("wet_bed_collision_probe_chunks")))
+        {
+            if(Runtime->HasField(TEXT("wet_bed_collision_probes_cm")))
+            {Error=TEXT("Ambiguous wet-bed probe encodings");return false;}
+            const auto P=Runtime->GetObjectField(TEXT("wet_bed_collision_probe_chunks"));
+            double Total=0;
+            if(!P || P->GetStringField(TEXT("schema"))!=TEXT("raftsim.chunked_wet_bed_probes.v1") ||
+                P->GetStringField(TEXT("encoding"))!=TEXT("xyz_cm_float64_le") ||
+                !P->TryGetNumberField(TEXT("count"),Total) || !FMath::IsFinite(Total) ||
+                Total<1 || Total>MAX_int32 || Total!=double(int64(Total)))
+            {Error=TEXT("Invalid chunk-owned wet-bed probe contract");return false;}
+            int64 Declared=0;TSet<FString> Paths;
+            const auto Files=Runtime->GetObjectField(TEXT("files_sha256"));
+            for(const auto& Value:P->GetArrayField(TEXT("chunks")))
+            {
+                const auto C=Value->AsObject();if(!C)return false;
+                const auto& XY=C->GetArrayField(TEXT("chunk"));if(XY.Num()!=2)return false;
+                const double X=XY[0]->AsNumber(),Y=XY[1]->AsNumber();
+                if(!FMath::IsFinite(X) || !FMath::IsFinite(Y) || FMath::Abs(X)>100000 || FMath::Abs(Y)>100000)return false;
+                const FIntPoint Index(X,Y);const int32* Owner=Indices.Find(Index);
+                double Count=0;FString Relative,Digest,Path,Bound;
+                if(!Owner || Index.X!=X || Index.Y!=Y || !Inputs[*Owner].WetProbePath.IsEmpty() ||
+                    !C->TryGetNumberField(TEXT("count"),Count) || !FMath::IsFinite(Count) ||
+                    Count<1 || Count>MAX_int32 || Count!=double(int64(Count)) ||
+                    !C->TryGetStringField(TEXT("file"),Relative) || !RelativeFile(Relative,Path) ||
+                    Paths.Contains(Path) || !C->TryGetStringField(TEXT("sha256"),Digest) ||
+                    !Files->TryGetStringField(Relative,Bound) || Bound!=Digest)
+                {Error=TEXT("Unknown, duplicate or unbound wet-bed probe chunk");return false;}
+                Paths.Add(Path);Declared+=int64(Count);
+                auto& Input=Inputs[*Owner];Input.WetProbePath=Path;Input.WetProbeHash=Digest;Input.WetProbeCount=int64(Count);
+                // Validate every point before creating a world, then reread only
+                // this chunk during collision checking. Never retain all points.
+                if(!RaftSimContinuousCollisionProbes::VisitFile(Path,int64(Count),Digest,[&](const FVector& Position)
+                    {if(FindOwner(Position)==*Owner)return true;Error=TEXT("Wet-bed probe belongs to another terrain chunk");return false;},Error))return false;
+            }
+            if(Declared!=int64(Total)){Error=TEXT("Incomplete chunk-owned wet-bed probes");return false;}
+            ExpectedWetProbes=int32(Declared);
+        }
+        else
+        {
         const auto& Probes=Runtime->GetArrayField(TEXT("wet_bed_collision_probes_cm"));
         if(Probes.IsEmpty()){Error=TEXT("Missing native wet-bed collision probes");return false;}
         ExpectedWetProbes=Probes.Num();
@@ -532,6 +644,7 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
             const int32 Owner=FindOwner(Position);
             if(Owner==INDEX_NONE){Error=TEXT("Cooked wet cell has no source terrain chunk");return false;}
             Inputs[Owner].WetProbes.Add(Position);
+        }
         }
         FString Relative;
         if(Runtime->TryGetStringField(TEXT("environment"),Relative))
@@ -702,12 +815,16 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
                 MaximumErrorCm=FMath::Max(MaximumErrorCm,FMath::Abs(double(Actual.GetValue())-Expected)); ++ProbeCount;
             }
         if(MaximumErrorCm>10.){Error=TEXT("Continuous collision exceeds 10 cm geometry tolerance");return false;}
-        for(const FVector& Position:C.WetProbes)
+        auto CheckWetProbe=[&](const FVector& Position)->bool
         {
             const auto Height=Land->GetHeightAtLocation(Position,EHeightfieldSource::Complex);
             if(!Height.IsSet()){Error=TEXT("Cooked wet cell has no native collision terrain");return false;}
             WetMaximum=FMath::Max(WetMaximum,FMath::Abs(double(Height.GetValue())-Position.Z));++WetProbeCount;
-        }
+            return true;
+        };
+        for(const FVector& Position:C.WetProbes)if(!CheckWetProbe(Position))return false;
+        if(!C.WetProbePath.IsEmpty() && !RaftSimContinuousCollisionProbes::VisitFile(
+            C.WetProbePath,C.WetProbeCount,C.WetProbeHash,CheckWetProbe,Error))return false;
         if(WetMaximum>10.){Error=TEXT("Continuous wet bed differs from native collision");return false;}
         if(C.Dressing && !AddContinuousDressingChunk(World,C.Dressing,Land,DressingMeshes,River,
             InstanceCount,MaximumGroundError,BatchActors,Error))return false;
@@ -775,7 +892,7 @@ static void ContinuousMapCommand(const TArray<FString>& Args)
             {
                 FString Absolute,Hash; const FString Name(*File.Key);
                 if (!RelativeFile(Name,Absolute) || !File.Value->TryGetString(Hash) || Hash.Len()!=64 ||
-                    !FRaftSimLiquidDataset::Hash(Absolute).Equals(Hash,ESearchCase::IgnoreCase))
+                    !RaftSimContinuousCollisionProbes::Hash(Absolute).Equals(Hash,ESearchCase::IgnoreCase))
                 { Valid=false; Error=TEXT("Changed continuous runtime dependency: ")+Name; break; }
             }
             for (const TCHAR* Key:{TEXT("terrain_manifest"),TEXT("coordinate_map"),TEXT("streaming")})

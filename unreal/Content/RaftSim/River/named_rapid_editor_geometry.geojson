@@ -85,16 +85,16 @@
         "type": "Point"
       },
       "properties": {
-        "difficulty_label": "IV",
-        "display_name": "Upper Huacas",
-        "feature_id": "pacuare_river_costa_rica__upper_huacas",
+        "difficulty_label": "III",
+        "display_name": "Bobo Falls",
+        "feature_id": "pacuare_river_costa_rica__bobo_falls",
         "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
         "geometry_source_status": "preview_scaffold_not_official_hydrography",
         "geometry_status": "candidate_centerline_projection_not_exact",
         "guide_review_status": "required",
         "portfolio_role": "runnable_river",
         "production_authoritative": false,
-        "review_priority": "critical",
+        "review_priority": "high",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
         "station_m": 6562.5
@@ -111,15 +111,15 @@
       },
       "properties": {
         "difficulty_label": "III",
-        "display_name": "Bobo Falls",
-        "feature_id": "pacuare_river_costa_rica__bobo_falls",
+        "display_name": "Rodeo",
+        "feature_id": "pacuare_river_costa_rica__rodeo",
         "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
         "geometry_source_status": "preview_scaffold_not_official_hydrography",
         "geometry_status": "candidate_centerline_projection_not_exact",
         "guide_review_status": "required",
         "portfolio_role": "runnable_river",
         "production_authoritative": false,
-        "review_priority": "high",
+        "review_priority": "medium",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
         "station_m": 8203.125
@@ -135,9 +135,9 @@
         "type": "Point"
       },
       "properties": {
-        "difficulty_label": "IV",
-        "display_name": "Lower Huacas",
-        "feature_id": "pacuare_river_costa_rica__lower_huacas",
+        "difficulty_label": "IV-",
+        "display_name": "Double Drop",
+        "feature_id": "pacuare_river_costa_rica__double_drop",
         "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
         "geometry_source_status": "preview_scaffold_not_official_hydrography",
         "geometry_status": "candidate_centerline_projection_not_exact",
@@ -160,16 +160,16 @@
         "type": "Point"
       },
       "properties": {
-        "difficulty_label": "III",
-        "display_name": "Rodeo",
-        "feature_id": "pacuare_river_costa_rica__rodeo",
+        "difficulty_label": "IV",
+        "display_name": "Upper Huacas",
+        "feature_id": "pacuare_river_costa_rica__upper_huacas",
         "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
         "geometry_source_status": "preview_scaffold_not_official_hydrography",
         "geometry_status": "candidate_centerline_projection_not_exact",
         "guide_review_status": "required",
         "portfolio_role": "runnable_river",
         "production_authoritative": false,
-        "review_priority": "medium",
+        "review_priority": "critical",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
         "station_m": 11484.375
@@ -185,16 +185,16 @@
         "type": "Point"
       },
       "properties": {
-        "difficulty_label": "III",
-        "display_name": "Guatemala",
-        "feature_id": "pacuare_river_costa_rica__guatemala",
+        "difficulty_label": "IV",
+        "display_name": "Lower Huacas",
+        "feature_id": "pacuare_river_costa_rica__lower_huacas",
         "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
         "geometry_source_status": "preview_scaffold_not_official_hydrography",
         "geometry_status": "candidate_centerline_projection_not_exact",
         "guide_review_status": "required",
         "portfolio_role": "runnable_river",
         "production_authoritative": false,
-        "review_priority": "medium",
+        "review_priority": "critical",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
         "station_m": 13125.0
@@ -206,56 +206,6 @@
         "coordinates": [
           -83.64517436,
           9.92405846
-        ],
-        "type": "Point"
-      },
-      "properties": {
-        "difficulty_label": "IV-",
-        "display_name": "Double Drop",
-        "feature_id": "pacuare_river_costa_rica__double_drop",
-        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
-        "geometry_source_status": "preview_scaffold_not_official_hydrography",
-        "geometry_status": "candidate_centerline_projection_not_exact",
-        "guide_review_status": "required",
-        "portfolio_role": "runnable_river",
-        "production_authoritative": false,
-        "review_priority": "critical",
-        "river_id": "pacuare_river_costa_rica",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 14765.625
-      },
-      "type": "Feature"
-    },
-    {
-      "geometry": {
-        "coordinates": [
-          -83.63299604,
-          9.93260076
-        ],
-        "type": "Point"
-      },
-      "properties": {
-        "difficulty_label": "III-IV",
-        "display_name": "Cimarrones",
-        "feature_id": "pacuare_river_costa_rica__cimarrones",
-        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
-        "geometry_source_status": "preview_scaffold_not_official_hydrography",
-        "geometry_status": "candidate_centerline_projection_not_exact",
-        "guide_review_status": "required",
-        "portfolio_role": "runnable_river",
-        "production_authoritative": false,
-        "review_priority": "critical",
-        "river_id": "pacuare_river_costa_rica",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 16406.25
-      },
-      "type": "Feature"
-    },
-    {
-      "geometry": {
-        "coordinates": [
-          -83.61873291,
-          9.93654597
         ],
         "type": "Point"
       },
@@ -272,15 +222,15 @@
         "review_priority": "high",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 18046.875
+        "station_m": 14765.625
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.60452727,
-          9.93242372
+          -83.63299604,
+          9.93260076
         ],
         "type": "Point"
       },
@@ -295,6 +245,56 @@
         "portfolio_role": "runnable_river",
         "production_authoritative": false,
         "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 16406.25
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.61873291,
+          9.93654597
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Guatemala",
+        "feature_id": "pacuare_river_costa_rica__guatemala",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 18046.875
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.60452727,
+          9.93242372
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III-IV",
+        "display_name": "Cimarrones",
+        "feature_id": "pacuare_river_costa_rica__cimarrones",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "critical",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
         "station_m": 19687.5

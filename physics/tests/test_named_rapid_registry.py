@@ -83,6 +83,26 @@ def test_named_rapid_catalog_covers_six_runnable_rivers():
     assert all(river["portfolio_role"] == "runnable_river" for river in rivers.values())
 
 
+def test_pacuare_catalog_follows_source_sequence_without_promoting_guide_km():
+    catalog = _load(SOURCE_CATALOG_RELATIVE_PATH)
+    river = next(r for r in catalog['rivers'] if r['river_id'] == 'pacuare_river_costa_rica')
+    evidence = _load(river['downstream_order_review']['evidence'])
+    guide_names, km = zip(*evidence['guide_rapid_km'])
+    assert list(km) == sorted(set(km))
+    assert [r['name'] for r in river['rapids'] if r['name'] != 'Bobo Falls'] == list(guide_names)
+    names = [r['name'] for r in river['rapids']]
+    bracket = evidence['bobo']
+    assert names.index(bracket['downstream_of']) < names.index('Bobo Falls') < names.index(bracket['upstream_of'])
+    assert bracket['guide_km'] is None and bracket['identity_resolved'] is False
+    assert evidence['runtime_placement_authorized'] is False
+    assert evidence['rapid_boundary_coordinates'] is None
+    assert dict(evidence['guide_rapid_km'])['Bienvenidos'] == 3.33
+    # _station_record treats river_km as authoritative. These guide distances
+    # have a different origin and must not silently take that runtime path.
+    assert all('river_km' not in rapid for rapid in river['rapids'])
+    assert river['stationing_authority'] == 'published_map_order_only'
+
+
 def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
     catalog = _load(SOURCE_CATALOG_RELATIVE_PATH)
     generated = build_editor_markers(catalog, REPO_ROOT)
@@ -138,10 +158,16 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
         and marker["stationing"]["production_authoritative"] is False
         for marker in pacuare
     )
-    assert [marker["display_name"] for marker in pacuare][3:6] == [
-        "Upper Huacas",
+    assert [marker["display_name"] for marker in pacuare][3:12] == [
         "Bobo Falls",
+        "Rodeo",
+        "Double Drop",
+        "Upper Huacas",
         "Lower Huacas",
+        "Upper Pinball",
+        "Lower Pinball",
+        "Guatemala",
+        "Cimarrones",
     ]
     chilko = rivers["chilko_river_lava_canyon"]["markers"]
     assert [marker["display_name"] for marker in chilko] == [

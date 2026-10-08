@@ -66,6 +66,10 @@ public:
     bool ResolveRapidFeatures(const FString& Map,const URaftSimWaterRuntimeAdapter& Water,
         TArray<FRaftSimRapidFeature>& Out,FString& Error) const;
 
+    /** Diagnostic access follows validated chart identity, never a map-name prefix.
+     * This does not enable gameplay, move a boat or bypass water/contact checks. */
+    bool AllowsRiverDiagnostics(const FString& Map,const URaftSimWaterRuntimeAdapter& Water) const;
+
     /** M3 full-reach moving-window manifest. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming")
     FString StreamingManifestPath;

@@ -22,6 +22,13 @@ bool FRaftSimRapidChallengeProfilesTest::RunTest(const FString&)
     TestFalse(TEXT("Badger lookalike is not playable"),HasProfile(TEXT("Other_L_Colorado_BadgerCreek")));
     TestEqual(TEXT("House Rock has leftward lateral, two left hydraulics and exit train"),Features(TEXT("L_Colorado_HouseRock")).Num(),11);
     TestFalse(TEXT("House Rock lookalike is not playable"),HasProfile(TEXT("Other_L_Colorado_HouseRock")));
+    TestEqual(TEXT("Soap Creek uses centre/left hydraulics and a lower train"),Features(TEXT("L_Colorado_SoapCreek")).Num(),18);
+    TestEqual(TEXT("Soap Creek PIE uses the same profile"),Features(TEXT("UEDPIE_0_L_Colorado_SoapCreek")).Num(),18);
+    TestFalse(TEXT("Soap Creek lookalike is not playable"),HasProfile(TEXT("Other_L_Colorado_SoapCreek")));
+    TestEqual(TEXT("Georgie has distinct right hole, wave, lateral and tail"),Features(TEXT("L_Colorado_Georgie")).Num(),8);
+    TestEqual(TEXT("Georgie PIE uses the same profile"),Features(TEXT("UEDPIE_0_L_Colorado_Georgie")).Num(),8);
+    TestFalse(TEXT("Georgie lookalike is not playable"),HasProfile(TEXT("Other_L_Colorado_Georgie")));
+    TestFalse(TEXT("Georgie is not the separate 24 and a half mile rapid"),HasProfile(TEXT("L_Colorado_24HalfMile")));
     TestTrue(TEXT("Pacuare uses catalogued hydraulic profiles"),HasProfile(TEXT("L_UpperHuacas")));
     TestFalse(TEXT("Cartesian evidence requires registered coordinates, not station as eastings"),HasProfile(TEXT("L_ZambeziUpperGorge")));
     TestFalse(TEXT("profile lookalikes are not playable maps"),HasProfile(TEXT("Other_L_Hance")));
@@ -61,7 +68,7 @@ bool FRaftSimRapidChallengeProfilesTest::RunTest(const FString&)
     TestEqual(TEXT("quiet pools cannot activate a named roller"),Append(TEXT("L_Zambezi"),Bounds,Pool,Sites),0);
     auto Dry=[](const FVector2D&,FRaftSimWaterSample& W){W.bWet=false;W.DepthMeters=0;W.VelocityMetersPerSecond=FVector(3,0,0);return true;};
     TestEqual(TEXT("dry/blocked cells remain authoritative"),Append(TEXT("L_Zambezi"),Bounds,Dry,Sites),0);
-    for(const TCHAR* Map:{TEXT("L_Hance"),TEXT("L_UpperHuacas"),TEXT("L_Terminator"),TEXT("L_LavaCanyon"),TEXT("L_Zambezi")})
+    for(const TCHAR* Map:{TEXT("L_Hance"),TEXT("L_UpperHuacas"),TEXT("L_Terminator"),TEXT("L_LavaCanyon"),TEXT("L_Zambezi"),TEXT("L_Colorado_Georgie")})
     {
         TestTrue(TEXT("same immutable profile storage on repeated queries"),&Features(Map)==&Features(Map));
         for(const auto& F:Features(Map))
@@ -100,6 +107,45 @@ bool FRaftSimRapidChallengeProfilesTest::RunTest(const FString&)
     TestEqual(TEXT("House Rock pool has no authored height"),
         RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(1050,0),Sites,0.f,&Foam),0.f);
     TestEqual(TEXT("House Rock pool has no profile foam"),Foam,0.f);
+    Sites.Reset();
+    Append(TEXT("L_Colorado_SoapCreek"),FBox2D(FVector2D(700,-80),FVector2D(1200,80)),Wet,Sites);
+    Water->ConfigureRaftSupportBreakingSites(Sites,0.f,2.f);
+    TestTrue(TEXT("Soap centre entry hydraulic has actual shared relief"),
+        RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(790,0),Sites,0.f,&Foam)>.25f);
+    TestEqual(TEXT("Soap right entry tongue is outside the stronger centre holes"),
+        RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(790,-16),Sites,0.f,&Foam),0.f);
+    const auto SoapHull=Water->ComputeFeatureVelocityAtRiverCoordinates(FVector2D(794.4,0),FVector2D(3,0),2.f,.85f);
+    TestTrue(TEXT("Soap immersed hull encounters the same roller as visible surface"),SoapHull.X<2.5);
+    TestTrue(TEXT("Soap right route still meets the lower wave train"),
+        RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(1020,-12),Sites,0.f,&Foam)>.25f);
+    TestEqual(TEXT("Soap downstream pool has no authored height"),
+        RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(1170,0),Sites,0.f,&Foam),0.f);
+    TestEqual(TEXT("Soap downstream pool has no authored froth"),Foam,0.f);
+    Sites.Reset();
+    TestEqual(TEXT("Soap quiet pool cannot activate rollers"),Append(TEXT("L_Colorado_SoapCreek"),FBox2D(FVector2D(700,-80),FVector2D(1200,80)),Pool,Sites),0);
+    TestEqual(TEXT("Soap dry cell cannot activate rollers"),Append(TEXT("L_Colorado_SoapCreek"),FBox2D(FVector2D(700,-80),FVector2D(1200,80)),Dry,Sites),0);
+    Sites.Reset();
+    const FBox2D GeorgieBounds(FVector2D(750,-60),FVector2D(1000,60));
+    TestEqual(TEXT("Georgie appends all wet production sites"),Append(TEXT("L_Colorado_Georgie"),GeorgieBounds,Wet,Sites),8);
+    Water->ConfigureRaftSupportBreakingSites(Sites,0.f,2.f);
+    const float GeorgieWave=RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(822,0),Sites,0.f,&Foam);
+    TestTrue(TEXT("Georgie standing wave has actual shared relief"),GeorgieWave>.25f);
+    TestTrue(TEXT("Georgie standing wave generates local froth"),Foam>0.f);
+    TestTrue(TEXT("Georgie right hole is a separate physical feature"),
+        RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(826,-18),Sites,0.f,&Foam)>.25f);
+    TestTrue(TEXT("Georgie right-of-centre seam is lower than the main crest"),
+        FMath::Abs(RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(822,-9),Sites,0.f,&Foam))<GeorgieWave*.5f);
+    const auto GeorgieSurface=Water->ComputeFeatureVelocityAtRiverCoordinates(FVector2D(830.4,-18),FVector2D(3,0),2.f,1.f);
+    const auto GeorgieHull=Water->ComputeFeatureVelocityAtRiverCoordinates(FVector2D(830.4,-18),FVector2D(3,0),2.f,.85f);
+    TestTrue(TEXT("Georgie surface and immersed hull share the right-hole return"),GeorgieSurface.X<2.5 && GeorgieHull.X<2.5);
+    TestEqual(TEXT("Georgie does not add relief in the downstream pool"),
+        RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(960,0),Sites,0.f,&Foam),0.f);
+    TestEqual(TEXT("Georgie froth ends before the downstream pool"),Foam,0.f);
+    TestTrue(TEXT("Georgie return current also ends before the pool"),
+        Water->ComputeFeatureVelocityAtRiverCoordinates(FVector2D(960,0),FVector2D(3,0),2.f,.85f).Equals(FVector(3,0,0),1.e-6));
+    Sites.Reset();
+    TestEqual(TEXT("Georgie quiet pools cannot activate named rollers"),Append(TEXT("L_Colorado_Georgie"),GeorgieBounds,Pool,Sites),0);
+    TestEqual(TEXT("Georgie dry cells cannot activate named rollers"),Append(TEXT("L_Colorado_Georgie"),GeorgieBounds,Dry,Sites),0);
     return true;
 }
 #endif
