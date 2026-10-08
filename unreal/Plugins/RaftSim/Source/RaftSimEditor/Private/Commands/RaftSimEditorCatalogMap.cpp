@@ -2,6 +2,7 @@
 // analytic channel burn, invented collision proxy or provisional flow field.
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 #include "Environment/RaftSimContinuousRiverSpec.h"
+#include "Environment/RaftSimContinuousRuntimeWindow.h"
 #include "Environment/RaftSimContinuousCollisionProbes.h"
 #include "Materials/RaftSimLiquidDataset.h"
 #include "GameFramework/GameModeBase.h"
@@ -196,6 +197,48 @@ static bool ResolveGeographicFinish(const TSharedPtr<FJsonObject>& J,double Star
     return true;
 }
 
+static bool PrepareRuntimeBinding(const TSharedPtr<FJsonObject>& J,
+    const RaftSimContinuousRiver::FSpec& River, const FVector& LaunchCm, double Start,
+    RaftSimContinuousRuntimeWindow::FBinding& Binding, FString& ProgressPath, FString& Error)
+{
+    ProgressPath.Reset();
+    // Validate coordinate roles before creating any runtime actors. Hydraulic
+    // XY selects a water crop; the separate curved route controls run progress.
+    TStrongObjectPtr<URaftSimWaterRuntimeAdapter> Hydraulic(NewObject<URaftSimWaterRuntimeAdapter>());
+    const FString HydraulicPath=J->GetStringField(TEXT("coordinate_map"));
+    FString StreamingPath;
+    FVector2D HydraulicLaunch;FVector Tangent,Left;
+    if(!Hydraulic->ConfigureRiverCoordinateMap(HydraulicPath) ||
+        !Hydraulic->WorldToRiverCoordinates(LaunchCm,HydraulicLaunch,Tangent,Left) ||
+        !RelativeFile(J->GetStringField(TEXT("streaming")),StreamingPath))
+    {Error=TEXT("Unable to resolve geographic launch water coordinates");return false;}
+    if(J->HasField(TEXT("progress_coordinate_map")) &&
+        (!J->TryGetStringField(TEXT("progress_coordinate_map"),ProgressPath) || ProgressPath.IsEmpty()))
+    {Error=TEXT("Explicit progress route must be a nonempty path");return false;}
+    if(Hydraulic->HasCartesianWaterCoordinates() && ProgressPath.IsEmpty())
+    {Error=TEXT("Cartesian hydraulics require a separate downstream progress route");return false;}
+    if(!ProgressPath.IsEmpty())
+    {
+        FString ProgressAbsolute,HydraulicAbsolute,Expected;
+        const TSharedPtr<FJsonObject>* Files=nullptr;
+        if(!J->TryGetObjectField(TEXT("files_sha256"),Files) || !Files ||
+            !(*Files)->TryGetStringField(ProgressPath,Expected) || Expected.Len()!=64 ||
+            !RelativeFile(ProgressPath,ProgressAbsolute) || !RelativeFile(HydraulicPath,HydraulicAbsolute) ||
+            !FRaftSimLiquidDataset::Hash(ProgressAbsolute).Equals(Expected,ESearchCase::IgnoreCase))
+        {Error=TEXT("Missing or changed hashed progress route");return false;}
+        TStrongObjectPtr<URaftSimWaterRuntimeAdapter> Progress(NewObject<URaftSimWaterRuntimeAdapter>());
+        FVector2D A,B;double AZ=0,BZ=0;
+        if(!Progress->ConfigureRiverCoordinateMap(ProgressPath) || Progress->HasCartesianWaterCoordinates() ||
+            !RaftSimContinuousRiver::Frame(FRaftSimLiquidDataset::Read(ProgressAbsolute),River,A,AZ,Error) ||
+            !RaftSimContinuousRiver::Frame(FRaftSimLiquidDataset::Read(HydraulicAbsolute),River,B,BZ,Error) ||
+            A!=B || AZ!=BZ || Progress->GetRiverWorldYSign()!=Hydraulic->GetRiverWorldYSign())
+        {Error=TEXT("Progress route and water must share the same world frame");return false;}
+    }
+    return RaftSimContinuousRuntimeWindow::Resolve(Hydraulic->HasCartesianWaterCoordinates(),
+        FRaftSimLiquidDataset::Read(StreamingPath),HydraulicLaunch,Start,
+        J->GetNumberField(TEXT("lateral_extent_m")),J->GetStringField(TEXT("cooked_fields")),Binding,Error);
+}
+
 static bool AddRuntime(UWorld* World, const TSharedPtr<FJsonObject>& J, FString& Error)
 {
     RaftSimContinuousRiver::FSpec River;
@@ -205,11 +248,14 @@ static bool AddRuntime(UWorld* World, const TSharedPtr<FJsonObject>& J, FString&
     const double Start=Launch->GetNumberField(TEXT("station_m"));
     double Finish=J->GetNumberField(TEXT("finish_station_m"));
     if(!ResolveGeographicFinish(J,Start,Finish,Error))return false;
+    const double Depth=Launch->GetNumberField(TEXT("minimum_footprint_depth_m"));
     if (XYZ.Num()!=3 || !FMath::IsFinite(Start) || !FMath::IsFinite(Finish) || Finish<=Start ||
-        Launch->GetNumberField(TEXT("minimum_footprint_depth_m"))<1.) return false;
+        !FMath::IsFinite(Depth) || Depth<1.) return false;
     const FVector LaunchCm(XYZ[0]->AsNumber(),XYZ[1]->AsNumber(),XYZ[2]->AsNumber());
     const FRotator Rotation(0,Launch->GetNumberField(TEXT("yaw_deg")),0);
     if (LaunchCm.ContainsNaN() || Rotation.ContainsNaN()) return false;
+    RaftSimContinuousRuntimeWindow::FBinding Binding;FString ProgressPath;
+    if(!PrepareRuntimeBinding(J,River,LaunchCm,Start,Binding,ProgressPath,Error))return false;
     UClass* Mode=LoadClass<AGameModeBase>(nullptr,TEXT("/Script/SmokeEmIfYouGotEm.RaftSimVerticalSliceGameMode"));
     if (!Mode) return false;
     World->GetWorldSettings()->DefaultGameMode=Mode;
@@ -219,10 +265,10 @@ static bool AddRuntime(UWorld* World, const TSharedPtr<FJsonObject>& J, FString&
     Water->CoordinateMapPath=J->GetStringField(TEXT("coordinate_map"));
     if(!RegisterRapidProfiles(*Water,J,Error))return false;
     Water->StreamingManifestPath=J->GetStringField(TEXT("streaming"));
-    Water->WindowCenterM=FVector2D(Start,0); Water->WindowExtentM=480;
+    Water->WindowCenterM=Binding.CenterM; Water->WindowExtentM=Binding.ExtentM.X;
     Water->bRecenterHydraulicCrux=false; Water->bEnableMovingWindowStreaming=true;
-    Water->MovingWindowStationExtentM=480; Water->MovingWindowAdvanceM=80;
-    Water->MovingWindowLateralExtentM=J->GetNumberField(TEXT("lateral_extent_m"));
+    Water->MovingWindowStationExtentM=Binding.ExtentM.X; Water->MovingWindowAdvanceM=Binding.AdvanceM;
+    Water->MovingWindowLateralExtentM=Binding.ExtentM.Y;
     Water->LivePresentationWidthM=Water->MovingWindowLateralExtentM;
     Water->bEnableCookedFarFieldWater=true; Water->bMapProvidesTerrain=true;
     Water->bLiveSolverOwnsRuntimeRendering=true; Water->bEnableLiveSolverVolumeCore=true;
@@ -299,7 +345,9 @@ static bool AddRuntime(UWorld* World, const TSharedPtr<FJsonObject>& J, FString&
     auto* Scenario=FindFProperty<FNameProperty>(RunClass,TEXT("ScenarioId"));
     auto* StartProp=FindFProperty<FFloatProperty>(RunClass,TEXT("StartStationM"));
     auto* FinishProp=FindFProperty<FFloatProperty>(RunClass,TEXT("FinishStationM"));
-    if (!Scenario || !StartProp || !FinishProp) return false;
+    auto* ProgressProp=FindFProperty<FStrProperty>(RunClass,TEXT("ProgressCoordinateMapPath"));
+    if (!Scenario || !StartProp || !FinishProp || !ProgressProp) return false;
+    ProgressProp->SetPropertyValue_InContainer(Run,ProgressPath);
     Scenario->SetPropertyValue_InContainer(Run,FName(*J->GetStringField(TEXT("section_id"))));
     StartProp->SetPropertyValue_InContainer(Run,Start); FinishProp->SetPropertyValue_InContainer(Run,Finish);
     if (World->GetWorldPartition() && Run->CanChangeIsSpatiallyLoadedFlag()) Run->SetIsSpatiallyLoaded(false);
@@ -504,6 +552,14 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
             !RaftSimContinuousRiver::Frame(FRaftSimLiquidDataset::Read(ChartPath),River,ChartOrigin,ChartDatum,Error) ||
             GeographicOrigin!=ChartOrigin || Datum!=ChartDatum)
         {Error=TEXT("Terrain and runtime do not share the river geographic frame");return false;}
+        // Fail before constructing thousands of terrain packages if the water
+        // source or progress route cannot initialize this geographic launch.
+        const auto Launch=Runtime->GetObjectField(TEXT("launch"));
+        const auto& XYZ=Launch->GetArrayField(TEXT("location_cm"));
+        if(XYZ.Num()!=3){Error=TEXT("Invalid runtime launch coordinates");return false;}
+        RaftSimContinuousRuntimeWindow::FBinding Binding;FString ProgressPath;
+        if(!PrepareRuntimeBinding(Runtime,River,FVector(XYZ[0]->AsNumber(),XYZ[1]->AsNumber(),XYZ[2]->AsNumber()),
+            Launch->GetNumberField(TEXT("station_m")),Binding,ProgressPath,Error))return false;
     }
     bool bNaniteTerrain=false;
     if (Runtime && Runtime->HasField(TEXT("nanite_terrain")) &&
