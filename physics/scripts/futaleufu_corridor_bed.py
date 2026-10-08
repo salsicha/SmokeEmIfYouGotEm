@@ -16,6 +16,42 @@ from futaleufu_planform import load_planform
 NAMES = ('rio_azul', 'upstream_mainstem', 'downstream_mainstem')
 
 
+def inferred_bank_ribbon(line, station, lower, upper, *, return_receipt=False):
+    """Explicit inferred strip, not a correction to captured source geometry.
+
+    Consecutive cross-sections sweep quadrilaterals. At sharp captured-route
+    turns their sides may cross: use a local convex bevel bounded by those four
+    inferred endpoints, explicitly recorded. This does NOT repair or widen any
+    captured polygon. Internal section edges cannot become hydraulic banks.
+    """
+    station, lower, upper = [np.asarray(a, float) for a in (station, lower, upper)]
+    if (station.ndim != 1 or len(station) < 2 or lower.shape != station.shape
+            or upper.shape != station.shape or not np.isfinite([station, lower, upper]).all()
+            or np.any(np.diff(station) <= 0) or station[0] != 0
+            or abs(station[-1]-line.length) > 1e-6 or np.any(lower >= upper)):
+        raise ValueError('Complete ordered inferred bank spans required')
+    before = shapely.get_coordinates(shapely.line_interpolate_point(line, np.maximum(station-1, 0)))
+    after = shapely.get_coordinates(shapely.line_interpolate_point(line, np.minimum(station+1, line.length)))
+    tangent = after-before
+    normal = np.c_[-tangent[:, 1], tangent[:, 0]]/np.linalg.norm(tangent, axis=1)[:, None]
+    centre = shapely.get_coordinates(shapely.line_interpolate_point(line, station))
+    low, high = centre+normal*lower[:, None], centre+normal*upper[:, None]
+    strips = [shapely.Polygon([low[i], high[i], high[i+1], low[i+1]]) for i in range(len(station)-1)]
+    joins = []
+    for i, strip in enumerate(strips):
+        if not strip.is_valid or strip.area <= 0:
+            join = shapely.MultiPoint([low[i], high[i], high[i+1], low[i+1]]).convex_hull
+            if join.geom_type != 'Polygon' or join.area <= 0:
+                raise ValueError(f'Degenerate inferred bank interval: {i}')
+            strips[i] = join
+            joins.append(dict(interval_index=i, station_m=[float(station[i]), float(station[i+1])],
+                              area_m2=float(join.area)))
+    polygon = shapely.union_all(strips)
+    receipt = dict(policy='Adjacent inferred cross-section sweep with explicitly bounded convex bevels',
+                   corner_joins=joins, inferred_area_m2=float(polygon.area), captured_banks_modified=False)
+    return (polygon, receipt) if return_receipt else polygon
+
+
 def source_heights(xy, grid, transform):
     """Bilinear pixel-centre sampling, without boundary clamping/extrapolation."""
     xy = np.asarray(xy, float)
@@ -113,6 +149,7 @@ class FutaleufuBed:
         holes = [shapely.Polygon(ring) for p in shapely.get_parts(self.polygon) for ring in p.interiors]
         self.islands = shapely.union_all(holes)
         shapely.prepare(self.polygon); shapely.prepare(self.islands)
+        self.initialize_bed_footprint()
         self.parameters = dict(depth_m=depth_m, bank_taper_m=bank_taper_m, max_cut_m=max_cut_m)
         initial_cut([0.], [0.], [False], [0.], [1.], **self.parameters)
         self.receipt = dict(schema='raftsim.futaleufu_initial_bed.v1',
@@ -120,9 +157,20 @@ class FutaleufuBed:
             construction_assumptions=self.parameters, branch_competition_distance_m=20.,
             scope='Initial inferred bathymetry; no flow assigned, hydraulic solution or engine acceptance',
             mainstem_ownership='Captured water polygons with islands excluded; no interpolated bank ribbon',
-            azul_ownership='Inferred spectral spans, only on the closest tributary branch; mapped islands excluded',
+            azul_ownership='Explicit inferred spectral bank ribbon; captured mainstem islands excluded',
+            inferred_bank_construction=self.ribbon_receipt,
+            bank_distance_policy='Boundary of the connected mapped-plus-inferred water union; no bank across tributary mouth',
             source_attribution=profile['attribution'], source_detail_m=30,
             measured_bed=False, discharge_assigned=False, installed_in_engine=False)
+
+    def initialize_bed_footprint(self):
+        a = self.arrays['rio_azul']
+        self.inferred_polygon, self.ribbon_receipt = inferred_bank_ribbon(
+            self.lines[0], a['station_m'], a['left_m'], a['right_m'], return_receipt=True)
+        self.bed_polygon = shapely.difference(shapely.union_all([self.polygon, self.inferred_polygon]), self.islands)
+        if not self.bed_polygon.is_valid:
+            raise ValueError('Invalid connected construction footprint')
+        shapely.prepare(self.inferred_polygon); shapely.prepare(self.bed_polygon)
 
     def sample(self, xy):
         xy = np.asarray(xy, float)
@@ -141,24 +189,15 @@ class FutaleufuBed:
         # construction geometry, not a hydraulic mixing solution.
         weights = np.clip(1-(distances-distances.min(axis=0))/20., 0, 1)**2
         stage = np.sum(weights*values['stage_m'], axis=0)/weights.sum(axis=0)
-        line = self.lines[0]; s = stations[0]
-        before = shapely.line_interpolate_point(line, np.maximum(s-1, 0))
-        after = shapely.line_interpolate_point(line, np.minimum(s+1, line.length))
-        tangent = shapely.get_coordinates(after)-shapely.get_coordinates(before)
-        normal = np.c_[-tangent[:, 1], tangent[:, 0]]/np.linalg.norm(tangent, axis=1)[:, None]
-        foot = shapely.get_coordinates(shapely.line_interpolate_point(line, s))
-        lateral = np.sum((xy-foot)*normal, axis=1)
-        azul_distance = np.maximum(np.minimum(lateral-values['left_m'][0],
-                                               values['right_m'][0]-lateral), 0)
         mapped = shapely.contains(self.polygon, pts)
-        inferred_azul = (owner == 0) & (azul_distance > 0) & ~mapped
+        inferred_azul = shapely.contains(self.inferred_polygon, pts) & ~mapped
         inside = np.array([(stations[j] > 0) & (stations[j] < line.length)
                            for j, line in enumerate(self.lines)])
         # A junction is an internal point even when one projected arm ends.
         domain = inside[owner, index] | (np.linalg.norm(xy-self.junction, axis=1) < 1e-6)
-        owned = (mapped | inferred_azul) & domain & (distances.min(axis=0) < 256)
+        owned = shapely.contains(self.bed_polygon, pts) & domain & (distances.min(axis=0) < 256)
         owned &= ~shapely.intersects(self.islands, pts)
-        bank_distance = np.where(mapped, shapely.distance(pts, self.polygon.boundary), azul_distance)
+        bank_distance = shapely.distance(pts, self.bed_polygon.boundary)
         width = np.sum(weights*(values['right_m']-values['left_m']), axis=0)/weights.sum(axis=0)
         result = initial_cut(source, stage, owned, bank_distance, width, **self.parameters)
         result.update(mapped_water=mapped & owned, inferred_planform=inferred_azul & owned,

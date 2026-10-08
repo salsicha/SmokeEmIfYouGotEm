@@ -160,9 +160,13 @@ class LandscapeTriangles:
         self.manifest=json.loads(manifest_bytes)
         m=self.manifest;layout=m['landscape']
         generic=m.get('schema')=='raftsim.continuous_landscape.v1'
+        futaleufu=generic and m.get('river_id')=='futaleufu_river_chile'
+        height_base=0. if futaleufu else HEIGHT_BASE
         if generic:
-            if (m.get('river_id')!='chilko_river_bc' or m.get('horizontal_crs')!='EPSG:3157' or
-                    m.get('vertical_reference')!='CGVD2013 (EPSG:6647)' or
+            frames={'chilko_river_bc':('EPSG:3157','CGVD2013 (EPSG:6647)'),
+                    'futaleufu_river_chile':('EPSG:32718','EGM2008')}
+            if (m.get('river_id') not in frames or
+                    (m.get('horizontal_crs'),m.get('vertical_reference'))!=frames.get(m.get('river_id')) or
                     'horizontal_origin_epsg6404_m' in m or 'height_base_ellipsoid_m' in layout):
                 raise ValueError('Unsupported continuous river geographic frame')
         elif m.get('schema')!='raftsim.colorado_continuous_landscape.v1':
@@ -171,7 +175,7 @@ class LandscapeTriangles:
         if (
                 layout['vertices']!=VERTICES or isinstance(self.spacing,bool) or
                 self.spacing not in ((1.,2.) if generic else (SPACING,)) or
-                layout['span_m']!=self.span or layout['height_base_m' if generic else 'height_base_ellipsoid_m']!=HEIGHT_BASE or
+                layout['span_m']!=self.span or layout['height_base_m' if generic else 'height_base_ellipsoid_m']!=height_base or
                 layout['height_range_m']!=HEIGHT_RANGE):
             raise ValueError('Unsupported common Landscape layout')
         origin=np.asarray(m['horizontal_origin_m' if generic else 'horizontal_origin_epsg6404_m'],dtype=float)
@@ -191,7 +195,7 @@ class LandscapeTriangles:
             if not np.array_equal(corner,chunk['origin_m' if generic else 'origin_epsg6404_m']):
                 raise ValueError('Chunk shifted off common geographic lattice')
             encoded_by_index[index]=encoded
-            surface=(corner,HEIGHT_BASE+encoded.astype(float)*HEIGHT_RANGE/65535)
+            surface=(corner,height_base+encoded.astype(float)*HEIGHT_RANGE/65535)
             self.chunks.append(surface);self.by_index[index]=surface
         if not self.chunks:raise ValueError('Empty terrain assembly')
         indices=np.array(list(self.by_index),dtype=np.int64)

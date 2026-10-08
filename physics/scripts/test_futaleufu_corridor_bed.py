@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import shapely
 
-from futaleufu_corridor_bed import FutaleufuBed, NAMES, initial_cut, source_heights
+from futaleufu_corridor_bed import FutaleufuBed, NAMES, initial_cut, source_heights, inferred_bank_ribbon
 from chilko_triangle_ownership import preserve_triangle_support
 
 
@@ -22,10 +22,39 @@ def fixture():
     bed.islands = shapely.box(35, -3, 45, 3)
     bed.polygon = shapely.difference(shapely.box(-110, -10, 110, 10), bed.islands)
     bed.parameters = dict(depth_m=1.8, bank_taper_m=5., max_cut_m=25.)
+    bed.initialize_bed_footprint()
     return bed
 
 
 class BedTests(unittest.TestCase):
+    def test_ribbon_preserves_offset_not_fabricated_centreline(self):
+        ribbon = inferred_bank_ribbon(shapely.LineString([(0, 0), (100, 0)]),
+                                      [0, 50, 100], [5, 5, 5], [15, 15, 15])
+        self.assertEqual(ribbon.area, 1000)
+        self.assertFalse(ribbon.covers(shapely.Point(50, 0)))
+        self.assertTrue(ribbon.covers(shapely.Point(50, 10)))
+
+    def test_no_false_bank_across_tributary_mouth(self):
+        bed = fixture()
+        r = bed.sample([[0, 10.001], [0, 10.], [0, 9.999]])
+        self.assertTrue(r['bed_owned'].all())
+        self.assertTrue((r['bank_distance_m'] >= 10-1e-5).all())
+        self.assertLess(np.ptp(r['height_m']), .001)
+
+    def test_tight_bend_join_is_explicit_and_bounded(self):
+        line = shapely.LineString([(0, 0), (10, 0), (10, 10)])
+        s = np.array([0., 9., 11., 20.])
+        ribbon, receipt = inferred_bank_ribbon(line, s, np.full(4, -10.), np.full(4, 10.), return_receipt=True)
+        self.assertTrue(ribbon.is_valid)
+        self.assertTrue(receipt['corner_joins'])
+        self.assertTrue(shapely.box(-10, -10, 20, 20).covers(ribbon))
+        self.assertFalse(receipt['captured_banks_modified'])
+
+    def test_mainstem_mapping_not_expanded_away_from_tributary(self):
+        bed = fixture()
+        self.assertEqual(bed.bed_polygon.difference(bed.polygon).difference(bed.inferred_polygon).area, 0)
+        self.assertEqual(bed.bed_polygon.intersection(bed.islands).area, 0)
+
     def test_pixel_centres_and_half_cells(self):
         grid = np.array([[0., 10.], [20., 30.]])
         t = [10, 0, 0, 0, -10, 20]
