@@ -38,6 +38,10 @@ def export(terrain, profile, out, origin, datum, buffer_m=600., discharge=45., r
     model = CorridorBed(terrain, profile, discharge, roughness, depth_profile=depth_profile)
     origin = np.asarray(origin, dtype=float)
     indices = corridor_chunks(model.line, origin, buffer_m)
+    grid=model.receipt.get('available_channel_depth',{}).get('capacity_grid')
+    if grid is not None:
+        from chilko_encoded_capacity import validate_capacity_grid
+        validate_capacity_grid(grid,origin)
     out.mkdir(parents=True)
     chunks = []; inferred_count = 0; sources = {str(i): 0 for i in (1, 2, 3)}
     max_cut = 0.; max_quantization_error = 0.

@@ -7,9 +7,22 @@ vertices and protection probes; a numerical row cannot silently own a bend.
 import numpy as np
 import shapely
 
-from chilko_triangle_ownership import support_offsets
+from chilko_triangle_ownership import POLICY, support_offsets
 from export_colorado_continuous_terrain import SPACING, HEIGHT_BASE, HEIGHT_RANGE
-from build_chilko_corridor_depth import constrain_source_amplitude
+
+
+def capacity_grid(origin):
+    origin=np.asarray(origin,dtype=float)
+    if origin.shape!=(2,) or not np.isfinite(origin).all():
+        raise ValueError('Explicit finite canonical terrain origin required')
+    return dict(horizontal_origin_m=origin.tolist(),spacing_m=SPACING,
+        height_base_m=HEIGHT_BASE,height_range_m=HEIGHT_RANGE,encoding='uint16_nearest',
+        diagonal='SE_to_NW_in_east_north_grid',support_policy=POLICY)
+
+
+def validate_capacity_grid(receipt,origin):
+    if receipt!=capacity_grid(origin):
+        raise ValueError('Encoded capacity requires the identical canonical terrain grid and guard')
 
 
 def triangle_stencil(xy, origin):
@@ -106,6 +119,7 @@ class EncodedSections:
         return fitted,initial,self.capacity(fitted,roughness)
 
     def apply_geographic_envelope(self,model,depth,amplitude):
+        from build_chilko_corridor_depth import constrain_source_amplitude
         # Every contributing vertex must retain its cut under the final varying
         # depth profile, so constrain its 37 support probes as well as itself.
         self.vertex_heights(amplitude) # validate bounded row amplitudes first

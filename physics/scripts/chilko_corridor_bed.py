@@ -95,8 +95,10 @@ def load_available_depth(folder, station, previous_depth, expected):
         if dm.get('native_calibration'):
             verify_calibrated_depth(dm,z)
         result=amplitude.copy()
-    return result,dict(manifest=str(folder/'manifest.json'),manifest_sha256=sha(folder/'manifest.json'),
-                       depth_sha256=dm['depth_sha256'])
+    receipt=dict(manifest=str(folder/'manifest.json'),manifest_sha256=sha(folder/'manifest.json'),
+                 depth_sha256=dm['depth_sha256'])
+    if 'capacity_grid' in dm:receipt['capacity_grid']=dm['capacity_grid']
+    return result,receipt
 
 
 def verify_calibrated_depth(manifest, arrays):

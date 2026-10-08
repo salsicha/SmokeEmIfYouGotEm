@@ -1,9 +1,12 @@
 import unittest
+import tempfile,json
+from pathlib import Path
+from unittest.mock import patch
 from types import SimpleNamespace
 import numpy as np
 import shapely
 from shapely.geometry import LineString,box
-from chilko_encoded_capacity import triangle_stencil,EncodedSections,inference_threshold
+from chilko_encoded_capacity import triangle_stencil,EncodedSections,inference_threshold,capacity_grid,validate_capacity_grid
 from chilko_triangle_ownership import preserve_triangle_support
 from export_colorado_catalog_runtime import landscape_sample
 from export_colorado_continuous_terrain import HEIGHT_BASE,HEIGHT_RANGE
@@ -25,6 +28,45 @@ def model():
 
 
 class EncodedCapacityTests(unittest.TestCase):
+    def test_normal_builder_uses_encoded_fit_and_records_grid(self):
+        from build_chilko_corridor_depth import build
+        m=model();m.surface=np.array([1000.,1000.]);m.terrain=SimpleNamespace(folder=Path('terrain'))
+        m.receipt={key:'fixture' for key in ('profile_manifest_sha256','profile_sha256','terrain_manifest_sha256',
+            'route_sha256','planform_sha256','ownership_policy')}
+        frame=dict(station=np.array([100.,102.]),source_station=np.array([100.,102.]),
+            xy=np.array([[100.,0.],[102.,0.]]),normal=np.array([[0.,1.],[0.,1.]]))
+        with tempfile.TemporaryDirectory() as tmp, \
+                patch('build_chilko_corridor_depth.CorridorBed',return_value=m), \
+                patch('build_chilko_corridor_depth.hydraulic_frame',return_value=(frame,{})), \
+                patch('build_chilko_corridor_depth.validate_branch_coverage',return_value={}), \
+                patch('build_chilko_corridor_depth.sha',return_value='fixture'),patch('builtins.print'):
+            out=Path(tmp)/'depth'
+            receipt=build('terrain','profile',out,origin=[0.,0.])
+            self.assertEqual(receipt['capacity_grid'],capacity_grid([0.,0.]))
+            self.assertFalse(receipt['hydraulic_solution'])
+            with np.load(out/'depth.npz') as z:
+                self.assertTrue((z['inferred_capacity_m3s']>=45.).all())
+                self.assertTrue((z['depth_amplitude_m']>=m.depth).all())
+            self.assertEqual(json.loads((out/'manifest.json').read_text()),receipt)
+
+    def test_export_refuses_incompatible_grid_before_creating_output(self):
+        from export_chilko_corridor_terrain import export
+        m=model();m.receipt=dict(available_channel_depth=dict(capacity_grid=capacity_grid([0.,0.])))
+        with tempfile.TemporaryDirectory() as tmp,patch('export_chilko_corridor_terrain.CorridorBed',return_value=m):
+            out=Path(tmp)/'terrain'
+            with self.assertRaisesRegex(ValueError,'identical canonical'):
+                export('terrain','profile',out,[1.,0.],900.,depth_profile='depth')
+            self.assertFalse(out.exists())
+
+    def test_capacity_is_bound_to_export_grid_and_guard(self):
+        grid=capacity_grid([442000.,5749000.])
+        validate_capacity_grid(grid,[442000.,5749000.])
+        for wrong in (dict(grid,spacing_m=1.),dict(grid,support_policy='none'),dict(grid,height_range_m=1000.)):
+            with self.assertRaises(ValueError):validate_capacity_grid(wrong,[442000.,5749000.])
+        with self.assertRaises(ValueError):validate_capacity_grid(grid,[442001.,5749000.])
+        for origin in (None,[0],[np.nan,0]):
+            with self.assertRaises(ValueError):capacity_grid(origin)
+
     def test_native_triangle_stencil_both_diagonals(self):
         xy=np.array([[[.2,.4],[1.5,.4],[1.7,1.8],[2.,2.]]])
         # Include the halo beyond the exact grid vertex: its zero-weight

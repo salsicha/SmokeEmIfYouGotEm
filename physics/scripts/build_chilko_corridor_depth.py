@@ -8,12 +8,12 @@ import json
 from pathlib import Path
 
 import numpy as np
-import shapely
 
 from chilko_corridor_bed import CorridorBed
 from mosaic_lidarbc_crops import sha
 from build_chilko_corridor_scenario import validate_branch_coverage
 from chilko_corridor_chart import hydraulic_frame
+from chilko_encoded_capacity import EncodedSections,capacity_grid
 
 
 def fit_depth_amplitude(terrain, stage, owned, shape, minimum, slope, discharge,
@@ -70,10 +70,11 @@ def constrain_source_amplitude(station, amplitude, projected_station, required):
     return amplitude
 
 
-def build(terrain,profile,out,discharge=45.,roughness=.045):
+def build(terrain,profile,out,discharge=45.,roughness=.045,*,origin=None):
     out=Path(out).resolve()
     if out.exists():raise ValueError('Fresh inferred-depth profile required')
     model=CorridorBed(terrain,profile,discharge,roughness)
+    grid=capacity_grid(origin)
     # Exact-route normals can intersect ANOTHER bend hundreds of metres away.
     # Fit on the globally non-overlapping full-domain chart, then constrain the
     # original geographic profile at each cell's own source projection. No
@@ -86,28 +87,19 @@ def build(terrain,profile,out,discharge=45.,roughness=.045):
     row_stage=np.interp(frame['source_station'],model.station,model.surface)
     slope=np.maximum(-np.gradient(row_stage,frame['station']),.001)
     depth=model.depth.copy();before=[];after=[];width=[]
-    for start in range(0,len(frame['station']),128):
-        sl=slice(start,start+128)
+    for start in range(0,len(frame['station']),32):
+        sl=slice(start,start+32)
         xy=frame['xy'][sl,None,:]+frame['normal'][sl,None,:]*lateral[None,:,None]
         r=model.sample(xy);mapped=r['mapped_water']
         if mapped[:,0].any() or mapped[:,-1].any():
             raise ValueError('Mapped branches exceed depth quadrature; do not silently truncate capacity')
-        owned=mapped&(r['source_height_m']<=r['ownership_reference_m']+.25)
-        f=np.zeros(mapped.shape)
-        projected=np.full(mapped.shape,np.nan)
-        if mapped.any():
-            points=shapely.points(xy[mapped]);s=shapely.line_locate_point(model.line,points)
-            projected[mapped]=s
-            distance=shapely.distance(points,model.polygon.boundary)
-            w=np.interp(s,model.station,model.width)
-            f[mapped]=np.sqrt(np.clip(2*distance/w,0.,1.))
-        # Existing inferred depth is the baseline, so an adequate section needs
-        # no higher envelope; never flatten or raise pre-existing deeper cells.
-        fitted,old,new=fit_depth_amplitude(r['height_m'],r['reference_m'],owned,f,
-            np.full(len(xy),.05),slope[sl],discharge,roughness)
-        required=np.broadcast_to(fitted[:,None],owned.shape)
-        constrain_source_amplitude(model.station,depth,projected[owned],required[owned])
-        before.extend(old);after.extend(new);width.extend(owned.sum(axis=1).astype(float))
+        sections=EncodedSections(model,xy,origin,slope[sl])
+        try:
+            fitted,old,new=sections.fit(discharge,roughness)
+        except ValueError as error:
+            raise ValueError(f'Chart stations {frame["station"][sl][0]}..{frame["station"][sl][-1]} m: {error}') from error
+        sections.apply_geographic_envelope(model,depth,fitted)
+        before.extend(old);after.extend(new);width.extend(sections.query_owned.sum(axis=1).astype(float))
         if start%1024==0:print(f'available-channel chart sections {start}/{len(frame["station"])}',flush=True)
     if (sha(Path(profile)/'manifest.json')!=model.receipt['profile_manifest_sha256'] or
             sha(Path(profile)/'profile.npz')!=model.receipt['profile_sha256'] or
@@ -117,7 +109,7 @@ def build(terrain,profile,out,discharge=45.,roughness=.045):
     np.savez_compressed(out/'depth.npz',station_m=model.station,depth_amplitude_m=depth,
         previous_depth_amplitude_m=model.depth,available_width_m=np.asarray(width),
         capacity_chart_station_m=frame['station'],capacity_chart_source_station_m=frame['source_station'],
-        previous_capacity_m3s=before,inferred_capacity_m3s=after)
+        minimum_amplitude_capacity_m3s=before,inferred_capacity_m3s=after)
     receipt=dict(schema='raftsim.chilko_available_channel_depth.v1',
         source_profile_manifest=str(Path(profile).resolve()/'manifest.json'),
         source_profile_sha256=model.receipt['profile_manifest_sha256'],
@@ -127,10 +119,11 @@ def build(terrain,profile,out,discharge=45.,roughness=.045):
         depth_sha256=sha(out/'depth.npz'),section_spacing_m=4.,lateral_spacing_m=1.,lateral_half_extent_m=256.,
         capacity_section_spacing_m=2.,capacity_chart_coverage=coverage,
         numerical_chart_policy=chart_policy,
-        capacity_policy='Non-overlapping numerical cross sections; conservative per-cell source-node amplitude constraints. Estimated Manning capacity, not measured branch discharge or native flux.',
+        capacity_grid=grid,
+        capacity_policy='Protected 37-probe native triangles, uint16 quantization and per-vertex/probe geographic amplitude constraints. Estimated Manning capacity, not measured branch discharge or native flux.',
         maximum_allowed_amplitude_m=10.,maximum_amplitude_m=float(depth.max()),
         changed_section_count=int((depth>model.depth+1e-6).sum()),
-        previous_capacity_percentiles_m3s=np.nanpercentile(before,[0,5,50,95,100]).tolist(),
+        minimum_amplitude_capacity_percentiles_m3s=np.nanpercentile(before,[0,5,50,95,100]).tolist(),
         inferred_capacity_percentiles_m3s=np.nanpercentile(after,[0,5,50,95,100]).tolist(),
         capacity_values_are_lower_bounds_before_geographic_envelope=True,
         endpoint_policy='Original source nodes constrained only by interior chart cells; no geometry extrapolation beyond route endpoints',
@@ -145,4 +138,5 @@ if __name__=='__main__':
     for key in ('terrain','profile','out'):parser.add_argument('--'+key,type=Path,required=True)
     parser.add_argument('--discharge',type=float,default=45.,help='Construction discharge in m3/s; not measured local flow')
     parser.add_argument('--roughness',type=float,default=.045,help='Inferred Manning n, not the native friction coefficient')
-    a=parser.parse_args();build(a.terrain,a.profile,a.out,a.discharge,a.roughness)
+    parser.add_argument('--origin',type=float,nargs=2,required=True,help='Canonical Landscape EPSG:3157 origin')
+    a=parser.parse_args();build(a.terrain,a.profile,a.out,a.discharge,a.roughness,origin=a.origin)
