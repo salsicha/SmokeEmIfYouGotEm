@@ -26,6 +26,18 @@ struct FSpec
 
 inline double TerrainHeightBase(const FSpec& Spec) { return Spec.bFutaleufu ? 0. : 200.; }
 
+inline bool FrameLabelsMatch(const FSpec& Spec, const FString& CRS, const FString& Vertical)
+{
+    // The captured Terminator chart and full-route chart use these exact
+    // descriptive labels for the same reviewed frame. Do not accept arbitrary
+    // prefixes (UTM18N, another geoid, or ellipsoid heights are not aliases).
+    const bool Horizontal = CRS == Spec.CRS || (Spec.bFutaleufu &&
+        CRS == TEXT("EPSG:32718 WGS 84 / UTM zone 18S"));
+    const bool Height = Vertical == Spec.VerticalReference || (Spec.bFutaleufu &&
+        Vertical == TEXT("EGM2008 orthometric metres (Copernicus GLO-30)"));
+    return Horizontal && Height;
+}
+
 inline bool Resolve(const TSharedPtr<FJsonObject>& J, FSpec& Out, FString& Error)
 {
     Out = FSpec{};
@@ -120,8 +132,8 @@ inline bool Frame(const TSharedPtr<FJsonObject>& J, const FSpec& Spec,
         if (J->HasField(TEXT("horizontal_crs")) &&
             (!J->TryGetStringField(TEXT("horizontal_crs"),CRS) || CRS != Spec.CRS)) return false;
     }
-    else if (!J->TryGetStringField(TEXT("horizontal_crs"),CRS) || CRS != Spec.CRS ||
-        !J->TryGetStringField(TEXT("vertical_reference"),Vertical) || Vertical != Spec.VerticalReference)
+    else if (!J->TryGetStringField(TEXT("horizontal_crs"),CRS) ||
+        !J->TryGetStringField(TEXT("vertical_reference"),Vertical) || !FrameLabelsMatch(Spec,CRS,Vertical))
     { Error=TEXT("Unverified horizontal or vertical reference for river"); return false; }
     double X=0,Y=0;
     if (!J->TryGetArrayField(Legacy ? TEXT("horizontal_origin_epsg6404_m") : TEXT("horizontal_origin_m"),Values) ||

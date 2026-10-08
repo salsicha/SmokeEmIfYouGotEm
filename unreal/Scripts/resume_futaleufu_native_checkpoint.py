@@ -15,6 +15,31 @@ import time
 import numpy as np
 
 from qualify_futaleufu_native_ports import ROOT, sha, resources
+from continue_futaleufu_native_flow import shared_native_work, require_launch_headroom
+
+
+def prelaunch_check(output, verify):
+    """Checkpoint serialization is not a reservation on the shared engine."""
+    try:
+        verify()
+        current, busy = resources(), shared_native_work()
+        (output/'prelaunch.json').write_text(json.dumps(
+            dict(resources=current, shared_work=busy), indent=2, allow_nan=False)+'\n')
+        require_launch_headroom(current, busy)
+        return current
+    except Exception as exc:
+        (output/'failure.json').write_text(json.dumps(dict(stage='prelaunch',
+            native_process_started=False, failure=str(exc)), indent=2, allow_nan=False)+'\n')
+        raise
+
+
+def watchdog_failure(current, busy, elapsed):
+    if busy: return 'Shared engine/build/cook appeared; stopped only owned checkpoint continuation'
+    if min(current['available_physical_bytes'], current['available_commit_bytes']) < 3*1024**3:
+        return 'Owned cook resource floor reached'
+    if current['free_disk_bytes'] < 40*1024**3: return 'Owned cook disk reserve reached'
+    if elapsed > 4*3600: return 'Owned cook four-hour bound reached'
+    return None
 
 
 def require_terminal_audit(audit):
@@ -42,10 +67,7 @@ def run(audit_path, solver, output):
     if output.exists(): raise ValueError('Fresh bounded continuation output required')
     if sha(solver) != 'fb2624bb8cb210142ae17741c5358c86a48d6f42c60eedab64715def53c6e558':
         raise ValueError('Existing source-verified native executable required')
-    active = subprocess.run(['pwsh', '-NoProfile', '-Command',
-        "Get-CimInstance Win32_Process | Where-Object { $_.Name -match '^(UnrealEditor|UnrealEditor-Cmd|raftsim_cartesian_cook|UnrealBuildTool)\\.exe$' } | Select-Object ProcessId,Name | ConvertTo-Json -Compress"],
-        capture_output=True, text=True, check=True)
-    if active.stdout.strip(): raise ValueError('Shared engine/cook work is active; do not duplicate or interrupt')
+    require_launch_headroom(resources(), shared_native_work())
     audit = json.loads(audit_path.read_text())
     last = require_terminal_audit(audit)
     previous = ROOT/audit['native_run']
@@ -63,6 +85,10 @@ def run(audit_path, solver, output):
         raise ValueError('Audited actual clock differs')
     pins = {ROOT/p: h for p, h in audit['sources_sha256'].items()}
     for p in (audit_path, solver, Path(__file__).resolve()): pins[p] = sha(p)
+    guard_source=ROOT/'unreal/Scripts/continue_futaleufu_native_flow.py'
+    if guard_source in pins and pins[guard_source] != sha(guard_source):
+        raise ValueError('Audited launch-guard source changed')
+    pins[guard_source]=sha(guard_source)
 
     def verify():
         for path, digest in pins.items():
@@ -115,8 +141,8 @@ def run(audit_path, solver, output):
     save('request.json', dict(command=command, steps=steps, snapshot_interval_steps=interval, dt_seconds=.01,
          source_time_seconds=receipt['time_seconds'], target_time_seconds=receipt['time_seconds']+300.,
          maximum_wall_seconds=timeout, source_audit_sha256=sha(audit_path), initial_resources=initial_resources,
-         guard='Stop only the owned native process on resource floor/timeout; preserve complete/failure fields'))
-    minimum = initial_resources.copy()
+         guard='Recheck actual shared work and resources after preparation; stop only the owned native process on overlap/resource floor/timeout; preserve complete/failure fields'))
+    minimum = prelaunch_check(output, verify).copy()
     failure = None
     started = time.monotonic()
     with (output/'native.log').open('x') as log:
@@ -128,10 +154,15 @@ def run(audit_path, solver, output):
             except subprocess.TimeoutExpired:
                 r = resources()
                 minimum = {k: min(minimum[k], r[k]) for k in r}
-                if min(r['available_physical_bytes'], r['available_commit_bytes']) < 3*1024**3:
-                    failure = 'Owned cook resource floor reached'
-                if r['free_disk_bytes'] < 40*1024**3: failure = 'Owned cook disk reserve reached'
-                if time.monotonic()-started > timeout: failure = 'Owned cook four-hour bound reached'
+                try:
+                    busy=shared_native_work(child.pid)
+                    elapsed=time.monotonic()-started
+                    with (output/'resources.jsonl').open('a') as telemetry:
+                        telemetry.write(json.dumps(dict(elapsed_seconds=elapsed, resources=r,
+                                                        shared_work=busy), allow_nan=False)+'\n')
+                    failure=watchdog_failure(r,busy,elapsed)
+                except Exception as exc:
+                    failure='Native guard observation failed: '+str(exc)
                 if failure:
                     child.terminate(); child.wait(timeout=30); break
     result = dict(exit_code=child.returncode, elapsed_seconds=time.monotonic()-started, minimum_resources=minimum,

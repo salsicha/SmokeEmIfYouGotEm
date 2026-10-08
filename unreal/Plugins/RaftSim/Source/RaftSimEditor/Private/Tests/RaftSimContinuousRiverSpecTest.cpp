@@ -1,5 +1,7 @@
 #include "Environment/RaftSimContinuousRiverSpec.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/Paths.h"
+#include "Materials/RaftSimLiquidDataset.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimContinuousRiverSpecTest,
@@ -74,6 +76,23 @@ bool FRaftSimFutaleufuContinuousTerrainFrameTest::RunTest(const FString& Paramet
     TestTrue(TEXT("Southern UTM18 and source geoid frame accepted"),Frame(J,Spec,XY,Datum,Error));
     TestEqual(TEXT("Continuous river origin is not recentered"),XY,FVector2D(739986.,5195961.5));
     TestEqual(TEXT("Local vertical offset retained"),Datum,150.);
+    J->SetStringField(TEXT("horizontal_crs"),TEXT("EPSG:32718 WGS 84 / UTM zone 18S"));
+    J->SetStringField(TEXT("vertical_reference"),TEXT("EGM2008 orthometric metres (Copernicus GLO-30)"));
+    TestTrue(TEXT("Exact captured source labels describe the same frame"),Frame(J,Spec,XY,Datum,Error));
+    TestEqual(TEXT("Descriptive labels do not change the origin"),XY,FVector2D(739986.,5195961.5));
+    TestEqual(TEXT("Descriptive labels do not change the vertical offset"),Datum,150.);
+    for(const TCHAR* Wrong : {TEXT("EPSG:32718 WGS 84 / UTM zone 18N"),TEXT("EPSG:32718 unknown frame")})
+    {
+        J->SetStringField(TEXT("horizontal_crs"),Wrong);
+        TestFalse(TEXT("An EPSG prefix alone cannot authorize a different frame"),Frame(J,Spec,XY,Datum,Error));
+    }
+    J->SetStringField(TEXT("horizontal_crs"),TEXT("EPSG:32718"));
+    for(const TCHAR* Wrong : {TEXT("EGM96"),TEXT("EGM2008 ellipsoid metres"),TEXT("EGM2008 unknown geoid")})
+    {
+        J->SetStringField(TEXT("vertical_reference"),Wrong);
+        TestFalse(TEXT("A height-reference prefix cannot substitute for the reviewed geoid"),Frame(J,Spec,XY,Datum,Error));
+    }
+    J->SetStringField(TEXT("vertical_reference"),TEXT("EGM2008"));
     J->SetArrayField(TEXT("horizontal_origin_m"),
         {MakeShared<FJsonValueNumber>(739987.),MakeShared<FJsonValueNumber>(5195961.5)});
     TestFalse(TEXT("Changed origin cannot silently misregister captured colour"),Frame(J,Spec,XY,Datum,Error));
@@ -87,6 +106,36 @@ bool FRaftSimFutaleufuContinuousTerrainFrameTest::RunTest(const FString& Paramet
     TestFalse(TEXT("Foreign vegetation cannot silently populate Futaleufu"),Dressing(J,Spec,Error));
     J->SetStringField(TEXT("schema"),TEXT("raftsim.continuous_map_import.v1"));
     TestFalse(TEXT("Terrain registration alone cannot authorize a single-inlet runtime"),Resolve(J,Spec,Error));
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimFutaleufuCapturedFrameTest,
+    "RaftSim.M9.FutaleufuCapturedChartFrame",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimFutaleufuCapturedFrameTest::RunTest(const FString& Parameters)
+{
+    using namespace RaftSimContinuousRiver;
+    auto Identity=MakeShared<FJsonObject>();
+    Identity->SetStringField(TEXT("schema"),TEXT("raftsim.continuous_landscape.v1"));
+    Identity->SetStringField(TEXT("river_id"),TEXT("futaleufu_river_chile"));
+    FSpec Spec;FString Error;
+    if(!TestTrue(TEXT("Resolve reviewed Futaleufu frame"),Resolve(Identity,Spec,Error)))return false;
+    const FString Root=FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()/TEXT("../physics/data/real_world/futaleufu_river_chile/"));
+    for(const TCHAR* Relative : {
+        TEXT("terrain/terminator_evidence_2026/terminator_evidence_runtime_coordinate_map.json"),
+        TEXT("production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/continuous_route_2026_10_v2/coordinate_map.json")})
+    {
+        const auto Chart=FRaftSimLiquidDataset::Read(Root/Relative);
+        if(!TestTrue(TEXT("Read actual captured chart, not a synthetic stand-in"),Chart.IsValid()))return false;
+        FVector2D XY;double Datum=0;
+        TestTrue(TEXT("Actual source chart is compatible with the continuous frame"),Frame(Chart,Spec,XY,Datum,Error));
+        TestEqual(TEXT("Source geographic origin stays registered"),XY,FVector2D(739986.,5195961.5));
+        TestEqual(TEXT("Source local elevation offset stays registered"),Datum,150.);
+    }
+    // Frame compatibility must not bypass the still-pending hydraulic contract.
+    Identity->SetStringField(TEXT("schema"),TEXT("raftsim.continuous_map_import.v1"));
+    TestFalse(TEXT("Compatible source frame does not authorize unvalidated runtime fields"),Resolve(Identity,Spec,Error));
     return true;
 }
 
