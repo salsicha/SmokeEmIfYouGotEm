@@ -86,16 +86,31 @@ public:
      * its irregular crashing. Heard as a real source: full within 8 m,
      * fading to -40 dB by 78 m. */
     void EnableSound(uint32 Seed);
+    /** Sound on (as EnableSound) or off, as the hole comes into or leaves
+     * earshot. */
+    void SetSoundActive(bool bActive, uint32 Seed);
+    /** Move the wave onto a moved or resized site without restarting it. */
+    void Retarget(const FRaftSimHoleChurnSite& InSite);
+    /** Sample the water's surface over the wave's footprint onto a grid
+     * every this many seconds and read it from there (0: sample every
+     * point every frame). For a costly surface such as a river's. */
+    void CacheSurface(float Seconds) { SurfaceCacheSeconds = FMath::Max(Seconds, 0.0f); SurfaceCacheAge = TNumericLimits<float>::Max(); }
     /** Step the wave and rebuild its geometry. */
     void Advance(float DeltaSeconds, const FVector& ViewLocationCm);
+    const FRaftSimHoleChurnSite& GetSite() const { return Site; }
 
     /** Set the breaking-water lip material toward dense white water (1) or a lacy veil (0). */
     static void ApplyFoamDensity(UMaterialInstanceDynamic* Material, float Density);
     /** The breaking wave a site draws, as the hull meets it. */
     static RaftSimHoleWave::FShape ShapeOf(const FRaftSimHoleChurnSite& Site);
+    /** The site that draws Shape with its pour-over's crest at CrestCm. */
+    static FRaftSimHoleChurnSite SiteOf(const RaftSimHoleWave::FShape& Shape, const FVector& CrestCm, const FVector& Downstream, int32 Seed);
 
 private:
     float Outside(const FVector& PointCm) const;
+    /** The water's surface (cm), from the cache where it has one. */
+    float SurfaceAt(const FVector& PointCm) const;
+    void RefreshSurfaceCache();
     /** The wave's cross-section at one place across the span: points from
      * the boil line up the back, over the lip and down the falling curtain,
      * evenly spaced along the curve (world cm), with their outward normals
@@ -118,4 +133,13 @@ private:
     TObjectPtr<UAudioComponent> Sound;
     UPROPERTY()
     TObjectPtr<URaftSimSynthSoundWave> SoundWave;
+
+    // The surface over the footprint, along (from AlongStartCm) by across
+    // (from -AcrossHalfCm), CacheStepCm apart.
+    float SurfaceCacheSeconds = 0.0f;
+    float SurfaceCacheAge = TNumericLimits<float>::Max();
+    TArray<float> SurfaceCacheCm;
+    int32 CacheAlongCount = 0, CacheAcrossCount = 0;
+    float CacheAlongStartCm = 0.0f, CacheAcrossHalfCm = 0.0f;
+    static constexpr float CacheStepCm = 40.0f;
 };

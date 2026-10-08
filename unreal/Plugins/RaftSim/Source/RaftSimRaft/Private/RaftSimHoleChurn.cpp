@@ -98,6 +98,25 @@ RaftSimHoleWave::FShape URaftSimHoleChurnComponent::ShapeOf(const FRaftSimHoleCh
     return Shape;
 }
 
+FRaftSimHoleChurnSite URaftSimHoleChurnComponent::SiteOf(const RaftSimHoleWave::FShape& Shape, const FVector& CrestCm,
+    const FVector& Downstream, int32 Seed)
+{
+    FRaftSimHoleChurnSite Site;
+    Site.CrestCm = CrestCm;
+    Site.Downstream = Downstream;
+    Site.HalfWidthCm = float(Shape.HalfWidthM * 100.0);
+    Site.PlungeOffsetCm = float(Shape.PlungeOffsetM * 100.0);
+    Site.CrestBowCmPerSquareMeter = float(Shape.CrestBowPerSquareMeter * 100.0);
+    Site.Intensity = float(Shape.Intensity);
+    Site.Seed = Seed;
+    Site.Look.WaveHeightCm = float(Shape.HeightM * 100.0);
+    Site.Look.WaveLengthCm = float(Shape.LengthM * 100.0);
+    Site.Look.CrestPosition = float(Shape.CrestPosition);
+    Site.Look.ThrowCm = float(Shape.ThrowM * 100.0);
+    Site.Look.RollCmPerSecond = float(Shape.RollMps * 100.0);
+    return Site;
+}
+
 void URaftSimHoleChurnComponent::ApplyFoamDensity(UMaterialInstanceDynamic* Material, float Density)
 {
     if (!Material)
@@ -206,6 +225,88 @@ void URaftSimHoleChurnComponent::EnableSound(uint32 Seed)
     Sound->Play();
 }
 
+void URaftSimHoleChurnComponent::SetSoundActive(bool bActive, uint32 Seed)
+{
+    if (bActive)
+    {
+        EnableSound(Seed);
+        return;
+    }
+    if (Sound)
+    {
+        Sound->Stop();
+        Sound->DestroyComponent();
+        Sound = nullptr;
+        SoundWave = nullptr;
+    }
+}
+
+void URaftSimHoleChurnComponent::Retarget(const FRaftSimHoleChurnSite& InSite)
+{
+    const FVector OldCrest = Site.CrestCm;
+    const float OldLength = Site.Look.WaveLengthCm, OldHalfWidth = Site.HalfWidthCm;
+    const int32 Seed = Site.Seed;
+    const float FoamDensity = Site.Look.FoamDensity;
+    Site = InSite;
+    Site.Seed = Seed;
+    Site.Look.FoamDensity = FoamDensity;
+    Site.Downstream = Site.Downstream.GetSafeNormal2D();
+    if (Site.Downstream.IsNearlyZero())
+    {
+        Site.Downstream = FVector::ForwardVector;
+    }
+    Across = FVector(-Site.Downstream.Y, Site.Downstream.X, 0.0f);
+    // The cached surface is laid out in the wave's own frame.
+    if (FVector::DistSquared(OldCrest, Site.CrestCm) > FMath::Square(20.0f) || OldLength != Site.Look.WaveLengthCm ||
+        OldHalfWidth != Site.HalfWidthCm)
+    {
+        SurfaceCacheAge = TNumericLimits<float>::Max();
+    }
+    if (Sound)
+    {
+        Sound->SetWorldLocation(Site.CrestCm + Site.Downstream * (Site.PlungeOffsetCm + Site.Look.CrestPosition * Site.Look.WaveLengthCm));
+    }
+}
+
+void URaftSimHoleChurnComponent::RefreshSurfaceCache()
+{
+    SurfaceCacheAge = 0.0f;
+    const float BowCm = Site.CrestBowCmPerSquareMeter * FMath::Square(Site.HalfWidthCm * 0.01f);
+    CacheAlongStartCm = -100.0f;
+    CacheAcrossHalfCm = Site.HalfWidthCm + 50.0f;
+    CacheAlongCount = FMath::CeilToInt((Site.PlungeOffsetCm + Site.Look.WaveLengthCm + BowCm + 200.0f) / CacheStepCm) + 1;
+    CacheAcrossCount = FMath::CeilToInt(2.0f * CacheAcrossHalfCm / CacheStepCm) + 1;
+    SurfaceCacheCm.SetNumUninitialized(CacheAlongCount * CacheAcrossCount);
+    for (int32 A = 0; A < CacheAlongCount; ++A)
+    {
+        for (int32 C = 0; C < CacheAcrossCount; ++C)
+        {
+            const FVector Point = Site.CrestCm + Site.Downstream * (CacheAlongStartCm + A * CacheStepCm) +
+                Across * (C * CacheStepCm - CacheAcrossHalfCm);
+            SurfaceCacheCm[A * CacheAcrossCount + C] = Surface ? Surface(Point) : Point.Z;
+        }
+    }
+}
+
+float URaftSimHoleChurnComponent::SurfaceAt(const FVector& PointCm) const
+{
+    if (SurfaceCacheSeconds > 0.0f && SurfaceCacheCm.Num() > 0)
+    {
+        const FVector Local = PointCm - Site.CrestCm;
+        const float AlongCells = (FVector::DotProduct(Local, Site.Downstream) - CacheAlongStartCm) / CacheStepCm;
+        const float AcrossCells = (FVector::DotProduct(Local, Across) + CacheAcrossHalfCm) / CacheStepCm;
+        if (AlongCells >= 0.0f && AcrossCells >= 0.0f && AlongCells <= CacheAlongCount - 1 && AcrossCells <= CacheAcrossCount - 1)
+        {
+            const int32 A = FMath::Min(FMath::FloorToInt(AlongCells), CacheAlongCount - 2);
+            const int32 C = FMath::Min(FMath::FloorToInt(AcrossCells), CacheAcrossCount - 2);
+            const float U = AlongCells - A, V = AcrossCells - C;
+            const auto At = [this](int32 Row, int32 Column) { return SurfaceCacheCm[Row * CacheAcrossCount + Column]; };
+            return FMath::Lerp(FMath::Lerp(At(A, C), At(A, C + 1), V), FMath::Lerp(At(A + 1, C), At(A + 1, C + 1), V), U);
+        }
+    }
+    return Surface ? Surface(PointCm) : PointCm.Z;
+}
+
 void URaftSimHoleChurnComponent::SetRaftExclusion(const FTransform& RaftTransform, float HalfLengthCm, float HalfWidthCm)
 {
     bHasExclusion = true;
@@ -242,8 +343,7 @@ void URaftSimHoleChurnComponent::Profile(float AcrossCm, float ToeLevelCm, TArra
     const FVector Base = Site.CrestCm + Across * AcrossCm;
     const auto WaterAt = [&](float AlongCm)
     {
-        const FVector Point = Base + Site.Downstream * AlongCm;
-        return Surface ? Surface(Point) : Point.Z;
+        return SurfaceAt(Base + Site.Downstream * AlongCm);
     };
     // The lip throws out and falls back in broad sections along the span,
     // smoothly enough that neighbouring sections stay joined.
@@ -325,12 +425,19 @@ void URaftSimHoleChurnComponent::Advance(float DeltaSeconds, const FVector& View
     const FRaftSimHoleChurnLook& Look = Site.Look;
     const float Dt = FMath::Clamp(DeltaSeconds, 0.0f, 0.1f);
     TimeSeconds += Dt;
+    if (SurfaceCacheSeconds > 0.0f)
+    {
+        SurfaceCacheAge += Dt;
+        if (SurfaceCacheAge >= SurfaceCacheSeconds)
+        {
+            RefreshSurfaceCache();
+        }
+    }
     // The trough's lowest water along the wave's centre line.
     float ToeLevelCm = TNumericLimits<float>::Max();
     for (int32 Step = 0; Step <= 24; ++Step)
     {
-        const FVector Point = Site.CrestCm + Site.Downstream * (Site.PlungeOffsetCm + Step * Look.WaveLengthCm / 24.0f);
-        ToeLevelCm = FMath::Min(ToeLevelCm, Surface ? Surface(Point) : Point.Z);
+        ToeLevelCm = FMath::Min(ToeLevelCm, SurfaceAt(Site.CrestCm + Site.Downstream * (Site.PlungeOffsetCm + Step * Look.WaveLengthCm / 24.0f)));
     }
 
     // The breaking wave's sound: a steady roar whose crashing never stops
@@ -376,9 +483,9 @@ void URaftSimHoleChurnComponent::Advance(float DeltaSeconds, const FVector& View
             const int32 I = A * kProfilePoints + B;
             const float Along = Arcs[B] / Length;
             // Squashed flat where the raft sits in the hole.
-            const FVector Ground(RowPoints[B].X, RowPoints[B].Y, Surface ? Surface(RowPoints[B]) : RowPoints[B].Z);
             const float Clear = Outside(RowPoints[B]);
-            Vertices[I] = FMath::Lerp(Ground, RowPoints[B], Clear);
+            Vertices[I] = Clear >= 1.0f ? RowPoints[B]
+                : FMath::Lerp(FVector(RowPoints[B].X, RowPoints[B].Y, SurfaceAt(RowPoints[B])), RowPoints[B], Clear);
             Analytic[I] = RowNormals[B];
             // The white water's texture rolls with it, over the lip and down.
             Uvs[I] = FVector2D(AcrossCm / 240.0f, (Arcs[B] - Roll) / 160.0f);
@@ -429,7 +536,7 @@ void URaftSimHoleChurnComponent::Advance(float DeltaSeconds, const FVector& View
             const float T = float(B) / (kSeamRows - 1);
             const float OffsetCm = FMath::Lerp(-35.0f, 75.0f, T);
             FVector Point = Plunges[A] + Site.Downstream * OffsetCm;
-            const float Water = Surface ? Surface(Point) : Point.Z;
+            const float Water = SurfaceAt(Point);
             const float Churn = 0.5f + 0.5f * Noise((OffsetCm + 90.0f * TimeSeconds) / 30.0f, AcrossCm / 30.0f, TimeSeconds * 1.8f);
             const float Hump = FMath::Sin(PI * T);
             Point.Z = Water + (4.0f + 16.0f * Churn * Hump) * Lateral * Site.Intensity;

@@ -36,6 +36,7 @@ CSV_DEFINE_CATEGORY(RaftSimTickRaft,true);
 #include "UnrealClient.h"
 #include "RaftSimRiverbedActor.h"
 #include "RaftSimWaterVfxActor.h"
+#include "RaftSimHoleWaterActor.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -493,6 +494,17 @@ void ARaftSimRaftActor::BeginPlay()
         {
             World->SpawnActor<ARaftSimWaterVfxActor>(
                 ARaftSimWaterVfxActor::StaticClass(), FTransform::Identity);
+        }
+
+        // The holes' breaking waves and the water they throw over the crew
+        // (drawn while RaftSim.HoleWater is on).
+        if (TActorIterator<ARaftSimHoleWaterActor> It(World); !It)
+        {
+            if (auto* Holes = World->SpawnActor<ARaftSimHoleWaterActor>(
+                    ARaftSimHoleWaterActor::StaticClass(), FTransform::Identity))
+            {
+                Holes->SetRaft(this);
+            }
         }
 
         if (RiverConfig && RiverConfig->bEnableMovingWindowStreaming)

@@ -18,11 +18,12 @@ CSV_DEFINE_CATEGORY(RaftSimClock,true);
 
 namespace
 {
-TAutoConsoleVariable<int32> CVarRaftSimHoleWaterPhysics(
-    TEXT("RaftSim.HoleWaterPhysics"), 0,
-    TEXT("1: the hull meets each hole's falling water and breaking wave (RaftSimHolePourOver.h, RaftSimHoleWave.h): ")
-    TEXT("a drifting raft is held and pushed back into the falling water, a paddling crew punches through. ")
-    TEXT("0 (default until checked on the rivers): the water adapter's own hole currents only."),
+TAutoConsoleVariable<int32> CVarRaftSimHoleWater(
+    TEXT("RaftSim.HoleWater"), 0,
+    TEXT("1: each hole is drawn as its breaking wave, with its sound and water thrown over the crew ")
+    TEXT("(ARaftSimHoleWaterActor), and the hull meets that wave and the water falling over the pour-over ")
+    TEXT("(RaftSimHolePourOver.h, RaftSimHoleWave.h): a drifting raft is held, a paddling crew punches through. ")
+    TEXT("0 (default until checked on the rivers): the hole currents and visuals as before."),
     ECVF_Default);
 
 // Each hole's trough level, sampled once a frame: the breaking wave's pile
@@ -38,10 +39,8 @@ struct FHoleToes
 // shared roller.
 RaftSimHoleWave::FShape WaveOf(const URaftSimWaterRuntimeAdapter::FSupportBreakingSite& Site)
 {
-    const double Strength = FMath::Clamp(Site.Intensity * Site.SpillingFraction, 0.0f, 1.0f);
-    // A legacy lattice crest carries no physical height: a modest pile.
-    const double CrestHeightM = Site.PhysicalCrestHeightMeters >= 0.0f ? Site.PhysicalCrestHeightMeters : 0.55;
-    return RaftSimHoleWave::FShape::ForCrest(CrestHeightM, Site.PhysicalCrestLengthMeters, Strength);
+    return RaftSimHoleWave::FShape::ForSite(Site.PhysicalCrestHeightMeters, Site.PhysicalCrestLengthMeters,
+        FMath::Clamp(Site.Intensity * Site.SpillingFraction, 0.0f, 1.0f));
 }
 
 // The hull's water at a point near the river's holes: the water falling over
@@ -55,7 +54,7 @@ RaftSimHoleWave::FHullWater WithHoles(URaftSimWaterRuntimeAdapter& Water, const 
     RaftSimHoleWave::FHullWater Hull;
     Hull.SurfaceM = Here.SurfaceHeightMeters;
     Hull.VelocityMps = Here.VelocityMetersPerSecond;
-    if (!Here.bWet || !Water.HasFeatureKinematics() || CVarRaftSimHoleWaterPhysics.GetValueOnAnyThread() == 0)
+    if (!Here.bWet || !Water.HasFeatureKinematics() || CVarRaftSimHoleWater.GetValueOnAnyThread() == 0)
     {
         return Hull;
     }

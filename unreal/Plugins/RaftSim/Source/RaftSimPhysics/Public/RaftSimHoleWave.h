@@ -68,6 +68,15 @@ struct FShape
         return Shape;
     }
 
+    /** A river hole site's pile: its crest relief's physical height and face
+     * length, as strong as it breaks (intensity times spilling fraction). A
+     * legacy lattice crest carries no physical height (negative): a modest
+     * pile. Drawn and felt alike. */
+    static FShape ForSite(double PhysicalCrestHeightM, double CrestLengthM, double Strength)
+    {
+        return ForCrest(PhysicalCrestHeightM >= 0.0 ? PhysicalCrestHeightM : 0.55, CrestLengthM, Strength);
+    }
+
     double Lateral(double Across) const
     {
         return FMath::Exp(-FMath::Pow(FMath::Abs(Across) / (0.8 * HalfWidthM), 4.0));

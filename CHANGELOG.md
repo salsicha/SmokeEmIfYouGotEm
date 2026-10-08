@@ -48,7 +48,7 @@ All notable changes to this project are recorded here, newest first. Versioning 
     Smaller holes flush a raft. Bigger ones keep and flip it, and at 1.2 m
     even a paddling crew can't get out.
 
-    In game it is off by default (`RaftSim.HoleWaterPhysics 1` to try it)
+    In game it is off by default (`RaftSim.HoleWater 1` to try it)
     until it has been checked on the rivers. It is always on in the test
     tank, which now also has a real crewed raft. Options:
     - `crew`: production seats, play's capsize gate and washouts;
@@ -56,6 +56,25 @@ All notable changes to this project are recorded here, newest first. Versioning 
     - `highside`: the crew high-side;
     - `crest=H`: a pour-over H metres high;
     - `yaw=D` and `seconds=N`.
+  - **Holes on the rivers** (`ARaftSimHoleWaterActor`, spawned with the raft):
+    while `RaftSim.HoleWater` is on, it covers the holes nearest the view
+    (up to six within 120 m):
+    - each is drawn as its breaking wave, at the size the hull meets it,
+      from the water adapter's own hole sites, the authored named holes
+      included;
+    - the nearest two are heard;
+    - water is thrown over the crew when the raft hits hard;
+    - the rapid roller and crest-spray particles are hidden.
+
+    Each wave samples the river surface over its footprint five times a
+    second rather than at every vertex.
+
+    First river trials with it on, in the rapid assessment's trial driver:
+    - Terminator and Hance on the centre line were each held in a hole.
+      Terminator lost all five aboard; Hance lost none.
+    - Khyber Pass cleared, but the bow stood up to 55 degrees.
+    - It is still too violent in big holes, burying and standing up the
+      raft. The falling water's push needs a cap.
   - **The guide can be washed out**, by the same impact and swamping rules as
     the paddlers but holding on twice as long as a braced paddler. Guides sit
     at the stern, so a stern held under a hole's falling water can take the
