@@ -21,7 +21,10 @@ struct FSpec
     FString WaterStem;
     FString DetailStem;
     bool bChilko = false;
+    bool bFutaleufu = false;
 };
+
+inline double TerrainHeightBase(const FSpec& Spec) { return Spec.bFutaleufu ? 0. : 200.; }
 
 inline bool Resolve(const TSharedPtr<FJsonObject>& J, FSpec& Out, FString& Error)
 {
@@ -51,6 +54,17 @@ inline bool Resolve(const TSharedPtr<FJsonObject>& J, FSpec& Out, FString& Error
         Out = {River,TEXT("Chilko"),TEXT("chilko_river_lava_canyon"),TEXT("PaddleCrew"),
             ERaftSimRaftRig::PaddleCrew,TEXT("EPSG:3157"),TEXT("CGVD2013 (EPSG:6647)"),
             TEXT("ChilkoRun"),TEXT("ChilkoLavaCanyon"),TEXT("Chilko"),true};
+    else if (River == TEXT("futaleufu_river_chile"))
+    {
+        // Terrain registration precedes the three-arm hydraulic/runtime
+        // contract. Never silently feed this river Colorado optics or a
+        // single-inlet cook while its confluence integration is pending.
+        if (Schema != TEXT("raftsim.continuous_landscape.v1"))
+        { Error=TEXT("Futaleufu continuous runtime requires its reviewed three-arm water contract"); return false; }
+        Out = {River,TEXT("Futaleufu"),TEXT("futaleufu_terminator"),TEXT("PaddleCrew"),
+            ERaftSimRaftRig::PaddleCrew,TEXT("EPSG:32718"),TEXT("EGM2008"),
+            TEXT("FutaleufuRun"),TEXT("FutaleufuTerminator"),TEXT("Futaleufu"),false,true};
+    }
     else { Error=TEXT("No reviewed continuous integration profile for river"); return false; }
     FString Rig;
     if (J->HasField(TEXT("rig")) && (!J->TryGetStringField(TEXT("rig"), Rig) || Rig != Out.RigName))
@@ -60,6 +74,8 @@ inline bool Resolve(const TSharedPtr<FJsonObject>& J, FSpec& Out, FString& Error
 
 inline bool Dressing(const TSharedPtr<FJsonObject>& J,const FSpec& Spec,FString& Error)
 {
+    if(Spec.bFutaleufu)
+    {Error=TEXT("Futaleufu requires its grounded native-canopy placement contract, not borrowed vegetation");return false;}
     FString Schema;double Clearance=0,Slope=0,Start=0,End=0;
     const TArray<TSharedPtr<FJsonValue>>* Meshes=nullptr;
     if(!J || !J->TryGetStringField(TEXT("schema"),Schema) ||

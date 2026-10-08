@@ -39,17 +39,19 @@ static bool RelativeFile(const FString& Name, FString& Absolute)
     return FPaths::FileExists(Absolute);
 }
 
-// Reuse only small-scale Colorado material detail, never a geographic drape.
+// Reuse each river's own small-scale material detail, never a geographic drape.
 static UMaterial* TerrainMaterial(const RaftSimContinuousRiver::FSpec* River=nullptr)
 {
     const bool Chilko=River && River->bChilko;
+    const bool Futaleufu=River && River->bFutaleufu;
     // A new asset version preserves already-saved maps. World-XY projection
     // stretches a texel vertically over an entire cliff; use the same detail
     // texture on three world planes without modifying any terrain geometry.
-    const FString ObjectName = Chilko ? TEXT("M_ChilkoContinuousGroundV2") : TEXT("M_ColoradoCatalogGroundV2");
+    const FString ObjectName = Futaleufu ? TEXT("M_FutaleufuContinuousGroundV1") :
+        Chilko ? TEXT("M_ChilkoContinuousGroundV2") : TEXT("M_ColoradoCatalogGroundV2");
     const FString PackageName = TEXT("/Game/RaftSim/Materials/Catalog/")+ObjectName;
     if (UMaterial* Existing = LoadObject<UMaterial>(nullptr, *(PackageName+TEXT(".")+ObjectName))) return Existing;
-    const FString TextureName=TEXT("T_RaftSim_")+(Chilko ? FString(TEXT("Chilko")) : FString(TEXT("ColoradoRiver")))+TEXT("_TerrainDetailAlbedo");
+    const FString TextureName=TEXT("T_RaftSim_")+(River ? River->DetailStem : FString(TEXT("ColoradoRiver")))+TEXT("_TerrainDetailAlbedo");
     UTexture2D* Albedo = LoadObject<UTexture2D>(nullptr,
         *(TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures/")+TextureName+TEXT(".")+TextureName));
     if (!Albedo) return nullptr;
@@ -76,7 +78,7 @@ static UMaterial* TerrainMaterial(const RaftSimContinuousRiver::FSpec* River=nul
         Weight->Input.Expression=SquaredNormal;
         Weight->R=Axis==0; Weight->G=Axis==1; Weight->B=Axis==2; Weight->A=false;
         auto* Sample=NewObject<UMaterialExpressionTextureSampleParameter2D>(M);
-        Sample->ParameterName=Chilko ? TEXT("ChilkoGroundDetail") : TEXT("ColoradoGroundDetail");
+        Sample->ParameterName=Futaleufu ? TEXT("FutaleufuGroundDetail") : Chilko ? TEXT("ChilkoGroundDetail") : TEXT("ColoradoGroundDetail");
         Sample->Texture=Albedo; Sample->Coordinates.Expression=UV; Sample->SamplerType=SAMPLERTYPE_Color;
         auto* Weighted=NewObject<UMaterialExpressionMultiply>(M);
         Weighted->A.Expression=Sample; Weighted->B.Expression=Weight;
@@ -516,15 +518,15 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
     const auto L=J->GetObjectField(TEXT("landscape"));
     const int32 Size=L->GetIntegerField(TEXT("vertices"));
     const auto& ScaleValues=L->GetArrayField(TEXT("scale_xyz"));
-    const double Base=L->GetNumberField(River.bChilko ? TEXT("height_base_m") : TEXT("height_base_ellipsoid_m"));
+    const double Base=L->GetNumberField((River.bChilko || River.bFutaleufu) ? TEXT("height_base_m") : TEXT("height_base_ellipsoid_m"));
     const double Range=L->GetNumberField(TEXT("height_range_m"));
     const double ActorZ=L->GetNumberField(TEXT("actor_z_cm"));
     const double Spacing=L->GetNumberField(TEXT("spacing_m"));
     const double Span=L->GetNumberField(TEXT("span_m"));
     const double SpanCm=Span*100.;
     if (Size!=127 || ScaleValues.Num()!=3 ||
-        !(Spacing==2. || (River.bChilko && Spacing==1.)) || Span!=(Size-1)*Spacing ||
-        Base!=200. || Range!=2400. || !FMath::IsFinite(Datum) || !FMath::IsFinite(ActorZ) ||
+        !(Spacing==2. || ((River.bChilko || River.bFutaleufu) && Spacing==1.)) || Span!=(Size-1)*Spacing ||
+        Base!=RaftSimContinuousRiver::TerrainHeightBase(River) || Range!=2400. || !FMath::IsFinite(Datum) || !FMath::IsFinite(ActorZ) ||
         !FMath::IsNearlyEqual(ActorZ,(Base+Range*32768./65535.-Datum)*100.,.0001))
     { Error=TEXT("Invalid shared terrain encoding"); return false; }
     const FVector Scale(ScaleValues[0]->AsNumber(),ScaleValues[1]->AsNumber(),ScaleValues[2]->AsNumber());

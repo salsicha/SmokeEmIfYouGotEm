@@ -50,6 +50,41 @@ bool FRaftSimContinuousRiverSpecTest::RunTest(const FString& Parameters)
     return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimFutaleufuContinuousTerrainFrameTest,
+    "RaftSim.M9.FutaleufuContinuousTerrainFrame",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimFutaleufuContinuousTerrainFrameTest::RunTest(const FString& Parameters)
+{
+    using namespace RaftSimContinuousRiver;
+    FString Error; FSpec Spec;
+    auto J=MakeShared<FJsonObject>();
+    J->SetStringField(TEXT("schema"),TEXT("raftsim.continuous_landscape.v1"));
+    J->SetStringField(TEXT("river_id"),TEXT("futaleufu_river_chile"));
+    J->SetStringField(TEXT("rig"),TEXT("PaddleCrew"));
+    TestTrue(TEXT("Full Futaleufu terrain has an explicit identity"),Resolve(J,Spec,Error));
+    TestEqual(TEXT("Futaleufu keeps its own detail assets"),Spec.DetailStem,FString(TEXT("Futaleufu")));
+    TestEqual(TEXT("Encoding includes the lower river below 200 m"),TerrainHeightBase(Spec),0.);
+    J->SetArrayField(TEXT("horizontal_origin_m"),
+        {MakeShared<FJsonValueNumber>(739986.),MakeShared<FJsonValueNumber>(5195961.5)});
+    J->SetStringField(TEXT("horizontal_crs"),TEXT("EPSG:32718"));
+    J->SetStringField(TEXT("vertical_reference"),TEXT("EGM2008"));
+    J->SetNumberField(TEXT("vertical_datum_m"),150.);
+    FVector2D XY;double Datum=0;
+    TestTrue(TEXT("Southern UTM18 and source geoid frame accepted"),Frame(J,Spec,XY,Datum,Error));
+    TestEqual(TEXT("Continuous river origin is not recentered"),XY,FVector2D(739986.,5195961.5));
+    TestEqual(TEXT("Local vertical offset retained"),Datum,150.);
+    J->SetStringField(TEXT("horizontal_crs"),TEXT("EPSG:32618"));
+    TestFalse(TEXT("Northern hemisphere cannot substitute"),Frame(J,Spec,XY,Datum,Error));
+    J->SetStringField(TEXT("horizontal_crs"),TEXT("EPSG:32718"));
+    J->SetStringField(TEXT("vertical_reference"),TEXT("NAD83(2011) ellipsoid"));
+    TestFalse(TEXT("Ellipsoid elevation cannot substitute for EGM2008"),Frame(J,Spec,XY,Datum,Error));
+    TestFalse(TEXT("Foreign vegetation cannot silently populate Futaleufu"),Dressing(J,Spec,Error));
+    J->SetStringField(TEXT("schema"),TEXT("raftsim.continuous_map_import.v1"));
+    TestFalse(TEXT("Terrain registration alone cannot authorize a single-inlet runtime"),Resolve(J,Spec,Error));
+    return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimContinuousRiverDressingTest,
     "RaftSim.M9.ContinuousRiverDressingIdentity",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
