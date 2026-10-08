@@ -1,4 +1,4 @@
-"""Unsaved native terrain review: no water, foliage, raft, or FPS acceptance."""
+"""Unsaved native environment review: no playable water, raft, or FPS acceptance."""
 import hashlib,json,os,time,traceback
 from pathlib import Path
 import unreal
@@ -11,7 +11,7 @@ if level not in counts:raise RuntimeError('Only explicit continuous terrain cand
 expected_count=counts[level]
 path=root/('unreal/Content/'+level.removeprefix('/Game/')+'.umap')
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-state=dict(frames=0,captures=[],scope='Native terrain-only diagnostic; no playable water, vegetation or performance acceptance')
+state=dict(frames=0,captures=[],scope='Native continuous-environment diagnostic; no playable water, boat or performance acceptance')
 views=[('azul_canyon',[439504.80775,-386523.59978,8907.82743]),
        ('confluence',[563655.26699,-378484.39764,5614.38904]),
        ('mainstem_island',[304528.62221,-96383.43869,4023.28625])]
@@ -62,6 +62,18 @@ try:
     resident=[a for a in actors.get_all_level_actors() if isinstance(a,unreal.LandscapeStreamingProxy)]
     state['loaded_terrain_proxies']=len(resident)
     if len(resident)!=expected_count:raise RuntimeError('Actual resident streaming proxies differ from expected count: '+str(len(resident)))
+    state['canopy_instances_by_mesh']={}
+    for actor in actors.get_all_level_actors():
+        if not isinstance(actor,unreal.InstancedFoliageActor):continue
+        for component in actor.get_components_by_class(unreal.InstancedStaticMeshComponent):
+            if not component.static_mesh:continue
+            name=component.static_mesh.get_path_name()
+            state['canopy_instances_by_mesh'][name]=state['canopy_instances_by_mesh'].get(name,0)+component.get_instance_count()
+            if component.get_collision_enabled()!=unreal.CollisionEnabled.NO_COLLISION:
+                raise RuntimeError('Canopy introduced physical collision')
+    state['canopy_instance_count']=sum(state['canopy_instances_by_mesh'].values())
+    expected_canopy=int(os.environ.get('RAFTSIM_TERRAIN_REVIEW_EXPECTED_CANOPY','0'))
+    if state['canopy_instance_count']!=expected_canopy:raise RuntimeError('Saved continuous canopy count mismatch')
     state['terrain_materials']={}
     for actor in resident:
         material=actor.get_editor_property('landscape_material')
