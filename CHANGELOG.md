@@ -278,6 +278,9 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- P pauses and resumes the run, as Escape does (and resumes from photo
+  mode). Photo mode moves from P to O; gamepad Y and the pause panel's
+  Photo Mode button are unchanged.
 - South Fork live oaks (the three V3 crown forms, about 80% of the river's
   trees) carry leaf sprays instead of sheets. Each branch tip held two
   crossed leaf-cluster cards 1.6-2.8 m wide, lit as flat planes, so the

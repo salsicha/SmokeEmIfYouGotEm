@@ -198,7 +198,7 @@ void URaftSimRunHudWidget::BuildWidgetTree()
     AddPrompt(Prompts, NSLOCTEXT("RaftSim", "HudKeyScout", "M"), NSLOCTEXT("RaftSim", "HudScout", "SCOUT"));
     AddPrompt(Prompts, NSLOCTEXT("RaftSim", "HudKeyCamera", "C"), NSLOCTEXT("RaftSim", "HudCamera", "CAMERA"));
     AddPrompt(Prompts, NSLOCTEXT("RaftSim", "HudKeyWeather", "T"), NSLOCTEXT("RaftSim", "HudWeather", "WEATHER"));
-    AddPrompt(Prompts, NSLOCTEXT("RaftSim", "HudKeyPause", "ESC"), NSLOCTEXT("RaftSim", "HudPause", "PAUSE"));
+    AddPrompt(Prompts, NSLOCTEXT("RaftSim", "HudKeyPause", "ESC / P"), NSLOCTEXT("RaftSim", "HudPause", "PAUSE"));
 
     // --- Rescue alert and crew-call subtitles.
     RescueCard = WidgetTree->ConstructWidget<UBorder>();
@@ -281,7 +281,7 @@ void URaftSimRunHudWidget::BuildWidgetTree()
     Pin(Canvas, PhotoChip, FAnchors(0.5f, 0.0f), FVector2D(0.5f, 0.0f), FVector2D(0, 22));
     UTextBlock* PhotoText = MakeText(Label(14), Paper());
     PhotoText->SetText(NSLOCTEXT("RaftSim", "PhotoChip",
-        "PHOTO MODE   ·   F9 / RT  CAPTURE   ·   P / Y  RETURN"));
+        "PHOTO MODE   ·   F9 / RT  CAPTURE   ·   O / Y  RETURN"));
     PhotoChip->SetContent(PhotoText);
     PhotoChip->SetVisibility(ESlateVisibility::Collapsed);
 
@@ -383,7 +383,7 @@ void URaftSimRunHudWidget::BuildWidgetTree()
     Action(NSLOCTEXT("RaftSim", "LeaveAction", "RETURN TO RIVERS"), GET_FUNCTION_NAME_CHECKED(URaftSimRunHudWidget, LeaveRun));
     UHorizontalBox* PauseHints = WidgetTree->ConstructWidget<UHorizontalBox>();
     PauseColumn->AddChildToVerticalBox(PauseHints)->SetPadding(FMargin(0, 22, 0, 0));
-    AddPrompt(PauseHints, NSLOCTEXT("RaftSim", "PauseKeyResume", "ESC / MENU"), NSLOCTEXT("RaftSim", "PauseResume", "RESUME"));
+    AddPrompt(PauseHints, NSLOCTEXT("RaftSim", "PauseKeyResume", "ESC / P / MENU"), NSLOCTEXT("RaftSim", "PauseResume", "RESUME"));
     AddPrompt(PauseHints, NSLOCTEXT("RaftSim", "PauseKeyLeave", "HOME / B"), NSLOCTEXT("RaftSim", "PauseLeave", "LEAVE"));
     PausePanel->SetVisibility(ESlateVisibility::Collapsed);
 

@@ -55,9 +55,9 @@ map is a development component, not another river to select.
 | Back to your seats (after a high-side) | 6 |
 | Scout the river | M |
 | Select swimmer / reach / throw line / reseat | Mouse wheel / E / R / F |
-| Pause and resume | Escape (rebindable in Settings) |
+| Pause and resume | Escape (rebindable in Settings) or P |
 | Restart checkpoint / return to rivers | Backspace / Home while paused |
-| Photo mode / capture photo | P / F9 in photo mode |
+| Photo mode / capture photo | O / F9 in photo mode |
 | Change camera / weather | C / T |
 | Review a completed run | V |
 

@@ -258,7 +258,18 @@ bool FRaftSimAssertM6RuntimeShell::Update()
     Test->TestEqual(TEXT("pause panel has four actionable buttons"), ActionCount, 4);
     if (Resume) Resume->OnClicked.Broadcast();
     Test->TestFalse(TEXT("clicking Resume resumes the actual world"), UGameplayStatics::IsGamePaused(World));
-    for (FKey Key : {EKeys::Gamepad_Special_Right, EKeys::M, EKeys::P})
+    // P pauses the river and resumes it, alongside the rebindable pause key.
+    const FInputKeyBinding* PauseOnP = Controller->InputComponent->KeyBindings.FindByPredicate(
+        [](const FInputKeyBinding& Binding) { return Binding.Chord.Key == EKeys::P && Binding.KeyEvent == IE_Pressed; });
+    Test->TestNotNull(TEXT("P is bound in the run"), PauseOnP);
+    if (PauseOnP)
+    {
+        PauseOnP->KeyDelegate.Execute(EKeys::P);
+        Test->TestTrue(TEXT("P pauses the river"), UGameplayStatics::IsGamePaused(World));
+        PauseOnP->KeyDelegate.Execute(EKeys::P);
+        Test->TestFalse(TEXT("P again resumes the river"), UGameplayStatics::IsGamePaused(World));
+    }
+    for (FKey Key : {EKeys::Gamepad_Special_Right, EKeys::M, EKeys::P, EKeys::O})
     {
         Test->TestTrue(TEXT("shell navigation works while paused"),
             Controller->InputComponent->KeyBindings.ContainsByPredicate(

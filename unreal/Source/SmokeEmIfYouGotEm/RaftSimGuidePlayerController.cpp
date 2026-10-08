@@ -187,6 +187,12 @@ void ARaftSimGuidePlayerController::SetupInputComponent()
         }
     }
     InputComponent->BindKey(PauseKey, IE_Pressed, this, &ARaftSimGuidePlayerController::TogglePauseMenu);
+    // P pauses and resumes as well as the rebindable pause key, unless that
+    // key is P itself: bound twice, one press would pause and resume at once.
+    if (PauseKey != EKeys::P)
+    {
+        InputComponent->BindKey(EKeys::P, IE_Pressed, this, &ARaftSimGuidePlayerController::TogglePauseMenu);
+    }
     InputComponent->BindKey(EKeys::Gamepad_Special_Right, IE_Pressed, this, &ARaftSimGuidePlayerController::TogglePauseMenu);
     InputComponent->BindKey(EKeys::Tab, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleCommandWheel);
     InputComponent->BindKey(EKeys::Tab, IE_Released, this, &ARaftSimGuidePlayerController::CloseCommandWheel);
@@ -195,7 +201,11 @@ void ARaftSimGuidePlayerController::SetupInputComponent()
     InputComponent->BindKey(EKeys::Gamepad_Special_Left, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleCommandWheel);
     InputComponent->BindKey(EKeys::M, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleScoutBoard);
     InputComponent->BindKey(EKeys::Gamepad_DPad_Down, IE_Pressed, this, &ARaftSimGuidePlayerController::HandleGamepadDPadDown);
-    InputComponent->BindKey(EKeys::P, IE_Pressed, this, &ARaftSimGuidePlayerController::TogglePhotoMode);
+    // Photo mode sits beside P on O, unless the pause key was rebound there.
+    if (PauseKey != EKeys::O)
+    {
+        InputComponent->BindKey(EKeys::O, IE_Pressed, this, &ARaftSimGuidePlayerController::TogglePhotoMode);
+    }
     InputComponent->BindKey(EKeys::Gamepad_FaceButton_Top, IE_Pressed, this, &ARaftSimGuidePlayerController::TogglePhotoMode);
     InputComponent->BindKey(EKeys::F9, IE_Pressed, this, &ARaftSimGuidePlayerController::CapturePhoto);
     InputComponent->BindKey(EKeys::Gamepad_RightTrigger, IE_Pressed, this, &ARaftSimGuidePlayerController::CapturePhoto);
@@ -230,7 +240,7 @@ void ARaftSimGuidePlayerController::SetupInputComponent()
         const FKey Key = Binding.Chord.Key;
         Binding.bExecuteWhenPaused = Key == PauseKey || Key == EKeys::Gamepad_Special_Right ||
             Key == EKeys::M || Key == EKeys::Gamepad_DPad_Down ||
-            Key == EKeys::P || Key == EKeys::Gamepad_FaceButton_Top ||
+            Key == EKeys::P || Key == EKeys::O || Key == EKeys::Gamepad_FaceButton_Top ||
             Key == EKeys::F9 || Key == EKeys::Gamepad_RightTrigger ||
             Key == EKeys::BackSpace || Key == EKeys::Gamepad_FaceButton_Bottom ||
             Key == EKeys::Home || Key == EKeys::Gamepad_FaceButton_Right;
