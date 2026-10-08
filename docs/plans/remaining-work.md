@@ -59,14 +59,35 @@ engine/build/cook work appears. All memory, disk, physical-state and route gates
 are unchanged; 18 guard/checkpoint/audit regressions pass. The old failure did
 not record per-process memory, so its exact memory attribution remains unknown.
 
-One fresh queue, `tmp/futaleufu-expanded-continuation-queue-v2`, is waiting for
-60 seconds of actual engine/build/cook idleness and adequate resources. It runs
-`tmp/resume_futaleufu_expanded_continuation_v2.ps1` (initial wrapper PID 32264,
-exec session 76625), reuses the verified two-second state, then requests the
-same full-domain thirty-second continuation and independent all-frame audit.
-It never reruns canopy/cold-start work, retries a failed solver automatically,
-or modifies another task. Check that process/session and its terminal receipts
-before starting anything else; the prior resume pipeline remains terminal.
+The fresh `tmp/futaleufu-expanded-continuation-queue-v2` is now terminal and
+successful, not a live queue. Its unchanged full-domain continuation reached
+32 seconds. The independent audit checked all 822 original cross-sections in
+each of 11 saved frames: every section remained connected and all closed
+exterior banks remained dry. Restart fields and clock matched exactly; maximum
+step mass residual was 5.98e-9 m3. See the
+[verified continuation receipt](../../physics/data/real_world/futaleufu_river_chile/review/expanded_continuation_checkpoint_2026_10_08.json).
+The final outlet carried 83.435 m3/s against the inferred 400 m3/s inlet, with
+316.565 m3/s still entering storage. These fields are not settled or approved
+for the normal map.
+
+The complete editor build `tmp/continuous-diagnostic-access-build-v11` and all
+four tests in `tmp/futaleufu-frame-native-v1/index.json` passed without warnings.
+The native tests read both actual Futaleufu coordinate charts. Their exact
+descriptive UTM18S/EGM2008 labels now match the reviewed frame without changing
+coordinates or accepting unknown aliases; the unvalidated runtime-water guard
+remains in force. Commit `28b616b44` also adds the same post-preparation
+process/resource checks to the long continuation runner; 17 Python regressions
+pass. These are frame and safety controls, not rendered or packaged acceptance.
+
+The next run is `tmp/futaleufu-expanded-native-long-v1`, launched through exec
+session 6554 (Python launcher PID 13432, worker PID 24484). It waits for a full
+idle minute, prepares the exact verified 32-second checkpoint, then requests
+30,000 native steps to 332 seconds. Inspect the live handle and launch/terminal
+receipts before starting another job. It retains the four-hour bound and the
+3 GiB RAM/commit and 40 GiB disk floors, and stops only its own solver if shared
+engine/build/cook work appears. A new independent all-frame audit must check
+containment beyond the old 92-second failure and continuing storage before
+runtime integration. No canopy work or cold start is repeated.
 Earlier serial-v1/v2 and Chilko queue-v10/v11 attempts are terminal and preserved, not
 live jobs. Inspect the pipeline's actual process and receipts before starting
 anything else. Diagnosis: `tmp/futaleufu-canopy-residency-v1.json`, SHA256
