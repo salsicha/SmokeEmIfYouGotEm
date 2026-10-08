@@ -19,6 +19,11 @@ struct FRaftSimCC0GripBar
     /** The way the palm faces: from the hand toward the bar. */
     FVector PalmFacing = FVector::ZeroVector;
     float RadiusCm = 0.0f;
+    /** How far the bar runs diagonally across the palm, in degrees: positive
+     * turns its thumb end toward the fingers (the bar from the heel of the
+     * hand to the base of the index finger, as in a power grip), negative
+     * toward the wrist. */
+    float ObliqueDegrees = 0.0f;
 };
 
 /** One hand's finger and thumb bones closed round a bar of one radius, as
@@ -256,15 +261,16 @@ private:
      * first pass, or zero; ResolveGripBar turns the grip toward it. */
     FVector GripForearmHint[2] = {FVector::ZeroVector, FVector::ZeroVector};
     void TurnGripTowardForearm(bool bLeft, FRaftSimCC0GripBar& Bar, float Handedness, float Share, float MaxDegrees) const;
+    void LayGripAlongForearm(bool bLeft, FRaftSimCC0GripBar& Bar, float MinDegrees, float MaxDegrees) const;
     bool ResolveHandAnatomy(bool bLeft, FVector& OutWristCm, FVector& OutFingers, FVector& OutThumb,
         FVector& OutPalm, float& OutHandedness) const;
     float MeasurePalmSurfaceOffsetCm(bool bLeft) const;
     bool ResolveGripBar(bool bLeft, const FRaftSimCrewAvatarPose& Pose, FRaftSimCC0GripBar& OutBar) const;
     FQuat ResolveGripHandDelta(bool bLeft, const FRaftSimCC0GripBar& Bar) const;
-    FVector ResolveGripPointInReferenceHandCm(bool bLeft, float RadiusCm) const;
+    FVector ResolveGripPointInReferenceHandCm(bool bLeft, float RadiusCm, float ObliqueDegrees = 0.0f) const;
     FVector ResolveGripWristCm(bool bLeft, const FRaftSimCC0GripBar& Bar) const;
-    const FRaftSimCC0HandGripShape& ResolveHandGripShape(bool bLeft, float RadiusCm) const;
-    void ApplyHandGripShape(bool bLeft, float RadiusCm);
+    const FRaftSimCC0HandGripShape& ResolveHandGripShape(bool bLeft, float RadiusCm, float ObliqueDegrees = 0.0f) const;
+    void ApplyHandGripShape(bool bLeft, const FRaftSimCC0GripBar& Bar);
     float ForearmTwistDegrees(bool bLeft, const FVector& ElbowCm, const FVector& WristCm,
         const FQuat& HandRotation) const;
     void MeasurePaddleGripOrientation(const FRaftSimCrewAvatarPose& Pose, float& OutMinimumPalmFacingDot,

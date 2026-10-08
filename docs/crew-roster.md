@@ -115,24 +115,33 @@ Each paddler holds the paddle as a rafter does: the inboard hand caps the
 T-grip palm-down, fingers over the crossbar, and the outboard hand grips the
 shaft about 66 cm down, knuckles out over the water, on either side of the
 boat. The fingers close together round the bar, and each thumb wraps the
-other way round it, its pad on the index finger: under the T-grip's
-crossbar, and round the shaft. Each grip turns about its bar toward the
-forearm carrying it, so the wrists stay straight through the stroke.
-- **Catch:** they lean well forward from the hips and turn the
-  paddle-side shoulder ahead. The top hand is stacked out over the blade
-  about 45 cm ahead, at forehead height, and the shaft stands near
-  vertical with the blade planted 60 cm ahead, just outside the tube.
-- **Power:** the torso pulls back through upright to a slight lean back,
-  carrying the paddle; the blade travels back to the hip.
-- **Exit and recovery:** the blade comes out behind the hip with the top
-  hand at chin height ahead of the chest, lifts clear of the water and
-  swings forward low over it as they lean forward again.
-- The top hand stays out in front of the body, 36-40 cm from the head and
-  well off the line of sight; from the guide's eye the arms stay out of
-  view through forward strokes and steering.
-- **Back strokes:** the blade plants behind the hip and drives forward
-  while the top hand works against it, drawn back to the chest. **Turns**
+other way round it, opposite the fingers: under the T-grip's crossbar, and
+round the shaft over the fingertips. Each grip turns about its bar and lays
+the bar diagonally across the palm as the forearm carrying it needs, the
+ring and little fingers converging toward the thumb as they close round it,
+so the wrists stay nearer what a wrist can do.
+- **Catch:** they lean well forward from the hips with the chest turned
+  25 degrees toward the paddle side. The top hand is stacked out over the
+  blade about 50 cm ahead of the seat, at forehead height, and the blade
+  plants about 60 cm ahead, well ahead of the knees, just outside the tube.
+- **Power:** the torso pulls back to upright and a little past it, the
+  chest turning on to 40 degrees toward the paddle side, while the top
+  hand pushes forward, staying about 42 cm ahead at chin height. The blade
+  draws back near vertical.
+- **Exit and recovery:** the blade comes out about 18 cm ahead of the
+  seat, before it reaches the hips, so the paddle never runs alongside the
+  body. It lifts clear of the water and swings forward low over it as they
+  lean forward again.
+- The turned chest brings the T-grip arm's shoulder forward, so that arm
+  reaches out to the T-grip in front of the chest and vest, not through
+  them.
+- **Back strokes:** the blade plants ahead of the hip and drives forward
+  past the knees, the chest turned 30 degrees toward it easing to 20, while
+  the top hand works against it, staying in front of the chest. **Turns**
   pair forward and back strokes.
+- **The guide through their own eyes** turns 60 percent as far and holds
+  the T-grip further out to the side, keeping their arms at the edge of the
+  player's view. Seen from outside, the guide paddles like everyone else.
 - **At rest** the paddle lies across the tops of the thighs, just behind
   the knees, with the blade out over the tube. The upper hand holds the
   T-grip and the lower hand the shaft just outboard of the outboard thigh.
@@ -140,11 +149,20 @@ forearm carrying it, so the wrists stay straight through the stroke.
 The T-grip crossbar runs parallel to the blade, as on a real paddle. Elbows
 bend on each body's own arm lengths: out, down and a little back on the shaft
 arm. The top arm, reaching across the chest, leads with its elbow out and
-down, turned as far as needed to keep the forearm clear of the face. As a
+down. Each elbow turns about the shoulder-wrist line as far as needed to keep
+the arm outside the chest and vest and the forearm clear of the face. As a
 hand nears full reach the shoulder slides toward it and rises, as a
-paddler's shoulder blade does, so the arm stays in its socket.
+paddler's shoulder blade does, so the arm stays in its socket. The spine
+twists with the chest turn, the lower back taking a third of it; the neck
+turns it all back so the head keeps looking downriver, and the vest follows
+the chest.
 `RaftSim.Crew.GearReview` renders each paddler's hands, shoulders, face and
-chin strap, feet and seat, and audits grip orientation and arm stretch.
+chin strap, feet and seat, and audits grip orientation and arm stretch. It
+holds each paddler at twenty points round a forward and a back stroke,
+checks that the blade works ahead of the hips, that the T-grip arm stays
+out of the chest and that the wrists bend within reach, and films the catch,
+power, exit and recovery from in front, above and straight down, with
+close-ups of each thumb with the paddle hidden.
 `review_crew_paddle_stroke_cycle.py` renders the crew at the catch, in the
 power phase, at the exit and in the recovery.
 

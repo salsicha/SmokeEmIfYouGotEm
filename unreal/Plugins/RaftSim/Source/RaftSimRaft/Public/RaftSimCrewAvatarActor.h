@@ -74,6 +74,11 @@ struct FRaftSimCrewAvatarPose
 
     FVector TorsoCenterCm = FVector::ZeroVector;
     FRotator TorsoRotation = FRotator::ZeroRotator;
+    /** The chest's turn on the hips about the spine, in degrees: positive
+     * turns the chest toward +Y (the +Y shoulder back, the -Y shoulder
+     * forward). The rendered spine twists by it; TorsoRotation's yaw only
+     * moves the host landmarks. */
+    float TorsoTwistDegrees = 0.f;
     FVector HeadCenterCm = FVector::ZeroVector;
     FVector LeftShoulderCm = FVector::ZeroVector;
     FVector LeftHandCm = FVector::ZeroVector;
@@ -109,12 +114,15 @@ class RAFTSIMRAFT_API URaftSimCrewAvatarPoseLibrary : public UBlueprintFunctionL
     GENERATED_BODY()
 
 public:
-    /** Deterministic Control-Rig-equivalent pose solve used by runtime and automation. */
+    /** Deterministic Control-Rig-equivalent pose solve used by runtime and
+     * automation. The guide seen through their own eyes paddles with their
+     * arms held out of the player's view (bFirstPersonGuide). */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
     static FRaftSimCrewAvatarPose EvaluatePose(
         ERaftSimCrewAvatarAction Action,
         float NormalizedPhase,
-        int32 SeatSide
+        int32 SeatSide,
+        bool bFirstPersonGuide = false
     );
 
     /** Small repeatable timing error that keeps a commanded crew coordinated but not cloned. */
@@ -229,6 +237,10 @@ public:
      * in its eye socket (possessed guide seat). Idempotent per value.
      */
     void SetFirstPersonHeadHidden(bool bShouldHide);
+
+    /** The player looks through this avatar's eyes. The guide then paddles
+     * with their arms held toward the edge of the view (EvaluatePose). */
+    void SetFirstPersonView(bool bInFirstPersonView) { bFirstPersonView = bInFirstPersonView; }
 
     /**
      * Hides the avatar's whole body (torso, gear, limbs, paddle) for the
@@ -617,6 +629,7 @@ private:
     bool bVisualBuilt = false;
     bool bUsingProductionVisual = false;
     bool bFirstPersonHeadHidden = false;
+    bool bFirstPersonView = false;
     bool bFirstPersonBodyHidden = false;
     float AnimationPhase = 0.0f;
     float AnimationPhaseOffset = 0.0f;

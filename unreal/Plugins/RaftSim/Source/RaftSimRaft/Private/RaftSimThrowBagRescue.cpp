@@ -68,6 +68,7 @@ FRaftSimCrewAvatarPose Blend(const FRaftSimCrewAvatarPose& A, const FRaftSimCrew
     FRaftSimCrewAvatarPose Out = S < .5f ? A : B;
     for (auto Point : Points) Out.*Point = FMath::Lerp(A.*Point, B.*Point, S);
     Out.TorsoRotation = FQuat::Slerp(A.TorsoRotation.Quaternion(), B.TorsoRotation.Quaternion(), S).Rotator();
+    Out.TorsoTwistDegrees = FMath::Lerp(A.TorsoTwistDegrees, B.TorsoTwistDegrees, S);
     Out.FistGripBlend = FMath::Lerp(A.FistGripBlend, B.FistGripBlend, S);
     Out.bFeetPlanted = false;
     return Out;

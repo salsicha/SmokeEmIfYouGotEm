@@ -765,10 +765,15 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
     // The blade travels WITH the top hand since the 2026-08-10 stroke fix:
     // planted forward at the catch, swept rearward through power. The old
     // expectation here encoded the reversed "back-paddle in mirror" motion.
+    // The blade plants well ahead of the knees and comes out ahead of the
+    // hips, never alongside the body, while the top hand stays out in front
+    // of the chest (2026-10-07).
     TestTrue(
-        TEXT("forward stroke has distinct catch and power-finish landmarks"),
-        ForwardCatch.PaddleTopCm.X - ForwardFinish.PaddleTopCm.X >= 25.0f &&
-            ForwardCatch.PaddleBottomCm.X - ForwardFinish.PaddleBottomCm.X >= 35.0f);
+        TEXT("forward stroke plants ahead of the knees and finishes ahead of the hips"),
+        ForwardCatch.PaddleBottomCm.X - ForwardFinish.PaddleBottomCm.X >= 35.0f &&
+            ForwardCatch.PaddleBottomCm.X >= ForwardCatch.LeftKneeCm.X + 20.0f &&
+            ForwardFinish.PaddleBottomCm.X >= 0.5f * (ForwardFinish.LeftHipCm.X + ForwardFinish.RightHipCm.X) + 10.0f &&
+            ForwardFinish.PaddleTopCm.X >= 35.0f);
     TestTrue(
         TEXT("forward recovery lifts the blade clear of the planted power path"),
         ForwardRecovery.PaddleBottomCm.Z - ForwardCatch.PaddleBottomCm.Z >= 24.0f);
@@ -1356,9 +1361,8 @@ bool FRaftSimM5StartRescueCommand::Update()
             // (RaftSimCC0CrewGrip.cpp), so a pad lands within half a
             // centimetre of the bar rather than being forced onto it (which
             // had bent fingers backwards), and the thumb wraps the bar the
-            // other way to rest over the index finger's middle segment,
-            // within 2.25 cm of that target (it stays off the fingers on the
-            // way round, the widest T-grip crossbar costing most).
+            // other way from the fingers: its pad falls under 2.25 cm (stand-off
+            // plus arc) short of closing 140 degrees round the bar.
             Test->TestTrue(
                 FString::Printf(
                     TEXT("CC0 crew body %s seats every distal finger pad on its "
@@ -1368,7 +1372,7 @@ bool FRaftSimM5StartRescueCommand::Update()
                 It->GetMaximumPaddleFingerContactErrorCm() <= 0.5f);
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("CC0 crew body %s rests both thumbs over their fingers "
+                    TEXT("CC0 crew body %s closes both thumbs round their bars against the fingers "
                          "(maximum error %.3f cm)"),
                     *It->GetName(),
                     It->GetMaximumPaddleThumbContactErrorCm()),

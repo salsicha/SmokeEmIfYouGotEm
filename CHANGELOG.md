@@ -14,11 +14,24 @@ All notable changes to this project are recorded here, newest first. Versioning 
     treated the back of the hand as the palm, so fingers bent backwards and
     wrists turned an extra half turn. At rest the top hand holds the T-grip.
   - **Paddle stroke:** the paddler leans well forward to plant the blade
-    near vertical and pulls back through upright to a lean back, from the
-    torso and core. The top hand stays out in front of the body, 36-40 cm
-    from the head: it had ridden beside the ear at eye height, so the top
-    arm crossed the face and, from the guide's eye, filled the view. Back
-    strokes draw the top hand back against the blade.
+    near vertical about 60 cm ahead of the seat, well ahead of the knees,
+    and pulls back to upright and a little past, from the torso and core.
+    The blade comes out about 18 cm ahead of the seat, before the hips:
+    drawn back past the hip, the paddle ran alongside the body and bent the
+    wrists past what wrists can do. Back strokes plant ahead of the hip and
+    drive forward past the knees. The top hand stays out in front of the
+    chest throughout.
+  - **Torso turn:** the chest turns on the hips toward the paddle side, 25
+    degrees at the catch to 40 at the exit, the lower back taking a third of
+    it and the neck turning it all back so the head looks downriver. The rendered spine had never
+    turned at all (it took only the host's lean), so the T-grip arm reaching
+    across the body cut through the chest and vest. Each elbow now also
+    turns about the shoulder-wrist line to keep the arm outside the chest
+    and vest. The vest follows the chest bone; it had taken its facing from
+    the shoulder joints, which slide toward a reaching hand, and swung
+    across the chest mid-stroke. The guide seen through their own eyes
+    turns less and holds the T-grip further out, keeping their arms at the
+    edge of the view.
   - **Shoulders:** a reaching shoulder stays on its collarbone; Ingrid's
     bare shoulder no longer tears away from the arm mid-stroke.
   - **Seats:** the crew sit 3.5 cm into the tube with a full contact patch,
@@ -44,13 +57,20 @@ All notable changes to this project are recorded here, newest first. Versioning 
     the panels stop lower. One shared pair had stood high off the narrow
     shoulders and pinned the arm raised to the T-grip under it.
   - **Thumbs:** the fingers close together round the bar and each thumb
-    wraps the other way round it, its pad on the index finger: under the
-    T-grip's crossbar, and opposed to the fingers round the shaft. The
-    thumb had pointed up the shaft and lay beside the T-grip.
+    wraps 140 degrees round it the other way, its end meeting the
+    fingertips: under the T-grip's crossbar, and round the shaft over the
+    fingers. Aimed at the outside of the index finger, out of the thumb's
+    reach round the far side of the bar, the thumb had stopped short along
+    the shaft and beside the T-grip.
   - **Wrists:** each grip turns about its bar toward the forearm carrying
-    it, and a raised elbow swings about the shoulder-wrist line on its own
-    bone lengths. Mid-stroke wrists had bent and twisted to impossible
-    angles.
+    it and lays the bar diagonally across the palm as the forearm needs,
+    as a hand holds a handle; a raised elbow swings about the
+    shoulder-wrist line on its own bone lengths. Laid square across the
+    palm, the T-grip's crossbar and the shaft ran nearly along their
+    forearms, bending the wrists 75 and 55 degrees sideways. Closing round
+    a bar laid toward the fingers, the ring and little fingers converge
+    toward the base of the thumb, so the little finger wraps the T-grip
+    instead of curling tight beside it.
   - **Knees and ankles:** the legs bend on each body's own thigh and calf.
     The rendered thighs are about 41 cm, the pose's 34-35 cm, and aiming
     each bone at the pose's knee left the thigh's end 7-8 cm from the
@@ -83,7 +103,12 @@ All notable changes to this project are recorded here, newest first. Versioning 
     the player's camera while the guide paddles, forward, back and
     steering, with an arm-coverage audit; a look down onto each nape; the
     throw bag, bow line, knot and a D-ring; and the hand-to-face gap at
-    twenty points round the stroke.
+    twenty points round the stroke. Each paddler is also held at twenty
+    points round a back stroke, under a back-paddle order, and both strokes
+    are checked for the blade working ahead of the hips, the T-grip arm
+    staying out of the chest and vest, and the wrists bending within reach;
+    the catch, power, exit and recovery are filmed from in front, above and
+    straight down, with each thumb close up with the paddle hidden.
 
 - Crew gear and grips:
   - **Grips:** the T-grip hand caps the crossbar palm-down, and the shaft

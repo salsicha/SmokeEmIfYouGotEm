@@ -1172,42 +1172,73 @@ void ApplyMirroredPaddleGrip(
     float SeatSide,
     float LowerHandAlpha = 0.55f);
 
+// The shape of a paddler's stroke. Every paddler turns the chest toward the
+// paddle side and keeps the T-grip hand out in front, so the arm reaching
+// across the body to the T-grip passes in front of the chest and vest, not
+// through them ("the arm reaching across the body to reach the t grip
+// shouldn't cut through the chest or life vest. the torso probably has to
+// pivot some so both arms can naturally reach their positions", 2026-10-07).
+// The guide seen in first person turns less and holds the T-grip further
+// out to the side: their own arms otherwise filled a quarter of the player's
+// view, and their chest lies below it.
+struct FStrokeShape
+{
+    // Chest turn toward the paddle side at the catch and the exit (degrees).
+    float TwistCatchDegrees;
+    float TwistExitDegrees;
+    // The T-grip ahead of the seat at the catch and the exit, and out
+    // toward the paddle side (cm).
+    float TopCatchCm;
+    float TopExitCm;
+    float TopOutboardCm;
+    // A back stroke: chest turn at the plant and the end, the T-grip ahead
+    // of the seat at the plant and the end.
+    float BackTwistPlantDegrees;
+    float BackTwistEndDegrees;
+    float BackTopPlantCm;
+    float BackTopEndCm;
+};
+constexpr FStrokeShape PaddlerStroke{25.0f, 40.0f, 50.0f, 42.0f, 26.0f, 30.0f, 20.0f, 42.0f, 38.0f};
+constexpr FStrokeShape FirstPersonGuideStroke{15.0f, 24.0f, 45.0f, 36.0f, 34.0f, 18.0f, 12.0f, 42.0f, 38.0f};
+
 // One forward stroke, landmarks only, driven from the torso and core as a
 // rafter paddles (2026-10-07: "a person leans forward and the paddle goes
 // vertically into the water, and for the pull back part of the stroke, the
 // body goes from a lean forward position to a lean back position").
-// - Catch (Wave 1): leaning well forward with the paddle-side shoulder turned
-//   ahead, the top hand stacked out over the water above the blade, which
-//   plants 62 cm ahead just outside the tube with the shaft near vertical.
-// - Power: the torso pulls back through upright to a slight lean back,
-//   carrying both hands with it; the blade travels back to the hip still
-//   near vertical.
+// - Catch (Wave 1): leaning well forward, the chest turned toward the paddle
+//   side, the top hand stacked out over the water above the blade, which
+//   plants about 60 cm ahead of the seat, well ahead of the knees, just
+//   outside the tube with the shaft near vertical.
+// - Power: the torso pulls back to upright and a little past it, turning
+//   further toward the paddle side; the top hand pushes forward and stays out
+//   in front while the blade draws back, still near vertical.
+// - Exit: the blade comes out about 18 cm ahead of the seat, before it
+//   reaches the hips. Drawn back past the hip, as it was, the paddle ran
+//   alongside the body and the wrists bent further than wrists can ("the
+//   paddle should never be directly next to the character since a person's
+//   wrists can't bend like that, the paddle should go into the water in
+//   front of the knees and end before the paddle reaches the hips",
+//   2026-10-07).
 // - Recovery: the blade lifts clear and swings forward low over the water
 //   as the paddler leans forward again.
-// The T-grip hand stays out in front of the body the whole way: about 45 cm
-// ahead at forehead height at the catch, at chin height ahead of the chest at
-// the exit, 36-40 cm from the head and 70 degrees off the line of sight. Held
-// beside the ear at eye height, as it was, the top arm crossed just in front
-// of the face, the hand pressed into the jaw, and from the guide's eye the
-// arm filled the view ("when paddling the guide's arm covers the camera",
-// 2026-10-07). The blade root sits a hand's depth under the surface so the
-// lower top hand still meets a near-vertical shaft; the rigid-paddle pass
+// The blade root sits a hand's depth under the surface; the rigid-paddle pass
 // solves the blade's horizontal reach for the 120 cm shaft.
-void ApplyForwardStroke(FRaftSimCrewAvatarPose& Pose, float Side, float Wave, float RecoveryLiftCm)
+void ApplyForwardStroke(FRaftSimCrewAvatarPose& Pose, float Side, float Wave, float RecoveryLiftCm, const FStrokeShape& Shape)
 {
     const float Catch = 0.5f * (1.0f + Wave);
     const float RecoveryAlpha = RecoveryLiftCm / StrokeRecoveryLiftPeakCm;
     // Negative pitch leans the torso forward.
-    Pose.TorsoRotation.Pitch = FMath::Lerp(8.0f, -28.0f, Catch);
-    // Negative yaw turns the +Y (starboard) shoulder forward: the paddle
-    // side leads at the catch and swings back past square at the exit.
-    Pose.TorsoRotation.Yaw = -Side * FMath::Lerp(-4.0f, 14.0f, Catch);
+    Pose.TorsoRotation.Pitch = FMath::Lerp(4.0f, -28.0f, Catch);
+    // Positive twist turns the chest toward +Y: toward the paddle side for a
+    // starboard paddler. The host landmarks turn with it.
+    Pose.TorsoTwistDegrees = Side * FMath::Lerp(Shape.TwistExitDegrees, Shape.TwistCatchDegrees, Catch);
+    Pose.TorsoRotation.Yaw = Pose.TorsoTwistDegrees;
     Pose.TorsoRotation.Roll = -Side * (2.0f + 3.0f * (1.0f - Catch));
-    Pose.TorsoCenterCm.X += FMath::Lerp(-3.0f, 8.0f, Catch);
-    Pose.PaddleTopCm.X = FMath::Lerp(20.0f, 45.0f, Catch);
-    Pose.PaddleTopCm.Y = FMath::Lerp(28.0f, 26.0f, Catch) * Side;
-    Pose.PaddleTopCm.Z = FMath::Lerp(93.0f, 102.0f, Catch) + 6.0f * RecoveryAlpha;
-    Pose.PaddleBottomCm.X = FMath::Lerp(-4.0f, 62.0f, Catch) + 24.0f * RecoveryAlpha;
+    Pose.TorsoCenterCm.X += FMath::Lerp(-1.0f, 8.0f, Catch);
+    Pose.PaddleTopCm.X = FMath::Lerp(Shape.TopExitCm, Shape.TopCatchCm, Catch);
+    Pose.PaddleTopCm.Y = Shape.TopOutboardCm * Side;
+    Pose.PaddleTopCm.Z = FMath::Lerp(99.0f, 102.0f, Catch) + 6.0f * RecoveryAlpha;
+    Pose.PaddleBottomCm.X = FMath::Lerp(18.0f, 62.0f, Catch) + 24.0f * RecoveryAlpha;
     Pose.PaddleBottomCm.Y = 50.0f * Side;
     Pose.PaddleBottomCm.Z = -16.0f + RecoveryLiftCm;
     ApplyMirroredPaddleGrip(Pose, Side);
@@ -1243,9 +1274,11 @@ void ApplyMirroredPaddleGrip(
 FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
     ERaftSimCrewAvatarAction Action,
     float NormalizedPhase,
-    int32 SeatSide)
+    int32 SeatSide,
+    bool bFirstPersonGuide)
 {
     const float Side = SeatSide < 0 ? -1.0f : 1.0f;
+    const FStrokeShape& Stroke = bFirstPersonGuide ? FirstPersonGuideStroke : PaddlerStroke;
     const float Wave = StrokeWave(NormalizedPhase);
     FRaftSimCrewAvatarPose Pose;
     Pose.TorsoCenterCm = FVector(2.0f, 0.0f, 59.0f);
@@ -1359,30 +1392,29 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             break;
         }
         case ERaftSimCrewAvatarAction::ForwardStroke:
-            ApplyForwardStroke(Pose, Side, Wave, StrokeRecoveryLiftCm(NormalizedPhase));
+            ApplyForwardStroke(Pose, Side, Wave, StrokeRecoveryLiftCm(NormalizedPhase), Stroke);
             break;
         case ERaftSimCrewAvatarAction::BackStroke:
         {
-            // The forward cadence run in reverse: the blade plants by the
-            // hip and drives forward. ApplyForwardStroke sets landmarks only,
-            // never returning an already-articulated pose; upper-body
-            // articulation is applied exactly once after the action
-            // landmarks are complete.
+            // The forward cadence run in reverse: the blade plants ahead of
+            // the hip, where the forward stroke comes out, and drives forward
+            // past the knees. ApplyForwardStroke sets landmarks only, never
+            // returning an already-articulated pose; upper-body articulation
+            // is applied exactly once after the action landmarks are complete.
             const float BackLiftCm = StrokeRecoveryLiftCm(NormalizedPhase);
-            ApplyForwardStroke(Pose, Side, -Wave, BackLiftCm);
-            // Sit up and turn toward the blade behind instead of reaching
-            // forward over the knees.
-            Pose.TorsoRotation.Pitch *= -0.5f;
-            Pose.TorsoRotation.Yaw = Side * 10.0f;
-            // The top hand works against the blade: ahead of the chest while
-            // the blade plants behind the hip, drawn back to the chest as the
-            // lower hand drives the blade forward. The forward stroke's top
-            // hand travels with its blade, and run backwards it ended at
-            // eye height far forward of a guide leaning back, the sleeve
-            // filling the first-person view.
+            ApplyForwardStroke(Pose, Side, -Wave, BackLiftCm, Stroke);
             const float BladeForward = 0.5f * (1.0f - Wave);
-            Pose.PaddleTopCm.X = FMath::Lerp(30.0f, 22.0f, BladeForward);
-            Pose.PaddleTopCm.Z = FMath::Lerp(94.0f, 91.0f, BladeForward) +
+            // Sit up, the chest turned toward the blade, instead of reaching
+            // forward over the knees.
+            Pose.TorsoRotation.Pitch = FMath::Lerp(-4.0f, 4.0f, BladeForward);
+            Pose.TorsoTwistDegrees = Side * FMath::Lerp(Stroke.BackTwistPlantDegrees, Stroke.BackTwistEndDegrees, BladeForward);
+            Pose.TorsoRotation.Yaw = Pose.TorsoTwistDegrees;
+            // The top hand works against the blade, drawn back a little as
+            // the lower hand drives the blade forward, but it stays out in
+            // front of the chest: drawn back to the chest, the arm folded
+            // across the vest.
+            Pose.PaddleTopCm.X = FMath::Lerp(Stroke.BackTopPlantCm, Stroke.BackTopEndCm, BladeForward);
+            Pose.PaddleTopCm.Z = FMath::Lerp(97.0f, 94.0f, BladeForward) +
                 6.0f * BackLiftCm / StrokeRecoveryLiftPeakCm;
             ApplyMirroredPaddleGrip(Pose, Side);
             break;
@@ -1396,8 +1428,7 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             // reaching across the boat toward the commanded turn direction.
             const float StrokeDirection = -Turn * Side;
             ApplyForwardStroke(
-                Pose, Side, StrokeDirection * Wave, StrokeRecoveryLiftCm(NormalizedPhase));
-            Pose.TorsoRotation.Yaw = Turn * (18.0f + 8.0f * Wave);
+                Pose, Side, StrokeDirection * Wave, StrokeRecoveryLiftCm(NormalizedPhase), Stroke);
             break;
         }
         case ERaftSimCrewAvatarAction::Brace:
@@ -1825,7 +1856,7 @@ void ARaftSimCrewAvatarActor::Tick(float DeltaSeconds)
         ? FMath::Frac(AnimationPhase + PhaseStep)
         : 0.0f;
     const FRaftSimCrewAvatarPose Pose =
-        URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide);
+        URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView);
     // The project-owned safety gear remains visible over the native rigged
     // fallback, so it must follow the same pose even when a production body is active.
     ApplyPose(Pose);
@@ -2009,7 +2040,7 @@ float ARaftSimCrewAvatarActor::GetProductionPfdTorsoErrorCm() const
     }
     const FRaftSimCrewAvatarPose Pose =
         URaftSimCrewAvatarPoseLibrary::EvaluatePose(
-            CurrentAction, AnimationPhase, SeatSide);
+            CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView);
     return FVector::Distance(ProductionPfd->GetRelativeLocation(), Pose.TorsoCenterCm);
 }
 
@@ -2049,7 +2080,7 @@ float ARaftSimCrewAvatarActor::GetWaistHipCenterErrorCm() const
     }
     const FRaftSimCrewAvatarPose Pose =
         URaftSimCrewAvatarPoseLibrary::EvaluatePose(
-            CurrentAction, AnimationPhase, SeatSide);
+            CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView);
     const FVector SolvedHipCenter = (Pose.LeftHipCm + Pose.RightHipCm) * 0.5f;
     return FVector::Distance(Pelvis->GetRelativeLocation(), SolvedHipCenter);
 }
@@ -2104,7 +2135,7 @@ float ARaftSimCrewAvatarActor::GetMinimumThighForwardAlignment() const
     }
     const FRaftSimCrewAvatarPose Pose =
         URaftSimCrewAvatarPoseLibrary::EvaluatePose(
-            CurrentAction, AnimationPhase, SeatSide);
+            CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView);
     const FVector TorsoForward =
         Pose.TorsoRotation.RotateVector(FVector::ForwardVector).GetSafeNormal();
     const auto ForwardAlignment = [&](const UProceduralMeshComponent* Thigh,
@@ -2134,7 +2165,7 @@ float ARaftSimCrewAvatarActor::GetMaximumHipThighBridgeCoverageErrorCm() const
     }
     const FRaftSimCrewAvatarPose Pose =
         URaftSimCrewAvatarPoseLibrary::EvaluatePose(
-            CurrentAction, AnimationPhase, SeatSide);
+            CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView);
     const auto DistanceToBridgeCentreline = [](
         const UProceduralMeshComponent* Thigh,
         const FVector& HipCm)
@@ -2185,7 +2216,7 @@ float ARaftSimCrewAvatarActor::GetMaximumThighKneeBridgeCoverageErrorCm() const
     }
     const FRaftSimCrewAvatarPose Pose =
         URaftSimCrewAvatarPoseLibrary::EvaluatePose(
-            CurrentAction, AnimationPhase, SeatSide);
+            CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView);
     const auto DistanceToBridgeCentreline = [](
         const UProceduralMeshComponent* Thigh,
         const FVector& KneeCm)
@@ -2253,7 +2284,7 @@ float ARaftSimCrewAvatarActor::GetMaximumShoulderSleeveAnchorErrorCm() const
     }
     const FRaftSimCrewAvatarPose Pose =
         URaftSimCrewAvatarPoseLibrary::EvaluatePose(
-            CurrentAction, AnimationPhase, SeatSide);
+            CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView);
     const auto ProximalEndpoint = [](const UProceduralMeshComponent* Sleeve)
     {
         const FVector Axis = Sleeve->GetRelativeRotation().RotateVector(FVector::UpVector);
@@ -2531,6 +2562,7 @@ FRaftSimCrewAvatarPose BlendTransferPose(const FRaftSimCrewAvatarPose& A, const 
     FRaftSimCrewAvatarPose Out = B;
     for (auto Point : kTransferPosePoints) Out.*Point = FMath::Lerp(A.*Point, B.*Point, S);
     Out.TorsoRotation = FQuat::Slerp(A.TorsoRotation.Quaternion(), B.TorsoRotation.Quaternion(), S).Rotator();
+    Out.TorsoTwistDegrees = FMath::Lerp(A.TorsoTwistDegrees, B.TorsoTwistDegrees, S);
     const FVector AxisA = (A.PaddleBottomCm - A.PaddleTopCm).GetSafeNormal();
     const FVector AxisB = (B.PaddleBottomCm - B.PaddleTopCm).GetSafeNormal();
     FVector Axis = FMath::Lerp(AxisA, AxisB, S).GetSafeNormal();
@@ -2570,7 +2602,7 @@ void ARaftSimCrewAvatarActor::StartHighSideLeg(const FVector& TargetRaftCm, floa
     // Begin from whatever the body is doing now (mid-stroke, mid-air on a
     // reversal, holding the other tube) rather than snapping to a seat pose.
     CrewTransferStartPose = bHasRenderedPose ? LastRenderedPose
-        : URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide);
+        : URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView);
     for (auto& Entry : GroundedFootPlacements) Entry = FGroundedFootPlacement{};
 }
 
@@ -2883,7 +2915,7 @@ void ARaftSimCrewAvatarActor::SetAvatarAction(
         // helmet cannot spend a frame at the previous action's head location.
         const FRaftSimCrewAvatarPose Pose =
             URaftSimCrewAvatarPoseLibrary::EvaluatePose(
-                CurrentAction, AnimationPhase, SeatSide);
+                CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView);
         ApplyPose(Pose);
         DispatchProductionPose();
         AlignProductionHeadgearToSolvedHead();
@@ -2902,7 +2934,7 @@ void ARaftSimCrewAvatarActor::SetAvatarActionPhaseForValidation(
     AnimationPhase = WrapNormalizedPhase(NormalizedPhase);
     if (bVisualBuilt)
     {
-        ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide));
+        ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView));
         DispatchProductionPose();
         AlignProductionHeadgearToSolvedHead();
     }
@@ -2914,7 +2946,7 @@ void ARaftSimCrewAvatarActor::SetExternalPose(const FRaftSimCrewAvatarPose& Pose
     bHasExternalPose = true;
     if (bApplyNow && bVisualBuilt)
     {
-        ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide));
+        ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView));
         DispatchProductionPose();
         AlignProductionHeadgearToSolvedHead();
     }
@@ -3105,7 +3137,7 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
     }
     RebuildSafetyGearMeshes();
     RebuildHeadMesh();
-    ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide));
+    ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide, bGuide && bFirstPersonView));
     TryActivateProductionVisual();
     PrepareStartupCrewMaterials(this);
     BuildPersonalAccessories();
@@ -3879,7 +3911,7 @@ void ARaftSimCrewAvatarActor::BuildVisual()
     ConfigureAppearance(VariantIndex, SeatSide, bGuide);
     if (!bUsingProductionVisual)
     {
-        ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, 0.0f, SeatSide));
+        ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, 0.0f, SeatSide, bGuide && bFirstPersonView));
     }
 }
 
@@ -4434,6 +4466,7 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
         }
         Pose.TorsoRotation = FQuat::Slerp(From.TorsoRotation.Quaternion(),
             To.TorsoRotation.Quaternion(), Blend).Rotator();
+        Pose.TorsoTwistDegrees = FMath::Lerp(From.TorsoTwistDegrees, To.TorsoTwistDegrees, Blend);
         Pose.bShowPaddle = false;
         const float PalmT = BoardingPoseAlpha <= BoardingReachFraction ? BoardingPoseAlpha / BoardingReachFraction :
             (BoardingPoseAlpha <= BoardingLegOverFraction ? 1.f : (1.f-BoardingPoseAlpha)/(1.f-BoardingLegOverFraction));

@@ -433,11 +433,22 @@ bool ARaftSimCC0CrewVisualActor::ComputeChestWorldTransform(
     }
     // Worn torso gear must not follow the head. Projecting the face direction
     // onto the chest plane spun the whole vest sideways in reentry and becomes
-    // ill-conditioned when looking down along the spine. The rendered shoulder
-    // line and spine define the chest independently of gaze.
-    const FVector ShoulderRight = ComponentTransform.TransformVectorNoScale(
-        BoneComponentLocation(TEXT("upperarm_r")) -
-        BoneComponentLocation(TEXT("upperarm_l")));
+    // ill-conditioned when looking down along the spine. The chest bone's
+    // shoulder line and the spine define the chest independently of gaze.
+    // The shoulder joints themselves slide toward a reaching hand
+    // (GirdleShoulder), and read from them the shoulder line turned the vest
+    // across the chest whenever one arm reached.
+    FVector ShoulderLine = BoneComponentLocation(TEXT("upperarm_r")) - BoneComponentLocation(TEXT("upperarm_l"));
+    const FTransform* RefChest = ReferenceComponentTransforms.Find(TEXT("spine_03"));
+    const FTransform* RefLeftShoulder = ReferenceComponentTransforms.Find(TEXT("upperarm_l"));
+    const FTransform* RefRightShoulder = ReferenceComponentTransforms.Find(TEXT("upperarm_r"));
+    if (RefChest && RefLeftShoulder && RefRightShoulder)
+    {
+        const FQuat ChestTurn = Body->GetBoneTransformByName(TEXT("spine_03"), EBoneSpaces::ComponentSpace).GetRotation() *
+            RefChest->GetRotation().Inverse();
+        ShoulderLine = ChestTurn.RotateVector(RefRightShoulder->GetLocation() - RefLeftShoulder->GetLocation());
+    }
+    const FVector ShoulderRight = ComponentTransform.TransformVectorNoScale(ShoulderLine);
     const FVector ChestForward = FVector::CrossProduct(ShoulderRight, SpineUp).GetSafeNormal();
     if (ChestForward.IsNearlyZero())
     {
@@ -1159,16 +1170,25 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         ProductionHeadLevelPitchDegrees + GazePitch, TorsoRight);
     const FVector HeadTop = PresentedHeadCenter + HeadUp * 16.0f;
 
+    // The chest turns on the hips about the spine: the lower back takes some
+    // of the turn and the chest all of it, and the neck turns it all back so
+    // the head keeps looking ahead, down the river. A head turned with the
+    // chest faced the T-grip hand held out on the paddle side. Aimed by their host directions alone
+    // the spine bones never turned, so a paddler's turned torso never showed
+    // and the arm reaching across to the T-grip cut through the chest and
+    // vest ("the torso probably has to pivot some so both arms can naturally
+    // reach their positions", 2026-10-07).
+    const float ChestTwist = Pose.TorsoTwistDegrees;
     SetSegmentBone(TEXT("pelvis"), TEXT("spine_01"), PelvisCm, Spine01Cm,
         ProductionAxialFacingTwistDegrees);
     SetSegmentBone(TEXT("spine_01"), TEXT("spine_02"), Spine01Cm, Spine02Cm,
-        ProductionAxialFacingTwistDegrees);
+        ProductionAxialFacingTwistDegrees + ChestTwist * 0.35f);
     SetSegmentBone(TEXT("spine_02"), TEXT("spine_03"), Spine02Cm, Spine03Cm,
-        ProductionAxialFacingTwistDegrees);
+        ProductionAxialFacingTwistDegrees + ChestTwist * 0.7f);
     SetSegmentBone(TEXT("spine_03"), TEXT("neck_01"), Spine03Cm, NeckBaseCm,
-        ProductionAxialFacingTwistDegrees);
+        ProductionAxialFacingTwistDegrees + ChestTwist);
     SetSegmentBone(TEXT("neck_01"), TEXT("head"), NeckBaseCm, PresentedHeadCenter,
-        ProductionAxialFacingTwistDegrees + GazeYaw * 0.45f);
+        ProductionAxialFacingTwistDegrees + ChestTwist * 0.4f + GazeYaw * 0.45f);
     SetSegmentBone(TEXT("head"), TEXT("head"), PresentedHeadCenter, HeadTop,
         ProductionAxialFacingTwistDegrees + GazeYaw);
 
@@ -1191,6 +1211,15 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     };
     const FVector LeftShoulderCm = DrivenBoneCm(TEXT("upperarm_l"));
     const FVector RightShoulderCm = DrivenBoneCm(TEXT("upperarm_r"));
+    // The chest in its vest as a rounded block on the chest frame the vest
+    // itself is seated on (ComputeChestWorldTransform): the vest's outer
+    // faces, its depth fitted to this body.
+    const FVector ChestUp = (NeckBaseCm - Spine01Cm).GetSafeNormal();
+    const FVector ChestRight = FVector::VectorPlaneProject(RightShoulderCm - LeftShoulderCm, ChestUp).GetSafeNormal();
+    const FVector ChestForward = FVector::CrossProduct(ChestRight, ChestUp);
+    const FVector ChestCenterCm = FMath::Lerp(Spine02Cm, Spine03Cm, 0.45f) +
+        ChestForward * (bVestFitMeasured ? FittedVestForwardOfSpineCm : 4.5f) + ChestUp * ProductionVestLiftAlongSpineCm;
+    const float VestDepth = bVestFitMeasured ? FittedVestDepthScale : 1.0f;
     const FVector RigShoulderCenterCm = (LeftShoulderCm + RightShoulderCm) * 0.5f;
     const FVector RigClavicleCenterCm =
         (DrivenBoneCm(TEXT("clavicle_l")) + DrivenBoneCm(TEXT("clavicle_r"))) * 0.5f;
@@ -1266,7 +1295,25 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // arm, skin and all, instead of bending it. Elbows hang down, out from
     // the body and a little back, as when holding a paddle; a target beyond
     // reach leaves the arm straight and the forearm takes the difference.
-    const auto SolveElbow = [&RestLengthCm, &TorsoRight, &PresentedHeadCenter, &HeadUp](
+    // How far a point of arm (of this radius) sinks into the chest block: the
+    // vest's outer faces in its own frame, a rounded box (front 15 cm and back
+    // 14 cm off its centre, sides 18 cm, hem 14 cm below to 21 cm above).
+    const auto IntoChestCm = [&](const FVector& PointCm, float ArmRadiusCm)
+    {
+        const FVector D = PointCm - ChestCenterCm;
+        const float Up = FVector::DotProduct(D, ChestUp);
+        if (Up < -14.0f || Up > 21.0f)
+        {
+            return 0.0f;
+        }
+        const float Forward = FVector::DotProduct(D, ChestForward) / VestDepth - 0.5f;
+        const float Side = FVector::DotProduct(D, ChestRight);
+        const float HalfDepth = 14.5f + ArmRadiusCm / VestDepth, HalfWidth = 18.0f + ArmRadiusCm;
+        const float Rounded = FMath::Pow(FMath::Pow(FMath::Abs(Forward) / HalfDepth, 3.0f) +
+            FMath::Pow(FMath::Abs(Side) / HalfWidth, 3.0f), 1.0f / 3.0f);
+        return FMath::Max(0.0f, 1.0f - Rounded) * FMath::Min(HalfDepth, HalfWidth);
+    };
+    const auto SolveElbow = [&RestLengthCm, &TorsoRight, &PresentedHeadCenter, &HeadUp, &IntoChestCm](
         bool bLeftArm, const FVector& ShoulderCm, const FVector& WristCm)
     {
         const float UpperCm = bLeftArm ? RestLengthCm(TEXT("upperarm_l"), TEXT("lowerarm_l"))
@@ -1310,18 +1357,40 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
             return FVector::Distance(OnForearm, OnHead);
         };
         constexpr float kForearmHeadClearanceCm = 14.5f;
+        // Keep the arm out of the chest and vest too: a bent arm reaching
+        // across the body to the T-grip dropped its elbow into the chest and
+        // its forearm through the vest ("the arm reaching across the body to
+        // reach the t grip shouldn't cut through the chest or life vest",
+        // 2026-10-07). Each pole is scored on how deep the upper arm (past its
+        // root) and forearm sink into the chest block, how far the forearm
+        // comes inside the head clearance, how far the elbow drops below the
+        // shoulder, and how far it turns from the preferred pole.
+        const auto PoleCost = [&](const FVector& Pole, float TurnDegrees)
+        {
+            const FVector Elbow = ElbowFor(Pole);
+            float Cost = FMath::Square(TurnDegrees / 90.0f);
+            for (int32 Sample = 0; Sample <= 6; ++Sample)
+            {
+                const float T = Sample / 6.0f;
+                Cost += 4.0f * FMath::Square(IntoChestCm(FMath::Lerp(ShoulderCm, Elbow, FMath::Lerp(0.45f, 1.0f, T)), 4.0f));
+                Cost += 4.0f * FMath::Square(IntoChestCm(FMath::Lerp(Elbow, WristCm, T), 3.5f));
+            }
+            Cost += 0.5f * FMath::Square(FMath::Max(0.0f, kForearmHeadClearanceCm - HeadClearanceCm(Elbow)));
+            Cost += 0.5f * FMath::Square(FMath::Max(0.0f, ShoulderCm.Z - 24.0f - Elbow.Z));
+            return Cost;
+        };
         FVector BestPole = PreferredPole;
-        float BestClearance = HeadClearanceCm(ElbowFor(PreferredPole));
-        for (float Step = 15.0f; Step <= 180.0f && BestClearance < kForearmHeadClearanceCm; Step += 15.0f)
+        float BestCost = PoleCost(PreferredPole, 0.0f);
+        for (float Step = 15.0f; Step <= 180.0f; Step += 15.0f)
         {
             for (const float Sign : {1.0f, -1.0f})
             {
                 const FVector Candidate = PreferredPole.RotateAngleAxis(Sign * Step, Along);
-                const float Clearance = HeadClearanceCm(ElbowFor(Candidate));
-                if (Clearance > BestClearance)
+                const float Cost = PoleCost(Candidate, Step);
+                if (Cost < BestCost)
                 {
                     BestPole = Candidate;
-                    BestClearance = Clearance;
+                    BestCost = Cost;
                 }
             }
         }
@@ -1965,7 +2034,7 @@ void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
         FRaftSimCC0GripBar Bar;
         if (ResolveGripBar(bLeft, GripPose, Bar))
         {
-            ApplyHandGripShape(bLeft, Bar.RadiusCm);
+            ApplyHandGripShape(bLeft, Bar);
         }
     }
     TArray<FTransform> ClosedLocal;

@@ -2364,6 +2364,7 @@ void ARaftSimRaftActor::SetGuideFirstPersonView(bool bFirstPerson)
 {
     if (ARaftSimCrewAvatarActor* Guide = FindAvatar(TEXT("guide")))
     {
+        Guide->SetFirstPersonView(bFirstPerson);
         Guide->SetFirstPersonHeadHidden(bFirstPerson);
     }
 }
