@@ -79,12 +79,27 @@ inline bool HasProfile(const FString& Map)
          Map.EndsWith(TEXT("L_UpperHuacas")) || Map.EndsWith(TEXT("L_Terminator")) ||
          Map.EndsWith(TEXT("L_LavaCanyon")) || Map.EndsWith(TEXT("L_Colorado_BadgerCreek")) ||
          Map.EndsWith(TEXT("L_Colorado_HouseRock")) || Map.EndsWith(TEXT("L_Colorado_SoapCreek")) ||
-         Map.EndsWith(TEXT("L_Colorado_Georgie")));
+         Map.EndsWith(TEXT("L_Colorado_Georgie")) || Map.EndsWith(TEXT("L_Colorado_Unkar")));
 }
 inline TArray<FFeature> BuildFeatures(const FString& Map)
 {
     if(!HasProfile(Map))return {};
     TArray<FFeature> Result;
+    if(Map.EndsWith(TEXT("L_Colorado_Unkar")))
+    {
+        // Unkar's v3 USGS-registered chart: upper drop ~740-980 m, then
+        // a quieter reach. Positive lateral is river LEFT. Guides describe
+        // left-wall hydraulics, a centre tongue and a timely move right,
+        // but not onto the shallow right margin. These dimensions are
+        // authored 8000-cfs hypotheses, not measured rocks or currents.
+        // See unkar_profile_evidence_2026_10_07.json. Keep the later drop
+        // beyond 1100 m separate; never carry rapid froth across the pool.
+        Result={{776,24,0,1.f,3.f,.9f},{782,28,0,.9f,3.f,.85f},
+                {828,12,-25,.75f,4.f,.55f}};
+        for(double Station:{848.,882.,916.,950.})
+            for(double Lateral:{0.,6.,12.})
+                Result.Add({Station,Lateral,0.,.65f,4.f,.35f});
+    }
     if(Map.EndsWith(TEXT("L_Colorado_Georgie")))
     {
         // Georgie / 24 Mile, NOT the separate 24 1/2 Mile rapid downstream.
@@ -185,6 +200,7 @@ inline const TArray<FFeature>& Features(const FString& Map)
     static const TArray<FFeature> HouseRock=BuildFeatures(TEXT("L_Colorado_HouseRock"));
     static const TArray<FFeature> SoapCreek=BuildFeatures(TEXT("L_Colorado_SoapCreek"));
     static const TArray<FFeature> Georgie=BuildFeatures(TEXT("L_Colorado_Georgie"));
+    static const TArray<FFeature> Unkar=BuildFeatures(TEXT("L_Colorado_Unkar"));
     if(Map.EndsWith(TEXT("L_Hance")))return Hance;
     if(Map.EndsWith(TEXT("L_Zambezi")))return Zambezi;
     if(Map.EndsWith(TEXT("L_UpperHuacas")))return Pacuare;
@@ -193,6 +209,7 @@ inline const TArray<FFeature>& Features(const FString& Map)
     if(Map.EndsWith(TEXT("L_Colorado_HouseRock")))return HouseRock;
     if(Map.EndsWith(TEXT("L_Colorado_SoapCreek")))return SoapCreek;
     if(Map.EndsWith(TEXT("L_Colorado_Georgie")))return Georgie;
+    if(Map.EndsWith(TEXT("L_Colorado_Unkar")))return Unkar;
     return Chilko;
 }
 

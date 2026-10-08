@@ -146,6 +146,7 @@ bool FRaftSimRapidRegistrationSourcesTest::RunTest(const FString&)
         else if(Name==TEXT("House Rock"))Map=TEXT("L_Colorado_HouseRock");
         else if(Name==TEXT("Soap Creek"))Map=TEXT("L_Colorado_SoapCreek");
         else if(Name==TEXT("Georgie"))Map=TEXT("L_Colorado_Georgie");
+        else if(Name==TEXT("Unkar"))Map=TEXT("L_Colorado_Unkar");
         else if(Name==TEXT("Hance"))Map=TEXT("L_Hance");else continue;
         auto* Source=NewObject<URaftSimWaterRuntimeAdapter>();
         const FString Path=FPaths::Combine(FPaths::GetPath(Assembly),Reach->GetStringField(TEXT("rebased_chart")));
@@ -169,8 +170,8 @@ bool FRaftSimRapidRegistrationSourcesTest::RunTest(const FString&)
         AddInfo(FString::Printf(TEXT("Registered %s: %d sites; maximum centre error %.9f cm"),*Name,Output.Num(),MaxError));
         Count+=Output.Num();++ReachCount;
     }
-    TestEqual(TEXT("all five production source reaches exercised"),ReachCount,5);
-    TestEqual(TEXT("all production source sites exercised"),Count,94);
+    TestEqual(TEXT("all six production source reaches exercised"),ReachCount,6);
+    TestEqual(TEXT("all production source sites exercised"),Count,109);
     return !HasAnyErrors();
 }
 #endif

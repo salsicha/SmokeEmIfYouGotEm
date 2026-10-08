@@ -29,6 +29,9 @@ bool FRaftSimRapidChallengeProfilesTest::RunTest(const FString&)
     TestEqual(TEXT("Georgie PIE uses the same profile"),Features(TEXT("UEDPIE_0_L_Colorado_Georgie")).Num(),8);
     TestFalse(TEXT("Georgie lookalike is not playable"),HasProfile(TEXT("Other_L_Colorado_Georgie")));
     TestFalse(TEXT("Georgie is not the separate 24 and a half mile rapid"),HasProfile(TEXT("L_Colorado_24HalfMile")));
+    TestEqual(TEXT("Unkar has left hydraulics, a diagonal and four centre train waves"),Features(TEXT("L_Colorado_Unkar")).Num(),15);
+    TestEqual(TEXT("Unkar PIE uses the same profile"),Features(TEXT("UEDPIE_0_L_Colorado_Unkar")).Num(),15);
+    TestFalse(TEXT("Unkar lookalike is not playable"),HasProfile(TEXT("Other_L_Colorado_Unkar")));
     TestTrue(TEXT("Pacuare uses catalogued hydraulic profiles"),HasProfile(TEXT("L_UpperHuacas")));
     TestFalse(TEXT("Cartesian evidence requires registered coordinates, not station as eastings"),HasProfile(TEXT("L_ZambeziUpperGorge")));
     TestFalse(TEXT("profile lookalikes are not playable maps"),HasProfile(TEXT("Other_L_Hance")));
@@ -146,6 +149,31 @@ bool FRaftSimRapidChallengeProfilesTest::RunTest(const FString&)
     Sites.Reset();
     TestEqual(TEXT("Georgie quiet pools cannot activate named rollers"),Append(TEXT("L_Colorado_Georgie"),GeorgieBounds,Pool,Sites),0);
     TestEqual(TEXT("Georgie dry cells cannot activate named rollers"),Append(TEXT("L_Colorado_Georgie"),GeorgieBounds,Dry,Sites),0);
+    Sites.Reset();
+    const FBox2D UnkarBounds(FVector2D(700,-60),FVector2D(1040,60));
+    TestEqual(TEXT("Unkar appends all wet production sites"),Append(TEXT("L_Colorado_Unkar"),UnkarBounds,Wet,Sites),15);
+    Water->ConfigureRaftSupportBreakingSites(Sites,0.f,2.f);
+    TestTrue(TEXT("Unkar left hole uses shared physical relief"),
+        RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(776,24),Sites,0.f,&Foam)>.25f);
+    TestTrue(TEXT("Unkar left hole produces local froth"),Foam>0.f);
+    TestEqual(TEXT("Unkar preserves the centre entry tongue"),
+        RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(776,0),Sites,0.f,&Foam),0.f);
+    const auto UnkarSurface=Water->ComputeFeatureVelocityAtRiverCoordinates(FVector2D(780.4,24),FVector2D(3,0),2.f,1.f);
+    const auto UnkarHull=Water->ComputeFeatureVelocityAtRiverCoordinates(FVector2D(780.4,24),FVector2D(3,0),2.f,.85f);
+    TestTrue(TEXT("Unkar visible transport and immersed hull share hole return"),UnkarSurface.X<2.5 && UnkarHull.X<2.5);
+    const FVector2D UnkarDiagonal=FVector2D(828,12)+4.4*FVector2D(FMath::Cos(FMath::DegreesToRadians(-25.)),FMath::Sin(FMath::DegreesToRadians(-25.)));
+    TestTrue(TEXT("Unkar diagonal pushes surface toward left wall"),
+        Water->ComputeFeatureVelocityAtRiverCoordinates(UnkarDiagonal,FVector2D(3,0),2.f,1.f).Y>.2);
+    TestTrue(TEXT("Unkar diagonal pushes immersed hull through the same kernel"),
+        Water->ComputeFeatureVelocityAtRiverCoordinates(UnkarDiagonal,FVector2D(3,0),2.f,.85f).Y>.2);
+    TestEqual(TEXT("Unkar froth does not bridge the quiet reach into the next drop"),
+        RaftSimPhysicalBreakingSample::Evaluate<true>(FVector2D(1040,6),Sites,0.f,&Foam),0.f);
+    TestEqual(TEXT("Unkar pool has no profile froth"),Foam,0.f);
+    TestTrue(TEXT("Unkar authored return also stops in the pool"),
+        Water->ComputeFeatureVelocityAtRiverCoordinates(FVector2D(1040,6),FVector2D(3,0),2.f,.85f).Equals(FVector(3,0,0),1.e-6));
+    Sites.Reset();
+    TestEqual(TEXT("Unkar quiet pools cannot activate named rollers"),Append(TEXT("L_Colorado_Unkar"),UnkarBounds,Pool,Sites),0);
+    TestEqual(TEXT("Unkar dry cells cannot activate named rollers"),Append(TEXT("L_Colorado_Unkar"),UnkarBounds,Dry,Sites),0);
     return true;
 }
 #endif

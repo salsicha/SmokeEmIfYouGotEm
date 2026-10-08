@@ -37,7 +37,8 @@ def main():
     assert hashlib.sha256(chart_bytes).hexdigest() == contract['files_sha256'][coordinate]
     fingerprint = config.get_editor_property('registered_rapid_chart_fingerprint')
     assert fingerprint.lower() == hashlib.sha1(chart_bytes.decode('utf-8-sig').encode('utf-8')).hexdigest()
-    counts = {'L_Colorado_BadgerCreek': 17, 'L_Colorado_HouseRock': 11, 'L_Hance': 40}
+    counts = {'L_Colorado_BadgerCreek': 17, 'L_Colorado_HouseRock': 11, 'L_Hance': 40,
+              'L_Colorado_SoapCreek': 18, 'L_Colorado_Georgie': 8, 'L_Colorado_Unkar': 15}
     sources = [s['map'] for s in contract['rapid_profile_sources']]
     assert len(sources) == len(set(sources)), 'Duplicate profile source'
     expected = sum(counts[s] for s in sources)

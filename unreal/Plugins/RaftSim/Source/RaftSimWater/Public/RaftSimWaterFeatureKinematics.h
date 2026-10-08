@@ -26,7 +26,7 @@ inline bool IsPlayableRiver(const FString& MapName)
     for(const TCHAR* Name : {TEXT("L_SouthForkAmerican_FullReach"),TEXT("L_SouthFork_Troublemaker"),
         TEXT("L_Hance"),TEXT("L_LavaCanyon"),TEXT("L_Terminator"),TEXT("L_UpperHuacas"),
         TEXT("L_Zambezi"),TEXT("L_ZambeziUpperGorge"),TEXT("L_Colorado_BadgerCreek"),
-        TEXT("L_Colorado_HouseRock"),TEXT("L_Colorado_SoapCreek"),TEXT("L_Colorado_Georgie")})
+        TEXT("L_Colorado_HouseRock"),TEXT("L_Colorado_SoapCreek"),TEXT("L_Colorado_Georgie"),TEXT("L_Colorado_Unkar")})
         if(Leaf==Name)return true;
     return false;
 }

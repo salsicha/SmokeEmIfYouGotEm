@@ -56,7 +56,8 @@ def rapid_profile_sources(assembly, mapping, files):
             manifest['horizontal_origin_epsg6404_m'] != origin or manifest['vertical_datum_m'] != datum):
         raise ValueError('Rapid assembly uses a different geographic frame')
     names = {'Badger Creek': 'L_Colorado_BadgerCreek', 'House Rock': 'L_Colorado_HouseRock',
-             'Soap Creek': 'L_Colorado_SoapCreek', 'Georgie': 'L_Colorado_Georgie', 'Hance': 'L_Hance'}
+             'Soap Creek': 'L_Colorado_SoapCreek', 'Georgie': 'L_Colorado_Georgie',
+             'Unkar': 'L_Colorado_Unkar', 'Hance': 'L_Hance'}
     sources = []; seen = set()
     files[assembly.relative_to(ROOT).as_posix()] = sha(assembly)
     for reach in manifest['source_reaches']:

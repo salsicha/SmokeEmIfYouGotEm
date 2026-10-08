@@ -259,6 +259,15 @@ class ContinuousMapContract(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'No supported production'):
             rapid_profile_sources(path,mapping,{})
 
+    def test_unkar_is_bound_to_original_geography_not_a_hance_offset(self):
+        path,mapping,original,rebased,manifest=self.source_assembly()
+        manifest['source_reaches'][0]['name']='Unkar'
+        path.write_text(json.dumps(manifest))
+        files={}
+        self.assertEqual(rapid_profile_sources(path,mapping,files),[
+            dict(map='L_Colorado_Unkar',coordinate_map=rebased.relative_to(ROOT).as_posix())])
+        for p in (path,original,rebased):self.assertEqual(files[p.relative_to(ROOT).as_posix()],sha(p))
+
     def test_georgie_uses_its_verified_source_chart_not_24_half_mile(self):
         path,mapping,original,rebased,manifest=self.source_assembly()
         manifest['source_reaches'][0]['name']='Georgie'
