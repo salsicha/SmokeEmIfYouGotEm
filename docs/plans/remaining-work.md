@@ -48,6 +48,25 @@ and partial continuation evidence; diagnose memory pressure before a fresh
 continuation attempt, without weakening the floor or repeating completed stages.
 The downstream Chilko hydraulic-input stage did not start.
 See the [canopy and flow handoff receipt](../../physics/data/real_world/futaleufu_river_chile/review/canopy_reload_and_expanded_flow_2026_10_08.json).
+
+The continuation launch race is now identified and repaired: the other task's
+`hole-tests-3/run.log` opens at 13:15:32 local time and exits at 13:19:20;
+our solver launched at 13:16:27, after its earlier idle check but after that
+engine test had started. The runner now rechecks actual processes and resources
+after checkpoint preparation and immediately before launch. During a run it
+records resource/process samples and stops only its own solver if new shared
+engine/build/cook work appears. All memory, disk, physical-state and route gates
+are unchanged; 18 guard/checkpoint/audit regressions pass. The old failure did
+not record per-process memory, so its exact memory attribution remains unknown.
+
+One fresh queue, `tmp/futaleufu-expanded-continuation-queue-v2`, is waiting for
+60 seconds of actual engine/build/cook idleness and adequate resources. It runs
+`tmp/resume_futaleufu_expanded_continuation_v2.ps1` (initial wrapper PID 32264,
+exec session 76625), reuses the verified two-second state, then requests the
+same full-domain thirty-second continuation and independent all-frame audit.
+It never reruns canopy/cold-start work, retries a failed solver automatically,
+or modifies another task. Check that process/session and its terminal receipts
+before starting anything else; the prior resume pipeline remains terminal.
 Earlier serial-v1/v2 and Chilko queue-v10/v11 attempts are terminal and preserved, not
 live jobs. Inspect the pipeline's actual process and receipts before starting
 anything else. Diagnosis: `tmp/futaleufu-canopy-residency-v1.json`, SHA256

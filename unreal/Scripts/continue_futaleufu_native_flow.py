@@ -16,6 +16,36 @@ import numpy as np
 from qualify_futaleufu_native_ports import ROOT, sha, resources
 
 
+def shared_native_work(owned_pid=None):
+    """Read actual processes; never interrupt another task or trust stale locks."""
+    active = subprocess.run(['pwsh', '-NoProfile', '-Command',
+        "Get-CimInstance Win32_Process | Where-Object { "
+        "$_.Name -match '^(UnrealEditor|UnrealEditor-Cmd|raftsim_cartesian_cook|UnrealBuildTool)\\.exe$' -or "
+        "($_.Name -eq 'dotnet.exe' -and $_.CommandLine -match 'UnrealBuildTool|AutomationTool') -or "
+        "($_.Name -eq 'cmd.exe' -and $_.CommandLine -match 'Engine[\\/]Build[\\/]BatchFiles[\\/](Build|RunUAT).bat') "
+        "} | Select-Object ProcessId,Name,PrivatePageCount | ConvertTo-Json -Compress"],
+        capture_output=True, text=True, check=True)
+    rows = json.loads(active.stdout) if active.stdout.strip() else []
+    if isinstance(rows, dict): rows = [rows]
+    return [row for row in rows if row['ProcessId'] != owned_pid]
+
+
+def require_launch_headroom(current, busy):
+    if busy: raise ValueError('Existing engine/build/cook work; do not overlap')
+    if (min(current['available_physical_bytes'], current['available_commit_bytes']) < 6*1024**3
+            or current['free_disk_bytes'] < 43*1024**3):
+        raise ValueError('Native continuation resource allowance unavailable')
+
+
+def runtime_guard_failure(current, busy, elapsed):
+    if busy: return 'Shared engine/build/cook appeared; stopped only owned continuation'
+    if min(current['available_physical_bytes'], current['available_commit_bytes']) < 3*1024**3:
+        return 'Owned native resource floor reached'
+    if current['free_disk_bytes'] < 40*1024**3: return 'Owned native disk reserve reached'
+    if elapsed > 3600: return 'Owned native continuation exceeded one-hour bound'
+    return None
+
+
 def prepare(previous,output):
     previous,output=Path(previous).resolve(),Path(output).resolve()
     output.relative_to(ROOT)
@@ -83,13 +113,8 @@ def run(previous,solver,output,steps=3000):
     output.relative_to(ROOT)
     if output.exists() or steps!=3000:raise ValueError('Fresh bounded 30-second continuation required')
     if sha(solver)!='fb2624bb8cb210142ae17741c5358c86a48d6f42c60eedab64715def53c6e558':raise ValueError('Verified native executable required')
-    active=subprocess.run(['pwsh','-NoProfile','-Command',
-        "Get-CimInstance Win32_Process | Where-Object { $_.Name -match '^(UnrealEditor|UnrealEditor-Cmd|raftsim_cartesian_cook|UnrealBuildTool)\\.exe$' } | Select-Object ProcessId,Name | ConvertTo-Json -Compress"],
-        capture_output=True,text=True,check=True)
-    if active.stdout.strip():raise ValueError('Existing engine/cook work; do not overlap')
     r=resources()
-    if min(r['available_physical_bytes'],r['available_commit_bytes'])<6*1024**3 or r['free_disk_bytes']<43*1024**3:
-        raise ValueError('Native continuation resource allowance unavailable')
+    require_launch_headroom(r, shared_native_work())
     output.mkdir(parents=True)
     m=prepare(previous,output/'packages');input_path=output/'packages/manifest.json'
     pins={ROOT/p:h for p,h in m['sources_sha256'].items()}
@@ -100,6 +125,16 @@ def run(previous,solver,output,steps=3000):
     command=[str(solver),str(input_path),str(output/'native'),str(steps),'300','4']
     save('request.json',dict(command=command,steps=steps,dt_seconds=.01,source_time_seconds=m['initial_time_seconds'],
         inputs_sha256={p.relative_to(ROOT).as_posix():h for p,h in pins.items()},initial_resources=r,timeout_seconds=3600))
+    # Preparing thousands of exact checkpoint packages can take minutes. The
+    # pre-prepare check is not permission to launch into subsequently started work.
+    try:
+        if any(sha(p)!=h for p,h in pins.items()):raise ValueError('Continuation input changed before launch')
+        busy=shared_native_work();r=resources()
+        save('prelaunch.json',dict(resources=r,shared_work=busy))
+        require_launch_headroom(r,busy)
+    except Exception as error:
+        save('failure.json',dict(stage='prelaunch',native_process_started=False,failure=str(error)))
+        raise
     start=time.monotonic();failure=None;minimum=r.copy()
     with (output/'native.log').open('x') as log:
         child=subprocess.Popen(command,cwd=ROOT,stdout=log,stderr=subprocess.STDOUT)
@@ -108,9 +143,14 @@ def run(previous,solver,output,steps=3000):
             try:child.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 r=resources();minimum={k:min(minimum[k],r[k]) for k in r}
-                if min(r['available_physical_bytes'],r['available_commit_bytes'])<3*1024**3:failure='Owned native resource floor reached'
-                if r['free_disk_bytes']<40*1024**3:failure='Owned native disk reserve reached'
-                if time.monotonic()-start>3600:failure='Owned native continuation exceeded one-hour bound'
+                try:
+                    busy=shared_native_work(child.pid)
+                    sample=dict(elapsed_seconds=time.monotonic()-start,resources=r,shared_work=busy)
+                    with (output/'resources.jsonl').open('a') as telemetry:
+                        telemetry.write(json.dumps(sample,allow_nan=False)+'\n')
+                    failure=runtime_guard_failure(r,busy,sample['elapsed_seconds'])
+                except Exception as error:
+                    failure='Native guard observation failed: '+str(error)
                 if failure:child.terminate();child.wait(timeout=30);break
     result=dict(exit_code=child.returncode,elapsed_seconds=time.monotonic()-start,minimum_resources=minimum,
         source_time_seconds=m['initial_time_seconds'],target_time_seconds=m['initial_time_seconds']+steps*.01,
