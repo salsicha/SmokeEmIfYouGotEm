@@ -51,6 +51,30 @@ class CanopyExclusionTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'Complete original/new canopy'):
             self.module.exclusion_contract(self.old, self.new)
 
+    def actor(self, name):
+        return types.SimpleNamespace(get_package=lambda: types.SimpleNamespace(get_name=lambda: name))
+
+    def test_unrelated_initial_editor_residency_is_not_selected(self):
+        targets = [self.actor('/target1'), self.actor('/target2'), self.actor('/target3')]
+        initial = [self.actor('/initial%d' % i) for i in range(4)]
+        actual = self.module.select_requested_actors(initial+targets, ['/target1', '/target2', '/target3'])
+        self.assertEqual(targets, actual)
+        self.assertEqual(3, len(actual))
+
+    def test_same_count_wrong_package_does_not_replace_missing_target(self):
+        with self.assertRaisesRegex(RuntimeError, 'Incomplete requested foliage residency'):
+            self.module.select_requested_actors([self.actor('/target1'), self.actor('/unrelated')],
+                                                ['/target1', '/target2'])
+
+    def test_duplicate_or_empty_requests_refuse(self):
+        for requested in ([], ['/target1', '/target1']):
+            with self.subTest(requested=requested), self.assertRaisesRegex(RuntimeError, 'Nonempty unique'):
+                self.module.select_requested_actors([self.actor('/target1')], requested)
+
+    def test_duplicate_resident_target_refuses(self):
+        with self.assertRaisesRegex(RuntimeError, 'Incomplete requested foliage residency'):
+            self.module.select_requested_actors([self.actor('/target1'), self.actor('/target1')], ['/target1'])
+
 
 if __name__ == '__main__':
     unittest.main()

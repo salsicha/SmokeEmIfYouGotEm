@@ -44,6 +44,19 @@ def exclusion_contract(old, new):
         old_instances=len(rows), retained_instances=len(retained))
 
 
+def select_requested_actors(actors, packages):
+    """Editor residency can include unrelated cells; selection is by identity."""
+    expected = set(packages)
+    if not expected or len(expected) != len(packages):
+        raise RuntimeError('Nonempty unique foliage package selection required')
+    selected = [a for a in actors if a.get_package().get_name() in expected]
+    names = [a.get_package().get_name() for a in selected]
+    if len(names) != len(expected) or set(names) != expected:
+        raise RuntimeError('Incomplete requested foliage residency: missing=%s, duplicates=%s' % (
+            sorted(expected-set(names)), sorted(n for n in set(names) if names.count(n) != 1)))
+    return selected
+
+
 def load_targets(contract, packages=None):
     if not unreal.get_editor_subsystem(unreal.LevelEditorSubsystem).load_level(LEVEL):
         raise RuntimeError('Continuous scene load failed')
@@ -64,9 +77,9 @@ def load_targets(contract, packages=None):
     unreal.WorldPartitionBlueprintLibrary.load_actors([d.guid for d in descs])
     actors = [a for a in unreal.get_editor_subsystem(unreal.EditorActorSubsystem).get_all_level_actors()
               if isinstance(a, unreal.InstancedFoliageActor)]
-    if len(actors) != len(descs):
-        raise RuntimeError('Unexpected foliage residency')
-    return actors
+    # The editor may restore other previously visible cells when opening this
+    # map. Do not unload, edit, save or include those actors in the update scope.
+    return select_requested_actors(actors, [str(d.actor_package) for d in descs])
 
 
 def settings(actors):
@@ -130,7 +143,9 @@ def main():
     unreal.SystemLibrary.execute_console_command(world, 'RaftSim.UpdateFutaleufuBufferCanopy %s %s %s' % (
         (OUT/'request.json').relative_to(ROOT).as_posix(), MODE, receipt.relative_to(ROOT).as_posix()))
     native = json.loads(receipt.read_text())
-    if (native['request_sha256'] != sha(OUT/'request.json') or not native['all_exclusions_absent_after_operation']
+    if (native['selection_scope'] != 'requested_foliage_packages' or
+            native['requested_loaded_packages'] != len(contract['loaded_foliage_packages']) or
+            native['request_sha256'] != sha(OUT/'request.json') or not native['all_exclusions_absent_after_operation']
             or not native['native_metadata_matches_render_instances'] or settings(actors) != old_settings):
         raise RuntimeError('Native foliage metadata/render/settings verification failed')
     if MODE == 'apply':

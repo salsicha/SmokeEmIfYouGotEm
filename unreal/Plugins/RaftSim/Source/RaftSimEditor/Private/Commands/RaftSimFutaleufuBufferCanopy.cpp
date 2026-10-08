@@ -36,6 +36,28 @@ static bool Run(const FString& Path,bool Apply,TSharedPtr<FJsonObject>& Result,F
     UWorld* World=GEditor ? GEditor->GetEditorWorldContext().World() : nullptr;
     if(!J || J->GetStringField(TEXT("schema"))!=TEXT("raftsim.futaleufu_buffer_canopy_update.v1") || !World ||
         World->GetPackage()->GetName()!=TEXT("/Game/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousContextV1"))return false;
+    TSet<FString> RequestedPackages;
+    const TArray<TSharedPtr<FJsonValue>>* Requested=nullptr;
+    if(!J->TryGetArrayField(TEXT("loaded_foliage_packages"),Requested) || Requested->IsEmpty())return false;
+    for(const auto& Value:*Requested)
+    {
+        FString Name;
+        if(!Value->TryGetString(Name) || !Name.StartsWith(TEXT("/Game/__ExternalActors__/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousContextV1/")) ||
+            RequestedPackages.Contains(Name))return false;
+        RequestedPackages.Add(Name);
+    }
+    // Opening an editor map may restore unrelated visible cells. Only the
+    // explicit package selection participates in mutation or retained digests.
+    TArray<AInstancedFoliageActor*> SelectedActors;TSet<FString> ResidentPackages;int32 UnselectedActors=0;
+    for(TActorIterator<AInstancedFoliageActor> It(World);It;++It)
+    {
+        const FString Name=It->GetPackage()->GetName();
+        if(!RequestedPackages.Contains(Name)){++UnselectedActors;continue;}
+        if(ResidentPackages.Contains(Name))return false;
+        ResidentPackages.Add(Name);SelectedActors.Add(*It);
+    }
+    if(ResidentPackages.Num()!=RequestedPackages.Num())
+    {Error=TEXT("Requested native foliage packages are not all resident");return false;}
     TArray<FTarget> Targets;
     for(const auto& Value:J->GetArrayField(TEXT("remove")))
     {
@@ -77,11 +99,11 @@ static bool Run(const FString& Path,bool Apply,TSharedPtr<FJsonObject>& Result,F
         if(Find){Before+=Info.Instances.Num();++Groups;if(!Removal.Indices.IsEmpty())Removals.Add(MoveTemp(Removal));}
         return true;
     };
-    for(TActorIterator<AInstancedFoliageActor> It(World);It;++It)
+    for(auto* Actor:SelectedActors)
     {
-        if(!It->GetIsSpatiallyLoaded())return false;
-        It->ForEachFoliageInfo([&](UFoliageType* Type,FFoliageInfo& Info)
-            {Valid=Valid && Inspect(*It,Type,Info,Apply,Expected);return Valid;});
+        if(!Actor->GetIsSpatiallyLoaded())return false;
+        Actor->ForEachFoliageInfo([&](UFoliageType* Type,FFoliageInfo& Info)
+            {Valid=Valid && Inspect(Actor,Type,Info,Apply,Expected);return Valid;});
         if(!Valid)return false;
     }
     if(Expected.IsEmpty())return false;
@@ -95,9 +117,9 @@ static bool Run(const FString& Path,bool Apply,TSharedPtr<FJsonObject>& Result,F
             R.Info->RemoveInstances(R.Indices,true);R.Actor->MarkPackageDirty();
         }
         TArray<FString> Actual;
-        for(TActorIterator<AInstancedFoliageActor> It(World);It;++It)
-            It->ForEachFoliageInfo([&](UFoliageType* Type,FFoliageInfo& Info)
-                {Valid=Valid && Inspect(*It,Type,Info,false,Actual);return Valid;});
+        for(auto* Actor:SelectedActors)
+            Actor->ForEachFoliageInfo([&](UFoliageType* Type,FFoliageInfo& Info)
+                {Valid=Valid && Inspect(Actor,Type,Info,false,Actual);return Valid;});
         if(!Valid || Actual.Num()!=Before-42 || Digest(Actual)!=Digest(Expected))
         {Error=TEXT("Retained foliage metadata or render instances changed; no save permitted");return false;}
     }
@@ -108,6 +130,9 @@ static bool Run(const FString& Path,bool Apply,TSharedPtr<FJsonObject>& Result,F
         Names.Add(MakeShared<FJsonValueString>(P->GetName()));
     }
     Result=MakeShared<FJsonObject>();Result->SetStringField(TEXT("request_sha256"),FRaftSimLiquidDataset::Hash(Path));
+    Result->SetStringField(TEXT("selection_scope"),TEXT("requested_foliage_packages"));
+    Result->SetNumberField(TEXT("requested_loaded_packages"),SelectedActors.Num());
+    Result->SetNumberField(TEXT("unselected_resident_actors_untouched"),UnselectedActors);
     Result->SetStringField(TEXT("retained_native_metadata_sha256"),Digest(Expected));
     Result->SetNumberField(TEXT("retained_loaded_instances"),Expected.Num());
     Result->SetNumberField(TEXT("removed_instances"),Apply ? 42 : 0);
