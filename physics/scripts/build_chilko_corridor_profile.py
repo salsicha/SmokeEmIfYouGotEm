@@ -34,7 +34,20 @@ def mapped_span(lateral, mapped):
     return left,right
 
 
-def channel_section(lateral, mapped, height, kind):
+def local_reference_support(projected_station, section_station, half_width=2.):
+    """Use evidence at this source station, not low samples from another bend.
+
+    Non-mapped samples may have missing projections and cannot contribute.
+    This filter changes reference support only, never the mapped bank span.
+    """
+    projected_station=np.asarray(projected_station,dtype=float)
+    if (projected_station.ndim!=1 or not np.isfinite([section_station,half_width]).all()
+            or not 0<half_width<=10.):
+        raise ValueError('One-dimensional projections and bounded station window required')
+    return np.isfinite(projected_station)&(abs(projected_station-section_station)<=half_width+1e-8)
+
+
+def channel_section(lateral, mapped, height, kind, reference_support=None):
     lateral=np.asarray(lateral,dtype=float);mapped=np.asarray(mapped,dtype=bool)
     height,kind=np.asarray(height),np.asarray(kind)
     if (lateral.ndim!=1 or len(lateral)<3 or any(a.shape!=lateral.shape for a in (mapped,height,kind)) or
@@ -52,6 +65,13 @@ def channel_section(lateral, mapped, height, kind):
         raise ValueError('Channel interior has missing terrain support')
     if len(interior)<3:
         raise ValueError('Insufficient supported channel interior')
+    if reference_support is not None:
+        reference_support=np.asarray(reference_support)
+        if reference_support.shape!=lateral.shape or reference_support.dtype.kind!='b':
+            raise ValueError('Boolean source-local reference support required')
+        interior=interior[reference_support[interior]]
+        if len(interior)<3:
+            raise ValueError('Insufficient source-local reference support')
     low=float(np.percentile(height[interior],20))
     support=interior[height[interior]<=low+.25]
     reference=float(np.median(height[support]))
@@ -113,9 +133,11 @@ def bridge_short_reference_gaps(station, reference):
     return result,records
 
 
-def build(terrain_path,route,planform,out,step=4.,diagnostic_gaps=False,bridge_short_gaps=False,chart_directions=False):
+def build(terrain_path,route,planform,out,step=4.,diagnostic_gaps=False,bridge_short_gaps=False,chart_directions=False,reference_window_m=2.):
     if out.exists():raise ValueError('Fresh corridor profile required')
     if not np.isfinite(step) or not 1<=step<=10:raise ValueError('Bounded positive route spacing required')
+    if not np.isfinite(reference_window_m) or not 0<reference_window_m<=10:
+        raise ValueError('Bounded source-local reference window required')
     terrain=CorridorTerrain(terrain_path);receipt=sha(terrain.folder/'manifest.json')
     if not terrain.conditioned or not compatible_capture_route(route,terrain.manifest['route_sha256']):
         raise ValueError('Verified conditioned terrain on the same FWA route required')
@@ -127,21 +149,26 @@ def build(terrain_path,route,planform,out,step=4.,diagnostic_gaps=False,bridge_s
     tangent=np.gradient(points,station,axis=0);norm=np.linalg.norm(tangent,axis=1)
     if (norm<1e-6).any():raise ValueError('Degenerate source route direction')
     normal=np.c_[-tangent[:,1],tangent[:,0]]/norm[:,None]
-    if chart_directions:normal=directions_at_source_points(LineString(xy),points)
+    source_line=LineString(xy)
+    if chart_directions:normal=directions_at_source_points(source_line,points)
     lateral=np.arange(-320,321,1.);sections=[];rejected=[]
     for start in range(0,len(points),256):
         p=points[start:start+256,None,:]+lateral[None,:,None]*normal[start:start+256,None,:]
         inside=shapely.contains_xy(polygon,p[...,0],p[...,1])
         h,k=terrain.sample(p)
+        projected=np.full(inside.shape,np.nan)
+        projected[inside]=shapely.line_locate_point(source_line,shapely.points(p[inside]))
         for i in range(len(p)):
-            try:sections.append(channel_section(lateral,inside[i],h[i],k[i]))
+            support=local_reference_support(projected[i],station[start+i],reference_window_m)
+            try:sections.append(channel_section(lateral,inside[i],h[i],k[i],support))
             except ValueError as e:
                 if not diagnostic_gaps and not bridge_short_gaps:raise ValueError(f'FWA station {station[start+i]:.3f} m: {e}') from e
                 if str(e) not in ('Insufficient supported channel interior',
+                        'Insufficient source-local reference support',
                         'Source route leaves mapped river; review geography before inferring channel',
                         'Mapped channel exceeds sampled width; no clamped bank permitted'):
                     raise
-                if str(e)=='Insufficient supported channel interior':
+                if str(e) in ('Insufficient supported channel interior','Insufficient source-local reference support'):
                     left,right=mapped_span(lateral,inside[i])
                     sections.append(dict(right_bank_m=float(lateral[left]-.5),left_bank_m=float(lateral[right]+.5),
                         width_m=float(right-left+1),reference_m=np.nan,support_count=0,native_support_count=0,
@@ -178,7 +205,11 @@ def build(terrain_path,route,planform,out,step=4.,diagnostic_gaps=False,bridge_s
         planform_policy=route_planform_policy(route),
         cross_section_direction_policy=('Shared full-route 320 m Gaussian numerical chart, 64 m endpoint extension; directions projected onto exact geographic anchors, not measured flow' if chart_directions else 'Raw exact-route finite-difference tangent'),
         profile_sha256=sha(out/'profile.npz'),
-        inference='Low channel-interior DEM samples within 0.25 m of interior p20, median then global resolution-weighted nonincreasing regression; no water-level survey',
+        inference='Source-station-local channel-interior DEM samples within 0.25 m of local interior p20, median then global resolution-weighted nonincreasing regression; no water-level survey',
+        reference_support_policy=dict(kind='exact_source_route_projection_window_v1',
+            station_half_width_m=float(reference_window_m),minimum_local_interior_samples=3,
+            bank_margin_m=3.,remote_reference_fallback=False,
+            qualification='Reference support is restricted to its actual geographic source station; bank spans and source terrain are unchanged. Missing local support remains an explicit refusal.'),
         regression_weight_policy=dict(native_1m_support_weight=1.,coarse_30m_support_weight=1./900.,
             conditioned_fallback_remains_coarse=True,
             qualification='Resolution-based inference weight, not measured sensor accuracy or independent statistical samples'),
@@ -202,6 +233,7 @@ if __name__=='__main__':
     p.add_argument('--diagnostic-gaps',action='store_true',help='Record ALL unsupported sections as NaN; never a complete construction profile')
     p.add_argument('--bridge-short-reference-gaps',action='store_true',help='Explicit inferred stage across narrow branches only: source anchors at most 20 m apart and 0.25 m drop')
     p.add_argument('--chart-directions',action='store_true',help='Orient exact route anchors across the existing shared full-domain numerical chart')
-    a=p.parse_args();r=build(a.terrain,a.route,a.planform,a.out,diagnostic_gaps=a.diagnostic_gaps,bridge_short_gaps=a.bridge_short_reference_gaps,chart_directions=a.chart_directions)
+    p.add_argument('--reference-window-m',type=float,default=2.,help='Maximum geographic source-station offset for DEM reference samples; no remote-bend fallback')
+    a=p.parse_args();r=build(a.terrain,a.route,a.planform,a.out,diagnostic_gaps=a.diagnostic_gaps,bridge_short_gaps=a.bridge_short_reference_gaps,chart_directions=a.chart_directions,reference_window_m=a.reference_window_m)
     print(json.dumps({k:v for k,v in r.items() if k!='rejected_source_sections'},indent=2))
     print('unsupported_source_sections',len(r['rejected_source_sections']))

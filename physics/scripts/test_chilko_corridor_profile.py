@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from build_chilko_corridor_profile import channel_section, surface_reference, bridge_short_reference_gaps, reference_weights
+from build_chilko_corridor_profile import channel_section, surface_reference, bridge_short_reference_gaps, reference_weights, local_reference_support
 
 
 class CorridorProfileTests(unittest.TestCase):
@@ -19,6 +19,34 @@ class CorridorProfileTests(unittest.TestCase):
         x,w,h,k=self.data();h[x==0]=105
         r=channel_section(x,w,h,k)
         self.assertEqual(r['reference_m'],100);self.assertEqual(r['surface_sample_range_m'],[100,100])
+
+    def test_downstream_low_samples_are_not_assigned_upstream(self):
+        x,w,h,k=self.data();h[x>4]=99.
+        projected=500+x
+        old=channel_section(x,w,h,k)
+        local=channel_section(x,w,h,k,local_reference_support(projected,500))
+        self.assertEqual(old['reference_m'],99)
+        self.assertEqual(local['reference_m'],100)
+        for key in ('left_bank_m','right_bank_m','width_m'):
+            self.assertEqual(old[key],local[key])
+        self.assertEqual(h[x==10],99.)
+
+    def test_source_local_filter_does_not_bypass_emergent_sample_exclusion(self):
+        x,w,h,k=self.data();h[x==0]=105.
+        local=channel_section(x,w,h,k,local_reference_support(500+x,500,4))
+        self.assertEqual(local['reference_m'],100)
+
+    def test_insufficient_local_support_is_not_replaced_by_remote_water(self):
+        x,w,h,k=self.data()
+        with self.assertRaisesRegex(ValueError,'source-local'):
+            channel_section(x,w,h,k,local_reference_support(500+x,500,.5))
+
+    def test_local_support_bounds_and_missing_projection(self):
+        np.testing.assert_array_equal(local_reference_support([498,499,500,502,np.nan,503],500),
+                                      [True,True,True,True,False,False])
+        for width in (0,11,np.nan):
+            with self.assertRaises(ValueError):local_reference_support([500],500,width)
+        with self.assertRaises(ValueError):local_reference_support([[500]],500)
 
     def test_conditioned_fallback_reference_stays_inferred(self):
         x,w,h,k=self.data();k[x<0]=3
