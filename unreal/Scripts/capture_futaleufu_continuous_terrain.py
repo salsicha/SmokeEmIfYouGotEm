@@ -4,8 +4,12 @@ from pathlib import Path
 import unreal
 root=Path(__file__).resolve().parents[2]
 out=Path(os.environ.get('RAFTSIM_TERRAIN_REVIEW_OUT',str(root/'tmp/futaleufu-continuous-terrain-review')))
-level='/Game/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousTerrainV1'
-path=root/'unreal/Content/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousTerrainV1.umap'
+level=os.environ.get('RAFTSIM_TERRAIN_REVIEW_LEVEL','/Game/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousTerrainV1')
+counts={'/Game/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousTerrainV1':177,
+        '/Game/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousContextV1':800}
+if level not in counts:raise RuntimeError('Only explicit continuous terrain candidates may be reviewed here')
+expected_count=counts[level]
+path=root/('unreal/Content/'+level.removeprefix('/Game/')+'.umap')
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 state=dict(frames=0,captures=[],scope='Native terrain-only diagnostic; no playable water, vegetation or performance acceptance')
 views=[('azul_canyon',[439504.80775,-386523.59978,8907.82743]),
@@ -53,18 +57,18 @@ try:
     # This terrain-only candidate has no runtime actors; load its full set and
     # validate real resident proxies, never equate root descriptors to geometry.
     wanted=[d.guid for d in descs]
-    if len(wanted)<354:raise RuntimeError('Incomplete root/proxy descriptor set: '+str(len(wanted)))
+    if len(wanted)<2*expected_count:raise RuntimeError('Incomplete root/proxy descriptor set: '+str(len(wanted)))
     unreal.WorldPartitionBlueprintLibrary.load_actors(wanted)
     resident=[a for a in actors.get_all_level_actors() if isinstance(a,unreal.LandscapeStreamingProxy)]
     state['loaded_terrain_proxies']=len(resident)
-    if len(resident)!=177:raise RuntimeError('Actual resident streaming proxies differ from 177: '+str(len(resident)))
+    if len(resident)!=expected_count:raise RuntimeError('Actual resident streaming proxies differ from expected count: '+str(len(resident)))
     state['terrain_materials']={}
     for actor in resident:
         material=actor.get_editor_property('landscape_material')
         name=material.get_path_name() if material else 'None'
         state['terrain_materials'][name]=state['terrain_materials'].get(name,0)+1
     expected=os.environ.get('RAFTSIM_TERRAIN_REVIEW_MATERIAL')
-    if expected and state['terrain_materials']!={expected:177}:raise RuntimeError('Saved terrain material mismatch')
+    if expected and state['terrain_materials']!={expected:expected_count}:raise RuntimeError('Saved terrain material mismatch')
     state['terrain_bounds']=[dict(name=a.get_name(),bounds=str(a.get_actor_bounds(False))) for a in resident]
     levels.editor_set_viewport_realtime(False)
     levels.editor_set_viewport_realtime(True)

@@ -168,3 +168,7 @@ unreal/Packaged/
 /unreal/Content/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousTerrainV1.umap
 /unreal/Content/__ExternalActors__/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousTerrainV1/
 /unreal/Content/__ExternalObjects__/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousTerrainV1/
+# Expanded captured surroundings remain a non-shipping integration candidate.
+/unreal/Content/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousContextV1.umap
+/unreal/Content/__ExternalActors__/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousContextV1/
+/unreal/Content/__ExternalObjects__/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousContextV1/
