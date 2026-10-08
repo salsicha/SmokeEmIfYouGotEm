@@ -123,7 +123,7 @@ def build(terrain,profile,out,discharge=45.,roughness=.045,*,origin=None,terrain
         source_terrain_sha256=model.receipt['terrain_manifest_sha256'],
         source_route_sha256=model.receipt['route_sha256'],source_planform_sha256=model.receipt['planform_sha256'],
         ownership_policy=model.receipt['ownership_policy'],discharge_m3s=discharge,manning_n=roughness,
-        depth_sha256=sha(out/'depth.npz'),section_spacing_m=4.,lateral_spacing_m=1.,lateral_half_extent_m=256.,
+        depth_sha256=sha(out/'depth.npz'),section_spacing_m=float(np.median(np.diff(model.station))),lateral_spacing_m=1.,lateral_half_extent_m=256.,
         capacity_section_spacing_m=2.,capacity_chart_coverage=coverage,
         numerical_chart_policy=chart_policy,
         capacity_grid=grid,

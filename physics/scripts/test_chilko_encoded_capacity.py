@@ -45,6 +45,7 @@ class EncodedCapacityTests(unittest.TestCase):
             self.assertEqual(receipt['capacity_grid'],capacity_grid([0.,0.]))
             self.assertFalse(receipt['hydraulic_solution'])
             self.assertIn('wet query',receipt['capacity_slope_policy'])
+            self.assertEqual(receipt['section_spacing_m'],float(np.median(np.diff(m.station))))
             with np.load(out/'depth.npz') as z:
                 self.assertTrue((z['inferred_capacity_m3s']>=45.).all())
                 self.assertTrue((z['depth_amplitude_m']>=m.depth).all())

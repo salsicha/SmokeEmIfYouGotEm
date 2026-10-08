@@ -227,13 +227,18 @@ def build(terrain_path,route,planform,out,step=4.,diagnostic_gaps=False,bridge_s
     return result
 
 
-if __name__=='__main__':
+def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('terrain','route','planform','out'):p.add_argument('--'+name,type=Path,required=True)
+    p.add_argument('--station-spacing-m',type=float,default=4.,help='Longitudinal reference sampling in metres (1..10); use native 1 m spacing to resolve short source-height transitions')
     p.add_argument('--diagnostic-gaps',action='store_true',help='Record ALL unsupported sections as NaN; never a complete construction profile')
     p.add_argument('--bridge-short-reference-gaps',action='store_true',help='Explicit inferred stage across narrow branches only: source anchors at most 20 m apart and 0.25 m drop')
     p.add_argument('--chart-directions',action='store_true',help='Orient exact route anchors across the existing shared full-domain numerical chart')
     p.add_argument('--reference-window-m',type=float,default=2.,help='Maximum geographic source-station offset for DEM reference samples; no remote-bend fallback')
-    a=p.parse_args();r=build(a.terrain,a.route,a.planform,a.out,diagnostic_gaps=a.diagnostic_gaps,bridge_short_gaps=a.bridge_short_reference_gaps,chart_directions=a.chart_directions,reference_window_m=a.reference_window_m)
+    a=p.parse_args(argv);r=build(a.terrain,a.route,a.planform,a.out,step=a.station_spacing_m,diagnostic_gaps=a.diagnostic_gaps,bridge_short_gaps=a.bridge_short_reference_gaps,chart_directions=a.chart_directions,reference_window_m=a.reference_window_m)
     print(json.dumps({k:v for k,v in r.items() if k!='rejected_source_sections'},indent=2))
     print('unsupported_source_sections',len(r['rejected_source_sections']))
+    return r
+
+
+if __name__=='__main__':main()

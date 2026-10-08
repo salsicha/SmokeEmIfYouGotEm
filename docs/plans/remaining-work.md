@@ -1,5 +1,30 @@
 # Remaining requested work
 
+October 8 follow-up: the remaining Chilko 35650 m pinch was traced to reference
+resolution, not a reason to weaken the source classifier. A fresh full-route
+profile at native one-metre station spacing completed in 278.188 s with all
+pinned inputs unchanged: 55,725 samples, and exactly zero difference at all
+13,932 raw reference samples shared with the previous four-metre profile.
+The same existing narrow-branch gap policy covers 15 missing raw samples over
+4366..4382 m (16 m, 0.145136 m drop); these remain explicitly inferred.
+CLI `--station-spacing-m 1` now exposes the builder's existing fine-resolution
+capability, and depth receipts record actual source spacing rather than a
+hard-coded four metres. All 63 focused regressions pass, including a short-drop
+classification case that still protects an exposed rock.
+
+All 190 bounded encoded-capacity checks pass: dense windows around both prior
+pinches plus 128 evenly spaced full-route sections. At chart 35650 m the fit
+now reaches 45.241853 m3/s with amplitude 1.780370 m; at 34730 m it reaches
+45.051124 m3/s with amplitude 4.644344 m. The 37-probe guard, original source
+terrain/banks, 0.25 m eligibility tolerance, 10 m maximum, 45 m3/s construction
+target and n=0.045 are unchanged. These are quantified inference results, not
+measured bathymetry or solved discharge. See the
+[full source-resolution qualification](../../physics/data/real_world/chilko_river_bc/review/source_resolution_2026_10_08.json).
+The next step is the complete checkpointed depth fit using
+`tmp/chilko-full-corridor-profile-v13-source-local-1m`; the 190 checks do not
+stand in for all 25,552 sections, terrain export, native flow, boat navigation
+or packaged 20 FPS acceptance. The earlier failed evidence below is retained.
+
 October 8 continuous-river construction update: Chilko's encoded-depth fitter
 now uses the existing 20 m smoothed source-profile slope at each owned wet
 query, not a stage gradient at the numerical chart centre (which can be dry
