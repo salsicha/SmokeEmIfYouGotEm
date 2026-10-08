@@ -255,7 +255,7 @@ bool FRiverDifficultyReview::Update()
         Result->SetStringField(TEXT("driver"),TEXT("12 m centerline lookahead; shared production turn/forward commands and personal steering every 0.85 s on both paddle and oar rigs; no high-side or rescue automation."));
         Result->SetBoolField(TEXT("solo_oar_rig"),Raft->IsSoloOarRig());
         Result->SetBoolField(TEXT("full_continuous_run"),false);
-        Result->SetNumberField(TEXT("assessment_protocol_version"),17);
+        Result->SetNumberField(TEXT("assessment_protocol_version"),18);
         Assessment=Trial->HasField(TEXT("variant"));
         StrictRoute=Continuous=RescueEnabled=false;
         TargetPhysicalRock=HasTargetRock=false;
@@ -513,7 +513,12 @@ bool FRiverDifficultyReview::Update()
         Result->SetNumberField(TEXT("overboard_drill_actual_station_m"),Route.X);
         Result->SetNumberField(TEXT("overboard_drill_actual_time_s"),Elapsed);
         Result->SetStringField(TEXT("overboard_drill_subject"),Raft->IsSoloOarRig()?TEXT("guide"):TEXT("one_passenger"));
+        Result->SetNumberField(TEXT("overboard_drill_swimmers_before_recovery"),Raft->GetSwimmerCount());
     }
+    // Observe every review tick BEFORE recovery commands. An in-reach guide
+    // can start boarding in this same tick; the 5 Hz post-input trace must not
+    // erase the genuine overboard state from the trial's peak count.
+    MaxSwimmers=FMath::Max(MaxSwimmers,Raft->GetSwimmerCount());
     // Observe the first downstream crossing of each section/move gate. Linear
     // segment intersection locates the crossing; it never drives the boat.
     const TArray<TSharedPtr<FJsonValue>>* Gates=nullptr;
@@ -533,6 +538,7 @@ bool FRiverDifficultyReview::Update()
             Receipt->SetNumberField(TEXT("full_hull_impulses_before_gate"),Physics->GetHullContactTotals().Impulses-InitialHullContact.Impulses);
             Receipt->SetNumberField(TEXT("speed_mps"),State.LinearVelocityMetersPerSecond.Size());
             Receipt->SetNumberField(TEXT("swimmers"),Raft->GetSwimmerCount());
+            Receipt->SetBoolField(TEXT("guide_rescue_active"),Raft->IsGuideRescuing());
             Receipt->SetNumberField(TEXT("pin_seconds_before_gate"),PinSeconds);
             Receipt->SetNumberField(TEXT("checkpoint_restores_during_trial"),Raft->GetCheckpointRestoreCount()-InitialRestores);
             double Lo=-DBL_MAX,Hi=DBL_MAX;
@@ -762,6 +768,7 @@ bool FRiverDifficultyReview::Update()
     Result->SetNumberField(TEXT("wall_seconds"),FPlatformTime::Seconds()-Wall);
     Result->SetNumberField(TEXT("recorded_incidents"),Run->GetSafetyIncidentCount());
     Result->SetNumberField(TEXT("completed_rescues"),Raft->GetCompletedRescueCount()-RescueCompletionsAtStart);
+    Result->SetBoolField(TEXT("guide_rescue_active_at_last_sample"),Raft->IsGuideRescuing());
     Result->SetNumberField(TEXT("full_hull_impulses"),Physics->GetHullContactTotals().Impulses-InitialHullContact.Impulses);
     Result->SetNumberField(TEXT("full_hull_impulse_steps"),Physics->GetHullContactTotals().ImpulseSteps-InitialHullContact.ImpulseSteps);
     Result->SetNumberField(TEXT("checkpoint_restores_during_trial"),Raft->GetCheckpointRestoreCount()-InitialRestores);
