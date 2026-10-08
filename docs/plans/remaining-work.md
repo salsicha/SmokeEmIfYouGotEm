@@ -22,11 +22,15 @@ geographic launch coordinates while keeping downstream run progress on its
 separate, hash-checked route. It also adds a snapshot auditor that checks the
 actual short/long sampling schedule and distinguishes an interrupted checkpoint
 from a completed run without granting restart or map acceptance. Twenty-two
-targeted Python regressions passed. The five native runtime-binding/frame tests
-remain queued in `tmp/continuous-runtime-binding-queue-v1` (wrapper PID 11696,
-exec session 50758 at this observation). Verify that handle and its terminal
-receipts before relying on this status or launching any build. Rendered full
-descents, normal-map promotion and packaged 20 FPS acceptance remain outstanding.
+targeted Python regressions passed. The native runtime-binding queue is now
+terminal and successful at 23:24:52 UTC: the editor build exited zero, and all
+five native tests passed with zero warnings, errors, skipped or unfinished
+tests. Its recorded DLL and source hashes remained unchanged. See the
+[native binding receipt](../../physics/data/real_world/futaleufu_river_chile/review/continuous_runtime_binding_native_2026_10_08.json).
+Do not rerun this completed queue. The evidence covers geographic crop selection,
+river coordinate frames and dressing identity, not full runtime map assembly.
+Rendered full descents, normal-map promotion and packaged 20 FPS acceptance
+remain outstanding.
 
 October 8 canopy residency repair: the first native apply reached the full
 Futaleufu map but stopped before modifying foliage because the Python loader
