@@ -1,7 +1,7 @@
 """Freeze the exact saved-scene runtime dependency closure, without recooking.
 
 Payloads are content-addressed but staged at their existing logical paths. This
-preserves every JSON/NumPy byte and saved actor binding; tmp-prefixed logical
+preserves every JSON/NumPy/RSBF byte and saved actor binding; tmp-prefixed logical
 names no longer require a developer's tmp directory. This is not acceptance of
 the physical state, visual result, or source bathymetry.
 """
@@ -12,6 +12,34 @@ import math
 from pathlib import Path, PurePosixPath
 import posixpath
 import shutil
+import struct
+
+
+def runtime_payload(name):
+    path = PurePosixPath(name)
+    return path.suffix in ('.json', '.npy') or (path.suffix == '.bin' and
+        path.name.startswith(('support_band_field_', 'observed_whitewater_')))
+
+
+def validate_support_band(path):
+    """Bounded RSBF layout check; same allocation budget as the native reader."""
+    with Path(path).open('rb') as stream:
+        header = stream.read(24)
+        if len(header) != 24:
+            raise ValueError('Truncated RSBF header')
+        magic, version, width, rows, origin, spacing = struct.unpack('<IIiiff', header)
+        if (magic != 0x52534246 or version != 1 or not 2 <= width <= 512 or rows < 2 or
+            not math.isfinite(origin) or not math.isfinite(spacing) or spacing <= 0):
+            raise ValueError('Invalid RSBF header')
+        cells = width * rows
+        size = 40 + 4 * rows + 9 * cells
+        if cells > 102400000 or size > 922400040 or Path(path).stat().st_size != size:
+            raise ValueError('Invalid RSBF extent or allocation budget')
+        for count, stride in ((rows, 4), (cells, 4), (cells, 4), (cells, 1)):
+            word = stream.read(4)
+            if len(word) != 4 or struct.unpack('<i', word)[0] != count:
+                raise ValueError('Invalid RSBF array count')
+            stream.seek(count * stride, 1)
 
 
 def sha(path):
@@ -70,8 +98,8 @@ class Closure:
 
     def add(self, name, expected=None):
         name = logical_path(name)
-        if PurePosixPath(name).suffix not in ('.json', '.npy'):
-            raise ValueError('Only runtime JSON/NumPy payloads may be bundled')
+        if not runtime_payload(name):
+            raise ValueError('Only runtime JSON/NumPy or named RSBF payloads may be bundled')
         other = self.case_names.setdefault(name.casefold(), name)
         if other != name:
             raise ValueError('Case-colliding runtime paths')
@@ -81,6 +109,8 @@ class Closure:
             if not path.is_relative_to(self.root):
                 raise ValueError('Runtime dependency escapes source root')
             self.files[name] = dict(path=path, sha256=sha(path), size_bytes=path.stat().st_size)
+            if PurePosixPath(name).suffix == '.bin':
+                validate_support_band(path)
         if expected is not None and self.files[name]['sha256'] != expected:
             raise ValueError('Runtime dependency hash mismatch: '+name)
         return self.files[name]['path']
@@ -103,37 +133,68 @@ class Closure:
         for meta in atlas['arrays'].values():
             self.add(relative_dependency(name, meta['file']), meta['sha256'])
 
-    def fields(self, name):
-        if ('fields', name) in self.visited:
+    def fields(self, name, cartesian=True, expected=None):
+        self.add(name, expected)
+        if ('fields', name, cartesian) in self.visited:
             return
-        self.visited.add(('fields', name))
+        self.visited.add(('fields', name, cartesian))
         fields = self.document(name, 'raftsim.cooked_flow_fields.v1')
         if not fields['bands']:
             raise ValueError('Empty field bands')
         for band in fields['bands']:
-            if not {'bed', 'captured_water_mask'}.issubset(band['arrays']):
+            required = {'bed', 'captured_water_mask'} if cartesian else {'bed', 'h', 'u', 'v', 'wet_mask'}
+            if not required.issubset(band['arrays']):
                 raise ValueError('Incomplete source terrain fields')
             for meta in band['arrays'].values():
                 self.add(relative_dependency(name, meta['file']), meta['sha256'])
-            shared = band['shared_cartesian_state']
-            self.atlas(relative_dependency(name, shared['manifest']), shared['sha256'])
+            if cartesian:
+                shared = band['shared_cartesian_state']
+                self.atlas(relative_dependency(name, shared['manifest']), shared['sha256'])
+            elif 'shared_cartesian_state' in band:
+                raise ValueError('Curved fields cannot use a Cartesian state atlas')
+            for key, prefix in (('presentation_baseline', 'support_band_field_'),
+                                ('observed_whitewater', 'observed_whitewater_')):
+                meta = band.get(key)
+                if meta is None:
+                    if key == 'presentation_baseline' and not cartesian:
+                        raise ValueError('Curved river presentation baseline required')
+                    continue
+                expected_name = prefix + band['band_id'] + '.bin'
+                if meta['file'] != expected_name or '/' in expected_name or not meta.get('sha256'):
+                    raise ValueError('RSBF sidecar must match native flow-band filename and hash')
+                self.add(relative_dependency(name, meta['file']), meta['sha256'])
 
     def collect(self, entrypoints):
         required = {'streaming_manifest', 'initial_fields_manifest',
                     'hydraulic_coordinate_map', 'route_coordinate_map'}
         if set(entrypoints) != required:
             raise ValueError('Complete saved-scene entrypoints required')
-        stream = self.document(entrypoints['streaming_manifest'], 'raftsim.cartesian_water_streaming.v1')
+        stream = json.loads(self.add(entrypoints['streaming_manifest']).read_text(encoding='utf-8-sig'))
+        if stream.get('schema') not in ('raftsim.cartesian_water_streaming.v1',
+                                       'raftsim.south_fork.moving_water_streaming.v1'):
+            raise ValueError('Unsupported runtime streaming schema')
+        cartesian = stream['schema'] == 'raftsim.cartesian_water_streaming.v1'
+        if not cartesian:
+            transit = stream['full_reach_transit_seed']
+            if not transit.get('cooked_fields_manifest_sha256'):
+                raise ValueError('Hash-bound full-reach transit fields required')
+            self.fields(logical_path(transit['cooked_fields_manifest']), False,
+                        transit['cooked_fields_manifest_sha256'])
         if not stream['windows']:
             raise ValueError('Empty streaming coverage')
         for row in stream['windows']:
-            self.fields(logical_path(row['cooked_fields_manifest']))
-        self.fields(logical_path(entrypoints['initial_fields_manifest']))
+            self.fields(logical_path(row['cooked_fields_manifest']), cartesian,
+                        row.get('cooked_fields_manifest_sha256'))
+        self.fields(logical_path(entrypoints['initial_fields_manifest']), cartesian)
         # Native coordinate loader reads each complete JSON document. Its
         # provenance references are evidence, not runtime array dependencies.
         for key in ('hydraulic_coordinate_map', 'route_coordinate_map'):
             data = json.loads(self.add(entrypoints[key]).read_text(encoding='utf-8-sig'))
             validate_coordinate_map(data)
+            if key == 'hydraulic_coordinate_map':
+                expected = 'raftsim.cartesian_water_coordinate_map.v1' if cartesian else 'raftsim.curved_river_coordinate_map.v1'
+                if data['schema'] != expected:
+                    raise ValueError('Hydraulic coordinate map must match streaming frame')
         return self.files
 
 

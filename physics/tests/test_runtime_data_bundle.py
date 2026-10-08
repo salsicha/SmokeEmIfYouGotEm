@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import shutil
+import struct
 
 import pytest
 
@@ -210,3 +211,93 @@ def test_staging_audit_rejects_corrupt_file_even_with_valid_original(fixture):
     (stage/result['files'][0]['destination']).write_bytes(b'bad staged file')
     with pytest.raises(ValueError,match='Staged runtime payload changed'):
         verify_staged(output,stage)
+
+
+@pytest.fixture
+def curved_fixture(fixture):
+    root, bindings, output, entries = fixture
+    baseline = struct.pack('<IIiiff', 0x52534246, 1, 2, 2, -1., 2.)
+    baseline += struct.pack('<i2f', 2, 0., 2.)
+    baseline += struct.pack('<i4f', 4, *([700.] * 4))
+    baseline += struct.pack('<i4f', 4, *([.25] * 4))
+    baseline += struct.pack('<i4B', 4, 1, 1, 1, 1)
+    for part in ('initial', 'transit'):
+        folder = root/'tmp/curved'/part
+        folder.mkdir(parents=True)
+        arrays = {}
+        for key in ('bed', 'h', 'u', 'v', 'wet_mask'):
+            path = folder/(key+'.npy')
+            path.write_bytes((part+key).encode())
+            arrays[key] = dict(file=path.name, sha256=sha(path))
+        path = folder/'support_band_field_normal.bin'
+        path.write_bytes(baseline)
+        fields = dict(schema='raftsim.cooked_flow_fields.v1', bands=[dict(band_id='normal', arrays=arrays,
+            presentation_baseline=dict(file=path.name, sha256=sha(path)))])
+        (folder/'manifest.json').write_text(json.dumps(fields))
+    entries.update(initial_fields_manifest='tmp/curved/initial/manifest.json',
+                   hydraulic_coordinate_map='physics/route.json')
+    (root/entries['streaming_manifest']).write_text(json.dumps(dict(
+        schema='raftsim.south_fork.moving_water_streaming.v1',
+        full_reach_transit_seed=dict(cooked_fields_manifest='tmp/curved/transit/manifest.json',
+            cooked_fields_manifest_sha256=sha(root/'tmp/curved/transit/manifest.json')),
+        windows=[dict(cooked_fields_manifest=entries['initial_fields_manifest'])])))
+    inventory = json.loads(bindings.read_text())
+    inventory['entrypoints'] = entries
+    bindings.write_text(json.dumps(inventory))
+    return root, bindings, output, entries
+
+
+def test_curved_bundle_includes_distinct_transit_and_binary_baselines(curved_fixture):
+    root, bindings, output, entries = curved_fixture
+    result = prepare(root, bindings, output)
+    names = {row['destination'] for row in result['files']}
+    assert 'tmp/curved/transit/manifest.json' in names
+    assert all('tmp/curved/'+part+'/support_band_field_normal.bin' in names for part in ('initial', 'transit'))
+    assert len(names) == 16  # 2 x (manifest + 5 arrays + baseline), stream, shared route.
+    assert not any('/atlas/' in name or '/state/' in name for name in names)
+    stage = root/'standalone/RaftSimRuntimeData'
+    for row in result['files']:
+        target = stage/row['destination']; target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(output/row['source'], target)
+    shutil.rmtree(root/'tmp')  # Only isolated fixture sources, never project data.
+    assert verify_bundle(output)['entrypoints'] == entries
+    assert verify_staged(output, stage)['files_verified'] == 16
+    (stage/'tmp/curved/transit/support_band_field_normal.bin').unlink()
+    with pytest.raises(FileNotFoundError):
+        verify_staged(output, stage)
+
+
+@pytest.mark.parametrize('change', ['missing_transit', 'transit_hash', 'missing_baseline', 'baseline_hash',
+    'wrong_sidecar_name', 'missing_velocity', 'wrong_coordinates', 'malformed_binary', 'array_count',
+    'truncated_binary', 'trailing_binary', 'oversized_binary', 'invalid_spacing'])
+def test_curved_bundle_rejects_incomplete_or_corrupt_closure(curved_fixture, change):
+    root, bindings, output, entries = curved_fixture
+    path = root/entries['streaming_manifest']; stream = json.loads(path.read_text())
+    fields_path = root/entries['initial_fields_manifest']; fields = json.loads(fields_path.read_text())
+    band = fields['bands'][0]
+    if change == 'missing_transit': del stream['full_reach_transit_seed']
+    if change == 'transit_hash': stream['full_reach_transit_seed']['cooked_fields_manifest_sha256'] = '0'*64
+    if change == 'missing_baseline': del band['presentation_baseline']
+    if change == 'baseline_hash': band['presentation_baseline']['sha256'] = '0'*64
+    if change == 'wrong_sidecar_name': band['presentation_baseline']['file'] = 'different.bin'
+    if change == 'missing_velocity': del band['arrays']['v']
+    if change == 'wrong_coordinates':
+        inventory = json.loads(bindings.read_text())
+        inventory['entrypoints']['hydraulic_coordinate_map'] = 'physics/hydraulic.json'
+        bindings.write_text(json.dumps(inventory))
+    if change in ('malformed_binary', 'array_count', 'truncated_binary', 'trailing_binary',
+                  'oversized_binary', 'invalid_spacing'):
+        binary = fields_path.parent/band['presentation_baseline']['file']
+        data = bytearray(binary.read_bytes())
+        if change == 'malformed_binary': data[:4] = b'bad!'
+        elif change == 'array_count': data[24:28] = struct.pack('<i', 2147483647)
+        elif change == 'truncated_binary': del data[-1]
+        elif change == 'trailing_binary': data.append(0)
+        elif change == 'oversized_binary': data[8:16] = struct.pack('<ii', 512, 2147483647)
+        elif change == 'invalid_spacing': data[20:24] = struct.pack('<f', float('nan'))
+        binary.write_bytes(data)
+        band['presentation_baseline']['sha256'] = sha(binary)
+    fields_path.write_text(json.dumps(fields)); path.write_text(json.dumps(stream))
+    with pytest.raises((ValueError, KeyError)):
+        prepare(root, bindings, output)
+    assert not output.exists()

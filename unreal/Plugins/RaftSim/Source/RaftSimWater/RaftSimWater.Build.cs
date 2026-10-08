@@ -209,7 +209,12 @@ public class RaftSimWater : ModuleRules
             string Source = CheckedRelativePath(File.GetStringField("source"));
             string Hash = File.GetStringField("sha256");
             string Extension = Path.GetExtension(Destination);
-            if ((Extension != ".json" && Extension != ".npy") ||
+            // Curved continuous rivers also require their hash-bound RSBF
+            // presentation/whitewater sidecars; never stage arbitrary binaries.
+            bool bSupportBand = Extension == ".bin" &&
+                (Path.GetFileName(Destination).StartsWith("support_band_field_", StringComparison.Ordinal) ||
+                 Path.GetFileName(Destination).StartsWith("observed_whitewater_", StringComparison.Ordinal));
+            if ((Extension != ".json" && Extension != ".npy" && !bSupportBand) ||
                 Source != "files/" + Hash + Extension || !Destinations.Add(Destination))
             {
                 throw new BuildException("Invalid or duplicate runtime bundle destination: " + Destination);

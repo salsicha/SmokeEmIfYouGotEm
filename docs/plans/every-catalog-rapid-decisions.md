@@ -5389,3 +5389,69 @@ continues independently, last observed28800/48000 steps. Preserve its bound
 binary/inputs; next work remains full-domain hydraulics, continuous scene and
 runtime bundle integration, then real descent/render/rescue and packaged20FPS
 validation. None of those gates is replaced by these bounded regression checks.
+
+### 2026-10-07 continuous runtime bundle closure
+
+Previous goal turn was progress: full-length RSBF repair committed/pushed as
+`ec7e51a2c`. Current work extends the verified runtime bundle path to curved
+continuous rivers. Previously it accepted only Cartesian streaming/atlas data
+and JSON/NumPy files, excluding the continuous map's binary baseline. The new
+closure follows both named windows and hash-bound full-reach transit fields,
+requires bed/h/u/v/wet_mask and the native-named presentation baseline, includes
+declared observed-whitewater fields, checks RSBF sizes/counts without allocating
+their payload and retains path/hash/scene-binding gates. UBT permits only named
+RSBF sidecars in addition to the previous file types; no candidate was activated
+in the normal package list.89 focused packaging/ground-source tests passed.
+The existing South Fork production bundle verified unchanged:2405 files,
+917995570 logical bytes. Other task's crew source edits remain excluded.
+
+Read-only native inventory succeeded for the saved chunked-parity candidate:
+`tmp/continuous-runtime-bundle-native-v1/inventory/bindings.json`. Its empty
+run-manager route override correctly falls back to the curved hydraulic chart,
+as the production RunManager does. No saved asset changed. A separate frozen
+bundle and staged tree contain exactly9 dependencies/25942143 bytes; bundle
+manifest SHA256 `f3d2ab1f06bebbeb024f194a08be7e6f7eaed971f688bb31d6d8732bbf6efa13`.
+
+First native staged/source comparison completed1001 route queries and273 wet
+field queries,24 solver steps per copy and one overlapping handoff per copy,
+all with exactly zero difference. Nevertheless exec76159/PID38828 returned
+-1073741819 after the log closed during editor shutdown. The partial report
+`verify/report.json` is NOT a clean native pass. Preserve it and the log;
+no new Unreal crash dump or Windows fault record was found during the bounded
+inspection. Precise shutdown cause is not established. The verifier now resets
+its own adapters and explicitly collects its Python/Unreal test objects before
+requesting editor exit; no physics or acceptance threshold was changed.
+
+Fresh rerun is queued in exec72522, script
+`tmp/run_continuous_bundle_native_v1.ps1 -Mode verify`, output `verify-v2` inside
+the same evidence root. It records process exit separately and must exit0.
+Other task's live editor at last check was28128 (`tmp/neck-c/native.log`); wait,
+do not stop/pause/message it. One dependent build guard is being started with
+`tmp/build_after_continuous_bundle_verify_v1.ps1`: it requires a clean V2 process
+and exact comparisons before invoking guarded buildv9. No duplicate build.
+A4 exec70425/solver11252 remains live, last observed33600/48000 steps.
+This is saved-data portability work, not a full-river cook, normal-menu map
+replacement, packaged execution, rendered rescue or20FPS acceptance.
+
+Dependent build guard handle is exec94443 (confirmed live); verifier exec72522
+also remains live. At the final check the prior crew editor had exited; both
+guards retain their idle/dependency checks. Do not start substitutes on the
+basis of missing output while these handles are live. Current packaging edits
+are uncommitted pending the clean native rerun/build; crew-review/crew-visual
+source changes are owned by the other task and must not be staged with them.
+
+### 2026-10-07 staged native rerun completed cleanly
+
+Previous turn was progress (continuous packaging implementation,89 tests and
+native inventory) plus verified waiting. Exec72522 is now terminal success:
+PID40632 exited0 at2026-10-08T01:58:09Z after explicit harness-owned adapter reset
+and Python/Unreal collection. All1001 route queries and273 wet field queries
+matched exactly after24 actual solver steps/copy and an overlapping handoff.
+The failed earlier exit remains preserved; no claim of a proven general engine
+shutdown repair. Durable receipt: `review/native_staged_runtime_2026_10_07.json`.
+Dependent exec94443/buildv9 completed0 at01:59:22Z; updated rules evaluated with
+the unchanged active South Fork bundle. No candidate package activation occurred.
+Both guards are terminal; no substitute build or repeated comparison is needed.
+The next resource gap is full79M-cell native stepping/capture peak memory and
+output size, distinct from the already-passed zero-step full-domain inspection.
+A4 remains the only production cook; keep its bound binary/inputs untouched.
