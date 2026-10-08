@@ -14,6 +14,7 @@ from mosaic_lidarbc_crops import sha
 from build_chilko_corridor_scenario import validate_branch_coverage
 from chilko_corridor_chart import hydraulic_frame
 from chilko_encoded_capacity import EncodedSections,capacity_grid
+from chilko_depth_checkpoint import DepthCheckpoint,checkpoint_binding
 
 
 def fit_depth_amplitude(terrain, stage, owned, shape, minimum, slope, discharge,
@@ -70,7 +71,7 @@ def constrain_source_amplitude(station, amplitude, projected_station, required):
     return amplitude
 
 
-def build(terrain,profile,out,discharge=45.,roughness=.045,*,origin=None,terrain_spacing_m=2.):
+def build(terrain,profile,out,discharge=45.,roughness=.045,*,origin=None,terrain_spacing_m=2.,checkpoint_dir=None):
     out=Path(out).resolve()
     if out.exists():raise ValueError('Fresh inferred-depth profile required')
     grid=capacity_grid(origin,terrain_spacing_m)
@@ -84,22 +85,28 @@ def build(terrain,profile,out,discharge=45.,roughness=.045,*,origin=None,terrain
     selected=(frame['source_station']>=20)&(frame['source_station']<=model.line.length-20)
     frame={k:v[selected] for k,v in frame.items()}
     lateral=np.arange(-256.,257.,1.)
-    row_stage=np.interp(frame['source_station'],model.station,model.surface)
-    slope=np.maximum(-np.gradient(row_stage,frame['station']),.001)
     depth=model.depth.copy();before=[];after=[];width=[]
-    for start in range(0,len(frame['station']),32):
+    completed=0;checkpoint=None
+    if checkpoint_dir is not None:
+        checkpoint=DepthCheckpoint(checkpoint_dir,checkpoint_binding(model,frame,grid,discharge,roughness),
+                                   model.depth,len(frame['station']))
+        completed,depth,before,after,width=checkpoint.load()
+        if completed:print(f'Resuming verified depth checkpoint at section {completed}/{len(frame["station"])}',flush=True)
+    for start in range(completed,len(frame['station']),32):
         sl=slice(start,start+32)
         xy=frame['xy'][sl,None,:]+frame['normal'][sl,None,:]*lateral[None,:,None]
         r=model.sample(xy);mapped=r['mapped_water']
         if mapped[:,0].any() or mapped[:,-1].any():
             raise ValueError('Mapped branches exceed depth quadrature; do not silently truncate capacity')
-        sections=EncodedSections(model,xy,origin,slope[sl],terrain_spacing_m=terrain_spacing_m)
+        sections=EncodedSections(model,xy,origin,terrain_spacing_m=terrain_spacing_m)
         try:
             fitted,old,new=sections.fit(discharge,roughness)
         except ValueError as error:
             raise ValueError(f'Chart stations {frame["station"][sl][0]}..{frame["station"][sl][-1]} m: {error}') from error
         sections.apply_geographic_envelope(model,depth,fitted)
         before.extend(old);after.extend(new);width.extend(sections.query_owned.sum(axis=1).astype(float))
+        if checkpoint is not None:
+            checkpoint.save(start+len(fitted),depth,before,after,width)
         if start%1024==0:print(f'available-channel chart sections {start}/{len(frame["station"])}',flush=True)
     if (sha(Path(profile)/'manifest.json')!=model.receipt['profile_manifest_sha256'] or
             sha(Path(profile)/'profile.npz')!=model.receipt['profile_sha256'] or
@@ -120,6 +127,7 @@ def build(terrain,profile,out,discharge=45.,roughness=.045,*,origin=None,terrain
         capacity_section_spacing_m=2.,capacity_chart_coverage=coverage,
         numerical_chart_policy=chart_policy,
         capacity_grid=grid,
+        capacity_slope_policy='Existing 20 m smoothed source-profile slope interpolated at each source-owned wet query; no chart-centre stage gradient',
         capacity_policy='Protected 37-probe native triangles, uint16 quantization and per-vertex/probe geographic amplitude constraints. Estimated Manning capacity, not measured branch discharge or native flux.',
         maximum_allowed_amplitude_m=10.,maximum_amplitude_m=float(depth.max()),
         changed_section_count=int((depth>model.depth+1e-6).sum()),
@@ -140,5 +148,6 @@ if __name__=='__main__':
     parser.add_argument('--roughness',type=float,default=.045,help='Inferred Manning n, not the native friction coefficient')
     parser.add_argument('--origin',type=float,nargs=2,required=True,help='Canonical Landscape EPSG:3157 origin')
     parser.add_argument('--terrain-spacing-m',type=float,choices=(1.,2.),default=2.)
+    parser.add_argument('--checkpoint-dir',type=Path,help='Optional atomic source/code/config-bound resume state; never an accepted output profile')
     a=parser.parse_args();build(a.terrain,a.profile,a.out,a.discharge,a.roughness,origin=a.origin,
-                              terrain_spacing_m=a.terrain_spacing_m)
+                              terrain_spacing_m=a.terrain_spacing_m,checkpoint_dir=a.checkpoint_dir)

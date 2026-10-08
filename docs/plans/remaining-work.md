@@ -1,5 +1,29 @@
 # Remaining requested work
 
+October 8 continuous-river construction update: Chilko's encoded-depth fitter
+now uses the existing 20 m smoothed source-profile slope at each owned wet
+query, not a stage gradient at the numerical chart centre (which can be dry
+and project onto a different river station). This corrects both artificially
+high and artificially low construction capacities without changing the 37-probe
+bank/rock guard, uint16 triangle bed, 10 m amplitude bound, 45 m3/s construction
+discharge or inferred Manning n=0.045. It is not a hydraulic solve.
+
+At chart station 35650 m, corrected maximum capacity is 37.658785 m3/s versus
+the erroneous 6.339585 m3/s, still below 45. The section therefore remains
+rejected; no full retry or native cook was started. Wet owned queries project
+to source stations 38688.533..38690.982 m, not the dry centre's 38714.724 m.
+See the [source-bound measurement receipt](../../physics/data/real_world/chilko_river_bc/review/geographic_capacity_2026_10_08.json).
+Continue inspecting local source-height/reference support, not relaxing the
+protection or increasing the depth cap to obtain a pass.
+
+The builder now supports `--checkpoint-dir` with atomic completed-batch saves
+bound to source receipts, script hashes, library versions, actual chart arrays,
+terrain grid and construction settings. Failed sections do not publish a depth
+asset; changed bindings refuse resume. An interrupted/resumed two-batch fit
+matches every array from a fresh fit. All 61 focused profile, bed, guard,
+encoding, export and checkpoint tests pass. This is supporting construction
+work, not newly delivered gameplay or full-river/packaged 20 FPS acceptance.
+
 CURRENT user direction (October 6): build and calibrate **all 99 indexed catalog
 entries**, including the 27 entries missing from playable maps. This is not a
 72-section calibration with omissions listed at the end. Compare route width,

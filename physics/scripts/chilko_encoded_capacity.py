@@ -69,17 +69,47 @@ def inference_threshold(ground,stage,shape,eligible):
     return threshold
 
 
+def geographic_query_slopes(model, station, owned):
+    """Use the existing 20 m source-profile slope at each owned wet query.
+
+    A numerical chart centre can be dry and project onto a different bend.
+    Its stage difference per chart metre is not the local river slope. Dry
+    queries contribute zero conveyance and need no extrapolated source slope.
+    This remains the same inferred Manning construction, not a flux solve.
+    """
+    source_station=np.asarray(model.station,dtype=float)
+    source_slope=np.asarray(model.slope,dtype=float)
+    station,owned=np.asarray(station),np.asarray(owned)
+    if (source_station.ndim!=1 or len(source_station)<2 or source_slope.shape!=source_station.shape
+            or not np.isfinite(source_station).all() or np.any(np.diff(source_station)<=0)
+            or not np.isfinite(source_slope).all() or np.any(source_slope<=0)
+            or station.shape!=owned.shape or owned.dtype.kind!='b'
+            or not np.isfinite(station[owned]).all()
+            or np.any(station[owned]<source_station[0]) or np.any(station[owned]>source_station[-1])):
+        raise ValueError('Finite in-route wet-query stations and positive source slopes required')
+    slope=np.zeros(station.shape,dtype=float)
+    slope[owned]=np.interp(station[owned],source_station,source_slope)
+    return slope
+
+
 class EncodedSections:
-    def __init__(self,model,xy,origin,slope,spacing=1.,*,terrain_spacing_m=SPACING):
+    def __init__(self,model,xy,origin,slope=None,spacing=1.,*,terrain_spacing_m=SPACING):
         self.terrain_grid=capacity_grid(origin,terrain_spacing_m)
-        self.xy=np.asarray(xy,dtype=float);self.slope=np.asarray(slope,dtype=float);self.spacing=float(spacing)
-        if (self.xy.ndim!=3 or self.slope.shape!=(len(self.xy),) or not np.isfinite(self.slope).all()
-                or np.any(self.slope<=0) or not np.isfinite(spacing) or spacing<=0):
+        self.xy=np.asarray(xy,dtype=float);self.spacing=float(spacing)
+        if self.xy.ndim!=3 or not np.isfinite(spacing) or spacing<=0:
             raise ValueError('Positive finite section slopes and quadrature spacing required')
+        if slope is not None:
+            slope=np.asarray(slope,dtype=float)
+            if slope.shape!=(len(self.xy),) or not np.isfinite(slope).all() or np.any(slope<=0):
+                raise ValueError('Positive finite section slopes and quadrature spacing required')
         self.nodes,self.indices,self.weights=triangle_stencil(self.xy,origin,terrain_spacing_m)
         self.ground,self.stage,self.shape,self.station,eligible=parameters(model,self.nodes)
-        _,self.query_stage,_,_,self.query_owned=parameters(model,self.xy)
+        _,self.query_stage,_,self.query_station,self.query_owned=parameters(model,self.xy)
         if not self.query_owned.any(axis=1).all():raise ValueError('No source-owned channel at a section')
+        # Explicit row slopes remain available for analytic controls. Production
+        # fitting defaults to geographic ownership, never a dry chart centre.
+        self.slope=(geographic_query_slopes(model,self.query_station,self.query_owned) if slope is None
+                    else np.broadcast_to(slope[:,None],self.query_owned.shape))
         self.threshold=inference_threshold(self.ground,self.stage,self.shape,eligible)
         offsets=support_offsets(terrain_spacing_m);self.probe_station=np.full((len(self.nodes),len(offsets)),np.nan)
         selected=np.flatnonzero(eligible)
@@ -106,7 +136,7 @@ class EncodedSections:
         if not np.isfinite(roughness) or not .02<=roughness<=.1:raise ValueError('Bounded inferred Manning n required')
         bed=np.sum(self.vertex_heights(amplitude)*self.weights,axis=-1)
         depth=np.where(self.query_owned,np.maximum(self.query_stage-bed,0),0)
-        return np.sum(depth**(5/3),axis=1)*self.spacing*np.sqrt(self.slope)/roughness
+        return np.sum(depth**(5/3)*np.sqrt(self.slope),axis=1)*self.spacing/roughness
 
     def fit(self,discharge=45.,roughness=.045):
         if not np.isfinite(discharge) or not 0<discharge<=500:raise ValueError('Bounded positive construction discharge required')
