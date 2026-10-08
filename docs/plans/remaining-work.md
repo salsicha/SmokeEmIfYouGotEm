@@ -82,6 +82,19 @@ zero encoded differences on shared edges. Maximum inferred bed cut is
 6.742165 m; maximum height-encoding error is 0.018311 m. These remain source
 terrain plus explicitly inferred underwater geometry, not measured bathymetry.
 See [the completed terrain receipt](../../physics/data/real_world/chilko_river_bc/review/full_reference_terrain_2026_10_08.json).
+The six published geographic markers have now been checked directly against
+that completed terrain, with input/tile hashes and explicit reflected Unreal
+coordinates retained in the [marker coverage receipt](../../physics/data/real_world/chilko_river_bc/review/full_reference_marker_coverage_2026_10_08.json).
+On the corrected source route, BCWW Bidwell is at 38,296.184 m and White Mile
+at 42,461.506 m; their representative points are 3.995 m and 1.322 m from the
+route, respectively. The two Bidwell sources differ by 63.094 m of station,
+not two established rapid boundaries. The put-in marker is on dry bank, and
+the Lava Canyon gazetteer centre is 356.110 m off-route: neither is an in-water
+spawn/rapid coordinate. All sampled points are covered by the full export.
+These encoded-terrain checks establish construction coverage only, not native
+collision, solved water, rapid extents, difficulty or navigability. Green Mile,
+White Kilometer, Miracle Canyon and the aggregate Lava Canyon scope retain
+their unresolved boundary/identity status; no aliases or endpoints were invented.
 The next Chilko construction step is the full 25,552 x 257 hydraulic-input
 build, not another depth fit or terrain export. The latest sequential pipeline
 stopped before starting it; older queue-v10/v11 jobs are terminal. Inspect live
