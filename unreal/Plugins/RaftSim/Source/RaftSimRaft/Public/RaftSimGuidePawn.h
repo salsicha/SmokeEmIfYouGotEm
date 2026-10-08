@@ -180,6 +180,11 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|GuideCamera")
     bool ToggleChaseCamera();
+#if !UE_BUILD_SHIPPING
+    /** Review captures: view the run from the chase camera behind the raft,
+     * whatever the mode allows (RaftSim.ChaseCamera). */
+    void ShowChaseCameraForReview();
+#endif
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|GuideCamera")
     bool IsChaseCameraActive() const { return CameraRuntimeState.bChaseCameraActive; }

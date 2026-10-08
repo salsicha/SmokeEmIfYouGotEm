@@ -538,6 +538,30 @@ bool ARaftSimGuidePawn::ToggleChaseCamera()
     return true;
 }
 
+#if !UE_BUILD_SHIPPING
+void ARaftSimGuidePawn::ShowChaseCameraForReview()
+{
+    if (GuideCamera == nullptr || ChaseCamera == nullptr)
+    {
+        return;
+    }
+    CameraRuntimeState.bChaseCameraActive = true;
+    GuideCamera->SetActive(false);
+    ChaseCamera->SetActive(true);
+}
+
+static FAutoConsoleCommandWithWorld GRaftSimChaseCameraCommand(
+    TEXT("RaftSim.ChaseCamera"),
+    TEXT("Review captures: view the run from the chase camera behind the raft."),
+    FConsoleCommandWithWorldDelegate::CreateLambda([](UWorld* World)
+    {
+        for (TActorIterator<ARaftSimGuidePawn> It(World); It; ++It)
+        {
+            It->ShowChaseCameraForReview();
+        }
+    }));
+#endif
+
 void ARaftSimGuidePawn::BeginScenarioCameraPresentation(float DurationSeconds)
 {
     IntroCameraDuration = FMath::Max(DurationSeconds, 0.25f);
