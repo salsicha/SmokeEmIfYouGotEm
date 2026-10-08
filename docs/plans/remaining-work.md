@@ -31,18 +31,29 @@ its recorded DLL hashes, not a clean build of the commit alone. See the
 These NullRHI controls are not rendered-map, whole-river or packaged 20 FPS
 acceptance.
 
-The single live `tmp/futaleufu-canopy-repair-resume-v1` process, launched through
-`tmp/resume_futaleufu_canopy_repair_v1.ps1` in exec session 80467, has advanced
-to `tmp/futaleufu-buffer-canopy-serial-v3`: guarded native canopy apply plus
-independent reload, then expanded-domain flow/audit and full Chilko hydraulic
-inputs. No duplicate build is scheduled. Inspect this resume process and its
-actual native receipts rather than restarting the terminal pipeline.
+The `tmp/futaleufu-canopy-repair-resume-v1` pipeline is now terminal. Native
+canopy apply and independent reload both succeeded: 42 exclusions removed,
+251,275 instances retained, exactly three foliage packages changed and 2,090
+scene packages unchanged. Native/render metadata and retained settings passed.
+This repairs the construction map, not the normal playable map.
+
+The expanded-domain cold start also passed: 200 native steps reached two seconds
+with exact initialization, connected original route sections and dry closed
+exterior banks in every saved frame. The subsequent continuation toward 32
+seconds stopped at the existing resource floor after 160.266 seconds of wall
+time: available commit memory reached 3,167,625,216 bytes, below the 3 GiB floor.
+Physical memory and disk remained above their floors. This is not a completed
+32-second validation or proof of settled hydraulics. Preserve the cold-start
+and partial continuation evidence; diagnose memory pressure before a fresh
+continuation attempt, without weakening the floor or repeating completed stages.
+The downstream Chilko hydraulic-input stage did not start.
+See the [canopy and flow handoff receipt](../../physics/data/real_world/futaleufu_river_chile/review/canopy_reload_and_expanded_flow_2026_10_08.json).
 Earlier serial-v1/v2 and Chilko queue-v10/v11 attempts are terminal and preserved, not
 live jobs. Inspect the pipeline's actual process and receipts before starting
 anything else. Diagnosis: `tmp/futaleufu-canopy-residency-v1.json`, SHA256
 `0c59f4c1112648bc6136f63b89fb671099b7aeaf6e473327da0ec4fe2eb50ae2`.
-No repaired native canopy, new flow fields or playable-map delivery is claimed
-until that sequence produces and passes its actual native receipts.
+Native canopy repair is verified; playable-map integration, settled flow and
+packaged performance remain unverified.
 
 October 8 latest handoff (supersedes the next-step wording in the older
 October 8 investigations below): the complete Chilko depth fit and native
@@ -52,9 +63,10 @@ zero encoded differences on shared edges. Maximum inferred bed cut is
 6.742165 m; maximum height-encoding error is 0.018311 m. These remain source
 terrain plus explicitly inferred underwater geometry, not measured bathymetry.
 See [the completed terrain receipt](../../physics/data/real_world/chilko_river_bc/review/full_reference_terrain_2026_10_08.json).
-The next Chilko construction step is the already queued full 25,552 x 257
-hydraulic-input build, not another depth fit or terrain export. Inspect
-`tmp/chilko-full-input-queue-v10` and its live process before starting work.
+The next Chilko construction step is the full 25,552 x 257 hydraulic-input
+build, not another depth fit or terrain export. The latest sequential pipeline
+stopped before starting it; older queue-v10/v11 jobs are terminal. Inspect live
+processes and resources before starting a fresh input-build handoff.
 
 Futaleufu's original 332-second native continuation finished numerically but
 failed geographic bank containment: five closed exterior faces were wet at
