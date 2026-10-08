@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="openstreetmap-cgimap 2.1.0 (3807405 spike-06.openstreetmap.org)" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">
+ <node id="8779392718" visible="true" version="1" changeset="105544731" timestamp="2021-05-29T18:41:20Z" user="joserrg12" uid="1104904" lat="10.0922296" lon="-83.4879677"/>
+ <node id="11787769133" visible="true" version="1" changeset="149585399" timestamp="2024-04-04T19:49:59Z" user="Rodo05" uid="18042234" lat="10.0921960" lon="-83.4880391"/>
+ <node id="11787769134" visible="true" version="1" changeset="149585399" timestamp="2024-04-04T19:49:59Z" user="Rodo05" uid="18042234" lat="10.0935292" lon="-83.4851541"/>
+ <way id="1269147862" visible="true" version="2" changeset="149636251" timestamp="2024-04-05T23:56:24Z" user="Rodo05" uid="18042234">
+  <nd ref="11787769133"/>
+  <nd ref="8779392718"/>
+  <nd ref="11787769134"/>
+  <tag k="bridge" v="yes"/>
+  <tag k="highway" v="trunk"/>
+  <tag k="lanes" v="2"/>
+  <tag k="layer" v="1"/>
+  <tag k="name" v="Autopista José Joaquín Trejos Fernández"/>
+  <tag k="oneway" v="yes"/>
+  <tag k="ref" v="32"/>
+  <tag k="surface" v="paved"/>
+ </way>
+</osm>
