@@ -1,5 +1,27 @@
 # Remaining requested work
 
+October 8 follow-through after the native binding tests: the independent audit
+of `tmp/futaleufu-expanded-native-long-v1` is complete with zero errors. Both
+complete snapshots (32 and 62 seconds) retain all 822 original route sections
+in one connected wet component with no dry sections or wet closed exterior
+faces. At 62 seconds, maximum depth is 4.662 m and speed 5.897 m/s. The outlet
+still carries only 122.122 m3/s of the inferred 400 m3/s inlet; instantaneous
+storage accumulation remains 277.878 m3/s. This is a verified interrupted
+checkpoint, not a successful 332-second run or settled runtime water. See the
+[interrupted checkpoint receipt](../../physics/data/real_world/futaleufu_river_chile/review/interrupted_checkpoint_audit_2026_10_08.json).
+Do not rerun its completed audit or forge a successful-terminal audit for the
+existing continuation runner; implement an explicit verified recovery path.
+
+After the shared crew test process and this audit both exited, a fresh full
+Chilko input build started in `tmp/chilko-full-corridor-input-build-v11`, output
+`tmp/chilko-full-corridor-inputs-v11-reference1m`, exec session 29998, owned
+builder PID 35332 at launch. The unchanged 55.7 km scope uses the already
+verified 4,772 terrain chunks. Its log reached `canonical hydraulic sections
+0/25552` and its live resource sample had no competing shared work. This is
+the sole current input build, not a new terrain export; inspect its live
+handle and terminal receipt before any further launch. V10 remains failed
+and preserved. No hydraulic solution or map acceptance is implied.
+
 October 8, 23:15 UTC handoff correction (supersedes live-job wording below):
 `tmp/full-river-long-handoff-v1` is terminal with a preserved failure receipt,
 not a running river pipeline. The full Chilko input builder started but stopped
