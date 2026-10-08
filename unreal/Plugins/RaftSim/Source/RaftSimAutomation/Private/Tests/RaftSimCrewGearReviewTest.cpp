@@ -264,6 +264,92 @@ void MeasureArmBodyContact(const ARaftSimCrewAvatarActor* Avatar, const FVector&
     }
 }
 
+// Skin round the neck and the shoulders against its rest shape: how far any
+// mesh edge there has stretched (posed length over rest length), and how far
+// two vertices that share a rest position (a seam between sections, such as
+// shirt and skin) have split. A neck pulled off the back, a spike of skin or
+// an arm drawn out of its socket all stretch the skin's edges.
+struct FSkinStretch
+{
+    double NeckRatio = 1., ShoulderRatio = 1., NeckSplitCm = 0., ShoulderSplitCm = 0.;
+    FString NeckWhere, ShoulderWhere, SplitWhere;
+};
+
+FSkinStretch MeasureSkinStretch(const ARaftSimCC0CrewVisualActor* Visual)
+{
+    FSkinStretch Out;
+    UPoseableMeshComponent* Body = Visual
+        ? const_cast<ARaftSimCC0CrewVisualActor*>(Visual)->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
+    const USkeletalMesh* Mesh = Body ? Cast<USkeletalMesh>(Body->GetSkinnedAsset()) : nullptr;
+    const FSkeletalMeshRenderData* Data = Mesh ? Mesh->GetResourceForRendering() : nullptr;
+    const FSkinWeightVertexBuffer* Weights = Body ? Body->GetSkinWeightBuffer(0) : nullptr;
+    if (!Data || Data->LODRenderData.IsEmpty() || !Weights) return Out;
+    const FSkeletalMeshLODRenderData& LOD = Data->LODRenderData[0];
+    TArray<uint32> Indices;
+    LOD.MultiSizeIndexContainer.GetIndexBuffer(Indices);
+    if (Indices.IsEmpty()) return Out;
+    const FReferenceSkeleton& Ref = Mesh->GetRefSkeleton();
+    const TArray<FVector> Posed = Visual->GetPosedBodyVerticesWorldCmForValidation();
+    const double Scale = Body->GetComponentScale().X;
+    const FVector Neck = Body->GetBoneLocationByName(TEXT("neck_01"), EBoneSpaces::WorldSpace);
+    const FVector Shoulders[] = {Body->GetBoneLocationByName(TEXT("upperarm_l"), EBoneSpaces::WorldSpace),
+        Body->GetBoneLocationByName(TEXT("upperarm_r"), EBoneSpaces::WorldSpace)};
+    const FVector Back = (Body->GetBoneLocationByName(TEXT("spine_03"), EBoneSpaces::WorldSpace) -
+        (Shoulders[0] + Shoulders[1]) * 0.5).GetSafeNormal();
+    // Region and dominant bone per vertex (0 = outside, 1 = neck, 2 = shoulder).
+    TArray<uint8> Region;
+    TArray<FName> Bone;
+    Region.SetNumZeroed(Posed.Num());
+    Bone.SetNum(Posed.Num());
+    TMap<FIntVector, TArray<int32>> Coincident;
+    for (const FSkelMeshRenderSection& Section : LOD.RenderSections)
+        for (uint32 V = Section.BaseVertexIndex; V < Section.BaseVertexIndex + Section.NumVertices && V < uint32(Posed.Num()); ++V)
+        {
+            const bool bNeck = FVector::Distance(Posed[V], Neck) < 16.;
+            const bool bShoulder = FVector::Distance(Posed[V], Shoulders[0]) < 14. || FVector::Distance(Posed[V], Shoulders[1]) < 14.;
+            if (!bNeck && !bShoulder) continue;
+            Region[V] = bNeck ? 1 : 2;
+            int32 Best = INDEX_NONE; float BestWeight = 0.f;
+            for (uint32 I = 0; I < Weights->GetMaxBoneInfluences(); ++I)
+            {
+                const float W = Weights->GetBoneWeight(V, I) / 65535.f;
+                if (W > BestWeight) { BestWeight = W; Best = Weights->GetBoneIndex(V, I); }
+            }
+            Bone[V] = Best != INDEX_NONE && Section.BoneMap.IsValidIndex(Best) ? Ref.GetBoneName(Section.BoneMap[Best]) : NAME_None;
+            const FVector R(LOD.StaticVertexBuffers.PositionVertexBuffer.VertexPosition(V));
+            Coincident.FindOrAdd(FIntVector(FMath::RoundToInt(R.X * 200.), FMath::RoundToInt(R.Y * 200.), FMath::RoundToInt(R.Z * 200.))).Add(V);
+        }
+    const auto Where = [&](uint32 A, uint32 B)
+    {
+        const FVector Mid = (Posed[A] + Posed[B]) * 0.5;
+        return FString::Printf(TEXT("%s/%s %s"), *Bone[A].ToString(), *Bone[B].ToString(),
+            FVector::DotProduct(Mid - Neck, Back) > 0. ? TEXT("back") : TEXT("front"));
+    };
+    for (int32 Tri = 0; Tri + 2 < Indices.Num(); Tri += 3)
+        for (int32 Edge = 0; Edge < 3; ++Edge)
+        {
+            const uint32 A = Indices[Tri + Edge], B = Indices[Tri + (Edge + 1) % 3];
+            if (A >= uint32(Posed.Num()) || B >= uint32(Posed.Num()) || !Region[A] || !Region[B]) continue;
+            const double RestCm = FVector::Distance(FVector(LOD.StaticVertexBuffers.PositionVertexBuffer.VertexPosition(A)),
+                FVector(LOD.StaticVertexBuffers.PositionVertexBuffer.VertexPosition(B))) * Scale;
+            if (RestCm < 0.05) continue;
+            const double Ratio = FVector::Distance(Posed[A], Posed[B]) / RestCm;
+            const bool bNeck = Region[A] == 1 && Region[B] == 1;
+            double& Worst = bNeck ? Out.NeckRatio : Out.ShoulderRatio;
+            if (Ratio > Worst) { Worst = Ratio; (bNeck ? Out.NeckWhere : Out.ShoulderWhere) = Where(A, B); }
+        }
+    for (const TPair<FIntVector, TArray<int32>>& Group : Coincident)
+        for (int32 I = 1; I < Group.Value.Num(); ++I)
+        {
+            const uint32 A = Group.Value[0], B = Group.Value[I];
+            const double Split = FVector::Distance(Posed[A], Posed[B]);
+            const bool bNeck = Region[A] == 1 && Region[B] == 1;
+            double& Worst = bNeck ? Out.NeckSplitCm : Out.ShoulderSplitCm;
+            if (Split > Worst) { Worst = Split; Out.SplitWhere = Where(A, B); }
+        }
+    return Out;
+}
+
 // How far the wrist bends: the angle between the forearm and the hand's line
 // from the wrist to the middle knuckle.
 double WristBendDegrees(UPoseableMeshComponent* Body, bool bLeft)
@@ -274,6 +360,65 @@ double WristBendDegrees(UPoseableMeshComponent* Body, bool bLeft)
     const FVector Forearm = (Bone(TEXT("hand")) - Bone(TEXT("lowerarm"))).GetSafeNormal();
     const FVector HandLine = (Bone(TEXT("middle_01")) - Bone(TEXT("hand"))).GetSafeNormal();
     return FMath::RadiansToDegrees(FMath::Acos(FMath::Clamp(FVector::DotProduct(Forearm, HandLine), -1., 1.)));
+}
+
+// How far an arm reaches: shoulder to wrist over the arm's own length (1 is
+// a straight arm), how far the shoulder joint has left its rest place on the
+// chest, and how far the hand has been drawn off the end of the forearm.
+// Also how far the upper arm has rolled off its elbow: the angle about the
+// upper arm between the way the rig's elbow bends and the way the forearm
+// actually bends (zero for a straight arm), and how far it would be off had
+// the upper arm been swung the shortest way up from its rest.
+struct FArmReach { double Straightness = 0., ShoulderShiftCm = 0., ForearmStretchCm = 0., HingeErrorDeg = 0., SwingHingeErrorDeg = 0.; };
+FArmReach MeasureArmReach(UPoseableMeshComponent* Body, bool bLeft)
+{
+    FArmReach Out;
+    const USkinnedAsset* Asset = Body->GetSkinnedAsset();
+    if (!Asset) return Out;
+    const FReferenceSkeleton& Ref = Asset->GetRefSkeleton();
+    const auto RestComponent = [&Ref](FName Name)
+    {
+        FTransform T = FTransform::Identity;
+        for (int32 B = Ref.FindBoneIndex(Name); B != INDEX_NONE; B = Ref.GetParentIndex(B)) T = T * Ref.GetRefBonePose()[B];
+        return T;
+    };
+    const TCHAR* S = bLeft ? TEXT("l") : TEXT("r");
+    const FName Upper(*FString::Printf(TEXT("upperarm_%s"), S)), Lower(*FString::Printf(TEXT("lowerarm_%s"), S)),
+        Hand(*FString::Printf(TEXT("hand_%s"), S));
+    if (Ref.FindBoneIndex(Hand) == INDEX_NONE) return Out;
+    const double Scale = Body->GetComponentScale().X;
+    const FVector RestUpper = RestComponent(Upper).GetLocation(), RestLower = RestComponent(Lower).GetLocation(),
+        RestHand = RestComponent(Hand).GetLocation();
+    const FVector PosedUpper = Body->GetBoneLocationByName(Upper, EBoneSpaces::WorldSpace),
+        PosedLower = Body->GetBoneLocationByName(Lower, EBoneSpaces::WorldSpace),
+        PosedHand = Body->GetBoneLocationByName(Hand, EBoneSpaces::WorldSpace);
+    const double UpperCm = FVector::Distance(RestUpper, RestLower) * Scale, ForeCm = FVector::Distance(RestLower, RestHand) * Scale;
+    Out.Straightness = FVector::Distance(PosedUpper, PosedHand) / FMath::Max(UpperCm + ForeCm, 1.);
+    Out.ForearmStretchCm = FVector::Distance(PosedLower, PosedHand) - ForeCm;
+    const FTransform RestChest = RestComponent(TEXT("spine_03"));
+    Out.ShoulderShiftCm = FVector::Distance(PosedUpper, Body->GetBoneTransformByName(TEXT("spine_03"), EBoneSpaces::WorldSpace)
+        .TransformPositionNoScale(RestChest.InverseTransformPositionNoScale(RestUpper) * Scale));
+    const FVector RestShaft = (RestLower - RestUpper).GetSafeNormal();
+    const FVector RestBend = FVector::VectorPlaneProject(RestHand - RestLower, RestShaft).GetSafeNormal();
+    const FVector Shaft = (PosedLower - PosedUpper).GetSafeNormal();
+    const FVector Bend = FVector::VectorPlaneProject((PosedHand - PosedLower).GetSafeNormal(), Shaft);
+    if (Bend.Size() > 0.1)
+    {
+        const FQuat Component = Body->GetComponentTransform().GetRotation();
+        const FQuat Turn = Body->GetBoneTransformByName(Upper, EBoneSpaces::WorldSpace).GetRotation() *
+            (Component * RestComponent(Upper).GetRotation()).Inverse();
+        const FVector Carried = Turn.RotateVector(Component.RotateVector(RestBend));
+        const FVector Toward = Bend.GetSafeNormal();
+        const auto AboutShaft = [&Shaft, &Toward](const FVector& From)
+        {
+            return FMath::RadiansToDegrees(FMath::Atan2(
+                FVector::DotProduct(Shaft, FVector::CrossProduct(From, Toward)), FVector::DotProduct(From, Toward)));
+        };
+        Out.HingeErrorDeg = AboutShaft(Carried);
+        Out.SwingHingeErrorDeg = AboutShaft(FQuat::FindBetweenNormals(Component.RotateVector(RestShaft), Shaft)
+            .RotateVector(Component.RotateVector(RestBend)));
+    }
+    return Out;
 }
 
 class FCrewGearReview final : public IAutomationLatentCommand
@@ -480,6 +625,8 @@ public:
                         UE_LOG(LogTemp, Display, TEXT("CREW_ARM_BODY_AUDIT paddler=%d top_skin_cm=%.2f top_vest_cm=%.2f shaft_skin_cm=%.2f shaft_vest_cm=%.2f top_wrist_deg=%.0f shaft_wrist_deg=%.0f"),
                             Index + 1, WorstTopArm[Index].SkinCm, WorstTopArm[Index].VestCm, WorstShaftArm[Index].SkinCm, WorstShaftArm[Index].VestCm,
                             MaxTopWristDeg[Index], MaxShaftWristDeg[Index]);
+                        UE_LOG(LogTemp, Display, TEXT("CREW_SKIN_AUDIT paddler=%d neck_ratio=%.2f neck_split_cm=%.2f shoulder_ratio=%.2f max_elbow_hinge_error_deg=%.0f"),
+                            Index + 1, WorstNeckRatio[Index], WorstNeckSplitCm[Index], WorstShoulderRatio[Index], MaxHingeErrorDeg[Index]);
                         UE_LOG(LogTemp, Display, TEXT("CREW_BLADE_AUDIT paddler=%d min_wet_blade_ahead_of_hips_cm=%.1f min_shaft_hand_ahead_of_hips_cm=%.1f"),
                             Index + 1, MinWetBladeAheadCm[Index], MinShaftHandAheadCm[Index]);
                         Test->TestTrue(FString::Printf(TEXT("paddler %d's blade works ahead of the hips (%.1f cm)"),
@@ -528,12 +675,25 @@ public:
                         UPoseableMeshComponent* Body = Visual
                             ? const_cast<ARaftSimCC0CrewVisualActor*>(Visual)->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
                         const double TopWrist = Body ? WristBendDegrees(Body, bLeftTop) : 0.;
+                        const FSkinStretch Stretch = MeasureSkinStretch(Visual);
+                        WorstNeckRatio[Index] = FMath::Max(WorstNeckRatio[Index], Stretch.NeckRatio);
+                        WorstShoulderRatio[Index] = FMath::Max(WorstShoulderRatio[Index], Stretch.ShoulderRatio);
+                        WorstNeckSplitCm[Index] = FMath::Max(WorstNeckSplitCm[Index], Stretch.NeckSplitCm);
+                        UE_LOG(LogTemp, Display, TEXT("CREW_SKIN_STRETCH stroke=%s phase=%.2f paddler=%d neck_ratio=%.2f neck_split_cm=%.2f shoulder_ratio=%.2f shoulder_split_cm=%.2f neck_at=[%s] shoulder_at=[%s] split_at=[%s]"),
+                            StrokeName, Phase, Index + 1, Stretch.NeckRatio, Stretch.NeckSplitCm, Stretch.ShoulderRatio, Stretch.ShoulderSplitCm,
+                            *Stretch.NeckWhere, *Stretch.ShoulderWhere, *Stretch.SplitWhere);
                         const double ShaftWrist = Body ? WristBendDegrees(Body, !bLeftTop) : 0.;
+                        const FArmReach TopReach = Body ? MeasureArmReach(Body, bLeftTop) : FArmReach();
+                        const FArmReach ShaftReach = Body ? MeasureArmReach(Body, !bLeftTop) : FArmReach();
+                        MaxHingeErrorDeg[Index] = FMath::Max(MaxHingeErrorDeg[Index],
+                            FMath::Max(FMath::Abs(TopReach.HingeErrorDeg), FMath::Abs(ShaftReach.HingeErrorDeg)));
                         MaxTopWristDeg[Index] = FMath::Max(MaxTopWristDeg[Index], TopWrist);
                         MaxShaftWristDeg[Index] = FMath::Max(MaxShaftWristDeg[Index], ShaftWrist);
-                        UE_LOG(LogTemp, Display, TEXT("CREW_ARM_BODY stroke=%s phase=%.2f paddler=%d action=%d top_skin_cm=%.2f/%d top_vest_cm=%.2f/%d shaft_skin_cm=%.2f/%d shaft_vest_cm=%.2f/%d blade_ahead_cm=%.1f tip_z=%.1f shaft_hand_ahead_cm=%.1f top_wrist_deg=%.0f shaft_wrist_deg=%.0f top_vest_at=%s/h%.0f/b%.0f shaft_vest_at=%s/h%.0f/b%.0f"),
+                        UE_LOG(LogTemp, Display, TEXT("CREW_ARM_BODY stroke=%s phase=%.2f paddler=%d action=%d top_skin_cm=%.2f/%d top_vest_cm=%.2f/%d shaft_skin_cm=%.2f/%d shaft_vest_cm=%.2f/%d blade_ahead_cm=%.1f tip_z=%.1f shaft_hand_ahead_cm=%.1f top_wrist_deg=%.0f shaft_wrist_deg=%.0f top_reach=%.2f top_shoulder_shift_cm=%.1f top_fore_stretch_cm=%.1f top_hinge_deg=%.0f/%.0f shaft_hinge_deg=%.0f/%.0f shaft_reach=%.2f shaft_fore_stretch_cm=%.1f top_vest_at=%s/h%.0f/b%.0f shaft_vest_at=%s/h%.0f/b%.0f"),
                             StrokeName, Phase, Index + 1, int32(Crew[Index]->GetAvatarAction()), Top.SkinCm, Top.SkinPoints, Top.VestCm, Top.VestPoints,
-                            Shaft.SkinCm, Shaft.SkinPoints, Shaft.VestCm, Shaft.VestPoints, BladeAhead, Tip.Z, ShaftHandAhead, TopWrist, ShaftWrist,
+                            Shaft.SkinCm, Shaft.SkinPoints, Shaft.VestCm, Shaft.VestPoints, BladeAhead, Tip.Z, ShaftHandAhead, TopWrist, ShaftWrist, TopReach.Straightness, TopReach.ShoulderShiftCm, TopReach.ForearmStretchCm,
+                            TopReach.HingeErrorDeg, TopReach.SwingHingeErrorDeg, ShaftReach.HingeErrorDeg, ShaftReach.SwingHingeErrorDeg,
+                            ShaftReach.Straightness, ShaftReach.ForearmStretchCm,
                             Top.bVestOnUpperArm ? TEXT("upper") : TEXT("fore"), Top.VestHeightCm, Top.VestBearingDeg,
                             Shaft.bVestOnUpperArm ? TEXT("upper") : TEXT("fore"), Shaft.VestHeightCm, Shaft.VestBearingDeg);
                     }
@@ -557,20 +717,27 @@ public:
             FVector Eye, Focus;
             FramePortrait(View == 0 ? 0 : 3, Avatar->GetActorTransform().TransformPosition(Avatar->GetPublishedCrewPose().TorsoCenterCm),
                 Fwd, RaftFrame.GetUnitAxis(EAxis::Y) * Side, Up, Eye, Focus);
+            float CycleFov = 45.f;
             if (View == 2)
             {
-                // Straight down onto the paddler: the arms against the chest
-                // and the blade against the hips, unforeshortened.
-                Focus = Avatar->GetActorTransform().TransformPosition(Avatar->GetPublishedCrewPose().TorsoCenterCm + FVector(12., 12. * Side, 0.));
-                Eye = Focus + Up * 190. - Fwd * 2.;
+                // The back of the neck in profile from out over the water: the
+                // neck must stay joined to the upper back as the head bows.
+                const auto* NapeVisual = Cast<ARaftSimCC0CrewVisualActor>(Avatar->GetProductionVisualActor());
+                const UPoseableMeshComponent* NapeBody = NapeVisual ? NapeVisual->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
+                const FVector Neck = NapeBody
+                    ? const_cast<UPoseableMeshComponent*>(NapeBody)->GetBoneLocationByName(TEXT("neck_01"), EBoneSpaces::WorldSpace)
+                    : Avatar->GetActorTransform().TransformPosition(Avatar->GetPublishedCrewPose().HeadCenterCm) - Up * 14.;
+                Focus = Neck - Fwd * 4.;
+                Eye = Focus + RaftFrame.GetUnitAxis(EAxis::Y) * Side * 42. - Fwd * 26. + Up * 3.;
+                CycleFov = 40.f;
             }
-            Camera->GetCameraComponent()->SetFieldOfView(45.f);
+            Camera->GetCameraComponent()->SetFieldOfView(CycleFov);
             Camera->SetActorLocationAndRotation(Eye, (Focus - Eye).Rotation());
             if (++FramesOnShot == 3 && bCapture)
             {
                 IFileManager::Get().MakeDirectory(*Dir, true);
                 FScreenshotRequest::RequestScreenshot(Dir / FString::Printf(TEXT("paddler%d-cycle-%s-%s.png"),
-                    Paddler + 1, Point.Name, View == 0 ? TEXT("front3q") : View == 1 ? TEXT("high") : TEXT("top")), true, false);
+                    Paddler + 1, Point.Name, View == 0 ? TEXT("front3q") : View == 1 ? TEXT("high") : TEXT("nape")), true, false);
             }
             if (FramesOnShot >= 5)
             {
@@ -743,8 +910,8 @@ public:
         {
             Test->TestTrue(TEXT("crew kept stroking through the review"), Raft->GetCrewStrokeCatchCount() > 0);
             for (int32 Arm = 0; Arm < 8; ++Arm)
-                UE_LOG(LogTemp, Display, TEXT("CREW_ARM_AUDIT paddler=%d hand=%s max_upper_stretch_cm=%.2f max_forearm_stretch_cm=%.2f"),
-                    Arm / 2 + 1, Arm % 2 ? TEXT("r") : TEXT("l"), MaxUpperStretchCm[Arm], MaxForearmStretchCm[Arm]);
+                UE_LOG(LogTemp, Display, TEXT("CREW_ARM_AUDIT paddler=%d hand=%s max_upper_stretch_cm=%.2f max_forearm_stretch_cm=%.2f at=%s"),
+                    Arm / 2 + 1, Arm % 2 ? TEXT("r") : TEXT("l"), MaxUpperStretchCm[Arm], MaxForearmStretchCm[Arm], *MaxForearmStretchAt[Arm]);
             // Then the crew rest, paddles across their laps.
             Raft->IssueCrewCommand(ERaftSimCrewCommand::Rest);
             bResting = true;
@@ -774,7 +941,7 @@ public:
                     const FVector Lap = Frame.TransformPosition((Pose.PaddleTopCm + Pose.PaddleBottomCm) * .5);
                     const FVector Seat = Frame.TransformPosition(Pose.TorsoCenterCm) - Up * 22.;
                     static const TCHAR* Names[] = {TEXT("rest-lap"), TEXT("rest-thighs"), TEXT("rest-hips-back"), TEXT("rest-hips-outboard"),
-                        TEXT("rest-neck-back")};
+                        TEXT("rest-nape")};
                     const FVector Head = Frame.TransformPosition(Pose.HeadCenterCm);
                     const int32 Shot = RestShotIndex % RestShotsEach;
                     switch (Shot)
@@ -783,7 +950,18 @@ public:
                     case 1: Focus = Lap - Up * 4.; Eye = Focus - Out * 70. + Fwd * 15. + Up * 6.; break;
                     case 2: Focus = Seat; Eye = Seat - Fwd * 75. + Up * 6.; break;
                     case 3: Focus = Seat; Eye = Seat + Out * 75. - Fwd * 12. + Up * 6.; break;
-                    case 4: Focus = Head - Up * 12. - Fwd * 3.; Eye = Head - Fwd * 32. + Up * 38. + Out * 12.; break;
+                    case 4:
+                    {
+                        // The back of the neck in profile, the head bowed or
+                        // looking about as it rests.
+                        const auto* NapeVisual = Cast<ARaftSimCC0CrewVisualActor>(Avatar->GetProductionVisualActor());
+                        const UPoseableMeshComponent* NapeBody = NapeVisual ? NapeVisual->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
+                        const FVector Neck = NapeBody
+                            ? const_cast<UPoseableMeshComponent*>(NapeBody)->GetBoneLocationByName(TEXT("neck_01"), EBoneSpaces::WorldSpace)
+                            : Head - Up * 14.;
+                        Focus = Neck - Fwd * 4.; Eye = Focus + Out * 42. - Fwd * 26. + Up * 3.;
+                        break;
+                    }
                     default:
                         FramePortrait(Shot - 5, Frame.TransformPosition(Pose.TorsoCenterCm), Fwd, Out, Up, Eye, Focus);
                         break;
@@ -861,6 +1039,12 @@ public:
                                 FName(*FString::Printf(TEXT("%s_%02d_%s"), Digit, Segment, S)), EBoneSpaces::WorldSpace), 1.5) - 0.9);
                 const FString FingerText = Fingers < 1.e6 ? FString::Printf(TEXT("%.2f"), Fingers) : FString(TEXT("none_over_thigh"));
                 UE_LOG(LogTemp, Display, TEXT("CREW_REST_AUDIT paddler=%d shaft_above_thighs_cm=%.2f fingers_above_thighs_cm=%s"), Index + 1, Shaft, *FingerText);
+                {
+                    const FSkinStretch Stretch = MeasureSkinStretch(Visual);
+                    UE_LOG(LogTemp, Display, TEXT("CREW_SKIN_STRETCH stroke=rest phase=0.00 paddler=%d neck_ratio=%.2f neck_split_cm=%.2f shoulder_ratio=%.2f shoulder_split_cm=%.2f neck_at=[%s] shoulder_at=[%s] split_at=[%s]"),
+                        Index + 1, Stretch.NeckRatio, Stretch.NeckSplitCm, Stretch.ShoulderRatio, Stretch.ShoulderSplitCm,
+                        *Stretch.NeckWhere, *Stretch.ShoulderWhere, *Stretch.SplitWhere);
+                }
                 UE_LOG(LogTemp, Display, TEXT("CREW_GRIP_SOLVE rest paddler=%d palm_facing=%.3f finger_curl=%.3f wrist_twist_deg=%.1f anchor_cm=%.2f pad_cm=%.2f thumb_cm=%.2f"),
                     Index + 1, Visual->GetMinimumPaddlePalmFacingDot(), Visual->GetMinimumPaddleFingerCurlTowardPalm(),
                     Visual->GetMaximumGripWristTwistDegrees(), Visual->GetMaximumPaddleGripAnchorErrorCm(),
@@ -996,8 +1180,25 @@ public:
                     const int32 Arm = Index * 2 + (bLeft ? 0 : 1);
                     MaxUpperStretchCm[Arm] = FMath::Max(MaxUpperStretchCm[Arm], float(
                         FVector::Distance(Bone(TEXT("upperarm")), Bone(TEXT("lowerarm"))) - RestCm(TEXT("upperarm"), TEXT("lowerarm"))));
-                    MaxForearmStretchCm[Arm] = FMath::Max(MaxForearmStretchCm[Arm], float(
-                        FVector::Distance(Bone(TEXT("lowerarm")), Bone(TEXT("hand"))) - RestCm(TEXT("lowerarm"), TEXT("hand"))));
+                    const float ForearmStretch = float(
+                        FVector::Distance(Bone(TEXT("lowerarm")), Bone(TEXT("hand"))) - RestCm(TEXT("lowerarm"), TEXT("hand")));
+                    if (ForearmStretch > 4.f)
+                    {
+                        // What the pose asked of the arm when the hand left it.
+                        const FVector HandTarget = Frame.TransformPosition(bLeft ? Pose.LeftHandCm : Pose.RightHandCm);
+                        UE_LOG(LogTemp, Display, TEXT("CREW_ARM_STRETCH shot=%d frame=%d paddler=%d hand=%s action=%d stretch_cm=%.1f shoulder_to_target_cm=%.1f arm_cm=%.1f target_to_hand_cm=%.1f top_local=%s hand_local=%s"),
+                            ShotIndex, FramesOnShot, Index + 1, S, int32(Crew[Index]->GetAvatarAction()), ForearmStretch,
+                            FVector::Distance(Bone(TEXT("upperarm")), HandTarget),
+                            RestCm(TEXT("upperarm"), TEXT("lowerarm")) + RestCm(TEXT("lowerarm"), TEXT("hand")),
+                            FVector::Distance(Bone(TEXT("hand")), HandTarget),
+                            *Pose.PaddleTopCm.ToCompactString(), *(bLeft ? Pose.LeftHandCm : Pose.RightHandCm).ToCompactString());
+                    }
+                    if (ForearmStretch > MaxForearmStretchCm[Arm])
+                    {
+                        MaxForearmStretchCm[Arm] = ForearmStretch;
+                        MaxForearmStretchAt[Arm] = FString::Printf(TEXT("shot%d/frame%d/action%d"),
+                            ShotIndex, FramesOnShot, int32(Crew[Index]->GetAvatarAction()));
+                    }
                 }
             }
         }
@@ -1033,7 +1234,14 @@ public:
                 // Close on each hand from out over the water and a little ahead.
                 const bool bLeftTop = FVector::DistSquared(Pose.LeftHandCm, Pose.PaddleTopCm) < FVector::DistSquared(Pose.RightHandCm, Pose.PaddleTopCm);
                 const bool bLeftHand = (Shot == EShot::TopHand) == bLeftTop;
-                Focus = W(bLeftHand ? Pose.LeftHandCm : Pose.RightHandCm);
+                // On the rendered palm: the lower hand may have slid up the
+                // shaft from the pose's grip to suit the body's arm.
+                const auto* HandVisual = Cast<ARaftSimCC0CrewVisualActor>(Avatar->GetProductionVisualActor());
+                UPoseableMeshComponent* HandBody = HandVisual
+                    ? const_cast<ARaftSimCC0CrewVisualActor*>(HandVisual)->FindComponentByClass<UPoseableMeshComponent>() : nullptr;
+                Focus = HandBody
+                    ? HandBody->GetBoneLocationByName(bLeftHand ? TEXT("middle_01_l") : TEXT("middle_01_r"), EBoneSpaces::WorldSpace)
+                    : W(bLeftHand ? Pose.LeftHandCm : Pose.RightHandCm);
                 Eye = Focus + Out * 42. + Fwd * 28. + Up * 12.; Fov = 32.f;
                 break;
             }
@@ -1145,6 +1353,8 @@ private:
         CycleShotIndex = 0, StrokeStage = 0;
     FArmBodyContact WorstTopArm[4], WorstShaftArm[4];
     double MaxTopWristDeg[4] = {}, MaxShaftWristDeg[4] = {};
+    double MaxHingeErrorDeg[4] = {};
+    double WorstNeckRatio[4] = {1., 1., 1., 1.}, WorstShoulderRatio[4] = {1., 1., 1., 1.}, WorstNeckSplitCm[4] = {};
     double MinWetBladeAheadCm[4] = {TNumericLimits<double>::Max(), TNumericLimits<double>::Max(),
         TNumericLimits<double>::Max(), TNumericLimits<double>::Max()};
     double MinShaftHandAheadCm[4] = {TNumericLimits<double>::Max(), TNumericLimits<double>::Max(),
@@ -1157,6 +1367,7 @@ private:
     bool bResting = false, bMidStrokeHeld = false, bMidStrokeDone = false;
     double RestStart = 0.;
     float MaxUpperStretchCm[8] = {}, MaxForearmStretchCm[8] = {};
+    FString MaxForearmStretchAt[8];
 };
 }
 

@@ -1113,6 +1113,11 @@ float StrokeWave(float Phase)
 }
 
 constexpr float StrokeRecoveryLiftPeakCm = 34.0f;
+// How far ahead of its track the lifted blade swings at the height of a
+// forward stroke's recovery. At 24 cm, with the lifted shaft laid out flat by
+// the rigid-paddle pass, the blade swung a metre ahead of the seat and the
+// lower hand on the shaft ran beyond the reach of the crew's arms.
+constexpr float StrokeRecoverySwingForwardCm = 12.0f;
 
 float StrokeRecoveryLiftCm(float Phase)
 {
@@ -1198,7 +1203,7 @@ struct FStrokeShape
     float BackTopPlantCm;
     float BackTopEndCm;
 };
-constexpr FStrokeShape PaddlerStroke{25.0f, 40.0f, 50.0f, 42.0f, 26.0f, 30.0f, 20.0f, 42.0f, 38.0f};
+constexpr FStrokeShape PaddlerStroke{30.0f, 40.0f, 46.0f, 42.0f, 26.0f, 30.0f, 20.0f, 42.0f, 38.0f};
 constexpr FStrokeShape FirstPersonGuideStroke{15.0f, 24.0f, 45.0f, 36.0f, 34.0f, 18.0f, 12.0f, 42.0f, 38.0f};
 
 // One forward stroke, landmarks only, driven from the torso and core as a
@@ -1238,7 +1243,7 @@ void ApplyForwardStroke(FRaftSimCrewAvatarPose& Pose, float Side, float Wave, fl
     Pose.PaddleTopCm.X = FMath::Lerp(Shape.TopExitCm, Shape.TopCatchCm, Catch);
     Pose.PaddleTopCm.Y = Shape.TopOutboardCm * Side;
     Pose.PaddleTopCm.Z = FMath::Lerp(99.0f, 102.0f, Catch) + 6.0f * RecoveryAlpha;
-    Pose.PaddleBottomCm.X = FMath::Lerp(18.0f, 62.0f, Catch) + 24.0f * RecoveryAlpha;
+    Pose.PaddleBottomCm.X = FMath::Lerp(18.0f, 62.0f, Catch) + StrokeRecoverySwingForwardCm * RecoveryAlpha;
     Pose.PaddleBottomCm.Y = 50.0f * Side;
     Pose.PaddleBottomCm.Z = -16.0f + RecoveryLiftCm;
     ApplyMirroredPaddleGrip(Pose, Side);
@@ -1416,6 +1421,13 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             Pose.PaddleTopCm.X = FMath::Lerp(Stroke.BackTopPlantCm, Stroke.BackTopEndCm, BladeForward);
             Pose.PaddleTopCm.Z = FMath::Lerp(97.0f, 94.0f, BladeForward) +
                 6.0f * BackLiftCm / StrokeRecoveryLiftPeakCm;
+            // The lifted blade swings ahead only as it nears the plant by
+            // the hip. The forward stroke's swing, at full height early in
+            // the recovery, held it out past the knees beyond the lower
+            // hand's reach; with no swing, the lifted shaft laid out flat
+            // behind the hip.
+            Pose.PaddleBottomCm.X += StrokeRecoverySwingForwardCm * BackLiftCm / StrokeRecoveryLiftPeakCm *
+                (1.0f - 2.0f * BladeForward);
             ApplyMirroredPaddleGrip(Pose, Side);
             break;
         }

@@ -21,9 +21,9 @@ All notable changes to this project are recorded here, newest first. Versioning 
     wrists past what wrists can do. Back strokes plant ahead of the hip and
     drive forward past the knees. The top hand stays out in front of the
     chest throughout.
-  - **Torso turn:** the chest turns on the hips toward the paddle side, 25
+  - **Torso turn:** the chest turns on the hips toward the paddle side, 30
     degrees at the catch to 40 at the exit, the lower back taking a third of
-    it and the neck turning it all back so the head looks downriver. The rendered spine had never
+    it and the head turning it back so it looks downriver. The rendered spine had never
     turned at all (it took only the host's lean), so the T-grip arm reaching
     across the body cut through the chest and vest. Each elbow now also
     turns about the shoulder-wrist line to keep the arm outside the chest
@@ -32,8 +32,30 @@ All notable changes to this project are recorded here, newest first. Versioning 
     across the chest mid-stroke. The guide seen through their own eyes
     turns less and holds the T-grip further out, keeping their arms at the
     edge of the view.
-  - **Shoulders:** a reaching shoulder stays on its collarbone; Ingrid's
-    bare shoulder no longer tears away from the arm mid-stroke.
+  - **Shoulders:** a reaching shoulder stays on its collarbone, sliding at
+    most 6 cm round it (was 11); Ingrid's bare shoulder no longer tears away
+    from the arm mid-stroke. Each upper arm now turns about its own length
+    so the elbow bends the way the rig's elbow hinges. Swung the shortest
+    way up from the hanging rest pose, the raised upper arm had rolled
+    up to 33 degrees off its elbow on starboard and up to 166 on port, wringing
+    the shoulder's skin round it: the armpit rode up in front and the arm
+    looked pulled out of its socket.
+  - **Neck:** the neck rises from the chest at the rig's own forward bend
+    (13-23 degrees, by body). It had been aimed almost straight on from the
+    chest with the head tipped forward over it, so the skin at the nape
+    folded into a notch and stood off the back of the neck. The head's nod
+    and turn are shared, half of each nod and a third of each turn in the
+    neck, and the head lifts against most of a forward lean, keeping the
+    eyes on the water ahead at the catch instead of bowing chin to chest.
+  - **Shaft hand:** the lower hand slides up the shaft as far as each
+    body's arm needs, as a paddler chokes up, staying at least 30 cm below
+    the T-grip. Held a fixed distance down the rigid shaft, it had been set
+    as far as 72 cm from a 46-54 cm arm with the blade low in the power
+    phase or the shaft laid flat in the recovery, and the hand stood off the
+    end of a straightened arm, the forearm drawn out as much as 21 cm. The
+    lifted blade also swings half as far ahead in the forward recovery
+    (12 cm, from 24), and in the back stroke's recovery swings ahead only
+    as it nears the hip instead of holding out past the knees.
   - **Seats:** the crew sit 3.5 cm into the tube with a full contact patch,
     and the resting paddle line is 1.2 cm higher to stay on the thighs.
   - **Collars** (clothing generator v4): the shirt collar hugs the neck,
@@ -107,8 +129,11 @@ All notable changes to this project are recorded here, newest first. Versioning 
     points round a back stroke, under a back-paddle order, and both strokes
     are checked for the blade working ahead of the hips, the T-grip arm
     staying out of the chest and vest, and the wrists bending within reach;
-    the catch, power, exit and recovery are filmed from in front, above and
-    straight down, with each thumb close up with the paddle hidden.
+    the catch, power, exit and recovery are filmed from in front, from
+    above and in profile at the nape, with each thumb close up with the
+    paddle hidden. The skin round the neck and shoulders is measured for
+    stretch, and each arm's reach, shoulder shift and elbow hinge are logged
+    through both strokes and live paddling.
 
 - Crew gear and grips:
   - **Grips:** the T-grip hand caps the crossbar palm-down, and the shaft

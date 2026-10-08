@@ -110,6 +110,12 @@ static TAutoConsoleVariable<float> CVarRaftSimCC0LegFacingTwistDegrees(
 // clavicle roots (the authored roots sit 4.8 cm apart); 0.28 keeps the
 // rendered span near 10.5 cm, inside the anatomical gate.
 constexpr float ProductionClavicleRootLateralFraction = 0.28f;
+// About as far as a shoulder blade carries a reaching arm's shoulder joint
+// round the collarbone. Slid 11 cm (a 40 degree swing), the shoulder dragged
+// the skin over it forward off the neck and the back, and the arm looked
+// drawn out of its socket ("the arm seems to be pulled out of the socket",
+// 2026-10-07).
+constexpr float ProductionMaxShoulderProtractionCm = 6.0f;
 
 const TCHAR* CC0GripDigits[] = {
     TEXT("thumb"), TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")};
@@ -1104,8 +1110,11 @@ void ARaftSimCC0CrewVisualActor::SetSegmentBone(
     Body->SetBoneTransformByName(BoneName, Target, EBoneSpaces::ComponentSpace);
 }
 
-void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pose)
+void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& HostPose)
 {
+    // The body follows the host pose, but its lower paddle hand may slide up
+    // the shaft to suit this body's arm (below).
+    FRaftSimCrewAvatarPose Pose = HostPose;
     const FVector HipCenter = (Pose.LeftHipCm + Pose.RightHipCm) * 0.5f;
     const FVector ShoulderCenter = (Pose.LeftShoulderCm + Pose.RightShoulderCm) * 0.5f;
     const FVector TorsoUp = Pose.TorsoRotation.Quaternion().RotateVector(FVector::UpVector);
@@ -1154,8 +1163,6 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         Spine02Cm, UpperSpine - MidSpine, RestLengthCm(TEXT("spine_02"), TEXT("spine_03")));
     const FVector NeckBaseCm = Advance(
         Spine03Cm, NeckBase - UpperSpine, RestLengthCm(TEXT("spine_03"), TEXT("neck_01")));
-    const FVector PresentedHeadCenter = Advance(
-        NeckBaseCm, Pose.HeadCenterCm - NeckBase, RestLengthCm(TEXT("neck_01"), TEXT("head")));
     // Aligning the authored neck-to-head shaft with the torso-up axis leaves
     // the rendered face pitched about 20 degrees skyward (forensics: face
     // vector (0.94, 0, 0.35)); tip the crown forward by that much so the
@@ -1166,19 +1173,74 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // the water. Headgear and eyewear read the solved head, so they follow.
     const float GazeYaw = GazeYawDegrees * GazeWeight;
     const float GazePitch = GazePitchDegrees * GazeWeight;
+    // A paddler leaning into the catch keeps their eyes on the water ahead:
+    // the head lifts back against most of a forward lean instead of bowing
+    // with the chest, chin to chest, which pulled the nape skin into a spike
+    // over the collar. A body folded far over (a swimmer, a crouch) keeps its
+    // head with the chest.
+    const float ForwardLean = -Pose.TorsoRotation.Pitch;
+    const float LeanLift = 0.6f * FMath::Clamp(ForwardLean, 0.0f, 30.0f) *
+        FMath::GetMappedRangeValueClamped(FVector2f(30.0f, 45.0f), FVector2f(1.0f, 0.0f), ForwardLean);
     const FVector HeadUp = TorsoUp.RotateAngleAxis(
-        ProductionHeadLevelPitchDegrees + GazePitch, TorsoRight);
-    const FVector HeadTop = PresentedHeadCenter + HeadUp * 16.0f;
+        ProductionHeadLevelPitchDegrees + GazePitch - LeanLift, TorsoRight);
 
     // The chest turns on the hips about the spine: the lower back takes some
-    // of the turn and the chest all of it, and the neck turns it all back so
-    // the head keeps looking ahead, down the river. A head turned with the
-    // chest faced the T-grip hand held out on the paddle side. Aimed by their host directions alone
+    // of the turn and the chest all of it, the neck most of it, and the head
+    // turns it back so the face keeps looking down the river. A head turned
+    // with the chest faced the T-grip hand held out on the paddle side; a
+    // neck turned back against the chest pinched the skin at its base into a
+    // spike ("the neck is still detached from the spine", 2026-10-07). Aimed by their host directions alone
     // the spine bones never turned, so a paddler's turned torso never showed
     // and the arm reaching across to the T-grip cut through the chest and
     // vest ("the torso probably has to pivot some so both arms can naturally
     // reach their positions", 2026-10-07).
     const float ChestTwist = Pose.TorsoTwistDegrees;
+    const float HeadTwist = ProductionAxialFacingTwistDegrees + ChestTwist * 0.15f + GazeYaw;
+    // The neck rises from the chest as the rig was built: bent forward at
+    // its base 13 to 23 degrees off the line of the upper chest, by body.
+    // Aimed along the host's neck, which runs almost straight on from the
+    // chest, the neck was bent back at its base and the head tipped forward
+    // over it, so the skin at the nape folded into a notch and stood off the
+    // back of the neck ("the neck is still detached from the spine,
+    // especially when the head tilts forward", 2026-10-07). Carry the neck
+    // on the chest at its rest bend, and share the head's own turn and nod
+    // (its gaze and the chest's turn undone) between the neck and the skull,
+    // as the neck's joints share them: the neck takes half of a nod and a
+    // third of a turn, the joint under the skull the rest.
+    constexpr float kNeckShareOfNod = 0.5f;
+    constexpr float kNeckShareOfTurn = 0.3f;
+    const FTransform* RestChest = ReferenceComponentTransforms.Find(TEXT("spine_03"));
+    const FTransform* RestNeck = ReferenceComponentTransforms.Find(TEXT("neck_01"));
+    const FTransform* RestHead = ReferenceComponentTransforms.Find(TEXT("head"));
+    FVector PresentedHeadCenter = Advance(
+        NeckBaseCm, Pose.HeadCenterCm - NeckBase, RestLengthCm(TEXT("neck_01"), TEXT("head")));
+    TOptional<FQuat> NeckRotation;
+    if (RestChest && RestNeck && RestHead)
+    {
+        // The rotation SetSegmentBone gives a bone aimed along Direction.
+        const auto Aimed = [](const FTransform& Rest, const FVector& RestDirection, const FVector& Direction, float TwistDegrees)
+        {
+            return (FQuat::FindBetweenNormals(RestDirection, Direction.GetSafeNormal()) *
+                FQuat(RestDirection, FMath::DegreesToRadians(TwistDegrees)) * Rest.GetRotation()).GetNormalized();
+        };
+        const FVector ChestShaft = (RestNeck->GetLocation() - RestChest->GetLocation()).GetSafeNormal();
+        const FVector NeckOffset = RestHead->GetLocation() - RestNeck->GetLocation();
+        const FVector NeckShaft = NeckOffset.GetSafeNormal();
+        if (!ChestShaft.IsNearlyZero() && !NeckShaft.IsNearlyZero())
+        {
+            const FQuat ChestTurn = Aimed(*RestChest, ChestShaft, NeckBaseCm - Spine03Cm,
+                ProductionAxialFacingTwistDegrees + ChestTwist) * RestChest->GetRotation().Inverse();
+            const FQuat HeadTurn = Aimed(*RestHead, NeckShaft, HeadUp, HeadTwist) *
+                (ChestTurn * RestHead->GetRotation()).Inverse();
+            FQuat Nod, Turn;
+            HeadTurn.ToSwingTwist(ChestTurn.RotateVector(NeckShaft), Nod, Turn);
+            const FQuat NeckTurn = FQuat::Slerp(FQuat::Identity, Nod, kNeckShareOfNod) *
+                FQuat::Slerp(FQuat::Identity, Turn, kNeckShareOfTurn) * ChestTurn;
+            NeckRotation = (NeckTurn * RestNeck->GetRotation()).GetNormalized();
+            PresentedHeadCenter = NeckBaseCm + NeckTurn.RotateVector(NeckOffset) * BodyScale;
+        }
+    }
+    const FVector HeadTop = PresentedHeadCenter + HeadUp * 16.0f;
     SetSegmentBone(TEXT("pelvis"), TEXT("spine_01"), PelvisCm, Spine01Cm,
         ProductionAxialFacingTwistDegrees);
     SetSegmentBone(TEXT("spine_01"), TEXT("spine_02"), Spine01Cm, Spine02Cm,
@@ -1187,10 +1249,19 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         ProductionAxialFacingTwistDegrees + ChestTwist * 0.7f);
     SetSegmentBone(TEXT("spine_03"), TEXT("neck_01"), Spine03Cm, NeckBaseCm,
         ProductionAxialFacingTwistDegrees + ChestTwist);
-    SetSegmentBone(TEXT("neck_01"), TEXT("head"), NeckBaseCm, PresentedHeadCenter,
-        ProductionAxialFacingTwistDegrees + ChestTwist * 0.4f + GazeYaw * 0.45f);
-    SetSegmentBone(TEXT("head"), TEXT("head"), PresentedHeadCenter, HeadTop,
-        ProductionAxialFacingTwistDegrees + GazeYaw);
+    if (NeckRotation.IsSet())
+    {
+        FTransform Neck = *RestNeck;
+        Neck.SetLocation(ToMeshSpace(NeckBaseCm));
+        Neck.SetRotation(NeckRotation.GetValue());
+        Body->SetBoneTransformByName(TEXT("neck_01"), Neck, EBoneSpaces::ComponentSpace);
+    }
+    else
+    {
+        SetSegmentBone(TEXT("neck_01"), TEXT("head"), NeckBaseCm, PresentedHeadCenter,
+            ProductionAxialFacingTwistDegrees + ChestTwist * 0.75f + GazeYaw * 0.45f);
+    }
+    SetSegmentBone(TEXT("head"), TEXT("head"), PresentedHeadCenter, HeadTop, HeadTwist);
 
     // The shoulders hang from the rig's chest top, not the host shoulder
     // line: children of the driven spine already sit at their rest offsets,
@@ -1231,6 +1302,41 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         PresentedHeadCenter - RigShoulderCenterCm,
         TorsoUp);
 
+    // The lower hand slides up the shaft as far as its arm needs, as a
+    // paddler chokes up. The pose holds it a fixed distance down a rigid
+    // 120 cm shaft; with the blade low and out in the power phase, or the
+    // shaft laid out flat in the recovery, that put the grip 60-72 cm from a
+    // 46-54 cm arm, and the hand stood off the end of a straightened arm, the
+    // forearm drawn out 20 cm. The hand keeps to the shaft and at least
+    // 30 cm below the T-grip.
+    if (Pose.bShowPaddle && !Pose.bOarGrip && HasHeldGrip(Pose))
+    {
+        const FVector Shaft = (Pose.PaddleBottomCm - Pose.PaddleTopCm).GetSafeNormal();
+        const bool bLeftLower = FVector::DistSquared(Pose.LeftHandCm, Pose.PaddleTopCm) >
+            FVector::DistSquared(Pose.RightHandCm, Pose.PaddleTopCm);
+        FVector& LowerGripCm = bLeftLower ? Pose.LeftHandCm : Pose.RightHandCm;
+        const FVector& LowerShoulderCm = bLeftLower ? LeftShoulderCm : RightShoulderCm;
+        const float ArmCm = bLeftLower
+            ? RestLengthCm(TEXT("upperarm_l"), TEXT("lowerarm_l")) + RestLengthCm(TEXT("lowerarm_l"), TEXT("hand_l"))
+            : RestLengthCm(TEXT("upperarm_r"), TEXT("lowerarm_r")) + RestLengthCm(TEXT("lowerarm_r"), TEXT("hand_r"));
+        // A slightly bent arm with its shoulder blade forward.
+        const float ReachCm = 0.96f * ArmCm + (bHeadHiddenForFirstPerson ? 0.0f : ProductionMaxShoulderProtractionCm);
+        constexpr float kMinimumHandSpacingCm = 30.0f;
+        for (int32 Pass = 0; Pass < 4 && !Shaft.IsNearlyZero() && ArmCm > 1.0f; ++Pass)
+        {
+            const FVector WristCm = ResolvePaddleGripWristCm(bLeftLower, Pose, LowerGripCm);
+            const float ExcessCm = FVector::Distance(WristCm, LowerShoulderCm) - ReachCm;
+            // How much nearer the shoulder each centimetre up the shaft brings
+            // the hand; a shaft running across the reach gains little.
+            const float Gain = FVector::DotProduct((WristCm - LowerShoulderCm).GetSafeNormal(), Shaft);
+            const float DownShaftCm = FVector::DotProduct(LowerGripCm - Pose.PaddleTopCm, Shaft);
+            if (ExcessCm <= 0.1f || Gain < 0.2f || DownShaftCm <= kMinimumHandSpacingCm)
+            {
+                break;
+            }
+            LowerGripCm = Pose.PaddleTopCm + Shaft * FMath::Max(kMinimumHandSpacingCm, DownShaftCm - ExcessCm / Gain);
+        }
+    }
     // The pose contract publishes palm/grip targets while the imported hand
     // bone is a wrist pivot. Offset each wrist by its own hash-locked reference
     // palm vector so the visible knuckle plane, not the wrist, meets the
@@ -1277,9 +1383,8 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         {
             return RestShoulderCm;
         }
-        constexpr float kMaxProtractionCm = 11.0f;
         constexpr float kMaxElevationCm = 4.0f;
-        const float Protraction = FMath::Clamp(ReachCm - 0.84f * ArmCm, 0.0f, kMaxProtractionCm);
+        const float Protraction = FMath::Clamp(ReachCm - 0.84f * ArmCm, 0.0f, ProductionMaxShoulderProtractionCm);
         const float Rise = FMath::Clamp(FVector::DotProduct(ToWrist, TorsoUp) / ReachCm, 0.0f, 1.0f);
         const FVector Reached = RestShoulderCm + ToWrist / ReachCm * Protraction + TorsoUp * (kMaxElevationCm * Rise);
         const float ClavicleCm = FVector::Distance(RestShoulderCm, ClavicleRootCm);
@@ -1460,12 +1565,46 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     const float LeftTwist = bPalmTarget ? ForearmTwistDegrees(true, LeftElbow, LeftWristCm, LeftHandRotation) : 0.0f;
     const float RightTwist = bPalmTarget ? ForearmTwistDegrees(false, RightElbow, RightWristCm, RightHandRotation) : 0.0f;
     MaximumGripWristTwistDegrees = (1.0f - ForearmTwistShareOfGrip) * FMath::Max(FMath::Abs(LeftTwist), FMath::Abs(RightTwist));
+    // The upper arm turns about its own length so the elbow hinges in the
+    // plane the forearm bends in: the rig's hanging arm bends forward 40
+    // degrees at the elbow, and that bend must still face the forearm once
+    // the arm is raised. Swung the shortest way up from its hanging rest,
+    // the upper arm rolled off its elbow, wringing the shoulder's skin round
+    // it: the armpit rode up in front and the arm looked drawn out of its
+    // socket ("you can see the arm seems to be pulled out of the socket
+    // here", 2026-10-07). A nearly straight arm has no bend to follow and
+    // keeps the shortest swing.
+    const auto UpperArmRollDegrees = [this](bool bLeftArm, const FVector& ShoulderCm, const FVector& ElbowCm, const FVector& WristCm)
+    {
+        const FTransform* Upper = ReferenceComponentTransforms.Find(bLeftArm ? TEXT("upperarm_l") : TEXT("upperarm_r"));
+        const FTransform* Lower = ReferenceComponentTransforms.Find(bLeftArm ? TEXT("lowerarm_l") : TEXT("lowerarm_r"));
+        const FTransform* Hand = ReferenceComponentTransforms.Find(bLeftArm ? TEXT("hand_l") : TEXT("hand_r"));
+        if (!Upper || !Lower || !Hand)
+        {
+            return 0.0f;
+        }
+        const FVector RestShaft = (Lower->GetLocation() - Upper->GetLocation()).GetSafeNormal();
+        const FVector RestBend = FVector::VectorPlaneProject(Hand->GetLocation() - Lower->GetLocation(), RestShaft).GetSafeNormal();
+        const FVector Shaft = (ElbowCm - ShoulderCm).GetSafeNormal();
+        const FVector Bend = FVector::VectorPlaneProject((WristCm - ElbowCm).GetSafeNormal(), Shaft);
+        // Sine of the elbow's bend: none below about 6 degrees, all from 20.
+        const float Weight = FMath::GetMappedRangeValueClamped(FVector2f(0.1f, 0.35f), FVector2f(0.0f, 1.0f), Bend.Size());
+        if (RestShaft.IsNearlyZero() || RestBend.IsNearlyZero() || Shaft.IsNearlyZero() || Weight <= 0.0f)
+        {
+            return 0.0f;
+        }
+        const FVector Swung = FQuat::FindBetweenNormals(RestShaft, Shaft).RotateVector(RestBend);
+        const FVector Toward = Bend.GetSafeNormal();
+        return Weight * static_cast<float>(FMath::RadiansToDegrees(FMath::Atan2(
+            FVector::DotProduct(Shaft, FVector::CrossProduct(Swung, Toward)), FVector::DotProduct(Swung, Toward))));
+    };
     SetSegmentBone(
         TEXT("clavicle_l"),
         TEXT("upperarm_l"),
         LeftClavicleRoot,
         LeftArmShoulderCm);
-    SetSegmentBone(TEXT("upperarm_l"), TEXT("lowerarm_l"), LeftArmShoulderCm, LeftElbow);
+    SetSegmentBone(TEXT("upperarm_l"), TEXT("lowerarm_l"), LeftArmShoulderCm, LeftElbow,
+        UpperArmRollDegrees(true, LeftArmShoulderCm, LeftElbow, LeftWristCm));
     SetSegmentBone(TEXT("lowerarm_l"), TEXT("hand_l"), LeftElbow, LeftWristCm, ForearmTwistShareOfGrip * LeftTwist);
     if (bPalmTarget)
     {
@@ -1480,7 +1619,8 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         TEXT("upperarm_r"),
         RightClavicleRoot,
         RightArmShoulderCm);
-    SetSegmentBone(TEXT("upperarm_r"), TEXT("lowerarm_r"), RightArmShoulderCm, RightElbow);
+    SetSegmentBone(TEXT("upperarm_r"), TEXT("lowerarm_r"), RightArmShoulderCm, RightElbow,
+        UpperArmRollDegrees(false, RightArmShoulderCm, RightElbow, RightWristCm));
     SetSegmentBone(TEXT("lowerarm_r"), TEXT("hand_r"), RightElbow, RightWristCm, ForearmTwistShareOfGrip * RightTwist);
     if (bPalmTarget)
     {
