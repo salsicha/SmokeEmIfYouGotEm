@@ -1,4 +1,8 @@
 *.mp4 filter=lfs diff=lfs merge=lfs -text
+# Pacuare bridge registration pins these exact source bytes across checkouts.
+physics/data/real_world/pacuare_river_costa_rica/huacas_sources_2026_10/osm/*.osm text eol=lf
+physics/scripts/register_pacuare_catalog_locations.py text eol=lf
+unreal/Scripts/register_pacuare_highway_bridge.py text eol=lf
 # These historical evidence files are byte-hash locked; preserve original LF.
 unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorSouthForkMaterial.cpp text eol=lf
 unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorSouthForkOrganicTerrainTest.cpp text eol=lf

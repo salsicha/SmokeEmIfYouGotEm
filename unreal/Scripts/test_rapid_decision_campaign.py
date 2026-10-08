@@ -92,6 +92,21 @@ class DecisionCampaign(unittest.TestCase):
             self.assertEqual(row['geographic_acceptance'],'unresolved')
             self.assertIn('catalog_location_evidence',row['location_evidence_file'])
 
+    def test_las_ranitas_uses_new_bridge_evidence_without_invented_bounds(self):
+        from register_pacuare_highway_bridge import ROOT, build as bridge_registration
+        import json
+        row=next(c for c in build()[0] if c['river']=='pacuare' and c['name']=='Las Ranitas')
+        evidence=json.loads((ROOT/row['location_evidence_file']).read_text(encoding='utf-8'))
+        self.assertEqual(evidence,bridge_registration())
+        self.assertEqual(row['guide_km'],evidence['guide_km'])
+        self.assertEqual(evidence['rapid'],row['name'])
+        self.assertEqual(len(evidence['alternatives']),2)
+        self.assertEqual(row['status'],'missing_playable_section')
+        self.assertEqual(row['geographic_acceptance'],'unresolved')
+        self.assertFalse(row['runtime_placement_authorized'])
+        self.assertIsNone(row['boundary_lon_lat'])
+        self.assertIsNone(row['route_coordinates'])
+
     def test_poor_approach_has_a_matched_ordinary_recovery(self):
         for p in build()[1]:
             for rapid in {t['rapid_id'] for t in p['trials'] if not t.get('portage')}:

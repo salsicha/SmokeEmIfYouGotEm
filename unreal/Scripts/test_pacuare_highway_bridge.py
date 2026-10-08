@@ -1,10 +1,23 @@
-import copy
+import json
 import math
+import subprocess
 import unittest
-from register_pacuare_highway_bridge import build, crossing, search_point
+from register_pacuare_highway_bridge import DATA, ROOT, build, crossing, search_point
 
 
 class PacuareBridgeTests(unittest.TestCase):
+    def test_saved_registration_reproduces_from_current_sources(self):
+        receipt=DATA/'review/highway_bridge_registration_2026_10_08.json'
+        self.assertEqual(json.loads(receipt.read_text(encoding='utf-8')),build())
+
+    def test_hash_locked_text_sources_have_portable_checkout_bytes(self):
+        paths=[p for p in build()['sources_sha256'] if p.endswith(('.py','.osm'))]
+        self.assertEqual(len(paths),4)
+        raw=subprocess.check_output(['git','check-attr','-z','eol','--',*paths],cwd=ROOT)
+        fields=raw.decode('utf-8').rstrip('\0').split('\0')
+        attributes=dict((fields[i],fields[i+2]) for i in range(0,len(fields),3))
+        self.assertEqual(attributes,dict.fromkeys(paths,'lf'))
+
     def test_actual_sources_supply_two_distinct_downstream_controls(self):
         result=build()
         self.assertEqual(len(result['alternatives']),2)

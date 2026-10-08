@@ -67,6 +67,13 @@ def definitions(axes):
     entries['pacuare','Bienvenidos'].update(guide_km=3.33,
         location_identity='Lower-run rapid between Tres Equis and Linda Vista; not San Martin Bienvenidos',
         identity_sources=[PAC,LODGE])
+    entries['pacuare','Las Ranitas'].update(guide_km=24.5,
+        location_evidence_file='physics/data/real_world/pacuare_river_costa_rica/review/highway_bridge_registration_2026_10_08.json',
+        location_status='bridge_bracketed_search_alternatives_not_verified_rapid_boundaries',
+        location_evidence='Dos Montanas and the two captured Highway 32 bridge crossings bracket the guide point. '
+                          'Retain both span interpretations, not an averaged point or current-map station.',
+        geographic_acceptance='unresolved', boundary_lon_lat=None,
+        runtime_placement_authorized=False)
     add('futaleufu','Asleep at the Wheel','hole','Avoid the centre-bottom hydraulic using the right passage',
         'https://www.whitewaterguidebook.com/chile/futaleufu-river-inferno/',
         'Upstream of Terminator and outside the old crop, but downstream of the Rio Azul confluence '
