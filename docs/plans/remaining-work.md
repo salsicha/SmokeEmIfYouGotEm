@@ -12,15 +12,26 @@ checkpoint, not a successful 332-second run or settled runtime water. See the
 Do not rerun its completed audit or forge a successful-terminal audit for the
 existing continuation runner; implement an explicit verified recovery path.
 
-After the shared crew test process and this audit both exited, a fresh full
-Chilko input build started in `tmp/chilko-full-corridor-input-build-v11`, output
-`tmp/chilko-full-corridor-inputs-v11-reference1m`, exec session 29998, owned
-builder PID 35332 at launch. The unchanged 55.7 km scope uses the already
-verified 4,772 terrain chunks. Its log reached `canonical hydraulic sections
-0/25552` and its live resource sample had no competing shared work. This is
-the sole current input build, not a new terrain export; inspect its live
-handle and terminal receipt before any further launch. V10 remains failed
-and preserved. No hydraulic solution or map acceptance is implied.
+After the shared crew test process and this audit both exited, the fresh full
+Chilko input build **completed successfully** in
+`tmp/chilko-full-corridor-input-build-v11`, output
+`tmp/chilko-full-corridor-inputs-v11-reference1m`. Exec session 29998 is terminal
+(exit zero), not live. All 25,552 x 257 two-metre hydraulic cells use the verified
+one-metre encoded terrain across the 55.7 km source route. All 167,052 source
+route/bank probes and 36,760 mapped branch-boundary probes are covered; the
+chart is nonfolding. All source hashes remained unchanged. The build took
+134 seconds without resource-floor breaches. V10 remains failed and preserved;
+do not repeat this successful V11 input build or the 4,772-chunk terrain export.
+See the [full-input receipt](../../physics/data/real_world/chilko_river_bc/observed_rapids/full_corridor_input_completion_2026_10_08.json).
+
+The next Chilko step is native full-domain cooking and independent geographic,
+storage/discharge, shoreline and boat-clearance review. The 4 m minimum initial
+wet width is not proof of whole-hull navigability. Review the existing lossless
+`--stream-output` native cooker and its qualification evidence before launch:
+retaining eleven uncompressed full-domain CSV frames risks the disk reserve.
+Keep the complete domain, actual physics, required snapshots and unchanged
+acceptance thresholds; do not obtain a pass by narrowing the run or suppressing
+evidence. No hydraulic solution or game-map acceptance is established yet.
 
 October 8, 23:15 UTC handoff correction (supersedes live-job wording below):
 `tmp/full-river-long-handoff-v1` is terminal with a preserved failure receipt,
