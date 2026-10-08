@@ -5282,3 +5282,110 @@ Native streaming-probe automation and actual chunked map import still require
 that successful link. A4 exec70425 remains the sole live production solve;
 full-grid read-only inspection exec90541 still has its resource/idle guard.
 Do not confuse this requested source checkpoint with completed river acceptance.
+
+Checkpoint delivery confirmed: main `3fa9b553d03ed0b84e9c72753dba57fafad89e31`
+was pushed and `git ls-remote origin refs/heads/main` returned that exact commit.
+All29 LFS objects (1.7 MB) uploaded. Solver dependency main `2f6d961` was pushed
+first. Remaining tracked working edits at delivery were the other task's crew,
+grip, rescue-animation and associated documentation/tests, deliberately excluded.
+Additional20 catalog/Pacuare/reprojection pytest checks passed; both continuous
+capture and profiler PowerShell fixture suites passed.
+
+Continuing after the push: guarded editor build exec81222 completed successfully
+at2026-10-08T01:08:17Z, with the new native parser test and map importer compiled
+and linked. Receipt `tmp/continuous-diagnostic-access-build-v6/completion.json`
+has exit_code0. Another task then started UBT PID37596; the immediate native-test
+launch correctly refused to overlap it. One guarded native test is now waiting
+in exec50884, script `tmp/test_chunked_probes_native_v1.ps1`. After60s shared idle,
+it will run four targeted native tests (collision probe stream, both rapid
+registrations and rapid profiles) into `tmp/continuous-chunked-probes-native-v1`.
+It defers after15min busy, does not stop/message other work and does not import
+or overwrite a map. Check this handle/report before launching any replacement.
+The fresh binary-probe contract is ready at
+`tmp/continuous-chunked-probes-validation-v1/contract.json`; full native terrain
+import, normal gameplay and packaged20FPS are still separate acceptance gates.
+
+### 2026-10-07 post-push native integration checks
+
+Previous goal turn was progress: committed/pushed the verified checkpoint,
+completed the editor rebuild and retained active guards. The full-domain
+read-only native inspection exec90541 is now terminal success. It actually
+loaded all79030458 V9 cells and evaluated225159 station faces in33.547s;
+peak commitment10376486912 bytes, peak working set10360287232 bytes,332 samples.
+Every discharge is finite, range62.760705..441.319903 m3/s; initial nonuniformity
+is NOT convergence. All protected inputs/binary stayed identical. The durable
+receipt is `review/native_full_domain_inspection_2026_10_07.json`. No steps,
+native full cook, capture-memory or FPS measurement occurred. Do not repeat the
+same read-only inspection; use its actual memory result in later scheduling.
+
+Native probe stream, synthetic rapid registration and rapid profiles actually
+passed in `tmp/continuous-chunked-probes-native-v1/automation/index.json`
+(SHA `616ff7a01e78339d32fbfb5b63cd72fca31e180fff8670d603eecf9e544bd5d6`).
+The fourth test reported Success WITH WARNING because its real assembly/chart
+arguments were absent; that does not prove real source registration. The strict
+import gate correctly stayed closed (3 clean successes,1 warning,0 failures).
+Corrected native run is queued in exec44237, same guard script now selecting
+`continuous-chunked-probes-native-v2`, actual `colorado-continuous-assembly-v3`
+manifest and final `colorado-shared-hydraulic-frame-terminal-v9` chart. It must
+produce4 clean successes and0 warnings before import; no gate was weakened.
+
+The exact comparison import contract is
+`tmp/continuous-chunked-import-parity-v1/contract.json`, SHA
+`91a4e14c2ab250931ea9e20daa932a826287c9cc8089192dd2ffaa80c9b1106b`.
+It preserves the earlier76-chunk BatchedStartV4 terrain, cooked fields, Nanite,
+1309 vegetation instances, rig, launch/finish and three rapid source charts;
+only the probe representation and fresh map identity differ. It preserves
+every103369 original wet probe. This intentionally bounded regression is not
+a substitute for the full450km replacement or new gameplay acceptance.
+Our first waiting import guard exec93008/PID39948 was terminated before any
+engine launch solely to correct the test-result dependency; no other process
+was stopped. Replacement guard is live exec96215, script
+`tmp/import_chunked_collision_parity_v1.ps1`, waiting on the V2 test result and
+60s shared engine idle, with a25min wait deadline. Check it before any replacement.
+It creates only fresh `L_Colorado_ContinuousChunkedParityV1`, never overwrites
+earlier maps; its generated map/external actors are explicitly ignored.
+Other task's latest live editor was17052 (stroke-final-e-tests); do not stop,
+pause or message it. A4 exec70425/solver11252 remains the single live production
+solve on the old14.4km chart. Full import and full-river acceptance remain open.
+
+### 2026-10-07 native chunked import verified; full-length loader repair
+
+Exec44237 completed with four clean native successes, zero warnings/failures.
+The corrected real-source test exercised all94 sites in five source rapids on
+the V9 chart. Exec96215 then completed: the fresh parity map saved successfully,
+76 Nanite proxies,3800 terrain probes (max0.317972cm),103369 wet-bed probes
+(max0.261719cm) and1309 vegetation roots (max0.273296cm). These match the earlier
+legacy-JSON import exactly. Durable evidence: `review/native_chunked_import_2026_10_07.json`.
+This closes the serialization/import regression, not full-river gameplay.
+
+Found a separate full-length runtime blocker: all three RSBF readers capped
+rows at200000 while Colorado V9 requires225158. New preflight retains the old
+102400000-cell/922400040-byte budget, accepting351x225158 (712174794 bytes),
+and validates all four serialized array counts before allocation. It rejects
+invalid dimensions before multiplication, malformed counts, wrong file extents
+and invalid spacing/origin. Existing physics and sampling arithmetic are unchanged.
+Read-only compatibility audit `tmp/support-band-layout-audit-v1.json` checked
+all18 existing files successfully (SHA256
+`7c9c83073ad49259efbd2052f8653156124139f70aca57126bd0146211ea0920`).
+Buildv7 linked successfully; native layout/bounds/transit tests run in exec59083.
+A subsequent extreme-dimension overflow hardening requires a fresh build/test
+before committing the loader. No full-domain cook, new descent or20FPS claim.
+
+Final validation completed: buildv8 linked successfully at2026-10-08T01:35:42Z.
+Water DLL SHA256 `0572b0505f2fdfa1dd7b1848ae51ebb47f6ffb229567f0a9f6afbc7f70816614`.
+Exec59993 completed with3 clean native tests,0 warnings/failures/not-run, report
+`tmp/support-band-layout-native-v2/automation/index.json` SHA256
+`b1a938b75e51f7e4711a4483816f89f910450ec74999c8e50b0f72747638c606`.
+The test actually wrote/read225158x2 through physical support, presentation and
+observed-whitewater production loaders, verified the450314m endpoint and sampled
+whitewater past the former row cap. Full351-column geometry is checked by an
+exact virtual extent/count-word fixture, not claimed as full payload ingestion.
+The unchanged South Fork full-reach transit test loaded its12271x21 baseline,
+stepped native water and preserved overlap on window movement. Extreme malformed
+dimensions and serialized counts are refused before payload allocation.
+
+No build/import/test guard remains live from this batch. A4 exec70425/solver11252
+continues independently, last observed28800/48000 steps. Preserve its bound
+binary/inputs; next work remains full-domain hydraulics, continuous scene and
+runtime bundle integration, then real descent/render/rescue and packaged20FPS
+validation. None of those gates is replaced by these bounded regression checks.

@@ -1,6 +1,7 @@
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterFeatureKinematics.h"
 #include "RaftSimWaterFlowFrame.h"
+#include "RaftSimSupportBandLayout.h"
 
 #include "RaftSimLiveWaterWindow.h"
 
@@ -1086,7 +1087,8 @@ bool URaftSimWaterRuntimeAdapter::LoadRaftSupportBandFieldFromFile(
     *Reader << RowCount;
     *Reader << RaftSupportBandField.LateralOriginM;
     *Reader << RaftSupportBandField.LateralSpacingM;
-    if (Width < 2 || Width > 512 || RowCount < 2 || RowCount > 200000)
+    if (!RaftSimSupportBandLayout::Preflight(*Reader,Width,RowCount,
+        RaftSupportBandField.LateralOriginM,RaftSupportBandField.LateralSpacingM))
     {
         RaftSupportBandField.Reset();
         return false;
@@ -1174,7 +1176,8 @@ bool URaftSimWaterRuntimeAdapter::LoadPresentationBaselineFieldFromFile(
     *Reader << RowCount;
     *Reader << PresentationBaselineField.LateralOriginM;
     *Reader << PresentationBaselineField.LateralSpacingM;
-    if (Width < 2 || Width > 512 || RowCount < 2 || RowCount > 200000)
+    if (!RaftSimSupportBandLayout::Preflight(*Reader,Width,RowCount,
+        PresentationBaselineField.LateralOriginM,PresentationBaselineField.LateralSpacingM))
     {
         PresentationBaselineField.Reset();
         return false;
@@ -1227,7 +1230,8 @@ bool URaftSimWaterRuntimeAdapter::LoadObservedWhitewaterFieldFromFile(
         *Reader << ObservedWhitewaterField.LateralOriginM;
         *Reader << ObservedWhitewaterField.LateralSpacingM;
     }
-    if (Width < 2 || Width > 512 || RowCount < 2 || RowCount > 200000)
+    if (!RaftSimSupportBandLayout::Preflight(*Reader,Width,RowCount,
+        ObservedWhitewaterField.LateralOriginM,ObservedWhitewaterField.LateralSpacingM))
     {
         UE_LOG(LogTemp, Warning, TEXT("RaftSim observed whitewater: bad header in %s"), *AbsolutePath);
         ObservedWhitewaterField.Reset();
