@@ -92,4 +92,97 @@ bool FRaftSimFutaleufuRuntimePacketsTest::RunTest(const FString&)
         Windows.Num(),Sampled,Wet,MaximumWorldDepthError,MaximumWorldVelocityError,MaximumStepMs));
     return !HasAnyErrors();
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimFutaleufuRuntimeHandoffTest,
+    "RaftSim.M9.FutaleufuRuntimeHandoffs",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimFutaleufuRuntimeHandoffTest::RunTest(const FString&)
+{
+    FString Relative;
+    if (!FParse::Value(FCommandLine::Get(),TEXT("RaftSimFutaleufuRuntime="),Relative) ||
+        !FPaths::IsRelative(Relative) || Relative.Contains(TEXT("..")))
+    { AddError(TEXT("Supply a repo-relative verified Futaleufu runtime export")); return false; }
+    FString Text; TSharedPtr<FJsonObject> Manifest;
+    if (!FFileHelper::LoadFileToString(Text,*(URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(Relative)/TEXT("streaming_manifest.json"))) ||
+        !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Text),Manifest) || !Manifest.IsValid())return false;
+    const auto& Rows=Manifest->GetArrayField(TEXT("windows"));
+    TArray<FVector2D> Centers; TArray<FString> Fields;
+    for(const auto& Value:Rows)
+    {
+        const auto Row=Value->AsObject();
+        const auto& B=Row->GetArrayField(TEXT("valid_live_center_bounds_m"))[0]->AsArray();
+        Centers.Add(FVector2D((B[0]->AsNumber()+B[2]->AsNumber())*.5,(B[1]->AsNumber()+B[3]->AsNumber())*.5));
+        Fields.Add(FPaths::GetPath(Row->GetStringField(TEXT("cooked_fields_manifest"))));
+    }
+    TStrongObjectPtr<URaftSimWaterRuntimeAdapter> Water(NewObject<URaftSimWaterRuntimeAdapter>());
+    FRaftSimWaterRuntimeConfig Config;
+    Config.bRequireAcceptedReportManifest=false;
+    Config.bEnableDeterministicCapture=false;
+    Config.FixedStepSeconds=.01f;
+    int32 Handoffs=0; int64 Samples=0,Wet=0,Evolved=0;
+    TSet<int32> Visited;
+    double MaxDepthError=0.,MaxVelocityError=0.;
+    // Every directed neighboring-packet edge, including diagonal moves and
+    // reverse recovery. This is a native state-transfer test, not a boat run.
+    for(int32 A=0;A<Centers.Num();++A)for(int32 B=0;B<Centers.Num();++B)
+    {
+        const auto D=Centers[B]-Centers[A];
+        if(A==B || FMath::Abs(D.X)>160.001 || FMath::Abs(D.Y)>160.001)continue;
+        Water->Configure(Config);
+        if(!Water->ConfigureRiverCoordinateMap(Relative/TEXT("coordinate_map.json")) ||
+            !Water->ConfigureMovingRiverWindow(Fields[A],TEXT("median_runnable"),Centers[A],FVector2D(224,224),.045f))
+        { AddError(FString::Printf(TEXT("Initial packet %d failed"),A));return false; }
+        FBox2D OldBounds;
+        if(!Water->GetLiveWaterFieldBoundsM(OldBounds))return false;
+        const FVector2D Low(FMath::Max(Centers[A].X,Centers[B].X)-104.,FMath::Max(Centers[A].Y,Centers[B].Y)-104.);
+        const FVector2D High(FMath::Min(Centers[A].X,Centers[B].X)+104.,FMath::Min(Centers[A].Y,Centers[B].Y)+104.);
+        TArray<FVector2D> Points; TArray<FRaftSimWaterSample> Seed,Before;
+        for(double Y=Low.Y;Y<=High.Y;Y+=8.)for(double X=Low.X;X<=High.X;X+=8.)
+        {
+            FRaftSimWaterSample S;
+            const FVector2D P(X,Y);
+            if(!OldBounds.IsInside(P) || !Water->SampleWaterFieldAtRiverCoordinates(P,S))return false;
+            Points.Add(P);Seed.Add(S);
+        }
+        for(int32 Step=0;Step<5;++Step)if(!Water->StepWater(.01f))return false;
+        FRaftSimWaterLiveWindowStats OldStats;
+        if(!Water->GetLiveWindowStats(OldStats) || OldStats.bHasNonFinite)return false;
+        const float Clock=Water->GetSimTimeSeconds();
+        for(int32 P=0;P<Points.Num();++P)
+        {
+            FRaftSimWaterSample S;
+            if(!Water->SampleWaterFieldAtRiverCoordinates(Points[P],S))return false;
+            Before.Add(S);
+            if(S.DepthMeters!=Seed[P].DepthMeters || S.VelocityMetersPerSecond!=Seed[P].VelocityMetersPerSecond)++Evolved;
+        }
+        if(!Water->ConfigureMovingRiverWindow(Fields[B],TEXT("median_runnable"),Centers[B],FVector2D(224,224),.045f))
+        { AddError(FString::Printf(TEXT("Native handoff %d to %d failed"),A,B));return false; }
+        FRaftSimWaterLiveWindowStats Stats; FBox2D NewBounds;
+        if(!Water->GetLiveWindowStats(Stats) || !Water->GetLiveWaterFieldBoundsM(NewBounds) ||
+            !TestTrue(TEXT("Handoff preserves evolved solver state and clock"),Stats.bLastHandoffPreservedState &&
+                Stats.LastHandoffTransferredCellCount>0 && Stats.MovingWindowHandoffCount==1 &&
+                Stats.SimTimeSeconds==OldStats.SimTimeSeconds && Water->GetSimTimeSeconds()==Clock && !Stats.bHasNonFinite))return false;
+        for(int32 P=0;P<Points.Num();++P)
+        {
+            FRaftSimWaterSample S;
+            if(!NewBounds.IsInside(Points[P]) || !Water->SampleWaterFieldAtRiverCoordinates(Points[P],S))return false;
+            if(!TestTrue(TEXT("Transferred overlap stays finite and bounded"),FMath::IsFinite(S.DepthMeters) &&
+                S.DepthMeters>=0. && S.DepthMeters<=10. && !S.VelocityMetersPerSecond.ContainsNaN() &&
+                S.VelocityMetersPerSecond.Size()<=20.001 && S.bWet==Before[P].bWet))return false;
+            MaxDepthError=FMath::Max(MaxDepthError,double(FMath::Abs(S.DepthMeters-Before[P].DepthMeters)));
+            MaxVelocityError=FMath::Max(MaxVelocityError,(S.VelocityMetersPerSecond-Before[P].VelocityMetersPerSecond).Size());
+            ++Samples;if(S.bWet)++Wet;
+        }
+        if(!Water->StepWater(.01f) || !Water->GetLiveWindowStats(Stats) || Stats.bHasNonFinite || Stats.SimTimeSeconds<=OldStats.SimTimeSeconds)return false;
+        ++Handoffs;Visited.Add(A);Visited.Add(B);
+    }
+    Water->Configure(Config);
+    TestEqual(TEXT("Every packet participates in neighbor handoffs"),Visited.Num(),Centers.Num());
+    TestTrue(TEXT("Real evolved wet overlap was exercised"),Handoffs>0 && Wet>0 && Evolved>0);
+    TestTrue(TEXT("Overlap depth does not reset"),MaxDepthError<1.e-6);
+    TestTrue(TEXT("Overlap current does not reset"),MaxVelocityError<1.e-6);
+    AddInfo(FString::Printf(TEXT("Futaleufu directed native handoffs: %d, packets %d, samples %lld, wet %lld, evolved %lld, maximum depth error %.9g m, velocity error %.9g m/s. No rendered, boat, route-selection or FPS acceptance."),
+        Handoffs,Visited.Num(),Samples,Wet,Evolved,MaxDepthError,MaxVelocityError));
+    return !HasAnyErrors();
+}
 #endif
