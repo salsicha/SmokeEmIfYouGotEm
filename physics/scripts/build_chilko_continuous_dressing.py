@@ -77,8 +77,8 @@ def build(runtime):
     cooked_clearance=CookedWaterClearance(mapping,terrain,grid,wet)
     origin=np.asarray(terrain['horizontal_origin_m']);chunks=[];total=0
     for chunk in terrain['chunks']:
-        corner=np.asarray(chunk['origin_m'])-[0,252]
-        rows=candidates(corner,seed_prefix='chilko-conifer-shrub-v1',probability=.55)
+        corner=np.asarray(chunk['origin_m'])-[0,triangles.span]
+        rows=candidates(corner,span=triangles.span,seed_prefix='chilko-conifer-shrub-v1',probability=.55)
         if not len(rows):continue
         xy=rows[:,:2];z=triangles.sample(xy)
         slope=terrain_support_slope(triangles.sample,xy,z)

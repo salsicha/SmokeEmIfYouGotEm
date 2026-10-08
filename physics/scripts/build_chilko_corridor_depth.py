@@ -70,11 +70,11 @@ def constrain_source_amplitude(station, amplitude, projected_station, required):
     return amplitude
 
 
-def build(terrain,profile,out,discharge=45.,roughness=.045,*,origin=None):
+def build(terrain,profile,out,discharge=45.,roughness=.045,*,origin=None,terrain_spacing_m=2.):
     out=Path(out).resolve()
     if out.exists():raise ValueError('Fresh inferred-depth profile required')
+    grid=capacity_grid(origin,terrain_spacing_m)
     model=CorridorBed(terrain,profile,discharge,roughness)
-    grid=capacity_grid(origin)
     # Exact-route normals can intersect ANOTHER bend hundreds of metres away.
     # Fit on the globally non-overlapping full-domain chart, then constrain the
     # original geographic profile at each cell's own source projection. No
@@ -93,7 +93,7 @@ def build(terrain,profile,out,discharge=45.,roughness=.045,*,origin=None):
         r=model.sample(xy);mapped=r['mapped_water']
         if mapped[:,0].any() or mapped[:,-1].any():
             raise ValueError('Mapped branches exceed depth quadrature; do not silently truncate capacity')
-        sections=EncodedSections(model,xy,origin,slope[sl])
+        sections=EncodedSections(model,xy,origin,slope[sl],terrain_spacing_m=terrain_spacing_m)
         try:
             fitted,old,new=sections.fit(discharge,roughness)
         except ValueError as error:
@@ -139,4 +139,6 @@ if __name__=='__main__':
     parser.add_argument('--discharge',type=float,default=45.,help='Construction discharge in m3/s; not measured local flow')
     parser.add_argument('--roughness',type=float,default=.045,help='Inferred Manning n, not the native friction coefficient')
     parser.add_argument('--origin',type=float,nargs=2,required=True,help='Canonical Landscape EPSG:3157 origin')
-    a=parser.parse_args();build(a.terrain,a.profile,a.out,a.discharge,a.roughness,origin=a.origin)
+    parser.add_argument('--terrain-spacing-m',type=float,choices=(1.,2.),default=2.)
+    a=parser.parse_args();build(a.terrain,a.profile,a.out,a.discharge,a.roughness,origin=a.origin,
+                              terrain_spacing_m=a.terrain_spacing_m)

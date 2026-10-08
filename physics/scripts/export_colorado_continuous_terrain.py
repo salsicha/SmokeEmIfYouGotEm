@@ -167,9 +167,11 @@ class LandscapeTriangles:
                 raise ValueError('Unsupported continuous river geographic frame')
         elif m.get('schema')!='raftsim.colorado_continuous_landscape.v1':
             raise ValueError('Unsupported common Landscape schema')
+        self.spacing=layout['spacing_m'];self.span=(VERTICES-1)*self.spacing
         if (
-                layout['vertices']!=VERTICES or layout['spacing_m']!=SPACING or
-                layout['span_m']!=SPAN or layout['height_base_m' if generic else 'height_base_ellipsoid_m']!=HEIGHT_BASE or
+                layout['vertices']!=VERTICES or isinstance(self.spacing,bool) or
+                self.spacing not in ((1.,2.) if generic else (SPACING,)) or
+                layout['span_m']!=self.span or layout['height_base_m' if generic else 'height_base_ellipsoid_m']!=HEIGHT_BASE or
                 layout['height_range_m']!=HEIGHT_RANGE):
             raise ValueError('Unsupported common Landscape layout')
         origin=np.asarray(m['horizontal_origin_m' if generic else 'horizontal_origin_epsg6404_m'],dtype=float)
@@ -185,7 +187,7 @@ class LandscapeTriangles:
             if (encoded.shape!=(VERTICES,VERTICES) or encoded.dtype.kind not in 'ui' or
                     np.any(encoded<0) or np.any(encoded>65535)):
                 raise ValueError('Invalid height samples')
-            corner=origin+np.array([index[0],index[1]+1])*SPAN
+            corner=origin+np.array([index[0],index[1]+1])*self.span
             if not np.array_equal(corner,chunk['origin_m' if generic else 'origin_epsg6404_m']):
                 raise ValueError('Chunk shifted off common geographic lattice')
             encoded_by_index[index]=encoded
@@ -218,10 +220,10 @@ class LandscapeTriangles:
         shape=xy.shape[:-1];points=xy.reshape(-1,2);result=np.full(len(points),np.nan)
         # Bound before integer conversion, including nonfinite/extreme inputs.
         finite=np.isfinite(points).all(axis=1)
-        lower=self.origin+self.index_min*SPAN
-        upper=self.origin+(self.index_max+1)*SPAN
+        lower=self.origin+self.index_min*self.span
+        upper=self.origin+(self.index_max+1)*self.span
         selected=np.flatnonzero(finite&(points>=lower).all(axis=1)&(points<=upper).all(axis=1))
-        indices=np.floor((points[selected]-self.origin)/SPAN).astype(np.int64)
+        indices=np.floor((points[selected]-self.origin)/self.span).astype(np.int64)
         # Interior queries visit one tile. An exact upper edge can belong to a
         # missing tile, so try its lower neighbours without extrapolating.
         for offset in ((0,0),(-1,0),(0,-1),(-1,-1)):
@@ -237,7 +239,7 @@ class LandscapeTriangles:
                 surface=self.by_key.get(int(keys[start]))
                 if surface is None:continue
                 corner,height=surface;take=query[start:end];p=points[take]
-                rows=(corner[1]-p[:,1])/SPACING;cols=(p[:,0]-corner[0])/SPACING
+                rows=(corner[1]-p[:,1])/self.spacing;cols=(p[:,0]-corner[0])/self.spacing
                 inside=(rows>=0)&(rows<=VERTICES-1)&(cols>=0)&(cols<=VERTICES-1)
                 if inside.any():result[take[inside]]=landscape_sample(height,rows[inside],cols[inside])
         return result.reshape(shape)

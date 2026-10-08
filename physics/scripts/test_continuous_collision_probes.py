@@ -54,6 +54,21 @@ class ChunkedCollisionProbes(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'no source terrain'): owners(points,{})
         with self.assertRaisesRegex(ValueError,'finite'): owners([[0,0,float('nan')]],{})
 
+    def test_one_metre_chunk_files_keep_every_probe_with_correct_owner(self):
+        from export_colorado_continuous_runtime import _registered_geometry
+        geometry=_registered_geometry(self.mapping,self.terrain,self.grid)
+        self.terrain.update(river_id='chilko_river_bc',landscape=dict(vertices=127,spacing_m=1.,span_m=126.))
+        self.terrain['chunks']=[dict(chunk=[x,y],world_northwest_xy_cm=[x*12600.,-(y+1)*12600.])
+            for x in range(-3,4) for y in (-1,0)]
+        indices={tuple(c['chunk']):i for i,c in enumerate(self.terrain['chunks'])}
+        with patch('continuous_collision_probes._registered_geometry',return_value=geometry):
+            receipt,_=self.write(block_cells=31)
+        assert receipt['count']==int(self.wet.sum())
+        for entry in receipt['chunks']:
+            probes=np.fromfile(ROOT/entry['file'],dtype='<f8').reshape(-1,3)
+            np.testing.assert_array_equal(owners(probes,indices,span_cm=12600.),
+                                          np.full(len(probes),indices[tuple(entry['chunk'])]))
+
     def test_reject_bad_shape_mask_duplicate_chunk_and_existing_output(self):
         self.wet[0,0]=2
         with self.assertRaisesRegex(ValueError,'Nonbinary'):self.write()

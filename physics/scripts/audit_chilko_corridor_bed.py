@@ -13,7 +13,7 @@ from shapely.geometry import LineString
 
 from chilko_corridor_terrain import CorridorTerrain
 from chilko_corridor_bed import source_water_reference
-from chilko_triangle_ownership import POLICY, preserve_triangle_support
+from chilko_triangle_ownership import support_policy as grid_support_policy, preserve_triangle_support
 from review_chilko_continuous_cook import verify_terrain_sources
 from plan_lidarbc_corridor_capture import route_xy
 from export_colorado_continuous_terrain import LandscapeTriangles, VERTICES, SPACING, sha
@@ -48,7 +48,7 @@ def audit(folder, terrain_folder, profile_folder, out):
     model=verify_terrain_sources(receipt)
     if model is None:raise ValueError('Full-route source planform required for bed audit')
     support_policy = m.get('inference_support_policy')
-    if support_policy not in (None, POLICY):
+    if support_policy not in (None, grid_support_policy(triangles.spacing)):
         raise ValueError('Unknown triangle inference-support policy')
     if (sha(source.folder/'manifest.json') != receipt['terrain_manifest_sha256'] or
             sha(profile_folder/'manifest.json') != receipt['profile_manifest_sha256'] or
@@ -72,11 +72,11 @@ def audit(folder, terrain_folder, profile_folder, out):
         with np.load(proof, allow_pickle=False) as z: r = dict(z)
         if any(a.shape != (VERTICES, VERTICES) for a in r.values()):
             raise ValueError('Source receipt shape differs from canonical lattice')
-        east, north = np.meshgrid(chunk['origin_m'][0]+np.arange(VERTICES)*SPACING,
-                                  chunk['origin_m'][1]-np.arange(VERTICES)*SPACING)
+        east, north = np.meshgrid(chunk['origin_m'][0]+np.arange(VERTICES)*triangles.spacing,
+                                  chunk['origin_m'][1]-np.arange(VERTICES)*triangles.spacing)
         xy = np.stack((east, north), axis=-1)
         if support_policy:
-            expected = preserve_triangle_support(model, xy, model.sample(xy))
+            expected = preserve_triangle_support(model, xy, model.sample(xy),spacing_m=triangles.spacing)
             for key in ('height_m', 'inferred_bed', 'inference_support_veto'):
                 if key not in r or not np.array_equal(r[key], expected[key]):
                     raise ValueError('Exported triangle-support ownership differs from source')

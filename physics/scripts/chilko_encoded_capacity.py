@@ -7,36 +7,38 @@ vertices and protection probes; a numerical row cannot silently own a bend.
 import numpy as np
 import shapely
 
-from chilko_triangle_ownership import POLICY, support_offsets
+from chilko_triangle_ownership import support_policy, support_offsets
 from export_colorado_continuous_terrain import SPACING, HEIGHT_BASE, HEIGHT_RANGE
 
 
-def capacity_grid(origin):
+def capacity_grid(origin, spacing_m=SPACING):
+    policy = support_policy(spacing_m)
     origin=np.asarray(origin,dtype=float)
     if origin.shape!=(2,) or not np.isfinite(origin).all():
         raise ValueError('Explicit finite canonical terrain origin required')
-    return dict(horizontal_origin_m=origin.tolist(),spacing_m=SPACING,
+    return dict(horizontal_origin_m=origin.tolist(),spacing_m=float(spacing_m),
         height_base_m=HEIGHT_BASE,height_range_m=HEIGHT_RANGE,encoding='uint16_nearest',
-        diagonal='SE_to_NW_in_east_north_grid',support_policy=POLICY)
+        diagonal='SE_to_NW_in_east_north_grid',support_policy=policy)
 
 
-def validate_capacity_grid(receipt,origin):
-    if receipt!=capacity_grid(origin):
+def validate_capacity_grid(receipt,origin,spacing_m=SPACING):
+    if receipt!=capacity_grid(origin,spacing_m):
         raise ValueError('Encoded capacity requires the identical canonical terrain grid and guard')
 
 
-def triangle_stencil(xy, origin):
+def triangle_stencil(xy, origin, spacing_m=SPACING):
+    support_policy(spacing_m)
     xy,origin=np.asarray(xy,dtype=float),np.asarray(origin,dtype=float)
     if xy.ndim!=3 or xy.shape[-1]!=2 or origin.shape!=(2,) or not np.isfinite(xy).all() or not np.isfinite(origin).all():
         raise ValueError('Finite row/lateral geographic queries and common grid origin required')
-    grid=(xy-origin)/SPACING;cell=np.floor(grid).astype(np.int64);f=grid-cell
+    grid=(xy-origin)/spacing_m;cell=np.floor(grid).astype(np.int64);f=grid-cell
     lower=f[...,0]+f[...,1]<=1
     offsets=np.where(lower[...,None,None],np.array([[0,0],[1,0],[0,1]]),np.array([[1,1],[0,1],[1,0]]))
     lattice=cell[...,None,:]+offsets
     weights=np.where(lower[...,None],np.stack((1-f.sum(-1),f[...,0],f[...,1]),-1),
                      np.stack((f.sum(-1)-1,1-f[...,0],1-f[...,1]),-1))
     nodes,inverse=np.unique(lattice.reshape(-1,2),axis=0,return_inverse=True)
-    return origin+nodes*SPACING,inverse.reshape(xy.shape[:-1]+(3,)),weights
+    return origin+nodes*spacing_m,inverse.reshape(xy.shape[:-1]+(3,)),weights
 
 
 def parameters(model, xy):
@@ -68,17 +70,18 @@ def inference_threshold(ground,stage,shape,eligible):
 
 
 class EncodedSections:
-    def __init__(self,model,xy,origin,slope,spacing=1.):
+    def __init__(self,model,xy,origin,slope,spacing=1.,*,terrain_spacing_m=SPACING):
+        self.terrain_grid=capacity_grid(origin,terrain_spacing_m)
         self.xy=np.asarray(xy,dtype=float);self.slope=np.asarray(slope,dtype=float);self.spacing=float(spacing)
         if (self.xy.ndim!=3 or self.slope.shape!=(len(self.xy),) or not np.isfinite(self.slope).all()
                 or np.any(self.slope<=0) or not np.isfinite(spacing) or spacing<=0):
             raise ValueError('Positive finite section slopes and quadrature spacing required')
-        self.nodes,self.indices,self.weights=triangle_stencil(self.xy,origin)
+        self.nodes,self.indices,self.weights=triangle_stencil(self.xy,origin,terrain_spacing_m)
         self.ground,self.stage,self.shape,self.station,eligible=parameters(model,self.nodes)
         _,self.query_stage,_,_,self.query_owned=parameters(model,self.xy)
         if not self.query_owned.any(axis=1).all():raise ValueError('No source-owned channel at a section')
         self.threshold=inference_threshold(self.ground,self.stage,self.shape,eligible)
-        offsets=support_offsets();self.probe_station=np.full((len(self.nodes),len(offsets)),np.nan)
+        offsets=support_offsets(terrain_spacing_m);self.probe_station=np.full((len(self.nodes),len(offsets)),np.nan)
         selected=np.flatnonzero(eligible)
         for start in range(0,len(selected),1024):
             ids=selected[start:start+1024];q=self.nodes[ids,None,:]+offsets[None,:,:]

@@ -418,7 +418,7 @@ static FAutoConsoleCommand ImportCommand(TEXT("RaftSim.ImportCatalogMap"),
 // obstacles; actual rock/bank collision continues to come from the terrain.
 static bool AddContinuousDressingChunk(UWorld* World,const TSharedPtr<FJsonObject>& Chunk,
     ALandscape* Land,const TArray<TStrongObjectPtr<UStaticMesh>>& Meshes,const RaftSimContinuousRiver::FSpec& River,
-    int32& Count,double& MaximumGroundError,TArray<FGuid>& BatchActors,FString& Error)
+    int32& Count,double& MaximumGroundError,TArray<FGuid>& BatchActors,double SpanCm,FString& Error)
 {
         if(!Chunk || !Land)return false;
         AActor* Actor=World->SpawnActor<AActor>(); if (!Actor) return false;
@@ -457,7 +457,7 @@ static bool AddContinuousDressingChunk(UWorld* World,const TSharedPtr<FJsonObjec
             FVector Position(XYZ[0]->AsNumber(),XYZ[1]->AsNumber(),XYZ[2]->AsNumber());
             if (Position.ContainsNaN()) return false;
             const FVector O=Land->GetActorLocation();
-            if(Position.X<O.X || Position.X>O.X+25200. || Position.Y<O.Y || Position.Y>O.Y+25200.)
+            if(Position.X<O.X || Position.X>O.X+SpanCm || Position.Y<O.Y || Position.Y>O.Y+SpanCm)
             {Error=TEXT("Dressing instance outside its registered terrain chunk");return false;}
             const auto Height=Land->GetHeightAtLocation(Position,EHeightfieldSource::Complex);
             if (!Height.IsSet() || FMath::Abs(double(Height.GetValue())-Position.Z)>10.)
@@ -519,13 +519,16 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
     const double Base=L->GetNumberField(River.bChilko ? TEXT("height_base_m") : TEXT("height_base_ellipsoid_m"));
     const double Range=L->GetNumberField(TEXT("height_range_m"));
     const double ActorZ=L->GetNumberField(TEXT("actor_z_cm"));
+    const double Spacing=L->GetNumberField(TEXT("spacing_m"));
+    const double Span=L->GetNumberField(TEXT("span_m"));
+    const double SpanCm=Span*100.;
     if (Size!=127 || ScaleValues.Num()!=3 ||
-        L->GetNumberField(TEXT("spacing_m"))!=2. || L->GetNumberField(TEXT("span_m"))!=252. ||
+        !(Spacing==2. || (River.bChilko && Spacing==1.)) || Span!=(Size-1)*Spacing ||
         Base!=200. || Range!=2400. || !FMath::IsFinite(Datum) || !FMath::IsFinite(ActorZ) ||
         !FMath::IsNearlyEqual(ActorZ,(Base+Range*32768./65535.-Datum)*100.,.0001))
     { Error=TEXT("Invalid shared terrain encoding"); return false; }
     const FVector Scale(ScaleValues[0]->AsNumber(),ScaleValues[1]->AsNumber(),ScaleValues[2]->AsNumber());
-    if (Scale.ContainsNaN() || !Scale.Equals(FVector(200,200,Range*100./512.*65536./65535.),.0001))
+    if (Scale.ContainsNaN() || !Scale.Equals(FVector(Spacing*100.,Spacing*100.,Range*100./512.*65536./65535.),.0001))
     { Error=TEXT("Terrain scale disagrees with encoded height"); return false; }
     const auto& Chunks=J->GetArrayField(TEXT("chunks"));
     if (Chunks.IsEmpty() || Chunks.Num()>32768) { Error=TEXT("Invalid continuous terrain extent"); return false; }
@@ -552,8 +555,8 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
         if (Indices.Contains(Input.Index) || Input.Index.X!=Index[0]->AsNumber() || Input.Index.Y!=Index[1]->AsNumber()) return false;
         Input.Location=FVector(XY[0]->AsNumber(),XY[1]->AsNumber(),ActorZ);
         if (Input.Location.ContainsNaN() ||
-            !FMath::IsNearlyEqual(Input.Location.X,Input.Index.X*25200.,.0001) ||
-            !FMath::IsNearlyEqual(Input.Location.Y,-(Input.Index.Y+1)*25200.,.0001))
+            !FMath::IsNearlyEqual(Input.Location.X,Input.Index.X*SpanCm,.0001) ||
+            !FMath::IsNearlyEqual(Input.Location.Y,-(Input.Index.Y+1)*SpanCm,.0001))
         { Error=TEXT("Chunk shifted off shared lattice"); return false; }
         const FString Name=C->GetStringField(TEXT("heightfield"));
         if (FPaths::GetCleanFilename(Name)!=Name || Name.Contains(TEXT(".."))) return false;
@@ -581,12 +584,12 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
     auto FindOwner=[&](const FVector& P)->int32
     {
         if(P.ContainsNaN() || FMath::Abs(P.X)>1.e9 || FMath::Abs(P.Y)>1.e9)return INDEX_NONE;
-        const FIntPoint Cell(FMath::FloorToInt(P.X/25200.),FMath::FloorToInt(-P.Y/25200.));
+        const FIntPoint Cell(FMath::FloorToInt(P.X/SpanCm),FMath::FloorToInt(-P.Y/SpanCm));
         for(int32 DX:{0,-1})for(int32 DY:{0,-1})
             if(const int32* I=Indices.Find(Cell+FIntPoint(DX,DY)))
             {
                 const FVector& O=Inputs[*I].Location;
-                if(P.X>=O.X && P.X<=O.X+25200. && P.Y>=O.Y && P.Y<=O.Y+25200.)return *I;
+                if(P.X>=O.X && P.X<=O.X+SpanCm && P.Y>=O.Y && P.Y<=O.Y+SpanCm)return *I;
             }
         return INDEX_NONE;
     };
@@ -809,7 +812,7 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
                 const double D=C.Heights[(Row+1)*Size+Col],E=C.Heights[(Row+1)*Size+Col+1];
                 const double Encoded=X<Y ? (1-Y)*A+X*E+(Y-X)*D : (1-X)*A+(X-Y)*B+Y*E;
                 const double Expected=(Base+Encoded*Range/65535.-Datum)*100.;
-                const FVector Position=C.Location+FVector((Col+X)*200.,(Row+Y)*200.,0);
+                const FVector Position=C.Location+FVector((Col+X)*Scale.X,(Row+Y)*Scale.Y,0);
                 const TOptional<float> Actual=Land->GetHeightAtLocation(Position,EHeightfieldSource::Complex);
                 if (!Actual.IsSet()) { Error=TEXT("Missing continuous complex collision"); return false; }
                 MaximumErrorCm=FMath::Max(MaximumErrorCm,FMath::Abs(double(Actual.GetValue())-Expected)); ++ProbeCount;
@@ -827,7 +830,7 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
             C.WetProbePath,C.WetProbeCount,C.WetProbeHash,CheckWetProbe,Error))return false;
         if(WetMaximum>10.){Error=TEXT("Continuous wet bed differs from native collision");return false;}
         if(C.Dressing && !AddContinuousDressingChunk(World,C.Dressing,Land,DressingMeshes,River,
-            InstanceCount,MaximumGroundError,BatchActors,Error))return false;
+            InstanceCount,MaximumGroundError,BatchActors,SpanCm,Error))return false;
         if(bNaniteTerrain)
         {
             // Keep the saved parent settings consistent with its spatial

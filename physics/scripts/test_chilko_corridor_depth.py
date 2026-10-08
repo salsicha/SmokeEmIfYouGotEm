@@ -16,7 +16,7 @@ class AvailableChannelDepthTests(unittest.TestCase):
                     patch('build_chilko_corridor_depth.CorridorBed',side_effect=RuntimeError('stop before sampling')) as model:
                 out=Path(tmp)/'fresh'
                 with self.assertRaisesRegex(RuntimeError,'stop before sampling'):
-                    build('terrain','profile',out,*arguments)
+                    build('terrain','profile',out,*arguments,origin=[0.,0.])
                 model.assert_called_once_with('terrain','profile',*expected)
                 self.assertFalse(out.exists())
 
