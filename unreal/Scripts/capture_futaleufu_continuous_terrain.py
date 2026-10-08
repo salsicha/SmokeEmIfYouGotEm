@@ -1,5 +1,9 @@
-"""Unsaved native environment review: no playable water, raft, or FPS acceptance."""
-import hashlib,json,os,time,traceback
+"""Unsaved native environment review: no playable water, raft, or FPS acceptance.
+
+Launch with -ExecCmds="py <this script>" so Slate ticks can finish captures.
+The synchronous -ExecutePythonScript mode exits before these callbacks run.
+"""
+import hashlib,json,os,sys,time,traceback
 from pathlib import Path
 import unreal
 root=Path(__file__).resolve().parents[2]
@@ -74,6 +78,11 @@ try:
     state['canopy_instance_count']=sum(state['canopy_instances_by_mesh'].values())
     expected_canopy=int(os.environ.get('RAFTSIM_TERRAIN_REVIEW_EXPECTED_CANOPY','0'))
     if state['canopy_instance_count']!=expected_canopy:raise RuntimeError('Saved continuous canopy count mismatch')
+    if expected_canopy:
+        sys.path.insert(0,str(Path(__file__).resolve().parent))
+        from install_futaleufu_continuous_canopy import PLAN,verify
+        state['saved_canopy_verification'],_packages=verify(actors.get_all_level_actors(),json.loads(PLAN.read_text()))
+        state['canopy_plan_sha256']=sha(PLAN)
     state['terrain_materials']={}
     for actor in resident:
         material=actor.get_editor_property('landscape_material')

@@ -71,6 +71,8 @@ def verify(actors,plan):
         for index in range(component.get_instance_count()):
             transform=component.get_instance_transform(index,True);v=transform.translation;s=transform.scale3d;q=transform.rotation
             x,y,z=float(v.x),float(v.y),float(v.z)
+            if not all(math.isfinite(a) for a in (x,y,z,s.x,s.y,s.z,q.x,q.y,q.z,q.w)):
+                raise RuntimeError('Nonfinite native canopy transform')
             yaw=math.degrees(math.atan2(2*(q.w*q.z+q.x*q.y),1-2*(q.y*q.y+q.z*q.z)))
             found=None
             for dx in (-1,0,1):
@@ -147,20 +149,22 @@ def main():
     packages.extend(f.get_package() for f in types)
     if not unreal.EditorLoadingAndSavingUtils.save_packages(packages,False):raise RuntimeError('Targeted foliage package save failed')
     if not all(sha(Path(p))==h for p,h in before.items()):raise RuntimeError('Original terrain package changed during foliage save')
-    levels.load_level('/Game/RaftSim/Maps/L_RaftSimTestTank');unreal.SystemLibrary.collect_garbage()
-    reloaded=load_world(levels);after,_=verify(reloaded,plan)
-    if not all(sha(Path(p))==h for p,h in before.items()):raise RuntimeError('Original terrain package changed after reload')
-    result=dict(schema='raftsim.futaleufu_continuous_canopy_install.v1',level=LEVEL,plan_sha256=sha(PLAN),
-        grounding_receipt_sha256=sha(GROUND),**after,original_terrain_packages_unchanged=len(before),
+    # Installation keeps native actor/component wrappers alive. Acceptance must
+    # load serialized instances in a separate editor process, not reuse that
+    # world lifetime. The fresh-process audit retains the same strict limits.
+    result=dict(schema='raftsim.futaleufu_continuous_canopy_install.v2',level=LEVEL,plan_sha256=sha(PLAN),
+        grounding_receipt_sha256=sha(GROUND),pre_save_verification=initial,original_terrain_packages_unchanged=len(before),
+        saved_reload_verified=False,next_validation='inspect_futaleufu_saved_canopy.py in a fresh editor process',
         asset_packages=[f.get_path_name() for f in types],rendered_acceptance=False,packaged_performance_acceptance=False,
         normal_playable_map_modified=False,water_or_terrain_modified=False)
     with (OUT/'integration.json').open('x') as f:json.dump(result,f,indent=2)
-    unreal.log('Continuous canopy saved and reloaded: '+json.dumps(result))
-    levels.load_level('/Game/RaftSim/Maps/L_RaftSimTestTank');unreal.SystemLibrary.collect_garbage()
+    unreal.log('Continuous canopy saved; independent reload audit required: '+json.dumps(result))
+    # Leave the owning world intact until wrappers leave scope on return.
 
 
-if OUT.exists():raise RuntimeError('Fresh installation output required; previous evidence preserved')
-try:main()
-except Exception:
-    OUT.mkdir(parents=True,exist_ok=True);(OUT/'failure.txt').write_text(traceback.format_exc());raise
-finally:unreal.SystemLibrary.quit_editor()
+if __name__=='__main__':
+    if OUT.exists():raise RuntimeError('Fresh installation output required; previous evidence preserved')
+    try:main()
+    except Exception:
+        OUT.mkdir(parents=True,exist_ok=True);(OUT/'failure.txt').write_text(traceback.format_exc());raise
+    finally:unreal.SystemLibrary.quit_editor()
