@@ -257,6 +257,12 @@ private:
      * handles. (One definition for both source files: as file-local copies
      * they collided once unity builds merged the two.) */
     static bool HasHeldGrip(const FRaftSimCrewAvatarPose& Pose) { return Pose.bShowPaddle || Pose.bOarGrip; }
+    /** This hand holds the paddle or oar: a swimmer keeps it in one hand
+     * and the other hangs open. */
+    static bool HoldsWith(const FRaftSimCrewAvatarPose& Pose, bool bLeft)
+    {
+        return HasHeldGrip(Pose) && !(bLeft ? Pose.bLeftHandFree : Pose.bRightHandFree);
+    }
     /** Each gripping forearm's direction (elbow to wrist) from the arm solve's
      * first pass, or zero; ResolveGripBar turns the grip toward it. */
     FVector GripForearmHint[2] = {FVector::ZeroVector, FVector::ZeroVector};
@@ -303,7 +309,7 @@ private:
     float MeasureMinimumPaddleFingerClosureDegrees(
         const FRaftSimCrewAvatarPose& Pose,
         bool bUpperTGrip) const;
-    float MeasureMinimumPaddleThumbClosureDegrees() const;
+    float MeasureMinimumPaddleThumbClosureDegrees(const FRaftSimCrewAvatarPose& Pose) const;
     float MeasureMaximumPaddleFingerContactErrorCm(
         const FRaftSimCrewAvatarPose& Pose) const;
     float MeasureMaximumPaddleThumbContactErrorCm(

@@ -1309,7 +1309,7 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Hos
     // 46-54 cm arm, and the hand stood off the end of a straightened arm, the
     // forearm drawn out 20 cm. The hand keeps to the shaft and at least
     // 30 cm below the T-grip.
-    if (Pose.bShowPaddle && !Pose.bOarGrip && HasHeldGrip(Pose))
+    if (Pose.bShowPaddle && !Pose.bOarGrip && HoldsWith(Pose, true) && HoldsWith(Pose, false))
     {
         const FVector Shaft = (Pose.PaddleBottomCm - Pose.PaddleTopCm).GetSafeNormal();
         const bool bLeftLower = FVector::DistSquared(Pose.LeftHandCm, Pose.PaddleTopCm) >
@@ -1341,13 +1341,16 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Hos
     // bone is a wrist pivot. Offset each wrist by its own hash-locked reference
     // palm vector so the visible knuckle plane, not the wrist, meets the
     // side-correct paddle handle.
-    const bool bPalmTarget = HasHeldGrip(Pose) || Pose.BoardingPalmSupportBlend > 0.f ||
-        Pose.BoardingPaddleGripBlend > 0.f;
+    // A free hand (a swimmer's, the paddle in the other) hangs open at its
+    // target.
+    const bool bBoardingPalm = Pose.BoardingPalmSupportBlend > 0.f || Pose.BoardingPaddleGripBlend > 0.f;
+    const bool bLeftPalmTarget = HoldsWith(Pose, true) || bBoardingPalm;
+    const bool bRightPalmTarget = HoldsWith(Pose, false) || bBoardingPalm;
     GripForearmHint[0] = GripForearmHint[1] = FVector::ZeroVector;
-    FVector LeftWristCm = bPalmTarget
+    FVector LeftWristCm = bLeftPalmTarget
         ? ResolvePaddleGripWristCm(true, Pose, Pose.LeftHandCm)
         : Pose.LeftHandCm;
-    FVector RightWristCm = bPalmTarget
+    FVector RightWristCm = bRightPalmTarget
         ? ResolvePaddleGripWristCm(false, Pose, Pose.RightHandCm)
         : Pose.RightHandCm;
     // The shoulder girdle follows a reaching arm. The rig's shoulder joint is
@@ -1544,15 +1547,18 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Hos
     // Second pass: each held grip turns about its bar toward the forearm
     // just solved (TurnGripTowardForearm), which moves its wrist; re-solve
     // the shoulders and elbows for the new wrists.
-    if (bPalmTarget && HasHeldGrip(Pose))
+    if (HoldsWith(Pose, true))
     {
         GripForearmHint[0] = (LeftWristCm - LeftElbow).GetSafeNormal();
-        GripForearmHint[1] = (RightWristCm - RightElbow).GetSafeNormal();
         LeftWristCm = ResolvePaddleGripWristCm(true, Pose, Pose.LeftHandCm);
-        RightWristCm = ResolvePaddleGripWristCm(false, Pose, Pose.RightHandCm);
         LeftArmShoulderCm = GirdleShoulder(true, LeftShoulderCm, LeftWristCm, LeftClavicleRoot);
-        RightArmShoulderCm = GirdleShoulder(false, RightShoulderCm, RightWristCm, RightClavicleRoot);
         LeftElbow = ClampElbowDrop(LeftArmShoulderCm, LeftWristCm, SolveElbow(true, LeftArmShoulderCm, LeftWristCm));
+    }
+    if (HoldsWith(Pose, false))
+    {
+        GripForearmHint[1] = (RightWristCm - RightElbow).GetSafeNormal();
+        RightWristCm = ResolvePaddleGripWristCm(false, Pose, Pose.RightHandCm);
+        RightArmShoulderCm = GirdleShoulder(false, RightShoulderCm, RightWristCm, RightClavicleRoot);
         RightElbow = ClampElbowDrop(RightArmShoulderCm, RightWristCm, SolveElbow(false, RightArmShoulderCm, RightWristCm));
     }
     // A gripping hand turns about its forearm as the forearm turns it:
@@ -1560,10 +1566,10 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Hos
     // twist and the wrist only the rest. Set on the hand alone, the whole
     // twist wrung the wrist ("the wrist seems to have an extra full or half
     // rotation", 2026-10-07).
-    const FQuat LeftHandRotation = bPalmTarget ? ResolvePaddleGripHandRotation(true, Pose) : FQuat::Identity;
-    const FQuat RightHandRotation = bPalmTarget ? ResolvePaddleGripHandRotation(false, Pose) : FQuat::Identity;
-    const float LeftTwist = bPalmTarget ? ForearmTwistDegrees(true, LeftElbow, LeftWristCm, LeftHandRotation) : 0.0f;
-    const float RightTwist = bPalmTarget ? ForearmTwistDegrees(false, RightElbow, RightWristCm, RightHandRotation) : 0.0f;
+    const FQuat LeftHandRotation = bLeftPalmTarget ? ResolvePaddleGripHandRotation(true, Pose) : FQuat::Identity;
+    const FQuat RightHandRotation = bRightPalmTarget ? ResolvePaddleGripHandRotation(false, Pose) : FQuat::Identity;
+    const float LeftTwist = bLeftPalmTarget ? ForearmTwistDegrees(true, LeftElbow, LeftWristCm, LeftHandRotation) : 0.0f;
+    const float RightTwist = bRightPalmTarget ? ForearmTwistDegrees(false, RightElbow, RightWristCm, RightHandRotation) : 0.0f;
     MaximumGripWristTwistDegrees = (1.0f - ForearmTwistShareOfGrip) * FMath::Max(FMath::Abs(LeftTwist), FMath::Abs(RightTwist));
     // The upper arm turns about its own length so the elbow hinges in the
     // plane the forearm bends in: the rig's hanging arm bends forward 40
@@ -1606,7 +1612,7 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Hos
     SetSegmentBone(TEXT("upperarm_l"), TEXT("lowerarm_l"), LeftArmShoulderCm, LeftElbow,
         UpperArmRollDegrees(true, LeftArmShoulderCm, LeftElbow, LeftWristCm));
     SetSegmentBone(TEXT("lowerarm_l"), TEXT("hand_l"), LeftElbow, LeftWristCm, ForearmTwistShareOfGrip * LeftTwist);
-    if (bPalmTarget)
+    if (bLeftPalmTarget)
     {
         SetPaddleGripHandTransform(true, Pose, LeftWristCm);
     }
@@ -1622,7 +1628,7 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Hos
     SetSegmentBone(TEXT("upperarm_r"), TEXT("lowerarm_r"), RightArmShoulderCm, RightElbow,
         UpperArmRollDegrees(false, RightArmShoulderCm, RightElbow, RightWristCm));
     SetSegmentBone(TEXT("lowerarm_r"), TEXT("hand_r"), RightElbow, RightWristCm, ForearmTwistShareOfGrip * RightTwist);
-    if (bPalmTarget)
+    if (bRightPalmTarget)
     {
         SetPaddleGripHandTransform(false, Pose, RightWristCm);
     }
@@ -1804,8 +1810,8 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Hos
     bPaddleGripActive = HasHeldGrip(Pose) && HasArticulatedPaddleGripRig();
     MaximumPaddleGripAnchorErrorCm = bPaddleGripActive
         ? FMath::Max(
-              MeasurePaddleGripAnchorErrorCm(true, Pose),
-              MeasurePaddleGripAnchorErrorCm(false, Pose))
+              HoldsWith(Pose, true) ? MeasurePaddleGripAnchorErrorCm(true, Pose) : 0.0f,
+              HoldsWith(Pose, false) ? MeasurePaddleGripAnchorErrorCm(false, Pose) : 0.0f)
         : 0.0f;
     MaximumPaddleFingerContactErrorCm = bPaddleGripActive
         ? MeasureMaximumPaddleFingerContactErrorCm(Pose)
@@ -1826,7 +1832,7 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Hos
         ? MeasureMinimumPaddleFingerClosureDegrees(Pose, false)
         : 0.0f;
     MinimumPaddleThumbClosureDegrees = bPaddleGripActive
-        ? MeasureMinimumPaddleThumbClosureDegrees()
+        ? MeasureMinimumPaddleThumbClosureDegrees(Pose)
         : 0.0f;
 }
 
@@ -1845,7 +1851,7 @@ FVector ARaftSimCC0CrewVisualActor::ResolvePaddleGripWristCm(
         return DesiredGripCm;
     }
     FRaftSimCC0GripBar Bar;
-    if (HasHeldGrip(Pose) && ResolveGripBar(bLeft, Pose, Bar))
+    if (HoldsWith(Pose, bLeft) && ResolveGripBar(bLeft, Pose, Bar))
     {
         return ResolveGripWristCm(bLeft, Bar);
     }
@@ -1855,7 +1861,7 @@ FVector ARaftSimCC0CrewVisualActor::ResolvePaddleGripWristCm(
     const FQuat TargetHandRotation = ResolvePaddleGripHandRotation(bLeft, Pose);
     const FQuat HandDelta =
         (TargetHandRotation * ReferenceHand->GetRotation().Inverse()).GetNormalized();
-    const float PalmWeight = HasHeldGrip(Pose) ? 1.f :
+    const float PalmWeight = HoldsWith(Pose, bLeft) ? 1.f : HasHeldGrip(Pose) ? 0.f :
         FMath::Clamp(Pose.BoardingPalmSupportBlend + Pose.BoardingPaddleGripBlend, 0.f, 1.f);
     return DesiredGripCm - HandDelta.RotateVector(ReferencePalmOffsetCm) * PalmWeight;
 }
@@ -1910,7 +1916,7 @@ FQuat ARaftSimCC0CrewVisualActor::ResolvePaddleGripHandRotation(
         return FQuat::Slerp(ReferenceHand->GetRotation(), SupportRotation, Pose.BoardingPalmSupportBlend).GetNormalized();
     }
     FRaftSimCC0GripBar Bar;
-    if (!ResolveGripBar(bLeft, Pose, Bar))
+    if ((HasHeldGrip(Pose) && !HoldsWith(Pose, bLeft)) || !ResolveGripBar(bLeft, Pose, Bar))
     {
         return ReferenceHand->GetRotation();
     }
@@ -1959,7 +1965,7 @@ float ARaftSimCC0CrewVisualActor::MeasureMinimumPaddleFingerClosureDegrees(
     {
         const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
         const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
-        if (IsUpperTGrip(Pose, GripCenterCm) != bUpperTGrip)
+        if (!HoldsWith(Pose, bLeft) || IsUpperTGrip(Pose, GripCenterCm) != bUpperTGrip)
         {
             continue;
         }
@@ -2005,7 +2011,7 @@ float ARaftSimCC0CrewVisualActor::MeasureMinimumPaddleFingerClosureDegrees(
         : MinimumClosureDegrees;
 }
 
-float ARaftSimCC0CrewVisualActor::MeasureMinimumPaddleThumbClosureDegrees() const
+float ARaftSimCC0CrewVisualActor::MeasureMinimumPaddleThumbClosureDegrees(const FRaftSimCrewAvatarPose& Pose) const
 {
     if (!Body)
     {
@@ -2014,6 +2020,10 @@ float ARaftSimCC0CrewVisualActor::MeasureMinimumPaddleThumbClosureDegrees() cons
     float MinimumClosureDegrees = TNumericLimits<float>::Max();
     for (const bool bLeft : {true, false})
     {
+        if (!HoldsWith(Pose, bLeft))
+        {
+            continue;
+        }
         const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
         FName ParentName(*FString::Printf(TEXT("hand_%s"), Side));
         float ChainClosureDegrees = 0.0f;
@@ -2067,9 +2077,11 @@ void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
         FMath::Clamp(Pose.FistGripBlend, 0.f, 1.f));
     for (const bool bLeft : {true, false})
     {
+        // A free hand beside one that holds the paddle stays relaxed.
+        const float HandAlpha = HasHeldGrip(Pose) && !HoldsWith(Pose, bLeft) ? 0.16f : GripAlpha;
         for (const TCHAR* Digit : CC0GripDigits)
         {
-            ApplyFingerChain(bLeft, Digit, GripAlpha);
+            ApplyFingerChain(bLeft, Digit, HandAlpha);
         }
         if (!HasHeldGrip(Pose) && Pose.BoardingPalmSupportBlend > 0.f)
         {
@@ -2172,7 +2184,7 @@ void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
     for (const bool bLeft : {true, false})
     {
         FRaftSimCC0GripBar Bar;
-        if (ResolveGripBar(bLeft, GripPose, Bar))
+        if (HoldsWith(GripPose, bLeft) && ResolveGripBar(bLeft, GripPose, Bar))
         {
             ApplyHandGripShape(bLeft, Bar);
         }

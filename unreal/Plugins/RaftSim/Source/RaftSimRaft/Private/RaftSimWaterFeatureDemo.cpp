@@ -16,6 +16,7 @@
 #include "RaftSimCameraPresentation.h"
 #include "RaftSimScreenRecorderSubsystem.h"
 #include "Camera/CameraActor.h"
+#include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -649,8 +650,20 @@ void StartWaterFeatureDemo(const TArray<FString>& Args,UWorld* World)
     if(bTop)Camera->SetActorLocation(FVector(231,1,950));
     const bool bUpstream=Demo->Kind!=TEXT("eddy") && Args.Contains(TEXT("upstream"));
     if(bUpstream)Camera->SetActorLocation(FVector(-560,-260,420));
+    // "uphigh": close over the pour-over, looking down on a raft held in the
+    // hole, at the tube the falling water takes and the crew it throws out.
+    const bool bUpHigh=Demo->Kind!=TEXT("eddy") && Args.Contains(TEXT("uphigh"));
+    if(bUpHigh)Camera->SetActorLocation(FVector(-180,-330,360));
     const FVector Focus=Demo->bCollisionControl ? FVector(-200,0,0) : Demo->Kind==TEXT("eddy") ? FVector(1600,250,0) :
-        bClose ? FVector(110,0,10) : bRaftCam ? FVector(330,0,40) : bSide ? FVector(220,0,30) : bUpstream ? FVector(230,0,30) : bTop ? FVector(230,0,0) : FVector(550,0,0);
+        bClose ? FVector(110,0,10) : bRaftCam ? FVector(330,0,40) : bSide ? FVector(220,0,30) : bUpstream ? FVector(230,0,30) :
+        bTop ? FVector(230,0,0) : bUpHigh ? FVector(260,20,10) : FVector(550,0,0);
+    // "slomo=F": the world runs at F of real time (the video is real time),
+    // to see a fall or a washout frame by frame.
+    for(const FString& Arg:Args)
+    {
+        if(Arg.StartsWith(TEXT("slomo=")))
+            UGameplayStatics::SetGlobalTimeDilation(World,FMath::Clamp(FCString::Atof(*Arg+6),.05f,1.f));
+    }
     Camera->SetActorRotation((Focus-Camera->GetActorLocation()).Rotation());
     RaftSimCameraPresentation::Configure(Camera->GetCameraComponent());World->GetFirstPlayerController()->SetViewTarget(Camera);
     Camera->GetCameraComponent()->SetFieldOfView(60.f);

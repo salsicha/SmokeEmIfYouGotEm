@@ -2713,7 +2713,8 @@ bool ARaftSimRaftActor::AdvanceIsolatedFlipDemo(float Dt, bool bPassengerWashout
         EnterCapsize(); // Real crew ejection/occupancy/rescue lifecycle.
     }
     if(bPassengerWashouts)UpdatePassengerWashouts(Dt);
-    if(RaftMode!=ERaftSimRaftMode::Upright)DriftSwimmers(Dt);
+    // As in play: a washed-out swimmer drifts with the boat still upright.
+    if(RaftMode!=ERaftSimRaftMode::Upright || !Swimmers.IsEmpty())DriftSwimmers(Dt);
     return true;
 }
 #endif
@@ -2920,6 +2921,10 @@ void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide, FName Onl
 
         if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmer.PassengerId))
         {
+            // The body as it sat when it went over: the rag doll tumbles out
+            // from there (BeginRagdollFall below).
+            const FTransform ReleaseWorld = Avatar->GetActorTransform();
+            const FRaftSimCrewAvatarPose ReleasePose = Avatar->GetPublishedCrewPose();
             // Ejection must not turn the swimmer toward world +X while the
             // detached guide camera retains its world heading. Keep heading,
             // but release seated/capsize roll and pitch for the authored swim.
@@ -2961,6 +2966,27 @@ void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide, FName Onl
                     Avatar->SetActorLocation(Swimmers.Last().SwimmerWorldPositionMeters * kCmPerM);
                 }
             }
+            // Thrown out (a washout, a capsize), the body tumbles as a rag
+            // doll, a hand on its paddle, up over the tube and into the water
+            // where the swimmer is: thrown up and out on top of the boat's own
+            // motion. A placed drill swimmer (ForceCrewOverboardForTesting)
+            // just swims.
+            const FVector Out(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+            const TWeakObjectPtr<URaftSimChronoRuntimeAdapter> WeakAdapter = RaftAdapter;
+            if (PhysicalRelease) Avatar->BeginRagdollFall(ReleaseWorld, ReleasePose,
+                Swimmers.Last().SwimmerDriftVelocityMetersPerSecond * kCmPerM + Out * 120.0 + FVector(0.0, 0.0, 150.0),
+                [WeakAdapter](const FVector& PointCm, float& OutSurfaceCm, FVector& OutVelocityCmPerSecond)
+                {
+                    FRaftSimFlexUniformWater Water;
+                    const URaftSimChronoRuntimeAdapter* Adapter = WeakAdapter.Get();
+                    if (!Adapter || !Adapter->SampleBoundFlexibleWater(PointCm, Water) || !Water.bWet)
+                    {
+                        return false;
+                    }
+                    OutSurfaceCm = float(Water.SurfaceHeightM * 100.0);
+                    OutVelocityCmPerSecond = Water.VelocityMps * 100.0;
+                    return true;
+                });
         }
     }
     for(int32 I=PreviousSwimmerCount;I<Swimmers.Num();++I)
@@ -3080,7 +3106,10 @@ void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
             bTarget && RescueInteraction.Phase == ERaftSimRescueInteractionPhase::ReadyForReentry
                 ? ERaftSimCrewAvatarAction::Reentry
                 : (bOnRope ? ERaftSimCrewAvatarAction::RopeTow : ERaftSimCrewAvatarAction::Swimming);
-        if(auto* Avatar=FindAvatar(Swimmers[Index].PassengerId))
+        // A body still tumbling out of the boat poses itself; a rope or the
+        // tube takes over from it.
+        if(auto* Avatar=FindAvatar(Swimmers[Index].PassengerId);
+            Avatar && !(Avatar->IsRagdolling() && DriftAction == ERaftSimCrewAvatarAction::Swimming))
             Avatar->SetAvatarAction(DriftAction);
         FVector HullTarget;
         if(!bOnRope && GetSwimmerTubeTarget(Swimmers[Index].PassengerId,Swimmers[Index].SwimmerWorldPositionMeters,HullTarget))
@@ -3092,7 +3121,13 @@ void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
                 Swimmers[Index].SwimmerWorldPositionMeters=HullTarget;
         }
         if (!SubmergedLab) AttachSwimmerToWaterSurface(Swimmers[Index]);
-        if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmers[Index].PassengerId))
+        if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmers[Index].PassengerId);
+            Avatar && Avatar->IsRagdolling() && DriftAction == ERaftSimCrewAvatarAction::Swimming)
+        {
+            // Still tumbling: the body follows this position on its own.
+            Avatar->SetRagdollAnchor(Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
+        }
+        else if (Avatar)
         {
             Avatar->SetActorLocation(Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
             Avatar->SetAvatarAction(DriftAction);

@@ -69,7 +69,9 @@ bool FRaftSimPassengerWashoutTest::RunTest(const FString&)
     TestEqual(TEXT("boat need not flip"),Raft->GetRaftMode(),ERaftSimRaftMode::Upright);
     TestTrue(TEXT("ejection cannot alter boat pose"),BoatBefore.Equals(Raft->GetActorTransform()));
     TestNull(TEXT("swimmer detached from seat"),Passenger->GetAttachParentActor());
-    TestEqual(TEXT("swimming animation"),Passenger->GetAvatarAction(),ERaftSimCrewAvatarAction::Swimming);
+    // Thrown into the water: tumbling (a rag doll, 2026-10-08), then swimming.
+    TestTrue(TEXT("tumbling into the water, then swimming"),Passenger->GetAvatarAction()==ERaftSimCrewAvatarAction::Falling||
+        Passenger->GetAvatarAction()==ERaftSimCrewAvatarAction::Swimming);
     const auto& Swimmer=Raft->Swimmers[0];
     TestTrue(TEXT("release retains actual height before buoyant resurfacing"),FMath::IsNearlyEqual(Swimmer.SwimmerWorldPositionMeters.Z,Release.Z));
     TestTrue(TEXT("water supplies release momentum"),Swimmer.SwimmerDriftVelocityMetersPerSecond.Y>1.);

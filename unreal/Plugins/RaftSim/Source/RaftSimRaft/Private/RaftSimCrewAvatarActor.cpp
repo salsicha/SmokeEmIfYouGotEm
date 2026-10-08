@@ -4,6 +4,7 @@ CSV_DEFINE_CATEGORY(RaftSimTickCrew,true);
 #include "RaftSimCrewRoster.h"
 #include "RaftSimAccessoryMesh.h"
 #include "RaftSimCrewBoarding.h"
+#include "RaftSimCrewRagdoll.h"
 
 #include "RaftSimCC0CrewVisualActor.h"
 #include "RaftSimMannyCrewVisualActor.h"
@@ -77,6 +78,8 @@ void PrepareStartupCrewMaterials(ARaftSimCrewAvatarActor* Avatar)
 }
 
 constexpr float kBaseRadiusCm = 50.0f;
+// A body that has stopped tumbling eases into the swim stroke over this long.
+constexpr float RagdollExitSeconds = 0.6f;
 const FVector kProductionSeatedPelvisReferenceExtentCm(15.0f, 23.0f, 15.0f);
 constexpr float kProductionHipThighBridgeStartFraction = -0.15f;
 constexpr float kProductionHipThighBridgeEndFraction = 1.06f;
@@ -1276,6 +1279,31 @@ void ApplyMirroredPaddleGrip(
 }
 }
 
+FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::BlendPoses(
+    const FRaftSimCrewAvatarPose& A, const FRaftSimCrewAvatarPose& B, float Alpha)
+{
+    const float T = FMath::Clamp(Alpha, 0.0f, 1.0f);
+    FRaftSimCrewAvatarPose Out = T < 0.5f ? A : B;
+    Out.TorsoCenterCm = FMath::Lerp(A.TorsoCenterCm, B.TorsoCenterCm, T);
+    Out.TorsoRotation = FQuat::Slerp(A.TorsoRotation.Quaternion(), B.TorsoRotation.Quaternion(), T).Rotator();
+    Out.TorsoTwistDegrees = FMath::Lerp(A.TorsoTwistDegrees, B.TorsoTwistDegrees, T);
+    Out.HeadCenterCm = FMath::Lerp(A.HeadCenterCm, B.HeadCenterCm, T);
+    Out.LeftShoulderCm = FMath::Lerp(A.LeftShoulderCm, B.LeftShoulderCm, T);
+    Out.RightShoulderCm = FMath::Lerp(A.RightShoulderCm, B.RightShoulderCm, T);
+    Out.LeftHandCm = FMath::Lerp(A.LeftHandCm, B.LeftHandCm, T);
+    Out.RightHandCm = FMath::Lerp(A.RightHandCm, B.RightHandCm, T);
+    Out.LeftHipCm = FMath::Lerp(A.LeftHipCm, B.LeftHipCm, T);
+    Out.RightHipCm = FMath::Lerp(A.RightHipCm, B.RightHipCm, T);
+    Out.LeftKneeCm = FMath::Lerp(A.LeftKneeCm, B.LeftKneeCm, T);
+    Out.RightKneeCm = FMath::Lerp(A.RightKneeCm, B.RightKneeCm, T);
+    Out.LeftFootCm = FMath::Lerp(A.LeftFootCm, B.LeftFootCm, T);
+    Out.RightFootCm = FMath::Lerp(A.RightFootCm, B.RightFootCm, T);
+    Out.PaddleTopCm = FMath::Lerp(A.PaddleTopCm, B.PaddleTopCm, T);
+    Out.PaddleBottomCm = FMath::Lerp(A.PaddleBottomCm, B.PaddleBottomCm, T);
+    Out.FistGripBlend = FMath::Lerp(A.FistGripBlend, B.FistGripBlend, T);
+    return Out;
+}
+
 FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
     ERaftSimCrewAvatarAction Action,
     float NormalizedPhase,
@@ -1529,7 +1557,22 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             Pose.RightKneeCm = FVector(-48.0f, 13.0f, 7.0f - 8.0f * Wave);
             Pose.LeftFootCm = FVector(-75.0f, -14.0f, 8.0f);
             Pose.RightFootCm = FVector(-75.0f, 14.0f, 8.0f);
-            Pose.bShowPaddle = false;
+            {
+                // A swimmer keeps their paddle ("they should keep one hand
+                // on the shaft of their paddles", 2026-10-08): the hand that
+                // held its shaft in the boat holds it alongside, the blade
+                // trailing back and out past the feet; the other hand strokes.
+                const bool bHoldLeft = Side < 0.0f;
+                const float Out = bHoldLeft ? -1.0f : 1.0f;
+                FVector& Held = bHoldLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+                Held = FVector(18.0f + 6.0f * Wave, Out * 32.0f, 6.0f);
+                const FVector Trailing = FVector(-0.92f, Out * 0.38f, -0.08f).GetSafeNormal();
+                Pose.PaddleTopCm = Held - Trailing * 45.0f;
+                Pose.PaddleBottomCm = Pose.PaddleTopCm + Trailing * 120.0f;
+                Pose.bShowPaddle = true;
+                Pose.bLeftHandFree = !bHoldLeft;
+                Pose.bRightHandFree = bHoldLeft;
+            }
             break;
         case ERaftSimCrewAvatarAction::RopeTow:
         {
@@ -1642,8 +1685,15 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
         const FVector RigidDelta = HorizontalAxis * HorizontalReach + FVector(0, 0, Height);
         const FVector RigidAxis = RigidDelta / ShaftLengthCm;
         Pose.PaddleBottomCm = Pose.PaddleTopCm + RigidDelta;
-        Pose.LeftHandCm = Pose.PaddleTopCm + RigidAxis * LeftGripDistance;
-        Pose.RightHandCm = Pose.PaddleTopCm + RigidAxis * RightGripDistance;
+        // Only a holding hand rides the shaft.
+        if (!Pose.bLeftHandFree)
+        {
+            Pose.LeftHandCm = Pose.PaddleTopCm + RigidAxis * LeftGripDistance;
+        }
+        if (!Pose.bRightHandFree)
+        {
+            Pose.RightHandCm = Pose.PaddleTopCm + RigidAxis * RightGripDistance;
+        }
     }
     if (UsesWaistPivotedUpperBodyArticulation(Action))
     {
@@ -1860,6 +1910,22 @@ void ARaftSimCrewAvatarActor::Tick(float DeltaSeconds)
 {
     CSV_SCOPED_TIMING_STAT(RaftSimTickCrew,Tick);
     Super::Tick(DeltaSeconds);
+    if (Ragdoll)
+    {
+        Ragdoll->Advance(DeltaSeconds, RagdollAnchorCm, RagdollWater);
+        if (Ragdoll->IsSettled())
+        {
+            EndRagdoll();
+        }
+        else
+        {
+            FTransform BodyRoot;
+            Ragdoll->Read(BodyRoot, ExternalPose);
+            bHasExternalPose = true;
+            SetActorTransform(BodyRoot);
+        }
+    }
+    RagdollExitBlend = FMath::Min(1.0f, RagdollExitBlend + DeltaSeconds / RagdollExitSeconds);
     UpdatePfdMaterialResponse(DeltaSeconds);
     const float CyclesPerSecond = CurrentAction == ERaftSimCrewAvatarAction::Swimming ? 0.8f
         : (CurrentAction == ERaftSimCrewAvatarAction::RopeTow ? 0.45f : 1.25f);
@@ -2891,10 +2957,82 @@ FRaftSimCrewAvatarPose ARaftSimCrewAvatarActor::BuildHighSideTransferPose(const 
     return Pose;
 }
 
+bool ARaftSimCrewAvatarActor::BeginRagdollFall(const FTransform& ReleaseWorld, const FRaftSimCrewAvatarPose& ReleasePose,
+    const FVector& VelocityCmPerSecond, TFunction<bool(const FVector&, float&, FVector&)> Water)
+{
+    if (!bVisualBuilt || (bGuide && bFirstPersonView))
+    {
+        return false;
+    }
+    // A tumble of its own each time: a turn about all three axes, seeded by
+    // who falls and when.
+    FRandomStream Random(int32(GetTypeHash(GetName()) ^ uint32(GetWorld() ? GetWorld()->GetTimeSeconds() * 1000.0 : 0.0)));
+    const FVector Spin(Random.FRandRange(-3.0f, 3.0f), Random.FRandRange(-3.0f, 3.0f), Random.FRandRange(-1.5f, 1.5f));
+    Ragdoll = MakeShared<FRaftSimCrewRagdoll>();
+    Ragdoll->Begin(ReleaseWorld, ReleasePose, VelocityCmPerSecond, Spin);
+    RagdollWater = MoveTemp(Water);
+    RagdollAnchorCm = GetActorLocation();
+    RagdollExitBlend = 1.0f;
+    FTransform BodyRoot;
+    Ragdoll->Read(BodyRoot, ExternalPose);
+    bHasExternalPose = true;
+    SetActorTransform(BodyRoot);
+    SetAvatarAction(ERaftSimCrewAvatarAction::Falling);
+    return true;
+}
+
+void ARaftSimCrewAvatarActor::EndRagdoll()
+{
+    if (!Ragdoll)
+    {
+        return;
+    }
+    FTransform BodyRoot;
+    FRaftSimCrewAvatarPose Last;
+    Ragdoll->Read(BodyRoot, Last);
+    // Swim from where the body lies: level on the water, facing the way the
+    // head points. Its last pose, seen from there, blends into the stroke.
+    const FTransform Swim(FRotationMatrix::MakeFromX(Ragdoll->GetHeading()).ToQuat(), RagdollAnchorCm);
+    const auto Into = [&BodyRoot, &Swim](const FVector& LocalCm) { return Swim.InverseTransformPosition(BodyRoot.TransformPosition(LocalCm)); };
+    RagdollExitPose = Last;
+    RagdollExitPose.TorsoCenterCm = Into(Last.TorsoCenterCm);
+    RagdollExitPose.TorsoRotation = (Swim.GetRotation().Inverse() * BodyRoot.GetRotation()).Rotator();
+    RagdollExitPose.HeadCenterCm = Into(Last.HeadCenterCm);
+    RagdollExitPose.LeftShoulderCm = Into(Last.LeftShoulderCm);
+    RagdollExitPose.RightShoulderCm = Into(Last.RightShoulderCm);
+    RagdollExitPose.LeftHandCm = Into(Last.LeftHandCm);
+    RagdollExitPose.RightHandCm = Into(Last.RightHandCm);
+    RagdollExitPose.LeftHipCm = Into(Last.LeftHipCm);
+    RagdollExitPose.RightHipCm = Into(Last.RightHipCm);
+    RagdollExitPose.LeftKneeCm = Into(Last.LeftKneeCm);
+    RagdollExitPose.RightKneeCm = Into(Last.RightKneeCm);
+    RagdollExitPose.LeftFootCm = Into(Last.LeftFootCm);
+    RagdollExitPose.RightFootCm = Into(Last.RightFootCm);
+    RagdollExitPose.PaddleTopCm = Into(Last.PaddleTopCm);
+    RagdollExitPose.PaddleBottomCm = Into(Last.PaddleBottomCm);
+    Ragdoll.Reset();
+    RagdollWater = nullptr;
+    ClearExternalPose();
+    RagdollExitBlend = 0.0f;
+    SetActorTransform(Swim);
+    SetAvatarAction(ERaftSimCrewAvatarAction::Swimming);
+}
+
 void ARaftSimCrewAvatarActor::SetAvatarAction(
     ERaftSimCrewAvatarAction NewAction,
     float Intensity)
 {
+    // Anything else (a rope, reseating, boarding) takes over from a tumble.
+    if (Ragdoll && NewAction != ERaftSimCrewAvatarAction::Falling)
+    {
+        Ragdoll.Reset();
+        RagdollWater = nullptr;
+        ClearExternalPose();
+    }
+    if (NewAction != ERaftSimCrewAvatarAction::Swimming)
+    {
+        RagdollExitBlend = 1.0f;
+    }
     if (!GetAttachParentActor() || NewAction == ERaftSimCrewAvatarAction::Swimming ||
         NewAction == ERaftSimCrewAvatarAction::Falling || NewAction == ERaftSimCrewAvatarAction::Reentry ||
         NewAction == ERaftSimCrewAvatarAction::RopeTow)
@@ -2906,17 +3044,15 @@ void ARaftSimCrewAvatarActor::SetAvatarAction(
         AnimationPhase = WrapNormalizedPhase(AnimationPhaseOffset);
     }
     ActionIntensity = FMath::Clamp(Intensity, 0.15f, 2.0f);
-    if (NewAction == ERaftSimCrewAvatarAction::Swimming || NewAction == ERaftSimCrewAvatarAction::RopeTow)
+    // Thrown into the river (Falling) is as soaked as swimming in it.
+    if (NewAction == ERaftSimCrewAvatarAction::Swimming || NewAction == ERaftSimCrewAvatarAction::RopeTow ||
+        NewAction == ERaftSimCrewAvatarAction::Falling)
     {
         PfdPresentationWetness = FMath::Max(PfdPresentationWetness, 0.84f);
     }
     else if (NewAction == ERaftSimCrewAvatarAction::Reentry)
     {
         PfdPresentationWetness = FMath::Max(PfdPresentationWetness, 0.70f);
-    }
-    else if (NewAction == ERaftSimCrewAvatarAction::Falling)
-    {
-        PfdPresentationWetness = FMath::Max(PfdPresentationWetness, 0.52f);
     }
     ApplyPfdMaterialWetness();
     if (bVisualBuilt)
@@ -3168,17 +3304,14 @@ void ARaftSimCrewAvatarActor::UpdatePfdMaterialResponse(float DeltaSeconds)
             0.0f,
             0.52f);
     }
-    if (CurrentAction == ERaftSimCrewAvatarAction::Swimming || CurrentAction == ERaftSimCrewAvatarAction::RopeTow)
+    if (CurrentAction == ERaftSimCrewAvatarAction::Swimming || CurrentAction == ERaftSimCrewAvatarAction::RopeTow ||
+        CurrentAction == ERaftSimCrewAvatarAction::Falling)
     {
         TargetWetness = FMath::Max(TargetWetness, 0.84f);
     }
     else if (CurrentAction == ERaftSimCrewAvatarAction::Reentry)
     {
         TargetWetness = FMath::Max(TargetWetness, 0.70f);
-    }
-    else if (CurrentAction == ERaftSimCrewAvatarAction::Falling)
-    {
-        TargetWetness = FMath::Max(TargetWetness, 0.52f);
     }
 
     const float InterpSpeed = TargetWetness > PfdPresentationWetness
@@ -4387,8 +4520,14 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& AuthoredPo
         CurrentAction == ERaftSimCrewAvatarAction::ThrowLine ||
         CurrentAction == ERaftSimCrewAvatarAction::HaulLine ||
         CurrentAction == ERaftSimCrewAvatarAction::ReachRescue ||
+        CurrentAction == ERaftSimCrewAvatarAction::Falling ||
         (CurrentAction == ERaftSimCrewAvatarAction::Reentry && BoardingPoseAlpha < 0.f));
     FRaftSimCrewAvatarPose Pose = bExternal ? ExternalPose : AuthoredPose;
+    // A body that has stopped tumbling eases from where it lay into the stroke.
+    if (CurrentAction == ERaftSimCrewAvatarAction::Swimming && RagdollExitBlend < 1.0f)
+    {
+        Pose = URaftSimCrewAvatarPoseLibrary::BlendPoses(RagdollExitPose, Pose, FMath::SmoothStep(0.0f, 1.0f, RagdollExitBlend));
+    }
     if (bCrewTransfer)
     {
         // Root relocation carries body, PPE and paddle together; the leap

@@ -734,7 +734,7 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
         ERaftSimCrewAvatarAction::ForwardStroke, 0.25f, -1);
     const FRaftSimCrewAvatarPose StarboardForward = URaftSimCrewAvatarPoseLibrary::EvaluatePose(
         ERaftSimCrewAvatarAction::ForwardStroke, 0.25f, 1);
-    TestFalse(TEXT("swimming hides the paddle"), Swim.bShowPaddle);
+    TestTrue(TEXT("a swimmer keeps the paddle in one hand"), Swim.bShowPaddle && Swim.bLeftHandFree != Swim.bRightHandFree);
     TestTrue(TEXT("high-side retains the emergency paddle"), HighSide.bShowPaddle);
     TestTrue(
         TEXT("high-side keeps both hands on the paddle shaft"),
@@ -1412,9 +1412,9 @@ bool FRaftSimM5StartRescueCommand::Update()
         CC0BodyCount,
         bExpectCC0Roster ? 5 : 0);
     Test->TestEqual(
-        TEXT("four seated CC0 paddlers retain active grips while one forced swimmer releases"),
+        TEXT("four seated CC0 paddlers keep their grips and the forced swimmer keeps hold of the paddle"),
         CC0ActivePaddleGripCount,
-        bExpectCC0Roster ? 4 : 0);
+        bExpectCC0Roster ? 5 : 0);
     int32 MetaHumanBodyCount = 0;
     for (TActorIterator<ARaftSimMetaHumanCrewVisualActor> It(GetM5GameWorld()); It; ++It)
     {
@@ -1535,7 +1535,9 @@ bool FRaftSimM5StartRescueCommand::Update()
                 *It->GetName(),
                 PfdWetness),
             PfdWetness >= 0.0f && PfdWetness <= 0.84f);
-        if (It->GetAvatarAction() == ERaftSimCrewAvatarAction::Swimming)
+        // Thrown out, a swimmer first tumbles (Falling) and then swims.
+        if (It->GetAvatarAction() == ERaftSimCrewAvatarAction::Swimming ||
+            It->GetAvatarAction() == ERaftSimCrewAvatarAction::Falling)
         {
             ++SwimmingPfdCount;
             Test->TestTrue(

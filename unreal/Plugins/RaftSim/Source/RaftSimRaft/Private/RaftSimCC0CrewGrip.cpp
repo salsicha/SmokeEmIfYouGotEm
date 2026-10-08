@@ -787,6 +787,10 @@ float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleFingerContactErrorCm(const
     for (const bool bLeft : {true, false})
     {
         FRaftSimCC0GripBar Bar;
+        if (!HoldsWith(Pose, bLeft))
+        {
+            continue;
+        }
         if (!ResolveGripBar(bLeft, Pose, Bar))
         {
             return TNumericLimits<float>::Max();
@@ -826,6 +830,10 @@ float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleThumbContactErrorCm(const 
     for (const bool bLeft : {true, false})
     {
         FRaftSimCC0GripBar Bar;
+        if (!HoldsWith(Pose, bLeft))
+        {
+            continue;
+        }
         if (!ResolveGripBar(bLeft, Pose, Bar))
         {
             return TNumericLimits<float>::Max();
@@ -862,6 +870,10 @@ void ARaftSimCC0CrewVisualActor::MeasurePaddleGripOrientation(
     }
     for (const bool bLeft : {true, false})
     {
+        if (!HoldsWith(Pose, bLeft))
+        {
+            continue;
+        }
         FVector Wrist, Fingers, Thumb, Palm;
         float Handedness = 1.0f;
         FRaftSimCC0GripBar Bar;

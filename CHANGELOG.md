@@ -99,6 +99,34 @@ All notable changes to this project are recorded here, newest first. Versioning 
       the test hole headless: drifting in, backwards, paddling, side-on and
       high-siding. `-RaftSimHoleSweep` reports the same five across hole
       sizes instead.
+- Crew thrown out of the raft fall as rag dolls (2026-10-08):
+  - **Rag doll** (`RaftSimCrewRagdoll.{h,cpp}`): a crew member washed out or
+    thrown out in a flip tumbles out of the boat as a loose body. It is a
+    point-and-bone body, with a stiff torso and head and limbs that fold
+    only as far as real joints do. It starts from the pose they were sitting
+    in and is thrown up and out over the tube. It falls, splashes into the
+    water and is dragged by it. The PFD floats it chest up at the surface,
+    where it settles and blends into the swim within about 1 to 4 seconds.
+
+    It keeps hold of its paddle throughout. The lower hand, the one on the
+    shaft, never lets go; the paddle swings from it with its own weight and
+    drag.
+
+    It is presentation only: gameplay's swimmer still decides where the
+    swimmer is, and the body is pulled toward that point. The forced
+    overboard drill still swims straight away.
+  - **Swimmers keep their paddles** in the hand that held the shaft; the
+    other hand strokes. Grips are now solved per hand, so a free hand opens
+    while the other still wraps the shaft.
+  - **Test tank:** an `uphigh` camera above and behind the downstream tube,
+    and `slomo=F` to run the scene slowed down.
+  - **Tests:** `RaftSim.Crew.RagdollFall` throws a paddler out over each side
+    and checks:
+    - the body rises before it falls;
+    - the hand stays on the shaft to within 1 cm;
+    - its bones keep their lengths;
+    - it floats chest at the surface by four seconds, where gameplay has
+      the swimmer.
 - Crew, gear and raft review fixes (2026-10-07):
   - **Hand grips rebuilt** (`RaftSimCC0CrewGrip.cpp`): every hold is solved
     against the bar it holds. The palm faces the T-grip crossbar or shaft,

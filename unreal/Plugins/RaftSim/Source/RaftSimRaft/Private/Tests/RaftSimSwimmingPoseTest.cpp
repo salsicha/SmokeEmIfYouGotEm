@@ -23,7 +23,14 @@ bool FRaftSimSwimmingPoseTest::RunTest(const FString&)
             TestTrue(TEXT("swimming long axis is near horizontal"), FMath::Abs(TorsoLongAxis.Z) < .05);
             TestTrue(TEXT("neck points toward the head rather than the feet"),
                 FVector::DotProduct(Pose.HeadCenterCm - Pose.TorsoCenterCm, TorsoLongAxis) > 25.);
-            TestFalse(TEXT("swimming does not retain a paddle"), Pose.bShowPaddle);
+            // A swimmer keeps their paddle in the hand that held its shaft
+            // in the boat (2026-10-08); the other hand strokes.
+            TestTrue(TEXT("a swimmer keeps their paddle in one hand"),
+                Pose.bShowPaddle && Pose.bLeftHandFree != Pose.bRightHandFree &&
+                Pose.bLeftHandFree == (Side > 0));
+            TestTrue(TEXT("the holding hand is on the shaft"),
+                FMath::PointDistToSegment(Pose.bLeftHandFree ? Pose.RightHandCm : Pose.LeftHandCm,
+                    Pose.PaddleTopCm, Pose.PaddleBottomCm) < 0.001);
             const auto Wrapped = URaftSimCrewAvatarPoseLibrary::EvaluatePose(
                 ERaftSimCrewAvatarAction::Swimming, Phase + 1.f, Side);
             TestTrue(TEXT("swimming torso and head loop continuously"),

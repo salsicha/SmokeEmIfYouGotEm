@@ -22,9 +22,10 @@ bool FRaftSimRigidCrewPaddleTest::RunTest(const FString&)
                 ++VisiblePoses;
                 TestTrue(TEXT("visible shaft is rigid through the entire action cycle"),
                     FMath::Abs(FVector::Distance(Pose.PaddleTopCm, Pose.PaddleBottomCm) - 120.0) < 0.0001);
-                TestTrue(TEXT("both hands remain on the finite shaft, not its extended line"),
-                    FMath::PointDistToSegment(Pose.LeftHandCm, Pose.PaddleTopCm, Pose.PaddleBottomCm) < 0.0001 &&
-                    FMath::PointDistToSegment(Pose.RightHandCm, Pose.PaddleTopCm, Pose.PaddleBottomCm) < 0.0001);
+                // A swimmer holds it in one hand; every holding hand is on it.
+                TestTrue(TEXT("every holding hand remains on the finite shaft, not its extended line"),
+                    (Pose.bLeftHandFree || FMath::PointDistToSegment(Pose.LeftHandCm, Pose.PaddleTopCm, Pose.PaddleBottomCm) < 0.0001) &&
+                    (Pose.bRightHandFree || FMath::PointDistToSegment(Pose.RightHandCm, Pose.PaddleTopCm, Pose.PaddleBottomCm) < 0.0001));
                 TestTrue(TEXT("blade remains outboard of its own seat"), Pose.PaddleBottomCm.Y * Side > 0);
                 const auto Wrapped = URaftSimCrewAvatarPoseLibrary::EvaluatePose(Action, Phase + 1.0f, Side);
                 TestTrue(TEXT("rigid constraint preserves phase periodicity"),
@@ -32,7 +33,7 @@ bool FRaftSimRigidCrewPaddleTest::RunTest(const FString&)
             }
         }
     }
-    TestEqual(TEXT("eight paddle actions, both sides, 101 phases"), VisiblePoses, 8 * 2 * 101);
+    TestEqual(TEXT("nine paddle actions (a swimmer keeps theirs), both sides, 101 phases"), VisiblePoses, 9 * 2 * 101);
     for (int32 Side : {-1, 1})
     {
         const auto Idle = URaftSimCrewAvatarPoseLibrary::EvaluatePose(ERaftSimCrewAvatarAction::SeatedIdle, 0, Side);

@@ -13,6 +13,7 @@ class UChildActorComponent;
 class UProceduralMeshComponent;
 class USceneComponent;
 class UStaticMeshComponent;
+class FRaftSimCrewRagdoll;
 
 /** Project-owned articulated animation states; no third-party character asset is required. */
 UENUM(BlueprintType)
@@ -106,6 +107,10 @@ struct FRaftSimCrewAvatarPose
     FVector RightOarAxis = FVector::RightVector;
     /** Closed fists without a paddle: rope, PFD shoulder straps, perimeter line. */
     float FistGripBlend = 0.f;
+    /** One hand off the paddle: a swimmer, or a body thrown out of the
+     * raft, keeps it in the other. The free hand hangs open. */
+    bool bLeftHandFree = false;
+    bool bRightHandFree = false;
 };
 
 UCLASS()
@@ -124,6 +129,10 @@ public:
         int32 SeatSide,
         bool bFirstPersonGuide = false
     );
+
+    /** A blended from (0) to B (1): every joint and the paddle eased, the
+     * torso turned the shortest way; flags taken from the nearer pose. */
+    static FRaftSimCrewAvatarPose BlendPoses(const FRaftSimCrewAvatarPose& A, const FRaftSimCrewAvatarPose& B, float Alpha);
 
     /** Small repeatable timing error that keeps a commanded crew coordinated but not cloned. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
@@ -231,6 +240,23 @@ public:
     void SetExternalPose(const FRaftSimCrewAvatarPose& Pose, bool bApplyNow = false);
     void ClearExternalPose();
     bool HasExternalPose() const { return bHasExternalPose; }
+
+    /**
+     * Thrown out of the raft: from the pose held at release (ReleaseWorld,
+     * ReleasePose) the body tumbles as a rag doll, one hand keeping its
+     * paddle, until it floats, then swims (FRaftSimCrewRagdoll). Water: the
+     * water's surface (cm) and velocity (cm/s) at a world point. False
+     * where it does not: the guide seen through their own eyes keeps the
+     * plain swim, since the camera rides their head.
+     */
+    bool BeginRagdollFall(const FTransform& ReleaseWorld, const FRaftSimCrewAvatarPose& ReleasePose,
+        const FVector& VelocityCmPerSecond, TFunction<bool(const FVector&, float&, FVector&)> Water);
+    bool IsRagdolling() const { return Ragdoll.IsValid(); }
+    /** Where gameplay has this swimmer; the tumbling body follows it. */
+    void SetRagdollAnchor(const FVector& AnchorCm) { RagdollAnchorCm = AnchorCm; }
+    /** Stop tumbling and swim from where the body lies. */
+    void EndRagdoll();
+    const FRaftSimCrewRagdoll* GetRagdoll() const { return Ragdoll.Get(); }
 
     /**
      * Hides this avatar's head and helmet so a first-person camera can sit
@@ -462,6 +488,14 @@ private:
     bool bHasRenderedPose = false;
     FRaftSimCrewAvatarPose ExternalPose;
     bool bHasExternalPose = false;
+    // Thrown out of the raft (BeginRagdollFall): the tumbling body, the
+    // water it falls into and the gameplay position it follows; then its
+    // last pose blending into the swim stroke.
+    TSharedPtr<FRaftSimCrewRagdoll> Ragdoll;
+    TFunction<bool(const FVector&, float&, FVector&)> RagdollWater;
+    FVector RagdollAnchorCm = FVector::ZeroVector;
+    FRaftSimCrewAvatarPose RagdollExitPose;
+    float RagdollExitBlend = 1.0f;
     struct FGroundedFootPlacement
     {
         bool bBound = false;
