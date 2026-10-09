@@ -15,6 +15,7 @@ from build_colorado_catalog_evidence import sha
 from export_colorado_continuous_terrain import LandscapeTriangles
 from export_colorado_continuous_runtime import registered_queries
 from review_colorado_catalog_cook import compare, load_frame, screen
+from native_frame_io import native_frame_paths
 from solver_face_discharge import face_discharge
 from chilko_native_friction import validate_friction
 
@@ -190,9 +191,8 @@ def review(inputs,cook,solver,out):
     native=json.loads((cook/'manifest.json').read_text())
     validation=json.loads((cook/'validation.json').read_text())
     validate_native(native,validation,scenario)
-    frames=sorted((cook/'frames').glob('frame_*.csv'))
-    if len(frames)<3 or native['frames']!=['frames/'+p.name for p in frames]:
-        raise ValueError('Incomplete native frame collection')
+    # Buffered (.csv) or streamed lossless (.csv.gz) native frames, strictly registered.
+    frames=native_frame_paths(cook,native,minimum=3)
     first,current,previous=(load_frame(p,bed.shape) for p in (frames[0],frames[-1],frames[-2]))
     for f in (first,current,previous):validate_frame(f,bed,scenario['grid'])
     with np.load(inputs/'scenario/initial_state.npz',allow_pickle=False) as initial:
