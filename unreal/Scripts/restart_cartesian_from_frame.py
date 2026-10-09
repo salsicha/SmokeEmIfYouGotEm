@@ -7,6 +7,7 @@ as initial_time_seconds. Physics, bed, boundaries and timestep are unchanged.
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -38,7 +39,12 @@ def build(package, frame, output, inlet_scale=1.0):
         source, target = package / name, output / name
         target.mkdir()
         for item in ('bed.npy', 'features.json', 'probes.json'):
-            (target / item).write_bytes((source / item).read_bytes())
+            # Unchanged inputs are hard-linked (these tools only ever write
+            # fresh directories, never edit a file in place); copy otherwise.
+            try:
+                os.link(source / item, target / item)
+            except OSError:
+                (target / item).write_bytes((source / item).read_bytes())
         scenario = json.loads((source / 'scenario.json').read_text())
         for boundary in scenario['boundaries']:
             if boundary.get('kind') == 'discharge_profile':

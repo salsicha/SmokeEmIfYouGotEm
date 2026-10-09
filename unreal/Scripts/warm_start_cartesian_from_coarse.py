@@ -13,6 +13,7 @@ import argparse
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -80,13 +81,26 @@ def build(fine, coarse, frame, output, wet_depth):
     output.mkdir(parents=True)
     inputs = []
     cold_volume = warm_volume = 0.0
+    # Closed exterior banks (tile edges with no neighbour and no inlet/outlet)
+    # must start exactly dry: the runtime export requires them so, and the
+    # cold start had them so. Interpolation may leave a film there.
+    present = set(keys)
+    ports = {(p['tile_index'], p['edge']) for p in fine_manifest['boundary_probes']}
+    edges = {'west': (-1, 0, np.s_[:, :2]), 'east': (1, 0, np.s_[:, -2:]),
+             'south': (0, -1, np.s_[:2, :]), 'north': (0, 1, np.s_[-2:, :])}
+    dried_cells, dried_volume = 0, 0.0
     centre = (np.arange(fine_cells) + 0.5) / k - 0.5  # fine cell centres in coarse-cell units within a tile
-    for name, key in zip(fine_manifest['packages'], keys):
+    for ordinal, (name, key) in enumerate(zip(fine_manifest['packages'], keys)):
         source = fine / name
         target = output / name
         target.mkdir()
         for item in ('scenario.json', 'bed.npy', 'features.json', 'probes.json'):
-            (target / item).write_bytes((source / item).read_bytes())
+            # Unchanged inputs are hard-linked (fresh directories only, never
+            # edited in place); copy where links are unavailable.
+            try:
+                os.link(source / item, target / item)
+            except OSError:
+                (target / item).write_bytes((source / item).read_bytes())
         bed = np.load(source / 'bed.npy')
         with np.load(source / 'initial_state.npz') as state:
             cold_volume += float(state['depth'].sum())
@@ -98,6 +112,13 @@ def build(fine, coarse, frame, output, wet_depth):
         u = np.where(h > 0, bilinear(vel_u, wet, x, y), 0.0)
         v = np.where(h > 0, bilinear(vel_v, wet, x, y), 0.0)
         u, v = np.nan_to_num(u), np.nan_to_num(v)
+        for edge, (dx, dy, band) in edges.items():
+            if (key[0] + dx, key[1] + dy) in present or (ordinal, edge) in ports:
+                continue
+            dried_cells += int(np.count_nonzero(h[band]))
+            dried_volume += float(h[band].sum())
+            h[band] = 0.0
+        u, v = np.where(h > 0, u, 0.0), np.where(h > 0, v, 0.0)
         if h.max() > 10 or np.hypot(u, v).max() > 20:
             raise ValueError('Warm start exceeds the native depth/speed gates in ' + name)
         warm_volume += float(h.sum())
@@ -123,10 +144,12 @@ def build(fine, coarse, frame, output, wet_depth):
                   initial_state='Warm start: settled coarse pre-cook surface and current interpolated onto the fine bed',
                   warm_start=dict(fine_manifest_sha256=sha(fine / 'manifest.json'), coarse_manifest_sha256=sha(coarse / 'manifest.json'),
                                   coarse_frame=str(frame), coarse_frame_h_sha256=sha(frame / 'h.npy'), factor=k,
-                                  wet_depth_m=wet_depth, cold_volume_m3=cold_volume, warm_volume_m3=warm_volume),
+                                  wet_depth_m=wet_depth, cold_volume_m3=cold_volume, warm_volume_m3=warm_volume,
+                                  closed_bank_cells_dried=dried_cells, closed_bank_volume_removed_m3=dried_volume),
                   settled_hydraulics=False, normal_map_integrated=False)
     (output / 'manifest.json').write_text(json.dumps(report, indent=2, allow_nan=False) + '\n')
-    print(json.dumps(dict(tiles=len(inputs), cold_volume_m3=cold_volume, warm_volume_m3=warm_volume)))
+    print(json.dumps(dict(tiles=len(inputs), cold_volume_m3=cold_volume, warm_volume_m3=warm_volume,
+                          closed_bank_cells_dried=dried_cells, closed_bank_volume_removed_m3=dried_volume)))
 
 
 if __name__ == '__main__':
