@@ -67,6 +67,32 @@ def deepest_wet_cell(atlas_dir, atlas, xy, radius):
     return best
 
 
+def select_window(streaming, x, y):
+    """The window FRaftSimCartesianWaterRegions::Select picks for a raft at (x, y).
+
+    Each window's live centre is the raft position clamped into one of its
+    valid centre boxes; it qualifies when the raft keeps the interior margin
+    inside the live window and the window plus context fits the packet. The
+    nearest centre wins, then the larger margin to the packet edge.
+    """
+    half = np.asarray(streaming['live_window_extent_m'], float) * 0.5
+    reach = half - streaming['minimum_raft_interior_margin_m']
+    context = half + streaming['source_context_cells'] * streaming['grid_spacing_m']
+    p = np.array([x, y])
+    best, best_key = None, None
+    for row in streaming['windows']:
+        bounds = np.asarray(row['hydraulic_bounds_m'], float)
+        for box in row['valid_live_center_bounds_m']:
+            centre = np.clip(p, box[:2], box[2:])
+            if np.any(np.abs(p - centre) > reach) or np.any(centre - context < bounds[:2]) or np.any(centre + context > bounds[2:]):
+                continue
+            margin = min((centre - bounds[:2]).min(), (bounds[2:] - centre).min())
+            key = (round(float(np.sum((p - centre) ** 2)), 9), -margin)
+            if best_key is None or key < best_key:
+                best, best_key = row, key
+    return best
+
+
 def build(runtime, start, finish, map_package, minimum_depth):
     runtime = Path(runtime).resolve()
     receipt = json.loads((runtime / 'export_audit.json').read_text())
@@ -97,16 +123,9 @@ def build(runtime, start, finish, map_package, minimum_depth):
     if best is None or best[0] < minimum_depth:
         raise ValueError('No native water deep enough near the start station')
     depth, x, y = best
-    window = None
-    for row in streaming['windows']:
-        for box in row['valid_live_center_bounds_m']:
-            if box[0] <= x <= box[2] and box[1] <= y <= box[3]:
-                window = row
-                break
-        if window:
-            break
+    window = select_window(streaming, x, y)
     if window is None:
-        raise ValueError('No streaming window may centre on the launch')
+        raise ValueError('No streaming window covers the launch with the raft margin')
     fields_dir = Path(window['cooked_fields_manifest']).parent.as_posix()
     files = {rel(p): sha(p) for p in (runtime / 'coordinate_map.json', runtime / 'streaming_manifest.json',
                                       runtime / 'export_audit.json', atlas_dir / 'manifest.json', ROUTE, audit)}
@@ -123,8 +142,11 @@ def build(runtime, start, finish, map_package, minimum_depth):
                     minimum_footprint_depth_m=float(minimum_depth), launch_depth_m=depth),
         finish_station_m=float(finish), rig='PaddleCrew',
         hydraulic_contract=dict(schema='raftsim.futaleufu_three_arm_runtime.v1', inlet_discharge_m3s=inlets,
+                                audited_outlet_discharge_m3s=audit_json['frames'][-1]['boundary_balance']['total_outlet_m3s'],
                                 source_audit=rel(audit),
-                                basis='Settled from a coarse pre-cook warm start; inflows are inferred construction values'),
+                                basis='Warm-started from a coarse pre-cook; inflows are inferred construction values. '
+                                      'The audited outlet discharge is what the run actually carries; any shortfall '
+                                      'is still being stored in the domain.'),
         acceptance='Pending native rendered descent, rescue streaming and packaged performance checks')
 
 
