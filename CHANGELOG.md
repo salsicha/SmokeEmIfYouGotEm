@@ -6,6 +6,45 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- **20 more named rapids on the South Fork** (2026-10-08). The South Fork full
+  descent now titles 40 rapids, not 20. The new ones are researched from
+  American Whitewater feature points, River Brain, the mile guide and
+  GoRafting, and placed at their published river miles from Chili Bar:
+
+  | Section | Rapids |
+  | --- | --- |
+  | Chili Bar run | Bed and Breakfast, The Narrows, Mini Gorge, Swimmer's Rapid |
+  | Coloma and Lotus | Gremlin's, Old Scary, Blue House Hole, Pink Fuzzy Bunny With a Fang, Barking Dog, Killer Fang Falls, Dave Moore, Current Divider |
+  | Highway 49 to the Gorge | Highway Rapid, Swimmer's (C to G), Cable Car Rapid, Airplane Turn, Speed Bump, Splat Rock, Son of Fowler |
+  | Reservoir | Salmon Falls |
+
+  Each rapid enters `named_rapid_source_catalog.json` with:
+  - its sources;
+  - the class each source reports;
+  - its researched position (sourced or derived);
+  - one main sub-feature, pending guide review.
+
+  It also gets an on-screen title and a difficulty-assessment trial, with a
+  first decision hypothesis for the decision campaign.
+
+  The raw research for all six runs is kept in
+  `physics/data/real_world/named_rapid_research_2026_10_08/`:
+
+  | Run | Named rapids | With positions |
+  | --- | --- | --- |
+  | Colorado, Lees Ferry to Pearce Ferry | 143 | 126 (USGS) |
+  | Futaleufú | 61 | — |
+  | Chilko | 13 | — |
+  | Pacuare | 32 | — |
+  | Zambezi | 44 | — |
+
+  It is not yet merged for the other rivers. Tools:
+  `physics/scripts/merge_named_rapid_research.py` and
+  `add_researched_rapid_titles.py`.
+  - **Fixes:**
+    - The rapid registry test now expects Chilko's reviewed order (Green Mile
+      before White Mile).
+    - Badger Creek has the on-screen title its assessment plan expected.
 - Holes (2026-10-08, in progress):
   - **Breaking wave** (`RaftSimHoleChurn.{h,cpp}`): a hole's froth is drawn as
     the wave it is, crashing back upstream in place. A white roller stands

@@ -9,14 +9,33 @@ namespace
 const FRaftSimRapidTitle GRapids[] = {
     // L_SouthForkAmerican_FullReach
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("chili_bar_hole"), TEXT("Chili Bar Hole"), TEXT("surf"), 36.2f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("bed_and_breakfast"), TEXT("Bed and Breakfast"), TEXT("II"), 338.0f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("meat_grinder"), TEXT("Meat Grinder"), TEXT("III+"), 965.6f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("racehorse_bend"), TEXT("Racehorse Bend"), TEXT("III"), 2092.1f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("maya"), TEXT("Maya"), TEXT("II-III"), 2414.0f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("rock_garden"), TEXT("Rock Garden"), TEXT("II"), 2735.9f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("african_queen"), TEXT("African Queen"), TEXT("II"), 3218.7f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("triple_threat"), TEXT("Triple Threat"), TEXT("III"), 4989.0f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("the_narrows"), TEXT("The Narrows"), TEXT("II+"), 5616.6f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("mini_gorge"), TEXT("Mini Gorge"), TEXT("II-II+"), 6421.3f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("swimmer_s_rapid_chili_bar_run"), TEXT("Swimmer's Rapid (Chili Bar run)"), TEXT("II"), 6646.6f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("troublemaker"), TEXT("Troublemaker"), TEXT("III+"), 8368.6f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("gremlin_s"), TEXT("Gremlin's"), TEXT("II"), 10589.5f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("old_scary"), TEXT("Old Scary"), TEXT("II"), 11362.0f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("blue_house_hole"), TEXT("Blue House Hole"), TEXT("surf"), 11716.0f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("pink_fuzzy_bunny_with_a_fang"), TEXT("Pink Fuzzy Bunny With a Fang"), TEXT("II-II+"), 13502.4f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("barking_dog"), TEXT("Barking Dog"), TEXT("II-II+"), 14854.2f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("killer_fang_falls"), TEXT("Killer Fang Falls"), TEXT("II"), 15176.1f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("dave_moore"), TEXT("Dave Moore"), TEXT("II"), 15916.4f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("current_divider"), TEXT("Current Divider"), TEXT("II-II+"), 16415.3f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("highway_rapid"), TEXT("Highway Rapid"), TEXT("II-II+"), 17912.0f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("swimmer_s_c_to_g"), TEXT("Swimmer's (C to G)"), TEXT("II-II+"), 18443.1f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("cable_car_rapid"), TEXT("Cable Car Rapid"), TEXT("II-II+"), 19183.4f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("airplane_turn"), TEXT("Airplane Turn"), TEXT("II"), 20567.4f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("speed_bump"), TEXT("Speed Bump"), TEXT("surf"), 24639.1f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("splat_rock"), TEXT("Splat Rock"), TEXT("II"), 25154.0f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("fowler_s_rock"), TEXT("Fowler's Rock"), TEXT("III"), 25427.6f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("son_of_fowler"), TEXT("Son of Fowler"), TEXT("II"), 25524.2f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("upper_haystack_canyon"), TEXT("Upper Haystack Canyon"), TEXT("III"), 26071.4f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("lost_hat"), TEXT("Lost Hat"), TEXT("III-"), 26876.0f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("satan_s_cesspool"), TEXT("Satan's Cesspool"), TEXT("III+"), 27197.9f, false},
@@ -28,6 +47,7 @@ const FRaftSimRapidTitle GRapids[] = {
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("hospital_bar"), TEXT("Hospital Bar"), TEXT("III"), 29933.8f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("recovery_room"), TEXT("Recovery Room"), TEXT("II-III"), 30255.7f, false},
     {TEXT("L_SouthForkAmerican_FullReach"), TEXT("surprise"), TEXT("Surprise"), TEXT("II-III"), 31060.3f, false},
+    {TEXT("L_SouthForkAmerican_FullReach"), TEXT("salmon_falls"), TEXT("Salmon Falls"), TEXT("II+"), 32186.9f, false},
     // L_Hance
     {TEXT("L_Hance"), TEXT("hance_main"), TEXT("Hance Rapid"), TEXT("IV-V"), 680.0f, false},
     {TEXT("L_Hance"), TEXT("son_of_hance"), TEXT("Son of Hance"), TEXT("III"), 1260.0f, false},
@@ -84,6 +104,8 @@ const FRaftSimRapidTitle GRapids[] = {
     {TEXT("L_ZambeziUpperGorge"), TEXT("r4b"), TEXT("Rapid 4B"), TEXT("IV"), 1720.0f, false},
     {TEXT("L_ZambeziUpperGorge"), TEXT("r5_stairway_to_heaven"), TEXT("Stairway to Heaven"), TEXT("V"), 2890.0f, false},
     {TEXT("L_ZambeziUpperGorge"), TEXT("r5_5"), TEXT("Rapid 5.5"), TEXT("II-III"), 3120.0f, false},
+    // L_Colorado_BadgerCreek (Grand Canyon 5 of 10, about class III)
+    {TEXT("L_Colorado_BadgerCreek"), TEXT("badger_creek"), TEXT("Badger Creek"), TEXT("III"), 790.0f, false},
 };
 }
 

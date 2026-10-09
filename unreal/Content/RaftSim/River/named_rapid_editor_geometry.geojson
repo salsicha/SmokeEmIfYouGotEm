@@ -1185,16 +1185,16 @@
         "type": "Point"
       },
       "properties": {
-        "difficulty_label": "IV-V (flow-dependent)",
-        "display_name": "White Mile",
-        "feature_id": "chilko_river_lava_canyon__white_mile",
+        "difficulty_label": "guide review required",
+        "display_name": "Green Mile",
+        "feature_id": "chilko_river_lava_canyon__green_mile",
         "geometry_source": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
         "geometry_source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
         "geometry_status": "candidate_centerline_projection_not_exact",
         "guide_review_status": "required",
         "portfolio_role": "runnable_river",
         "production_authoritative": false,
-        "review_priority": "critical",
+        "review_priority": "high",
         "river_id": "chilko_river_lava_canyon",
         "station_kind": "provisional_downstream_order_interpolation",
         "station_m": 27922.848
@@ -1210,16 +1210,16 @@
         "type": "Point"
       },
       "properties": {
-        "difficulty_label": "guide review required",
-        "display_name": "Green Mile",
-        "feature_id": "chilko_river_lava_canyon__green_mile",
+        "difficulty_label": "IV-V (flow-dependent)",
+        "display_name": "White Mile",
+        "feature_id": "chilko_river_lava_canyon__white_mile",
         "geometry_source": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
         "geometry_source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
         "geometry_status": "candidate_centerline_projection_not_exact",
         "guide_review_status": "required",
         "portfolio_role": "runnable_river",
         "production_authoritative": false,
-        "review_priority": "high",
+        "review_priority": "critical",
         "river_id": "chilko_river_lava_canyon",
         "station_kind": "provisional_downstream_order_interpolation",
         "station_m": 37230.464

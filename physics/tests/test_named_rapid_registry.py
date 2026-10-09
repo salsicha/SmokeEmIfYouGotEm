@@ -46,7 +46,7 @@ def test_named_rapid_catalog_covers_six_runnable_rivers():
     validate_source_catalog(catalog)
 
     expected_counts = {
-        "south_fork_american_chili_bar": 20,
+        "south_fork_american_chili_bar": 40,
         "colorado_river_grand_canyon_rowing": 15,
         "pacuare_river_costa_rica": 15,
         "zambezi_batoka_gorge": 25,
@@ -109,7 +109,7 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
     committed = _load(EDITOR_MARKERS_RELATIVE_PATH)
     assert generated == committed
     assert committed["production_promoted"] is False
-    assert sum(river["marker_count"] for river in committed["rivers"]) == 85
+    assert sum(river["marker_count"] for river in committed["rivers"]) == 105
     assert committed["portfolio"]["runnable_river_count"] == 6
     assert committed["portfolio"]["additional_active_environment_count"] == 0
 
@@ -173,8 +173,8 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
     assert [marker["display_name"] for marker in chilko] == [
         "Bidwell Rapids",
         "Lava Canyon",
-        "White Mile",
         "Green Mile",
+        "White Mile",
         "Miracle Canyon",
     ]
     assert all(
@@ -297,6 +297,27 @@ SOUTH_FORK_EXPECTED_SUBFEATURE_COUNTS = {
     "Hospital Bar": 5,
     "Recovery Room": 3,
     "Surprise": 3,
+    # Researched 2026-10-08: one main sub-feature each, pending guide review.
+    "Bed and Breakfast": 1,
+    "The Narrows": 1,
+    "Mini Gorge": 1,
+    "Swimmer's Rapid (Chili Bar run)": 1,
+    "Gremlin's": 1,
+    "Old Scary": 1,
+    "Blue House Hole": 1,
+    "Pink Fuzzy Bunny With a Fang": 1,
+    "Barking Dog": 1,
+    "Killer Fang Falls": 1,
+    "Dave Moore": 1,
+    "Current Divider": 1,
+    "Highway Rapid": 1,
+    "Swimmer's (C to G)": 1,
+    "Cable Car Rapid": 1,
+    "Airplane Turn": 1,
+    "Speed Bump": 1,
+    "Splat Rock": 1,
+    "Son of Fowler": 1,
+    "Salmon Falls": 1,
 }
 
 
@@ -498,7 +519,7 @@ def test_named_rapid_review_runs_cover_flow_lines_controls_and_safety_policy():
     assert generated == committed
     assert committed["run_count"] == len(committed["runs"])
     assert committed["run_count"] > 400
-    assert committed["run_count"] == 453
+    assert committed["run_count"] == 513
     assert committed["portfolio"]["total_river_count"] == 6
     assert {run["flow_band"] for run in committed["runs"]} == {
         "low_review",

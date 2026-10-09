@@ -64,7 +64,27 @@ bouncing_rock|Avoid broadside arrival at right rock|wall|0,4,0
 pre_op|Keep between bank holes|hole|0,0,0
 hospital_bar|Square diagonal; avoid Catcher's Mitt|wall|0,0,3
 recovery_room|Entry hole and reservoir-dependent runout|hole|0,3,0
-surprise|Funnel and pourover|hole|0,3,0''',
+surprise|Funnel and pourover|hole|0,3,0
+bed_and_breakfast|Short class II; boofable rock left of centre|slalom|0,-2,0
+the_narrows|Rock-walled outcrop slalom to a rocky-island rest|slalom|0,0,0
+mini_gorge|Bedrock narrows with seams and boils after a wave lead-in|continuous|0,0,0
+swimmer_s_rapid_chili_bar_run|Easy class II above Indian Creek|train|0,0,0
+gremlin_s|Wide left bend; features right of centre; surf wave at the end|train|0,-3,0
+old_scary|Island split: left-channel ledge or technical right channel|slalom|3,3,0
+blue_house_hole|River-left surf wave; go left of the island|surf|3,4,3
+pink_fuzzy_bunny_with_a_fang|Island split: left tongue toward the Fang or right ledges|hole|3,3,0
+barking_dog|Funnel into a steep breaking wave; eddy right|surf|0,0,-3
+killer_fang_falls|Far-right pourover below Barking Dog|hole|0,2,0
+dave_moore|Right-channel wave train or left-channel S-turn|train|-3,-3,0
+current_divider|Island split with most flow right, then right-left-right|slalom|-3,3,-3
+highway_rapid|Long shallow rocky left bend; exit right of the rock island|continuous|0,3,-3
+swimmer_s_c_to_g|Benign wave train above Greenwood Creek|train|0,0,0
+cable_car_rapid|Right bend around a bushy island; most flow right|slalom|0,-3,-3
+airplane_turn|Three channels; the far left kicks back right|slalom|0,0,0
+speed_bump|Surf wave above Fowler's Rock|surf|0,0,0
+splat_rock|River-left splat rock above Fowler's Rock|wall|0,-2,0
+son_of_fowler|Wave train growing holes at high water below Fowler's|train|0,0,0
+salmon_falls|Low-reservoir wave trains, chutes and boofs|continuous|0,0,0''',
 'colorado': '''hance_main|Right entry; early left ferry via Duck Pond|continuous|-14,9,5
 son_of_hance|Hidden hole and unstable exit water|hole|0,-5,0
 badger_creek|Choose the tongue beside the upper-right hydraulic, then square the following waves|hole|0,0,0''',
