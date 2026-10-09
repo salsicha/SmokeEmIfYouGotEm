@@ -380,17 +380,22 @@ def main():
         # wide as the neighbouring wetted channel.
         si = np.clip(np.round(np.nan_to_num(st_grid, nan=-1)).astype(int), -1, M - 1)
         wet_m = np.bincount(si[river & (si >= 0)], minlength=M).astype(float)
-        span = 101
-        padded = np.pad(np.where(wet_m > 0, wet_m, np.nan), span // 2, mode='edge')
+        valid = wet_m >= args.min_wetted_width_m
+        span = 501
+        padded = np.pad(np.where(valid, wet_m, np.nan), span // 2, mode='constant', constant_values=np.nan)
         windows = np.lib.stride_tricks.sliding_window_view(padded, span)
-        typical = np.nan_to_num(np.nanmedian(np.where(np.isfinite(windows), windows, np.nan), axis=1),
-                                nan=args.min_wetted_width_m)
-        need = wet_m < args.min_wetted_width_m
+        with np.errstate(all='ignore'):
+            typical = np.nanmedian(windows, axis=1)
+        typical = np.where(np.isfinite(typical), typical, np.median(wet_m[valid]) if valid.any() else args.min_wetted_width_m)
+        need = ~valid
         width_need = np.clip(typical, args.min_wetted_width_m, 40.0)
-        centre = 0.5 * (mleft + mright)
-        ok = channel & (si >= 0)
+        # Centre the band in the bank-derived channel; where its offsets are
+        # unusable (a bank far out on bars), on the midline itself.
+        centre = np.where(np.isfinite(mleft) & np.isfinite(mright) & (mleft > mright), 0.5 * (mleft + mright), 0.0)
+        ok = np.isfinite(lat_grid) & (si >= 0)
         band = np.zeros_like(channel)
         band[ok] = need[si[ok]] & (np.abs(lat_grid[ok] - centre[si[ok]]) <= 0.5 * width_need[si[ok]])
+        channel |= band
         river |= band; bars &= ~band; rocks &= ~band; vegin &= ~band
         wetted_band_m = int(need[np.unique(si[band])].sum()) if band.any() else 0
     foam = white & river
