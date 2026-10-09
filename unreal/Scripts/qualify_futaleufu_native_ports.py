@@ -17,6 +17,10 @@ from build_futaleufu_continuous_water_domain import (
     ROOT, PREFIX, sha, FutaleufuBed, connected_tiles, observe_branches)
 from prepare_futaleufu_hydraulic_ports import FACES
 
+# PowerShell 7 where installed, otherwise the built-in Windows PowerShell;
+# both provide Get-CimInstance and ConvertTo-Json for the process guards.
+POWERSHELL = shutil.which('pwsh') or shutil.which('powershell') or 'powershell'
+
 
 class MemoryStatus(ctypes.Structure):
     _fields_=[('length',ctypes.c_ulong),('load',ctypes.c_ulong)]+[
@@ -39,7 +43,7 @@ def run(packages,solver,output,steps=200):
         raise ValueError('Fresh output and bounded 20-multiple native steps (20..200) required')
     if sha(solver)!='fb2624bb8cb210142ae17741c5358c86a48d6f42c60eedab64715def53c6e558':
         raise ValueError('Use the existing source-verified Cartesian executable')
-    active=subprocess.run(['pwsh','-NoProfile','-Command',
+    active=subprocess.run([POWERSHELL,'-NoProfile','-Command',
         "Get-CimInstance Win32_Process | Where-Object { $_.Name -match '^(UnrealEditor|UnrealEditor-Cmd|raftsim_cartesian_cook|UnrealBuildTool)\\.exe$' } | Select-Object ProcessId,Name | ConvertTo-Json -Compress"],
         capture_output=True,text=True,check=True)
     if active.stdout.strip(): raise ValueError('Shared engine/cook work active; no duplicate or interruption')

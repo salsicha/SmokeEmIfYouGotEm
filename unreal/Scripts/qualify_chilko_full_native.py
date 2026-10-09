@@ -12,7 +12,7 @@ import time
 
 import numpy as np
 
-from qualify_futaleufu_native_ports import ROOT, sha, resources
+from qualify_futaleufu_native_ports import ROOT, sha, resources, POWERSHELL
 from continue_futaleufu_native_flow import shared_native_work
 from build_chilko_completed_corridor_inputs import require_idle_headroom, watchdog_failure
 from native_frame_io import NativeFrameStore, native_frame_paths
@@ -27,7 +27,7 @@ FLAGS=['--solver-mode','finite_volume','--boundary-mode','scenario','--flux-sche
 
 def busy(owned=None):
     rows=shared_native_work(owned)
-    result=subprocess.run(['pwsh','-NoProfile','-Command',
+    result=subprocess.run([POWERSHELL,'-NoProfile','-Command',
         "Get-CimInstance Win32_Process -Filter \"Name = 'raftsim_water_solver.exe'\" | "
         'Select-Object ProcessId,Name | ConvertTo-Json -Compress'],capture_output=True,text=True,check=True)
     other=json.loads(result.stdout) if result.stdout.strip() else []

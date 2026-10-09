@@ -13,12 +13,12 @@ import time
 
 import numpy as np
 
-from qualify_futaleufu_native_ports import ROOT, sha, resources
+from qualify_futaleufu_native_ports import ROOT, sha, resources, POWERSHELL
 
 
 def shared_native_work(owned_pid=None):
     """Read actual processes; never interrupt another task or trust stale locks."""
-    active = subprocess.run(['pwsh', '-NoProfile', '-Command',
+    active = subprocess.run([POWERSHELL, '-NoProfile', '-Command',
         "Get-CimInstance Win32_Process | Where-Object { "
         "$_.Name -match '^(UnrealEditor|UnrealEditor-Cmd|raftsim_cartesian_cook|UnrealBuildTool)\\.exe$' -or "
         "($_.Name -eq 'dotnet.exe' -and $_.CommandLine -match 'UnrealBuildTool|AutomationTool') -or "
