@@ -50,7 +50,7 @@ def bilinear(field, valid, y, x):
     return np.where(weight > 1e-12, total / np.maximum(weight, 1e-12), np.nan)
 
 
-def build(inputs, coarse, out, frame_index=-1, wet_depth=0.02):
+def build(inputs, coarse, out, frame_index=-1, wet_depth=0.02, frame=None):
     inputs, coarse, out = (Path(p).resolve() for p in (inputs, coarse, out))
     if out.exists():
         raise ValueError('Fresh warm-start inputs directory required')
@@ -65,9 +65,13 @@ def build(inputs, coarse, out, frame_index=-1, wet_depth=0.02):
     k = settle['factor']
     cgrid = coarse_scenario['grid']
     cook = coarse / 'native' / coarse_scenario['metadata']['scenario_id']
-    native = json.loads((cook / 'manifest.json').read_text())
-    frames = native_frame_paths(cook, native)
-    frame_path = frames[frame_index]
+    if frame is None:
+        native = json.loads((cook / 'manifest.json').read_text())
+        frame_path = native_frame_paths(cook, native)[frame_index]
+    else:
+        # An explicit saved frame of a stopped run, which has no manifest.
+        frame_path = Path(frame).resolve()
+        frame_path.relative_to(cook / 'frames')
     frame = load_frame(frame_path, (cgrid['ny'], cgrid['nx']))
     cbed = np.load(coarse / 'scenario/bed.npy')
     if not np.allclose(frame['eta'] - frame['h'], cbed, atol=1e-6):
@@ -115,5 +119,6 @@ if __name__ == '__main__':
     parser.add_argument('--out', required=True, type=Path)
     parser.add_argument('--frame-index', type=int, default=-1)
     parser.add_argument('--wet-depth', type=float, default=0.02)
+    parser.add_argument('--frame', type=Path, help='explicit saved coarse frame instead of --frame-index')
     args = parser.parse_args()
-    build(args.inputs, args.coarse, args.out, args.frame_index, args.wet_depth)
+    build(args.inputs, args.coarse, args.out, args.frame_index, args.wet_depth, args.frame)

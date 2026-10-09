@@ -119,7 +119,7 @@ def build(inputs, factor, out):
     return coarse
 
 
-def restart(coarse, out, run_seconds, frame=None, splice_from_m=None, splice_state=None):
+def restart(coarse, out, run_seconds, frame=None, splice_from_m=None, splice_state=None, inlet_scale=1.0):
     """Continue a coarse pre-cook from a saved native frame (default: its last).
 
     The scenario, bed and boundaries are copied unchanged; only the initial
@@ -130,6 +130,10 @@ def restart(coarse, out, run_seconds, frame=None, splice_from_m=None, splice_sta
     splice_state (an initial_state.npz on the same coarse grid). This is only
     an initial guess for settling: a settled upstream reach can rejoin a
     downstream start without waiting for one slow refill front.
+
+    inlet_scale multiplies the inflow ghost velocities relative to the
+    ORIGINAL coarse boundary (depths unchanged), to fill a deficit faster.
+    A settle must end with a stage at 1.0, the original boundary.
     """
     import sys
     sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -176,10 +180,18 @@ def restart(coarse, out, run_seconds, frame=None, splice_from_m=None, splice_sta
     np.savez_compressed(target / 'initial_state.npz', depth=h, eta=bed + h, u=u, v=v, hu=h * u, hv=h * v, wet=wet)
     if not run_seconds > 0:
         raise ValueError('Positive simulated seconds of the continued run required')
+    if not inlet_scale > 0:
+        raise ValueError('Positive inlet scale required')
+    original = scenario['metadata']['coarse_settle'].setdefault('original_boundaries', scenario['boundaries'])
+    boundaries = json.loads(json.dumps(original))
+    for boundary in boundaries:
+        if boundary['kind'] == 'discharge_profile':
+            boundary['ghost_cells'] = [[b, h, u * inlet_scale, v * inlet_scale] for b, h, u, v in boundary['ghost_cells']]
+    scenario['boundaries'] = boundaries
     elapsed = scenario['metadata']['coarse_settle'].get('elapsed_seconds', 0.0)
     scenario['metadata']['coarse_settle'] = dict(
         scenario['metadata']['coarse_settle'], restarted_from=str(frame_path), restarted_from_sha256=sha(frame_path),
-        elapsed_seconds=elapsed + run_seconds, splice=splice)
+        elapsed_seconds=elapsed + run_seconds, splice=splice, inlet_scale=inlet_scale)
     (target / 'scenario.json').write_text(json.dumps(scenario, indent=2, allow_nan=False) + '\n')
     print(json.dumps(dict(restarted_from=str(frame_path), elapsed_seconds=scenario['metadata']['coarse_settle']['elapsed_seconds'])))
 
@@ -192,12 +204,14 @@ if __name__ == '__main__':
     parser.add_argument('--frame', type=Path, help='With --restart: an explicit saved frame instead of the last')
     parser.add_argument('--splice-from-m', type=float, help='With --restart: station from which --splice-state is used')
     parser.add_argument('--splice-state', type=Path, help='With --restart: initial_state.npz on the same coarse grid')
+    parser.add_argument('--inlet-scale', type=float, default=1.0, help='With --restart: inflow multiple of the original boundary')
     parser.add_argument('--factor', type=int, default=4)
     parser.add_argument('--out', required=True, type=Path)
     args = parser.parse_args()
     if (args.inputs is None) == (args.restart is None):
         parser.error('Give exactly one of --inputs or --restart')
     if args.restart:
-        restart(args.restart, args.out, args.run_seconds or 0.0, args.frame, args.splice_from_m, args.splice_state)
+        restart(args.restart, args.out, args.run_seconds or 0.0, args.frame, args.splice_from_m, args.splice_state,
+                args.inlet_scale)
     else:
         build(args.inputs, args.factor, args.out)
