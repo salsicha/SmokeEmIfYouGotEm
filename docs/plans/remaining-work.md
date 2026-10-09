@@ -1,5 +1,26 @@
 # Remaining requested work
 
+October 8 full Chilko native initialization **V2 passed** after the shared
+crew/physics tests finished (39 successes, three successes with warnings, zero
+failures) and the other task committed its work. All 6,566,864 cells loaded in
+the production solver; the independent readback verified complete finite fields,
+grid/bed agreement and exact initial state within the unchanged serialization
+tolerance. Source hashes were unchanged. The complete lossless frame is
+328,668,959 bytes; the run and readback took 90.359 seconds. See the
+[full-grid initialization receipt](../../physics/data/real_world/chilko_river_bc/observed_rapids/full_native_initialization_completion_2026_10_08.json).
+V1's interruption remains preserved. Do not repeat this successful initialization.
+
+The next full-domain advance uses `advance_chilko_full_native.py`: 200 actual
+native steps, all eleven snapshots, no cropped domain or changed physics.
+Native outputs and review scratch use a fresh system-temp directory because
+that volume has over 500 GB available while the project volume has only about
+47 GB. Both volumes retain the forty-GiB reserve; source data stay in place.
+Fifteen lightweight qualification/reader/advance tests pass, with the optional
+CLI parity test skipped in this invocation. This short timed advance is a
+checkpoint toward the full hydraulic solution, not settled-flow, map or FPS
+acceptance. It still requires independent geographic and storage/discharge
+review before runtime export and full terrain/vegetation assembly.
+
 October 8 full Chilko initialization update: V1 is now **terminal and failed**,
 not queued or running. The old exec 59546 waiter disappeared without creating
 output; its replacement exec 50266 subsequently launched native PID 8172 after
