@@ -1,5 +1,5 @@
 {
-  "feature_count": 52,
+  "feature_count": 75,
   "features": [
     {
       "geometry": {
@@ -54,8 +54,8 @@
     {
       "geometry": {
         "coordinates": [
-          -83.73899122,
-          9.93687567
+          -83.74351048,
+          9.94136504
         ],
         "type": "Point"
       },
@@ -72,15 +72,40 @@
         "review_priority": "medium",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 1640.625
+        "station_m": 937.5
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.7290566,
-          9.92583535
+          -83.73753168,
+          9.93533427
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Linda Vista Rapid",
+        "feature_id": "pacuare_river_costa_rica__linda_vista_rapid",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 1875.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.73184747,
+          9.9290312
         ],
         "type": "Point"
       },
@@ -97,15 +122,15 @@
         "review_priority": "high",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 3281.25
+        "station_m": 2812.5
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.71919125,
-          9.91473419
+          -83.72626962,
+          9.92263623
         ],
         "type": "Point"
       },
@@ -122,7 +147,57 @@
         "review_priority": "high",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 4921.875
+        "station_m": 3750.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.72062619,
+          9.91629776
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Costa Rica Rios Rapid",
+        "feature_id": "pacuare_river_costa_rica__costa_rica_rios_rapid",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 4687.5
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.71474559,
+          9.91017363
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II",
+        "display_name": "Crying Rock Rapid",
+        "feature_id": "pacuare_river_costa_rica__crying_rock_rapid",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 5625.0
       },
       "type": "Feature"
     },
@@ -131,6 +206,81 @@
         "coordinates": [
           -83.70841754,
           9.9045032
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II",
+        "display_name": "Rio Tropicales Rapid",
+        "feature_id": "pacuare_river_costa_rica__rio_tropicales_rapid",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 6562.5
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.70136815,
+          9.89974207
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Entrance to the Gorge",
+        "feature_id": "pacuare_river_costa_rica__entrance_to_the_gorge",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 7500.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.69341155,
+          9.89671926
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Rio's Bend",
+        "feature_id": "pacuare_river_costa_rica__rio_s_bend",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 8437.5
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.6849065,
+          9.89651567
         ],
         "type": "Point"
       },
@@ -147,15 +297,15 @@
         "review_priority": "high",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 6562.5
+        "station_m": 9375.0
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.69548044,
-          9.89725675
+          -83.67679365,
+          9.89909339
         ],
         "type": "Point"
       },
@@ -172,15 +322,40 @@
         "review_priority": "medium",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 8203.125
+        "station_m": 10312.5
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.68075211,
-          9.89750434
+          -83.66945566,
+          9.90340913
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Palomitas",
+        "feature_id": "pacuare_river_costa_rica__palomitas",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 11250.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.66272195,
+          9.90860837
         ],
         "type": "Point"
       },
@@ -197,15 +372,15 @@
         "review_priority": "critical",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 9843.75
+        "station_m": 12187.5
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.66772321,
-          9.90464612
+          -83.65631984,
+          9.9142032
         ],
         "type": "Point"
       },
@@ -222,15 +397,15 @@
         "review_priority": "critical",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 11484.375
+        "station_m": 13125.0
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.65631984,
-          9.9142032
+          -83.6500001,
+          9.91988906
         ],
         "type": "Point"
       },
@@ -247,15 +422,15 @@
         "review_priority": "critical",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 13125.0
+        "station_m": 14062.5
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.64517436,
-          9.92405846
+          -83.64353014,
+          9.9254071
         ],
         "type": "Point"
       },
@@ -272,15 +447,15 @@
         "review_priority": "high",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 14765.625
+        "station_m": 15000.0
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.63299604,
-          9.93260076
+          -83.63667099,
+          9.9304439
         ],
         "type": "Point"
       },
@@ -297,15 +472,15 @@
         "review_priority": "high",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 16406.25
+        "station_m": 15937.5
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.61873291,
-          9.93654597
+          -83.62914215,
+          9.9344278
         ],
         "type": "Point"
       },
@@ -322,15 +497,15 @@
         "review_priority": "medium",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 18046.875
+        "station_m": 16875.0
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.60452727,
-          9.93242372
+          -83.62087114,
+          9.93646304
         ],
         "type": "Point"
       },
@@ -347,6 +522,56 @@
         "review_priority": "critical",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 17812.5
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.61239523,
+          9.93567414
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II",
+        "display_name": "La Cimarrones Bend",
+        "feature_id": "pacuare_river_costa_rica__la_cimarrones_bend",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 18750.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.60452727,
+          9.93242372
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II",
+        "display_name": "Sobaco del Diablo",
+        "feature_id": "pacuare_river_costa_rica__sobaco_del_diablo",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
         "station_m": 19687.5
       },
       "type": "Feature"
@@ -354,8 +579,58 @@
     {
       "geometry": {
         "coordinates": [
-          -83.59253902,
-          9.92362816
+          -83.5974498,
+          9.92769886
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Los Indios",
+        "feature_id": "pacuare_river_costa_rica__los_indios",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 20625.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.59096051,
+          9.92220511
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II",
+        "display_name": "Magnetic Rock",
+        "feature_id": "pacuare_river_costa_rica__magnetic_rock",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 21562.5
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.58479091,
+          9.91636219
         ],
         "type": "Point"
       },
@@ -372,15 +647,15 @@
         "review_priority": "critical",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 21328.125
+        "station_m": 22500.0
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.58175949,
-          9.91338663
+          -83.57872629,
+          9.91041288
         ],
         "type": "Point"
       },
@@ -397,15 +672,15 @@
         "review_priority": "critical",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 22968.75
+        "station_m": 23437.5
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -83.57096693,
-          9.90315955
+          -83.57255616,
+          9.90457066
         ],
         "type": "Point"
       },
@@ -422,7 +697,32 @@
         "review_priority": "medium",
         "river_id": "pacuare_river_costa_rica",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 24609.375
+        "station_m": 24375.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.56604386,
+          9.8991049
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Graduation",
+        "feature_id": "pacuare_river_costa_rica__graduation",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 25312.5
       },
       "type": "Feature"
     },
@@ -1054,8 +1354,58 @@
     {
       "geometry": {
         "coordinates": [
+          -72.00758032,
+          -43.31005421
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II",
+        "display_name": "Big Water 101 Class",
+        "feature_id": "futaleufu_river_chile__big_water_101_class",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 833.333
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
           -72.00129139,
           -43.31022185
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II-III",
+        "display_name": "School House",
+        "feature_id": "futaleufu_river_chile__school_house",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 1666.667
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -71.99531894,
+          -43.31258514
         ],
         "type": "Point"
       },
@@ -1072,7 +1422,7 @@
         "review_priority": "high",
         "river_id": "futaleufu_river_chile",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 1666.667
+        "station_m": 2500.0
       },
       "type": "Feature"
     },
@@ -1081,6 +1431,106 @@
         "coordinates": [
           -71.98608042,
           -43.31445862
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Surf Rock",
+        "feature_id": "futaleufu_river_chile__surf_rock",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 3333.333
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -71.97641822,
+          -43.31270803
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Pillow Rock",
+        "feature_id": "futaleufu_river_chile__pillow_rock",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 4166.667
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -71.97414559,
+          -43.31625981
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "Terminator Wave",
+        "feature_id": "futaleufu_river_chile__terminator_wave",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 5000.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -71.97113847,
+          -43.31917273
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "Terminator Entrance",
+        "feature_id": "futaleufu_river_chile__terminator_entrance",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 5833.333
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -71.9739467,
+          -43.3262478
         ],
         "type": "Point"
       },
@@ -1097,15 +1547,15 @@
         "review_priority": "critical",
         "river_id": "futaleufu_river_chile",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 3333.333
+        "station_m": 6666.667
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -71.97414559,
-          -43.31625981
+          -71.97929309,
+          -43.33247973
         ],
         "type": "Point"
       },
@@ -1122,15 +1572,15 @@
         "review_priority": "critical",
         "river_id": "futaleufu_river_chile",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 5000.0
+        "station_m": 7500.0
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -71.9739467,
-          -43.3262478
+          -71.98264298,
+          -43.33935226
         ],
         "type": "Point"
       },
@@ -1147,15 +1597,15 @@
         "review_priority": "critical",
         "river_id": "futaleufu_river_chile",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 6666.667
+        "station_m": 8333.333
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -71.98264298,
-          -43.33935226
+          -71.9916968,
+          -43.34258403
         ],
         "type": "Point"
       },
@@ -1172,15 +1622,40 @@
         "review_priority": "critical",
         "river_id": "futaleufu_river_chile",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 8333.333
+        "station_m": 9166.667
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -124.08128908,
-          51.76144057
+          -124.11291419,
+          51.73439156
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "S-bends",
+        "feature_id": "chilko_river_lava_canyon__s_bends",
+        "geometry_source": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "geometry_source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "chilko_river_lava_canyon",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 5076.881
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -124.07007551,
+          51.76287986
         ],
         "type": "Point"
       },
@@ -1197,15 +1672,15 @@
         "review_priority": "critical",
         "river_id": "chilko_river_lava_canyon",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 9307.616
+        "station_m": 10153.763
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -124.02574247,
-          51.82075055
+          -124.04202211,
+          51.79592281
         ],
         "type": "Point"
       },
@@ -1222,15 +1697,15 @@
         "review_priority": "critical",
         "river_id": "chilko_river_lava_canyon",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 18615.232
+        "station_m": 15230.644
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -123.93848526,
-          51.87278684
+          -124.00787587,
+          51.83085612
         ],
         "type": "Point"
       },
@@ -1247,15 +1722,40 @@
         "review_priority": "high",
         "river_id": "chilko_river_lava_canyon",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 27922.848
+        "station_m": 20307.526
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -123.83243131,
-          51.90410396
+          -123.9665894,
+          51.8626505
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "guide review required",
+        "display_name": "Mr. Toad's Wild Ride",
+        "feature_id": "chilko_river_lava_canyon__mr_toad_s_wild_ride",
+        "geometry_source": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "geometry_source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "chilko_river_lava_canyon",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 25384.407
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -123.90990718,
+          51.87930527
         ],
         "type": "Point"
       },
@@ -1272,15 +1772,40 @@
         "review_priority": "critical",
         "river_id": "chilko_river_lava_canyon",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 37230.464
+        "station_m": 30461.289
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -123.77376543,
-          51.96236425
+          -123.84683159,
+          51.89283321
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "guide review required",
+        "display_name": "Eagle's Claw",
+        "feature_id": "chilko_river_lava_canyon__eagle_s_claw",
+        "geometry_source": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "geometry_source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "chilko_river_lava_canyon",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 35538.17
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -123.8144998,
+          51.92780435
         ],
         "type": "Point"
       },
@@ -1297,7 +1822,57 @@
         "review_priority": "high",
         "river_id": "chilko_river_lava_canyon",
         "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 46538.08
+        "station_m": 40615.051
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -123.78062894,
+          51.95610118
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "guide review required",
+        "display_name": "Maytag",
+        "feature_id": "chilko_river_lava_canyon__maytag",
+        "geometry_source": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "geometry_source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "chilko_river_lava_canyon",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 45691.933
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -123.72808711,
+          51.98393601
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "guide review required",
+        "display_name": "Landslide Rapid",
+        "feature_id": "chilko_river_lava_canyon__landslide_rapid",
+        "geometry_source": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "geometry_source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "chilko_river_lava_canyon",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 50768.814
       },
       "type": "Feature"
     }

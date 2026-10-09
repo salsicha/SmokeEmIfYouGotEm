@@ -23,8 +23,22 @@ These are review evidence, not surveyed geometry or guide-approved lines.
 | `zambezi.json` | Boiling Pot to Mukuni Beach | 44 | Derived from satellite whitewater and landmarks (no published rapid coordinates exist) |
 
 Merged so far by `physics/scripts/merge_named_rapid_research.py`:
-- the 20 placeable new South Fork rapids;
-- 111 new active Colorado rapids and riffles, via `colorado_normalized.json`
-  from `normalize_colorado_rapid_research.py`. `add_researched_rapid_titles.py` gave them
-on-screen titles and assessment trials on the FullReach map. Second Helping and
-Cornholio have no published chainage and are not placed.
+- **South Fork:** the 20 placeable new rapids.
+  `add_researched_rapid_titles.py` gave them on-screen titles and
+  assessment trials on the FullReach map. Second Helping and Cornholio have
+  no published chainage and are not placed.
+- **Colorado:** 111 new active rapids and riffles, via
+  `colorado_normalized.json` from `normalize_colorado_rapid_research.py`.
+  They are catalogued with editor markers; no playable Colorado reach covers
+  them yet.
+- **Futaleufu:** 6 game-run rapids, by research order (`--unit order
+  --only-game-run`).
+- **Chilko:** 5, by research order. The Bidwell scouting eddy is left out.
+- **Pacuare:** 12, by research order. Their guide km are added to
+  `pacuare_river_costa_rica/observed_rapids/catalog_order_evidence_2026_10_07.json`.
+  Left out:
+  - the rapids above Tres Equis;
+  - The Play Hole and Terciopelo Snake (no km);
+  - Bobito (possible Bobo alias).
+- **Zambezi:** not merged. Its catalog order is its rapid numbering, which
+  sub-rapids would break.

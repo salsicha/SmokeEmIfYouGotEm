@@ -47,7 +47,7 @@ class PacuareLocationsTests(unittest.TestCase):
 
     def test_real_registration_preserves_unresolved_entries_and_source_frames(self):
         result=build();rows={r['name']:r for r in result['rapid_locations']}
-        self.assertEqual(len(rows),15)
+        self.assertEqual(len(rows),27)
         self.assertAlmostEqual(result['single_offset_spread_m'],167.6)
         self.assertFalse(result['offset_spread_is_accuracy_bound'])
         for name in ('Bienvenidos','Bobo Falls','Las Ranitas'):

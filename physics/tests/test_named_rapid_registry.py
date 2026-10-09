@@ -48,10 +48,10 @@ def test_named_rapid_catalog_covers_six_runnable_rivers():
     expected_counts = {
         "south_fork_american_chili_bar": 40,
         "colorado_river_grand_canyon_rowing": 126,
-        "pacuare_river_costa_rica": 15,
+        "pacuare_river_costa_rica": 27,
         "zambezi_batoka_gorge": 25,
-        "futaleufu_river_chile": 5,
-        "chilko_river_lava_canyon": 5,
+        "futaleufu_river_chile": 11,
+        "chilko_river_lava_canyon": 10,
     }
     assert {river["river_id"]: len(river["rapids"]) for river in catalog["rivers"]} == expected_counts
     assert all(source["url"].startswith("https://") for source in catalog["sources"])
@@ -109,7 +109,7 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
     committed = _load(EDITOR_MARKERS_RELATIVE_PATH)
     assert generated == committed
     assert committed["production_promoted"] is False
-    assert sum(river["marker_count"] for river in committed["rivers"]) == 216
+    assert sum(river["marker_count"] for river in committed["rivers"]) == 239
     assert committed["portfolio"]["runnable_river_count"] == 6
     assert committed["portfolio"]["additional_active_environment_count"] == 0
 
@@ -158,7 +158,9 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
         and marker["stationing"]["production_authoritative"] is False
         for marker in pacuare
     )
-    assert [marker["display_name"] for marker in pacuare][3:12] == [
+    # The reviewed sequence keeps its relative order; researched rapids
+    # (2026-10-08) are interleaved by the guide sequence.
+    reviewed = [
         "Bobo Falls",
         "Rodeo",
         "Double Drop",
@@ -169,13 +171,20 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
         "Guatemala",
         "Cimarrones",
     ]
+    assert [marker["display_name"] for marker in pacuare
+            if marker["display_name"] in reviewed] == reviewed
     chilko = rivers["chilko_river_lava_canyon"]["markers"]
     assert [marker["display_name"] for marker in chilko] == [
+        "S-bends",
         "Bidwell Rapids",
         "Lava Canyon",
         "Green Mile",
+        "Mr. Toad's Wild Ride",
         "White Mile",
+        "Eagle's Claw",
         "Miracle Canyon",
+        "Maytag",
+        "Landslide Rapid",
     ]
     assert all(
         marker["stationing"]["station_kind"] == "provisional_downstream_order_interpolation"
@@ -480,7 +489,7 @@ def test_editor_geometry_is_candidate_only_and_blocks_misaligned_south_fork():
     generated = build_editor_geometry_geojson(markers)
     committed = _load(EDITOR_GEOMETRY_RELATIVE_PATH)
     assert generated == committed
-    assert committed["feature_count"] == 52
+    assert committed["feature_count"] == 75
     assert committed["production_promoted"] is False
     assert {feature["properties"]["river_id"] for feature in committed["features"]} == {
         "pacuare_river_costa_rica",
@@ -521,7 +530,7 @@ def test_named_rapid_review_runs_cover_flow_lines_controls_and_safety_policy():
     assert generated == committed
     assert committed["run_count"] == len(committed["runs"])
     assert committed["run_count"] > 400
-    assert committed["run_count"] == 846
+    assert committed["run_count"] == 921
     assert committed["portfolio"]["total_river_count"] == 6
     assert {run["flow_band"] for run in committed["runs"]} == {
         "low_review",
@@ -543,7 +552,7 @@ def test_named_rapid_review_runs_cover_flow_lines_controls_and_safety_policy():
     assert all(run["voice_paddle_commands_enabled"] is False for run in colorado)
 
     chilko = [run for run in committed["runs"] if run["river_id"] == "chilko_river_lava_canyon"]
-    assert len(chilko) == 30
+    assert len(chilko) == 45
     assert all(run["portfolio_role"] == "runnable_river" for run in chilko)
     zambezi = [run for run in committed["runs"] if run["river_id"] == "zambezi_batoka_gorge"]
     assert zambezi

@@ -63,6 +63,24 @@ def main_subfeature(record, entry, source_ids):
             'consequence_class': consequence, 'source_ids': source_ids, 'guide_review_status': 'required'}
 
 
+def normalise_class(cls):
+    """{low, high, range_note} from a dict or a list of per-source ratings."""
+    if isinstance(cls, dict):
+        return cls
+    if not isinstance(cls, list):
+        return {}
+    grades = []
+    for row in cls:
+        text = str(row.get('rating') if isinstance(row, dict) else row)
+        match = re.match(r'\s*(VI|IV|V|I{1,3})([+-]?)', text)
+        if match:
+            grades.append((ROMAN[match.group(1)], match.group(1) + match.group(2)))
+    if not grades:
+        return {}
+    note = '; '.join(f"{r.get('rating')} ({r.get('source')})" for r in cls if isinstance(r, dict))[:300]
+    return {'low': min(grades)[1], 'high': max(grades)[1], 'range_note': note}
+
+
 def rapid_slug(name):
     return re.sub(r'[^a-z0-9]+', '_', name.lower()).strip('_')
 
@@ -99,7 +117,12 @@ def rights_status(text):
     return 'link_only_factual_index'
 
 
-def merge(research_path, river_id, unit, prefix, catalog_path=CATALOG, dry_run=False, default_class='II'):
+def sequence_key(name):
+    return re.sub(r'[^a-z0-9]', '', re.sub(r'\b(rapids?|riffle)\b', '', name.lower()))
+
+
+def merge(research_path, river_id, unit, prefix, catalog_path=CATALOG, dry_run=False, default_class='II',
+          skip=None, only_game_run=False):
     catalog = json.loads(Path(catalog_path).read_text(encoding='utf-8'))
     research = json.loads(Path(research_path).read_text(encoding='utf-8'))
     river = next(r for r in catalog['rivers'] if r['river_id'] == river_id)
@@ -111,12 +134,13 @@ def merge(research_path, river_id, unit, prefix, catalog_path=CATALOG, dry_run=F
     id_map = {}
     for source in research.get('sources', []):
         url = source.get('url') or ''
+        sid = source.get('source_id') or source.get('id') or url
         if not url.startswith('https://'):
             continue
         if url in by_url:
-            id_map[source['source_id']] = by_url[url]
+            id_map[sid] = id_map[url] = by_url[url]
             continue
-        base = f"{prefix}_{re.sub(r'[^a-z0-9]+', '_', source['source_id'].lower()).strip('_')}"
+        base = f"{prefix}_{re.sub(r'[^a-z0-9]+', '_', sid.lower()).strip('_')[:40]}"
         taken = {s['source_id'] for s in catalog['sources']}
         new_id, n = base, 2
         while new_id in taken:
@@ -125,22 +149,29 @@ def merge(research_path, river_id, unit, prefix, catalog_path=CATALOG, dry_run=F
                                        source_kind=source.get('kind', 'research_reference'),
                                        rights_status=rights_status(source.get('rights'))))
         by_url[url] = new_id
-        id_map[source['source_id']] = new_id
+        id_map[sid] = id_map[url] = new_id
     references = [r.get('flow_band_reference') for r in river['rapids']]
     flow_reference = references[0] if references and all(references) else None
+    order_only = unit == 'order'
+    skip = {name.casefold() for name in (skip or [])}
     added, unplaced = [], []
-    for record in research['rapids']:
-        is_new = record.get('is_new', record.get('in_existing_catalog') is False)
-        if not is_new or record['name'].casefold() in known:
+    for index, record in enumerate(research['rapids']):
+        is_new = record['is_new'] if 'is_new' in record else record.get('in_existing_catalog') is False
+        if not is_new or record['name'].casefold() in known or record['name'].casefold() in skip:
             continue
-        value = published_value(record.get('chainage') or {}, unit)
-        if value is None:
+        if only_game_run and not record.get('in_game_run'):
+            continue
+        value = None if order_only else published_value(record.get('chainage') or {}, unit)
+        if value is None and not order_only:
             unplaced.append(record['name'])
             continue
-        cls = record.get('class') if isinstance(record.get('class'), dict) else {}
+        cls = normalise_class(record.get('class'))
+        record = dict(record, feature=record.get('feature') or record.get('description') or '')
         label = class_label(cls) or ('surf feature' if 'surf' in ((record.get('kind') or '') + (record.get('feature') or '')).lower() else default_class)
-        source_ids = sorted({id_map[s['source_id']] for s in record.get('sources', []) if s.get('source_id') in id_map})
-        entry = {'name': record['name'], 'order': 0, station_key: value, 'class': label,
+        cited = [s.get('source_id') or s.get('id') or s.get('url') if isinstance(s, dict) else s
+                 for s in record.get('sources', [])]
+        source_ids = sorted({id_map[c] for c in cited if c in id_map})
+        entry = {'name': record['name'], 'order': 0, **({} if order_only else {station_key: value}), 'class': label,
                  'class_reported_range': {'low': cls.get('low') or label, 'high': cls.get('high') or label,
                                           'note': cls.get('range_note') or 'Researched 2026-10-08; see research_source_ids.'},
                  'feature_tags': tags_for(record.get('feature', '')),
@@ -161,10 +192,28 @@ def merge(research_path, river_id, unit, prefix, catalog_path=CATALOG, dry_run=F
             entry['research_position'] = dict(lat=position['lat'], lon=position['lon'],
                                               derived=bool(position.get('derived', record.get('position') is None)),
                                               basis=position.get('method') or position.get('selection') or position.get('source_id'))
-        added.append(entry)
-    combined = river['rapids'] + added
-    # Downstream order by station; existing rapids keep their stations.
-    combined.sort(key=lambda r: (r.get(station_key, float('inf')), r['order'] if r['order'] else 1e9))
+        added.append((index, entry))
+    if order_only:
+        # No stations: place new rapids by the research's downstream sequence.
+        # Existing rapids keep their own relative order; each takes its
+        # research position where its name matches, never moving backwards.
+        sequence = {}
+        for index, record in enumerate(research['rapids']):
+            for name in [record['name']] + (record.get('aliases') or []):
+                sequence.setdefault(sequence_key(name), index)
+        keyed, last = [], -1.0
+        for rapid in river['rapids']:
+            found = [sequence[sequence_key(n)] for n in [rapid['name']] + rapid.get('aliases', [])
+                     if sequence_key(n) in sequence]
+            last = max(found[0], last + 1e-3) if found else last + 1e-3
+            keyed.append((last, 0, rapid))
+        keyed += [(index, 1, entry) for index, entry in added]
+        combined = [rapid for _, _, rapid in sorted(keyed, key=lambda row: (row[0], row[1]))]
+    else:
+        combined = river['rapids'] + [entry for _, entry in added]
+        # Downstream order by station; existing rapids keep their stations.
+        combined.sort(key=lambda r: (r.get(station_key, float('inf')), r['order'] if r['order'] else 1e9))
+    added = [entry for _, entry in added]
     for order, rapid in enumerate(combined, start=1):
         rapid['order'] = order
     river['rapids'] = combined
@@ -259,13 +308,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--research', required=True, type=Path)
     parser.add_argument('--river', required=True)
-    parser.add_argument('--unit', choices=('mile', 'km'), required=True)
+    parser.add_argument('--unit', choices=('mile', 'km', 'order'), required=True,
+                        help="'order' for rivers catalogued by downstream order only (no stations written)")
+    parser.add_argument('--skip', default='', help='Comma-separated research names to leave out')
+    parser.add_argument('--only-game-run', action='store_true', help="Only records flagged in_game_run")
     parser.add_argument('--prefix', required=True, help='Source-ID prefix for new sources')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--default-class', default='II', help='Class for rapids no source rates')
     args = parser.parse_args()
     added, unplaced = merge(args.research, args.river, args.unit, args.prefix, dry_run=args.dry_run,
-                            default_class=args.default_class)
+                            default_class=args.default_class,
+                            skip=[s.strip() for s in args.skip.split(',') if s.strip()],
+                            only_game_run=args.only_game_run)
     for entry in added:
         print(f"{entry['order']:3d} {entry['name']:40s} {entry.get('river_mile', entry.get('river_km'))} {entry['class']:10s} {entry['feature_tags']}")
     print(f'added {len(added)}; unplaced (no chainage): {unplaced}')

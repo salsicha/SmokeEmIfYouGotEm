@@ -5,8 +5,8 @@ from build_rapid_decision_campaign import build, definitions
 class DecisionCampaign(unittest.TestCase):
     def test_no_catalog_entry_disappears(self):
         contracts,plans=build()
-        self.assertEqual(len(contracts),230)
-        self.assertEqual(sum(c['status']=='missing_playable_section' for c in contracts),137)
+        self.assertEqual(len(contracts),251)
+        self.assertEqual(sum(c['status']=='missing_playable_section' for c in contracts),158)
         self.assertEqual(sum(len(p['trials']) for p in plans),553)
         self.assertTrue(all(c['catalog_class_match']=='not_established' for c in contracts))
         self.assertEqual(len(definitions()),93)
@@ -62,7 +62,7 @@ class DecisionCampaign(unittest.TestCase):
 
     def test_missing_entries_have_sources_not_fake_routes(self):
         missing=[c for c in build()[0] if c['status']=='missing_playable_section']
-        self.assertEqual(len(missing),137)
+        self.assertEqual(len(missing),158)
         for c in missing:
             self.assertTrue(c['source'].startswith('https://'))
             self.assertTrue(c['construction_review'])
@@ -90,7 +90,10 @@ class DecisionCampaign(unittest.TestCase):
             self.assertIsNone(row['boundary_lon_lat'])
             self.assertIsNone(row['route_coordinates'])
             self.assertEqual(row['geographic_acceptance'],'unresolved')
-            self.assertIn('catalog_location_evidence',row['location_evidence_file'])
+            # Reviewed rows cite the Chilko location ledger; rapids added from
+            # the 2026-10-08 research cite that research, still unresolved.
+            self.assertTrue('catalog_location_evidence' in row['location_evidence_file'] or
+                            'named_rapid_research_2026_10_08' in row['location_evidence_file'])
 
     def test_las_ranitas_uses_new_bridge_evidence_without_invented_bounds(self):
         from register_pacuare_highway_bridge import ROOT, build as bridge_registration

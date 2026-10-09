@@ -6,6 +6,27 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- **More catalogued rapids on the Futaleufu, Chilko and Pacuare runs**
+  (2026-10-08). These catalogs are kept in downstream order, not stations.
+  The new rapids are placed by the researched downstream sequence, and
+  existing rapids keep their reviewed relative order:
+
+  | Run | Rapids | New |
+  | --- | --- | --- |
+  | Futaleufu game run | 5 -> 11 | Big Water 101 Class, School House, Surf Rock, Pillow Rock, Terminator Wave, Terminator Entrance |
+  | Chilko | 5 -> 10 | S-bends, Mr. Toad's Wild Ride, Eagle's Claw, Maytag, Landslide Rapid |
+  | Pacuare | 15 -> 27 | Linda Vista, Costa Rica Rios, Crying Rock, Rio Tropicales, Entrance to the Gorge, Rio's Bend, Palomitas, La Cimarrones Bend, Sobaco del Diablo, Los Indios, Magnetic Rock, Graduation |
+
+  - **Pacuare guide sequence:** the new rapids join it with their GoRafting
+    km, so the catalog still follows it. Left out:
+    - rapids above Tres Equis;
+    - two with no km;
+    - Bobito, a possible alias of the unresolved Bobo Falls.
+  - **Tooling:** `merge_named_rapid_research.py` gains `--unit order`,
+    `--skip` and `--only-game-run`, and reads each research file's own
+    schema.
+  - **Bridge registration:** the Las Ranitas bridge registration is
+    regenerated for the extended sequence; only its source hash changed.
 - **111 more catalogued Colorado rapids, Lees Ferry to Pearce Ferry**
   (2026-10-08). The Colorado catalog grows from 15 to 126 rapids and riffles.
   - **Placement:** at their USGS GCMRC river miles, 105 at the GCMRC River

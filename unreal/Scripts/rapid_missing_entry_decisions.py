@@ -144,4 +144,6 @@ def researched(entries, add):
                 'Researched 2026-10-08 at its published station; the line and flow-specific behaviour are not yet reviewed',
                 location_evidence='Researched position: ' + ('derived' if (rapid.get('research_position') or {}).get('derived')
                                                               else 'source point' if rapid.get('research_position') else 'chainage only'),
-                source_flow_scope='Not matched to the game flow')
+                source_flow_scope='Not matched to the game flow',
+                location_evidence_file='physics/data/real_world/named_rapid_research_2026_10_08/README.md',
+                geographic_acceptance='unresolved', boundary_lon_lat=None)
