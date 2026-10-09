@@ -40,5 +40,13 @@ Merged so far by `physics/scripts/merge_named_rapid_research.py`:
   - the rapids above Tres Equis;
   - The Play Hole and Terciopelo Snake (no km);
   - Bobito (possible Bobo alias).
-- **Zambezi:** not merged. Its catalog order is its rapid numbering, which
-  sub-rapids would break.
+- **Zambezi:** nothing new to add. All 25 numbered rapids are already in
+  the catalog, and the game places them by the observed control stations
+  in `zambezi_batoka_gorge/observed_rapids/batoka_run_observed_rapids.json`.
+  The research adds only derived positions for these rapids (no source
+  publishes coordinates). Other entries are left out:
+  - sub-features of numbered rapids (3.5, 4b, 5.5, 7B, 12A-C, 16A/B, 18b),
+    which would break the order = rapid-number rule;
+  - access points and landmarks;
+  - rapids outside the Boiling Pot to Mukuni Beach run (the minus rapids,
+    Closed Season, Open Season).
