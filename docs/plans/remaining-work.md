@@ -58,6 +58,14 @@ Azul to the Pasarela", route stations 5,420-15,900 m on
   linked-run boundary tests.
 - The map file and actors were backed up before the runtime was added:
   `tmp/futaleufu-context-map-backup-v1`. Four actor files were added.
+- Hands-off trials on the map (`tmp/futaleufu-continuous-handsoff-v1`,
+  headless, fixed 30 Hz): all eight researched rapids cleared, with no
+  swimmers, hull contacts or grounding, and roll under 2 degrees.
+  These rapids are far milder than the real ones (Terminator is class V).
+  The bed is inferred from Copernicus 30 m terrain at 1.8 m depth, with
+  no boulders, holes or ledges. The L_Terminator challenge keeps the
+  evidence-built Terminator features. Rapid features along the continuous
+  route remain to be built.
 - Not yet done: a rendered full descent, rescue streaming and packaged
   frame rate. The backwater could be settled further for the full
   400 m3/s.
