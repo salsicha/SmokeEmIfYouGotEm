@@ -399,6 +399,37 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- **The crew's weight bears where they sit** (2026-10-08,
+  `RaftSimChronoRuntimeAdapter.cpp`). Their mass was already part of the
+  raft's body, but it acted at the hull's centre, so where they sat never
+  tilted the boat. Each person's weight now acts at their seat, or wherever
+  they lean, brace or high-side to, so the boat's centre of mass is the dry
+  hull plus each person aboard. On still water, with the 85 kg guide and
+  four 75 kg paddlers:
+  - **Full crew**: the boat lists 0.7 degrees to the guide's side and sits
+    0.25 degrees bow down.
+  - **Two port paddlers washed out**: 150 kg leaves the boat, the centre of
+    mass moves 23 cm to starboard and the starboard tube sinks to 1.8
+    degrees.
+  - **The guide out**: the stern rises (bow down 0.8 degrees) and the list
+    goes.
+  - **Everyone high-sided onto one tube**: it holds that tube down 3
+    degrees, so a high-side now levers the boat.
+
+  The inertia follows them too. The configured inertia is the full crew at
+  their seats. Its crew share scales, axis by axis, with how far out the
+  crew aboard actually sit, so a guide at the stern leaving takes more pitch
+  inertia than a paddler amidships. A full crew at their seats and an empty
+  hull keep the inertia they had. The body still turns about the hull's
+  centre. Step telemetry now reports the centre of mass and the crew's
+  weight torque. New test `RaftSim.Physics.CrewWeightBalance`.
+  `RaftSim.Crew.OccupancyControlsLoadsAndIntegratedMass` checks the new
+  inertia rule and centre of mass.
+
+  The rescue choreography review's 3.2 m breaking broadside can now stand
+  the boat on its tube and drop it back upright, as a raft balanced on its
+  side can go either way. If the first wave doesn't roll it over, up to two
+  more follow, 10 s apart.
 - P pauses and resumes the run, as Escape does (and resumes from photo
   mode). Photo mode moves from P to O; gamepad Y and the pause panel's
   Photo Mode button are unchanged.

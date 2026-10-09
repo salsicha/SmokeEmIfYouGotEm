@@ -493,13 +493,47 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         ? FMath::Max(NominalMassKg - NominalFlexibleCrewMassKg +
             SeatSolve.CrewTelemetry.TotalCrewMassKg, 1.0e-3)
         : NominalMassKg;
-    // Preserve the existing shape-based inertia approximation as occupancy
-    // changes. This is not a per-limb/parallel-axis center-of-mass solve.
-    const double InertiaScale = MassKg / NominalMassKg;
-    const FVector Inertia(
-        FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.X) * InertiaScale, 1.0e-3),
-        FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.Y) * InertiaScale, 1.0e-3),
-        FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.Z) * InertiaScale, 1.0e-3));
+    // The crew are part of the body where they sit (lean, brace or
+    // high-side to). Their weight there is the boat's centre of mass, and
+    // turns it about the hull centre (below); how far out they sit sets
+    // their share of its inertia. The configured inertia is the full crew
+    // at their seats. Its crew share (the part above the dry hull's mass
+    // share) scales, per axis, with the crew's second moment about the hull
+    // centre now against then: a guide at the stern leaving takes more pitch
+    // inertia than a paddler amidships, and an empty hull keeps its own.
+    FVector Inertia(RaftConfig.InertiaTensorKgM2);
+    FVector CrewMomentKgM = FVector::ZeroVector;
+    if (bBodyMassIncludesFlexibleCrew)
+    {
+        const auto SecondMoment = [](const FVector& R, double M)
+            { return FVector(R.Y * R.Y + R.Z * R.Z, R.X * R.X + R.Z * R.Z, R.X * R.X + R.Y * R.Y) * M; };
+        FVector Seated = FVector::ZeroVector;
+        for (const FRaftSimFlexCrewSeat& Seat : FlexSeats)
+        {
+            Seated += SecondMoment(Seat.LocalPosition, Seat.OccupantMassKg);
+        }
+        FVector Aboard = FVector::ZeroVector;
+        for (const FRaftSimFlexSeatTelemetry& Seat : SeatSolve.CrewTelemetry.SeatTelemetry)
+        {
+            if (Seat.bOccupied)
+            {
+                Aboard += SecondMoment(Seat.EffectiveLocalPosition, Seat.MassKg);
+                CrewMomentKgM += Seat.EffectiveLocalPosition * Seat.MassKg;
+            }
+        }
+        const double DryShare = FMath::Clamp((NominalMassKg - NominalFlexibleCrewMassKg) / NominalMassKg, 0.0, 1.0);
+        for (int32 Axis = 0; Axis < 3; ++Axis)
+        {
+            const double Configured = RaftConfig.InertiaTensorKgM2[Axis];
+            Inertia[Axis] = Configured * DryShare + Configured * (1.0 - DryShare) *
+                (Seated[Axis] > 1.0e-9 ? Aboard[Axis] / Seated[Axis] : MassKg / NominalMassKg);
+        }
+    }
+    else
+    {
+        Inertia *= MassKg / NominalMassKg;
+    }
+    Inertia = Inertia.ComponentMax(FVector(1.0e-3));
 
     // Buoyancy support stage (ported from the P1 actor integrator): gravity,
     // multi-point tube buoyancy against the live water surface, blended
@@ -512,11 +546,19 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     // It prevents empty-hull high-spin drag from adding kinetic energy.
     const bool bImplicitDragCandidate=true;
     const bool bSupportStage = static_cast<bool>(WaterSurfaceSampler) && TubeSamplePointsM.Num() > 0;
+    FVector CrewWeightTorqueNm = FVector::ZeroVector;
     if (bSupportStage)
     {
         CSV_SCOPED_TIMING_STAT(RaftSimBody,WaterSupportAndDrag);
         const double WeightN = MassKg * kSupportGravityMps2;
         ForceN.Z += -WeightN;
+        // The dry hull's weight acts at its centre; each person's where they
+        // sit. Off centre it tilts the boat: a guide at the stern sits it
+        // lower, a washed-out paddler leaves that side light and a high-side
+        // holds the far tube down.
+        CrewWeightTorqueNm = FVector::CrossProduct(
+            State.Orientation.RotateVector(CrewMomentKgM), FVector(0.0, 0.0, -kSupportGravityMps2));
+        TorqueNm += CrewWeightTorqueNm;
         const double PerPointBuoyancyN =
             // Occupants leaving do not remove inflated hull volume/capacity.
             NominalMassKg * kSupportGravityMps2 * static_cast<double>(RaftConfig.BuoyancyWeightMultiple) /
@@ -1020,6 +1062,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     LastFlexStepTelemetry.OccupiedCrewMassKg = SeatSolve.CrewTelemetry.TotalCrewMassKg;
     LastFlexStepTelemetry.IntegratedMassKg = MassKg;
     LastFlexStepTelemetry.IntegratedInertiaKgM2 = Inertia;
+    LastFlexStepTelemetry.CenterOfMassLocalM = CrewMomentKgM / MassKg;
+    LastFlexStepTelemetry.CrewWeightTorqueNm = CrewWeightTorqueNm;
     LastFlexStepTelemetry.BuoyancyReferenceMassKg = NominalMassKg;
     LastFlexStepTelemetry.MaxFreeboardLossM = SeatSolve.TubeSolve.MaxFreeboardLossM;
     LastFlexStepTelemetry.PortTotalFreeboardLossM = SeatSolve.PortTotalFreeboardLossM;

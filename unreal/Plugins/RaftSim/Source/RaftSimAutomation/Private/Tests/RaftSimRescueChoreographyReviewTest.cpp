@@ -146,18 +146,8 @@ public:
         {
             // The same breaking broadside the flip regression uses.
             if (!Runtime) { Test->AddError(TEXT("Physics bridge missing")); return true; }
-            const auto Scenes = RaftSimFlipTestEnvironment::Scenes();
-            const auto Wave = *Scenes.FindByPredicate([](const auto& S) { return S.Name == TEXT("breaking_broadside_3p2m"); });
-            const double Started = Now;
-            const FVector Origin(Raft->GetActorLocation().X, Raft->GetActorLocation().Y, 0.);
-            const TWeakObjectPtr<UWorld> WeakWorld(World);
-            Runtime->SetFlexibleUniformWater(FRaftSimFlexUniformWater{}, false);
-            Runtime->SetWaterSurfaceSampler([Wave, Started, Origin, WeakWorld](const FVector& P, float& Height)
-            { if (!WeakWorld.IsValid()) return false; Height = Wave.Surface(P - Origin, WeakWorld->GetTimeSeconds() - Started) * 100. + Origin.Z; return true; });
-            Runtime->SetFlexibleWaterFieldSampler([Wave, Started, Origin, WeakWorld](const FVector& P, FRaftSimFlexUniformWater& W)
-            { if (!WeakWorld.IsValid()) return false; const double Seconds = WeakWorld->GetTimeSeconds() - Started;
-              W.bWet = Wave.Wet(P - Origin); W.SurfaceHeightM = Wave.Surface(P - Origin, Seconds) + Origin.Z * .01;
-              W.VelocityMps = Wave.Velocity(P - Origin, Seconds); return true; });
+            SendWave(*Runtime, *Raft, *World, Now);
+            Waves = 1;
             NextStage();
             break;
         }
@@ -169,6 +159,9 @@ public:
                 Runtime->SetFlexibleWaterFieldSampler([](const FVector&, FRaftSimFlexUniformWater& W) { W = {}; W.bWet = true; return true; });
                 NextStage();
             }
+            // A wave can stand the boat on its tube and drop it back upright
+            // with the crew's weight where they sit; another follows.
+            else if (T > 10. && Waves < 3 && Runtime) { SendWave(*Runtime, *Raft, *World, Now); ++Waves; StageStart = Now; }
             else if (T > 15.) { Test->AddError(TEXT("No physical capsize")); return true; }
             break;
         case 7:
@@ -218,7 +211,25 @@ public:
 
 private:
     FAutomationTestBase* Test;
+    // A breaking broadside rolling in from where the boat lies now.
+    static void SendWave(URaftSimChronoRuntimeAdapter& Runtime, const ARaftSimRaftActor& Raft, UWorld& World, double Now)
+    {
+        const auto Scenes = RaftSimFlipTestEnvironment::Scenes();
+        const auto Wave = *Scenes.FindByPredicate([](const auto& S) { return S.Name == TEXT("breaking_broadside_3p2m"); });
+        const double Started = Now;
+        const FVector Origin(Raft.GetActorLocation().X, Raft.GetActorLocation().Y, 0.);
+        const TWeakObjectPtr<UWorld> WeakWorld(&World);
+        Runtime.SetFlexibleUniformWater(FRaftSimFlexUniformWater{}, false);
+        Runtime.SetWaterSurfaceSampler([Wave, Started, Origin, WeakWorld](const FVector& P, float& Height)
+        { if (!WeakWorld.IsValid()) return false; Height = Wave.Surface(P - Origin, WeakWorld->GetTimeSeconds() - Started) * 100. + Origin.Z; return true; });
+        Runtime.SetFlexibleWaterFieldSampler([Wave, Started, Origin, WeakWorld](const FVector& P, FRaftSimFlexUniformWater& W)
+        { if (!WeakWorld.IsValid()) return false; const double Seconds = WeakWorld->GetTimeSeconds() - Started;
+          W.bWet = Wave.Wet(P - Origin); W.SurfaceHeightM = Wave.Surface(P - Origin, Seconds) + Origin.Z * .01;
+          W.VelocityMps = Wave.Velocity(P - Origin, Seconds); return true; });
+    }
+
     int32 Stage = 0;
+    int32 Waves = 0;
     int32 HighSideStage = 0;
     bool bHighSideDone = false;
     double HighSideStart = 0.;

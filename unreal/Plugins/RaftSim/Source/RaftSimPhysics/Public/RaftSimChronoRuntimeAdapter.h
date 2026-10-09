@@ -169,6 +169,11 @@ struct FRaftSimFlexStepTelemetry
     double OccupiedCrewMassKg = 0.0;
     double IntegratedMassKg = 0.0;
     FVector IntegratedInertiaKgM2 = FVector::ZeroVector;
+    // The body's centre of mass, raft-local metres from the hull centre:
+    // the dry hull there plus each person aboard at their seat.
+    FVector CenterOfMassLocalM = FVector::ZeroVector;
+    // Their weight's turn about the hull centre on the last support pass.
+    FVector CrewWeightTorqueNm = FVector::ZeroVector;
     double BuoyancyReferenceMassKg = 0.0;
     double MaxFreeboardLossM = 0.0;
     double PortTotalFreeboardLossM = 0.0;

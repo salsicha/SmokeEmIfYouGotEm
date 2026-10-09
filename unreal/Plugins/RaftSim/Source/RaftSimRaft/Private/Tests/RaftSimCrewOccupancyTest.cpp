@@ -80,8 +80,23 @@ bool FRaftSimCrewOccupancyTest::RunTest(const FString&)
             FMath::IsNearlyEqual(Adapter->GetKinematicState().LinearVelocityMetersPerSecond.X, 1.0, 1.e-6));
         TestTrue(TEXT("hull buoyancy capacity does not lose crew-sized volume"),
             FMath::IsNearlyEqual(T.BuoyancyReferenceMassKg, 605.));
-        TestTrue(TEXT("documented shape-inertia scale uses current mass"),
-            T.IntegratedInertiaKgM2.Equals(Body.InertiaTensorKgM2 * (ExpectedMass / 605.), 1.e-6));
+        // The crew's share of the configured inertia (above the dry hull's
+        // mass share) follows how far out those aboard sit, against the
+        // full crew at their seats.
+        const auto Weight = RaftSimFlex::EvaluateCrewWeightDistribution(Flex.TotalMassKg(), FVector(0, 0, -9.81),
+            Adapter->bFlexCapsized ? Adapter->FlexCapsizedSeats : Adapter->FlexSeats, Adapter->FlexActions,
+            Flex.LengthM, Flex.WidthM);
+        const auto SecondMoment = [](const FVector& R, double M)
+            { return FVector(R.Y * R.Y + R.Z * R.Z, R.X * R.X + R.Z * R.Z, R.X * R.X + R.Y * R.Y) * M; };
+        FVector Seated = FVector::ZeroVector, Aboard = FVector::ZeroVector;
+        for (const auto& Seat : Adapter->FlexSeats) Seated += SecondMoment(Seat.LocalPosition, Seat.OccupantMassKg);
+        for (const auto& Seat : Weight.SeatTelemetry) if (Seat.bOccupied) Aboard += SecondMoment(Seat.EffectiveLocalPosition, Seat.MassKg);
+        FVector ExpectedInertia;
+        for (int32 Axis = 0; Axis < 3; ++Axis)
+            ExpectedInertia[Axis] = Body.InertiaTensorKgM2[Axis] * (220. / 605. + 385. / 605. * Aboard[Axis] / Seated[Axis]);
+        TestTrue(TEXT("crew inertia follows where those aboard sit"), T.IntegratedInertiaKgM2.Equals(ExpectedInertia, 1.e-6));
+        TestTrue(TEXT("the centre of mass is each person aboard at their seat"),
+            T.CenterOfMassLocalM.Equals(Weight.CombinedCenterOfGravityOffset, 1.e-7));
         AddInfo(FString::Printf(TEXT("OCCUPANCY crew=%.0f integrated=%.0f buoyancy_reference=%.0f"),
             T.OccupiedCrewMassKg, T.IntegratedMassKg, T.BuoyancyReferenceMassKg));
     };
