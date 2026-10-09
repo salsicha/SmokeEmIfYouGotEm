@@ -6,6 +6,17 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- **111 more catalogued Colorado rapids, Lees Ferry to Pearce Ferry**
+  (2026-10-08). The Colorado catalog grows from 15 to 126 rapids and riffles.
+  - **Placement:** at their USGS GCMRC river miles, 105 at the GCMRC River
+    Rapids layer's own points, with Grand Canyon 1-10 ratings as published.
+  - **Left out:** drowned and historical Lake Mead names and non-rapid
+    obstacles.
+  - **What each entry has:** an editor marker, simulator review runs and a
+    source-linked "missing playable section" decision. None has a playable
+    reach or title yet.
+  - **Normalization:** `normalize_colorado_rapid_research.py` converts the two
+    raw Colorado files.
 - **20 more named rapids on the South Fork** (2026-10-08). The South Fork full
   descent now titles 40 rapids, not 20. The new ones are researched from
   American Whitewater feature points, River Brain, the mile guide and

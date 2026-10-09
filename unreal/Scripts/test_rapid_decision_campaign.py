@@ -5,8 +5,8 @@ from build_rapid_decision_campaign import build, definitions
 class DecisionCampaign(unittest.TestCase):
     def test_no_catalog_entry_disappears(self):
         contracts,plans=build()
-        self.assertEqual(len(contracts),119)
-        self.assertEqual(sum(c['status']=='missing_playable_section' for c in contracts),26)
+        self.assertEqual(len(contracts),230)
+        self.assertEqual(sum(c['status']=='missing_playable_section' for c in contracts),137)
         self.assertEqual(sum(len(p['trials']) for p in plans),553)
         self.assertTrue(all(c['catalog_class_match']=='not_established' for c in contracts))
         self.assertEqual(len(definitions()),93)
@@ -62,7 +62,7 @@ class DecisionCampaign(unittest.TestCase):
 
     def test_missing_entries_have_sources_not_fake_routes(self):
         missing=[c for c in build()[0] if c['status']=='missing_playable_section']
-        self.assertEqual(len(missing),26)
+        self.assertEqual(len(missing),137)
         for c in missing:
             self.assertTrue(c['source'].startswith('https://'))
             self.assertTrue(c['construction_review'])

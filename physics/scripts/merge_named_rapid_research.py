@@ -99,7 +99,7 @@ def rights_status(text):
     return 'link_only_factual_index'
 
 
-def merge(research_path, river_id, unit, prefix, catalog_path=CATALOG, dry_run=False):
+def merge(research_path, river_id, unit, prefix, catalog_path=CATALOG, dry_run=False, default_class='II'):
     catalog = json.loads(Path(catalog_path).read_text(encoding='utf-8'))
     research = json.loads(Path(research_path).read_text(encoding='utf-8'))
     river = next(r for r in catalog['rivers'] if r['river_id'] == river_id)
@@ -116,7 +116,11 @@ def merge(research_path, river_id, unit, prefix, catalog_path=CATALOG, dry_run=F
         if url in by_url:
             id_map[source['source_id']] = by_url[url]
             continue
-        new_id = f"{prefix}_{re.sub(r'[^a-z0-9]+', '_', source['source_id'].lower()).strip('_')}"
+        base = f"{prefix}_{re.sub(r'[^a-z0-9]+', '_', source['source_id'].lower()).strip('_')}"
+        taken = {s['source_id'] for s in catalog['sources']}
+        new_id, n = base, 2
+        while new_id in taken:
+            new_id, n = f'{base}_{n}', n + 1
         catalog['sources'].append(dict(source_id=new_id, river_id=river_id, title=source.get('title', new_id), url=url,
                                        source_kind=source.get('kind', 'research_reference'),
                                        rights_status=rights_status(source.get('rights'))))
@@ -134,7 +138,7 @@ def merge(research_path, river_id, unit, prefix, catalog_path=CATALOG, dry_run=F
             unplaced.append(record['name'])
             continue
         cls = record.get('class') if isinstance(record.get('class'), dict) else {}
-        label = class_label(cls) or ('surf feature' if 'surf' in (record.get('kind', '') + record.get('feature', '')).lower() else 'II')
+        label = class_label(cls) or ('surf feature' if 'surf' in ((record.get('kind') or '') + (record.get('feature') or '')).lower() else default_class)
         source_ids = sorted({id_map[s['source_id']] for s in record.get('sources', []) if s.get('source_id') in id_map})
         entry = {'name': record['name'], 'order': 0, station_key: value, 'class': label,
                  'class_reported_range': {'low': cls.get('low') or label, 'high': cls.get('high') or label,
@@ -258,8 +262,10 @@ if __name__ == '__main__':
     parser.add_argument('--unit', choices=('mile', 'km'), required=True)
     parser.add_argument('--prefix', required=True, help='Source-ID prefix for new sources')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--default-class', default='II', help='Class for rapids no source rates')
     args = parser.parse_args()
-    added, unplaced = merge(args.research, args.river, args.unit, args.prefix, dry_run=args.dry_run)
+    added, unplaced = merge(args.research, args.river, args.unit, args.prefix, dry_run=args.dry_run,
+                            default_class=args.default_class)
     for entry in added:
         print(f"{entry['order']:3d} {entry['name']:40s} {entry.get('river_mile', entry.get('river_km'))} {entry['class']:10s} {entry['feature_tags']}")
     print(f'added {len(added)}; unplaced (no chainage): {unplaced}')

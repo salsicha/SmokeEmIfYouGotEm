@@ -47,7 +47,7 @@ def test_named_rapid_catalog_covers_six_runnable_rivers():
 
     expected_counts = {
         "south_fork_american_chili_bar": 40,
-        "colorado_river_grand_canyon_rowing": 15,
+        "colorado_river_grand_canyon_rowing": 126,
         "pacuare_river_costa_rica": 15,
         "zambezi_batoka_gorge": 25,
         "futaleufu_river_chile": 5,
@@ -109,7 +109,7 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
     committed = _load(EDITOR_MARKERS_RELATIVE_PATH)
     assert generated == committed
     assert committed["production_promoted"] is False
-    assert sum(river["marker_count"] for river in committed["rivers"]) == 105
+    assert sum(river["marker_count"] for river in committed["rivers"]) == 216
     assert committed["portfolio"]["runnable_river_count"] == 6
     assert committed["portfolio"]["additional_active_environment_count"] == 0
 
@@ -480,13 +480,15 @@ def test_editor_geometry_is_candidate_only_and_blocks_misaligned_south_fork():
     generated = build_editor_geometry_geojson(markers)
     committed = _load(EDITOR_GEOMETRY_RELATIVE_PATH)
     assert generated == committed
-    assert committed["feature_count"] == 50
+    assert committed["feature_count"] == 52
     assert committed["production_promoted"] is False
     assert {feature["properties"]["river_id"] for feature in committed["features"]} == {
         "pacuare_river_costa_rica",
         "zambezi_batoka_gorge",
         "futaleufu_river_chile",
         "chilko_river_lava_canyon",
+        # Paria and Cathedral riffles fall on Colorado's Lees Ferry candidate line.
+        "colorado_river_grand_canyon_rowing",
     }
     assert all(
         feature["properties"]["production_authoritative"] is False
@@ -519,7 +521,7 @@ def test_named_rapid_review_runs_cover_flow_lines_controls_and_safety_policy():
     assert generated == committed
     assert committed["run_count"] == len(committed["runs"])
     assert committed["run_count"] > 400
-    assert committed["run_count"] == 513
+    assert committed["run_count"] == 846
     assert committed["portfolio"]["total_river_count"] == 6
     assert {run["flow_band"] for run in committed["runs"]} == {
         "low_review",

@@ -1,6 +1,56 @@
 {
-  "feature_count": 50,
+  "feature_count": 52,
   "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -111.53257123,
+          36.87961379
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "1/10",
+        "display_name": "Paria Riffle",
+        "feature_id": "colorado_river_grand_canyon_rowing__paria_riffle",
+        "geometry_source": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "lees_ferry_pilot_centerline_review_gated",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "colorado_river_grand_canyon_rowing",
+        "station_kind": "published_river_mile_converted",
+        "station_m": 1496.69
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.56204828,
+          36.87482389
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "2/10",
+        "display_name": "Cathedral Riffle",
+        "feature_id": "colorado_river_grand_canyon_rowing__cathedral_riffle",
+        "geometry_source": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "lees_ferry_pilot_centerline_review_gated",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "portfolio_role": "runnable_river",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "colorado_river_grand_canyon_rowing",
+        "station_kind": "published_river_mile_converted",
+        "station_m": 4361.322
+      },
+      "type": "Feature"
+    },
     {
       "geometry": {
         "coordinates": [

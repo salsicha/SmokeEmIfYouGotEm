@@ -10,8 +10,8 @@ from report_rapid_assessment import inventory, assess, passing_track_spread, cat
 class AssessmentTests(unittest.TestCase):
     def test_all_master_entries_are_reported(self):
         rows = inventory()
-        self.assertEqual(sum(r['master_catalog'] for r in rows), 105)
-        self.assertEqual(len(rows), 119)
+        self.assertEqual(sum(r['master_catalog'] for r in rows), 216)
+        self.assertEqual(len(rows), 230)
         self.assertEqual(len({(r['river'], r['name']) for r in rows}), len(rows))
 
     def test_missing_reach_is_not_a_fake_class(self):
@@ -117,7 +117,7 @@ class AssessmentTests(unittest.TestCase):
             with patch('sys.argv', ['report_rapid_assessment', str(root/'inputs'), '--output', str(root/'report')]):
                 main()
             rows = json.loads((root/'report/report.json').read_text(encoding='utf-8'))
-            self.assertEqual(len(rows), 119)
+            self.assertEqual(len(rows), 230)
             self.assertTrue(all(r['game_class'] is None for r in rows))
             document = (root/'report/report.html').read_text(encoding='utf-8')
             self.assertIn('OBSERVATION INVENTORY', document)

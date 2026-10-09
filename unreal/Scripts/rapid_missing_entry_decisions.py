@@ -109,4 +109,39 @@ def definitions(axes):
         location_status='aggregate_rafting_reach_distinct_from_geographic_point',
         location_evidence='Official BC geographic Lava Canyon lies upstream of the Bidwell marker; '
                           'do not interchange it with the commercial run name or downstream basalt slot.')
+    researched(entries, add)
     return entries
+
+
+def researched(entries, add):
+    """Catalog rapids added from the 2026-10-08 research and not yet built.
+
+    Family follows the researched feature tags. The decision is the researched
+    one-line description, which names the feature but does not prescribe a
+    verified line.
+    """
+    import json
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[2]
+    catalog = json.loads((root / 'physics/data/real_world/named_rapid_source_catalog.json').read_text(encoding='utf-8'))
+    urls = {s['source_id']: s['url'] for s in catalog['sources']}
+    rivers = {'south_fork_american_chili_bar': 'south-fork', 'colorado_river_grand_canyon_rowing': 'colorado',
+              'pacuare_river_costa_rica': 'pacuare', 'futaleufu_river_chile': 'futaleufu',
+              'chilko_river_lava_canyon': 'chilko', 'zambezi_batoka_gorge': 'zambezi'}
+    for river in catalog['rivers']:
+        key = rivers[river['river_id']]
+        for rapid in river['rapids']:
+            if (key, rapid['name']) in entries or not rapid.get('research_source_ids'):
+                continue
+            tags = set(rapid['feature_tags'])
+            family = ('surf' if 'surf_wave' in tags and len(tags) <= 2 else
+                      'hole' if tags & {'hole', 'pourover', 'ledge'} else
+                      'continuous' if 'continuous_whitewater' in tags else
+                      'slalom' if tags & {'boulder', 'boulder_garden', 'island_split', 'pin_hazard'} else
+                      'wall' if tags & {'constriction', 'bend', 'lateral'} else 'train')
+            add(key, rapid['name'], family, rapid.get('research_summary') or rapid['name'],
+                urls[rapid['research_source_ids'][0]],
+                'Researched 2026-10-08 at its published station; the line and flow-specific behaviour are not yet reviewed',
+                location_evidence='Researched position: ' + ('derived' if (rapid.get('research_position') or {}).get('derived')
+                                                              else 'source point' if rapid.get('research_position') else 'chainage only'),
+                source_flow_scope='Not matched to the game flow')

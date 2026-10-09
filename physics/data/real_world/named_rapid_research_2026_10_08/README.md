@@ -22,7 +22,9 @@ These are review evidence, not surveyed geometry or guide-approved lines.
 | `pacuare.json` | Tres Equis to Siquirres | 32 (17 new) | GoRafting km mapped onto OSM relation 12000489 |
 | `zambezi.json` | Boiling Pot to Mukuni Beach | 44 | Derived from satellite whitewater and landmarks (no published rapid coordinates exist) |
 
-Merged so far by `physics/scripts/merge_named_rapid_research.py`: the 20
-placeable new South Fork rapids. `add_researched_rapid_titles.py` gave them
+Merged so far by `physics/scripts/merge_named_rapid_research.py`:
+- the 20 placeable new South Fork rapids;
+- 111 new active Colorado rapids and riffles, via `colorado_normalized.json`
+  from `normalize_colorado_rapid_research.py`. `add_researched_rapid_titles.py` gave them
 on-screen titles and assessment trials on the FullReach map. Second Helping and
 Cornholio have no published chainage and are not placed.
