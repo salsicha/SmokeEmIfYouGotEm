@@ -106,5 +106,16 @@ class CoarseSettleTests(unittest.TestCase):
             self.assertEqual(report['coarse_warm_start']['factor'], 2)
 
 
+    def test_conveyance_levels_keep_flat_blocks_and_lower_channels(self):
+        fine = np.full((4, 4), 10.0)
+        level = warm.conveyance_levels(np.array([[1.0, 2.0]])[:, :1], np.array([[10.0]]), fine, 4)
+        self.assertAlmostEqual(float(level[0, 0]), 11.0, places=6)
+        channel = fine.copy(); channel[:, 1:3] -= 1.0  # half the block 1 m deeper; block mean 9.5
+        level = warm.conveyance_levels(np.array([[1.0]]), np.array([[9.5]]), channel, 4)
+        self.assertLess(float(level[0, 0]), 10.5)
+        depth = np.maximum(level[0, 0] - channel, 0)
+        self.assertAlmostEqual(float((depth ** (5 / 3)).mean()), 1.0, places=6)
+
+
 if __name__ == '__main__':
     unittest.main()

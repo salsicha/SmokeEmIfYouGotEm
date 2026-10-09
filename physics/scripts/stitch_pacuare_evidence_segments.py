@@ -151,6 +151,24 @@ def stitch(segments, out, run_chain):
             target[owned] = np.interp(seg_chain[owned], chain, station).astype(np.float32)
             filled[view] |= take
         print('pasted', s['folder'].name, 'owned', s['own'], flush=True)
+    # Fallback: at meanders a cell can lie in one window but nearest a reach
+    # owned by a segment whose window does not reach it. Take such cells from
+    # any segment that has evidence there, so the river has no holes.
+    fallback = 0
+    for s in segs:
+        g = s['manifest']['grid']
+        r0, c0 = int(round(ytop - g['y_top'])), int(round(g['x0'] - x0))
+        view = np.s_[r0:r0 + g['ny'], c0:c0 + g['nx']]
+        with np.load(s['folder'] / 'evidence_grid.npz') as a:
+            take = ~np.isfinite(grid['bed'][view]) & np.isfinite(a['bed'])
+            if not take.any():
+                continue
+            fallback += int(take.sum())
+            for key in ARRAYS_F32 + ARRAYS_BOOL + ('class_code',):
+                if key in a.files and key != 'station':
+                    target = grid[key][view]
+                    target[take] = a[key][take]
+            filled[view] |= take
     missing = int((~filled).sum())
     out.mkdir(parents=True)
     np.savez_compressed(out / 'evidence_grid.npz', **grid)
@@ -169,7 +187,8 @@ def stitch(segments, out, run_chain):
                     class_codes=base.get('class_codes'),
                     statistics=dict(reach_station_m=run_station, reach_osm_chain_m=list(run_chain),
                                     midline_join_gaps_m=joins, profile_rises_removed_m=step_drops,
-                                    window_cells_without_segment=missing, midline_length_m=float(station[-1])),
+                                    window_cells_without_segment=missing, fallback_cells_from_other_segments=fallback,
+                                    midline_length_m=float(station[-1])),
                     segments=sources, inferred=True, accepted=False)
     (out / 'manifest.json').write_text(json.dumps(manifest, indent=1) + '\n')
     print(json.dumps(manifest['statistics'], indent=1))

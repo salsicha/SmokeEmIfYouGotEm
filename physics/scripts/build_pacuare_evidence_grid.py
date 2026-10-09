@@ -174,6 +174,15 @@ def main():
     ap.add_argument('--out', type=Path, required=True)
     ap.add_argument('--chain-m', type=float, nargs=2, default=(81950.0, 84450.0))
     ap.add_argument('--margin-m', type=float, default=330.0)
+    ap.add_argument('--bank-search-m', type=float, default=80.0,
+                    help='IGN bank lines are kept when mostly within this distance of the OSM line '
+                         '(the OSM line strays farther from the river in some canyons)')
+    ap.add_argument('--min-wetted-width-m', type=float, default=0.0,
+                    help='restore a central wetted band where a station has less wetted channel than this (0: off)')
+    ap.add_argument('--osm-max-deviation-m', type=float, default=0.0,
+                    help='replace bank-pair midline points farther than this from the OSM line (0: off)')
+    ap.add_argument('--osm-gap-fill-m', type=float, default=0.0,
+                    help='use the OSM line for the midline across bank-pair gaps longer than this (0: off)')
     ap.add_argument('--extension-m', type=float, default=3000.0,
                     help='OSM chainage beyond the reach used for the midline and surface anchors '
                          '(sparse 50 m contours upstream need more than the default)')
@@ -215,7 +224,7 @@ def main():
             continue
         p = np.array(f['geometry']['coordinates'])[:, :2]
         ps, pl = project(p[:, 0], p[:, 1], X, Y, S, LX, LY)
-        near = np.abs(pl) < 80
+        near = np.abs(pl) < args.bank_search_m
         if near.mean() > 0.6 and np.ptp(ps[near]) > 100:
             d = densify(p, 1.0)
             bank.append(d); bank_id.append(np.full(len(d), len(bank_id)))
@@ -246,6 +255,29 @@ def main():
     bins = np.floor(ms_ / 6.0).astype(int)
     ub = np.unique(bins)
     cxm = np.array([np.median(mids[bins == u, 0]) for u in ub]); cym = np.array([np.median(mids[bins == u, 1]) for u in ub])
+    osm_filled_m = 0.0
+    osm_replaced_m = 0.0
+    if args.osm_max_deviation_m > 0:
+        # Island and side-channel bank lines can pull facing-pair midpoints
+        # far off the main channel; the OSM line follows the main channel.
+        ox_, oy_ = np.interp(ub * 6.0 + 3.0, S, X), np.interp(ub * 6.0 + 3.0, S, Y)
+        off = np.hypot(cxm - ox_, cym - oy_) > args.osm_max_deviation_m
+        cxm, cym = np.where(off, ox_, cxm), np.where(off, oy_, cym)
+        osm_replaced_m = 6.0 * int(off.sum())
+    if args.osm_gap_fill_m > 0:
+        # Where no facing bank pair exists for longer than the threshold (a
+        # bank far out on bars or floodplain), the midline would become a
+        # straight chord across the bend. Use the OSM line there instead.
+        step = int(np.ceil(args.osm_gap_fill_m / 6.0))
+        add = []
+        for a_, b_ in zip(ub[:-1], ub[1:]):
+            if b_ - a_ > step:
+                add.extend(range(a_ + 1, b_))
+        if add:
+            add = np.array(add)
+            cxm = np.r_[cxm, np.interp(add * 6.0 + 3.0, S, X)]; cym = np.r_[cym, np.interp(add * 6.0 + 3.0, S, Y)]
+            ub = np.r_[ub, add]
+            osm_filled_m = 6.0 * len(add)
     order = np.argsort(ub)
     mx_, my_ = gauss_smooth(cxm[order], 2.0), gauss_smooth(cym[order], 2.0)
     mxs, mys, _ = arc_resample(mx_, my_, 1.0)
@@ -340,6 +372,27 @@ def main():
             rock_comps.append(pix)
     vegin = channel & ortho_valid & veg & (mxc > 60) & ~white & ~bright
     river = channel & ~bars & ~rocks & ~vegin
+    wetted_band_m = 0
+    if args.min_wetted_width_m > 0:
+        # Canopy over the channel, or bright water read as gravel, can leave a
+        # station with no wetted cells: bars across the whole channel would
+        # dam the river. Restore a central wetted band there (inferred), as
+        # wide as the neighbouring wetted channel.
+        si = np.clip(np.round(np.nan_to_num(st_grid, nan=-1)).astype(int), -1, M - 1)
+        wet_m = np.bincount(si[river & (si >= 0)], minlength=M).astype(float)
+        span = 101
+        padded = np.pad(np.where(wet_m > 0, wet_m, np.nan), span // 2, mode='edge')
+        windows = np.lib.stride_tricks.sliding_window_view(padded, span)
+        typical = np.nan_to_num(np.nanmedian(np.where(np.isfinite(windows), windows, np.nan), axis=1),
+                                nan=args.min_wetted_width_m)
+        need = wet_m < args.min_wetted_width_m
+        width_need = np.clip(typical, args.min_wetted_width_m, 40.0)
+        centre = 0.5 * (mleft + mright)
+        ok = channel & (si >= 0)
+        band = np.zeros_like(channel)
+        band[ok] = need[si[ok]] & (np.abs(lat_grid[ok] - centre[si[ok]]) <= 0.5 * width_need[si[ok]])
+        river |= band; bars &= ~band; rocks &= ~band; vegin &= ~band
+        wetted_band_m = int(need[np.unique(si[band])].sum()) if band.any() else 0
     foam = white & river
 
     # ---------------- water-surface anchors: contour level crossings
@@ -461,8 +514,9 @@ def main():
     rock_tops = []
     er = edt_inside(rocks)
     for pix in rock_comps:
+        pix = pix[rocks[pix[:, 0], pix[:, 1]]]  # minus any restored wetted band
         r_, c_ = pix[:, 0], pix[:, 1]
-        if not np.isfinite(ws_cell[r_, c_]).all():
+        if not len(pix) or not np.isfinite(ws_cell[r_, c_]).all():
             continue
         htop = float(np.clip(0.45 * np.sqrt(len(pix)), 0.3, 1.5))
         emax = max(er[r_, c_].max(), 1.0)
@@ -506,7 +560,7 @@ def main():
                  anchors=[(float(s_), float(z_)) for s_, z_ in zip(a_st, a_z)],
                  inferred_depth_m_p10_p50_p90=np.percentile((ws_cell - bed)[inreach & (cls == 2)], [10, 50, 90]).tolist(),
                  wetted_width_reach_m_p10_p50_p90=np.percentile(width[reach_idx[0] // 2:reach_idx[-1] // 2], [10, 50, 90]).tolist(),
-                 foam_boulders=len(boulders), emergent_rocks=len(rock_tops))
+                 foam_boulders=len(boulders), emergent_rocks=len(rock_tops), osm_midline_fill_m=osm_filled_m, osm_midline_replaced_m=osm_replaced_m, restored_wetted_band_m=wetted_band_m)
     manifest = dict(
         schema='raftsim.pacuare.huacas_evidence_grid.v1', crs='EPSG:5367 CR05 / CRTM05', vertical='IGN orthometric metres (contours)',
         grid=dict(x0=X0, y_top=Y1, nx=NX, ny=NY, cell_m=1.0),
@@ -520,7 +574,7 @@ def main():
                      '4': 'submerged boulder: location from orthophoto whitewater, height from a pour-over assumption (inferred)'},
         parameters=dict(discharge_m3s=Q, discharge_source='existing rainfed_runnable_planning band (not measured; no gauge)',
                         n_pool=args.n_pool, n_rapid=args.n_rapid, pool_weight=args.pool_weight, min_slope=args.min_slope,
-                        anchor_bank_distance_m=args.anchor_bank_distance_m, chain_m=list(args.chain_m), margin_m=args.margin_m, extension_m=args.extension_m,
+                        anchor_bank_distance_m=args.anchor_bank_distance_m, chain_m=list(args.chain_m), margin_m=args.margin_m, extension_m=args.extension_m, bank_search_m=args.bank_search_m, osm_gap_fill_m=args.osm_gap_fill_m, osm_max_deviation_m=args.osm_max_deviation_m, min_wetted_width_m=args.min_wetted_width_m,
                         ws_profile=dict(path=str(args.ws_profile), sha256=sha(args.ws_profile)) if args.ws_profile else None,
                         bar_top_m=args.bar_top_m, bar_ramp_m=args.bar_ramp_m,
                         bed_correction=None if corr is None else str(args.bed_correction),

@@ -30,15 +30,13 @@ def sha(path):
 
 
 def blocks(fine, factor, weights=None):
-    """Block sums over real cells; rows are padded with zero weight."""
+    """Block sums over real cells; rows and stations are padded with zero weight."""
     ny, nx = fine.shape
-    pad = (-ny) % factor
-    if nx % factor:
-        raise ValueError('Station count must divide by the factor')
+    pad, pad_x = (-ny) % factor, (-nx) % factor
     w = np.ones_like(fine) if weights is None else weights
-    f = np.pad(fine * w, ((0, pad), (0, 0)))
-    w = np.pad(w, ((0, pad), (0, 0)))
-    shape = (f.shape[0] // factor, factor, nx // factor, factor)
+    f = np.pad(fine * w, ((0, pad), (0, pad_x)))
+    w = np.pad(w, ((0, pad), (0, pad_x)))
+    shape = (f.shape[0] // factor, factor, f.shape[1] // factor, factor)
     return f.reshape(shape).sum(axis=(1, 3)), w.reshape(shape).sum(axis=(1, 3))
 
 
@@ -96,7 +94,7 @@ def build(inputs, factor, out):
         shutil.copyfile(source / name, target / name)
     coarse = json.loads(json.dumps(scenario))
     half = (factor - 1) * 0.5 * grid['dx']
-    coarse['grid'] = dict(nx=nx // factor, ny=bed_c.shape[0], dx=grid['dx'] * factor, dy=grid['dy'] * factor,
+    coarse['grid'] = dict(nx=bed_c.shape[1], ny=bed_c.shape[0], dx=grid['dx'] * factor, dy=grid['dy'] * factor,
                           origin_x=grid['origin_x'] + half, origin_y=grid['origin_y'] + half)
     coarse['fixed_dt'] = scenario['fixed_dt'] * factor
     for boundary in coarse['boundaries']:
@@ -111,7 +109,7 @@ def build(inputs, factor, out):
     coarse['metadata']['coarse_settle'] = dict(
         factor=factor, source_inputs=str(inputs), source_scenario_sha256=sha(source / 'scenario.json'),
         source_bed_sha256=sha(source / 'bed.npy'), source_initial_state_sha256=sha(source / 'initial_state.npz'),
-        fine_shape=[ny, nx], padded_rows=(-ny) % factor,
+        fine_shape=[ny, nx], padded_rows=(-ny) % factor, padded_stations=(-nx) % factor,
         fine_volume_m3=float(h.sum() * grid['dx'] * grid['dy']),
         coarse_volume_m3=float(h_c.sum() * grid['dx'] * grid['dy'] * factor ** 2))
     (target / 'scenario.json').write_text(json.dumps(coarse, indent=2, allow_nan=False) + '\n')

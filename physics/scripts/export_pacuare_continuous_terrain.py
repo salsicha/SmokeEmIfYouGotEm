@@ -19,7 +19,7 @@ import numpy as np
 from scipy.ndimage import map_coordinates
 
 from export_colorado_continuous_terrain import (
-    VERTICES, SPACING, SPAN, HEIGHT_RANGE, LandscapeTriangles, sha, write_png_u16)
+    VERTICES, HEIGHT_RANGE, LandscapeTriangles, sha, write_png_u16)
 
 RIVER_ID = 'pacuare_river_costa_rica'
 CRS = 'EPSG:5367'
@@ -33,11 +33,15 @@ def encode(height):
     return np.rint((height - HEIGHT_BASE) / HEIGHT_RANGE * 65535).astype('uint16')
 
 
-def export(evidence, out, origin, datum):
+def export(evidence, out, origin, datum, spacing=2.0):
     evidence, out = Path(evidence).resolve(), Path(out).resolve()
     if out.exists():
         raise ValueError('Fresh terrain export required')
     origin = np.asarray(origin, float)
+    if spacing not in (1.0, 2.0):
+        raise ValueError('Continuous terrain spacing must be 1 or 2 m')
+    SPACING = float(spacing)
+    SPAN = (VERTICES - 1) * SPACING
     if origin.shape != (2,) or not np.isfinite(origin).all() or not np.isfinite(datum):
         raise ValueError('Invalid geographic frame')
     manifest_path, grid_path = evidence / 'manifest.json', evidence / 'evidence_grid.npz'
@@ -107,6 +111,8 @@ if __name__ == '__main__':
     p.add_argument('--out', type=Path, required=True)
     p.add_argument('--origin', type=float, nargs=2, required=True)
     p.add_argument('--vertical-datum-m', type=float, required=True)
+    p.add_argument('--spacing', type=float, default=2.0,
+                   help='lattice spacing; 1 m resolves narrow riffle channels the 2 m lattice raises')
     a = p.parse_args()
-    r = export(a.evidence, a.out, a.origin, a.vertical_datum_m)
+    r = export(a.evidence, a.out, a.origin, a.vertical_datum_m, a.spacing)
     print(json.dumps(dict(chunks=len(r['chunks']), incomplete_chunks=len(r['incomplete_source_chunks']))))

@@ -15,6 +15,7 @@ from build_colorado_catalog_evidence import sha
 from continue_colorado_catalog_cook import restart_state
 from review_chilko_continuous_cook import read_inputs, validate_native, validate_frame
 from review_colorado_catalog_cook import load_frame
+from native_frame_io import native_frame_paths
 
 
 def validate_parent(receipt, hashes, scenario, native, validation, frame_name, frame_hash):
@@ -40,10 +41,9 @@ def prepare(inputs, cook, review, out):
     receipt = json.loads(review.read_text())
     native = json.loads((cook/'manifest.json').read_text())
     validation = json.loads((cook/'validation.json').read_text())
-    relative = Path(native['frames'][-1])
-    if relative.parent != Path('frames') or relative.suffix != '.csv':
-        raise ValueError('Invalid native final frame path')
-    frame_path = cook/relative; frame_hash = sha(frame_path)
+    # Buffered (.csv) or streamed lossless (.csv.gz) frames, strictly registered.
+    frame_path = native_frame_paths(cook, native)[-1]
+    relative = frame_path.relative_to(cook); frame_hash = sha(frame_path)
     validate_parent(receipt, hashes, scenario, native, validation, relative.name, frame_hash)
     frame = load_frame(frame_path, bed.shape)
     validate_frame(frame, bed, scenario['grid'])

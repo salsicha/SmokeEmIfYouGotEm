@@ -3,7 +3,8 @@
 The coarse frame (build_chilko_coarse_settle.py) gives the water surface and
 depth-averaged current. They are interpolated bilinearly in grid index
 space, using wet coarse cells only, onto every fine cell centre. Fine depth
-is that surface above the unchanged fine bed. Velocity is zero wherever the
+is that surface above the unchanged fine bed (optionally lowered to equal
+conveyance on the fine bed, --conveyance-match). Velocity is zero wherever the
 fine depth is at most the solver's 1e-6 m dry tolerance, matching what the
 native solver does when it loads a state.
 
@@ -50,7 +51,33 @@ def bilinear(field, valid, y, x):
     return np.where(weight > 1e-12, total / np.maximum(weight, 1e-12), np.nan)
 
 
-def build(inputs, coarse, out, frame_index=-1, wet_depth=0.02, frame=None):
+def conveyance_levels(coarse_h, coarse_bed, fine_bed, k, iterations=40):
+    """Per coarse cell, the water level on its k x k fine cells with the same mean conveyance.
+
+    A coarse cell's bed is the block mean, so a narrow channel becomes wider
+    and shallower and needs more water for the same discharge. Under one
+    energy slope, Manning conveyance per unit width scales with h^(5/3); the
+    level eta* with mean(max(eta* - b_fine, 0)^(5/3)) = h_coarse^(5/3) carries
+    the coarse cell's discharge on the real bed. Returns eta* (NaN where dry).
+    """
+    ny, nx = coarse_h.shape
+    pad, pad_x = ny * k - fine_bed.shape[0], nx * k - fine_bed.shape[1]
+    beds = np.pad(fine_bed, ((0, pad), (0, pad_x)), constant_values=np.inf)
+    beds = beds.reshape(ny, k, nx, k).transpose(0, 2, 1, 3).reshape(ny, nx, k * k)
+    real = np.isfinite(beds)
+    target = coarse_h ** (5 / 3)
+    lo = np.where(real, beds, np.inf).min(axis=2)
+    hi = coarse_bed + coarse_h + np.where(real, np.abs(beds - coarse_bed[..., None]), 0).max(axis=2)
+    for _ in range(iterations):
+        mid = 0.5 * (lo + hi)
+        depth = np.where(real, np.maximum(mid[..., None] - np.where(real, beds, 0), 0.0), 0.0)
+        mean = (depth ** (5 / 3)).sum(axis=2) / real.sum(axis=2)
+        low = mean < target
+        lo, hi = np.where(low, mid, lo), np.where(low, hi, mid)
+    return np.where(coarse_h > 0, 0.5 * (lo + hi), np.nan)
+
+
+def build(inputs, coarse, out, frame_index=-1, wet_depth=0.02, frame=None, conveyance_match=False):
     inputs, coarse, out = (Path(p).resolve() for p in (inputs, coarse, out))
     if out.exists():
         raise ValueError('Fresh warm-start inputs directory required')
@@ -82,9 +109,20 @@ def build(inputs, coarse, out, frame_index=-1, wet_depth=0.02, frame=None):
     # on fine index (k - 1) / 2 in both directions.
     cy, cx = (rows - (k - 1) * 0.5) / k, (cols - (k - 1) * 0.5) / k
     surface = bilinear(frame['eta'], wet, cy, cx)
+    lowering = None
+    if conveyance_match:
+        level = conveyance_levels(np.where(wet, frame['h'], 0.0), cbed, bed, k)
+        drop = np.where(wet & np.isfinite(level), frame['eta'] - level, 0.0)
+        lowering = np.nan_to_num(bilinear(drop, wet, cy, cx))
+        surface = surface - lowering
     h = np.where(np.isfinite(surface), np.maximum(surface - bed, 0.0), 0.0)
     u = np.nan_to_num(bilinear(frame['u'], wet, cy, cx))
     v = np.nan_to_num(bilinear(frame['v'], wet, cy, cx))
+    if conveyance_match:
+        # Manning under one slope: velocity scales with h^(2/3) of the coarse depth.
+        coarse_depth = np.nan_to_num(bilinear(frame['h'], wet, cy, cx))
+        ratio = np.where(coarse_depth > 1e-3, (h / np.maximum(coarse_depth, 1e-3)) ** (2 / 3), 0.0)
+        u, v = u * np.minimum(ratio, 3.0), v * np.minimum(ratio, 3.0)
     wet_fine = h > DRY
     h = np.where(wet_fine, h, 0.0)
     u, v = np.where(wet_fine, u, 0.0), np.where(wet_fine, v, 0.0)
@@ -103,6 +141,9 @@ def build(inputs, coarse, out, frame_index=-1, wet_depth=0.02, frame=None):
         source_inputs=str(inputs), source_inputs_sha256={n: sha(inputs / n) for n in COPIED + ('scenario/initial_state.npz', 'build_report.json')},
         coarse_scenario_sha256=sha(coarse / 'scenario/scenario.json'), coarse_frame=str(frame_path),
         coarse_frame_sha256=sha(frame_path), factor=k, wet_depth_m=wet_depth,
+        conveyance_match=bool(conveyance_match),
+        surface_lowering_m=None if lowering is None else dict(
+            median=float(np.median(lowering[h > DRY])), p95=float(np.percentile(lowering[h > DRY], 95))),
         cold_volume_m3=cold_volume, warm_volume_m3=float(h.sum() * grid['dx'] * grid['dy']),
         policy='Coarse-settled surface and current interpolated onto the unchanged fine bed; '
                'geography, friction, boundaries and scenario identity unchanged.')
@@ -120,5 +161,7 @@ if __name__ == '__main__':
     parser.add_argument('--frame-index', type=int, default=-1)
     parser.add_argument('--wet-depth', type=float, default=0.02)
     parser.add_argument('--frame', type=Path, help='explicit saved coarse frame instead of --frame-index')
+    parser.add_argument('--conveyance-match', action='store_true',
+                        help='lower the surface per coarse cell to the fine level with equal mean conveyance')
     args = parser.parse_args()
-    build(args.inputs, args.coarse, args.out, args.frame_index, args.wet_depth, args.frame)
+    build(args.inputs, args.coarse, args.out, args.frame_index, args.wet_depth, args.frame, args.conveyance_match)
