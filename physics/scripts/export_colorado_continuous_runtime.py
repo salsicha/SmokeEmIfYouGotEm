@@ -23,9 +23,10 @@ from native_frame_io import NativeFrameStore
 def _registered_geometry(mapping, terrain, grid):
     generic=terrain.get('schema')=='raftsim.continuous_landscape.v1'
     origin_key='horizontal_origin_m' if generic else 'horizontal_origin_epsg6404_m'
-    if generic and (terrain.get('river_id')!='chilko_river_bc' or
-            terrain.get('horizontal_crs')!='EPSG:3157' or
-            terrain.get('vertical_reference')!='CGVD2013 (EPSG:6647)' or
+    frames={'chilko_river_bc':('EPSG:3157','CGVD2013 (EPSG:6647)'),
+            'pacuare_river_costa_rica':('EPSG:5367','IGN Costa Rica orthometric heights')}
+    if generic and (terrain.get('river_id') not in frames or
+            (terrain.get('horizontal_crs'),terrain.get('vertical_reference'))!=frames[terrain.get('river_id')] or
             terrain.get('world_y_sign')!=-1 or
             any(mapping.get(key)!=terrain.get(key) for key in
                 ('river_id','horizontal_crs','vertical_reference')) or
@@ -164,15 +165,19 @@ def export(inputs, cook, review, out, river_id='colorado_river_grand_canyon_rowi
 
 
 def _export(inputs,cook,review,out,river_id,*,frame_loader=None):
-    chilko=river_id=='chilko_river_bc'
-    if chilko:
+    # Chilko and Pacuare are generic continuous rivers with their own reviews.
+    chilko=river_id in ('chilko_river_bc','pacuare_river_costa_rica')
+    if river_id=='chilko_river_bc':
         from review_chilko_continuous_cook import checked_cook as checked_chilko
         build,receipt,native,scenario,frame,bed=checked_chilko(inputs,cook,review)
+    elif river_id=='pacuare_river_costa_rica':
+        from review_pacuare_continuous_cook import checked_cook as checked_pacuare
+        build,receipt,native,scenario,frame,bed=checked_pacuare(inputs,cook,review)
     elif river_id=='colorado_river_grand_canyon_rowing':
         build, receipt, native, scenario, frame, bed = checked_cook(inputs, cook, review,frame_loader=frame_loader)
     else:raise ValueError('Unsupported continuous river')
     band_id=scenario['metadata']['flow_band'] if chilko else BAND
-    section_id='chilko_continuous' if chilko else 'colorado_continuous'
+    section_id={'chilko_river_bc':'chilko_continuous','pacuare_river_costa_rica':'pacuare_continuous'}.get(river_id,'colorado_continuous')
     name=scenario['metadata']['scenario_id'] if chilko else build['name']
     terrain_folder = (ROOT/build['continuous_terrain']['manifest']).parent
     for key in ('continuous_terrain', 'shared_hydraulic_frame'):
@@ -268,7 +273,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     for key in ('inputs', 'cook', 'review', 'out'):
         parser.add_argument('--'+key, type=Path, required=True)
-    parser.add_argument('--river-id',choices=['colorado_river_grand_canyon_rowing','chilko_river_bc'],default='colorado_river_grand_canyon_rowing')
+    parser.add_argument('--river-id',choices=['colorado_river_grand_canyon_rowing','chilko_river_bc','pacuare_river_costa_rica'],default='colorado_river_grand_canyon_rowing')
     args = parser.parse_args()
     result = export(*(getattr(args, key).resolve() for key in ('inputs', 'cook', 'review', 'out')),river_id=args.river_id)
     print(json.dumps({k: v for k, v in result.items() if k != 'files_sha256'}, indent=2))

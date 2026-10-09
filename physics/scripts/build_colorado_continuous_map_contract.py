@@ -81,8 +81,12 @@ def build(runtime, map_name, start, finish, lateral=0., dressing=None, nanite_te
         raise ValueError('Nanite terrain selection must be boolean')
     runtime = runtime.resolve(); runtime.relative_to(ROOT)
     manifest = json.loads((runtime/'manifest.json').read_text())
-    chilko=manifest.get('schema')=='raftsim.continuous_runtime_candidate.v1' and manifest.get('river_id')=='chilko_river_bc'
-    stem='Chilko' if chilko else 'Colorado'
+    # Generic continuous rivers: (map stem, section id, dressing schema).
+    generic_rivers={'chilko_river_bc':('Chilko','chilko_continuous','raftsim.chilko_continuous_dressing.v1'),
+                    'pacuare_river_costa_rica':('Pacuare','pacuare_continuous','raftsim.pacuare_continuous_dressing.v1')}
+    river_id=manifest.get('river_id')
+    chilko=manifest.get('schema')=='raftsim.continuous_runtime_candidate.v1' and river_id in generic_rivers
+    stem,section,dressing_schema=generic_rivers[river_id] if chilko else ('Colorado','colorado_continuous','raftsim.colorado_continuous_dressing.v1')
     if not re.fullmatch(r'L_'+stem+r'_[A-Za-z0-9_]+', map_name):
         raise ValueError('Fresh continuous '+stem+' map name required')
     if (ROOT/'unreal/Content/RaftSim/Maps/Continuous'/f'{map_name}.umap').exists():
@@ -91,9 +95,9 @@ def build(runtime, map_name, start, finish, lateral=0., dressing=None, nanite_te
             (runtime/'REJECTED.json').exists() or manifest['terrain_solver_bed_max_error_m'] > .01):
         raise ValueError('Unsupported or rejected continuous runtime')
     if chilko and profile_assembly is not None:
-        raise ValueError('Chilko geographic rapid profiles require their own reviewed contracts')
+        raise ValueError(stem+' geographic rapid profiles require their own reviewed contracts')
     if chilko and takeout_request is not None:
-        raise ValueError('Colorado takeout cannot be used for Chilko')
+        raise ValueError('Colorado takeout cannot be used for '+stem)
     if not chilko and manifest['full_river_coverage'] and takeout_request is None:
         raise ValueError('Full Colorado run requires source-identified Pearce Ferry takeout')
     files = {}
@@ -107,8 +111,8 @@ def build(runtime, map_name, start, finish, lateral=0., dressing=None, nanite_te
     flow = json.loads((fields/'manifest.json').read_text())
     terrain = json.loads((runtime/'terrain/manifest.json').read_text())
     mapping = json.loads((runtime/'coordinate_map.json').read_text())
-    if chilko and (flow.get('river_id')!='chilko_river_bc' or terrain.get('river_id')!='chilko_river_bc'):
-        raise ValueError('Chilko runtime dependencies disagree on river identity')
+    if chilko and (flow.get('river_id')!=river_id or terrain.get('river_id')!=river_id):
+        raise ValueError(stem+' runtime dependencies disagree on river identity')
     band = flow['bands'][0]; g = flow['grid']
     grid = dict(nx=g['nx'], ny=g['ny'], dx=g['dx_m'], dy=g['dy_m'],
                 origin_x=g['origin_x_m'], origin_y=g['origin_y_m'])
@@ -140,11 +144,11 @@ def build(runtime, map_name, start, finish, lateral=0., dressing=None, nanite_te
     if dressing is not None:
         dressing = dressing.resolve(); dressing.relative_to(ROOT)
         environment = json.loads(dressing.read_text())
-        if (environment.get('schema') != ('raftsim.chilko_continuous_dressing.v1' if chilko else 'raftsim.colorado_continuous_dressing.v1') or
+        if (environment.get('schema') != dressing_schema or
                 environment['runtime_sha256'] != sha(runtime/'manifest.json') or
                 environment['terrain_sha256'] != sha(runtime/'terrain/manifest.json')):
             raise ValueError('Dressing belongs to different runtime terrain/water')
-        if chilko and environment.get('river_id')!='chilko_river_bc':
+        if chilko and environment.get('river_id')!=river_id:
             raise ValueError('Dressing river identity disagrees')
         files[dressing.relative_to(ROOT).as_posix()] = sha(dressing)
         for name, digest in environment['mesh_files_sha256'].items():
@@ -152,9 +156,9 @@ def build(runtime, map_name, start, finish, lateral=0., dressing=None, nanite_te
             if sha(path) != digest: raise ValueError('Changed dressing asset')
             files[name] = digest
     result = dict(schema='raftsim.continuous_map_import.v1' if chilko else 'raftsim.colorado_continuous_map_import.v1',
-        river_id='chilko_river_bc' if chilko else 'colorado_river_grand_canyon_rowing',
+        river_id=river_id if chilko else 'colorado_river_grand_canyon_rowing',
         map_package='/Game/RaftSim/Maps/Continuous/'+map_name,
-        display_name=stem+' continuous construction descent', section_id='chilko_continuous' if chilko else 'colorado_continuous',
+        display_name=stem+' continuous construction descent', section_id=section,
         files_sha256=files, terrain_manifest=relative+'/terrain/manifest.json',
         coordinate_map=relative+'/coordinate_map.json', cooked_fields=relative+'/cooked_flow_fields',
         streaming=relative+'/moving_water_streaming.json', flow_band=band['band_id'],

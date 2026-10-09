@@ -160,11 +160,12 @@ class LandscapeTriangles:
         self.manifest=json.loads(manifest_bytes)
         m=self.manifest;layout=m['landscape']
         generic=m.get('schema')=='raftsim.continuous_landscape.v1'
-        futaleufu=generic and m.get('river_id')=='futaleufu_river_chile'
-        height_base=0. if futaleufu else HEIGHT_BASE
+        # Rivers whose ground lies below the common 200 m base use a 0 m base.
+        height_base=0. if generic and m.get('river_id') in ('futaleufu_river_chile','pacuare_river_costa_rica') else HEIGHT_BASE
         if generic:
             frames={'chilko_river_bc':('EPSG:3157','CGVD2013 (EPSG:6647)'),
-                    'futaleufu_river_chile':('EPSG:32718','EGM2008')}
+                    'futaleufu_river_chile':('EPSG:32718','EGM2008'),
+                    'pacuare_river_costa_rica':('EPSG:5367','IGN Costa Rica orthometric heights')}
             if (m.get('river_id') not in frames or
                     (m.get('horizontal_crs'),m.get('vertical_reference'))!=frames.get(m.get('river_id')) or
                     'horizontal_origin_epsg6404_m' in m or 'height_base_ellipsoid_m' in layout):

@@ -174,6 +174,9 @@ def main():
     ap.add_argument('--out', type=Path, required=True)
     ap.add_argument('--chain-m', type=float, nargs=2, default=(81950.0, 84450.0))
     ap.add_argument('--margin-m', type=float, default=330.0)
+    ap.add_argument('--extension-m', type=float, default=3000.0,
+                    help='OSM chainage beyond the reach used for the midline and surface anchors '
+                         '(sparse 50 m contours upstream need more than the default)')
     ap.add_argument('--discharge-m3s', type=float, default=45.0)
     ap.add_argument('--n-pool', type=float, default=0.035)
     ap.add_argument('--n-rapid', type=float, default=0.05)
@@ -185,6 +188,9 @@ def main():
     ap.add_argument('--bar-ramp-m', type=float, default=6.0, help='distance over which bars rise from +0.1 m to the crest')
     ap.add_argument('--boulder-crest-below-ws-m', type=float, default=0.25)
     ap.add_argument('--bed-correction', type=Path)
+    ap.add_argument('--ws-profile', type=Path,
+                    help='full-run water-surface profile (osm_chain_m, ws_m) from build_pacuare_full_run_profile.py; '
+                         'replaces the window anchor interpolation so segments share one surface')
     args = ap.parse_args()
     out = args.out.resolve()
     assert not out.exists(), 'fresh output folder required'
@@ -194,7 +200,7 @@ def main():
     cld = json.loads(args.centreline.read_text(encoding='utf-8'))
     cl = np.array(cld['centreline_lon_lat_chain'])
     s0, s1 = args.chain_m
-    ext = (cl[:, 2] > s0 - 3000) & (cl[:, 2] < s1 + 3000)
+    ext = (cl[:, 2] > s0 - args.extension_m) & (cl[:, 2] < s1 + args.extension_m)
     ox, oy = tm_forward(cl[ext, 0], cl[ext, 1], CRTM05); oc = cl[ext, 2]
     S = np.arange(oc[0], oc[-1], 2.0)
     X = np.interp(S, oc, ox); Y = np.interp(S, oc, oy)
@@ -377,6 +383,15 @@ def main():
         ws_m[j0:j1 + 1] = a_z[i] - (a_z[i] - a_z[i + 1]) * c / c[-1]
     fin = np.isfinite(ws_m)
     ws_m = np.interp(np.arange(M), np.nonzero(fin)[0], ws_m[fin])
+    if args.ws_profile:
+        # A window sees whitewater only inside itself, so its own drop
+        # distribution packs each contour interval into the window. A shared
+        # full-run profile keeps neighbouring windows on one surface.
+        gp = json.loads(args.ws_profile.read_text())
+        gc, gw = np.asarray(gp['osm_chain_m'], float), np.asarray(gp['ws_m'], float)
+        covered = (mchain >= gc[0]) & (mchain <= gc[-1])
+        ws_m = np.interp(mchain, gc, gw)
+        fin = covered
     reach_idx = np.nonzero(reach)[0]
     assert fin[reach_idx].all(), 'reach must lie between two surface anchors'
     ws_cell = np.where(np.isfinite(st_grid), ws_m[np.clip(st_i, 0, M - 1)], np.nan)
@@ -505,7 +520,8 @@ def main():
                      '4': 'submerged boulder: location from orthophoto whitewater, height from a pour-over assumption (inferred)'},
         parameters=dict(discharge_m3s=Q, discharge_source='existing rainfed_runnable_planning band (not measured; no gauge)',
                         n_pool=args.n_pool, n_rapid=args.n_rapid, pool_weight=args.pool_weight, min_slope=args.min_slope,
-                        anchor_bank_distance_m=args.anchor_bank_distance_m, chain_m=list(args.chain_m), margin_m=args.margin_m,
+                        anchor_bank_distance_m=args.anchor_bank_distance_m, chain_m=list(args.chain_m), margin_m=args.margin_m, extension_m=args.extension_m,
+                        ws_profile=dict(path=str(args.ws_profile), sha256=sha(args.ws_profile)) if args.ws_profile else None,
                         bar_top_m=args.bar_top_m, bar_ramp_m=args.bar_ramp_m,
                         bed_correction=None if corr is None else str(args.bed_correction),
                         bed_correction_sha256=None if corr is None else sha(args.bed_correction)),

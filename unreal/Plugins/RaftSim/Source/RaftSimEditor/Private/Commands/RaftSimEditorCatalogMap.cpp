@@ -53,7 +53,8 @@ static UMaterial* TerrainMaterial(const RaftSimContinuousRiver::FSpec* River=nul
     // A new asset version preserves already-saved maps. World-XY projection
     // stretches a texel vertically over an entire cliff; use the same detail
     // texture on three world planes without modifying any terrain geometry.
-    const FString ObjectName = Chilko ? TEXT("M_ChilkoContinuousGroundV2") : TEXT("M_ColoradoCatalogGroundV2");
+    const FString ObjectName = Chilko ? TEXT("M_ChilkoContinuousGroundV2") :
+        (River && River->bPacuare) ? TEXT("M_PacuareContinuousGroundV1") : TEXT("M_ColoradoCatalogGroundV2");
     const FString PackageName = TEXT("/Game/RaftSim/Materials/Catalog/")+ObjectName;
     if (UMaterial* Existing = LoadObject<UMaterial>(nullptr, *(PackageName+TEXT(".")+ObjectName))) return Existing;
     const FString TextureName=TEXT("T_RaftSim_")+(River ? River->DetailStem : FString(TEXT("ColoradoRiver")))+TEXT("_TerrainDetailAlbedo");
@@ -275,7 +276,8 @@ static bool AddRuntime(UWorld* World, const TSharedPtr<FJsonObject>& J, FString&
     const FString WaterFolder=TEXT("/Game/RaftSim/Environment/")+River.AssetFolder+TEXT("/Water/");
     // Futaleufu's reviewed live-volume instance is V3 (Terminator optics).
     const FString MaterialName=TEXT("MI_RaftSim_")+River.WaterStem+
-        (River.bFutaleufu ? TEXT("_LiveVolumeWaterV3") : TEXT("_LiveVolumeWaterV2"));
+        (River.bFutaleufu ? TEXT("_LiveVolumeWaterV3") :
+         River.bPacuare ? TEXT("_LiveVolumeWaterV1") : TEXT("_LiveVolumeWaterV2"));
     const FString NormalName=TEXT("T_RaftSim_")+River.WaterStem+TEXT("WaterV1_FlowNormal");
     const FString FoamName=TEXT("T_RaftSim_")+River.WaterStem+TEXT("WaterV1_FoamLace");
     Water->LiveVolumeCoreMaterialOverride=LoadObject<UMaterialInterface>(nullptr,
@@ -580,14 +582,15 @@ static bool ImportContinuousTerrain(const TSharedPtr<FJsonObject>& J, const FStr
     const auto L=J->GetObjectField(TEXT("landscape"));
     const int32 Size=L->GetIntegerField(TEXT("vertices"));
     const auto& ScaleValues=L->GetArrayField(TEXT("scale_xyz"));
-    const double Base=L->GetNumberField((River.bChilko || River.bFutaleufu) ? TEXT("height_base_m") : TEXT("height_base_ellipsoid_m"));
+    const bool Generic=River.bChilko || River.bFutaleufu || River.bPacuare;
+    const double Base=L->GetNumberField(Generic ? TEXT("height_base_m") : TEXT("height_base_ellipsoid_m"));
     const double Range=L->GetNumberField(TEXT("height_range_m"));
     const double ActorZ=L->GetNumberField(TEXT("actor_z_cm"));
     const double Spacing=L->GetNumberField(TEXT("spacing_m"));
     const double Span=L->GetNumberField(TEXT("span_m"));
     const double SpanCm=Span*100.;
     if (Size!=127 || ScaleValues.Num()!=3 ||
-        !(Spacing==2. || ((River.bChilko || River.bFutaleufu) && Spacing==1.)) || Span!=(Size-1)*Spacing ||
+        !(Spacing==2. || (Generic && Spacing==1.)) || Span!=(Size-1)*Spacing ||
         Base!=RaftSimContinuousRiver::TerrainHeightBase(River) || Range!=2400. || !FMath::IsFinite(Datum) || !FMath::IsFinite(ActorZ) ||
         !FMath::IsNearlyEqual(ActorZ,(Base+Range*32768./65535.-Datum)*100.,.0001))
     { Error=TEXT("Invalid shared terrain encoding"); return false; }
