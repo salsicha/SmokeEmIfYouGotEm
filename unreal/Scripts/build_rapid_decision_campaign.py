@@ -202,7 +202,8 @@ def build(stage='screen'):
             ref=references.get((reach['river'],original['id']))
             if ref and ref['start_m']<=start and ref['finish_m']>=finish:
                 route=copy.deepcopy(ref.get('route_laterals',route))
-            if original['id']=='lower_pinball':
+            if reach['river']=='pacuare' and original['id']=='lower_pinball':
+                # Upper Huacas map stations; not valid on another map of the river.
                 route=copy.deepcopy(references['pacuare','lower_pinball']['route_laterals'])
             if reach['river']=='chilko' and original['id']=='bidwell':
                 # Fresh full-production-hull matched control v2: zero contact
