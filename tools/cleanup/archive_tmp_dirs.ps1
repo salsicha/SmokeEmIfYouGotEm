@@ -2,14 +2,20 @@
 # the project drive without destroying anything. Each folder is copied in
 # full, verified by file count and bytes, and only then removed from tmp/.
 # A manifest line per folder is appended to <ArchiveRoot>\archive-manifest.tsv.
+# The archive must be on another, non-system drive: task outputs never go to
+# the system drive (user rule).
 param(
     [Parameter(Mandatory = $true)][string]$ListFile,
-    [string]$ArchiveRoot = 'C:\SmokeEmIfYouGotEm-archive\tmp',
+    [Parameter(Mandatory = $true)][string]$ArchiveRoot,
     [string]$ProjectTmp = (Join-Path $PSScriptRoot '..\..\tmp'),
     [double]$ArchiveDriveReserveGB = 60
 )
 $ErrorActionPreference = 'Stop'
 $ProjectTmp = (Resolve-Path $ProjectTmp).Path
+$archiveDrive = $ArchiveRoot.Substring(0, 1).ToUpper()
+if ($archiveDrive -eq $env:SystemDrive.Substring(0, 1).ToUpper() -or $archiveDrive -eq $ProjectTmp.Substring(0, 1).ToUpper()) {
+    throw 'The archive must be on another, non-system drive.'
+}
 New-Item -ItemType Directory -Force $ArchiveRoot | Out-Null
 $manifest = Join-Path $ArchiveRoot 'archive-manifest.tsv'
 function Measure-Tree([string]$Path) {

@@ -6,15 +6,16 @@
 # Budget: the project folder stays under -BudgetGB (900 GB, well inside 1 TB)
 # and its drive keeps -DriveReserveGB free. Nothing is deleted outright:
 # old Git LFS versions are pruned only once GitHub confirms it holds them
-# (git lfs prune --verify-remote), and cold tmp/ run folders are moved,
-# verified, to a compressed archive on another drive (archive_tmp_dirs.ps1),
-# which can be deleted by hand when no longer wanted.
+# (git lfs prune --verify-remote). Cold tmp/ run folders are listed; with
+# -ArchiveRoot on another, non-system drive (task outputs never go to the
+# system drive) they are moved, verified, to a compressed archive there
+# (archive_tmp_dirs.ps1), which can be deleted by hand when no longer wanted.
 param(
     [switch]$Apply,
     [double]$BudgetGB = 900,
     [double]$DriveReserveGB = 100,
     [double]$ColdDays = 7,
-    [string]$ArchiveRoot = 'C:\SmokeEmIfYouGotEm-archive\tmp'
+    [string]$ArchiveRoot = ''
 )
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -44,9 +45,10 @@ if ($over) { 'OVER BUDGET: run with -Apply, or archive further by hand.' }
 if (-not $Apply) { return }
 Push-Location $root
 try { git lfs prune --verify-remote } finally { Pop-Location }
-if ($cold.Count) {
-    $list = Join-Path ([IO.Path]::GetTempPath()) ('cold-tmp-{0}.txt' -f (Get-Date -Format 'yyyyMMddHHmmss'))
-    $cold | Set-Content -Encoding utf8 $list
+$list = Join-Path $root ('tmp\cold-tmp-{0}.txt' -f (Get-Date -Format 'yyyyMMddHHmmss'))
+$cold | Set-Content -Encoding utf8 $list
+'Cold folder list: ' + $list
+if ($cold.Count -and $ArchiveRoot) {
     New-Item -ItemType Directory -Force $ArchiveRoot | Out-Null
     compact /c /i /q $ArchiveRoot | Out-Null
     & (Join-Path $PSScriptRoot 'archive_tmp_dirs.ps1') -ListFile $list -ArchiveRoot $ArchiveRoot
