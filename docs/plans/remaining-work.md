@@ -74,6 +74,36 @@ Fixed in passing:
 - the registry test's stale Chilko order;
 - Badger Creek's missing title.
 
+**Chilko full-river water (October 9): not through the construction screen.**
+The 2 m solver advances about 0.04 simulated seconds per wall second, so
+the river was settled on a 4x coarser grid (`build_chilko_coarse_settle.py`):
+- The 1D conveyance start drained: its inlet pool overshot below a sill
+  560 m downstream, supply stopped and the river emptied. Restarts used a
+  splice, a temporary doubled inflow to refill the 2D volume deficit, then
+  45 m3/s until 95% of faces were within 2.8% of 45 m3/s
+  (`tmp/chilko-coarse-settle-k4-v1..v8`).
+- The 8 m block-mean bed needs about a third more water than the 2 m bed.
+  Warm starts (`warm_start_chilko_from_coarse.py`, optionally
+  conveyance-matched) flood a fringe beside the mapped channel: wet
+  overlap 0.776 against the 0.9 gate, discharge error p95 26-30% against
+  5%, draining at about 5 m3/s. Surface (p95 0.56 m) and settling (1 cm)
+  gates pass (`tmp/chilko-full-warm-review-v3`).
+- Next: a bed calibration toward the reference surface (as the 5 km
+  connected map needed), or an intermediate 4 m settle. Both take many
+  hours of single-threaded solver time. The export refuses an unscreened
+  cook, so no Chilko full-river map yet.
+
+**Pacuare full run (October 9): evidence, terrain and scenario built.**
+Sources: `physics/data/real_world/pacuare_river_costa_rica/full_run_sources_2026_10`
+(SNIT kept by the user's decision). Eleven segments, one shared
+contour-anchored surface (`build_pacuare_full_run_profile.py`), stitched
+into one evidence folder, 1 m continuous terrain and a 2 m scenario
+(San Martin, OSM 69.6 km, to 95.8 km above Siquirres; the IGN banks end
+230 m before the take-out). Repairs the full run needed: a wider bank
+search and OSM midline in the Dos Montanas canyon and braids, and a
+minimum wetted band where canopy hid the water. Cooking and map import
+remain.
+
 October 8 full Chilko native initialization **V2 passed** after the shared
 crew/physics tests finished (39 successes, three successes with warnings, zero
 failures) and the other task committed its work. All 6,566,864 cells loaded in
