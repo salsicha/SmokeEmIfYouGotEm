@@ -17,6 +17,14 @@ separate permission, or confirm a strictly noncommercial project. OSM and
 Copernicus evidence retain their separate licences; no new SNIT capture or
 source substitution was started pending that decision.
 
+**October 8 decision:** the user chose to keep using SNIT, including for the
+full Tres Equis to Siquirres run (the option offered for a strictly
+noncommercial project). See
+`physics/data/real_world/pacuare_river_costa_rica/review/snit_use_decision_2026_10_08.json`.
+SNIT-derived work may continue and be extended. It is still not rights-cleared
+for commercial release, and each new SNIT download still needs the user's
+permission.
+
 ## Objective
 
 Reconstruct the Pacuare run's rapids, including boulder positions, rock islands,
