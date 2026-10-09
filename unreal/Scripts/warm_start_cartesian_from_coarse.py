@@ -118,7 +118,10 @@ def build(fine, coarse, frame, output, wet_depth):
             dried_cells += int(np.count_nonzero(h[band]))
             dried_volume += float(h[band].sum())
             h[band] = 0.0
-        u, v = np.where(h > 0, u, 0.0), np.where(h > 0, v, 0.0)
+        # The native solver zeroes velocity where depth is at most 1e-6 m (the
+        # wet mask below) when it loads a state; match it so the declared start
+        # is exactly the state the cook writes as its first frame.
+        u, v = np.where(h > 1e-6, u, 0.0), np.where(h > 1e-6, v, 0.0)
         if h.max() > 10 or np.hypot(u, v).max() > 20:
             raise ValueError('Warm start exceeds the native depth/speed gates in ' + name)
         warm_volume += float(h.sum())
