@@ -1,5 +1,28 @@
 # Remaining requested work
 
+October 8 follow-through: `recover_futaleufu_native_checkpoint.py` now provides
+an explicit recovery path for an independently audited, complete snapshot from
+a guard-interrupted producer. It leaves the original failure and
+`restart_authorized=false` audit untouched, rejects numerical failures and
+missing/changed snapshot evidence, preserves the full physical domain and
+exact native clock/state, and retains the existing resource and overlap guards.
+Seventeen checkpoint/schedule/guard tests pass. A read-only check against the
+actual interrupted audit selects step 3000 at 61.999999999996234 seconds and
+verifies that its source manifest, failure, request and frame receipt belong to
+the audit's recorded hashes. The recovery cook has NOT been launched; full
+source verification, native advancement and a new geographic audit remain.
+
+Commit `f502ac9a4` adds full-domain Chilko initialization qualification using
+the current source-matching native solver and lossless streamed output. Twelve
+lightweight tests pass (the optional native CLI parity test was skipped in
+that invocation; earlier binary-specific parity evidence remains separate).
+Its existing exec session **59546** is waiting for 60 seconds without shared
+engine/build/cook work before creating
+`tmp/chilko-full-native-initialization-v1`. At the latest process check the other
+task's broad crew/physics engine tests were active as PID 29016. Inspect the
+session and actual processes before taking action; do not launch a duplicate.
+The initialization check is not a timed hydraulic cook or playable acceptance.
+
 October 8 follow-through after the native binding tests: the independent audit
 of `tmp/futaleufu-expanded-native-long-v1` is complete with zero errors. Both
 complete snapshots (32 and 62 seconds) retain all 822 original route sections
