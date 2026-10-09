@@ -6,6 +6,31 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- **Futaleufu as one continuous run** (2026-10-08). The menu's Futaleufu
+  card now opens "Rio Azul to the Pasarela": a 10.5 km descent on
+  `L_Futaleufu_ContinuousContextV1`, from just below the Rio Azul confluence
+  (route station 5,420 m) to the Pasarela footbridge (15,900 m). It passes
+  School House, Asleep at the Wheel, the Terminator series, Khyber Pass and
+  the Himalayas. The Terminator challenge stays available.
+  - **Water:** the full three-arm river (1 m grid, 6,329 tiles) was filled
+    on a 4 m grid for 8,000 s, warm-started onto the 1 m grid and run for
+    30 s more. The independent audit passes: route connected, all 822
+    cross-sections wet, no wet closed banks. The outlet carries 389.6 m³/s
+    of the inferred 400 m³/s inflow (30 Rio Azul + 370 mainstem); the rest
+    is a backwater upstream of the confluence, outside the run, that is
+    still filling.
+  - **Engine:** `RaftSim.AddContinuousRuntime` added the water, raft, run
+    manager and player start to the existing terrain and vegetation map.
+    The raft launches on 4.96 m of solved water. The production hull clears
+    the riverbed at all 800 route stations.
+  - **Rapids:** the eight researched rapids have on-screen titles and a
+    `futaleufu-continuous` assessment plan, with decision rows.
+  - **Local only:** the map and its water export are construction assets
+    kept out of git (`.gitignore`), like the context map they extend.
+  - **Tools:** the warm start dries closed banks and matches the solver's
+    1e-6 m dry threshold for velocity. The contract builder picks the launch
+    window exactly as the engine does. The native-work guards fall back to
+    Windows PowerShell when `pwsh` is missing.
 - **More catalogued rapids on the Futaleufu, Chilko and Pacuare runs**
   (2026-10-08). These catalogs are kept in downstream order, not stations.
   The new rapids are placed by the researched downstream sequence, and

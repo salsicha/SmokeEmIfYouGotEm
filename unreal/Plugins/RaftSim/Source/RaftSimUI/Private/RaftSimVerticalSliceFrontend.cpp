@@ -83,6 +83,15 @@ TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenario
             TEXT("/Game/RaftSim/Maps/L_Terminator"),
             ERaftSimLicenseTier::ExpeditionGuide, 13, 750.0f, 2380.0f),
         MakeScenario(
+            TEXT("futaleufu_continuous"), TEXT("Futaleufu: Rio Azul to the Pasarela"),
+            TEXT("One continuous descent from the Rio Azul confluence through School House, Asleep at the Wheel, "
+                 "the Terminator series, Khyber Pass and the Himalayas to the Pasarela footbridge. "
+                 "Terrain is source-captured; the riverbed is inferred. The inflow (30 m3/s Azul + 370 m3/s "
+                 "mainstem) is a construction value; the run carries about 390 m3/s while the upper "
+                 "backwater still fills."),
+            TEXT("/Game/RaftSim/Maps/Continuous/L_Futaleufu_ContinuousContextV1"),
+            ERaftSimLicenseTier::ExpeditionGuide, 18, 5420.0f, 15900.0f),
+        MakeScenario(
             TEXT("lava_canyon_challenge"), TEXT("Lava Canyon Free Run"),
             TEXT("Manage position, crew fatigue, and swimmer recovery through the continuous Lava Canyon section."),
             TEXT("/Game/RaftSim/Maps/L_LavaCanyon"),

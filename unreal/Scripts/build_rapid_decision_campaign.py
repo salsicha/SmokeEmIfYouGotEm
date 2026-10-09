@@ -20,6 +20,7 @@ SOURCES = {
  'chilko':'https://www.ukriversguidebook.co.uk/reports/north-america/a-golden-day-on-the-chilko',
  'zambezi':'https://thezambezi.com/zambezi-river-rapid-guide.html',
  'zambezi-upper':'https://thezambezi.com/zambezi-river-rapid-guide.html',
+ 'futaleufu-continuous':'https://gorafting.com/chile/futaleufu-river/',
 }
 # Qualitative comparison axes. A rapid can have a broad correct line and still
 # require control; a catalog class is never a numerical target flip probability.
@@ -128,6 +129,14 @@ rapid_22|Lower-gorge wave section; exact line evidence limited|unresolved|0,0,0
 rapid_23|Bend and cauldron; precise line unverified|unresolved|0,0,0
 rapid_24|Flow-dependent play wave|surf|0,0,0
 rapid_25|Final wave section; exact line evidence limited|unresolved|0,0,0''',
+'futaleufu-continuous': '''school_house|Read-and-run class II-III just below the Rio Azul confluence|train|0,0,0
+asleep_at_the_wheel|Avoid the centre-bottom hydraulic using the right passage|hole|0,-4,-4
+terminator_wave|Optional surf with eddy service|surf|0,0,0
+terminator_entrance|Choose the left entrance channel|slalom|4,12,16
+terminator_core|Offset holes; crux; Typewriter; exit setup|continuous|16,24,6
+son_of_terminator|Work left; prepare right for Khyber|continuous|6,4,-9
+khyber_pass|Right-centre; middle; back right of the main hole|hole|-10,-3,-10
+himalayas|Square centre waves; both edge sneaks are legitimate|train|0,0,0''',
 'zambezi-upper': '''r1_the_wall|Ferry away from wall cushion|wall|0,-8,-8
 r2_the_bridge|Wave line under bridge|train|0,0,0
 r3|Right of left hydraulic|hole|-6,-6,-6

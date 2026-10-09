@@ -40,14 +40,27 @@ the fill now runs on a coarse grid instead:
 - `run_cartesian_bounded.py` runs it and writes the layout the existing
   continuation audit reads.
 
-Status as of this entry:
-- The coarse cook (`tmp/futaleufu-coarse-settle-k4-v{1,2,3}`) is still
-  filling. The front is about 6 km down the 10.6 km reach at 3,000 s, and
-  every closed bank is still dry.
-- Engine side: `RaftSim.AddContinuousRuntime` adds verified runtime water,
-  raft and run manager to an existing continuous map. Futaleufu runtime
-  contracts are accepted only with an explicit three-arm contract.
-  `build_futaleufu_continuous_map_contract.py` writes one from an export.
+**Futaleufu is playable as one continuous run** (menu card "Futaleufu: Rio
+Azul to the Pasarela", route stations 5,420-15,900 m on
+`L_Futaleufu_ContinuousContextV1`):
+- Coarse settle: `tmp/futaleufu-coarse-settle-k4-v1..v4`, 8,000 s. The
+  outlet levels off at 370 m3/s because a backwater upstream of the
+  confluence (tiles x 171-197, y 127-142) keeps spreading. It is outside
+  the run.
+- Fine run: `tmp/futaleufu-warm-fine-v2` (3,000 steps, 30 s), audit
+  `tmp/futaleufu-warm-fine-v2-audit.json`: no errors, 822/822 sections
+  wet, outlet 389.6 of 400 m3/s.
+- Export `tmp/futaleufu-cartesian-runtime-settled-v1` (152 packets, all
+  5,518 probes covered); contract `tmp/futaleufu-continuous-map-contract-v1.json`.
+- Engine: runtime added (launch on 4.96 m of water). Passing:
+  FutaleufuRuntimePackets, FutaleufuContinuousSelection and
+  FutaleufuHullClearance (800/800 stations), plus titles, menu and
+  linked-run boundary tests.
+- The map file and actors were backed up before the runtime was added:
+  `tmp/futaleufu-context-map-backup-v1`. Four actor files were added.
+- Not yet done: a rendered full descent, rescue streaming and packaged
+  frame rate. The backwater could be settled further for the full
+  400 m3/s.
 
 Fixed in passing:
 - the registry test's stale Chilko order;

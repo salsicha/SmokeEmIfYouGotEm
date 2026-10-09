@@ -65,6 +65,15 @@ const FRaftSimRapidTitle GRapids[] = {
     {TEXT("L_Terminator"), TEXT("son_of_terminator"), TEXT("Son of Terminator"), TEXT("IV"), 1380.0f, false},
     {TEXT("L_Terminator"), TEXT("khyber_pass"), TEXT("Khyber Pass"), TEXT("IV"), 1680.0f, false},
     {TEXT("L_Terminator"), TEXT("himalayas"), TEXT("Himalayas"), TEXT("IV"), 1820.0f, false},
+    // L_Futaleufu_ContinuousContextV1 (Rio Azul confluence to the Pasarela; researched route stations)
+    {TEXT("L_Futaleufu_ContinuousContextV1"), TEXT("school_house"), TEXT("School House"), TEXT("II-III"), 5509.9f, false},
+    {TEXT("L_Futaleufu_ContinuousContextV1"), TEXT("asleep_at_the_wheel"), TEXT("Asleep at the Wheel"), TEXT("III-IV"), 8312.9f, false},
+    {TEXT("L_Futaleufu_ContinuousContextV1"), TEXT("terminator_wave"), TEXT("Terminator Wave"), TEXT("IV"), 11937.5f, false},
+    {TEXT("L_Futaleufu_ContinuousContextV1"), TEXT("terminator_entrance"), TEXT("Terminator Entrance"), TEXT("IV"), 12178.7f, false},
+    {TEXT("L_Futaleufu_ContinuousContextV1"), TEXT("terminator_core"), TEXT("Terminator"), TEXT("V"), 12472.9f, false},
+    {TEXT("L_Futaleufu_ContinuousContextV1"), TEXT("son_of_terminator"), TEXT("Son of Terminator"), TEXT("III-IV"), 12662.1f, false},
+    {TEXT("L_Futaleufu_ContinuousContextV1"), TEXT("khyber_pass"), TEXT("Khyber Pass"), TEXT("IV"), 12952.3f, false},
+    {TEXT("L_Futaleufu_ContinuousContextV1"), TEXT("himalayas"), TEXT("Himalayas"), TEXT("III-IV"), 13145.4f, false},
     // L_LavaCanyon
     {TEXT("L_LavaCanyon"), TEXT("bidwell"), TEXT("Bidwell Rapid"), TEXT("IV"), 690.0f, false},
     {TEXT("L_LavaCanyon"), TEXT("white_kilometre"), TEXT("White Kilometre"), TEXT("III"), 1530.0f, false},

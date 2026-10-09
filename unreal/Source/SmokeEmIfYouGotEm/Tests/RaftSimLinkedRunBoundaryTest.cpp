@@ -22,6 +22,7 @@ bool FRaftSimLinkedRunBoundaryTest::RunTest(const FString&)
         {TEXT("hance_challenge"),TEXT("colorado_river_grand_canyon_rowing/terrain/hance_evidence_2021/hance_evidence_runtime_coordinate_map.json"),1455.f},
         {TEXT("upper_huacas_challenge"),TEXT("pacuare_river_costa_rica/terrain/huacas_evidence_2017/huacas_evidence_runtime_coordinate_map.json"),2328.f},
         {TEXT("terminator_challenge"),TEXT("futaleufu_river_chile/terrain/terminator_evidence_2026/terminator_evidence_runtime_coordinate_map.json"),2065.f},
+        {TEXT("futaleufu_continuous"),TEXT("futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/continuous_route_2026_10_v2/coordinate_map.json"),13305.f},
         {TEXT("lava_canyon_challenge"),TEXT("chilko_river_bc/terrain/lava_canyon_evidence_2023/lava_canyon_evidence_2023_runtime_coordinate_map.json"),3975.f},
         {TEXT("catalog_badger_creek"),TEXT("colorado_river_grand_canyon_rowing/catalog_runtime_2026_10_v3/badger_creek/terrain/coordinate_map.json"),1050.f}};
     for(const auto& C:Cases)

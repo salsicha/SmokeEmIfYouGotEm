@@ -5,11 +5,11 @@ from build_rapid_decision_campaign import build, definitions
 class DecisionCampaign(unittest.TestCase):
     def test_no_catalog_entry_disappears(self):
         contracts,plans=build()
-        self.assertEqual(len(contracts),251)
+        self.assertEqual(len(contracts),259)
         self.assertEqual(sum(c['status']=='missing_playable_section' for c in contracts),158)
-        self.assertEqual(sum(len(p['trials']) for p in plans),553)
+        self.assertEqual(sum(len(p['trials']) for p in plans),601)
         self.assertTrue(all(c['catalog_class_match']=='not_established' for c in contracts))
-        self.assertEqual(len(definitions()),93)
+        self.assertEqual(len(definitions()),101)
 
     def test_new_badger_section_remains_one_colorado_catalog_entry(self):
         contracts,plans=build()

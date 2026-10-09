@@ -69,7 +69,7 @@ const FRunButtonSpec RunButtonSpecs[] = {
         ERaftSimGameMode::FreeRun},
     {TEXT("hance_challenge"), TEXT("Colorado, Grand Canyon: Hance"), ERaftSimGameMode::FreeRun},
     {TEXT("upper_huacas_challenge"), TEXT("Pacuare: Upper Huacas"), ERaftSimGameMode::FreeRun},
-    {TEXT("terminator_challenge"), TEXT("Futaleufu: Terminator"), ERaftSimGameMode::FreeRun},
+    {TEXT("futaleufu_continuous"), TEXT("Futaleufu: Rio Azul to the Pasarela"), ERaftSimGameMode::FreeRun},
     {TEXT("lava_canyon_challenge"), TEXT("Chilko: Lava Canyon"), ERaftSimGameMode::FreeRun},
     {TEXT("zambezi_reference_run"),
         TEXT("Zambezi, Batoka Gorge: Boiling Pot to Mukuni Beach"), ERaftSimGameMode::FreeRun},

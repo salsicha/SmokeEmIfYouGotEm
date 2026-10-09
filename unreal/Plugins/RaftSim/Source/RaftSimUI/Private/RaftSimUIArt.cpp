@@ -544,7 +544,7 @@ FRiverCard RiverCardFor(FName ScenarioId, const FText& FallbackTitle)
         A.WaterNear = FLinearColor(0.10f, 0.15f, 0.07f);
         A.Relief = 1.0f; A.Gorge = 0.6f; A.Trees = 1.0f; A.Whitewater = 0.7f; A.Seed = 11; A.SunX = 0.30f;
     }
-    else if (Id == TEXT("terminator_challenge"))
+    else if (Id == TEXT("terminator_challenge") || Id == TEXT("futaleufu_continuous"))
     {
         Set(TEXT("Futaleufú"), TEXT("Terminator  ·  Patagonia, Chile"),
             TEXT("CLASS V"), TEXT("Turquoise glacial water at full force."));

@@ -24,7 +24,8 @@ FLOWS = {'south-fork': '1,600 cfs', 'colorado': '8,000 cfs',
          'pacuare': '1,589 cfs (45 m³/s)', 'futaleufu': '14,126 cfs (400 m³/s)',
          'chilko': '3,284 cfs (93 m³/s)',
          'zambezi': 'Simulated discharge uncalibrated; catalogue range ≈7,063–10,594 cfs (200–300 m³/s), not a verified in-game flow',
-         'zambezi-upper': '9,994 cfs (283 m³/s)'}
+         'zambezi-upper': '9,994 cfs (283 m³/s)',
+         'futaleufu-continuous': '13,759 cfs (390 m³/s carried; inferred 400 m³/s inflow)'}
 
 
 def norm(text):
@@ -76,6 +77,10 @@ def inventory():
         rows.append(dict(river='zambezi-upper', name=trial['name'].replace('_', ' '),
                          catalog_class=trial['catalog_class'], master_catalog=False, trial=trial,
                          flow=FLOWS['zambezi-upper'], source=lookup['zambezi-upper']['source']))
+    for trial in lookup['futaleufu-continuous']['trials']:
+        rows.append(dict(river='futaleufu-continuous', name=trial['name'],
+                         catalog_class=trial['catalog_class'], master_catalog=False, trial=trial,
+                         flow=FLOWS['futaleufu-continuous'], source=lookup['futaleufu-continuous']['source']))
     assert sum(r['master_catalog'] for r in rows) == sum(len(r['rapids']) for r in catalog['rivers'])
     return rows
 
