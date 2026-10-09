@@ -1,5 +1,19 @@
 # Remaining requested work
 
+October 8 full Chilko initialization update: V1 is now **terminal and failed**,
+not queued or running. The old exec 59546 waiter disappeared without creating
+output; its replacement exec 50266 subsequently launched native PID 8172 after
+an idle minute. After 70.718 seconds the other task started another engine build
+(dotnet PID 28524), so the ownership guard stopped only the Chilko solver.
+Memory and disk remained above their floors. The preserved 286,031,872-byte
+`.csv.gz.partial` file has no completed manifest or independently verified
+initial frame; it is not a usable checkpoint. See the
+[interruption receipt](../../physics/data/real_world/chilko_river_bc/observed_rapids/full_native_initialization_interruption_2026_10_08.json).
+Do not rerun the completed terrain/input construction, reuse the V1 output
+directory, or claim the full native initialization passed. Wait for the shared
+task's build/test sequence to finish before a fresh labeled qualification,
+rather than repeatedly launching into short idle gaps between its phases.
+
 October 8 follow-through: `recover_futaleufu_native_checkpoint.py` now provides
 an explicit recovery path for an independently audited, complete snapshot from
 a guard-interrupted producer. It leaves the original failure and
