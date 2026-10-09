@@ -273,7 +273,9 @@ static bool AddRuntime(UWorld* World, const TSharedPtr<FJsonObject>& J, FString&
     Water->bEnableCookedFarFieldWater=true; Water->bMapProvidesTerrain=true;
     Water->bLiveSolverOwnsRuntimeRendering=true; Water->bEnableLiveSolverVolumeCore=true;
     const FString WaterFolder=TEXT("/Game/RaftSim/Environment/")+River.AssetFolder+TEXT("/Water/");
-    const FString MaterialName=TEXT("MI_RaftSim_")+River.WaterStem+TEXT("_LiveVolumeWaterV2");
+    // Futaleufu's reviewed live-volume instance is V3 (Terminator optics).
+    const FString MaterialName=TEXT("MI_RaftSim_")+River.WaterStem+
+        (River.bFutaleufu ? TEXT("_LiveVolumeWaterV3") : TEXT("_LiveVolumeWaterV2"));
     const FString NormalName=TEXT("T_RaftSim_")+River.WaterStem+TEXT("WaterV1_FlowNormal");
     const FString FoamName=TEXT("T_RaftSim_")+River.WaterStem+TEXT("WaterV1_FoamLace");
     Water->LiveVolumeCoreMaterialOverride=LoadObject<UMaterialInterface>(nullptr,
@@ -975,6 +977,94 @@ static void ContinuousMapCommand(const TArray<FString>& Args)
 static FAutoConsoleCommand ContinuousMap(TEXT("RaftSim.ImportContinuousMap"),
     TEXT("Import screened common-grid terrain/water with production raft and native collision verification."),
     FConsoleCommandWithArgsDelegate::CreateStatic(&ContinuousMapCommand));
+
+// A Cartesian runtime may author its launch as hydraulic east/north metres
+// (launch.hydraulic_xy_m). The raft is then placed on the actual native water
+// surface there, through the same coordinate map play uses; the point must be
+// wet and at least the launch's minimum footprint depth.
+static bool ResolveCartesianLaunch(const TSharedPtr<FJsonObject>& J, FString& Error)
+{
+    const auto Launch=J->GetObjectField(TEXT("launch"));
+    const TArray<TSharedPtr<FJsonValue>>* XY=nullptr;
+    if(!Launch || !Launch->TryGetArrayField(TEXT("hydraulic_xy_m"),XY))return true;
+    if(!XY || XY->Num()!=2){Error=TEXT("Invalid hydraulic launch");return false;}
+    const FVector2D P((*XY)[0]->AsNumber(),(*XY)[1]->AsNumber());
+    FString StreamingPath;
+    FRaftSimCartesianWaterRegions Regions;FVector2D Center;
+    if(!RelativeFile(J->GetStringField(TEXT("streaming")),StreamingPath) ||
+        !Regions.Load(FRaftSimLiquidDataset::Read(StreamingPath),Error))return false;
+    const auto* Region=Regions.Select(P,J->GetStringField(TEXT("cooked_fields")),&Center);
+    if(!Region || Region->FieldsDirectory!=J->GetStringField(TEXT("cooked_fields")))
+    {Error=TEXT("The declared initial window does not cover the hydraulic launch");return false;}
+    TStrongObjectPtr<URaftSimWaterRuntimeAdapter> Water(NewObject<URaftSimWaterRuntimeAdapter>());
+    FRaftSimWaterSample Sample;FVector Position;
+    if(!Water->ConfigureRiverCoordinateMap(J->GetStringField(TEXT("coordinate_map"))) ||
+        !Water->ConfigureRiverWindow(Region->FieldsDirectory,J->GetStringField(TEXT("flow_band")),Center,
+            Regions.GetExtentM(),.045f,false) ||
+        !Water->SampleWaterFieldAtRiverCoordinates(P,Sample) || !Sample.bWet ||
+        Sample.DepthMeters<Launch->GetNumberField(TEXT("minimum_footprint_depth_m")) ||
+        !Water->RiverToWorldPosition(P,Sample.SurfaceHeightMeters+Water->GetRiverVerticalDatumM(),Position))
+    {Error=TEXT("Hydraulic launch is not on native water of the required depth");return false;}
+    Launch->SetArrayField(TEXT("location_cm"),{MakeShared<FJsonValueNumber>(Position.X),
+        MakeShared<FJsonValueNumber>(Position.Y),MakeShared<FJsonValueNumber>(Position.Z)});
+    UE_LOG(LogTemp,Display,TEXT("Cartesian launch hydraulic=(%.2f,%.2f) depth=%.3f m world=%s"),
+        P.X,P.Y,Sample.DepthMeters,*Position.ToString());
+    return true;
+}
+
+// Adds the playable runtime (water, production raft, player start and run
+// manager) to an already imported continuous map, keeping its terrain and
+// vegetation. Every hashed dependency is verified first; a map that already
+// has runtime water is refused. With a third argument the result is saved as
+// that fresh map instead of in place.
+static void AddContinuousRuntimeCommand(const TArray<FString>& Args)
+{
+    FString Error=TEXT("Usage: RaftSim.AddContinuousRuntime <repo-relative-contract.json> <continuous-map> [fresh-map]");
+    FString Path; bool Ok=false;
+    if ((Args.Num()==2 || Args.Num()==3) && RelativeFile(Args[0],Path))
+    {
+        const auto J=FRaftSimLiquidDataset::Read(Path);
+        RaftSimContinuousRiver::FSpec River;
+        bool Valid=J && J->GetStringField(TEXT("schema"))==TEXT("raftsim.continuous_map_import.v1") &&
+            RaftSimContinuousRiver::Resolve(J,River,Error);
+        if (Valid)
+        {
+            const auto Files=J->GetObjectField(TEXT("files_sha256"));
+            Valid=!Files->Values.IsEmpty();
+            for (const auto& File:Files->Values)
+            {
+                FString Absolute,Hash; const FString Name(*File.Key);
+                if (!RelativeFile(Name,Absolute) || !File.Value->TryGetString(Hash) || Hash.Len()!=64 ||
+                    !RaftSimContinuousCollisionProbes::Hash(Absolute).Equals(Hash,ESearchCase::IgnoreCase))
+                { Valid=false; Error=TEXT("Changed continuous runtime dependency: ")+Name; break; }
+            }
+            for (const TCHAR* Key:{TEXT("coordinate_map"),TEXT("streaming"),TEXT("progress_coordinate_map")})
+                if (Valid && !Files->HasField(J->GetStringField(Key)))
+                { Valid=false; Error=FString(TEXT("Unhashed runtime dependency: "))+Key; }
+        }
+        const FString Prefix=TEXT("/Game/RaftSim/Maps/Continuous/L_")+River.MapStem+TEXT("_");
+        const FString Target=Args.Num()==3 ? Args[2] : Args[1];
+        if (Valid && (!Args[1].StartsWith(Prefix) || !Target.StartsWith(Prefix) ||
+            !FPackageName::DoesPackageExist(Args[1]) || (Args.Num()==3 && FPackageName::DoesPackageExist(Target))))
+        { Valid=false; Error=TEXT("An existing continuous map of this river (and a fresh target) is required"); }
+        UWorld* World=Valid ? UEditorLoadingAndSavingUtils::LoadMap(
+            FPackageName::LongPackageNameToFilename(Args[1],FPackageName::GetMapPackageExtension())) : nullptr;
+        if (Valid && !World) { Valid=false; Error=TEXT("Unable to load the continuous map"); }
+        if (Valid)
+            for (TActorIterator<ARaftSimRiverWaterConfig> It(World);It;++It)
+            { Valid=false; Error=TEXT("The map already has runtime water"); break; }
+        if (Valid && ResolveCartesianLaunch(J,Error) && AddRuntime(World,J,Error))
+        {
+            FAssetCompilingManager::Get().FinishAllCompilation();
+            Ok=SavePreviewWorld(World,Target,Error) && UEditorLoadingAndSavingUtils::SaveDirtyPackages(true,true);
+        }
+    }
+    UE_LOG(LogTemp,Display,TEXT("Continuous runtime add saved=%d: %s"),Ok?1:0,*Error);
+    FPlatformMisc::RequestExitWithStatus(false,Ok?0:1);
+}
+static FAutoConsoleCommand ContinuousRuntime(TEXT("RaftSim.AddContinuousRuntime"),
+    TEXT("Add verified runtime water, raft and run manager to an existing continuous map."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(&AddContinuousRuntimeCommand));
 
 // Only clean, already-saved spatial actors may be released. This never deletes
 // an actor or package; its descriptor must survive and be loadable afterwards.

@@ -38,6 +38,24 @@ inline bool FrameLabelsMatch(const FSpec& Spec, const FString& CRS, const FStrin
     return Horizontal && Height;
 }
 
+// Futaleufu's runtime water joins two inlets (Rio Azul and the upstream
+// mainstem) at the confluence. Its import contract must name both inflows
+// and the native audit the fields came from; a bare frame or a single-inlet
+// cook never qualifies.
+inline bool FutaleufuThreeArmContract(const TSharedPtr<FJsonObject>& J)
+{
+    const TSharedPtr<FJsonObject>* Contract=nullptr;
+    const TSharedPtr<FJsonObject>* Inlets=nullptr;
+    FString Schema, Audit;
+    double Azul=0, Mainstem=0;
+    return J->TryGetObjectField(TEXT("hydraulic_contract"),Contract) && Contract && Contract->IsValid() &&
+        (*Contract)->TryGetStringField(TEXT("schema"),Schema) && Schema==TEXT("raftsim.futaleufu_three_arm_runtime.v1") &&
+        (*Contract)->TryGetObjectField(TEXT("inlet_discharge_m3s"),Inlets) && Inlets && Inlets->IsValid() &&
+        (*Inlets)->TryGetNumberField(TEXT("rio_azul"),Azul) && (*Inlets)->TryGetNumberField(TEXT("upstream_mainstem"),Mainstem) &&
+        FMath::IsFinite(Azul) && FMath::IsFinite(Mainstem) && Azul>0. && Mainstem>0. &&
+        (*Contract)->TryGetStringField(TEXT("source_audit"),Audit) && !Audit.IsEmpty();
+}
+
 inline bool Resolve(const TSharedPtr<FJsonObject>& J, FSpec& Out, FString& Error)
 {
     Out = FSpec{};
@@ -71,7 +89,7 @@ inline bool Resolve(const TSharedPtr<FJsonObject>& J, FSpec& Out, FString& Error
         // Terrain registration precedes the three-arm hydraulic/runtime
         // contract. Never silently feed this river Colorado optics or a
         // single-inlet cook while its confluence integration is pending.
-        if (Schema != TEXT("raftsim.continuous_landscape.v1"))
+        if (Schema != TEXT("raftsim.continuous_landscape.v1") && !FutaleufuThreeArmContract(J))
         { Error=TEXT("Futaleufu continuous runtime requires its reviewed three-arm water contract"); return false; }
         Out = {River,TEXT("Futaleufu"),TEXT("futaleufu_terminator"),TEXT("PaddleCrew"),
             ERaftSimRaftRig::PaddleCrew,TEXT("EPSG:32718"),TEXT("EGM2008"),

@@ -1,5 +1,58 @@
 # Remaining requested work
 
+October 8-9 (Claude; Codex paused):
+
+**Disk.** D: went from 42 GB to about 300 GB free:
+- `git lfs prune --verify-remote` removed 92 GB of old LFS versions that
+  GitHub holds.
+- 30 superseded packaged builds (175 GB) moved, verified, to
+  `C:\SmokeEmIfYouGotEm-archive\tmp`. That was before the user's rule
+  against task outputs on the system drive came to light. The user decides
+  whether to delete or return them, and nothing else goes to C:.
+
+`tools/cleanup/project_space.ps1` reports the project against a 900 GB
+budget. It only archives to a non-system drive given with -ArchiveRoot.
+`select_cold_tmp.py` lists cold, unreferenced tmp/ folders (about 150 GB of
+September experiments), but these stay in place.
+
+**Rapids.** Full rapid research for all six runs is in
+`physics/data/real_world/named_rapid_research_2026_10_08/`. The catalog
+grows from 85 to 239 rapids:
+
+| River | Before | After | Notes |
+| --- | --- | --- | --- |
+| South Fork | 20 | 40 | Titled and assessed on FullReach |
+| Colorado | 15 | 126 | USGS GCMRC miles |
+| Futaleufu | 5 | 11 | |
+| Chilko | 5 | 10 | |
+| Pacuare | 15 | 27 | |
+| Zambezi | | | Unchanged; rapid numbering is its order |
+
+**Futaleufu hydraulics.** The 1 m, 0.01 s native cook needs days to fill
+and settle from the construction depths: about 3 steps/s, and the reach
+must rise about 2.5 m to carry 400 m3/s in the inferred 1.8 m-deep bed. So
+the fill now runs on a coarse grid instead:
+- `build_cartesian_coarse_settle.py` builds the same tiles and ports at
+  4 m (about 1 simulated second per wall second);
+- `restart_cartesian_from_frame.py` continues it;
+- `warm_start_cartesian_from_coarse.py` warm-starts the fine package from
+  the settled coarse state;
+- `run_cartesian_bounded.py` runs it and writes the layout the existing
+  continuation audit reads.
+
+Status as of this entry:
+- The coarse cook (`tmp/futaleufu-coarse-settle-k4-v{1,2,3}`) is still
+  filling. The front is about 6 km down the 10.6 km reach at 3,000 s, and
+  every closed bank is still dry.
+- Engine side: `RaftSim.AddContinuousRuntime` adds verified runtime water,
+  raft and run manager to an existing continuous map. Futaleufu runtime
+  contracts are accepted only with an explicit three-arm contract.
+  `build_futaleufu_continuous_map_contract.py` writes one from an export.
+
+Fixed in passing:
+- the registry test's stale Chilko order;
+- Badger Creek's missing title.
+
 October 8 full Chilko native initialization **V2 passed** after the shared
 crew/physics tests finished (39 successes, three successes with warnings, zero
 failures) and the other task committed its work. All 6,566,864 cells loaded in
