@@ -1,5 +1,6 @@
 import unittest
-from advance_chilko_full_native import CELLS,STEPS,INTERVAL,require_qualification,validate_execution,scratch_requirement
+from unittest.mock import patch
+from advance_chilko_full_native import ROOT,CELLS,STEPS,INTERVAL,require_qualification,validate_execution,scratch_requirement,native_output_path
 
 
 class FullNativeAdvance(unittest.TestCase):
@@ -22,6 +23,15 @@ class FullNativeAdvance(unittest.TestCase):
     def test_storage_keeps_every_frame_and_existing_reserve(self):
         self.assertEqual((CELLS,STEPS,INTERVAL),(6566864,200,20))
         self.assertEqual(scratch_requirement(100),40*1024**3+22*100+3*CELLS*15*8)
+
+    def test_native_output_stays_in_project_despite_system_temp(self):
+        with patch.dict('os.environ',{'TEMP':'C:/temp','TMP':'C:/temp','SystemDrive':'C:'}):
+            self.assertEqual(native_output_path(ROOT/'tmp/test-job'),(ROOT/'tmp/test-job/native').resolve())
+        with self.assertRaises(ValueError):native_output_path(ROOT/'outside-tmp')
+
+    def test_system_drive_project_is_refused(self):
+        with patch.dict('os.environ',{'SystemDrive':ROOT.drive}),self.assertRaises(ValueError):
+            native_output_path(ROOT/'tmp/test-job')
 
 
 if __name__=='__main__':unittest.main()

@@ -1,15 +1,15 @@
 """Advance the complete qualified Chilko domain; retain every native snapshot.
 
-Large native outputs and bounded review scratch use a fresh system-temp folder,
-not the space-constrained project volume. Both volumes retain a 40 GiB reserve.
+Native outputs and review scratch stay inside the project's job directory.
+Insufficient project storage is an error, never a fallback to the system drive.
 This is a first timed full-domain advance, not settled-flow or game acceptance.
 """
 import argparse
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
-import tempfile
 import time
 
 import numpy as np
@@ -45,6 +45,14 @@ def scratch_requirement(initial_frame_bytes):
     return 40*1024**3+2*(1+STEPS//INTERVAL)*initial_frame_bytes+3*CELLS*15*8
 
 
+def native_output_path(job):
+    path=(Path(job)/'native').resolve()
+    path.relative_to((ROOT/'tmp').resolve())
+    if path.drive.casefold()==os.environ.get('SystemDrive','C:').casefold():
+        raise ValueError('Native outputs must not use the system drive')
+    return path
+
+
 def run(inputs,input_job,qualification,solver,job):
     inputs,input_job,qualification,solver,job=[Path(p).resolve() for p in
                                               (inputs,input_job,qualification,solver,job)]
@@ -73,12 +81,11 @@ def run(inputs,input_job,qualification,solver,job):
         for path,digest in pins.items():
             if sha(path)!=digest:raise ValueError('Changed full-domain advance input: '+str(path))
     verify();require_idle_headroom(resources(),busy())
-    scratch_parent=Path(tempfile.gettempdir()).resolve()
-    if shutil.disk_usage(scratch_parent).free<scratch_requirement(completed['frame_bytes']):
-        raise ValueError('System-temp volume lacks full snapshot and review headroom')
+    scratch=native_output_path(job)
+    if shutil.disk_usage(ROOT/'tmp').free<scratch_requirement(completed['frame_bytes']):
+        raise ValueError('Project volume lacks full snapshot and review headroom; no system-drive fallback')
     job.mkdir(parents=True)
-    scratch=Path(tempfile.mkdtemp(prefix='raftsim-chilko-full-native-',dir=scratch_parent)).resolve()
-    scratch.relative_to(scratch_parent)
+    scratch.mkdir()
     def save(name,value):
         with (job/name).open('x',encoding='utf-8') as stream:json.dump(value,stream,indent=2,allow_nan=False)
     command=[str(solver),'--scenario',str(inputs/'scenario'),'--output',str(scratch),
@@ -87,7 +94,7 @@ def run(inputs,input_job,qualification,solver,job):
         steps=STEPS,frame_interval=INTERVAL,expected_snapshots=1+STEPS//INTERVAL,
         requested_simulation_seconds=STEPS*scenario['fixed_dt'],maximum_wall_seconds=8*3600,
         source_sha256={p.relative_to(ROOT).as_posix():h for p,h in pins.items()},
-        storage_policy='Fresh system-temp native output retained; project and output volumes both keep forty GiB',
+        storage_policy='Native output and review scratch retained inside project job; forty GiB reserve; no system-drive fallback',
         initial_scratch_free_bytes=shutil.disk_usage(scratch).free))
     started=time.monotonic();child=None;minimum=resources();scratch_min=shutil.disk_usage(scratch).free;stage='prelaunch'
     def guard():
@@ -99,11 +106,12 @@ def run(inputs,input_job,qualification,solver,job):
             stream.write(json.dumps(dict(elapsed_seconds=elapsed,resources=current,
                 scratch_free_bytes=free,shared_work=active))+'\n')
         reason=watchdog_failure(current,active,elapsed)
-        if reason or free<40*1024**3:raise RuntimeError(reason or 'System-temp disk reserve reached')
+        if reason or free<40*1024**3:raise RuntimeError(reason or 'Project disk reserve reached')
     try:
         verify();require_idle_headroom(resources(),busy());guard();stage='native_advance'
         with (job/'native.log').open('x') as log:
-            child=subprocess.Popen(command,cwd=ROOT,stdout=log,stderr=subprocess.STDOUT)
+            child=subprocess.Popen(command,cwd=ROOT,stdout=log,stderr=subprocess.STDOUT,
+                env={**os.environ,**{key:str(scratch) for key in ('TEMP','TMP','TMPDIR')}})
             save('launch.json',dict(pid=child.pid));print('Full Chilko timed native advance PID '+str(child.pid),flush=True)
             while child.poll() is None:
                 try:child.wait(timeout=5)
